@@ -1,0 +1,50 @@
+{
+  "name": "@data-wise/rforge-plugin",
+  "version": "1.0.0",
+  "description": "Complete RForge toolkit - 13 commands for R package development, ecosystem management, and intelligent orchestration",
+  "type": "module",
+  "main": "index.js",
+  "files": [
+    "commands/",
+    "agents/",
+    "lib/",
+    "docs/",
+    ".claude-plugin/",
+    "scripts/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "install": "./scripts/install.sh",
+    "uninstall": "./scripts/uninstall.sh"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "plugin",
+    "rforge",
+    "r-packages",
+    "ecosystem",
+    "mcp",
+    "development",
+    "cran",
+    "dependencies"
+  ],
+  "author": "Data-Wise",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Data-Wise/claude-plugins.git",
+    "directory": "rforge"
+  },
+  "bugs": {
+    "url": "https://github.com/Data-Wise/claude-plugins/issues"
+  },
+  "homepage": "https://github.com/Data-Wise/claude-plugins/tree/main/rforge#readme",
+  "peerDependencies": {
+    "rforge-mcp": ">=0.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
