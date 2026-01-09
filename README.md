@@ -63,39 +63,259 @@ Comprehensive analysis with R CMD check (2-5 minutes)
 
 ## Requirements
 
-1. **RForge MCP Server** - Must be installed and configured
-   ```bash
-   npx rforge-mcp configure
-   ```
+**RForge requires BOTH the plugin AND MCP server:**
+
+1. **RForge MCP Server** (required for all functionality)
+   - Provides R package analysis tools
+   - Must be configured in Claude settings
 
 2. **R Environment**
    - R >= 4.0.0
-   - devtools
-   - testthat
-   - covr (optional, for coverage)
+   - devtools package
+   - testthat package
+   - covr package (optional, for coverage analysis)
 
-3. **Claude Code** - This is a Claude Code plugin
+3. **Claude Code CLI or Claude Desktop**
+   - Plugin works in both environments
 
 ## Installation
 
-1. **Install RForge MCP**
-   ```bash
-   npx rforge-mcp configure
-   ```
+RForge has a two-part installation: the plugin (commands/UI) and the MCP server (backend tools).
 
-2. **Install this plugin**
-   ```bash
-   # Plugin is automatically available in ~/.claude/plugins/rforge-orchestrator/
-   # No additional installation needed
-   ```
+### Part 1: Install RForge MCP Server
 
-3. **Restart Claude Code**
+The MCP server must be installed FIRST and configured in Claude settings.
 
-4. **Test it**
-   ```bash
-   cd /path/to/r-package
-   /rforge:analyze "Test installation"
-   ```
+```bash
+# Install rforge-mcp globally
+npm install -g rforge-mcp
+```
+
+**Configure in Claude settings:**
+
+Add to `~/.claude/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "rforge-mcp": {
+      "command": "npx",
+      "args": ["rforge-mcp"]
+    }
+  }
+}
+```
+
+**Or use project-specific configuration:**
+
+Add to `.claude/settings.local.json` in your R package:
+
+```json
+{
+  "mcpServers": {
+    "rforge-mcp": {
+      "command": "npx",
+      "args": ["rforge-mcp"],
+      "env": {
+        "RFORGE_MODE": "default"
+      }
+    }
+  }
+}
+```
+
+**Verify MCP server is configured:**
+
+```bash
+# Check settings file
+cat ~/.claude/settings.json | grep rforge-mcp
+
+# Expected output:
+# "rforge-mcp": {
+```
+
+### Part 2: Install RForge Plugin
+
+#### Option 1: Homebrew (Recommended - macOS)
+
+```bash
+# Add the Data-Wise tap
+brew tap data-wise/tap
+
+# Install rforge plugin
+brew install rforge
+```
+
+The Homebrew formula automatically:
+- Installs the plugin to `~/.claude/plugins/rforge`
+- Makes it available in Claude Code CLI and Claude Desktop
+- Reminds you to install rforge-mcp if not present
+
+#### Option 2: npm (When published)
+
+```bash
+# Install from npm (after publishing)
+npm install -g @data-wise/rforge-plugin
+
+# Plugin will auto-install to ~/.claude/plugins/rforge
+```
+
+#### Option 3: Manual Installation (Local Development)
+
+**For Claude Code CLI and Claude Desktop:**
+
+```bash
+# Clone the repository
+git clone https://github.com/Data-Wise/rforge.git
+cd rforge
+
+# Install in development mode (symlink - changes reflected immediately)
+ln -s $(pwd) ~/.claude/plugins/rforge
+
+# Or install in production mode (copy - stable)
+cp -r . ~/.claude/plugins/rforge
+```
+
+**Installation locations:**
+- Plugin directory: `~/.claude/plugins/rforge`
+- Commands: `~/.claude/plugins/rforge/commands/`
+- Agent: `~/.claude/plugins/rforge/agents/orchestrator.md`
+- Lib: `~/.claude/plugins/rforge/lib/`
+
+### Verify Complete Installation
+
+**Step 1: Check MCP server**
+
+```bash
+# Verify npm package is installed
+npm list -g rforge-mcp
+
+# Expected output:
+# └── rforge-mcp@0.1.0
+```
+
+**Step 2: Check plugin**
+
+```bash
+# Check plugin directory exists
+ls -la ~/.claude/plugins/rforge
+
+# Verify plugin.json
+cat ~/.claude/plugins/rforge/.claude-plugin/plugin.json
+```
+
+**Step 3: Test end-to-end**
+
+```bash
+# Navigate to an R package
+cd ~/projects/r-packages/active/RMediation
+
+# Start Claude Code
+claude
+
+# Test a command
+/rforge:status
+```
+
+**Expected output:**
+
+```
+Connecting to rforge-mcp...
+✅ RForge MCP server connected
+
+📊 RMediation - Single Package
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Version: 2.4.0
+Tests: 187 passing
+Health: 87/100 (B+)
+```
+
+### Using in Claude Code CLI
+
+After installation, commands are immediately available:
+
+```bash
+# Navigate to any R package
+cd ~/my-r-package
+
+# Start Claude Code
+claude
+
+# Use rforge commands
+/rforge:analyze "Update bootstrap algorithm"
+/rforge:status
+/rforge:quick
+```
+
+### Using in Claude Desktop App
+
+RForge automatically loads when you open Claude Desktop. Commands work the same way:
+
+1. Open Claude Desktop app
+2. Navigate conversation to an R package directory (or specify path)
+3. Use slash commands: `/rforge:analyze`, `/rforge:status`, etc.
+
+### MCP Server Configuration Options
+
+**Basic configuration (most users):**
+
+```json
+{
+  "mcpServers": {
+    "rforge-mcp": {
+      "command": "npx",
+      "args": ["rforge-mcp"]
+    }
+  }
+}
+```
+
+**Advanced configuration with environment variables:**
+
+```json
+{
+  "mcpServers": {
+    "rforge-mcp": {
+      "command": "npx",
+      "args": ["rforge-mcp"],
+      "env": {
+        "RFORGE_MODE": "default",
+        "RFORGE_FORMAT": "terminal"
+      }
+    }
+  }
+}
+```
+
+**Environment variables:**
+- `RFORGE_MODE` - Default mode: `default` (< 10s), `debug` (< 120s), `optimize` (< 180s), `release` (< 300s)
+- `RFORGE_FORMAT` - Output format: `terminal`, `json`, `markdown`
+
+### Migration from rforge-orchestrator
+
+If you previously used `rforge-orchestrator` from the monorepo:
+
+**Important:** The MCP server name changed from `rforge-orchestrator` to `rforge-mcp`.
+
+**Update your settings:**
+
+```json
+// OLD (remove this):
+{
+  "mcpServers": {
+    "rforge-orchestrator": { ... }
+  }
+}
+
+// NEW (use this):
+{
+  "mcpServers": {
+    "rforge-mcp": { ... }
+  }
+}
+```
+
+**See [MCP-MIGRATION.md](MCP-MIGRATION.md) for complete migration guide.**
 
 ## Pattern Recognition
 
