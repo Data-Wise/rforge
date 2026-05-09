@@ -1,0 +1,15 @@
+project: rforge
+updated: 2026-05-09
+
+worktrees:
+  - branch: feature/scratch-2026-05-09
+    path: ~/.git-worktrees/rforge/feature-scratch-2026-05-09
+    base: dev
+    status: WIP
+    created: 2026-05-09
+    scope: placeholder
+    notes: |
+      Auto-generated placeholder created during dev-branch + protection setup.
+      Repurpose (rename branch, rewrite ORCHESTRATE) once a real feature scope
+      is decided, or remove the worktree if unused.
+      Outstanding: npm install fails — peer dep rforge-mcp@>=0.1.0 not on npm.
