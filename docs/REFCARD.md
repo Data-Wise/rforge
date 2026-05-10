@@ -1,6 +1,6 @@
-# RForge Orchestrator Plugin - Reference Card
+# RForge Plugin - Reference Card
 
-> **Version:** 0.1.0 | **Last Updated:** 2025-12-23
+> **Version:** 1.2.0 | **Last Updated:** 2026-05-09
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -120,29 +120,56 @@ Tools the orchestrator can delegate to:
 
 ---
 
+## Hooks & Skills (v1.2.0+)
+
+RForge ships autonomous tooling that activates without an explicit
+slash command.
+
+**`pretooluse.py` hook** — runs on every `Write`/`Edit`:
+
+| Rule | Severity |
+|------|----------|
+| Edit `man/*.Rd` (roxygen-generated) | **BLOCK** |
+| Edit `R/*.R` | warn (NAMESPACE/DESCRIPTION reminder) |
+| Bad SemVer in `DESCRIPTION` `Version:` | warn |
+| Write outside current worktree | warn |
+
+**`skills/validation/description-sync.md`** — verifies `DESCRIPTION`
+`Version:` matches the top entry of `NEWS.md` / `CHANGELOG.md`. Pure
+shell, no R required. Runs in `release` mode pre-CRAN.
+
+See [Hooks & Skills Reference](hooks-and-skills.md) for full details.
+
+---
+
 ## Installation
 
-**Homebrew (Recommended):**
+**Claude Code marketplace (Recommended, v1.2.0+):**
+
+From inside Claude Code:
+
+```text
+/plugin marketplace add Data-Wise/rforge
+/plugin install rforge
+```
+
+Update later with `/plugin update rforge`. Works on macOS, Linux, Windows.
+
+**Homebrew (macOS):**
 
 ```bash
-brew install data-wise/tap/rforge-orchestrator
+brew install data-wise/tap/rforge
 ```
 
 **Manual:**
 
 ```bash
-cd ~/.claude/plugins
-git clone https://github.com/Data-Wise/claude-plugins.git temp
-mv temp/rforge-orchestrator .
-rm -rf temp
+git clone https://github.com/Data-Wise/rforge.git
+ln -s "$(pwd)/rforge" ~/.claude/plugins/rforge
 ```
 
-**Uninstall:**
-
-```bash
-brew uninstall rforge-orchestrator
-# or manually: rm -rf ~/.claude/plugins/rforge-orchestrator
-```
+See the [main README](../README.md#installation) for the full matrix of
+install options.
 
 ---
 

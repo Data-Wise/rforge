@@ -1,0 +1,11 @@
+# Python bytecode (from .claude-plugin/hooks/*.py)
+__pycache__/
+*.pyc
+*.pyo
+
+# OS noise
+.DS_Store
+
+# Editor scratch
+*.swp
+*~

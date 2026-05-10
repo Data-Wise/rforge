@@ -45,7 +45,11 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.emoji:
@@ -61,7 +65,9 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - 🚀 Quick Start: docs/QUICK-START.md
-  - 📚 Reference Card: docs/REFCARD.md
-  - Commands: docs/commands.md
-  - Architecture: docs/architecture.md
+  - 🚀 Quick Start: QUICK-START.md
+  - 📚 Reference Card: REFCARD.md
+  - Commands: commands.md
+  - Architecture: architecture.md
+  - Hooks & Skills: hooks-and-skills.md
+  - Configuration: configuration.md

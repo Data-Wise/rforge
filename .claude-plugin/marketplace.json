@@ -1,0 +1,40 @@
+{
+  "name": "data-wise-rforge",
+  "owner": {
+    "name": "Data-Wise",
+    "email": "dt@stat-wise.com"
+  },
+  "metadata": {
+    "description": "RForge toolkit for Claude Code: 15 commands for R package development, ecosystem management, and intelligent orchestration",
+    "version": "1.2.0"
+  },
+  "plugins": [
+    {
+      "name": "rforge",
+      "source": {
+        "source": "github",
+        "repo": "Data-Wise/rforge"
+      },
+      "description": "RForge toolkit for Claude Code: 15 commands for R package development, ecosystem management, and intelligent orchestration",
+      "version": "1.2.0",
+      "author": {
+        "name": "Data-Wise",
+        "email": "dt@stat-wise.com"
+      },
+      "homepage": "https://data-wise.github.io/rforge/",
+      "repository": "https://github.com/Data-Wise/rforge",
+      "license": "MIT",
+      "category": "development",
+      "keywords": [
+        "r",
+        "r-package",
+        "cran",
+        "devtools",
+        "roxygen",
+        "package-development",
+        "ecosystem",
+        "orchestration"
+      ]
+    }
+  ]
+}

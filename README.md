@@ -136,7 +136,21 @@ cat ~/.claude/settings.json | grep rforge-mcp
 
 ### Part 2: Install RForge Plugin
 
-#### Option 1: Homebrew (Recommended - macOS)
+#### Option 1: Claude Code Marketplace (Recommended)
+
+From inside Claude Code:
+
+```text
+/plugin marketplace add Data-Wise/rforge
+/plugin install rforge
+```
+
+The marketplace install reads `.claude-plugin/marketplace.json` from the
+repository, fetches the plugin into `~/.claude/plugins/rforge`, and wires
+it up automatically. Works on macOS, Linux, and Windows. Update later with
+`/plugin update rforge`.
+
+#### Option 2: Homebrew (macOS)
 
 ```bash
 # Add the Data-Wise tap
@@ -151,7 +165,7 @@ The Homebrew formula automatically:
 - Makes it available in Claude Code CLI and Claude Desktop
 - Reminds you to install rforge-mcp if not present
 
-#### Option 2: npm (When published)
+#### Option 3: npm (When published)
 
 ```bash
 # Install from npm (after publishing)
@@ -160,7 +174,7 @@ npm install -g @data-wise/rforge-plugin
 # Plugin will auto-install to ~/.claude/plugins/rforge
 ```
 
-#### Option 3: Manual Installation (Local Development)
+#### Option 4: Manual Installation (Local Development)
 
 **For Claude Code CLI and Claude Desktop:**
 
