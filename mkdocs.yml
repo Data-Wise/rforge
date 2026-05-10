@@ -61,7 +61,9 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - 🚀 Quick Start: docs/QUICK-START.md
-  - 📚 Reference Card: docs/REFCARD.md
-  - Commands: docs/commands.md
-  - Architecture: docs/architecture.md
+  - 🚀 Quick Start: QUICK-START.md
+  - 📚 Reference Card: REFCARD.md
+  - Commands: commands.md
+  - Architecture: architecture.md
+  - Hooks & Skills: hooks-and-skills.md
+  - Configuration: configuration.md
