@@ -491,18 +491,22 @@ Plugin settings in `plugin.json`:
 
 **Plugin structure:**
 ```
-~/.claude/plugins/rforge-orchestrator/
-├── plugin.json              # Plugin manifest
+~/.claude/plugins/rforge/
+├── .claude-plugin/
+│   ├── plugin.json          # Plugin manifest (v1.2.0)
+│   ├── marketplace.json     # Marketplace install metadata
+│   ├── config.json          # User-tunable options (CRAN mirror, etc.)
+│   ├── hooks/
+│   │   └── pretooluse.py    # R-aware Write/Edit guard (4 rules)
+│   └── skills/
+│       └── validation/
+│           └── description-sync.md  # DESCRIPTION ↔ NEWS.md drift check
+├── commands/                # 15 slash commands (/rforge:*)
 ├── agents/
-│   └── orchestrator.md      # Main orchestration logic
-├── skills/
-│   ├── analyze.md           # /rforge:analyze
-│   ├── quick.md             # /rforge:quick
-│   └── thorough.md          # /rforge:thorough
+│   └── orchestrator.md      # Pattern recognition + delegation
 ├── lib/
-│   └── dashboard.ts         # Progress utilities (future)
-└── docs/
-    └── architecture.md      # Design docs
+│   └── formatters.py        # Output formatting helpers
+└── docs/                    # User-facing docs
 ```
 
 ## Contributing

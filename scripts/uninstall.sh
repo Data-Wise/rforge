@@ -1,9 +1,14 @@
 #!/bin/bash
-# Uninstall rforge-orchestrator plugin from Claude Code
+# Uninstall the rforge plugin from Claude Code.
+# Note: as of v1.2.0 the plugin installs to ~/.claude/plugins/rforge.
+# Earlier versions (v0.1.0 from the claude-plugins monorepo) installed
+# to ~/.claude/plugins/rforge-orchestrator — if you have that legacy
+# install, remove it manually with:
+#   rm -rf ~/.claude/plugins/rforge-orchestrator
 
 set -euo pipefail
 
-PLUGIN_NAME="rforge-orchestrator"
+PLUGIN_NAME="rforge"
 TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
 
 # Colors
@@ -13,7 +18,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-echo -e "${BLUE}=== RForge Orchestrator Plugin Uninstaller ===${NC}"
+echo -e "${BLUE}=== RForge Plugin Uninstaller ===${NC}"
 echo ""
 
 # Check if plugin is installed
@@ -58,6 +63,8 @@ echo ""
 echo -e "${GREEN}✓ Plugin uninstalled successfully${NC}"
 echo ""
 echo -e "${BLUE}To reinstall:${NC}"
-echo -e "  cd ~/projects/dev-tools/claude-plugins/rforge-orchestrator"
+echo -e "  brew install --HEAD data-wise/tap/rforge   # Recommended (Homebrew)"
+echo -e "  # Or from a local checkout:"
+echo -e "  cd ~/projects/dev-tools/rforge"
 echo -e "  ./scripts/install.sh         # Production mode"
 echo -e "  ./scripts/install.sh --dev   # Development mode"

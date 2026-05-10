@@ -1,12 +1,12 @@
 #!/bin/bash
-# Test script for rforge-orchestrator plugin structure
+# Test script for the rforge plugin structure
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-echo "🧪 Testing rforge-orchestrator plugin structure..."
+echo "🧪 Testing rforge plugin structure..."
 
 # Test 1: Check required files exist
 echo "✓ Test 1: Required files..."

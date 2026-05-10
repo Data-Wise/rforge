@@ -193,16 +193,20 @@ RForge MCP server must be configured in `~/.claude/settings.json`:
 ## File Structure
 
 ```
-rforge-orchestrator/
-├── commands/              # 3 slash commands
-│   ├── analyze.md
-│   ├── quick.md
-│   └── thorough.md
+rforge/
+├── .claude-plugin/        # Plugin manifest + extras (v1.2.0)
+│   ├── plugin.json
+│   ├── marketplace.json
+│   ├── config.json
+│   ├── hooks/pretooluse.py
+│   └── skills/validation/description-sync.md
+├── commands/              # 15 slash commands (/rforge:*)
 ├── agents/                # 1 orchestrator agent
 │   └── orchestrator.md
 ├── scripts/               # Installation scripts
 │   ├── install.sh
 │   └── uninstall.sh
+├── lib/formatters.py
 └── docs/                  # Documentation
     └── REFCARD.md (this file)
 ```
@@ -256,8 +260,8 @@ rforge-orchestrator/
 
 - **Main README:** `README.md`
 - **Installation Guide:** Homebrew formula includes full guide
-- **Plugin Repository:** https://github.com/Data-Wise/claude-plugins
-- **GitHub Release:** https://github.com/Data-Wise/claude-plugins/releases/tag/rforge-orchestrator-v0.1.0
+- **Plugin Repository:** https://github.com/Data-Wise/rforge
+- **GitHub Releases:** https://github.com/Data-Wise/rforge/releases
 
 ---
 

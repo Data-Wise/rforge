@@ -48,12 +48,18 @@ This will:
 ### Step 2: Install RForge Plugin
 
 ```bash
-# Via npm (recommended)
+# Via Claude Code marketplace (recommended for v1.2.0+)
+/plugin marketplace add Data-Wise/rforge
+
+# Or via Homebrew (HEAD-only until v1.2.0 stable release)
+brew install --HEAD data-wise/tap/rforge
+
+# Or via npm
 npm install -g @data-wise/rforge-plugin
 
 # Or from source (development)
-git clone https://github.com/Data-Wise/claude-plugins.git
-cd claude-plugins/rforge
+git clone https://github.com/Data-Wise/rforge.git
+cd rforge
 ./scripts/install.sh --dev
 ```
 
@@ -346,6 +352,6 @@ Now that you're set up, explore:
 
 ## Getting Help
 
-- **GitHub Issues:** [claude-plugins/issues](https://github.com/Data-Wise/claude-plugins/issues)
-- **Documentation Site:** [data-wise.github.io/claude-plugins](https://data-wise.github.io/claude-plugins)
+- **GitHub Issues:** [Data-Wise/rforge/issues](https://github.com/Data-Wise/rforge/issues)
+- **Documentation Site:** [data-wise.github.io/rforge](https://data-wise.github.io/rforge)
 - **npm Package:** [@data-wise/rforge-plugin](https://www.npmjs.com/package/@data-wise/rforge-plugin)
