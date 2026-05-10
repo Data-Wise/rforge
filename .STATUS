@@ -8,17 +8,17 @@ worktrees:
   - branch: feature/mcp-absorb-discovery
     path: ~/.git-worktrees/rforge/feature-mcp-absorb-discovery
     base: dev
-    status: SCAFFOLDED (not started — awaiting fresh session)
+    status: IN PROGRESS (fresh session opened 2026-05-10)
     created: 2026-05-10
     scope: "Path B Phase B.1 — port rforge_detect, rforge_deps, rforge_impact to lib/"
     target_release: v1.3.0 (non-breaking)
     spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
     orchestrate: ORCHESTRATE-mcp-absorb-discovery.md
     notes: |
-      ORCHESTRATE committed on the feature branch (1fb5fa5). Feature
-      branch NOT pushed yet — push when implementation begins.
-      Per CLAUDE.md ORCHESTRATE workflow, implementation requires a
-      fresh `claude` session inside the worktree.
+      ORCHESTRATE scaffold committed on feature branch (1fb5fa5).
+      Implementation underway in a separate `claude` session inside
+      the worktree. This `dev`-side STATUS will be updated again when
+      the feature branch is pushed and a PR opens.
 
 recent:
   - date: 2026-05-10
