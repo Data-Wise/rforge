@@ -316,7 +316,6 @@ Now that you're set up, explore:
 
 - **[Commands Reference](commands.md)** - All 15 RForge commands
 - **[Architecture Guide](architecture.md)** - How RForge works internally
-- **[Mode System Guide](../../docs/MODE-USAGE-GUIDE.md)** - Deep dive into modes
 
 ## Common Commands Cheat Sheet
 

@@ -236,11 +236,6 @@ Plugin settings in `plugin.json`:
 
 ## Development
 
-**For plugin development and contributions:**
-- 📖 **[Developer Guide (CLAUDE.md)](../CLAUDE.md)** - Comprehensive guide for working with this monorepo
-- Development commands, architecture patterns, CI/CD workflows
-- Quality standards and troubleshooting
-
 **Plugin structure:**
 ```
 ~/.claude/plugins/rforge-orchestrator/

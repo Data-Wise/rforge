@@ -4,6 +4,28 @@
 
 Automatically analyzes R package changes by intelligently delegating to RForge MCP tools and synthesizing results.
 
+## What's new in v1.2.0
+
+- 🛒 **Marketplace install** — one-shot setup via
+  `/plugin marketplace add Data-Wise/rforge` (no clone, no symlinks).
+  See [`docs/configuration.md`](docs/configuration.md) for tunable
+  options (CRAN mirror, vignette engine, R version pin, CLAUDE.md budget).
+- 🪝 **R-aware `PreToolUse` hook** — four rules that fire on every
+  `Write`/`Edit`: blocks hand-edits to roxygen-generated `man/*.Rd`,
+  warns when `R/*.R` edits may need NAMESPACE/DESCRIPTION sync, warns
+  on non-SemVer `DESCRIPTION` Version bumps, warns on writes outside
+  the active worktree. Diagnostic, not adversarial — only the
+  `man/*.Rd` rule blocks. See [`docs/hooks-and-skills.md`](docs/hooks-and-skills.md).
+- 🔍 **`description-sync` validation skill** — pure-shell sanity check
+  that `DESCRIPTION` Version matches the top entry in `NEWS.md` /
+  `CHANGELOG.md`. Catches the most common pre-CRAN release-prep failure.
+  No R required.
+- 📐 **Plugin Surface architecture diagram** — new Mermaid diagram in
+  [`docs/architecture.md`](docs/architecture.md) showing how marketplace,
+  config, commands, agents, hooks, and skills relate.
+
+Full changelog: [`CHANGELOG.md`](CHANGELOG.md).
+
 ## Quick Start
 
 ```bash
@@ -466,11 +488,6 @@ Plugin settings in `plugin.json`:
 ```
 
 ## Development
-
-**For plugin development and contributions:**
-- 📖 **[Developer Guide (CLAUDE.md)](../CLAUDE.md)** - Comprehensive guide for working with this monorepo
-- Development commands, architecture patterns, CI/CD workflows
-- Quality standards and troubleshooting
 
 **Plugin structure:**
 ```

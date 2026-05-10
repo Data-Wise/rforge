@@ -600,6 +600,3 @@ class MarkdownFormatter {
 
 - **[Quick Start Guide](quickstart.md)** - Getting started
 - **[Commands Reference](commands.md)** - All commands
-- **[Mode System Guide](../../docs/MODE-USAGE-GUIDE.md)** - Mode system deep dive
-- **[Format Examples](../../docs/FORMAT-EXAMPLES.md)** - Output samples
-- **[Real-World Testing](../../docs/REAL-WORLD-TESTING-RESULTS.md)** - Performance data
