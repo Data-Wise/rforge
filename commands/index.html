@@ -13,17 +13,21 @@
         <link rel="canonical" href="https://data-wise.github.io/rforge/commands/">
       
       
+        <link rel="prev" href="../REFCARD/">
+      
+      
+        <link rel="next" href="../architecture/">
       
       
         
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>RForge Commands Reference - RForge Plugin</title>
+        <title>Commands - RForge Plugin</title>
       
     
     
@@ -108,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              RForge Commands Reference
+              Commands
             
           </span>
         </div>
@@ -240,7 +244,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../docs/QUICK-START.md" class="md-tabs__link">
+      <a href="../QUICK-START/" class="md-tabs__link">
         
   
   
@@ -259,7 +263,26 @@
   
   
     <li class="md-tabs__item">
-      <a href="../docs/REFCARD.md" class="md-tabs__link">
+      <a href="../quickstart/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  📖 Detailed Quick Start
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../REFCARD/" class="md-tabs__link">
         
   
   
@@ -276,9 +299,11 @@
   
   
   
+    
   
-    <li class="md-tabs__item">
-      <a href="../docs/commands.md" class="md-tabs__link">
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
         
   
   
@@ -297,7 +322,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../docs/architecture.md" class="md-tabs__link">
+      <a href="../architecture/" class="md-tabs__link">
         
   
   
@@ -307,6 +332,64 @@
 
       </a>
     </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../hooks-and-skills/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Hooks & Skills
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../configuration/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Configuration
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../specs/" class="md-tabs__link">
+          
+  
+  
+  Specs
+
+        </a>
+      </li>
+    
   
 
       
@@ -389,7 +472,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../docs/QUICK-START.md" class="md-nav__link">
+      <a href="../QUICK-START/" class="md-nav__link">
         
   
   
@@ -416,7 +499,34 @@
   
   
     <li class="md-nav__item">
-      <a href="../docs/REFCARD.md" class="md-nav__link">
+      <a href="../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📖 Detailed Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../REFCARD/" class="md-nav__link">
         
   
   
@@ -440,10 +550,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../docs/commands.md" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -451,6 +588,358 @@
     
   
     Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#command-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command Categories
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#status-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Status &amp; Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Status &amp; Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rforgestatus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgeanalyze" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:analyze
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgequick" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:quick
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgethorough" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:thorough
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ecosystem-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ecosystem Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ecosystem Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rforgedetect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:detect
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgecascade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:cascade
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgeimpact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:impact
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgerelease" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:release
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgedeps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:deps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation &amp; Tasks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Documentation &amp; Tasks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rforgedoc-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:doc-check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgecomplete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:complete
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgecapture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:capture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgenext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:next
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#health-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Health Checks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Health Checks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rforgeecosystem-health" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:ecosystem-health
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgerpkg-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:rpkg-check
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-categories-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command Categories Summary
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command Categories Summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#by-time-budget" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        By Time Budget
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#by-use-case" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        By Use Case
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Flags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
   
 
     
@@ -470,14 +959,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../docs/architecture.md" class="md-nav__link">
+      <a href="../hooks-and-skills/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Architecture
+    Hooks & Skills
   
 
     
@@ -486,6 +975,146 @@
   
 
       </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Specs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP absorb (Path B)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1242,8 +1871,6 @@
 <ul>
 <li><strong><a href="../quickstart/">Quick Start Guide</a></strong> - Getting started with RForge</li>
 <li><strong><a href="../architecture/">Architecture Guide</a></strong> - How RForge works</li>
-<li><strong><a href="../../docs/MODE-USAGE-GUIDE.md">Mode System Guide</a></strong> - Deep dive into modes</li>
-<li><strong><a href="../../docs/FORMAT-EXAMPLES.md">Format Examples</a></strong> - Output format samples</li>
 </ul>
 
 

@@ -13,17 +13,21 @@
         <link rel="canonical" href="https://data-wise.github.io/rforge/architecture/">
       
       
+        <link rel="prev" href="../commands/">
+      
+      
+        <link rel="next" href="../hooks-and-skills/">
       
       
         
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>RForge Architecture Guide - RForge Plugin</title>
+        <title>Architecture - RForge Plugin</title>
       
     
     
@@ -108,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              RForge Architecture Guide
+              Architecture
             
           </span>
         </div>
@@ -240,7 +244,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../docs/QUICK-START.md" class="md-tabs__link">
+      <a href="../QUICK-START/" class="md-tabs__link">
         
   
   
@@ -259,7 +263,26 @@
   
   
     <li class="md-tabs__item">
-      <a href="../docs/REFCARD.md" class="md-tabs__link">
+      <a href="../quickstart/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  📖 Detailed Quick Start
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../REFCARD/" class="md-tabs__link">
         
   
   
@@ -278,7 +301,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../docs/commands.md" class="md-tabs__link">
+      <a href="../commands/" class="md-tabs__link">
         
   
   
@@ -295,9 +318,11 @@
   
   
   
+    
   
-    <li class="md-tabs__item">
-      <a href="../docs/architecture.md" class="md-tabs__link">
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
         
   
   
@@ -307,6 +332,64 @@
 
       </a>
     </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../hooks-and-skills/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Hooks & Skills
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../configuration/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Configuration
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../specs/" class="md-tabs__link">
+          
+  
+  
+  Specs
+
+        </a>
+      </li>
+    
   
 
       
@@ -389,7 +472,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../docs/QUICK-START.md" class="md-nav__link">
+      <a href="../QUICK-START/" class="md-nav__link">
         
   
   
@@ -416,7 +499,34 @@
   
   
     <li class="md-nav__item">
-      <a href="../docs/REFCARD.md" class="md-nav__link">
+      <a href="../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📖 Detailed Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../REFCARD/" class="md-nav__link">
         
   
   
@@ -443,7 +553,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../docs/commands.md" class="md-nav__link">
+      <a href="../commands/" class="md-nav__link">
         
   
   
@@ -467,10 +577,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../docs/architecture.md" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -486,6 +623,687 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugin-surface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin Surface
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Layers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pattern-recognition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern Recognition
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pattern Recognition">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-code_change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. CODE_CHANGE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-bug_fix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. BUG_FIX
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-cran_release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. CRAN_RELEASE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. DOCUMENTATION
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-dependency_update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. DEPENDENCY_UPDATE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-general_status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. GENERAL_STATUS
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parallel-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parallel Execution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parallel Execution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-parallel-execution-matters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Parallel Execution Matters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#real-world-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Real-World Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mode-system-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mode System Integration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mode System Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#default-mode-10s" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default Mode (&lt;10s)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug-mode-120s" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debug Mode (&lt;120s)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimize-mode-180s" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimize Mode (&lt;180s)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#release-mode-300s" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Release Mode (&lt;300s)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#result-synthesis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result Synthesis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Result Synthesis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#synthesis-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Synthesis Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-synthesis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example Synthesis
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mcp-tool-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP Tool Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-structure-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Structure Detection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project Structure Detection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#detection-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detection Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ecosystem-detection-benefits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ecosystem Detection Benefits
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling-resilience" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling &amp; Resilience
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Handling &amp; Resilience">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tool-failure-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool Failure Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#graceful-degradation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graceful Degradation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-optimizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Optimizations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Optimizations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-caching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Caching
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-smart-tool-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Smart Tool Selection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-incremental-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Incremental Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-format-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Format System
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Output Format System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terminal-formatter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Terminal Formatter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#json-formatter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JSON Formatter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#markdown-formatter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Markdown Formatter
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-architecture-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Architecture Enhancements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Future Architecture Enhancements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#planned-improvements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Planned Improvements
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hooks-and-skills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hooks & Skills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Specs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP absorb (Path B)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -521,6 +1339,17 @@
     <span class="md-ellipsis">
       
         Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugin-surface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin Surface
       
     </span>
   </a>
@@ -1029,6 +1858,110 @@
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p>RForge is an <strong>orchestrator plugin</strong> that intelligently delegates to RForge MCP server tools. It doesn't execute R code directly - instead, it acts as an intelligent coordinator that recognizes patterns, selects appropriate tools, executes them in parallel, and synthesizes results.</p>
 <p><strong>Key Innovation:</strong> Auto-delegation with parallel execution that completes 4 tool calls in the time it takes to execute 1.</p>
+<h2 id="plugin-surface">Plugin Surface<a class="headerlink" href="#plugin-surface" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>Added in v1.2.0. Mirrors craft's <code>.claude-plugin/</code> layout.</p>
+</blockquote>
+<p>The plugin ships four kinds of artifact, each loaded by Claude Code at a
+different lifecycle stage:</p>
+<pre class="mermaid"><code>graph LR
+    subgraph User["You / Claude Code session"]
+        UR[User request]
+    end
+
+    subgraph Plugin[".claude-plugin/"]
+        MP[marketplace.json&lt;br/&gt;&lt;i&gt;install-time&lt;/i&gt;]
+        CFG[config.json&lt;br/&gt;&lt;i&gt;plugin-load&lt;/i&gt;]
+        CMD[commands/*.md&lt;br/&gt;&lt;i&gt;15 slash commands&lt;/i&gt;]
+        AGT[agents/orchestrator.md&lt;br/&gt;&lt;i&gt;auto-delegation&lt;/i&gt;]
+        HK[hooks/pretooluse.py&lt;br/&gt;&lt;i&gt;every Write/Edit&lt;/i&gt;]
+        SK[skills/validation/*.md&lt;br/&gt;&lt;i&gt;auto-discovered&lt;/i&gt;]
+    end
+
+    subgraph MCP["RForge MCP server"]
+        T1[health]
+        T2[tests]
+        T3[docs]
+        T4[impact]
+    end
+
+    subgraph R["R environment"]
+        DESCR[DESCRIPTION]
+        NS[NAMESPACE]
+        RD[man/*.Rd]
+        SRC[R/*.R]
+    end
+
+    UR --&gt;|/rforge:analyze| CMD
+    UR --&gt;|edits files| HK
+    HK --&gt;|reads| DESCR
+    HK --&gt;|protects| RD
+    CMD --&gt;|delegates| AGT
+    AGT --&gt;|invokes| T1
+    AGT --&gt;|invokes| T2
+    AGT --&gt;|invokes| T3
+    AGT --&gt;|invokes| T4
+    T1 --&gt; R
+    T2 --&gt; R
+    T3 --&gt; R
+    T4 --&gt; R
+    SK -.-&gt;|optional| DESCR
+    CFG -.-&gt;|reads| CMD
+    CFG -.-&gt;|reads| AGT</code></pre>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>When it fires</th>
+<th>Lives in</th>
+<th>Authority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>marketplace.json</code></td>
+<td>At install (<code>/plugin marketplace add</code>)</td>
+<td><code>.claude-plugin/</code></td>
+<td>Claude Code marketplace</td>
+</tr>
+<tr>
+<td><code>config.json</code></td>
+<td>When plugin loads</td>
+<td><code>.claude-plugin/</code></td>
+<td>rforge runtime</td>
+</tr>
+<tr>
+<td><code>commands/*.md</code></td>
+<td>When user types <code>/rforge:&lt;cmd&gt;</code></td>
+<td><code>commands/</code></td>
+<td>Claude Code</td>
+</tr>
+<tr>
+<td><code>agents/orchestrator.md</code></td>
+<td>When pattern recognition triggers</td>
+<td><code>agents/</code></td>
+<td>Claude Code</td>
+</tr>
+<tr>
+<td><code>hooks/pretooluse.py</code></td>
+<td>Every <code>Write</code>/<code>Edit</code> tool call</td>
+<td><code>.claude-plugin/hooks/</code></td>
+<td>Claude Code hook system</td>
+</tr>
+<tr>
+<td><code>skills/validation/*.md</code></td>
+<td>When Claude needs to verify state</td>
+<td><code>.claude-plugin/skills/</code></td>
+<td>Claude Code skill discovery</td>
+</tr>
+</tbody>
+</table>
+<p>The orchestrator-and-MCP machinery (covered in the rest of this document)
+is the <em>runtime brain</em>. The four pieces above are the <em>static surface</em>
+the plugin advertises to Claude Code.</p>
+<p>For a user-facing tour of the new hook + skill, see
+<a href="../hooks-and-skills/">Hooks &amp; Skills Reference</a>.</p>
+<hr />
 <h2 id="architecture-layers">Architecture Layers<a class="headerlink" href="#architecture-layers" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────────────────────────────┐
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│                    User Request                         │
@@ -1516,9 +2449,6 @@
 <ul>
 <li><strong><a href="../quickstart/">Quick Start Guide</a></strong> - Getting started</li>
 <li><strong><a href="../commands/">Commands Reference</a></strong> - All commands</li>
-<li><strong><a href="../../docs/MODE-USAGE-GUIDE.md">Mode System Guide</a></strong> - Mode system deep dive</li>
-<li><strong><a href="../../docs/FORMAT-EXAMPLES.md">Format Examples</a></strong> - Output samples</li>
-<li><strong><a href="../../docs/REAL-WORLD-TESTING-RESULTS.md">Real-World Testing</a></strong> - Performance data</li>
 </ul>
 
 

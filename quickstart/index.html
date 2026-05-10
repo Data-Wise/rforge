@@ -13,17 +13,21 @@
         <link rel="canonical" href="https://data-wise.github.io/rforge/quickstart/">
       
       
+        <link rel="prev" href="../QUICK-START/">
+      
+      
+        <link rel="next" href="../REFCARD/">
       
       
         
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>RForge Quick Start Guide - RForge Plugin</title>
+        <title>📖 Detailed Quick Start - RForge Plugin</title>
       
     
     
@@ -108,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              RForge Quick Start Guide
+              📖 Detailed Quick Start
             
           </span>
         </div>
@@ -240,7 +244,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../docs/QUICK-START.md" class="md-tabs__link">
+      <a href="../QUICK-START/" class="md-tabs__link">
         
   
   
@@ -257,9 +261,30 @@
   
   
   
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  📖 Detailed Quick Start
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
   
     <li class="md-tabs__item">
-      <a href="../docs/REFCARD.md" class="md-tabs__link">
+      <a href="../REFCARD/" class="md-tabs__link">
         
   
   
@@ -278,7 +303,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../docs/commands.md" class="md-tabs__link">
+      <a href="../commands/" class="md-tabs__link">
         
   
   
@@ -297,7 +322,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../docs/architecture.md" class="md-tabs__link">
+      <a href="../architecture/" class="md-tabs__link">
         
   
   
@@ -307,6 +332,64 @@
 
       </a>
     </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../hooks-and-skills/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Hooks & Skills
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../configuration/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Configuration
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../specs/" class="md-tabs__link">
+          
+  
+  
+  Specs
+
+        </a>
+      </li>
+    
   
 
       
@@ -389,7 +472,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../docs/QUICK-START.md" class="md-nav__link">
+      <a href="../QUICK-START/" class="md-nav__link">
         
   
   
@@ -413,10 +496,461 @@
       
   
   
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📖 Detailed Quick Start
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📖 Detailed Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-install-rforge-mcp-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Install RForge MCP Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-install-rforge-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Install RForge Plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-restart-claude-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Restart Claude Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-verify-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Verify Installation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#basic-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Basic Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quick-status-check-10-seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Status Check (&lt;10 seconds)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#analyze-package-30-seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analyze Package (&lt;30 seconds)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mode-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mode System
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Workflows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-daily-development-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Daily Development Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-before-committing-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Before Committing Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-cran-preparation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. CRAN Preparation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-ecosystem-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Ecosystem Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Formats
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Output Formats">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terminal-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Terminal (Default)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JSON
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#markdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Markdown
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-structure-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Structure Detection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project Structure Detection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single Package
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ecosystem-multiple-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ecosystem (Multiple Packages)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hybrid-mixed-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hybrid (Mixed Content)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rforge-mcp-server-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "RForge MCP server not found"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#not-an-r-package-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Not an R package directory"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#r-cmd-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "R CMD not found"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Issues
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-commands-cheat-sheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Commands Cheat Sheet
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Help
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
   
   
     <li class="md-nav__item">
-      <a href="../docs/REFCARD.md" class="md-nav__link">
+      <a href="../REFCARD/" class="md-nav__link">
         
   
   
@@ -443,7 +977,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../docs/commands.md" class="md-nav__link">
+      <a href="../commands/" class="md-nav__link">
         
   
   
@@ -470,7 +1004,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../docs/architecture.md" class="md-nav__link">
+      <a href="../architecture/" class="md-nav__link">
         
   
   
@@ -486,6 +1020,173 @@
   
 
       </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hooks-and-skills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hooks & Skills
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Specs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP absorb (Path B)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -953,13 +1654,19 @@
 - Configure Claude Code to use it
 - Set up necessary R environment variables</p>
 <h3 id="step-2-install-rforge-plugin">Step 2: Install RForge Plugin<a class="headerlink" href="#step-2-install-rforge-plugin" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Via npm (recommended)</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>@data-wise/rforge-plugin
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Via Claude Code marketplace (recommended for v1.2.0+)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>/plugin<span class="w"> </span>marketplace<span class="w"> </span>add<span class="w"> </span>Data-Wise/rforge
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Or from source (development)</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Data-Wise/claude-plugins.git
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="nb">cd</span><span class="w"> </span>claude-plugins/rforge
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>./scripts/install.sh<span class="w"> </span>--dev
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Or via Homebrew (HEAD-only until v1.2.0 stable release)</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>brew<span class="w"> </span>install<span class="w"> </span>--HEAD<span class="w"> </span>data-wise/tap/rforge
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Or via npm</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>@data-wise/rforge-plugin
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="c1"># Or from source (development)</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Data-Wise/rforge.git
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="nb">cd</span><span class="w"> </span>rforge
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>./scripts/install.sh<span class="w"> </span>--dev
 </span></code></pre></div>
 <h3 id="step-3-restart-claude-code">Step 3: Restart Claude Code<a class="headerlink" href="#step-3-restart-claude-code" title="Permanent link">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Exit and restart Claude Code</span>
@@ -1179,7 +1886,6 @@
 <ul>
 <li><strong><a href="../commands/">Commands Reference</a></strong> - All 15 RForge commands</li>
 <li><strong><a href="../architecture/">Architecture Guide</a></strong> - How RForge works internally</li>
-<li><strong><a href="../../docs/MODE-USAGE-GUIDE.md">Mode System Guide</a></strong> - Deep dive into modes</li>
 </ul>
 <h2 id="common-commands-cheat-sheet">Common Commands Cheat Sheet<a class="headerlink" href="#common-commands-cheat-sheet" title="Permanent link">&para;</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1"># Status and analysis</span>
@@ -1207,8 +1913,8 @@
 </span></code></pre></div>
 <h2 id="getting-help">Getting Help<a class="headerlink" href="#getting-help" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>GitHub Issues:</strong> <a href="https://github.com/Data-Wise/claude-plugins/issues">claude-plugins/issues</a></li>
-<li><strong>Documentation Site:</strong> <a href="https://data-wise.github.io/claude-plugins">data-wise.github.io/claude-plugins</a></li>
+<li><strong>GitHub Issues:</strong> <a href="https://github.com/Data-Wise/rforge/issues">Data-Wise/rforge/issues</a></li>
+<li><strong>Documentation Site:</strong> <a href="https://data-wise.github.io/rforge">data-wise.github.io/rforge</a></li>
 <li><strong>npm Package:</strong> <a href="https://www.npmjs.com/package/@data-wise/rforge-plugin">@data-wise/rforge-plugin</a></li>
 </ul>
 
