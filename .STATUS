@@ -1,23 +1,29 @@
 project: rforge
-updated: 2026-05-09
+updated: 2026-05-10
+status: Active
+version: 1.2.0
+last_release: 2026-05-10 (PR #1 squash-merged to dev as 83a7d4d)
 
-worktrees:
-  - branch: feature/craft-parity-foundations
-    path: ~/.git-worktrees/rforge/feature-craft-parity-foundations
-    base: dev
-    status: WIP
-    created: 2026-05-09
-    scope: craft-parity-foundations
-    target_release: v1.2.0
-    spec: PROPOSAL-craft-parity-2026-05-09.md
-    orchestrate: ORCHESTRATE-craft-parity-foundations.md
+worktrees: []
+
+recent:
+  - date: 2026-05-10
+    pr: 1
+    branch: feature/craft-parity-foundations
+    title: "Craft parity foundations: marketplace, hooks, skills (v1.2.0)"
+    state: MERGED
+    merge_commit: 83a7d4d
     summary: |
-      Phases 1+2 of craft-parity roadmap: add marketplace.json, config.json,
-      hooks/pretooluse.py, and skills/validation/. Non-breaking. Targets v1.2.0.
-    blockers:
-      - "npm install fails on rforge-mcp@>=0.1.0 (404). Pre-existing; does not block this scope."
+      Phases 1+2 of craft-parity roadmap shipped. Added marketplace.json,
+      config.json (4 stub options), pretooluse.py (4 R-aware rules,
+      1 BLOCK + 3 WARN), description-sync skill (first validation skill),
+      docs (hooks-and-skills, configuration, architecture Mermaid),
+      tests/test-all.sh (20 checks). Self-review caught hook contract bug
+      (env vars vs stdin) — fixed in b413ab3 before merge. Same bug
+      flagged + fixed upstream in craft (PR #125, separate session).
 
 backlog:
   - title: "craft-parity Phase 3 — command namespacing (BREAKING, v2.0.0)"
   - title: "craft-parity Phase 4 — discovery engine + agents (v2.1.0)"
-  - title: "publish rforge-mcp to npm (unblocks fresh installs)"
+  - title: "publish rforge-mcp to npm (unblocks fresh `npm install` for users)"
+  - title: "GitHub release v1.2.0 from dev → main (when ready to ship)"
