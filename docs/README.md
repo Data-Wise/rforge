@@ -174,8 +174,8 @@ See [REFCARD.md](REFCARD.md) for detailed pattern recognition guide.
 
 ## 🔗 External Links
 
-- **Plugin Repository:** https://github.com/Data-Wise/claude-plugins
-- **GitHub Release:** https://github.com/Data-Wise/claude-plugins/releases/tag/rforge-orchestrator-v0.1.0
+- **Plugin Repository:** https://github.com/Data-Wise/rforge
+- **GitHub Releases:** https://github.com/Data-Wise/rforge/releases
 - **Homebrew Tap:** https://github.com/Data-Wise/homebrew-tap
 - **Homebrew Formula:** `brew info rforge-orchestrator`
 

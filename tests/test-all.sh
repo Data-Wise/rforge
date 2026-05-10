@@ -84,13 +84,24 @@ hook_handles_garbage_stdin() {
 }
 
 # Manifest checks.
+# Asserts all 4 version sources agree. We previously only compared
+# plugin.json + marketplace.json/plugins[0]; package.json drifted to
+# 1.1.0 while the others moved to 1.2.0 (caught by /craft:docs:update,
+# fixed in c2369ae). marketplace.json has two version fields
+# (metadata.version + plugins[0].version) that can also drift apart.
 versions_match() {
     python3 -c "
 import json, sys
-p = json.load(open('.claude-plugin/plugin.json'))['version']
-m = json.load(open('.claude-plugin/marketplace.json'))['plugins'][0]['version']
-if p != m:
-    print(f'mismatch: plugin.json={p}  marketplace.json={m}', file=sys.stderr)
+versions = {
+    'plugin.json': json.load(open('.claude-plugin/plugin.json'))['version'],
+    'marketplace.json/metadata': json.load(open('.claude-plugin/marketplace.json'))['metadata']['version'],
+    'marketplace.json/plugins[0]': json.load(open('.claude-plugin/marketplace.json'))['plugins'][0]['version'],
+    'package.json': json.load(open('package.json'))['version'],
+}
+unique = set(versions.values())
+if len(unique) > 1:
+    detail = ' | '.join(f'{k}={v}' for k, v in versions.items())
+    print(f'version mismatch: {detail}', file=sys.stderr)
     sys.exit(1)
 "
 }
@@ -181,7 +192,7 @@ run "marketplace.json parses" python3 -c "import json; json.load(open('.claude-p
 run "config.json parses"      python3 -c "import json; json.load(open('.claude-plugin/config.json'))"
 run "plugin.json parses"      python3 -c "import json; json.load(open('.claude-plugin/plugin.json'))"
 run "package.json parses"     python3 -c "import json; json.load(open('package.json'))"
-run "plugin.json/marketplace.json versions match" versions_match
+run "All 4 version sources agree (plugin/marketplace/package)" versions_match
 run "CHANGELOG has current version entry"          changelog_has_current_version
 
 # Docs site
