@@ -2,14 +2,22 @@ project: rforge
 updated: 2026-05-09
 
 worktrees:
-  - branch: feature/scratch-2026-05-09
-    path: ~/.git-worktrees/rforge/feature-scratch-2026-05-09
+  - branch: feature/craft-parity-foundations
+    path: ~/.git-worktrees/rforge/feature-craft-parity-foundations
     base: dev
     status: WIP
     created: 2026-05-09
-    scope: placeholder
-    notes: |
-      Auto-generated placeholder created during dev-branch + protection setup.
-      Repurpose (rename branch, rewrite ORCHESTRATE) once a real feature scope
-      is decided, or remove the worktree if unused.
-      Outstanding: npm install fails — peer dep rforge-mcp@>=0.1.0 not on npm.
+    scope: craft-parity-foundations
+    target_release: v1.2.0
+    spec: PROPOSAL-craft-parity-2026-05-09.md
+    orchestrate: ORCHESTRATE-craft-parity-foundations.md
+    summary: |
+      Phases 1+2 of craft-parity roadmap: add marketplace.json, config.json,
+      hooks/pretooluse.py, and skills/validation/. Non-breaking. Targets v1.2.0.
+    blockers:
+      - "npm install fails on rforge-mcp@>=0.1.0 (404). Pre-existing; does not block this scope."
+
+backlog:
+  - title: "craft-parity Phase 3 — command namespacing (BREAKING, v2.0.0)"
+  - title: "craft-parity Phase 4 — discovery engine + agents (v2.1.0)"
+  - title: "publish rforge-mcp to npm (unblocks fresh installs)"
