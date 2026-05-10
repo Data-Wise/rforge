@@ -4,7 +4,21 @@ status: Active
 version: 1.2.0 (released)
 last_release: 2026-05-10 v1.2.0 (PR #2 dev → main, tag https://github.com/Data-Wise/rforge/releases/tag/v1.2.0)
 
-worktrees: []
+worktrees:
+  - branch: feature/mcp-absorb-discovery
+    path: ~/.git-worktrees/rforge/feature-mcp-absorb-discovery
+    base: dev
+    status: SCAFFOLDED (not started — awaiting fresh session)
+    created: 2026-05-10
+    scope: "Path B Phase B.1 — port rforge_detect, rforge_deps, rforge_impact to lib/"
+    target_release: v1.3.0 (non-breaking)
+    spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
+    orchestrate: ORCHESTRATE-mcp-absorb-discovery.md
+    notes: |
+      ORCHESTRATE committed on the feature branch (1fb5fa5). Feature
+      branch NOT pushed yet — push when implementation begins.
+      Per CLAUDE.md ORCHESTRATE workflow, implementation requires a
+      fresh `claude` session inside the worktree.
 
 recent:
   - date: 2026-05-10
@@ -67,10 +81,15 @@ decisions:
 backlog:
   - title: "craft-parity Phase 3 — command namespacing (BREAKING, v2.0.0)"
   - title: "craft-parity Phase 4 — discovery engine + agents (v2.1.0)"
-  - title: "Path B Phase B.1 — port discovery + deps modules to lib/"
+  - title: "Path B Phase B.2 — port rforge_status (with mode-aware execution)"
     spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
-  - title: "Clean up orphaned tags (v1.4-v1.15) carried over from monorepo extraction"
-    notes: "Cosmetic only — these tags don't point to commits in any branch. Safe to delete with `git push origin :refs/tags/v1.X.0`."
+    notes: "Blocked on B.1 landing (establishes lib/ calling convention)."
+  - title: "Path B Phase B.3 — port rforge_init (state file)"
+    spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
+    notes: "Can run in parallel with B.2 once B.1 lands."
+  - title: "Path B Phase B.4 — archive rforge-mcp repo"
+    spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
+    notes: "After B.1+B.2+B.3 land. Just paperwork (DEPRECATED.md + GitHub archive)."
 
 shipped:
   - "v1.2.0 — 2026-05-10 — craft parity foundations + post-merge polish + MCP decoupling"
