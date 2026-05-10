@@ -1,8 +1,8 @@
 project: rforge
 updated: 2026-05-10
 status: Active
-version: 1.2.0 (on dev, not yet GitHub-released)
-last_release: 2026-05-10 (PR #1 squash-merged to dev as 83a7d4d)
+version: 1.2.0 (released)
+last_release: 2026-05-10 v1.2.0 (PR #2 dev → main, tag https://github.com/Data-Wise/rforge/releases/tag/v1.2.0)
 
 worktrees: []
 
@@ -69,5 +69,9 @@ backlog:
   - title: "craft-parity Phase 4 — discovery engine + agents (v2.1.0)"
   - title: "Path B Phase B.1 — port discovery + deps modules to lib/"
     spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
-  - title: "GitHub release v1.2.0 from dev → main"
-    notes: "Pre-flight done: docs synced, all tests passing, 4-source version sync verified."
+  - title: "Clean up orphaned tags (v1.4-v1.15) carried over from monorepo extraction"
+    notes: "Cosmetic only — these tags don't point to commits in any branch. Safe to delete with `git push origin :refs/tags/v1.X.0`."
+
+shipped:
+  - "v1.2.0 — 2026-05-10 — craft parity foundations + post-merge polish + MCP decoupling"
+  - "v1.1.0 — 2026-01-09 — initial standalone release"
