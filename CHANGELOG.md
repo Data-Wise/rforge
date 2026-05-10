@@ -9,6 +9,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.0] - 2026-05-09
 
+> **Note:** v1.2.0 was developed across multiple sessions on `dev`. The list
+> below captures the full scope of the upcoming release, including post-merge
+> polish (rename-debt cleanup, MCP decoupling, version-sync hardening). Tagged
+> release date will reflect the final ship date.
+
+### Changed — MCP server is now optional (decoupling)
+
+- **`package.json`** — removed `peerDependencies.rforge-mcp`. The plugin no
+  longer requires `rforge-mcp` to be installed. Existing users with the MCP
+  server keep all functionality; new users can install plugin standalone via
+  marketplace, npm, or Homebrew without hitting the long-standing 404 from
+  `rforge-mcp` not being on the npm registry.
+- **`README.md`** — "Part 1: Install RForge MCP Server" reframed as optional.
+- Plugin commands work via Claude Code's built-in tools (Read, Bash, etc.).
+  MCP integration provides typed I/O for users who want it; not required for
+  core functionality.
+
+### Changed — Rename debt cleanup (post-extraction)
+
+- All user-facing install instructions now use the `rforge` formula and plugin
+  name (was `rforge-orchestrator`, the pre-extraction monorepo name).
+- All `Data-Wise/claude-plugins` URLs in current-install contexts replaced
+  with `Data-Wise/rforge`.
+- Plugin install path: `~/.claude/plugins/rforge` (was `rforge-orchestrator`).
+- Migration section in `README.md` and `MCP-MIGRATION.md` retain the old name
+  intentionally (documents the rename for users on the old install).
+- `scripts/install.sh` + `scripts/uninstall.sh`: `PLUGIN_NAME` now `rforge`.
+  Comments document the legacy `rforge-orchestrator` cleanup path.
+
+### Changed — Version-sync hardening
+
+- **`tests/test-all.sh`** — the `versions_match` test now asserts all 4 version
+  sources agree: `plugin.json`, `marketplace.json/metadata`,
+  `marketplace.json/plugins[0]`, `package.json`. Previously only the first two
+  were compared; `package.json` drifted from 1.1.0 → 1.2.0 unnoticed in the
+  initial PR. Negative-tested by injecting a fake mismatch.
+
+### Fixed — broken internal links
+
+- 9 broken internal links in `docs/` and `README.md` from the monorepo
+  extraction (paths like `../../docs/MODE-USAGE-GUIDE.md`,
+  `../../KNOWLEDGE.md`) removed. Documents that survived the extraction now
+  link to surviving siblings only.
+
 ### Added — Craft-Parity Foundations (Phases 1 + 2)
 
 Brings rforge's plugin architecture to parity with craft for the

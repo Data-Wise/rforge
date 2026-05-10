@@ -103,10 +103,14 @@ Comprehensive analysis with R CMD check (2-5 minutes)
 ## Installation
 
 RForge has a two-part installation: the plugin (commands/UI) and the MCP server (backend tools).
+**As of v1.2.0 the MCP server is optional** — the plugin's commands work standalone via Claude
+Code's built-in tools (Read, Bash, etc.). Install the MCP server only if you want richer
+typed/structured analysis output and reusability from non-Claude-Code clients.
 
-### Part 1: Install RForge MCP Server
+### Part 1 (optional): Install RForge MCP Server
 
-The MCP server must be installed FIRST and configured in Claude settings.
+If you want advanced ecosystem analysis with structured I/O, install the MCP server and
+configure it in Claude settings. Otherwise skip to Part 2 — the plugin works without it.
 
 ```bash
 # Install rforge-mcp globally

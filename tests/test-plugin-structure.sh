@@ -77,20 +77,14 @@ if command -v jq >/dev/null 2>&1; then
     echo "  ✅ Repository URL correct"
 fi
 
-# Test 8: Check package.json has peerDependencies
-echo "✓ Test 8: RForge MCP peer dependency..."
-if command -v jq >/dev/null 2>&1; then
-    PEER_DEPS=$(jq -r '.peerDependencies | keys[]' "$PLUGIN_DIR/package.json" 2>/dev/null || echo "")
-    if [[ "$PEER_DEPS" != *"rforge-mcp"* ]]; then
-        echo "❌ Missing rforge-mcp peer dependency"
-        exit 1
-    fi
-    echo "  ✅ RForge MCP peer dependency present"
-fi
+# Test 8 removed in v1.2.0: previously asserted `rforge-mcp` peer dependency
+# was present. As of v1.2.0 the MCP server is optional (see CHANGELOG —
+# "MCP server is now optional (decoupling)"), so peerDependencies is
+# intentionally absent from package.json. The plugin works standalone.
 
 echo ""
 echo "✅ All tests passed!"
 echo "📊 Summary:"
 echo "  - Commands: $COMMAND_COUNT"
 echo "  - Agents: $AGENT_COUNT"
-echo "  - Peer dependencies: rforge-mcp"
+echo "  - Peer dependencies: none (MCP optional in v1.2.0+)"
