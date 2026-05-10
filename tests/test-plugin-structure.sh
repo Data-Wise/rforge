@@ -70,8 +70,8 @@ echo "  ✅ No hardcoded paths found"
 echo "✓ Test 7: Package.json repository..."
 if command -v jq >/dev/null 2>&1; then
     REPO_URL=$(jq -r '.repository.url' "$PLUGIN_DIR/package.json")
-    if [[ "$REPO_URL" != *"claude-plugins"* ]]; then
-        echo "❌ Repository URL should point to claude-plugins monorepo, got: $REPO_URL"
+    if [[ "$REPO_URL" != *"Data-Wise/rforge"* ]]; then
+        echo "❌ Repository URL should point to Data-Wise/rforge, got: $REPO_URL"
         exit 1
     fi
     echo "  ✅ Repository URL correct"
