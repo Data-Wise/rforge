@@ -41,37 +41,51 @@ activate:
 }
 ```
 
-### Environment Contract
+### Input Contract
 
-| Variable | Provided by | Purpose |
-|----------|-------------|---------|
-| `CLAUDE_TOOL_NAME` | Claude Code | Name of the tool being invoked (e.g. `Write`, `Edit`). |
-| `CLAUDE_TOOL_INPUT` | Claude Code | JSON-encoded tool input parameters. |
+Claude Code passes the hook payload as **JSON on stdin** (NOT as
+environment variables — see `~/.claude/hooks/branch-guard.sh:6` for the
+canonical contract documentation).
+
+```json
+{
+  "session_id": "...",
+  "tool_name": "Write",
+  "tool_input": { "file_path": "...", "content": "..." },
+  "cwd": "..."
+}
+```
+
+The hook reads `tool_name` and `tool_input` from this payload. Empty or
+malformed stdin is handled gracefully (silent no-op, exit 0).
 
 ### Testing
 
 ```bash
 # Block: editing a roxygen-generated .Rd file
-CLAUDE_TOOL_NAME=Edit \
-CLAUDE_TOOL_INPUT='{"file_path":"man/foo.Rd","old_string":"x","new_string":"y"}' \
-  python3 .claude-plugin/hooks/pretooluse.py
+echo '{"tool_name":"Edit","tool_input":{"file_path":"man/foo.Rd","old_string":"x","new_string":"y"}}' \
+  | python3 .claude-plugin/hooks/pretooluse.py
 echo $?  # → 2 (blocked)
 
 # Warn: editing R/ source
-CLAUDE_TOOL_NAME=Edit \
-CLAUDE_TOOL_INPUT='{"file_path":"R/foo.R","old_string":"x","new_string":"y"}' \
-  python3 .claude-plugin/hooks/pretooluse.py
+echo '{"tool_name":"Edit","tool_input":{"file_path":"R/foo.R","old_string":"x","new_string":"y"}}' \
+  | python3 .claude-plugin/hooks/pretooluse.py
 echo $?  # → 0 (allowed, with warning to stderr)
 
 # Warn: bad SemVer in DESCRIPTION
-CLAUDE_TOOL_NAME=Write \
-CLAUDE_TOOL_INPUT='{"file_path":"DESCRIPTION","content":"Version: not-semver\n"}' \
-  python3 .claude-plugin/hooks/pretooluse.py
+echo '{"tool_name":"Write","tool_input":{"file_path":"DESCRIPTION","content":"Version: not-semver\n"}}' \
+  | python3 .claude-plugin/hooks/pretooluse.py
 echo $?  # → 0 (allowed, with warning)
+
+# Full validation suite (includes contract correctness checks):
+bash tests/test-all.sh
 ```
 
 ## See Also
 
 - `.claude-plugin/skills/validation/description-sync.md` — companion
   validator that catches DESCRIPTION ↔ NEWS.md drift at release time.
-- craft's `pretooluse.py` — upstream pattern this hook is modeled on.
+- craft's `pretooluse.py` — original inspiration for this hook's rules.
+  **Note:** craft's hook reads from env vars, which appears to be a
+  silent no-op against the actual Claude Code stdin contract. This
+  rforge port intentionally diverges to use the working stdin protocol.

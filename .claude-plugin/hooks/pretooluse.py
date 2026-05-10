@@ -135,15 +135,20 @@ def check_description_version(file_path, content):
 
 
 def main():
-    tool_name = os.environ.get("CLAUDE_TOOL_NAME", "")
+    # Claude Code passes the hook payload as JSON on stdin:
+    #   { "session_id": "...", "tool_name": "Write",
+    #     "tool_input": { "file_path": "...", "content": "..." }, ... }
+    # See ~/.claude/hooks/branch-guard.sh for the canonical contract.
+    try:
+        payload = json.load(sys.stdin)
+    except (json.JSONDecodeError, ValueError):
+        return
+
+    tool_name = payload.get("tool_name", "")
     if tool_name not in ("Write", "Edit"):
         return
 
-    try:
-        parsed = json.loads(os.environ.get("CLAUDE_TOOL_INPUT", "{}"))
-    except json.JSONDecodeError:
-        return
-
+    parsed = payload.get("tool_input", {}) or {}
     file_path = parsed.get("file_path", "")
     if not file_path:
         return

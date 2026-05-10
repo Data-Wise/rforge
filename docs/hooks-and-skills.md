@@ -117,19 +117,18 @@ activate, add to your `~/.claude/settings.json` (or per-project
 
 ### Testing the hook locally
 
-Each rule can be exercised from the shell:
+Each rule can be exercised by piping JSON to stdin (Claude Code's hook
+contract — see `.claude-plugin/hooks/README.md` for details):
 
 ```bash
 # Block: editing a roxygen-generated .Rd file (exit 2)
-CLAUDE_TOOL_NAME=Edit \
-CLAUDE_TOOL_INPUT='{"file_path":"man/foo.Rd","old_string":"x","new_string":"y"}' \
-  python3 .claude-plugin/hooks/pretooluse.py
+echo '{"tool_name":"Edit","tool_input":{"file_path":"man/foo.Rd","old_string":"x","new_string":"y"}}' \
+  | python3 .claude-plugin/hooks/pretooluse.py
 echo $?
 
 # Warn: bad SemVer in DESCRIPTION (exit 0)
-CLAUDE_TOOL_NAME=Write \
-CLAUDE_TOOL_INPUT='{"file_path":"DESCRIPTION","content":"Version: not-semver\n"}' \
-  python3 .claude-plugin/hooks/pretooluse.py
+echo '{"tool_name":"Write","tool_input":{"file_path":"DESCRIPTION","content":"Version: not-semver\n"}}' \
+  | python3 .claude-plugin/hooks/pretooluse.py
 echo $?
 ```
 

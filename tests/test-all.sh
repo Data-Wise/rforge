@@ -37,38 +37,49 @@ run() {
 }
 
 # Hook smoke tests — each rule isolated.
+# Claude Code passes the hook payload as JSON on stdin (per the contract
+# documented in ~/.claude/hooks/branch-guard.sh). Earlier versions of
+# these tests passed env vars — that's not the actual Claude Code API
+# and the hook silently no-op'd in production.
 hook_blocks_man_rd() {
-    CLAUDE_TOOL_NAME=Edit \
-    CLAUDE_TOOL_INPUT='{"file_path":"man/foo.Rd","old_string":"x","new_string":"y"}' \
-        python3 .claude-plugin/hooks/pretooluse.py
+    echo '{"tool_name":"Edit","tool_input":{"file_path":"man/foo.Rd","old_string":"x","new_string":"y"}}' \
+        | python3 .claude-plugin/hooks/pretooluse.py
     [ $? -eq 2 ]
 }
 
 hook_warns_r_source() {
-    CLAUDE_TOOL_NAME=Edit \
-    CLAUDE_TOOL_INPUT='{"file_path":"R/foo.R","old_string":"x","new_string":"y"}' \
-        python3 .claude-plugin/hooks/pretooluse.py 2>/dev/null
+    echo '{"tool_name":"Edit","tool_input":{"file_path":"R/foo.R","old_string":"x","new_string":"y"}}' \
+        | python3 .claude-plugin/hooks/pretooluse.py 2>/dev/null
     [ $? -eq 0 ]
 }
 
 hook_warns_bad_semver() {
-    CLAUDE_TOOL_NAME=Write \
-    CLAUDE_TOOL_INPUT='{"file_path":"DESCRIPTION","content":"Version: not-semver\n"}' \
-        python3 .claude-plugin/hooks/pretooluse.py 2>&1 | grep -q "not SemVer-compatible"
+    echo '{"tool_name":"Write","tool_input":{"file_path":"DESCRIPTION","content":"Version: not-semver\n"}}' \
+        | python3 .claude-plugin/hooks/pretooluse.py 2>&1 \
+        | grep -q "not SemVer-compatible"
 }
 
 hook_silent_on_good_semver() {
     local out
-    out=$(CLAUDE_TOOL_NAME=Write \
-          CLAUDE_TOOL_INPUT='{"file_path":"DESCRIPTION","content":"Version: 1.2.0\n"}' \
-          python3 .claude-plugin/hooks/pretooluse.py 2>&1)
+    out=$(echo '{"tool_name":"Write","tool_input":{"file_path":"DESCRIPTION","content":"Version: 1.2.0\n"}}' \
+          | python3 .claude-plugin/hooks/pretooluse.py 2>&1)
     [ -z "$out" ]
 }
 
 hook_ignores_non_write_edit() {
-    CLAUDE_TOOL_NAME=Read \
-    CLAUDE_TOOL_INPUT='{"file_path":"man/foo.Rd"}' \
-        python3 .claude-plugin/hooks/pretooluse.py
+    echo '{"tool_name":"Read","tool_input":{"file_path":"man/foo.Rd"}}' \
+        | python3 .claude-plugin/hooks/pretooluse.py
+    [ $? -eq 0 ]
+}
+
+# Contract test: empty/garbage stdin must not crash.
+hook_handles_empty_stdin() {
+    echo '' | python3 .claude-plugin/hooks/pretooluse.py
+    [ $? -eq 0 ]
+}
+
+hook_handles_garbage_stdin() {
+    echo 'not json at all' | python3 .claude-plugin/hooks/pretooluse.py
     [ $? -eq 0 ]
 }
 
@@ -162,6 +173,8 @@ run "Hook rule 2: warns on R/*.R, exits 0"   hook_warns_r_source
 run "Hook rule 3a: warns on bad SemVer"      hook_warns_bad_semver
 run "Hook rule 3b: silent on good SemVer"    hook_silent_on_good_semver
 run "Hook ignores non-Write/Edit tools"      hook_ignores_non_write_edit
+run "Hook handles empty stdin gracefully"    hook_handles_empty_stdin
+run "Hook handles garbage stdin gracefully"  hook_handles_garbage_stdin
 
 # Manifests
 run "marketplace.json parses" python3 -c "import json; json.load(open('.claude-plugin/marketplace.json'))"
