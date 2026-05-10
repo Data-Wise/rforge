@@ -1,0 +1,73 @@
+project: rforge
+updated: 2026-05-10
+status: Active
+version: 1.2.0 (on dev, not yet GitHub-released)
+last_release: 2026-05-10 (PR #1 squash-merged to dev as 83a7d4d)
+
+worktrees: []
+
+recent:
+  - date: 2026-05-10
+    pr: 1
+    branch: feature/craft-parity-foundations
+    title: "Craft parity foundations: marketplace, hooks, skills (v1.2.0)"
+    state: MERGED
+    merge_commit: 83a7d4d
+    summary: |
+      Phases 1+2 of craft-parity roadmap shipped. Added marketplace.json,
+      config.json (4 stub options), pretooluse.py (4 R-aware rules,
+      1 BLOCK + 3 WARN), description-sync skill (first validation skill),
+      docs (hooks-and-skills, configuration, architecture Mermaid),
+      tests/test-all.sh (20 checks). Self-review caught hook contract bug
+      (env vars vs stdin) — fixed in b413ab3 before merge. Same bug
+      flagged + fixed upstream in craft (PR #125, separate session).
+
+  - date: 2026-05-10
+    type: post-merge polish (5 commits on dev)
+    summary: |
+      Post-merge cleanup pass after PR #1 landed. Tightened version-sync,
+      eliminated rename-debt + monorepo-extraction debris, decoupled MCP.
+
+      8c94582  chore(.STATUS): clean up worktree entry post-merge
+      c2369ae  docs: package.json bump 1.1.0→1.2.0 + 9-link sweep + README v1.2.0 narrative
+      cdf9c2e  chore: monorepo URL leftovers + harden versions_match (4 sources, was 2)
+      957158b  docs: complete rforge-orchestrator → rforge rename across user-facing docs
+      <next>   chore: drop rforge-mcp peer dep + Path B migration SPEC
+
+      Cross-repo follow-ups:
+      - Data-Wise/homebrew-tap PR #103 MERGED — deprecate! rforge-orchestrator formula
+      - Data-Wise/craft PR #125 OPEN (separate session) — fix pretooluse stdin contract
+      - Data-Wise/craft Issue #126 OPEN — 3 doc files still showing env-var contract
+
+      Verified: 20/20 tests, 0 broken internal links, all 4 version sources
+      sync at 1.2.0, npm install no longer fails on rforge-mcp 404.
+
+decisions:
+  - date: 2026-05-10
+    decision: "MCP is now optional (Path A → B)"
+    rationale: |
+      User goal: maintain only rforge (not also rforge-mcp). Half of MCP's
+      13 tools were placeholders; user is single-client (Claude Code, no
+      Desktop/Cursor); plugin commands are markdown prompts that work via
+      Claude Code's built-in tools without an MCP server.
+    path_a_shipped:
+      commit: <next>
+      changes:
+        - "package.json: drop peerDependencies.rforge-mcp"
+        - "README.md: reframe Part 1 (MCP install) as optional"
+        - "tests/test-plugin-structure.sh: remove Test 8 (peer-dep assertion)"
+        - "CHANGELOG.md: document the decoupling in v1.2.0 entry"
+    path_b_spec:
+      file: docs/specs/SPEC-mcp-absorb-2026-05-10.md
+      summary: |
+        Migration plan for absorbing rforge-mcp's 7 implemented tools into
+        rforge's lib/. 4 phases. Drops 6 placeholder MCP tools entirely.
+        Estimated 3-4 sessions, not urgent — A already unblocks npm install.
+
+backlog:
+  - title: "craft-parity Phase 3 — command namespacing (BREAKING, v2.0.0)"
+  - title: "craft-parity Phase 4 — discovery engine + agents (v2.1.0)"
+  - title: "Path B Phase B.1 — port discovery + deps modules to lib/"
+    spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
+  - title: "GitHub release v1.2.0 from dev → main"
+    notes: "Pre-flight done: docs synced, all tests passing, 4-source version sync verified."

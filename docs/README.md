@@ -1,6 +1,6 @@
-# RForge Orchestrator Plugin - Documentation
+# RForge Plugin - Documentation
 
-> **Complete documentation for the RForge Orchestrator Plugin v0.1.0**
+> **Complete documentation for the RForge Plugin v1.2.0**
 
 ---
 
@@ -18,7 +18,7 @@
 | Document | Purpose | Location |
 |----------|---------|----------|
 | **[README.md](../README.md)** | Main plugin documentation | Root |
-| **Homebrew Formula** | Installation and usage | `brew info rforge-orchestrator` |
+| **Homebrew Formula** | Installation and usage | `brew info data-wise/tap/rforge` |
 
 ---
 
@@ -28,7 +28,7 @@
 
 **Need a reminder:** Check [REFCARD.md](REFCARD.md)
 
-**Installing:** Run `brew install data-wise/tap/rforge-orchestrator`
+**Installing:** Run `brew install --HEAD data-wise/tap/rforge` (HEAD-only until v1.2.0 stable release ships)
 
 ---
 
@@ -38,7 +38,7 @@
 Perfect for:
 - First-time users
 - Getting up and running fast
-- Learning the 3 commands
+- Learning the headline commands (`/rforge:quick`, `analyze`, `thorough`)
 
 **Contents:**
 - Installation (1 minute)
@@ -54,7 +54,7 @@ Perfect for:
 - One-page printable reference
 
 **Contents:**
-- All 3 commands in tables
+- All commands in tables (15 total)
 - Pattern recognition guide
 - RForge MCP tools overview
 - Common workflows
@@ -78,22 +78,29 @@ Perfect for:
 ## 📂 Plugin Structure
 
 ```
-rforge-orchestrator/
+rforge/
+├── .claude-plugin/            # Claude Code plugin manifest + extras
+│   ├── plugin.json            # Plugin manifest (v1.2.0)
+│   ├── marketplace.json       # Marketplace install metadata
+│   ├── config.json            # User-tunable options
+│   ├── hooks/
+│   │   └── pretooluse.py      # R-aware Write/Edit guard
+│   └── skills/
+│       └── validation/        # Autonomous validation skills
+├── commands/                  # 15 slash commands (/rforge:*)
+├── agents/                    # Orchestrator agent
+│   └── orchestrator.md        # Pattern recognition + delegation
 ├── docs/                      # 👈 You are here
 │   ├── README.md              # This file
 │   ├── QUICK-START.md         # 3-minute guide
-│   └── REFCARD.md             # One-page reference
-├── commands/                  # 3 slash commands
-│   ├── analyze.md             # /rforge:analyze
-│   ├── quick.md               # /rforge:quick
-│   └── thorough.md            # /rforge:thorough
-├── agents/                    # Orchestrator agent
-│   └── orchestrator.md        # Pattern recognition + delegation
-├── tests/                     # Unit tests
-│   └── test-plugin-structure.sh
+│   ├── REFCARD.md             # One-page reference
+│   ├── architecture.md        # Plugin Surface diagram + details
+│   ├── hooks-and-skills.md    # Hook rules + skill reference
+│   └── configuration.md       # config.json options
+├── lib/
+│   └── formatters.py          # Output formatting helpers
+├── tests/                     # Validation suite (test-all.sh)
 ├── scripts/                   # Installation scripts
-│   ├── install.sh
-│   └── uninstall.sh
 ├── README.md                  # Main documentation
 ├── package.json               # npm metadata
 └── LICENSE                    # MIT license
@@ -112,7 +119,7 @@ rforge-orchestrator/
 → [REFCARD.md](REFCARD.md)
 
 **Install the plugin**
-→ Run `brew install data-wise/tap/rforge-orchestrator`
+→ Run `brew install --HEAD data-wise/tap/rforge`
 
 **Understand pattern recognition**
 → [REFCARD.md](REFCARD.md#pattern-recognition)
@@ -174,35 +181,38 @@ See [REFCARD.md](REFCARD.md) for detailed pattern recognition guide.
 
 ## 🔗 External Links
 
-- **Plugin Repository:** https://github.com/Data-Wise/claude-plugins
-- **GitHub Release:** https://github.com/Data-Wise/claude-plugins/releases/tag/rforge-orchestrator-v0.1.0
+- **Plugin Repository:** https://github.com/Data-Wise/rforge
+- **GitHub Releases:** https://github.com/Data-Wise/rforge/releases
 - **Homebrew Tap:** https://github.com/Data-Wise/homebrew-tap
-- **Homebrew Formula:** `brew info rforge-orchestrator`
-- **Monorepo Documentation:** [../../KNOWLEDGE.md](../../KNOWLEDGE.md)
+- **Homebrew Formula:** `brew info data-wise/tap/rforge`
 
 ---
 
 ## 📦 Installation
 
-**Homebrew (Recommended):**
+**Claude Code marketplace (Recommended for v1.2.0+):**
+
+```text
+/plugin marketplace add Data-Wise/rforge
+```
+
+**Homebrew (HEAD-only until v1.2.0 stable release):**
 
 ```bash
-brew install data-wise/tap/rforge-orchestrator
+brew install --HEAD data-wise/tap/rforge
 ```
 
 **Manual:**
 
 ```bash
 cd ~/.claude/plugins
-git clone https://github.com/Data-Wise/claude-plugins.git temp
-mv temp/rforge-orchestrator .
-rm -rf temp
+git clone https://github.com/Data-Wise/rforge.git
 ```
 
 **Uninstall:**
 
 ```bash
-brew uninstall rforge-orchestrator
+brew uninstall rforge
 ```
 
 ---
@@ -228,11 +238,11 @@ See [QUICK-START.md](QUICK-START.md#prerequisites) for details.
 
 ## 📝 Document Maintenance
 
-**Last Updated:** 2025-12-23
-**Plugin Version:** 0.1.0
-**Documentation Version:** 1.0.0
+**Last Updated:** 2026-05-10
+**Plugin Version:** 1.2.0
+**Documentation Version:** 1.2.0
 
-**Release:** https://github.com/Data-Wise/claude-plugins/releases/tag/rforge-orchestrator-v0.1.0
+**Releases:** https://github.com/Data-Wise/rforge/releases
 
 ---
 

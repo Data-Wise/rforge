@@ -1,8 +1,35 @@
-# RForge Orchestrator Plugin
+# RForge Plugin
 
-**Auto-delegation orchestrator for RForge MCP tools**
+[![Version](https://img.shields.io/github/package-json/v/Data-Wise/rforge?label=version&color=blue)](https://github.com/Data-Wise/rforge/releases)
+[![npm](https://img.shields.io/npm/v/@data-wise/rforge-plugin?label=npm&color=red)](https://www.npmjs.com/package/@data-wise/rforge-plugin)
+[![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
+[![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
-Automatically analyzes R package changes by intelligently delegating to RForge MCP tools and synthesizing results.
+**R package ecosystem orchestrator for Claude Code — 15 commands, R-aware hooks, validation skills.**
+
+Automatically analyzes R package changes by intelligently delegating to RForge MCP tools and synthesizing results. As of v1.2.0 the MCP server is optional — the plugin works standalone via Claude Code's built-in tools.
+
+## What's new in v1.2.0
+
+- 🛒 **Marketplace install** — one-shot setup via
+  `/plugin marketplace add Data-Wise/rforge` (no clone, no symlinks).
+  See [`docs/configuration.md`](docs/configuration.md) for tunable
+  options (CRAN mirror, vignette engine, R version pin, CLAUDE.md budget).
+- 🪝 **R-aware `PreToolUse` hook** — four rules that fire on every
+  `Write`/`Edit`: blocks hand-edits to roxygen-generated `man/*.Rd`,
+  warns when `R/*.R` edits may need NAMESPACE/DESCRIPTION sync, warns
+  on non-SemVer `DESCRIPTION` Version bumps, warns on writes outside
+  the active worktree. Diagnostic, not adversarial — only the
+  `man/*.Rd` rule blocks. See [`docs/hooks-and-skills.md`](docs/hooks-and-skills.md).
+- 🔍 **`description-sync` validation skill** — pure-shell sanity check
+  that `DESCRIPTION` Version matches the top entry in `NEWS.md` /
+  `CHANGELOG.md`. Catches the most common pre-CRAN release-prep failure.
+  No R required.
+- 📐 **Plugin Surface architecture diagram** — new Mermaid diagram in
+  [`docs/architecture.md`](docs/architecture.md) showing how marketplace,
+  config, commands, agents, hooks, and skills relate.
+
+Full changelog: [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Quick Start
 
@@ -81,10 +108,14 @@ Comprehensive analysis with R CMD check (2-5 minutes)
 ## Installation
 
 RForge has a two-part installation: the plugin (commands/UI) and the MCP server (backend tools).
+**As of v1.2.0 the MCP server is optional** — the plugin's commands work standalone via Claude
+Code's built-in tools (Read, Bash, etc.). Install the MCP server only if you want richer
+typed/structured analysis output and reusability from non-Claude-Code clients.
 
-### Part 1: Install RForge MCP Server
+### Part 1 (optional): Install RForge MCP Server
 
-The MCP server must be installed FIRST and configured in Claude settings.
+If you want advanced ecosystem analysis with structured I/O, install the MCP server and
+configure it in Claude settings. Otherwise skip to Part 2 — the plugin works without it.
 
 ```bash
 # Install rforge-mcp globally
@@ -136,7 +167,21 @@ cat ~/.claude/settings.json | grep rforge-mcp
 
 ### Part 2: Install RForge Plugin
 
-#### Option 1: Homebrew (Recommended - macOS)
+#### Option 1: Claude Code Marketplace (Recommended)
+
+From inside Claude Code:
+
+```text
+/plugin marketplace add Data-Wise/rforge
+/plugin install rforge
+```
+
+The marketplace install reads `.claude-plugin/marketplace.json` from the
+repository, fetches the plugin into `~/.claude/plugins/rforge`, and wires
+it up automatically. Works on macOS, Linux, and Windows. Update later with
+`/plugin update rforge`.
+
+#### Option 2: Homebrew (macOS)
 
 ```bash
 # Add the Data-Wise tap
@@ -151,7 +196,7 @@ The Homebrew formula automatically:
 - Makes it available in Claude Code CLI and Claude Desktop
 - Reminds you to install rforge-mcp if not present
 
-#### Option 2: npm (When published)
+#### Option 3: npm (When published)
 
 ```bash
 # Install from npm (after publishing)
@@ -160,7 +205,7 @@ npm install -g @data-wise/rforge-plugin
 # Plugin will auto-install to ~/.claude/plugins/rforge
 ```
 
-#### Option 3: Manual Installation (Local Development)
+#### Option 4: Manual Installation (Local Development)
 
 **For Claude Code CLI and Claude Desktop:**
 
@@ -453,25 +498,24 @@ Plugin settings in `plugin.json`:
 
 ## Development
 
-**For plugin development and contributions:**
-- 📖 **[Developer Guide (CLAUDE.md)](../CLAUDE.md)** - Comprehensive guide for working with this monorepo
-- Development commands, architecture patterns, CI/CD workflows
-- Quality standards and troubleshooting
-
 **Plugin structure:**
 ```
-~/.claude/plugins/rforge-orchestrator/
-├── plugin.json              # Plugin manifest
+~/.claude/plugins/rforge/
+├── .claude-plugin/
+│   ├── plugin.json          # Plugin manifest (v1.2.0)
+│   ├── marketplace.json     # Marketplace install metadata
+│   ├── config.json          # User-tunable options (CRAN mirror, etc.)
+│   ├── hooks/
+│   │   └── pretooluse.py    # R-aware Write/Edit guard (4 rules)
+│   └── skills/
+│       └── validation/
+│           └── description-sync.md  # DESCRIPTION ↔ NEWS.md drift check
+├── commands/                # 15 slash commands (/rforge:*)
 ├── agents/
-│   └── orchestrator.md      # Main orchestration logic
-├── skills/
-│   ├── analyze.md           # /rforge:analyze
-│   ├── quick.md             # /rforge:quick
-│   └── thorough.md          # /rforge:thorough
+│   └── orchestrator.md      # Pattern recognition + delegation
 ├── lib/
-│   └── dashboard.ts         # Progress utilities (future)
-└── docs/
-    └── architecture.md      # Design docs
+│   └── formatters.py        # Output formatting helpers
+└── docs/                    # User-facing docs
 ```
 
 ## Contributing

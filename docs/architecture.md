@@ -8,6 +8,78 @@ RForge is an **orchestrator plugin** that intelligently delegates to RForge MCP 
 
 **Key Innovation:** Auto-delegation with parallel execution that completes 4 tool calls in the time it takes to execute 1.
 
+## Plugin Surface
+
+> Added in v1.2.0. Mirrors craft's `.claude-plugin/` layout.
+
+The plugin ships four kinds of artifact, each loaded by Claude Code at a
+different lifecycle stage:
+
+```mermaid
+graph LR
+    subgraph User["You / Claude Code session"]
+        UR[User request]
+    end
+
+    subgraph Plugin[".claude-plugin/"]
+        MP[marketplace.json<br/><i>install-time</i>]
+        CFG[config.json<br/><i>plugin-load</i>]
+        CMD[commands/*.md<br/><i>15 slash commands</i>]
+        AGT[agents/orchestrator.md<br/><i>auto-delegation</i>]
+        HK[hooks/pretooluse.py<br/><i>every Write/Edit</i>]
+        SK[skills/validation/*.md<br/><i>auto-discovered</i>]
+    end
+
+    subgraph MCP["RForge MCP server"]
+        T1[health]
+        T2[tests]
+        T3[docs]
+        T4[impact]
+    end
+
+    subgraph R["R environment"]
+        DESCR[DESCRIPTION]
+        NS[NAMESPACE]
+        RD[man/*.Rd]
+        SRC[R/*.R]
+    end
+
+    UR -->|/rforge:analyze| CMD
+    UR -->|edits files| HK
+    HK -->|reads| DESCR
+    HK -->|protects| RD
+    CMD -->|delegates| AGT
+    AGT -->|invokes| T1
+    AGT -->|invokes| T2
+    AGT -->|invokes| T3
+    AGT -->|invokes| T4
+    T1 --> R
+    T2 --> R
+    T3 --> R
+    T4 --> R
+    SK -.->|optional| DESCR
+    CFG -.->|reads| CMD
+    CFG -.->|reads| AGT
+```
+
+| Layer | When it fires | Lives in | Authority |
+|-------|---------------|----------|-----------|
+| `marketplace.json` | At install (`/plugin marketplace add`) | `.claude-plugin/` | Claude Code marketplace |
+| `config.json` | When plugin loads | `.claude-plugin/` | rforge runtime |
+| `commands/*.md` | When user types `/rforge:<cmd>` | `commands/` | Claude Code |
+| `agents/orchestrator.md` | When pattern recognition triggers | `agents/` | Claude Code |
+| `hooks/pretooluse.py` | Every `Write`/`Edit` tool call | `.claude-plugin/hooks/` | Claude Code hook system |
+| `skills/validation/*.md` | When Claude needs to verify state | `.claude-plugin/skills/` | Claude Code skill discovery |
+
+The orchestrator-and-MCP machinery (covered in the rest of this document)
+is the *runtime brain*. The four pieces above are the *static surface*
+the plugin advertises to Claude Code.
+
+For a user-facing tour of the new hook + skill, see
+[Hooks & Skills Reference](hooks-and-skills.md).
+
+---
+
 ## Architecture Layers
 
 ```
@@ -528,6 +600,3 @@ class MarkdownFormatter {
 
 - **[Quick Start Guide](quickstart.md)** - Getting started
 - **[Commands Reference](commands.md)** - All commands
-- **[Mode System Guide](../../docs/MODE-USAGE-GUIDE.md)** - Mode system deep dive
-- **[Format Examples](../../docs/FORMAT-EXAMPLES.md)** - Output samples
-- **[Real-World Testing](../../docs/REAL-WORLD-TESTING-RESULTS.md)** - Performance data

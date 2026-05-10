@@ -536,5 +536,3 @@ All analysis commands support:
 
 - **[Quick Start Guide](quickstart.md)** - Getting started with RForge
 - **[Architecture Guide](architecture.md)** - How RForge works
-- **[Mode System Guide](../../docs/MODE-USAGE-GUIDE.md)** - Deep dive into modes
-- **[Format Examples](../../docs/FORMAT-EXAMPLES.md)** - Output format samples

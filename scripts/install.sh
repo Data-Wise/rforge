@@ -1,9 +1,14 @@
 #!/bin/bash
-# Install rforge-orchestrator plugin to Claude Code
+# Install the rforge plugin to Claude Code.
+# As of v1.2.0 the plugin installs to ~/.claude/plugins/rforge.
+# Earlier versions used PLUGIN_NAME="rforge-orchestrator" — if you
+# previously installed that, the path differs and you may want to
+# remove the old directory (`rm -rf ~/.claude/plugins/rforge-orchestrator`)
+# after the new install completes.
 
 set -euo pipefail
 
-PLUGIN_NAME="rforge-orchestrator"
+PLUGIN_NAME="rforge"
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TARGET_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
 
@@ -20,7 +25,7 @@ if [[ "${1:-}" == "--dev" ]]; then
     DEV_MODE=true
 fi
 
-echo -e "${BLUE}=== RForge Orchestrator Plugin Installer ===${NC}"
+echo -e "${BLUE}=== RForge Plugin Installer ===${NC}"
 echo -e "${BLUE}Plugin: ${YELLOW}$PLUGIN_NAME${NC}"
 echo -e "${BLUE}Source: ${YELLOW}$SOURCE_DIR${NC}"
 echo -e "${BLUE}Target: ${YELLOW}$TARGET_DIR${NC}"

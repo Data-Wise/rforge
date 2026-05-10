@@ -1,4 +1,4 @@
-# RForge Orchestrator Plugin - Quick Start
+# RForge Plugin - Quick Start
 
 > **Get up and running in 3 minutes**
 
@@ -6,11 +6,19 @@
 
 ## Install (1 minute)
 
-```bash
-brew install data-wise/tap/rforge-orchestrator
+**Recommended (Claude Code marketplace, v1.2.0+):**
+
+```text
+/plugin marketplace add Data-Wise/rforge
 ```
 
-**Done!** The plugin is automatically installed to `~/.claude/plugins/rforge-orchestrator`.
+**Or via Homebrew (HEAD-only until v1.2.0 stable release ships):**
+
+```bash
+brew install --HEAD data-wise/tap/rforge
+```
+
+**Done!** The plugin is installed to `~/.claude/plugins/rforge`.
 
 ---
 
@@ -70,7 +78,9 @@ brew install data-wise/tap/rforge-orchestrator
 
 ---
 
-## The 3 Commands
+## The 3 Headline Commands
+
+These are the entry points most users start with. The plugin ships **15 commands total** — see [REFCARD.md](REFCARD.md) for the full set (ecosystem management, dependency tracking, CRAN release planning, doc-drift checks, and more).
 
 | Command | Speed | When to Use |
 |---------|-------|-------------|
@@ -190,17 +200,19 @@ The orchestrator automatically detects what you're doing:
 
 ## What's Next?
 
-- **Full command reference:** See `docs/REFCARD.md`
-- **Homebrew formula:** `brew info rforge-orchestrator`
-- **Plugin source:** https://github.com/Data-Wise/claude-plugins
-- **GitHub release:** https://github.com/Data-Wise/claude-plugins/releases/tag/rforge-orchestrator-v0.1.0
+- **Full command reference:** See [REFCARD.md](REFCARD.md)
+- **Hooks & validation skills:** See [hooks-and-skills.md](hooks-and-skills.md)
+- **Configuration options:** See [configuration.md](configuration.md)
+- **Homebrew formula:** `brew info data-wise/tap/rforge`
+- **Plugin source:** https://github.com/Data-Wise/rforge
+- **GitHub releases:** https://github.com/Data-Wise/rforge/releases
 
 ---
 
 ## Uninstall
 
 ```bash
-brew uninstall rforge-orchestrator
+brew uninstall rforge
 ```
 
 ---
@@ -209,7 +221,7 @@ brew uninstall rforge-orchestrator
 
 **Commands not showing?**
 - Restart Claude Code
-- Check: `ls ~/.claude/plugins/rforge-orchestrator`
+- Check: `ls ~/.claude/plugins/rforge`
 
 **"RForge MCP not configured"?**
 - Add `rforge-mcp` to `~/.claude/settings.json`

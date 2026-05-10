@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "description": "User-configurable options for the rforge plugin. Override per-project in .claude/rforge.local.json.",
+  "options": {
+    "cran_mirror": {
+      "type": "string",
+      "default": "https://cloud.r-project.org",
+      "description": "Default CRAN mirror used for install.packages() and dependency resolution. The R-project cloud CDN is vendor-neutral and globally distributed.",
+      "examples": [
+        "https://cloud.r-project.org",
+        "https://cran.rstudio.com",
+        "https://packagemanager.posit.co/cran/latest"
+      ]
+    },
+    "vignette_engine": {
+      "type": "string",
+      "default": "knitr::rmarkdown",
+      "description": "Default VignetteBuilder used when scaffolding new vignettes. Set to 'quarto' to use Quarto-based vignettes instead.",
+      "enum": [
+        "knitr::rmarkdown",
+        "knitr::knitr",
+        "quarto"
+      ]
+    },
+    "r_version_pin": {
+      "type": "string",
+      "default": ">= 4.1.0",
+      "description": "Default R version requirement written into DESCRIPTION's Depends field for new packages. Use SemVer comparison syntax."
+    },
+    "claude_md_budget": {
+      "type": "integer",
+      "default": 600,
+      "description": "Maximum line count for CLAUDE.md files; warned by /rforge:doc-check when exceeded."
+    }
+  }
+}

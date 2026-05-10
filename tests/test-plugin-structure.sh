@@ -1,12 +1,12 @@
 #!/bin/bash
-# Test script for rforge-orchestrator plugin structure
+# Test script for the rforge plugin structure
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-echo "🧪 Testing rforge-orchestrator plugin structure..."
+echo "🧪 Testing rforge plugin structure..."
 
 # Test 1: Check required files exist
 echo "✓ Test 1: Required files..."
@@ -70,27 +70,21 @@ echo "  ✅ No hardcoded paths found"
 echo "✓ Test 7: Package.json repository..."
 if command -v jq >/dev/null 2>&1; then
     REPO_URL=$(jq -r '.repository.url' "$PLUGIN_DIR/package.json")
-    if [[ "$REPO_URL" != *"claude-plugins"* ]]; then
-        echo "❌ Repository URL should point to claude-plugins monorepo, got: $REPO_URL"
+    if [[ "$REPO_URL" != *"Data-Wise/rforge"* ]]; then
+        echo "❌ Repository URL should point to Data-Wise/rforge, got: $REPO_URL"
         exit 1
     fi
     echo "  ✅ Repository URL correct"
 fi
 
-# Test 8: Check package.json has peerDependencies
-echo "✓ Test 8: RForge MCP peer dependency..."
-if command -v jq >/dev/null 2>&1; then
-    PEER_DEPS=$(jq -r '.peerDependencies | keys[]' "$PLUGIN_DIR/package.json" 2>/dev/null || echo "")
-    if [[ "$PEER_DEPS" != *"rforge-mcp"* ]]; then
-        echo "❌ Missing rforge-mcp peer dependency"
-        exit 1
-    fi
-    echo "  ✅ RForge MCP peer dependency present"
-fi
+# Test 8 removed in v1.2.0: previously asserted `rforge-mcp` peer dependency
+# was present. As of v1.2.0 the MCP server is optional (see CHANGELOG —
+# "MCP server is now optional (decoupling)"), so peerDependencies is
+# intentionally absent from package.json. The plugin works standalone.
 
 echo ""
 echo "✅ All tests passed!"
 echo "📊 Summary:"
 echo "  - Commands: $COMMAND_COUNT"
 echo "  - Agents: $AGENT_COUNT"
-echo "  - Peer dependencies: rforge-mcp"
+echo "  - Peer dependencies: none (MCP optional in v1.2.0+)"
