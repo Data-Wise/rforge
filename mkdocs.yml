@@ -66,8 +66,12 @@ markdown_extensions:
 nav:
   - Home: index.md
   - 🚀 Quick Start: QUICK-START.md
+  - 📖 Detailed Quick Start: quickstart.md
   - 📚 Reference Card: REFCARD.md
   - Commands: commands.md
   - Architecture: architecture.md
   - Hooks & Skills: hooks-and-skills.md
   - Configuration: configuration.md
+  - Specs:
+    - Overview: specs/README.md
+    - "MCP absorb (Path B)": specs/SPEC-mcp-absorb-2026-05-10.md

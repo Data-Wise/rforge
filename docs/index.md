@@ -1,8 +1,24 @@
-# RForge Orchestrator Plugin
+# RForge Plugin
 
-**Auto-delegation orchestrator for RForge MCP tools**
+[![Version](https://img.shields.io/github/package-json/v/Data-Wise/rforge?label=version&color=blue)](https://github.com/Data-Wise/rforge/releases)
+[![npm](https://img.shields.io/npm/v/@data-wise/rforge-plugin?label=npm&color=red)](https://www.npmjs.com/package/@data-wise/rforge-plugin)
+[![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
+[![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
-Automatically analyzes R package changes by intelligently delegating to RForge MCP tools and synthesizing results.
+**R package ecosystem orchestrator for Claude Code — 15 commands, R-aware hooks, validation skills.**
+
+Automatically analyzes R package changes by intelligently delegating to RForge MCP tools and synthesizing results. As of v1.2.0 the MCP server is optional — the plugin works standalone via Claude Code's built-in tools.
+
+## What's new in v1.2.0
+
+- 🛒 **Marketplace install** — `/plugin marketplace add Data-Wise/rforge`
+- 🪝 **R-aware `PreToolUse` hook** — 4 rules (block `man/*.Rd` edits, warn on `R/*.R` and DESCRIPTION SemVer drift, warn on outside-worktree writes). See [Hooks & Skills](hooks-and-skills.md).
+- 🔍 **`description-sync` validation skill** — pure-shell DESCRIPTION ↔ NEWS.md drift check. No R required.
+- 📐 **Plugin Surface diagram** in [Architecture](architecture.md) (Mermaid).
+- 🔓 **MCP decoupled** — `npm install` now works without `rforge-mcp` (was failing with 404 for fresh users).
+- ⚙️ **User options** — see [Configuration](configuration.md) for `cran_mirror`, `vignette_engine`, `r_version_pin`, `claude_md_budget`.
+
+Full release notes: [CHANGELOG.md](https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md).
 
 ## Quick Start
 
