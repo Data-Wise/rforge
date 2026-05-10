@@ -83,11 +83,14 @@ Comprehensive analysis with R CMD check (2-5 minutes)
    npx rforge-mcp configure
    ```
 
-2. **Install this plugin**
-   ```bash
-   # Plugin is automatically available in ~/.claude/plugins/rforge-orchestrator/
-   # No additional installation needed
+2. **Install this plugin** (recommended: Claude Code marketplace)
+   ```text
+   /plugin marketplace add Data-Wise/rforge
+   /plugin install rforge
    ```
+
+   Alternative options (Homebrew, npm, manual symlink) are documented in
+   the main [README](https://github.com/Data-Wise/rforge#installation).
 
 3. **Restart Claude Code**
 
