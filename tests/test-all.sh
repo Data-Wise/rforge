@@ -168,7 +168,7 @@ for field in ('name:', 'description:', 'category:'):
 "
 }
 
-# Lib modules — pytest suite for lib/discovery.py + lib/deps.py.
+# Lib modules — pytest suite for lib/discovery.py + lib/deps.py + lib/status.py + lib/init.py.
 # Requires pytest. If not installed, we emit a clear hint and fail —
 # pytest is a dev-time dependency, expected in CI and local dev.
 lib_pytest() {
@@ -176,14 +176,26 @@ lib_pytest() {
         echo "pytest not installed — run: pip install pytest" >&2
         return 1
     fi
-    python3 -m pytest tests/test_lib_discovery.py tests/test_lib_deps.py -q
+    python3 -m pytest tests/test_lib_discovery.py tests/test_lib_deps.py tests/test_lib_status.py tests/test_lib_init.py -q
 }
 
 # Lib CLIs run end-to-end on an empty cwd without error.
 # lib/ is now a Python package — invoke via `python3 -m lib.<module>`.
+# CRITICAL: lib.init writes to ~/.rforge/ by default; we MUST pass --home to
+# a temp dir so the smoke test NEVER touches the user's real home.
+# We pass --path <tmpdir> instead of cd-ing so `lib` stays importable via
+# the plugin root (which is the CWD when this script runs).
 lib_cli_smoke() {
-    python3 -m lib.discovery --path . --format json > /dev/null && \
-    python3 -m lib.deps --path . --format json > /dev/null
+    local tmpdir home_smoke
+    tmpdir=$(mktemp -d)
+    home_smoke=$(mktemp -d)
+    python3 -m lib.discovery --path "$tmpdir" --format json > /dev/null && \
+    python3 -m lib.deps --path "$tmpdir" --format json > /dev/null && \
+    python3 -m lib.status --path "$tmpdir" --format json > /dev/null && \
+    python3 -m lib.init --path "$tmpdir" --home "$home_smoke" --format json > /dev/null
+    local rc=$?
+    rm -rf "$tmpdir" "$home_smoke"
+    return $rc
 }
 
 # Auto-extracted reference docs (docs/reference/*.md) must stay in sync with
@@ -229,8 +241,8 @@ run "Skill: embedded script syntax-checks"   skill_extract_and_check
 run "Skill: frontmatter has required fields" skill_frontmatter_complete
 
 # Lib modules (Path B Phase B.1 ports)
-run "Lib: pytest suite (discovery + deps)"   lib_pytest
-run "Lib: CLI smoke (discovery.py + deps.py)" lib_cli_smoke
+run "Lib: pytest suite (discovery + deps + status + init)"   lib_pytest
+run "Lib: CLI smoke (discovery + deps + status + init)" lib_cli_smoke
 run "Lib: reference docs in sync with source" lib_reference_in_sync
 
 echo ""

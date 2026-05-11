@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+> **Note:** v1.3.0 completes Path B — `rforge-mcp` is fully absorbed into the
+> plugin via pure-Python `lib/` ports. With this release, the plugin no longer
+> has any runtime dependency on the MCP server; the `data-wise/rforge-mcp`
+> repo will be archived separately once this PR merges.
+
 ### Added — Path B Phase B.1: discovery + deps ported to `lib/`
 
 - **`lib/discovery.py`** — pure-Python R ecosystem detector. Walks the filesystem
@@ -28,22 +33,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   constraints, `R` filtering), FS traversal (hidden-dir handling, no descent
   into packages), classification rules, graph construction, cycle detection,
   impact heuristics, and blockers.
-- **`tests/test-all.sh`** — adds two checks (`Lib: pytest suite`,
-  `Lib: CLI smoke`); total now 22.
+
+### Added — Path B Phases B.2 + B.3: status + init ported to `lib/`
+
+- **`lib/status.py`** — pure-Python port of `rforge-mcp`'s `status` tool. Reads
+  `DESCRIPTION` + `.STATUS` files and computes ecosystem health score.
+  Faithful port: same algorithm, same field names, no R subprocess. CLI:
+  `python3 -m lib.status [--path .] [--format text|json]`. (B.2)
+- **`lib/init.py`** — pure-Python port of `rforge-mcp`'s `init` tool. Writes
+  `~/.rforge/context.json` (global per-user state, matches MCP). Idempotent.
+  CLI: `python3 -m lib.init [--path .] [--quick] [--format text|json]`. (B.3)
+- **`commands/init.md`** — first-class `/rforge:init` command (B.3 makes init
+  a real, addressable tool).
+- **`docs/reference/{status,init}.md`** — auto-generated API reference from
+  module introspection; kept in sync by `scripts/gen_lib_reference.py --check`.
 
 ### Changed
 
 - **`commands/detect.md`, `commands/deps.md`, `commands/impact.md`** — invoke
   the new `lib/` Python modules via Bash instead of the `rforge_*` MCP tools.
   Both subprocess CLI usage and Python API documented.
+- **`commands/{status,quick,thorough}.md`** now dispatch
+  `python3 -m lib.status` instead of the MCP tool. `thorough.md` simplified
+  to point users at `R CMD check` / `devtools::test()` / `covr` directly.
+- **`commands/analyze.md`** — last two inline `rforge_status` / `rforge_detect`
+  references swapped for the `lib/` CLIs.
+- **`scripts/gen_lib_reference.py`** now generates references for `lib.status`
+  and `lib.init` alongside `lib.discovery` and `lib.deps`.
+- **`tests/test-all.sh`**: `lib_pytest` and `lib_cli_smoke` runners now
+  exercise all four `lib/` modules (discovery + deps + status + init). Total
+  checks remain 23 — coverage grew within existing runners.
+
+### Scope notes
+
+- **Status port is faithful, not aspirational.** The original SPEC called for
+  a 4-mode (default/debug/optimize/release) status contract with R subprocess
+  support. Wave 1 research surfaced that the MCP server's `status` tool had
+  no modes and ran no R subprocess — it's a `.STATUS` file reader with a
+  health-score heuristic. The 4-mode design is descoped to v1.4.0 pending
+  real-user input on what depth is wanted.
+- **`mcpServers.rforge` cleanup.** Users with `~/.claude/settings.json`
+  referencing the now-archived `rforge-mcp` binary should remove that entry
+  manually. We don't auto-edit user settings.
+
+### Removed
+
+- N/A — the plugin no longer depends on `rforge-mcp` at runtime, but no
+  rforge-side files are deleted in v1.3.0. (The `data-wise/rforge-mcp` repo
+  itself is archived separately after this PR merges.)
 
 ### Notes
 
 - Non-breaking: existing users with `rforge-mcp` installed keep working; new
   users get pure-Python analysis with no peer dependency.
-- Validated side-by-side against MCP server output on the mediationverse
-  ecosystem (5 packages); algorithmic parity confirmed (both treat `.Rcheck`
-  duplicates equivalently).
+- B.1 was validated side-by-side against MCP server output on the
+  mediationverse ecosystem (5 packages); algorithmic parity confirmed.
 
 ---
 
