@@ -43,10 +43,18 @@ from typing import Any, Optional
 from .discovery import read_description
 
 
+__all__ = [
+    "InitResult",
+    "init_context",
+    "format_text",
+    "format_json",
+]
+
+
 # ───────────────────────── Dataclass ─────────────────────────
 
 
-@dataclass
+@dataclass(frozen=True)
 class InitResult:
     """Outcome of `init_context()`.
 
@@ -148,8 +156,18 @@ def init_context(
 
     Returns:
         InitResult describing the state file path and detection outcome.
+
+    Raises:
+        FileNotFoundError: if `path` does not exist.
+        NotADirectoryError: if `path` exists but is not a directory.
+            (Matches `discovery.detect_ecosystem` error semantics.)
     """
-    abs_path = str(Path(path).resolve())
+    resolved = Path(path).resolve()
+    if not resolved.exists():
+        raise FileNotFoundError(f"path does not exist: {resolved}")
+    if not resolved.is_dir():
+        raise NotADirectoryError(f"path is not a directory: {resolved}")
+    abs_path = str(resolved)
     state_path = _state_path_for(home)
     existing = _load_context(state_path)
 
@@ -159,23 +177,28 @@ def init_context(
     package_version = desc.version if desc else None
 
     # Short-circuit: existing context matches this path and is initialized.
-    path_matches = bool(existing and existing.get("path") == abs_path)
-    already_init = bool(existing and existing.get("initialized") is True and path_matches)
+    # Explicit `is not None` checks let mypy narrow `existing` to dict without
+    # the `# type: ignore` workarounds the first draft needed.
+    if existing is not None:
+        path_matches = existing.get("path") == abs_path
+        already_init = existing.get("initialized") is True and path_matches
+    else:
+        path_matches = False
+        already_init = False
 
-    if already_init and not quick:
-        msg = _format_already_message(existing)  # type: ignore[arg-type]
+    if already_init and not quick and existing is not None:
         return InitResult(
             state_path=state_path,
             was_initialized=True,
-            package_name=existing.get("package") if existing else package_name,  # type: ignore[union-attr]
-            package_version=existing.get("version") if existing else package_version,  # type: ignore[union-attr]
+            package_name=existing.get("package", package_name),
+            package_version=existing.get("version", package_version),
             quick_mode=quick,
-            message=msg,
+            message=_format_already_message(existing),
         )
 
     # Build/update the context dict. Preserve detected_at across re-inits
     # on the same path; treat path mismatch as a fresh detection.
-    if existing and path_matches:
+    if existing is not None and path_matches:
         context: dict[str, Any] = dict(existing)
         context.setdefault("detected_at", _now_iso())
     else:

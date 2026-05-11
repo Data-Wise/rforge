@@ -37,6 +37,18 @@ from typing import Optional
 from .discovery import detect_ecosystem
 
 
+__all__ = [
+    "EcosystemStatus",
+    "PackageStatus",
+    "StatusFileSummary",
+    "aggregate_status",
+    "calculate_health_score",
+    "parse_status_file",
+    "format_text",
+    "format_json",
+]
+
+
 # ───────────────────────── Dataclasses ─────────────────────────
 
 
@@ -58,7 +70,7 @@ class StatusFileSummary:
             "phase": self.phase,
             "just_completed": list(self.just_completed),
             "next_actions": list(self.next_actions),
-            "last_updated": self.last_updated,
+            "last_updated": self.last_updated.isoformat() if self.last_updated else None,
         }
 
 
@@ -81,19 +93,25 @@ class PackageStatus:
             "path": self.path,
             "check_status": self.check_status,
             "test_status": self.test_status,
-            "last_updated": self.last_updated,
+            "last_updated": self.last_updated.isoformat() if self.last_updated else None,
             "status_file": self.status_file.to_dict() if self.status_file else None,
         }
 
 
 @dataclass
 class EcosystemStatus:
-    """Aggregated ecosystem status — the public return value of `aggregate_status`."""
+    """Aggregated ecosystem status — the public return value of `aggregate_status`.
+
+    `blocking_issues` is `None` when blocker detection isn't implemented yet
+    (deferred to v1.4.0 — see the comment in `aggregate_status`). When it
+    becomes a real list, `[]` means "checked, found none" and is semantically
+    distinct from `None` (not checked).
+    """
 
     ecosystem: str
     packages: list[PackageStatus]
     health_score: int
-    blocking_issues: list[str]
+    blocking_issues: Optional[list[str]]
     last_updated: datetime
 
     def to_dict(self) -> dict:
@@ -101,12 +119,18 @@ class EcosystemStatus:
             "ecosystem": self.ecosystem,
             "packages": [p.to_dict() for p in self.packages],
             "health_score": self.health_score,
-            "blocking_issues": list(self.blocking_issues),
-            "last_updated": self.last_updated,
+            "blocking_issues": list(self.blocking_issues) if self.blocking_issues is not None else None,
+            "last_updated": self.last_updated.isoformat() if isinstance(self.last_updated, datetime) else self.last_updated,
         }
 
 
 # ───────────────────────── .STATUS parsing ─────────────────────────
+#
+# The parser is intentionally regex-only (no YAML/Markdown libs) and is
+# tightly coupled to rforge's `.STATUS` template. Expected sections are
+# delimited by emoji headers — `🎯 CURRENT STATUS`, `✅ JUST COMPLETED`,
+# `📋 NEXT ACTIONS`, `⏰ LAST UPDATED`. Files that deviate from this
+# format will parse partially (fields that don't match stay None).
 
 
 _FOCUS_RE = re.compile(
@@ -260,7 +284,9 @@ def aggregate_status(ecosystem_path: str | os.PathLike = ".") -> EcosystemStatus
 
     # Blocking issues: MCP source populates this from .STATUS content
     # keywords like 'BLOCKED'; deferred until v1.4.0.
-    blocking_issues: list[str] = []
+    # `None` (not `[]`) signals "not implemented yet" — an actual empty list
+    # will mean "checked, found none".
+    blocking_issues: Optional[list[str]] = None
 
     health_score = calculate_health_score(packages)
 
@@ -299,8 +325,10 @@ def format_text(result: EcosystemStatus) -> str:
     lines.append(f"📊 ECOSYSTEM STATUS: {result.ecosystem}")
     lines.append("")
     if result.packages:
-        lines.append(f"{'Package':<24} {'Version':<10} {'Check':<10} Progress")
-        lines.append("─" * 60)
+        lines.append(
+            f"{'Package':<22} {'Version':<10} {'Check':<10} {'Test':<10} Progress"
+        )
+        lines.append("─" * 70)
         for pkg in result.packages:
             progress = (
                 f"{pkg.status_file.progress}%"
@@ -308,8 +336,9 @@ def format_text(result: EcosystemStatus) -> str:
                 else "--"
             )
             lines.append(
-                f"{pkg.name:<24} {pkg.version:<10} "
-                f"{_check_icon(pkg.check_status)} {pkg.check_status:<7} {progress}"
+                f"{pkg.name:<22} {pkg.version:<10} "
+                f"{_check_icon(pkg.check_status)} {pkg.check_status:<7} "
+                f"{_check_icon(pkg.test_status)} {pkg.test_status:<7} {progress}"
             )
     else:
         lines.append("(no packages discovered)")
@@ -326,6 +355,8 @@ def format_text(result: EcosystemStatus) -> str:
 
 
 def format_json(result: EcosystemStatus) -> str:
+    # `result.to_dict()` already serializes datetimes via isoformat, so the
+    # `default=str` fallback should never fire on a well-formed result.
     return json.dumps(result.to_dict(), indent=2, sort_keys=True, default=str)
 
 

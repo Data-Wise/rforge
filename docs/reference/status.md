@@ -32,12 +32,17 @@ Usage (Python API):
 
 Aggregated ecosystem status — the public return value of `aggregate_status`.
 
+`blocking_issues` is `None` when blocker detection isn't implemented yet
+(deferred to v1.4.0 — see the comment in `aggregate_status`). When it
+becomes a real list, `[]` means "checked, found none" and is semantically
+distinct from `None` (not checked).
+
 | Field | Type | Default |
 |---|---|---|
 | `ecosystem` | `str` | — |
 | `packages` | `list[PackageStatus]` | — |
 | `health_score` | `int` | — |
-| `blocking_issues` | `list[str]` | — |
+| `blocking_issues` | `Optional[list[str]]` | — |
 | `last_updated` | `datetime` | — |
 
 ### `class PackageStatus`

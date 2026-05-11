@@ -92,3 +92,8 @@ Args:
 
 Returns:
     InitResult describing the state file path and detection outcome.
+
+Raises:
+    FileNotFoundError: if `path` does not exist.
+    NotADirectoryError: if `path` exists but is not a directory.
+        (Matches `discovery.detect_ecosystem` error semantics.)

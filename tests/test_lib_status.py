@@ -29,7 +29,9 @@ def test_aggregate_status_empty_ecosystem(tmp_path):
     assert isinstance(result, EcosystemStatus)
     assert result.packages == []
     assert result.health_score == 100  # convention: no packages → perfect
-    assert result.blocking_issues == []
+    # `None` (not `[]`) signals blocker-detection is not implemented yet
+    # (deferred to v1.4.0). `[]` would mean "checked, found none".
+    assert result.blocking_issues is None
     assert result.ecosystem == str(tmp_path.resolve())
 
 
