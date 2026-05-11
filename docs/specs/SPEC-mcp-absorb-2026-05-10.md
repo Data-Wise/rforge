@@ -2,7 +2,7 @@
 
 > **Date:** 2026-05-10
 > **Status:** Shipped (pending v1.3.0 PR merge) — Path A shipped in v1.2.0; Phases B.1 (discovery + deps), B.2 (status), B.3 (init), B.4 (archive paperwork) all complete on `feature/mcp-absorb-rest` (2026-05-11). See [Scope correction](#scope-correction-2026-05-11) below.
-> **Related:** [Path A in CHANGELOG v1.2.0](../../CHANGELOG.md), [rforge-mcp repo](https://github.com/data-wise/rforge-mcp), [ORCHESTRATE for B.1](../../ORCHESTRATE-mcp-absorb-discovery.md)
+> **Related:** [Path A in CHANGELOG v1.2.0](../../CHANGELOG.md), [rforge-mcp repo](https://github.com/data-wise/rforge-mcp). ORCHESTRATE files for each phase were deleted at merge time per the CLAUDE.md cleanup rule — see PR #3 (B.1) and PR #4 (B.2+B.3+B.4) for the as-shipped commits.
 
 ## Summary
 

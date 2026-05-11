@@ -73,6 +73,11 @@ nav:
   - Hooks & Skills: hooks-and-skills.md
   - Configuration: configuration.md
   - Lib Modules: lib-modules.md
+  - Troubleshooting: troubleshooting.md
+  - Tutorials:
+    - Overview: tutorials/README.md
+    - "Getting started": tutorials/getting-started.md
+    - "Migrating from rforge-mcp": tutorials/migrate-from-mcp.md
   - Reference:
     - "discovery API": reference/discovery.md
     - "deps API": reference/deps.md
