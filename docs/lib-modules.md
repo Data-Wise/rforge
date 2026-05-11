@@ -4,9 +4,9 @@ Pure-Python R ecosystem analysis, callable from plugin commands or directly
 from any shell. Ships with rforge v1.3+ (no R subprocess, no MCP server, no
 external dependencies beyond the stdlib).
 
-> **Background.** As of v1.3.0 the plugin's discovery + dependency analysis
-> lives in `lib/` — three former MCP tools (`rforge_detect`, `rforge_deps`,
-> `rforge_impact`) ported to two self-contained Python modules. See
+> **Background.** As of v1.3.0 the plugin's entire analysis surface lives in
+> `lib/` — four self-contained Python modules (`discovery`, `deps`, `status`,
+> `init`) that replace all 7 implemented `rforge-mcp` tools. See
 > [Path B SPEC](specs/SPEC-mcp-absorb-2026-05-10.md) for the migration plan
 > and [reference docs](reference/discovery.md) for auto-generated API listings.
 
@@ -15,12 +15,14 @@ external dependencies beyond the stdlib).
 The original analysis logic ran inside `rforge-mcp` (a separate Node.js server).
 v1.2.0 dropped the peer dependency; v1.3.0 absorbs the logic itself. Result:
 the plugin's commands no longer require any external service to enumerate
-packages, build dependency graphs, or reason about change impact.
+packages, build dependency graphs, reason about change impact, summarize
+ecosystem health, or initialize per-user state.
 
 ```mermaid
 flowchart LR
-    cmd["/rforge:detect<br>/rforge:deps<br>/rforge:impact"] -->|bash| py[python3 -m lib.discovery<br>python3 -m lib.deps]
-    py --> fs[(R DESCRIPTION<br>files on disk)]
+    cmd["/rforge:detect<br>/rforge:deps<br>/rforge:impact<br>/rforge:status<br>/rforge:init"] -->|bash| py[python3 -m lib.discovery<br>python3 -m lib.deps<br>python3 -m lib.status<br>python3 -m lib.init]
+    py --> fs[(R DESCRIPTION<br>+ .STATUS files on disk)]
+    py --> state[(~/.rforge/<br>context.json)]
     py --> out[text or JSON<br>to stdout]
 ```
 
@@ -215,31 +217,37 @@ $ python3 -m lib.deps --path ~/projects/r-packages/active \
   ...
 ```
 
-## Coexistence with `rforge-mcp`
+## Replacement of `rforge-mcp`
 
-The `lib/` modules **do not replace** the MCP server — they sit alongside
-it. Users who have `rforge-mcp` installed keep getting MCP-driven analysis;
-users on the standalone path get the same analysis via `python3 lib/...`.
+As of v1.3.0 the `lib/` modules **replace** `rforge-mcp` entirely. The MCP
+server is no longer required (and is being archived). Anyone migrating from
+v1.2.x can remove the `mcpServers.rforge` entry from `~/.claude/settings.json`
+— see [`migration/rforge-mcp-deprecation.md`](migration/rforge-mcp-deprecation.md)
+for the full migration table mapping old MCP tools to new `lib/` modules.
 
-Both implementations should produce equivalent output for the three ported
-tools (`rforge_detect`, `rforge_deps`, `rforge_impact`). Known divergences
-are documented in the ORCHESTRATE file for each phase (e.g., `.Rcheck`
-duplicate handling is identical in both — both scanners pick up the
-shadow DESCRIPTION).
+Field-level wire compatibility: `lib/status.py` reads/writes the same
+`.STATUS` shape MCP did, and `lib/init.py` writes the same
+`~/.rforge/context.json` schema MCP used — so user state migrates
+transparently with no copy step.
 
 ## Testing
 
 ```bash
-python3 -m pytest tests/test_lib_discovery.py tests/test_lib_deps.py -v
+python3 -m pytest tests/test_lib_discovery.py tests/test_lib_deps.py tests/test_lib_status.py tests/test_lib_init.py -v
 ```
 
-32 cases cover DESCRIPTION edge cases, FS traversal, classification,
-graph construction, cycle detection, impact heuristics, and blockers.
-Integrated into `tests/test-all.sh` (full plugin suite — 22 checks).
+65 cases cover DESCRIPTION edge cases, FS traversal, classification,
+graph construction, cycle detection, impact heuristics, blockers,
+`.STATUS` parsing + health-score math, and `~/.rforge/context.json`
+round-trip with idempotency. Integrated into `tests/test-all.sh`
+(full plugin suite — 23 checks).
 
 ## See also
 
 - [Reference: `discovery` API](reference/discovery.md) — auto-extracted signatures + docstrings
 - [Reference: `deps` API](reference/deps.md) — auto-extracted signatures + docstrings
+- [Reference: `status` API](reference/status.md) — auto-extracted signatures + docstrings
+- [Reference: `init` API](reference/init.md) — auto-extracted signatures + docstrings
 - [SPEC: Absorb rforge-mcp (Path B)](specs/SPEC-mcp-absorb-2026-05-10.md) — full migration plan
+- [Migration: rforge-mcp deprecation](migration/rforge-mcp-deprecation.md) — old MCP tool → new lib module table
 - [Architecture](architecture.md#path-b-lib-modules) — where lib/ fits in the plugin surface

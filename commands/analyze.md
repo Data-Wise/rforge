@@ -45,7 +45,7 @@ Parse the user's request to detect mode:
 - Quick health metrics
 - Balanced, actionable output
 
-**Tools:** `rforge_detect`, `rforge_status`, `rforge_quick_health`
+**Tools:** `python3 -m lib.discovery`, `python3 -m lib.status`
 
 **Time Budget:** MUST complete in < 10 seconds
 
@@ -161,8 +161,8 @@ Start timer
 ### Step 3: Execute Mode-Specific Analysis
 
 **For Default Mode:**
-1. Call `rforge_detect` to find packages
-2. Call `rforge_status` for quick health
+1. Run `python3 -m lib.discovery` to find packages
+2. Run `python3 -m lib.status` for quick health
 3. Identify critical issues only
 4. Return actionable summary
 

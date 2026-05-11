@@ -32,27 +32,20 @@ Before installing RForge, ensure you have:
 
 ## Installation
 
-### Step 1: Install RForge MCP Server
+> **v1.3.0 note:** RForge is now fully self-contained. The MCP server is
+> no longer required (and is being archived). If you previously had an
+> `mcpServers.rforge` entry in `~/.claude/settings.json`, see
+> [`migration/rforge-mcp-deprecation.md`](migration/rforge-mcp-deprecation.md).
 
-The RForge plugin delegates to an MCP server for R package analysis:
-
-```bash
-npx rforge-mcp configure
-```
-
-This will:
-- Install the RForge MCP server
-- Configure Claude Code to use it
-- Set up necessary R environment variables
-
-### Step 2: Install RForge Plugin
+### Step 1: Install RForge Plugin
 
 ```bash
-# Via Claude Code marketplace (recommended for v1.2.0+)
+# Via Claude Code marketplace (recommended)
 /plugin marketplace add Data-Wise/rforge
+/plugin install rforge
 
-# Or via Homebrew (HEAD-only until v1.2.0 stable release)
-brew install --HEAD data-wise/tap/rforge
+# Or via Homebrew (macOS)
+brew install data-wise/tap/rforge
 
 # Or via npm
 npm install -g @data-wise/rforge-plugin
@@ -62,6 +55,15 @@ git clone https://github.com/Data-Wise/rforge.git
 cd rforge
 ./scripts/install.sh --dev
 ```
+
+### Step 2: Verify Python 3.10+
+
+```bash
+python3 --version    # Expect 3.10 or newer
+```
+
+The `lib/` modules run via `python3 -m lib.<tool>`; modern macOS / Linux
+distros ship with a compatible Python by default.
 
 ### Step 3: Restart Claude Code
 
@@ -81,9 +83,9 @@ cd ~/path/to/your-r-package
 ```
 
 You should see output showing your package health status. If you get an error, check that:
-- The RForge MCP server is configured (`claude mcp list`)
+- The plugin loaded (`ls ~/.claude/plugins/rforge`)
 - You're in an R package directory (has `DESCRIPTION` file)
-- R is accessible in your PATH
+- Python 3.10+ is on PATH (`python3 --version`)
 
 ## Basic Usage
 
@@ -257,15 +259,17 @@ Use `/rforge:detect` to see how RForge categorizes your project.
 
 ## Troubleshooting
 
-### "RForge MCP server not found"
+### "python3: command not found"
 
 **Solution:**
 ```bash
-# Check MCP server status
-claude mcp list
+# Verify Python 3.10+ is installed
+python3 --version
 
-# Reconfigure if needed
-npx rforge-mcp configure
+# macOS: install via Homebrew
+brew install python@3.12
+
+# Linux: install via your distro's package manager
 ```
 
 ### "Not an R package directory"
