@@ -8,17 +8,46 @@ worktrees:
   - branch: feature/mcp-absorb-discovery
     path: ~/.git-worktrees/rforge/feature-mcp-absorb-discovery
     base: dev
-    status: IN PROGRESS (fresh session opened 2026-05-10)
+    status: IMPLEMENTATION COMPLETE — pushed, awaiting user direction on PR
     created: 2026-05-10
     scope: "Path B Phase B.1 — port rforge_detect, rforge_deps, rforge_impact to lib/"
     target_release: v1.3.0 (non-breaking)
     spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
     orchestrate: ORCHESTRATE-mcp-absorb-discovery.md
+    last_commit: 6ab7f64 (docs(orchestrate): stress-test report on a second R ecosystem)
+    impl_commit: c01d581 (feat(lib): port discovery + deps from rforge-mcp to lib/)
     notes: |
-      ORCHESTRATE scaffold committed on feature branch (1fb5fa5).
-      Implementation underway in a separate `claude` session inside
-      the worktree. This `dev`-side STATUS will be updated again when
-      the feature branch is pushed and a PR opens.
+      Implementation shipped 2026-05-10:
+        - lib/discovery.py (327 lines), lib/deps.py (385 lines)
+        - 32 pytest cases (tests/test_lib_{discovery,deps}.py) + conftest
+        - tests/test-all.sh: 22/22 checks pass (was 20)
+        - commands/{detect,deps,impact}.md updated to invoke new lib/
+        - CHANGELOG [Unreleased] entry, SPEC status Draft → In Progress
+      Side-by-side validated on mediationverse (5 packages) + second
+      stress test on ~/projects/r-packages (6 packages with stable/
+      category). Algorithmic parity with rforge-mcp confirmed.
+      Branch pushed to origin; PR creation deferred to user per
+      feature-branch-workflow rule.
+
+  - branch: feature/mcp-absorb-status
+    path: ~/.git-worktrees/rforge/feature-mcp-absorb-status
+    base: dev
+    status: SCAFFOLDED (ORCHESTRATE only; implementation deferred to fresh session)
+    created: 2026-05-10
+    scope: "Path B Phase B.2 — port rforge_status to lib/status.py (mode-aware)"
+    target_release: v1.3.0 (non-breaking)
+    spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
+    orchestrate: ORCHESTRATE-mcp-absorb-status.md
+    last_commit: f6e05c4 (chore: ORCHESTRATE for Path B Phase B.2)
+    notes: |
+      Branches off origin/dev. ORCHESTRATE documents:
+        - 4-mode contract (default <5s / debug <30s / optimize <60s /
+          release <120s) with perf budgets as acceptance criteria
+        - R subprocess as an open question (pure-Py vs Rscript)
+        - Stacking choice: rebase onto feature/mcp-absorb-discovery
+          if B.1 hasn't merged when implementation begins
+      Per CLAUDE.md: implementation requires a fresh `claude` session
+      from inside the worktree directory.
 
 recent:
   - date: 2026-05-10
@@ -81,12 +110,9 @@ decisions:
 backlog:
   - title: "craft-parity Phase 3 — command namespacing (BREAKING, v2.0.0)"
   - title: "craft-parity Phase 4 — discovery engine + agents (v2.1.0)"
-  - title: "Path B Phase B.2 — port rforge_status (with mode-aware execution)"
-    spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
-    notes: "Blocked on B.1 landing (establishes lib/ calling convention)."
   - title: "Path B Phase B.3 — port rforge_init (state file)"
     spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
-    notes: "Can run in parallel with B.2 once B.1 lands."
+    notes: "Worktree not yet created. Small scope. Can parallelize with B.2."
   - title: "Path B Phase B.4 — archive rforge-mcp repo"
     spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
     notes: "After B.1+B.2+B.3 land. Just paperwork (DEPRECATED.md + GitHub archive)."
