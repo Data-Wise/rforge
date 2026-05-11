@@ -80,6 +80,94 @@ For a user-facing tour of the new hook + skill, see
 
 ---
 
+## Path B: `lib/` modules {#path-b-lib-modules}
+
+> **Added in v1.3.0.** Three former MCP tools (`rforge_detect`, `rforge_deps`,
+> `rforge_impact`) ported to self-contained Python in `lib/`. Path A (v1.2.0)
+> dropped the *peer dependency* on `rforge-mcp`; Path B absorbs the *logic*.
+> The MCP server is still supported — `lib/` runs in parallel.
+
+### Two execution paths
+
+Commands like `/rforge:detect` and `/rforge:deps` now have a choice: they
+can shell out to the in-plugin Python modules (no external service
+required) or, if the user has `rforge-mcp` installed, delegate to the MCP
+server. The output shape is equivalent for the three ported tools.
+
+```mermaid
+graph TB
+    subgraph User["You / Claude Code session"]
+        UR[User: /rforge:detect or /rforge:deps]
+    end
+
+    subgraph Cmd[commands/*.md]
+        DT[detect.md]
+        DP[deps.md]
+        IM[impact.md]
+    end
+
+    subgraph LibPath["Path B (v1.3+, default)"]
+        L1[lib/discovery.py]
+        L2[lib/deps.py]
+    end
+
+    subgraph MCPPath["MCP path (still supported)"]
+        T1[rforge_detect]
+        T2[rforge_deps]
+        T3[rforge_impact]
+    end
+
+    subgraph FS["Filesystem"]
+        DESCR[R DESCRIPTION files]
+        CFG[.rforge.yaml]
+    end
+
+    UR --> DT
+    UR --> DP
+    UR --> IM
+    DT -->|bash python3| L1
+    DP -->|bash python3| L2
+    IM -->|bash python3| L2
+    DT -.->|optional MCP| T1
+    DP -.->|optional MCP| T2
+    IM -.->|optional MCP| T3
+    L1 --> DESCR
+    L1 --> CFG
+    L2 --> DESCR
+    T1 --> DESCR
+    T2 --> DESCR
+    T3 --> DESCR
+```
+
+Solid arrows: the in-plugin path (v1.3+ default). Dashed arrows: the
+legacy MCP path, still functional for users who installed `rforge-mcp`.
+
+### Why two paths?
+
+- **Non-breaking migration.** Existing users keep working without forced
+  reinstall; new users get pure-Python analysis with zero peer deps.
+- **Capability ceiling.** Commands that need R subprocess (e.g.,
+  `/rforge:status` with `optimize`/`release` modes) still rely on the MCP
+  server until Phase B.2 ports `status` to `lib/status.py`. See the
+  [Path B SPEC](specs/SPEC-mcp-absorb-2026-05-10.md) for the full plan.
+- **Wire compatibility.** `lib/discovery.py` preserves the MCP server's
+  `mode` field (`minimal`/`standard`/`full`) for direct side-by-side
+  validation against `rforge_detect` output. The user-facing `kind` field
+  (`single`/`ecosystem`/`hybrid`) is layered on top.
+
+### What's still MCP-only
+
+| Tool | Phase | Status |
+|---|---|---|
+| `rforge_status` | B.2 | Pending — mode-aware execution (default/debug/optimize/release) with R subprocess |
+| `rforge_init` | B.3 | Pending — `.rforge/context.json` state file |
+
+See [`docs/lib-modules.md`](lib-modules.md) for the user-facing reference,
+and the auto-extracted [`reference/discovery.md`](reference/discovery.md) /
+[`reference/deps.md`](reference/deps.md) for full API listings.
+
+---
+
 ## Architecture Layers
 
 ```

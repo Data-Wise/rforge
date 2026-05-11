@@ -51,6 +51,7 @@ Full changelog: [`CHANGELOG.md`](CHANGELOG.md).
 📊 **Live progress** - Real-time updates as tools complete
 🎯 **Smart synthesis** - Combines results into actionable summary
 🧠 **ADHD-friendly** - Fast feedback, clear structure, visual progress
+🐍 **Standalone lib/ (v1.3+)** - Pure-Python discovery + dependency analysis at `lib/discovery.py` and `lib/deps.py`. No R subprocess, no MCP server. See [`docs/lib-modules.md`](docs/lib-modules.md).
 
 ## How It Works
 

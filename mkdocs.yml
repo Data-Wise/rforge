@@ -72,6 +72,10 @@ nav:
   - Architecture: architecture.md
   - Hooks & Skills: hooks-and-skills.md
   - Configuration: configuration.md
+  - Lib Modules: lib-modules.md
+  - Reference:
+    - "discovery API": reference/discovery.md
+    - "deps API": reference/deps.md
   - Specs:
     - Overview: specs/README.md
     - "MCP absorb (Path B)": specs/SPEC-mcp-absorb-2026-05-10.md
