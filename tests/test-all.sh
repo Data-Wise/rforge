@@ -185,6 +185,13 @@ lib_cli_smoke() {
     python3 lib/deps.py --path . --format json > /dev/null
 }
 
+# Auto-extracted reference docs (docs/reference/*.md) must stay in sync with
+# the docstrings in lib/. Drift means someone updated a docstring without
+# re-running the generator.
+lib_reference_in_sync() {
+    python3 scripts/gen_lib_reference.py --check
+}
+
 echo "═══════════════════════════════════════════════════════════════"
 echo "  RForge plugin — full validation suite"
 echo "═══════════════════════════════════════════════════════════════"
@@ -223,6 +230,7 @@ run "Skill: frontmatter has required fields" skill_frontmatter_complete
 # Lib modules (Path B Phase B.1 ports)
 run "Lib: pytest suite (discovery + deps)"   lib_pytest
 run "Lib: CLI smoke (discovery.py + deps.py)" lib_cli_smoke
+run "Lib: reference docs in sync with source" lib_reference_in_sync
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
