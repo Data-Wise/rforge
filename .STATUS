@@ -1,5 +1,5 @@
 project: rforge
-updated: 2026-05-10
+updated: 2026-05-11
 status: Active
 version: 1.2.0 (released)
 last_release: 2026-05-10 v1.2.0 (PR #2 dev → main, tag https://github.com/Data-Wise/rforge/releases/tag/v1.2.0)
@@ -7,27 +7,28 @@ last_release: 2026-05-10 v1.2.0 (PR #2 dev → main, tag https://github.com/Data
 worktrees:
   - branch: feature/mcp-absorb-rest
     path: ~/.git-worktrees/rforge/feature-mcp-absorb-rest
-    base: dev (9e4f8f4 — includes B.1 merged at 951e055)
-    status: SCAFFOLDED (ORCHESTRATE only; implementation deferred to fresh session)
+    base: dev
+    status: REVIEW (PR #4 OPEN, ready for merge after pre-merge fixups)
     created: 2026-05-10
-    scope: "Path B Phases B.2 + B.3 + B.4 (consolidated) — finish MCP absorption"
-    target_release: v1.3.0 (non-breaking, atomic ship of all remaining Path B work)
+    scope: "Path B Phases B.2 + B.3 + B.4 — finish MCP absorption (v1.3.0)"
+    target_release: v1.3.0 (non-breaking)
     spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
-    orchestrate: ORCHESTRATE-mcp-absorb-rest.md
-    last_commit: d0af11d (chore: ORCHESTRATE for Path B B.2 + B.3 + B.4 consolidated)
+    pr: 4
     notes: |
-      Replaces the prior standalone B.2 worktree (feature/mcp-absorb-status,
-      SCAFFOLDED only) and absorbs B.3 + B.4 from backlog. Rationale:
-        - B.2 = substantive (rforge_status, mode-aware, R subprocess)
-        - B.3 = small (rforge_init, ~50 LOC)
-        - B.4 = paperwork (DEPRECATED.md + GitHub archive)
-        → bundle ships v1.3.0 atomically; users get complete absorption
-          in one release.
-      Stacking question from old B.2 ORCHESTRATE is now resolved:
-      lib/discovery.py + lib/deps.py + lib/__init__.py are already on
-      dev (via B.1 merge), so this worktree branches from dev cleanly.
-      Per CLAUDE.md: implementation requires a fresh `claude` session
-      from inside the worktree directory.
+      Consolidated worktree (replaces the originally-planned three separate
+      worktrees for B.2/B.3/B.4). Single PR ships v1.3.0 atomically.
+
+      Scope correction applied during execution: research found MCP's
+      `status` tool was a thin .STATUS reader, not the 4-mode contract
+      the SPEC described. lib/status.py ported faithfully; 4-mode design
+      descoped to v1.4.0.
+
+      State: 65/65 pytest, 23/23 test-all.sh, 0 MCP refs in commands/.
+      Cross-repo B.4 paperwork drafted in docs/migration/; archive step
+      executes AFTER this PR merges per the post-merge checklist.
+      Pre-merge review fixups applied (commit 863b9d0): error-handling
+      consistency, format_text test_status column, type:ignore cleanup,
+      __all__ added, frozen InitResult, blocking_issues None semantics.
 
 recent:
   - date: 2026-05-10
@@ -117,8 +118,9 @@ decisions:
 backlog:
   - title: "craft-parity Phase 3 — command namespacing (BREAKING, v2.0.0)"
   - title: "craft-parity Phase 4 — discovery engine + agents (v2.1.0)"
-  # Path B B.2 + B.3 + B.4 are now consolidated into the active
-  # feature/mcp-absorb-rest worktree (see worktrees: above).
+  - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"
+    spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
+    notes: "lib/status.py shipped as a thin faithful port in v1.3.0. The 4-mode contract (default/debug/optimize/release with R subprocess) was descoped pending real-user input on what depth is wanted. Open a new SPEC when there's demand."
 
 shipped:
   - "v1.2.0 — 2026-05-10 — craft parity foundations + post-merge polish + MCP decoupling"

@@ -5,9 +5,16 @@
 [![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
 [![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
-**R package ecosystem orchestrator for Claude Code — 15 commands, R-aware hooks, validation skills.**
+**R package ecosystem orchestrator for Claude Code — 16 commands, R-aware hooks, validation skills.**
 
-Automatically analyzes R package changes by intelligently delegating to RForge MCP tools and synthesizing results. As of v1.2.0 the MCP server is optional — the plugin works standalone via Claude Code's built-in tools.
+Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
+
+## What's new in v1.3.0
+
+- 🎯 **MCP absorption complete** — `rforge-mcp` has been absorbed into the plugin. All 7 implemented tools now ship as pure-Python `lib/` modules. The MCP server is no longer required (and is being archived). See [`docs/migration/rforge-mcp-deprecation.md`](docs/migration/rforge-mcp-deprecation.md).
+- 🐍 **`lib/status.py`** — ecosystem health snapshot (`DESCRIPTION` + `.STATUS` parsing). `python3 -m lib.status [--path .] [--format text|json]`.
+- 🌱 **`lib/init.py`** — initialize `~/.rforge/context.json` for cross-package state. `python3 -m lib.init [--quick]`. New `/rforge:init` command.
+- 📦 **No runtime dependencies beyond Python 3.10+** — the plugin works on any system with a modern Python.
 
 ## What's new in v1.2.0
 
@@ -47,11 +54,11 @@ Full changelog: [`CHANGELOG.md`](CHANGELOG.md).
 ## Features
 
 ✨ **Auto-delegation** - Recognizes task patterns, selects appropriate tools
-⚡ **Parallel execution** - Calls multiple MCP tools simultaneously
+⚡ **Parallel execution** - Invokes multiple `lib/` modules simultaneously
 📊 **Live progress** - Real-time updates as tools complete
 🎯 **Smart synthesis** - Combines results into actionable summary
 🧠 **ADHD-friendly** - Fast feedback, clear structure, visual progress
-🐍 **Standalone lib/ (v1.3+)** - Pure-Python discovery + dependency analysis at `lib/discovery.py` and `lib/deps.py`. No R subprocess, no MCP server. See [`docs/lib-modules.md`](docs/lib-modules.md).
+🐍 **Pure-Python `lib/`** - `lib/discovery.py`, `lib/deps.py`, `lib/status.py`, `lib/init.py`. No R subprocess, no MCP server, no Node.js. See [`docs/lib-modules.md`](docs/lib-modules.md).
 
 ## How It Works
 
@@ -62,7 +69,7 @@ Pattern Recognition (CODE_CHANGE, BUG_FIX, etc.)
     ↓
 Tool Selection (impact, tests, docs, health)
     ↓
-Parallel MCP Calls (4 tools × 8 sec = 8 sec total, not 32 sec!)
+Parallel `lib/` invocations (python3 -m lib.* in subprocess)
     ↓
 Results Synthesis (impact + quality + maintenance + next steps)
     ↓
@@ -91,82 +98,20 @@ Comprehensive analysis with R CMD check (2-5 minutes)
 
 ## Requirements
 
-**RForge requires BOTH the plugin AND MCP server:**
-
-1. **RForge MCP Server** (required for all functionality)
-   - Provides R package analysis tools
-   - Must be configured in Claude settings
-
+1. **Python 3.10+** (the `lib/` modules run via `python3 -m lib.<tool>`)
 2. **R Environment**
    - R >= 4.0.0
-   - devtools package
-   - testthat package
+   - devtools package (optional, for `/rforge:thorough`)
+   - testthat package (optional)
    - covr package (optional, for coverage analysis)
-
 3. **Claude Code CLI or Claude Desktop**
    - Plugin works in both environments
 
+> **Migrating from v1.2.x?** If you have an `mcpServers.rforge` entry in
+> `~/.claude/settings.json`, you can remove it — v1.3.0 no longer needs the
+> MCP server. See [`docs/migration/rforge-mcp-deprecation.md`](docs/migration/rforge-mcp-deprecation.md).
+
 ## Installation
-
-RForge has a two-part installation: the plugin (commands/UI) and the MCP server (backend tools).
-**As of v1.2.0 the MCP server is optional** — the plugin's commands work standalone via Claude
-Code's built-in tools (Read, Bash, etc.). Install the MCP server only if you want richer
-typed/structured analysis output and reusability from non-Claude-Code clients.
-
-### Part 1 (optional): Install RForge MCP Server
-
-If you want advanced ecosystem analysis with structured I/O, install the MCP server and
-configure it in Claude settings. Otherwise skip to Part 2 — the plugin works without it.
-
-```bash
-# Install rforge-mcp globally
-npm install -g rforge-mcp
-```
-
-**Configure in Claude settings:**
-
-Add to `~/.claude/settings.json`:
-
-```json
-{
-  "mcpServers": {
-    "rforge-mcp": {
-      "command": "npx",
-      "args": ["rforge-mcp"]
-    }
-  }
-}
-```
-
-**Or use project-specific configuration:**
-
-Add to `.claude/settings.local.json` in your R package:
-
-```json
-{
-  "mcpServers": {
-    "rforge-mcp": {
-      "command": "npx",
-      "args": ["rforge-mcp"],
-      "env": {
-        "RFORGE_MODE": "default"
-      }
-    }
-  }
-}
-```
-
-**Verify MCP server is configured:**
-
-```bash
-# Check settings file
-cat ~/.claude/settings.json | grep rforge-mcp
-
-# Expected output:
-# "rforge-mcp": {
-```
-
-### Part 2: Install RForge Plugin
 
 #### Option 1: Claude Code Marketplace (Recommended)
 
@@ -195,7 +140,6 @@ brew install rforge
 The Homebrew formula automatically:
 - Installs the plugin to `~/.claude/plugins/rforge`
 - Makes it available in Claude Code CLI and Claude Desktop
-- Reminds you to install rforge-mcp if not present
 
 #### Option 3: npm (When published)
 
@@ -228,19 +172,9 @@ cp -r . ~/.claude/plugins/rforge
 - Agent: `~/.claude/plugins/rforge/agents/orchestrator.md`
 - Lib: `~/.claude/plugins/rforge/lib/`
 
-### Verify Complete Installation
+### Verify Installation
 
-**Step 1: Check MCP server**
-
-```bash
-# Verify npm package is installed
-npm list -g rforge-mcp
-
-# Expected output:
-# └── rforge-mcp@0.1.0
-```
-
-**Step 2: Check plugin**
+**Step 1: Check plugin**
 
 ```bash
 # Check plugin directory exists
@@ -248,6 +182,12 @@ ls -la ~/.claude/plugins/rforge
 
 # Verify plugin.json
 cat ~/.claude/plugins/rforge/.claude-plugin/plugin.json
+```
+
+**Step 2: Check Python**
+
+```bash
+python3 --version    # Expect 3.10+
 ```
 
 **Step 3: Test end-to-end**
@@ -266,9 +206,6 @@ claude
 **Expected output:**
 
 ```
-Connecting to rforge-mcp...
-✅ RForge MCP server connected
-
 📊 RMediation - Single Package
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Version: 2.4.0
@@ -301,47 +238,19 @@ RForge automatically loads when you open Claude Desktop. Commands work the same 
 2. Navigate conversation to an R package directory (or specify path)
 3. Use slash commands: `/rforge:analyze`, `/rforge:status`, etc.
 
-### MCP Server Configuration Options
+### Migration
 
-**Basic configuration (most users):**
+- **From v1.2.x:** the `mcpServers.rforge` entry in `~/.claude/settings.json` is no longer needed in v1.3.0. Remove it manually (we don't auto-edit user settings). See [`docs/migration/rforge-mcp-deprecation.md`](docs/migration/rforge-mcp-deprecation.md) for the full migration table.
 
-```json
-{
-  "mcpServers": {
-    "rforge-mcp": {
-      "command": "npx",
-      "args": ["rforge-mcp"]
-    }
-  }
-}
-```
+### Migration from rforge-orchestrator (historical, pre-v1.3.0)
 
-**Advanced configuration with environment variables:**
-
-```json
-{
-  "mcpServers": {
-    "rforge-mcp": {
-      "command": "npx",
-      "args": ["rforge-mcp"],
-      "env": {
-        "RFORGE_MODE": "default",
-        "RFORGE_FORMAT": "terminal"
-      }
-    }
-  }
-}
-```
-
-**Environment variables:**
-- `RFORGE_MODE` - Default mode: `default` (< 10s), `debug` (< 120s), `optimize` (< 180s), `release` (< 300s)
-- `RFORGE_FORMAT` - Output format: `terminal`, `json`, `markdown`
-
-### Migration from rforge-orchestrator
+> Only relevant if you skipped v1.2.x and are coming from a much older
+> `rforge-orchestrator` setup. v1.3.0 doesn't use any MCP server, so the
+> end state is just: remove these entries entirely.
 
 If you previously used `rforge-orchestrator` from the monorepo:
 
-**Important:** The MCP server name changed from `rforge-orchestrator` to `rforge-mcp`.
+**Important:** The MCP server name changed from `rforge-orchestrator` to `rforge-mcp` in v1.2.x, then `rforge-mcp` was absorbed into the plugin in v1.3.0.
 
 **Update your settings:**
 
@@ -426,11 +335,11 @@ The orchestrator automatically detects what you're doing:
 │  └───────┬───────────────────────┘ │
 │          │                          │
 └──────────┼──────────────────────────┘
-           │ Parallel MCP calls
+           │ Parallel python3 -m lib.* calls
            ↓
     ┌──────┴──────┬──────┬──────┐
     ↓             ↓      ↓      ↓
-[Impact]     [Tests] [Docs] [Health]
+[discovery]  [deps] [status] [init]
     ↓             ↓      ↓      ↓
   (8s)          (5s)   (3s)   (7s)
     │             │      │      │
@@ -462,10 +371,13 @@ The orchestrator automatically detects what you're doing:
 
 ## Troubleshooting
 
-**"RForge MCP not found"**
+**"python3: command not found"**
 ```bash
-npx rforge-mcp configure
-# Then restart Claude Code
+# Verify Python 3.10+ is on PATH
+python3 --version
+
+# macOS: install via Homebrew
+brew install python@3.12
 ```
 
 **"Package not detected"**
@@ -511,10 +423,14 @@ Plugin settings in `plugin.json`:
 │   └── skills/
 │       └── validation/
 │           └── description-sync.md  # DESCRIPTION ↔ NEWS.md drift check
-├── commands/                # 15 slash commands (/rforge:*)
+├── commands/                # 16 slash commands (/rforge:*)
 ├── agents/
 │   └── orchestrator.md      # Pattern recognition + delegation
-├── lib/
+├── lib/                     # Pure-Python analysis modules
+│   ├── discovery.py         # Package detection + ecosystem layout
+│   ├── deps.py              # Dependency graph + impact
+│   ├── status.py            # DESCRIPTION + .STATUS health snapshot
+│   ├── init.py              # ~/.rforge/context.json initializer
 │   └── formatters.py        # Output formatting helpers
 └── docs/                    # User-facing docs
 ```
@@ -534,7 +450,8 @@ MIT
 
 ## Links
 
-- RForge MCP Server: https://github.com/data-wise/rforge-mcp
+- RForge MCP Server (archived as of v1.3.0): https://github.com/data-wise/rforge-mcp
+- v1.3.0 migration: [`docs/migration/rforge-mcp-deprecation.md`](docs/migration/rforge-mcp-deprecation.md)
 - Claude Code: https://claude.com/code
 - Documentation: See `docs/` folder
 

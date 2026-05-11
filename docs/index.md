@@ -5,9 +5,16 @@
 [![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
 [![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
-**R package ecosystem orchestrator for Claude Code — 15 commands, R-aware hooks, validation skills.**
+**R package ecosystem orchestrator for Claude Code — 16 commands, R-aware hooks, validation skills.**
 
-Automatically analyzes R package changes by intelligently delegating to RForge MCP tools and synthesizing results. As of v1.2.0 the MCP server is optional — the plugin works standalone via Claude Code's built-in tools.
+Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
+
+## What's new in v1.3.0
+
+- 🎯 **MCP absorption complete** — `rforge-mcp` has been absorbed into the plugin. All 7 implemented tools now ship as pure-Python `lib/` modules. See [migration guide](migration/rforge-mcp-deprecation.md).
+- 🐍 **`lib/status.py`** — ecosystem health snapshot (`DESCRIPTION` + `.STATUS` parsing). `python3 -m lib.status`.
+- 🌱 **`lib/init.py`** — `~/.rforge/context.json` initializer. New `/rforge:init` command.
+- 📦 **No runtime dependencies beyond Python 3.10+**.
 
 ## What's new in v1.2.0
 
@@ -15,7 +22,7 @@ Automatically analyzes R package changes by intelligently delegating to RForge M
 - 🪝 **R-aware `PreToolUse` hook** — 4 rules (block `man/*.Rd` edits, warn on `R/*.R` and DESCRIPTION SemVer drift, warn on outside-worktree writes). See [Hooks & Skills](hooks-and-skills.md).
 - 🔍 **`description-sync` validation skill** — pure-shell DESCRIPTION ↔ NEWS.md drift check. No R required.
 - 📐 **Plugin Surface diagram** in [Architecture](architecture.md) (Mermaid).
-- 🔓 **MCP decoupled** — `npm install` now works without `rforge-mcp` (was failing with 404 for fresh users).
+- 🔓 **MCP decoupled** — `npm install` works without `rforge-mcp` (was failing with 404 for fresh users). Absorbed entirely in v1.3.0.
 - ⚙️ **User options** — see [Configuration](configuration.md) for `cran_mirror`, `vignette_engine`, `r_version_pin`, `claude_md_budget`.
 
 Full release notes: [CHANGELOG.md](https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md).
@@ -79,34 +86,27 @@ Comprehensive analysis with R CMD check (2-5 minutes)
 
 ## Requirements
 
-1. **RForge MCP Server** - Must be installed and configured
-   ```bash
-   npx rforge-mcp configure
-   ```
-
+1. **Python 3.10+** — `lib/` modules run via `python3 -m lib.<tool>`
 2. **R Environment**
    - R >= 4.0.0
-   - devtools
-   - testthat
+   - devtools (optional, for `/rforge:thorough`)
+   - testthat (optional)
    - covr (optional, for coverage)
-
 3. **Claude Code** - This is a Claude Code plugin
 
 ## Installation
 
-1. **Install RForge MCP**
-   ```bash
-   npx rforge-mcp configure
-   ```
+```text
+/plugin marketplace add Data-Wise/rforge
+/plugin install rforge
+```
 
-2. **Install this plugin** (recommended: Claude Code marketplace)
-   ```text
-   /plugin marketplace add Data-Wise/rforge
-   /plugin install rforge
-   ```
+Alternative options (Homebrew, npm, manual symlink) are documented in
+the main [README](https://github.com/Data-Wise/rforge#installation).
 
-   Alternative options (Homebrew, npm, manual symlink) are documented in
-   the main [README](https://github.com/Data-Wise/rforge#installation).
+> **Migrating from v1.2.x?** If `~/.claude/settings.json` has an
+> `mcpServers.rforge` entry, it's no longer needed in v1.3.0 — remove it
+> manually. See [migration guide](migration/rforge-mcp-deprecation.md).
 
 3. **Restart Claude Code**
 
@@ -215,10 +215,13 @@ The orchestrator automatically detects what you're doing:
 
 ## Troubleshooting
 
-**"RForge MCP not found"**
+**"python3: command not found"**
 ```bash
-npx rforge-mcp configure
-# Then restart Claude Code
+# Verify Python 3.10+ is on PATH
+python3 --version
+
+# macOS: install via Homebrew
+brew install python@3.12
 ```
 
 **"Package not detected"**
@@ -287,7 +290,8 @@ MIT
 
 ## Links
 
-- RForge MCP Server: https://github.com/data-wise/rforge-mcp
+- RForge MCP Server (archived as of v1.3.0): https://github.com/data-wise/rforge-mcp
+- v1.3.0 migration: [migration/rforge-mcp-deprecation.md](migration/rforge-mcp-deprecation.md)
 - Claude Code: https://claude.com/code
 - Documentation: See `docs/` folder
 
