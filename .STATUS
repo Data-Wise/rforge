@@ -5,23 +5,27 @@ version: 1.2.0 (released)
 last_release: 2026-05-10 v1.2.0 (PR #2 dev → main, tag https://github.com/Data-Wise/rforge/releases/tag/v1.2.0)
 
 worktrees:
-  - branch: feature/mcp-absorb-status
-    path: ~/.git-worktrees/rforge/feature-mcp-absorb-status
-    base: dev
+  - branch: feature/mcp-absorb-rest
+    path: ~/.git-worktrees/rforge/feature-mcp-absorb-rest
+    base: dev (9e4f8f4 — includes B.1 merged at 951e055)
     status: SCAFFOLDED (ORCHESTRATE only; implementation deferred to fresh session)
     created: 2026-05-10
-    scope: "Path B Phase B.2 — port rforge_status to lib/status.py (mode-aware)"
-    target_release: v1.3.0 (non-breaking)
+    scope: "Path B Phases B.2 + B.3 + B.4 (consolidated) — finish MCP absorption"
+    target_release: v1.3.0 (non-breaking, atomic ship of all remaining Path B work)
     spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
-    orchestrate: ORCHESTRATE-mcp-absorb-status.md
-    last_commit: f6e05c4 (chore: ORCHESTRATE for Path B Phase B.2)
+    orchestrate: ORCHESTRATE-mcp-absorb-rest.md
+    last_commit: d0af11d (chore: ORCHESTRATE for Path B B.2 + B.3 + B.4 consolidated)
     notes: |
-      Branches off origin/dev. ORCHESTRATE documents:
-        - 4-mode contract (default <5s / debug <30s / optimize <60s /
-          release <120s) with perf budgets as acceptance criteria
-        - R subprocess as an open question (pure-Py vs Rscript)
-        - Stacking choice: rebase onto feature/mcp-absorb-discovery
-          if B.1 hasn't merged when implementation begins
+      Replaces the prior standalone B.2 worktree (feature/mcp-absorb-status,
+      SCAFFOLDED only) and absorbs B.3 + B.4 from backlog. Rationale:
+        - B.2 = substantive (rforge_status, mode-aware, R subprocess)
+        - B.3 = small (rforge_init, ~50 LOC)
+        - B.4 = paperwork (DEPRECATED.md + GitHub archive)
+        → bundle ships v1.3.0 atomically; users get complete absorption
+          in one release.
+      Stacking question from old B.2 ORCHESTRATE is now resolved:
+      lib/discovery.py + lib/deps.py + lib/__init__.py are already on
+      dev (via B.1 merge), so this worktree branches from dev cleanly.
       Per CLAUDE.md: implementation requires a fresh `claude` session
       from inside the worktree directory.
 
@@ -113,12 +117,8 @@ decisions:
 backlog:
   - title: "craft-parity Phase 3 — command namespacing (BREAKING, v2.0.0)"
   - title: "craft-parity Phase 4 — discovery engine + agents (v2.1.0)"
-  - title: "Path B Phase B.3 — port rforge_init (state file)"
-    spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
-    notes: "Worktree not yet created. Small scope. Can parallelize with B.2."
-  - title: "Path B Phase B.4 — archive rforge-mcp repo"
-    spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
-    notes: "After B.1+B.2+B.3 land. Just paperwork (DEPRECATED.md + GitHub archive)."
+  # Path B B.2 + B.3 + B.4 are now consolidated into the active
+  # feature/mcp-absorb-rest worktree (see worktrees: above).
 
 shipped:
   - "v1.2.0 — 2026-05-10 — craft parity foundations + post-merge polish + MCP decoupling"
