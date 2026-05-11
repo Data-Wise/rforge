@@ -53,6 +53,15 @@ Tools to port in this phase:
 
 **Known divergence (consistent with MCP):** The `medfit.Rcheck/` directory's DESCRIPTION is picked up as a duplicate package. Both implementations exhibit this behavior because `findRPackages` traverses non-hidden subdirs without an `.Rcheck` skip list. Future enhancement; intentionally out of scope here.
 
+## Stress test on a second layout (2026-05-10)
+
+Also validated on `~/projects/r-packages/` (parent of `active/` + `stable/`):
+
+- 6 unique packages found across 2 subdirs: `medfit`, `medrobust`, `medsim`, `mediationverse`, `probmed` (active) + `RMediation` (stable).
+- `RMediation` correctly tagged `[stable]` via path-based category inference.
+- **No `.Rcheck` duplicate** when scanning from the grandparent — `medfit.Rcheck/<medfit>/DESCRIPTION` sits at depth 3 and is outside the default `max_depth=2`. Confirms the duplicate only appears when scanning a layout where `.Rcheck` is a sibling of `DESCRIPTION` (depth 1).
+- Non-package directories (e.g. `mediation-planning/`, which has no `DESCRIPTION`) are correctly excluded — the strict-hybrid heuristic didn't falsely flag this layout as hybrid.
+
 ## Acceptance criteria
 
 - [ ] `lib/discovery.py` defines `detect_ecosystem(path: str) -> Ecosystem` returning a dataclass with `packages`, `mode` (single/ecosystem/hybrid), `config`. No imports from `rforge-mcp`.
