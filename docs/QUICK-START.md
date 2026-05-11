@@ -12,10 +12,10 @@
 /plugin marketplace add Data-Wise/rforge
 ```
 
-**Or via Homebrew (HEAD-only until v1.2.0 stable release ships):**
+**Or via Homebrew (stable):**
 
 ```bash
-brew install --HEAD data-wise/tap/rforge
+brew install data-wise/tap/rforge
 ```
 
 **Done!** The plugin is installed to `~/.claude/plugins/rforge`.
@@ -26,21 +26,13 @@ brew install --HEAD data-wise/tap/rforge
 
 **Required:**
 1. ✅ Claude Code CLI installed
-2. ✅ RForge MCP server configured in `~/.claude/settings.json`
+2. ✅ Python 3.10+ on PATH (`python3 --version`)
 3. ✅ Working in an R package directory (has `DESCRIPTION` file)
 
-**Check RForge MCP:**
-```json
-// ~/.claude/settings.json
-{
-  "mcpServers": {
-    "rforge-mcp": {
-      "command": "node",
-      "args": ["/path/to/rforge-mcp/dist/index.js"]
-    }
-  }
-}
-```
+> **Migrating from v1.2.x?** If `~/.claude/settings.json` has an
+> `mcpServers.rforge` entry, you can remove it — v1.3.0 absorbed the MCP
+> server into the plugin. See
+> [`docs/migration/rforge-mcp-deprecation.md`](migration/rforge-mcp-deprecation.md).
 
 ---
 
@@ -223,13 +215,15 @@ brew uninstall rforge
 - Restart Claude Code
 - Check: `ls ~/.claude/plugins/rforge`
 
-**"RForge MCP not configured"?**
-- Add `rforge-mcp` to `~/.claude/settings.json`
-- Restart Claude Code
+**"python3: command not found"?**
+- Verify Python 3.10+ is installed: `python3 --version`
+- macOS: `brew install python@3.12`
+- Linux: install via your distro's package manager
 
 **Slow performance?**
-- Check RForge MCP server is running: `ps aux | grep rforge-mcp`
-- Test MCP directly: Use Claude Desktop to verify MCP works
+- Run `/rforge:quick` for the fastest tool
+- For thorough analysis, expect 2-5 minutes (`/rforge:thorough`)
+- Check that you're in the package root (not a subdirectory)
 
 **Not in R package?**
 - Must have `DESCRIPTION` file

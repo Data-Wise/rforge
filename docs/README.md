@@ -1,6 +1,6 @@
 # RForge Plugin - Documentation
 
-> **Complete documentation for the RForge Plugin v1.2.0**
+> **Complete documentation for the RForge Plugin v1.3.0**
 
 ---
 
@@ -28,7 +28,7 @@
 
 **Need a reminder:** Check [REFCARD.md](REFCARD.md)
 
-**Installing:** Run `brew install --HEAD data-wise/tap/rforge` (HEAD-only until v1.2.0 stable release ships)
+**Installing:** Run `brew install data-wise/tap/rforge`
 
 ---
 
@@ -80,7 +80,7 @@ Perfect for:
 ```
 rforge/
 ├── .claude-plugin/            # Claude Code plugin manifest + extras
-│   ├── plugin.json            # Plugin manifest (v1.2.0)
+│   ├── plugin.json            # Plugin manifest (v1.3.0)
 │   ├── marketplace.json       # Marketplace install metadata
 │   ├── config.json            # User-tunable options
 │   ├── hooks/
@@ -196,7 +196,7 @@ See [REFCARD.md](REFCARD.md) for detailed pattern recognition guide.
 /plugin marketplace add Data-Wise/rforge
 ```
 
-**Homebrew (HEAD-only until v1.2.0 stable release):**
+**Homebrew (stable):**
 
 ```bash
 brew install --HEAD data-wise/tap/rforge
@@ -238,9 +238,9 @@ See [QUICK-START.md](QUICK-START.md#prerequisites) for details.
 
 ## 📝 Document Maintenance
 
-**Last Updated:** 2026-05-10
-**Plugin Version:** 1.2.0
-**Documentation Version:** 1.2.0
+**Last Updated:** 2026-05-11
+**Plugin Version:** 1.3.0
+**Documentation Version:** 1.3.0
 
 **Releases:** https://github.com/Data-Wise/rforge/releases
 

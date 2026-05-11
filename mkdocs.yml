@@ -72,6 +72,20 @@ nav:
   - Architecture: architecture.md
   - Hooks & Skills: hooks-and-skills.md
   - Configuration: configuration.md
+  - Lib Modules: lib-modules.md
+  - Troubleshooting: troubleshooting.md
+  - Tutorials:
+    - Overview: tutorials/README.md
+    - "Getting started": tutorials/getting-started.md
+    - "Migrating from rforge-mcp": tutorials/migrate-from-mcp.md
+  - Reference:
+    - "discovery API": reference/discovery.md
+    - "deps API": reference/deps.md
+    - "status API": reference/status.md
+    - "init API": reference/init.md
   - Specs:
     - Overview: specs/README.md
     - "MCP absorb (Path B)": specs/SPEC-mcp-absorb-2026-05-10.md
+  - Migration:
+    - "rforge-mcp deprecation": migration/rforge-mcp-deprecation.md
+    - "v1.3.0 post-merge checklist": migration/v1.3.0-post-merge-checklist.md

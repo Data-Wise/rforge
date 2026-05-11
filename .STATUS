@@ -1,12 +1,71 @@
 project: rforge
-updated: 2026-05-10
+updated: 2026-05-11
 status: Active
-version: 1.2.0 (on dev, not yet GitHub-released)
-last_release: 2026-05-10 (PR #1 squash-merged to dev as 83a7d4d)
+version: 1.2.0 (released); v1.3.0 on dev, awaiting GitHub release
+last_release: 2026-05-10 v1.2.0 (PR #2 dev → main, tag https://github.com/Data-Wise/rforge/releases/tag/v1.2.0)
 
 worktrees: []
 
 recent:
+  - date: 2026-05-11
+    pr: 4
+    branch: feature/mcp-absorb-rest
+    title: "Path B v1.3.0 — finish MCP absorption (B.2 + B.3 + B.4)"
+    state: MERGED
+    merge_commit: 716dcab
+    summary: |
+      Completes Path B — `rforge_status` + `rforge_init` ported to `lib/`;
+      `rforge-mcp` archive paperwork drafted in `docs/migration/`. After
+      this lands, the plugin is fully self-sufficient — no MCP server
+      required at runtime for any of the 7 implemented MCP tools.
+
+      Consolidated 3 worktrees → 1 (B.2 + B.3 + B.4 in one atomic PR).
+
+      Scope correction during execution: MCP's `status` tool was a thin
+      .STATUS reader, NOT the 4-mode contract the SPEC implied. ported
+      faithfully; 4-mode design descoped to v1.4.0 (backlog).
+
+      Pre-merge review caught 6 concerns; all addressed in commit
+      14c37de (rebased SHA) before merge:
+        - error handling consistency in init_context
+        - format_text test_status column
+        - 3× type:ignore cleanup via `is not None` narrowing
+        - frozen=True on InitResult, __all__ added, blocking_issues None semantics
+        - datetime isoformat consistency
+        - .STATUS regex parser format coupling documented
+
+      Final state: 65/65 pytest, 23/23 test-all.sh.
+
+      Post-merge cross-repo work pending: archive data-wise/rforge-mcp
+      on GitHub (paperwork drafted in docs/migration/, executes manually).
+
+  - date: 2026-05-10
+    pr: 3
+    branch: feature/mcp-absorb-discovery
+    title: "feat: Path B Phase B.1 — port discovery + deps to lib/"
+    state: MERGED
+    merge_commit: 951e055
+    summary: |
+      First Path B port. Three of rforge-mcp's tools (rforge_detect,
+      rforge_deps, rforge_impact) now live as pure-Python modules in
+      lib/. Plugin commands invoke them directly via `python3 -m lib.X`.
+      Non-breaking: existing rforge-mcp users keep all functionality.
+
+      Includes pre-PR self-review refactor (commit 5d95c7a) addressing
+      2 blockers caught in review:
+        - lib/ made a real Python package (was sys.path hack risking
+          name collision)
+        - assert → walrus operator in parse_description (assert is
+          strippable under python -O)
+
+      Final state: 36/36 pytest, 23/23 test-all.sh, public API
+      unchanged. Pre-merge ORCHESTRATE-*.md removal per CLAUDE.md
+      merge-cleanup rule (commit e37a6a9).
+
+      Lines: +2335/-194 across 21 files (lib/__init__.py, discovery.py
+      361 lines, deps.py 481 lines, 3 test files, 5 doc pages,
+      scripts/gen_lib_reference.py, command updates).
+
   - date: 2026-05-10
     pr: 1
     branch: feature/craft-parity-foundations
@@ -65,9 +124,16 @@ decisions:
         Estimated 3-4 sessions, not urgent — A already unblocks npm install.
 
 backlog:
+  - title: "Release v1.3.0 (dev → main + GitHub release + tap formula bump)"
+    notes: "Pre-flight done: 65/65 pytest, 23/23 test-all.sh, all 4 version sources still sync at 1.2.0 (needs bump). Path: /craft:release or manual dev→main PR per established playbook."
+  - title: "Path B B.4 cross-repo paperwork — archive data-wise/rforge-mcp on GitHub"
+    notes: "DEPRECATED.md drafted in docs/migration/rforge-mcp-deprecation.md. Per docs/migration/v1.3.0-post-merge-checklist.md, archive step executes AFTER v1.3.0 release ships. Manual: add DEPRECATED.md to data-wise/rforge-mcp + `gh repo archive` button."
   - title: "craft-parity Phase 3 — command namespacing (BREAKING, v2.0.0)"
   - title: "craft-parity Phase 4 — discovery engine + agents (v2.1.0)"
-  - title: "Path B Phase B.1 — port discovery + deps modules to lib/"
+  - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"
     spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
-  - title: "GitHub release v1.2.0 from dev → main"
-    notes: "Pre-flight done: docs synced, all tests passing, 4-source version sync verified."
+    notes: "lib/status.py shipped as a thin faithful port in v1.3.0. The 4-mode contract (default/debug/optimize/release with R subprocess) was descoped pending real-user input on what depth is wanted. Open a new SPEC when there's demand."
+
+shipped:
+  - "v1.2.0 — 2026-05-10 — craft parity foundations + post-merge polish + MCP decoupling"
+  - "v1.1.0 — 2026-01-09 — initial standalone release"

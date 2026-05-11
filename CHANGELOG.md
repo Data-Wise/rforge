@@ -7,6 +7,90 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2026-05-11
+
+> **Path B complete** — `rforge-mcp` is fully absorbed into the plugin via
+> pure-Python `lib/` ports. With this release, the plugin no longer has any
+> runtime dependency on the MCP server. The `data-wise/rforge-mcp` repo will
+> be archived separately post-merge per `docs/migration/v1.3.0-post-merge-checklist.md`.
+
+### Added — Path B Phase B.1: discovery + deps ported to `lib/`
+
+- **`lib/discovery.py`** — pure-Python R ecosystem detector. Walks the filesystem
+  for `DESCRIPTION` files, classifies layouts as `single | ecosystem | hybrid`,
+  preserves MCP-compatible `mode` field (`minimal | standard | full`) for
+  side-by-side validation. Exposes `detect_ecosystem()` API and an
+  `argparse` CLI (`python3 -m lib.discovery --path . --format {text,json}`).
+- **`lib/deps.py`** — dependency-graph + impact analysis, ported from
+  `rforge-mcp` `tools/deps/{deps,impact}.js`. Builds DAG from
+  `Imports`/`Depends`/`Suggests`/`LinkingTo`, computes topological layers
+  (leaves first), detects cycles, identifies blockers. `analyze_impact()`
+  estimates direct/indirect dependents, risk level, work hours, and
+  generates change-type-aware recommendations. CLI subcommands:
+  `python3 -m lib.deps [--path .] [--format {text,json}] [graph|impact ...]`.
+- **`tests/test_lib_discovery.py` + `tests/test_lib_deps.py`** — 32 pytest cases
+  covering DESCRIPTION parsing edge cases (continuation lines, version
+  constraints, `R` filtering), FS traversal (hidden-dir handling, no descent
+  into packages), classification rules, graph construction, cycle detection,
+  impact heuristics, and blockers.
+
+### Added — Path B Phases B.2 + B.3: status + init ported to `lib/`
+
+- **`lib/status.py`** — pure-Python port of `rforge-mcp`'s `status` tool. Reads
+  `DESCRIPTION` + `.STATUS` files and computes ecosystem health score.
+  Faithful port: same algorithm, same field names, no R subprocess. CLI:
+  `python3 -m lib.status [--path .] [--format text|json]`. (B.2)
+- **`lib/init.py`** — pure-Python port of `rforge-mcp`'s `init` tool. Writes
+  `~/.rforge/context.json` (global per-user state, matches MCP). Idempotent.
+  CLI: `python3 -m lib.init [--path .] [--quick] [--format text|json]`. (B.3)
+- **`commands/init.md`** — first-class `/rforge:init` command (B.3 makes init
+  a real, addressable tool).
+- **`docs/reference/{status,init}.md`** — auto-generated API reference from
+  module introspection; kept in sync by `scripts/gen_lib_reference.py --check`.
+
+### Changed
+
+- **`commands/detect.md`, `commands/deps.md`, `commands/impact.md`** — invoke
+  the new `lib/` Python modules via Bash instead of the `rforge_*` MCP tools.
+  Both subprocess CLI usage and Python API documented.
+- **`commands/{status,quick,thorough}.md`** now dispatch
+  `python3 -m lib.status` instead of the MCP tool. `thorough.md` simplified
+  to point users at `R CMD check` / `devtools::test()` / `covr` directly.
+- **`commands/analyze.md`** — last two inline `rforge_status` / `rforge_detect`
+  references swapped for the `lib/` CLIs.
+- **`scripts/gen_lib_reference.py`** now generates references for `lib.status`
+  and `lib.init` alongside `lib.discovery` and `lib.deps`.
+- **`tests/test-all.sh`**: `lib_pytest` and `lib_cli_smoke` runners now
+  exercise all four `lib/` modules (discovery + deps + status + init). Total
+  checks remain 23 — coverage grew within existing runners.
+
+### Scope notes
+
+- **Status port is faithful, not aspirational.** The original SPEC called for
+  a 4-mode (default/debug/optimize/release) status contract with R subprocess
+  support. Wave 1 research surfaced that the MCP server's `status` tool had
+  no modes and ran no R subprocess — it's a `.STATUS` file reader with a
+  health-score heuristic. The 4-mode design is descoped to v1.4.0 pending
+  real-user input on what depth is wanted.
+- **`mcpServers.rforge` cleanup.** Users with `~/.claude/settings.json`
+  referencing the now-archived `rforge-mcp` binary should remove that entry
+  manually. We don't auto-edit user settings.
+
+### Removed
+
+- N/A — the plugin no longer depends on `rforge-mcp` at runtime, but no
+  rforge-side files are deleted in v1.3.0. (The `data-wise/rforge-mcp` repo
+  itself is archived separately after this PR merges.)
+
+### Notes
+
+- Non-breaking: existing users with `rforge-mcp` installed keep working; new
+  users get pure-Python analysis with no peer dependency.
+- B.1 was validated side-by-side against MCP server output on the
+  mediationverse ecosystem (5 packages); algorithmic parity confirmed.
+
+---
+
 ## [1.2.0] - 2026-05-09
 
 > **Note:** v1.2.0 was developed across multiple sessions on `dev`. The list

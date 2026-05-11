@@ -1,8 +1,8 @@
 # SPEC: Absorb rforge-mcp into rforge plugin (Path B)
 
 > **Date:** 2026-05-10
-> **Status:** Draft — Path A (decoupling) shipped in v1.2.0; Path B (absorption) is future work
-> **Related:** [Path A in CHANGELOG v1.2.0](../../CHANGELOG.md), [rforge-mcp repo](https://github.com/data-wise/rforge-mcp)
+> **Status:** Shipped (pending v1.3.0 PR merge) — Path A shipped in v1.2.0; Phases B.1 (discovery + deps), B.2 (status), B.3 (init), B.4 (archive paperwork) all complete on `feature/mcp-absorb-rest` (2026-05-11). See [Scope correction](#scope-correction-2026-05-11) below.
+> **Related:** [Path A in CHANGELOG v1.2.0](../../CHANGELOG.md), [rforge-mcp repo](https://github.com/data-wise/rforge-mcp). ORCHESTRATE files for each phase were deleted at merge time per the CLAUDE.md cleanup rule — see PR #3 (B.1) and PR #4 (B.2+B.3+B.4) for the as-shipped commits.
 
 ## Summary
 
@@ -66,7 +66,7 @@ These are pure-FS / pure-parsing logic. Smallest risk, biggest reward.
 
 **Acceptance:**
 - Existing `/rforge:detect` and `/rforge:deps` commands updated to invoke
-  `python3 lib/discovery.py` / `python3 lib/deps.py` (or equivalent)
+  `python3 -m lib.discovery` / `python3 -m lib.deps` (or equivalent)
 - Output matches what MCP server returned (run both side-by-side on
   mediationverse ecosystem; diff outputs)
 
@@ -145,3 +145,17 @@ cd ~/.git-worktrees/rforge/feature-mcp-absorb-discovery
 
 - Path A (this v1.2.0): peer dep removed, plugin standalone — see CHANGELOG
 - `.STATUS` backlog: this SPEC supersedes "publish rforge-mcp to npm"
+
+## Scope correction (2026-05-11)
+
+During implementation, research surfaced that the MCP server's `status` tool
+was substantially thinner than this SPEC described — no modes, no R subprocess,
+no escalating fidelity. The original 4-mode contract reflected aspirational
+design rather than what MCP actually shipped.
+
+`lib/status.py` is a faithful port of MCP's actual behavior: `DESCRIPTION` +
+`.STATUS` parsing with a health-score heuristic. The 4-mode design is
+descoped to a future v1.4.0 SPEC, to be informed by real-user requests for
+specific check depths.
+
+All other phase B.3 / B.4 acceptance criteria ship as planned.
