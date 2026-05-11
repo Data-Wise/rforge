@@ -5,11 +5,11 @@ through to the section that matches what you're seeing.
 
 ## Quick navigation
 
-- [Install / setup issues](#install--setup-issues)
-- [Command not found / not loading](#command-not-found--not-loading)
+- [Install / setup issues](#install-setup-issues)
+- [Command not found / not loading](#command-not-found-not-loading)
 - [Path errors from `lib/` modules](#path-errors-from-lib-modules)
-- [Missing R / Rscript](#missing-r--rscript)
-- [`init` / context state issues](#init--context-state-issues)
+- [Missing R / Rscript](#missing-r-rscript)
+- [`init` / context state issues](#init-context-state-issues)
 - [Leftover rforge-mcp signals](#leftover-rforge-mcp-signals)
 - [Hook unexpectedly blocks an edit](#hook-unexpectedly-blocks-an-edit)
 - [Tests fail after a fresh install](#tests-fail-after-a-fresh-install)
@@ -68,7 +68,7 @@ order:
 1. Restart Claude Code (quit + reopen)
 2. If still missing: `ls ~/.claude/plugins/rforge/commands/` — should
    list 15 `.md` files
-3. If empty: re-run install (see [Install issues](#install--setup-issues))
+3. If empty: re-run install (see [Install issues](#install-setup-issues))
 
 ### `/rforge:detect` runs but produces no output
 

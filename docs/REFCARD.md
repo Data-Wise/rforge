@@ -86,6 +86,7 @@
 
 | Command | Speed | When to Use | Output |
 |---------|-------|-------------|--------|
+| `/rforge:init` | <5s | First run on a package or ecosystem | Writes `~/.rforge/context.json` |
 | `/rforge:quick` | ~10s | Pre-commit, quick status | Basic health check |
 | `/rforge:analyze` | ~30s | After changes, understand impact | Impact + recommendations |
 | `/rforge:thorough` | 2-5m | Release prep, major changes | Comprehensive analysis |
@@ -106,17 +107,18 @@ The orchestrator automatically detects task types:
 
 ---
 
-## RForge MCP Tools
+## RForge Lib Modules (v1.3.0+)
 
-Tools the orchestrator can delegate to:
+As of v1.3.0 the plugin is self-contained — slash commands dispatch to pure-Python `lib/` modules instead of an MCP server. CLI form: `python3 -m lib.<module>`.
 
-| Tool | Purpose | Speed |
-|------|---------|-------|
-| `impact` | Analyze code change impact | ~8s |
-| `tests` | Run and analyze tests | ~10s |
-| `docs` | Check documentation completeness | ~8s |
-| `health` | Package health metrics | ~8s |
-| `rdoc` | R documentation validation | ~8s |
+| Module | Purpose | Speed |
+|--------|---------|-------|
+| `lib.discovery` | Ecosystem + package detection | <2s |
+| `lib.deps` | Dependency graph + impact analysis | ~8s |
+| `lib.status` | Ecosystem health snapshot | <5s |
+| `lib.init` | Initialize `~/.rforge/context.json` | <5s |
+
+See [`docs/lib-modules.md`](lib-modules.md) and the [reference API docs](reference/discovery.md) for full call signatures.
 
 ---
 
@@ -168,7 +170,7 @@ git clone https://github.com/Data-Wise/rforge.git
 ln -s "$(pwd)/rforge" ~/.claude/plugins/rforge
 ```
 
-See the [main README](../README.md#installation) for the full matrix of
+See the [Home page](index.md#installation) for the full matrix of
 install options.
 
 ---

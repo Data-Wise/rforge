@@ -1,7 +1,7 @@
 {
   "name": "@data-wise/rforge-plugin",
   "version": "1.3.0",
-  "description": "RForge toolkit for Claude Code: 15 commands for R package development, ecosystem management, and intelligent orchestration",
+  "description": "RForge toolkit for Claude Code: 16 commands for R package development, ecosystem management, and intelligent orchestration",
   "type": "module",
   "main": "index.js",
   "files": [

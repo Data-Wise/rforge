@@ -1,13 +1,56 @@
 # RForge Commands Reference
 
-Complete reference for all 15 RForge commands. Commands are organized by category with usage examples and parameter details.
+Complete reference for all 16 RForge commands. Commands are organized by category with usage examples and parameter details.
 
 ## Command Categories
 
-- [Status & Analysis](#status--analysis) (4 commands)
+- [Setup & State](#setup-state) (1 command)
+- [Status & Analysis](#status-analysis) (4 commands)
 - [Ecosystem Management](#ecosystem-management) (5 commands)
-- [Documentation & Tasks](#documentation--tasks) (4 commands)
+- [Documentation & Tasks](#documentation-tasks) (4 commands)
 - [Health Checks](#health-checks) (2 commands)
+
+---
+
+## Setup & State
+
+### /rforge:init
+
+Initialize the active rforge context for the current R package or ecosystem. Writes per-user state to `~/.rforge/context.json` so other commands know which package you're working on.
+
+**Usage:**
+```bash
+/rforge:init [--path PATH] [--quick] [--format FORMAT]
+```
+
+**Parameters:**
+- `--path` (optional) — Package or ecosystem root (defaults to current directory)
+- `--quick` (optional) — Skip comprehensive analysis (faster, lighter context file)
+- `--format` (optional) — Output format: `text` (default) or `json`
+
+**Examples:**
+```bash
+# Initialize from the current directory
+/rforge:init
+
+# Quick init (skip analysis)
+/rforge:init --quick
+
+# Initialize a specific package
+/rforge:init --path ~/projects/medfit
+```
+
+**What this does:**
+- Detects the package or ecosystem layout (uses `lib/discovery.py`)
+- Writes `~/.rforge/context.json` marking the path as the active context
+- Idempotent — re-running on the same path is a no-op for state, may refresh analysis
+- Per-user, not per-package — switching contexts overwrites the state file
+
+**When to run:** First time using rforge on a package, or when switching active context. Other commands (`/rforge:status`, `/rforge:deps`, etc.) read this file to know which package they're operating on.
+
+**Time budget:** <5s (`--quick`), <15s (default)
+
+**Underlying module:** `python3 -m lib.init` — see [init API reference](reference/init.md).
 
 ---
 
