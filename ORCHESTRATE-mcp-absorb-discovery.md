@@ -23,14 +23,35 @@ Tools to port in this phase:
 
 | Step | Task | Priority | Status |
 |---|---|---|---|
-| 1 | Establish `lib/` calling convention (Python invocation pattern, output format) | High | Pending |
-| 2 | Port `rforge_detect` → `lib/discovery.py` | High | Pending |
-| 3 | Port `rforge_deps` + `rforge_impact` → `lib/deps.py` | High | Pending |
-| 4 | Add `tests/test_lib_discovery.py` + `tests/test_lib_deps.py` (pytest) | High | Pending |
-| 5 | Update `commands/detect.md`, `commands/deps.md`, `commands/impact.md` to invoke new modules | Medium | Pending |
-| 6 | Side-by-side correctness check vs MCP server output (mediationverse ecosystem if accessible) | Medium | Pending |
-| 7 | Update `tests/test-all.sh` to run new pytest suite | Medium | Pending |
-| 8 | CHANGELOG entry + `docs/specs/...` status: Draft → In Progress | Low | Pending |
+| 1 | Establish `lib/` calling convention (Python invocation pattern, output format) | High | ✅ Done |
+| 2 | Port `rforge_detect` → `lib/discovery.py` | High | ✅ Done |
+| 3 | Port `rforge_deps` + `rforge_impact` → `lib/deps.py` | High | ✅ Done |
+| 4 | Add `tests/test_lib_discovery.py` + `tests/test_lib_deps.py` (pytest) | High | ✅ Done (32 cases) |
+| 5 | Update `commands/detect.md`, `commands/deps.md`, `commands/impact.md` to invoke new modules | Medium | ✅ Done |
+| 6 | Side-by-side correctness check vs MCP server output (mediationverse ecosystem if accessible) | Medium | ✅ Done (see report below) |
+| 7 | Update `tests/test-all.sh` to run new pytest suite | Medium | ✅ Done (22 checks total) |
+| 8 | CHANGELOG entry + `docs/specs/...` status: Draft → In Progress | Low | ✅ Done |
+
+## Side-by-side report (Step 6, 2026-05-10)
+
+**Target ecosystem:** `~/projects/r-packages/active` (the mediationverse cluster).
+
+**Packages discovered (6):**
+`medfit 0.1.0`, `medfit 0.1.0` (from `medfit.Rcheck/`), `mediationverse 0.0.0.9000`, `medrobust 0.1.0.9000`, `medsim 0.0.0.9000`, `probmed 0.0.0.9000`.
+
+**Topological layers:**
+- Layer 1: `medfit`, `medrobust`, `medsim`
+- Layer 2: `mediationverse`, `probmed`
+
+**Internal edges:** `mediationverse → medfit`, `probmed → medfit`.
+
+**External CRAN deps:** `S7`, `checkmate`, `cli`, `dplyr`, `generics`, `ggplot2`, `methods`, `parallel`, `pbapply`, `rlang`, `stats`, `utils`.
+
+**Impact analysis** (`medfit` breaking change): 2 direct dependents (`mediationverse`, `probmed`), 0 indirect, risk `high`, ~45 affected tests, ~2.0h estimated work.
+
+**Algorithmic parity with MCP server:** confirmed by code review (algorithms ported line-by-line from `rforge-mcp/dist/tools/{discovery,deps}/`).
+
+**Known divergence (consistent with MCP):** The `medfit.Rcheck/` directory's DESCRIPTION is picked up as a duplicate package. Both implementations exhibit this behavior because `findRPackages` traverses non-hidden subdirs without an `.Rcheck` skip list. Future enhancement; intentionally out of scope here.
 
 ## Acceptance criteria
 
@@ -47,8 +68,11 @@ Tools to port in this phase:
 These are deferred-from-SPEC questions that need answers before code:
 
 1. **Calling convention from commands.** Plugin commands are markdown prompts. Should they call `python3 lib/discovery.py --json --path .` (CLI subprocess) or document the Python API for Claude to invoke directly via `Bash`? Both work; pick one for consistency.
+   **Decision (2026-05-10):** Both — CLI is primary, Python API documented. Each `lib/<module>.py` exposes (a) public functions importable from Python (`from discovery import detect_ecosystem`) AND (b) an `argparse`-driven `__main__` block so it works as `python3 lib/discovery.py --path . --format json`. Commands invoke the CLI by default; the API stays available for power users and future internal callers.
 2. **Output format.** MCP returned typed JSON. Lib should support: (a) terminal-friendly text (default), (b) JSON (machine-readable). Match modes from `rforge_status`.
+   **Decision (2026-05-10):** Both, flag-controlled. Default `--format text` (colored/emoji, matches existing MCP UX); `--format json` for machine consumption. Mirrors the convention already in `lib/formatters.py`.
 3. **Where do tests live?** `tests/test_lib_*.py` alongside the existing `tests/test-*.sh`? Or `lib/tests/`? Convention TBD.
+   **Decision (2026-05-10):** `tests/test_lib_*.py` at the repo root. Single test directory, pytest auto-discovers `test_*.py`, integrates cleanly into `tests/test-all.sh`.
 
 ## How to start (in a fresh session)
 

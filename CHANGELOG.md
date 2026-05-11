@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added — Path B Phase B.1: discovery + deps ported to `lib/`
+
+- **`lib/discovery.py`** — pure-Python R ecosystem detector. Walks the filesystem
+  for `DESCRIPTION` files, classifies layouts as `single | ecosystem | hybrid`,
+  preserves MCP-compatible `mode` field (`minimal | standard | full`) for
+  side-by-side validation. Exposes `detect_ecosystem()` API and an
+  `argparse` CLI (`python3 lib/discovery.py --path . --format {text,json}`).
+- **`lib/deps.py`** — dependency-graph + impact analysis, ported from
+  `rforge-mcp` `tools/deps/{deps,impact}.js`. Builds DAG from
+  `Imports`/`Depends`/`Suggests`/`LinkingTo`, computes topological layers
+  (leaves first), detects cycles, identifies blockers. `analyze_impact()`
+  estimates direct/indirect dependents, risk level, work hours, and
+  generates change-type-aware recommendations. CLI subcommands:
+  `python3 lib/deps.py [--path .] [--format {text,json}] [graph|impact ...]`.
+- **`tests/test_lib_discovery.py` + `tests/test_lib_deps.py`** — 32 pytest cases
+  covering DESCRIPTION parsing edge cases (continuation lines, version
+  constraints, `R` filtering), FS traversal (hidden-dir handling, no descent
+  into packages), classification rules, graph construction, cycle detection,
+  impact heuristics, and blockers.
+- **`tests/test-all.sh`** — adds two checks (`Lib: pytest suite`,
+  `Lib: CLI smoke`); total now 22.
+
+### Changed
+
+- **`commands/detect.md`, `commands/deps.md`, `commands/impact.md`** — invoke
+  the new `lib/` Python modules via Bash instead of the `rforge_*` MCP tools.
+  Both subprocess CLI usage and Python API documented.
+
+### Notes
+
+- Non-breaking: existing users with `rforge-mcp` installed keep working; new
+  users get pure-Python analysis with no peer dependency.
+- Validated side-by-side against MCP server output on the mediationverse
+  ecosystem (5 packages); algorithmic parity confirmed (both treat `.Rcheck`
+  duplicates equivalently).
+
+---
+
 ## [1.2.0] - 2026-05-09
 
 > **Note:** v1.2.0 was developed across multiple sessions on `dev`. The list

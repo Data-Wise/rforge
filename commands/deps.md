@@ -9,24 +9,32 @@ Build and visualize dependency relationships in your R package ecosystem.
 
 ## What It Does
 
-Uses the `rforge_deps` MCP tool to:
-- Parse DESCRIPTION files
-- Build dependency graph
-- Identify topological order
-- Find circular dependencies
-- Calculate dependency depth
+Runs the in-plugin deps module to:
+- Parse DESCRIPTION files (`Imports`, `Depends`, `Suggests`, `LinkingTo`)
+- Build the internal dependency graph
+- Compute topological build order (leaves first)
+- Detect circular dependencies
+- Identify blocking packages
 
 ## Usage
 
+Invoke via Bash:
+
 ```bash
-# Dependency graph for ecosystem
-/rforge:deps
+# Dependency graph for the ecosystem (terminal output)
+python3 lib/deps.py --path . --format text
 
-# Graph for specific package
-/rforge:deps medfit
+# Machine-readable JSON
+python3 lib/deps.py --path . --format json
+```
 
-# Include reverse dependencies
-/rforge:deps --reverse
+The same logic is also importable as a Python API:
+
+```python
+from discovery import detect_ecosystem
+from deps import build_graph
+graph = build_graph(detect_ecosystem("."))
+print(graph.layers)
 ```
 
 ## Output
