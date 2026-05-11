@@ -1,6 +1,6 @@
 # RForge Plugin - Reference Card
 
-> **Version:** 1.2.0 | **Last Updated:** 2026-05-09
+> **Version:** 1.3.0 | **Last Updated:** 2026-05-11
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -194,7 +194,7 @@ RForge MCP server must be configured in `~/.claude/settings.json`:
 
 ```
 rforge/
-├── .claude-plugin/        # Plugin manifest + extras (v1.2.0)
+├── .claude-plugin/        # Plugin manifest + extras (v1.3.0)
 │   ├── plugin.json
 │   ├── marketplace.json
 │   ├── config.json

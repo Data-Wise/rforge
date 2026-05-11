@@ -12,10 +12,10 @@
 /plugin marketplace add Data-Wise/rforge
 ```
 
-**Or via Homebrew (HEAD-only until v1.2.0 stable release ships):**
+**Or via Homebrew (stable):**
 
 ```bash
-brew install --HEAD data-wise/tap/rforge
+brew install data-wise/tap/rforge
 ```
 
 **Done!** The plugin is installed to `~/.claude/plugins/rforge`.

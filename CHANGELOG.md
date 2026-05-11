@@ -7,12 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [1.3.0] - 2026-05-11
 
-> **Note:** v1.3.0 completes Path B — `rforge-mcp` is fully absorbed into the
-> plugin via pure-Python `lib/` ports. With this release, the plugin no longer
-> has any runtime dependency on the MCP server; the `data-wise/rforge-mcp`
-> repo will be archived separately once this PR merges.
+> **Path B complete** — `rforge-mcp` is fully absorbed into the plugin via
+> pure-Python `lib/` ports. With this release, the plugin no longer has any
+> runtime dependency on the MCP server. The `data-wise/rforge-mcp` repo will
+> be archived separately post-merge per `docs/migration/v1.3.0-post-merge-checklist.md`.
 
 ### Added — Path B Phase B.1: discovery + deps ported to `lib/`
 
