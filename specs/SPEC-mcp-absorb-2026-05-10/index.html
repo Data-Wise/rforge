@@ -1425,6 +1425,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#scope-correction-2-phase-b4-archival-2026-05-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scope correction #2 — Phase B.4 archival (2026-05-11)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1740,6 +1751,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#scope-correction-2-phase-b4-archival-2026-05-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scope correction #2 — Phase B.4 archival (2026-05-11)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1769,7 +1791,7 @@
 <blockquote>
 <p><strong>Date:</strong> 2026-05-10
 <strong>Status:</strong> Shipped (pending v1.3.0 PR merge) — Path A shipped in v1.2.0; Phases B.1 (discovery + deps), B.2 (status), B.3 (init), B.4 (archive paperwork) all complete on <code>feature/mcp-absorb-rest</code> (2026-05-11). See <a href="#scope-correction-2026-05-11">Scope correction</a> below.
-<strong>Related:</strong> <a href="https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md">Path A in CHANGELOG v1.2.0</a>, <a href="https://github.com/data-wise/rforge-mcp">rforge-mcp repo</a>. ORCHESTRATE files for each phase were deleted at merge time per the CLAUDE.md cleanup rule — see PR #3 (B.1) and PR #4 (B.2+B.3+B.4) for the as-shipped commits.</p>
+<strong>Related:</strong> <a href="https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md">Path A in CHANGELOG v1.2.0</a>. The <code>rforge-mcp</code> prototype lived only as a local working directory at <code>~/projects/dev-tools/mcp-servers/rforge/</code> — not on GitHub, not on npm (see <a href="#scope-correction-2--phase-b4-archival-2026-05-11">Scope correction #2</a> at the bottom). ORCHESTRATE files for each phase were deleted at merge time per the CLAUDE.md cleanup rule — see PR #3 (B.1) and PR #4 (B.2+B.3+B.4) for the as-shipped commits.</p>
 </blockquote>
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
 <p>After Path A landed (peer dep removed in v1.2.0), the plugin runs standalone
@@ -1964,7 +1986,7 @@ Not urgent — Path A already unblocks <code>npm install</code>.</p>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span>-b<span class="w"> </span>feature/mcp-absorb-discovery<span class="w"> </span>dev
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nb">cd</span><span class="w"> </span>~/.git-worktrees/rforge/feature-mcp-absorb-discovery
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Reference: rforge-mcp source at https://github.com/data-wise/rforge-mcp</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Reference: rforge-mcp source at ~/projects/dev-tools/mcp-servers/rforge/</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># Local install: /opt/homebrew/lib/node_modules/rforge-mcp/</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># Compiled tools: dist/tools/{discovery,deps}/</span>
 </span></code></pre></div>
@@ -1983,6 +2005,17 @@ design rather than what MCP actually shipped.</p>
 descoped to a future v1.4.0 SPEC, to be informed by real-user requests for
 specific check depths.</p>
 <p>All other phase B.3 / B.4 acceptance criteria ship as planned.</p>
+<h2 id="scope-correction-2-phase-b4-archival-2026-05-11">Scope correction #2 — Phase B.4 archival (2026-05-11)<a class="headerlink" href="#scope-correction-2-phase-b4-archival-2026-05-11" title="Permanent link">&para;</a></h2>
+<p>After v1.3.0 shipped, attempting Phase B.4's <code>gh repo archive
+data-wise/rforge-mcp</code> revealed the repo never existed on GitHub.
+<code>rforge-mcp</code> was a local-only working directory during pre-v1.3.0
+development — never pushed to GitHub, never published to npm.</p>
+<p>Phase B.4 was rewritten in
+<a href="../../migration/v1.3.0-post-merge-checklist/"><code>docs/migration/v1.3.0-post-merge-checklist.md</code></a>
+to reflect the actual cleanup tasks: drop the global <code>npm link</code> symlink
+and tombstone the local source directory. The SPEC's assumption that
+rforge-mcp had public artifacts to retire is preserved here as historical
+context, but <strong>not action-guidance</strong>.</p>
 
 
 

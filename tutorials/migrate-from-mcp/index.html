@@ -1777,18 +1777,22 @@ migrated. The <code>rforge-mcp</code> server is no longer in your runtime path.<
 ...) continue to work exactly as before — they now dispatch to the
 in-plugin Python modules instead of the MCP server.</p>
 <h2 id="rollback-if-something-goes-wrong">Rollback (if something goes wrong)<a class="headerlink" href="#rollback-if-something-goes-wrong" title="Permanent link">&para;</a></h2>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Reinstall rforge-mcp</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>rforge-mcp
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Restore the mcpServers.rforge block in ~/.claude/settings.json</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="c1"># (you backed it up before deleting, right? if not, see the v1.2.x docs)</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># Downgrade the plugin</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>brew<span class="w"> </span>install<span class="w"> </span>data-wise/tap/rforge@1.2.0
+<p><code>rforge-mcp</code> was never published to npm or GitHub — it was a local-only
+prototype during pre-v1.3.0 development. So "reinstalling" only applies
+if you have the original local source dir.</p>
+<div class="language-zsh highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># If you still have the local source (typical author location):</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">cd</span><span class="w"> </span>~/projects/dev-tools/mcp-servers/rforge-archived<span class="w">  </span><span class="c1"># or rforge/ if not tombstoned</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>npm<span class="w"> </span>link<span class="w">    </span><span class="c1"># re-creates the global symlink</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="c1"># Restore the mcpServers.rforge block in ~/.claude/settings.json</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="c1"># (point command/args at your local source dist/index.js)</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="c1"># Downgrade the plugin (formula version-pinning)</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>brew<span class="w"> </span>uninstall<span class="w"> </span>rforge<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>brew<span class="w"> </span>install<span class="w"> </span>data-wise/tap/rforge@1.2.0
 </span></code></pre></div>
-<p>The <code>rforge-mcp</code> repo is archived (read-only on GitHub), but the npm
-package and any local installs remain functional. Don't be afraid to
-roll back; nothing is destroyed.</p>
+<p>Don't be afraid to roll back; the plugin's <code>lib/</code> modules are independent
+of the MCP server, so a downgrade only affects which command surface
+Claude Code sees.</p>
 <h2 id="next-steps">Next steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Read <a href="../../hooks-and-skills/">Hooks &amp; Skills</a></strong> — the v1.2.0 hook

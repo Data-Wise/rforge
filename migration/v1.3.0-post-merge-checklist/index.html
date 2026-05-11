@@ -1377,10 +1377,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-push-deprecatedmd-to-rforge-mcp" class="md-nav__link">
+  <a href="#scope-correction-2026-05-11" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Push DEPRECATED.md to rforge-mcp
+        Scope correction (2026-05-11)
       
     </span>
   </a>
@@ -1388,10 +1388,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-archive-the-github-repo" class="md-nav__link">
+  <a href="#1-drop-the-global-npm-link-symlink" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Archive the GitHub repo
+        1. Drop the global npm link symlink
       
     </span>
   </a>
@@ -1399,10 +1399,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-optional-note-to-existing-local-users" class="md-nav__link">
+  <a href="#2-tombstone-the-local-source-dir" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. (Optional) Note to existing local users
+        2. Tombstone the local source dir
       
     </span>
   </a>
@@ -1410,10 +1410,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-update-your-own-settingsjson" class="md-nav__link">
+  <a href="#3-update-your-own-claudesettingsjson" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Update your own settings.json
+        3. Update your own ~/.claude/settings.json
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-skipped-does-not-apply" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. (Skipped — does not apply)
       
     </span>
   </a>
@@ -1425,17 +1436,6 @@
     <span class="md-ellipsis">
       
         Verification
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-not-needed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's NOT needed
       
     </span>
   </a>
@@ -1496,10 +1496,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-push-deprecatedmd-to-rforge-mcp" class="md-nav__link">
+  <a href="#scope-correction-2026-05-11" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Push DEPRECATED.md to rforge-mcp
+        Scope correction (2026-05-11)
       
     </span>
   </a>
@@ -1507,10 +1507,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-archive-the-github-repo" class="md-nav__link">
+  <a href="#1-drop-the-global-npm-link-symlink" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Archive the GitHub repo
+        1. Drop the global npm link symlink
       
     </span>
   </a>
@@ -1518,10 +1518,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-optional-note-to-existing-local-users" class="md-nav__link">
+  <a href="#2-tombstone-the-local-source-dir" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. (Optional) Note to existing local users
+        2. Tombstone the local source dir
       
     </span>
   </a>
@@ -1529,10 +1529,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-update-your-own-settingsjson" class="md-nav__link">
+  <a href="#3-update-your-own-claudesettingsjson" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Update your own settings.json
+        3. Update your own ~/.claude/settings.json
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-skipped-does-not-apply" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. (Skipped — does not apply)
       
     </span>
   </a>
@@ -1544,17 +1555,6 @@
     <span class="md-ellipsis">
       
         Verification
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-not-needed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's NOT needed
       
     </span>
   </a>
@@ -1598,79 +1598,75 @@
 
 
 <h1 id="v130-post-merge-checklist-cross-repo-work">v1.3.0 post-merge checklist (cross-repo work)<a class="headerlink" href="#v130-post-merge-checklist-cross-repo-work" title="Permanent link">&para;</a></h1>
-<p>After the rforge plugin v1.3.0 PR merges to <code>dev</code>/<code>main</code>, complete these
-out-of-tree steps. <strong>None of them touch the rforge repo itself</strong> — they all
-operate on the (now-obsolete) <code>data-wise/rforge-mcp</code> repo.</p>
-<blockquote>
-<p><strong>Why post-merge?</strong> Archiving rforge-mcp before v1.3.0 lands would leave
-the replacement under review while the original is read-only — bad UX
-for anyone watching the org. Wait for the merge, then run these steps.</p>
-</blockquote>
-<h2 id="1-push-deprecatedmd-to-rforge-mcp">1. Push DEPRECATED.md to rforge-mcp<a class="headerlink" href="#1-push-deprecatedmd-to-rforge-mcp" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Adjust this path to wherever you have rforge-mcp cloned locally.</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># Common locations: ~/projects/data-wise/rforge-mcp or ~/code/rforge-mcp</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">cd</span><span class="w"> </span>~/projects/data-wise/rforge-mcp
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>git<span class="w"> </span>pull
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># Copy the drafted text from the merged rforge PR into ./DEPRECATED.md</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># (adjust the source path if your rforge clone lives elsewhere)</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>cp<span class="w"> </span>~/projects/dev-tools/rforge/docs/migration/rforge-mcp-deprecation.md<span class="w"> </span>./DEPRECATED.md
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1"># Edit DEPRECATED.md: replace [DATE TO BE FILLED IN AT ARCHIVE TIME]</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="c1"># with today&#39;s date (YYYY-MM-DD).</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nv">$EDITOR</span><span class="w"> </span>DEPRECATED.md
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>git<span class="w"> </span>add<span class="w"> </span>DEPRECATED.md
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;docs: deprecation notice — absorbed into rforge plugin v1.3.0&quot;</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
+<p>After the rforge plugin v1.3.0 ships, the original <code>rforge-mcp</code> artifact
+should be retired. This page documents what that meant in practice and
+what was actually done.</p>
+<h2 id="scope-correction-2026-05-11">Scope correction (2026-05-11)<a class="headerlink" href="#scope-correction-2026-05-11" title="Permanent link">&para;</a></h2>
+<p>The original SPEC assumed <code>rforge-mcp</code> lived as a public GitHub repo at
+<code>data-wise/rforge-mcp</code> and on npm as <code>rforge-mcp</code>. <strong>Neither was ever
+true.</strong> The prototype only existed as a local working directory at
+<code>~/projects/dev-tools/mcp-servers/rforge</code> on the author's machine,
+exposed globally via <code>npm link</code> (not <code>npm publish</code>).</p>
+<p>So the checklist was rewritten from "archive the GitHub repo + push
+DEPRECATED.md" to the actual cleanup tasks below.</p>
+<h2 id="1-drop-the-global-npm-link-symlink">1. Drop the global <code>npm link</code> symlink<a class="headerlink" href="#1-drop-the-global-npm-link-symlink" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>npm<span class="w"> </span>uninstall<span class="w"> </span>-g<span class="w"> </span>rforge-mcp
 </span></code></pre></div>
-<h2 id="2-archive-the-github-repo">2. Archive the GitHub repo<a class="headerlink" href="#2-archive-the-github-repo" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>gh<span class="w"> </span>repo<span class="w"> </span>archive<span class="w"> </span>data-wise/rforge-mcp<span class="w"> </span>--yes
+<p>This removes the symlink at <code>$(npm prefix -g)/lib/node_modules/rforge-mcp</code>
+that pointed at the local source. After this, <code>npm list -g</code> no longer
+shows rforge-mcp, and any <code>node /opt/homebrew/bin/rforge-mcp</code> invocation
+fails (which is what we want — the plugin's <code>lib/</code> modules are now the
+intended surface).</p>
+<h2 id="2-tombstone-the-local-source-dir">2. Tombstone the local source dir<a class="headerlink" href="#2-tombstone-the-local-source-dir" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># In the local rforge-mcp source dir</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>cp<span class="w"> </span>~/projects/dev-tools/rforge/docs/migration/rforge-mcp-deprecation.md<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">   </span>~/projects/dev-tools/mcp-servers/rforge/DEPRECATED.md
 </span></code></pre></div>
-<p>This makes the repo read-only. Issues and PRs are blocked. The repo
-remains visible and clonable. Reversible via the GitHub UI if needed
-(Settings → Danger Zone → Unarchive).</p>
-<h2 id="3-optional-note-to-existing-local-users">3. (Optional) Note to existing local users<a class="headerlink" href="#3-optional-note-to-existing-local-users" title="Permanent link">&para;</a></h2>
-<p>If you have shell aliases, npm-linked binaries, or shortcuts pointing at
-a local <code>rforge-mcp</code> install, remove them. The plugin now provides
-everything via <code>python3 -m lib.&lt;tool&gt;</code> and the <code>/rforge:*</code> slash commands.</p>
-<h2 id="4-update-your-own-settingsjson">4. Update your own settings.json<a class="headerlink" href="#4-update-your-own-settingsjson" title="Permanent link">&para;</a></h2>
+<p>Optionally rename the directory itself to make its retired state obvious
+in <code>ls</code> output:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>mv<span class="w"> </span>~/projects/dev-tools/mcp-servers/rforge<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">   </span>~/projects/dev-tools/mcp-servers/rforge-archived
+</span></code></pre></div>
+<h2 id="3-update-your-own-claudesettingsjson">3. Update your own <code>~/.claude/settings.json</code><a class="headerlink" href="#3-update-your-own-claudesettingsjson" title="Permanent link">&para;</a></h2>
 <p>If your personal <code>~/.claude/settings.json</code> has an <code>mcpServers.rforge</code>
 entry, remove it manually. We don't auto-edit user settings. Example:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// Before:</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&quot;rforge&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">]</span><span class="w"> </span><span class="p">},</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">&quot;other-server&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1">// After:</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="nt">&quot;other-server&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// Before:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">&quot;rforge&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">]</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">&quot;other-server&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">}</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1">// After:</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="nt">&quot;other-server&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">}</span>
 </span></code></pre></div>
+<h2 id="4-skipped-does-not-apply">4. (Skipped — does not apply)<a class="headerlink" href="#4-skipped-does-not-apply" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>No GitHub repo to archive</strong> — <code>data-wise/rforge-mcp</code> never existed
+  publicly. <code>gh repo view</code> returns <code>Could not resolve to a Repository</code>.</li>
+<li><strong>No npm package to deprecate</strong> — <code>npm view rforge-mcp</code> returns 404.</li>
+<li><strong>No Homebrew formula</strong> — never had one.</li>
+</ul>
 <h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
 <p>After completing steps 1 and 2:</p>
 <ul>
-<li><code>gh repo view data-wise/rforge-mcp</code> should show the archived banner.</li>
-<li>Visiting https://github.com/data-wise/rforge-mcp should display the
-  "This repository has been archived..." notice at the top.</li>
-<li><code>gh api repos/data-wise/rforge-mcp --jq .archived</code> should return <code>true</code>.</li>
-<li>The <code>DEPRECATED.md</code> file should be visible at the root of the rforge-mcp
-  repo on the <code>main</code> branch.</li>
+<li><code>npm list -g rforge-mcp</code> returns nothing (was: <code>rforge-mcp@0.1.0 → ...</code>)</li>
+<li><code>which rforge-mcp</code> returns nothing (binary is no longer on PATH)</li>
+<li>The local source dir is tombstoned with <code>DEPRECATED.md</code> and/or renamed</li>
 </ul>
-<h2 id="whats-not-needed">What's NOT needed<a class="headerlink" href="#whats-not-needed" title="Permanent link">&para;</a></h2>
-<p>No npm, Homebrew, or PyPI cleanup is required — rforge-mcp was never
-published to any package registry. The only artifacts are the GitHub repo
-itself and any local clones / <code>npm link</code> installs on individual machines.</p>
 <h2 id="rollback">Rollback<a class="headerlink" href="#rollback" title="Permanent link">&para;</a></h2>
-<p>If something goes wrong:</p>
+<p>If you ever need to resurrect rforge-mcp:</p>
 <ul>
-<li><strong>DEPRECATED.md commit</strong>: <code>git revert</code> the commit on rforge-mcp <code>main</code>.</li>
-<li><strong>Archive</strong>: GitHub UI → repo Settings → Danger Zone → Unarchive
-  repository. The repo becomes writable again immediately.</li>
+<li>The local source remains at <code>~/projects/dev-tools/mcp-servers/rforge-archived/</code>
+  (or <code>rforge/</code> if you skipped the rename).</li>
+<li>Re-link it globally with <code>cd &lt;source-dir&gt; &amp;&amp; npm link</code>.</li>
+<li>Restore the <code>mcpServers.rforge</code> entry in <code>~/.claude/settings.json</code>.</li>
 </ul>
+<p>Note: as of v1.3.0, the plugin's pure-Python <code>lib/</code> modules cover every
+implemented tool that rforge-mcp shipped — there is no functional reason
+to restore the MCP server. This rollback path is a safety net, not a
+recommended workflow.</p>
 
 
 
