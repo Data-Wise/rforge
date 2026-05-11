@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 15 commands for R package development, ecosystem management, and intelligent orchestration with MCP integration">
+        <meta name="description" content="R package ecosystem orchestrator - 16 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -718,6 +718,34 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup &amp; State
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup &amp; State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rforgeinit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:init
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1732,6 +1760,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#setup-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup &amp; State
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup &amp; State">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rforgeinit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:init
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#status-analysis" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2051,37 +2107,67 @@
 
 
 <h1 id="rforge-commands-reference">RForge Commands Reference<a class="headerlink" href="#rforge-commands-reference" title="Permanent link">&para;</a></h1>
-<p>Complete reference for all 15 RForge commands. Commands are organized by category with usage examples and parameter details.</p>
+<p>Complete reference for all 16 RForge commands. Commands are organized by category with usage examples and parameter details.</p>
 <h2 id="command-categories">Command Categories<a class="headerlink" href="#command-categories" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="#status--analysis">Status &amp; Analysis</a> (4 commands)</li>
+<li><a href="#setup-state">Setup &amp; State</a> (1 command)</li>
+<li><a href="#status-analysis">Status &amp; Analysis</a> (4 commands)</li>
 <li><a href="#ecosystem-management">Ecosystem Management</a> (5 commands)</li>
-<li><a href="#documentation--tasks">Documentation &amp; Tasks</a> (4 commands)</li>
+<li><a href="#documentation-tasks">Documentation &amp; Tasks</a> (4 commands)</li>
 <li><a href="#health-checks">Health Checks</a> (2 commands)</li>
 </ul>
+<hr />
+<h2 id="setup-state">Setup &amp; State<a class="headerlink" href="#setup-state" title="Permanent link">&para;</a></h2>
+<h3 id="rforgeinit">/rforge:init<a class="headerlink" href="#rforgeinit" title="Permanent link">&para;</a></h3>
+<p>Initialize the active rforge context for the current R package or ecosystem. Writes per-user state to <code>~/.rforge/context.json</code> so other commands know which package you're working on.</p>
+<p><strong>Usage:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/rforge:init<span class="w"> </span><span class="o">[</span>--path<span class="w"> </span>PATH<span class="o">]</span><span class="w"> </span><span class="o">[</span>--quick<span class="o">]</span><span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>FORMAT<span class="o">]</span>
+</span></code></pre></div></p>
+<p><strong>Parameters:</strong>
+- <code>--path</code> (optional) — Package or ecosystem root (defaults to current directory)
+- <code>--quick</code> (optional) — Skip comprehensive analysis (faster, lighter context file)
+- <code>--format</code> (optional) — Output format: <code>text</code> (default) or <code>json</code></p>
+<p><strong>Examples:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Initialize from the current directory</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>/rforge:init
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Quick init (skip analysis)</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>/rforge:init<span class="w"> </span>--quick
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Initialize a specific package</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>/rforge:init<span class="w"> </span>--path<span class="w"> </span>~/projects/medfit
+</span></code></pre></div></p>
+<p><strong>What this does:</strong>
+- Detects the package or ecosystem layout (uses <code>lib/discovery.py</code>)
+- Writes <code>~/.rforge/context.json</code> marking the path as the active context
+- Idempotent — re-running on the same path is a no-op for state, may refresh analysis
+- Per-user, not per-package — switching contexts overwrites the state file</p>
+<p><strong>When to run:</strong> First time using rforge on a package, or when switching active context. Other commands (<code>/rforge:status</code>, <code>/rforge:deps</code>, etc.) read this file to know which package they're operating on.</p>
+<p><strong>Time budget:</strong> &lt;5s (<code>--quick</code>), &lt;15s (default)</p>
+<p><strong>Underlying module:</strong> <code>python3 -m lib.init</code> — see <a href="../reference/init/">init API reference</a>.</p>
 <hr />
 <h2 id="status-analysis">Status &amp; Analysis<a class="headerlink" href="#status-analysis" title="Permanent link">&para;</a></h2>
 <h3 id="rforgestatus">/rforge:status<a class="headerlink" href="#rforgestatus" title="Permanent link">&para;</a></h3>
 <p>Quick ecosystem-wide status dashboard with mode-specific detail levels.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/rforge:status<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--mode<span class="w"> </span>MODE<span class="o">]</span><span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>FORMAT<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/rforge:status<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--mode<span class="w"> </span>MODE<span class="o">]</span><span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>FORMAT<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>package</code> (optional) - Package name (defaults to current or ecosystem)
 - <code>--mode</code> (optional) - Status detail level: <code>default</code>, <code>debug</code>, <code>optimize</code>, <code>release</code>
 - <code>--format</code> (optional) - Output format: <code>terminal</code>, <code>json</code>, <code>markdown</code></p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Quick health check (default mode)</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>/rforge:status
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Debug mode for detailed diagnostics</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>/rforge:status<span class="w"> </span>--mode<span class="w"> </span>debug
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># JSON output for automation</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>/rforge:status<span class="w"> </span>--format<span class="w"> </span>json
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Specific package status</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>/rforge:status<span class="w"> </span>mypackage<span class="w"> </span>--mode<span class="w"> </span>release
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Quick health check (default mode)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>/rforge:status
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Debug mode for detailed diagnostics</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>/rforge:status<span class="w"> </span>--mode<span class="w"> </span>debug
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># JSON output for automation</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>/rforge:status<span class="w"> </span>--format<span class="w"> </span>json
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># Specific package status</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>/rforge:status<span class="w"> </span>mypackage<span class="w"> </span>--mode<span class="w"> </span>release
 </span></code></pre></div></p>
 <p><strong>Output includes:</strong>
 - Health score (0-100)
@@ -2095,24 +2181,24 @@
 <h3 id="rforgeanalyze">/rforge:analyze<a class="headerlink" href="#rforgeanalyze" title="Permanent link">&para;</a></h3>
 <p>Deep analysis with mode system support and intelligent recommendations.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/rforge:analyze<span class="w"> </span><span class="o">[</span>description<span class="o">]</span><span class="w"> </span><span class="o">[</span>--mode<span class="w"> </span>MODE<span class="o">]</span><span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>FORMAT<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/rforge:analyze<span class="w"> </span><span class="o">[</span>description<span class="o">]</span><span class="w"> </span><span class="o">[</span>--mode<span class="w"> </span>MODE<span class="o">]</span><span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>FORMAT<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>description</code> (optional) - What to analyze or focus on
 - <code>--mode</code> (optional) - Analysis depth: <code>default</code>, <code>debug</code>, <code>optimize</code>, <code>release</code>
 - <code>--format</code> (optional) - Output format: <code>terminal</code>, <code>json</code>, <code>markdown</code></p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Balanced analysis</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;Check package health&quot;</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Debug mode for investigating issues</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>debug<span class="w"> </span><span class="s2">&quot;Why are tests failing?&quot;</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Release mode for CRAN preparation</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span><span class="s2">&quot;Prepare for CRAN submission&quot;</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># Performance analysis</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>optimize<span class="w"> </span><span class="s2">&quot;Identify bottlenecks&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Balanced analysis</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;Check package health&quot;</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Debug mode for investigating issues</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>debug<span class="w"> </span><span class="s2">&quot;Why are tests failing?&quot;</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Release mode for CRAN preparation</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span><span class="s2">&quot;Prepare for CRAN submission&quot;</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="c1"># Performance analysis</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>optimize<span class="w"> </span><span class="s2">&quot;Identify bottlenecks&quot;</span>
 </span></code></pre></div></p>
 <p><strong>Performs:</strong>
 - Pattern recognition (CODE_CHANGE, BUG_FIX, CRAN_RELEASE, etc.)
@@ -2124,16 +2210,16 @@
 <h3 id="rforgequick">/rforge:quick<a class="headerlink" href="#rforgequick" title="Permanent link">&para;</a></h3>
 <p>Ultra-fast status check using only quick tools (&lt;10 seconds).</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/rforge:quick<span class="w"> </span><span class="o">[</span>description<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:quick<span class="w"> </span><span class="o">[</span>description<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>description</code> (optional) - Brief context for the check</p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Morning stand-up check</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>/rforge:quick
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Pre-commit validation</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>/rforge:quick<span class="w"> </span><span class="s2">&quot;Before committing changes&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Morning stand-up check</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>/rforge:quick
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Pre-commit validation</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>/rforge:quick<span class="w"> </span><span class="s2">&quot;Before committing changes&quot;</span>
 </span></code></pre></div></p>
 <p><strong>Provides:</strong>
 - Basic package info
@@ -2145,16 +2231,16 @@
 <h3 id="rforgethorough">/rforge:thorough<a class="headerlink" href="#rforgethorough" title="Permanent link">&para;</a></h3>
 <p>Comprehensive analysis with R CMD check integration (2-5 minutes).</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:thorough<span class="w"> </span><span class="o">[</span>description<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/rforge:thorough<span class="w"> </span><span class="o">[</span>description<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>description</code> (optional) - Analysis context</p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Full CRAN preparation</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Prepare for CRAN submission&quot;</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Deep quality audit</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Pre-release audit&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Full CRAN preparation</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Prepare for CRAN submission&quot;</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Deep quality audit</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Pre-release audit&quot;</span>
 </span></code></pre></div></p>
 <p><strong>Includes:</strong>
 - R CMD check execution
@@ -2168,12 +2254,12 @@
 <h3 id="rforgedetect">/rforge:detect<a class="headerlink" href="#rforgedetect" title="Permanent link">&para;</a></h3>
 <p>Auto-detect project structure (single package, ecosystem, or hybrid).</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/rforge:detect
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>/rforge:detect
 </span></code></pre></div></p>
 <p><strong>No parameters</strong></p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Detect current directory structure</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>/rforge:detect
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Detect current directory structure</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>/rforge:detect
 </span></code></pre></div></p>
 <p><strong>Output:</strong>
 - Project type: single, ecosystem, or hybrid
@@ -2184,16 +2270,16 @@
 <h3 id="rforgecascade">/rforge:cascade<a class="headerlink" href="#rforgecascade" title="Permanent link">&para;</a></h3>
 <p>Plan coordinated updates across dependent packages.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>/rforge:cascade<span class="w"> </span><span class="o">[</span>description<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>/rforge:cascade<span class="w"> </span><span class="o">[</span>description<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>description</code> (optional) - What's changing and why</p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Plan update cascade</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>/rforge:cascade<span class="w"> </span><span class="s2">&quot;Update base package dependency from v1 to v2&quot;</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># Version bump cascade</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>/rforge:cascade<span class="w"> </span><span class="s2">&quot;Major version bump in core package&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Plan update cascade</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>/rforge:cascade<span class="w"> </span><span class="s2">&quot;Update base package dependency from v1 to v2&quot;</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># Version bump cascade</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>/rforge:cascade<span class="w"> </span><span class="s2">&quot;Major version bump in core package&quot;</span>
 </span></code></pre></div></p>
 <p><strong>Analyzes:</strong>
 - Dependency graph
@@ -2204,16 +2290,16 @@
 <h3 id="rforgeimpact">/rforge:impact<a class="headerlink" href="#rforgeimpact" title="Permanent link">&para;</a></h3>
 <p>Analyze change impact across ecosystem packages.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>/rforge:impact<span class="w"> </span><span class="o">[</span>description<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>/rforge:impact<span class="w"> </span><span class="o">[</span>description<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>description</code> (optional) - What changed</p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># API change impact</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>/rforge:impact<span class="w"> </span><span class="s2">&quot;Changed function signature in base package&quot;</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># Dependency update impact</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>/rforge:impact<span class="w"> </span><span class="s2">&quot;Updated ggplot2 to v3.5.0&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># API change impact</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>/rforge:impact<span class="w"> </span><span class="s2">&quot;Changed function signature in base package&quot;</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># Dependency update impact</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>/rforge:impact<span class="w"> </span><span class="s2">&quot;Updated ggplot2 to v3.5.0&quot;</span>
 </span></code></pre></div></p>
 <p><strong>Reports:</strong>
 - Affected packages
@@ -2224,12 +2310,12 @@
 <h3 id="rforgerelease">/rforge:release<a class="headerlink" href="#rforgerelease" title="Permanent link">&para;</a></h3>
 <p>Plan CRAN submission sequence based on dependencies.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>/rforge:release
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>/rforge:release
 </span></code></pre></div></p>
 <p><strong>No parameters</strong></p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Generate release plan</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>/rforge:release
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Generate release plan</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>/rforge:release
 </span></code></pre></div></p>
 <p><strong>Provides:</strong>
 - Submission order (base packages first)
@@ -2240,19 +2326,19 @@
 <h3 id="rforgedeps">/rforge:deps<a class="headerlink" href="#rforgedeps" title="Permanent link">&para;</a></h3>
 <p>Build and visualize dependency graph across R package ecosystem.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>/rforge:deps<span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>FORMAT<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>/rforge:deps<span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>FORMAT<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>--format</code> (optional) - Output format: <code>terminal</code>, <code>json</code>, <code>mermaid</code></p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Terminal visualization</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>/rforge:deps
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1"># Mermaid diagram for documentation</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>/rforge:deps<span class="w"> </span>--format<span class="w"> </span>mermaid<span class="w"> </span>&gt;<span class="w"> </span>deps.mmd
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="c1"># JSON for programmatic use</span>
-</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>/rforge:deps<span class="w"> </span>--format<span class="w"> </span>json
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Terminal visualization</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>/rforge:deps
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Mermaid diagram for documentation</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>/rforge:deps<span class="w"> </span>--format<span class="w"> </span>mermaid<span class="w"> </span>&gt;<span class="w"> </span>deps.mmd
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="c1"># JSON for programmatic use</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>/rforge:deps<span class="w"> </span>--format<span class="w"> </span>json
 </span></code></pre></div></p>
 <p><strong>Output:</strong>
 - Dependency graph (directed acyclic graph)
@@ -2264,12 +2350,12 @@
 <h3 id="rforgedoc-check">/rforge:doc-check<a class="headerlink" href="#rforgedoc-check" title="Permanent link">&para;</a></h3>
 <p>Check for documentation drift and inconsistencies across packages.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>/rforge:doc-check
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>/rforge:doc-check
 </span></code></pre></div></p>
 <p><strong>No parameters</strong></p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Check documentation status</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>/rforge:doc-check
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Check documentation status</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>/rforge:doc-check
 </span></code></pre></div></p>
 <p><strong>Validates:</strong>
 - Exported functions have documentation
@@ -2280,16 +2366,16 @@
 <h3 id="rforgecomplete">/rforge:complete<a class="headerlink" href="#rforgecomplete" title="Permanent link">&para;</a></h3>
 <p>Mark tasks complete with automatic documentation cascade.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>/rforge:complete<span class="w"> </span><span class="o">[</span>task_description<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>/rforge:complete<span class="w"> </span><span class="o">[</span>task_description<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>task_description</code> (optional) - What was completed</p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Mark task complete</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>/rforge:complete<span class="w"> </span><span class="s2">&quot;Implemented bootstrap CI method&quot;</span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># Trigger doc cascade</span>
-</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>/rforge:complete<span class="w"> </span><span class="s2">&quot;Fixed critical bug in mediation function&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># Mark task complete</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>/rforge:complete<span class="w"> </span><span class="s2">&quot;Implemented bootstrap CI method&quot;</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="c1"># Trigger doc cascade</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>/rforge:complete<span class="w"> </span><span class="s2">&quot;Fixed critical bug in mediation function&quot;</span>
 </span></code></pre></div></p>
 <p><strong>Actions:</strong>
 - Updates task tracking
@@ -2300,16 +2386,16 @@
 <h3 id="rforgecapture">/rforge:capture<a class="headerlink" href="#rforgecapture" title="Permanent link">&para;</a></h3>
 <p>Quick capture ideas and tasks for later (with automatic doc cascade detection).</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>/rforge:capture<span class="w"> </span><span class="o">[</span>idea<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>/rforge:capture<span class="w"> </span><span class="o">[</span>idea<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>idea</code> (required) - What to capture</p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># Capture feature idea</span>
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>/rforge:capture<span class="w"> </span><span class="s2">&quot;Add support for weighted mediation&quot;</span>
-</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
-</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="c1"># Capture bug note</span>
-</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>/rforge:capture<span class="w"> </span><span class="s2">&quot;Edge case: NA handling in bootstrap&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Capture feature idea</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>/rforge:capture<span class="w"> </span><span class="s2">&quot;Add support for weighted mediation&quot;</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="c1"># Capture bug note</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>/rforge:capture<span class="w"> </span><span class="s2">&quot;Edge case: NA handling in bootstrap&quot;</span>
 </span></code></pre></div></p>
 <p><strong>Stores:</strong>
 - Idea with timestamp
@@ -2319,12 +2405,12 @@
 <h3 id="rforgenext">/rforge:next<a class="headerlink" href="#rforgenext" title="Permanent link">&para;</a></h3>
 <p>Get ecosystem-aware next task recommendation.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>/rforge:next
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>/rforge:next
 </span></code></pre></div></p>
 <p><strong>No parameters</strong></p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Get next task suggestion</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>/rforge:next
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1"># Get next task suggestion</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>/rforge:next
 </span></code></pre></div></p>
 <p><strong>Considers:</strong>
 - Unfinished tasks
@@ -2342,16 +2428,16 @@
 <h3 id="rforgeecosystem-health">/rforge:ecosystem-health<a class="headerlink" href="#rforgeecosystem-health" title="Permanent link">&para;</a></h3>
 <p>Comprehensive ecosystem health metrics with visual dashboard.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>/rforge:ecosystem-health<span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>FORMAT<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>/rforge:ecosystem-health<span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>FORMAT<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>--format</code> (optional) - Output format: <code>terminal</code>, <code>json</code>, <code>markdown</code></p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1"># Visual health dashboard</span>
-</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>/rforge:ecosystem-health
-</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>
-</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="c1"># JSON metrics</span>
-</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>/rforge:ecosystem-health<span class="w"> </span>--format<span class="w"> </span>json
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="c1"># Visual health dashboard</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>/rforge:ecosystem-health
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="c1"># JSON metrics</span>
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>/rforge:ecosystem-health<span class="w"> </span>--format<span class="w"> </span>json
 </span></code></pre></div></p>
 <p><strong>Metrics:</strong>
 - Overall health score (0-100)
@@ -2363,16 +2449,16 @@
 <h3 id="rforgerpkg-check">/rforge:rpkg-check<a class="headerlink" href="#rforgerpkg-check" title="Permanent link">&para;</a></h3>
 <p>R CMD check integration with detailed error reporting.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>/rforge:rpkg-check<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>/rforge:rpkg-check<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>package</code> (optional) - Package to check (defaults to current)</p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="c1"># Check current package</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>/rforge:rpkg-check
-</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
-</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="c1"># Check specific package</span>
-</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>/rforge:rpkg-check<span class="w"> </span>mypackage
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="c1"># Check current package</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>/rforge:rpkg-check
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="c1"># Check specific package</span>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>/rforge:rpkg-check<span class="w"> </span>mypackage
 </span></code></pre></div></p>
 <p><strong>Executes:</strong>
 - R CMD check with standard flags
@@ -2440,7 +2526,7 @@
 - <code>--format json</code> - Machine-readable with metadata
 - <code>--format markdown</code> - Documentation-ready</p>
 <p><strong>Example:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span>--format<span class="w"> </span>markdown<span class="w"> </span>&gt;<span class="w"> </span>analysis.md
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span>--format<span class="w"> </span>markdown<span class="w"> </span>&gt;<span class="w"> </span>analysis.md
 </span></code></pre></div></p>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 15 commands for R package development, ecosystem management, and intelligent orchestration with MCP integration">
+        <meta name="description" content="R package ecosystem orchestrator - 16 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -706,10 +706,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#rforge-mcp-tools" class="md-nav__link">
+  <a href="#rforge-lib-modules-v130" class="md-nav__link">
     <span class="md-ellipsis">
       
-        RForge MCP Tools
+        RForge Lib Modules (v1.3.0+)
       
     </span>
   </a>
@@ -1598,10 +1598,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#rforge-mcp-tools" class="md-nav__link">
+  <a href="#rforge-lib-modules-v130" class="md-nav__link">
     <span class="md-ellipsis">
       
-        RForge MCP Tools
+        RForge Lib Modules (v1.3.0+)
       
     </span>
   </a>
@@ -1853,6 +1853,12 @@
 </thead>
 <tbody>
 <tr>
+<td><code>/rforge:init</code></td>
+<td>&lt;5s</td>
+<td>First run on a package or ecosystem</td>
+<td>Writes <code>~/.rforge/context.json</code></td>
+</tr>
+<tr>
 <td><code>/rforge:quick</code></td>
 <td>~10s</td>
 <td>Pre-commit, quick status</td>
@@ -1912,44 +1918,40 @@
 </tbody>
 </table>
 <hr />
-<h2 id="rforge-mcp-tools">RForge MCP Tools<a class="headerlink" href="#rforge-mcp-tools" title="Permanent link">&para;</a></h2>
-<p>Tools the orchestrator can delegate to:</p>
+<h2 id="rforge-lib-modules-v130">RForge Lib Modules (v1.3.0+)<a class="headerlink" href="#rforge-lib-modules-v130" title="Permanent link">&para;</a></h2>
+<p>As of v1.3.0 the plugin is self-contained — slash commands dispatch to pure-Python <code>lib/</code> modules instead of an MCP server. CLI form: <code>python3 -m lib.&lt;module&gt;</code>.</p>
 <table>
 <thead>
 <tr>
-<th>Tool</th>
+<th>Module</th>
 <th>Purpose</th>
 <th>Speed</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>impact</code></td>
-<td>Analyze code change impact</td>
+<td><code>lib.discovery</code></td>
+<td>Ecosystem + package detection</td>
+<td>&lt;2s</td>
+</tr>
+<tr>
+<td><code>lib.deps</code></td>
+<td>Dependency graph + impact analysis</td>
 <td>~8s</td>
 </tr>
 <tr>
-<td><code>tests</code></td>
-<td>Run and analyze tests</td>
-<td>~10s</td>
+<td><code>lib.status</code></td>
+<td>Ecosystem health snapshot</td>
+<td>&lt;5s</td>
 </tr>
 <tr>
-<td><code>docs</code></td>
-<td>Check documentation completeness</td>
-<td>~8s</td>
-</tr>
-<tr>
-<td><code>health</code></td>
-<td>Package health metrics</td>
-<td>~8s</td>
-</tr>
-<tr>
-<td><code>rdoc</code></td>
-<td>R documentation validation</td>
-<td>~8s</td>
+<td><code>lib.init</code></td>
+<td>Initialize <code>~/.rforge/context.json</code></td>
+<td>&lt;5s</td>
 </tr>
 </tbody>
 </table>
+<p>See <a href="../lib-modules/"><code>docs/lib-modules.md</code></a> and the <a href="../reference/discovery/">reference API docs</a> for full call signatures.</p>
 <hr />
 <h2 id="hooks-skills-v120">Hooks &amp; Skills (v1.2.0+)<a class="headerlink" href="#hooks-skills-v120" title="Permanent link">&para;</a></h2>
 <p>RForge ships autonomous tooling that activates without an explicit
@@ -2000,7 +2002,7 @@ shell, no R required. Runs in <code>release</code> mode pre-CRAN.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Data-Wise/rforge.git
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>ln<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/rforge&quot;</span><span class="w"> </span>~/.claude/plugins/rforge
 </span></code></pre></div>
-<p>See the <a href="../README.md#installation">main README</a> for the full matrix of
+<p>See the <a href="../#installation">Home page</a> for the full matrix of
 install options.</p>
 <hr />
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
