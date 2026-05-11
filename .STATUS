@@ -5,30 +5,6 @@ version: 1.2.0 (released)
 last_release: 2026-05-10 v1.2.0 (PR #2 dev → main, tag https://github.com/Data-Wise/rforge/releases/tag/v1.2.0)
 
 worktrees:
-  - branch: feature/mcp-absorb-discovery
-    path: ~/.git-worktrees/rforge/feature-mcp-absorb-discovery
-    base: dev
-    status: IMPLEMENTATION COMPLETE — pushed, awaiting user direction on PR
-    created: 2026-05-10
-    scope: "Path B Phase B.1 — port rforge_detect, rforge_deps, rforge_impact to lib/"
-    target_release: v1.3.0 (non-breaking)
-    spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
-    orchestrate: ORCHESTRATE-mcp-absorb-discovery.md
-    last_commit: 6ab7f64 (docs(orchestrate): stress-test report on a second R ecosystem)
-    impl_commit: c01d581 (feat(lib): port discovery + deps from rforge-mcp to lib/)
-    notes: |
-      Implementation shipped 2026-05-10:
-        - lib/discovery.py (327 lines), lib/deps.py (385 lines)
-        - 32 pytest cases (tests/test_lib_{discovery,deps}.py) + conftest
-        - tests/test-all.sh: 22/22 checks pass (was 20)
-        - commands/{detect,deps,impact}.md updated to invoke new lib/
-        - CHANGELOG [Unreleased] entry, SPEC status Draft → In Progress
-      Side-by-side validated on mediationverse (5 packages) + second
-      stress test on ~/projects/r-packages (6 packages with stable/
-      category). Algorithmic parity with rforge-mcp confirmed.
-      Branch pushed to origin; PR creation deferred to user per
-      feature-branch-workflow rule.
-
   - branch: feature/mcp-absorb-status
     path: ~/.git-worktrees/rforge/feature-mcp-absorb-status
     base: dev
@@ -50,6 +26,33 @@ worktrees:
       from inside the worktree directory.
 
 recent:
+  - date: 2026-05-10
+    pr: 3
+    branch: feature/mcp-absorb-discovery
+    title: "feat: Path B Phase B.1 — port discovery + deps to lib/"
+    state: MERGED
+    merge_commit: 951e055
+    summary: |
+      First Path B port. Three of rforge-mcp's tools (rforge_detect,
+      rforge_deps, rforge_impact) now live as pure-Python modules in
+      lib/. Plugin commands invoke them directly via `python3 -m lib.X`.
+      Non-breaking: existing rforge-mcp users keep all functionality.
+
+      Includes pre-PR self-review refactor (commit 5d95c7a) addressing
+      2 blockers caught in review:
+        - lib/ made a real Python package (was sys.path hack risking
+          name collision)
+        - assert → walrus operator in parse_description (assert is
+          strippable under python -O)
+
+      Final state: 36/36 pytest, 23/23 test-all.sh, public API
+      unchanged. Pre-merge ORCHESTRATE-*.md removal per CLAUDE.md
+      merge-cleanup rule (commit e37a6a9).
+
+      Lines: +2335/-194 across 21 files (lib/__init__.py, discovery.py
+      361 lines, deps.py 481 lines, 3 test files, 5 doc pages,
+      scripts/gen_lib_reference.py, command updates).
+
   - date: 2026-05-10
     pr: 1
     branch: feature/craft-parity-foundations
