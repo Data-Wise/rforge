@@ -168,6 +168,31 @@ for field in ('name:', 'description:', 'category:'):
 "
 }
 
+# Lib modules — pytest suite for lib/discovery.py + lib/deps.py.
+# Requires pytest. If not installed, we emit a clear hint and fail —
+# pytest is a dev-time dependency, expected in CI and local dev.
+lib_pytest() {
+    if ! python3 -c "import pytest" 2>/dev/null; then
+        echo "pytest not installed — run: pip install pytest" >&2
+        return 1
+    fi
+    python3 -m pytest tests/test_lib_discovery.py tests/test_lib_deps.py -q
+}
+
+# Lib CLIs run end-to-end on an empty cwd without error.
+# lib/ is now a Python package — invoke via `python3 -m lib.<module>`.
+lib_cli_smoke() {
+    python3 -m lib.discovery --path . --format json > /dev/null && \
+    python3 -m lib.deps --path . --format json > /dev/null
+}
+
+# Auto-extracted reference docs (docs/reference/*.md) must stay in sync with
+# the docstrings in lib/. Drift means someone updated a docstring without
+# re-running the generator.
+lib_reference_in_sync() {
+    python3 scripts/gen_lib_reference.py --check
+}
+
 echo "═══════════════════════════════════════════════════════════════"
 echo "  RForge plugin — full validation suite"
 echo "═══════════════════════════════════════════════════════════════"
@@ -202,6 +227,11 @@ run "mkdocs nav files all exist"   mkdocs_nav_files_exist
 # Skills
 run "Skill: embedded script syntax-checks"   skill_extract_and_check
 run "Skill: frontmatter has required fields" skill_frontmatter_complete
+
+# Lib modules (Path B Phase B.1 ports)
+run "Lib: pytest suite (discovery + deps)"   lib_pytest
+run "Lib: CLI smoke (discovery.py + deps.py)" lib_cli_smoke
+run "Lib: reference docs in sync with source" lib_reference_in_sync
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════"

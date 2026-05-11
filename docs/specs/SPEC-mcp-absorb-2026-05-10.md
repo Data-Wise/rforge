@@ -1,8 +1,8 @@
 # SPEC: Absorb rforge-mcp into rforge plugin (Path B)
 
 > **Date:** 2026-05-10
-> **Status:** Draft — Path A (decoupling) shipped in v1.2.0; Path B (absorption) is future work
-> **Related:** [Path A in CHANGELOG v1.2.0](../../CHANGELOG.md), [rforge-mcp repo](https://github.com/data-wise/rforge-mcp)
+> **Status:** In Progress — Path A shipped in v1.2.0; Phase B.1 (discovery + deps) implemented on `feature/mcp-absorb-discovery` (2026-05-10)
+> **Related:** [Path A in CHANGELOG v1.2.0](../../CHANGELOG.md), [rforge-mcp repo](https://github.com/data-wise/rforge-mcp), [ORCHESTRATE for B.1](../../ORCHESTRATE-mcp-absorb-discovery.md)
 
 ## Summary
 
@@ -66,7 +66,7 @@ These are pure-FS / pure-parsing logic. Smallest risk, biggest reward.
 
 **Acceptance:**
 - Existing `/rforge:detect` and `/rforge:deps` commands updated to invoke
-  `python3 lib/discovery.py` / `python3 lib/deps.py` (or equivalent)
+  `python3 -m lib.discovery` / `python3 -m lib.deps` (or equivalent)
 - Output matches what MCP server returned (run both side-by-side on
   mediationverse ecosystem; diff outputs)
 

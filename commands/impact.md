@@ -10,24 +10,39 @@ Analyze the ripple effects of changes across your R package ecosystem.
 
 ## What It Does
 
-Uses the `rforge_impact` MCP tool to:
-- Identify affected packages
-- Estimate cascade workload
-- Find breaking changes
-- Calculate update priority
-- Provide mitigation strategies
+Runs the in-plugin impact analysis (co-located with deps logic) to:
+- Identify direct + indirect dependents of a package
+- Compute the topological update sequence
+- Estimate cascade workload (time)
+- Assess risk level (low/medium/high)
+- Recommend mitigation strategies
 
 ## Usage
 
+Invoke via Bash. `--package` is required; `--change-type` defaults to `feature`.
+
 ```bash
-# Impact of recent changes
-/rforge:impact
+# Analyze the impact of a breaking change to a package
+python3 -m lib.deps --path . --format text impact \
+    --package medfit --change-type breaking
 
-# Impact of specific change
-/rforge:impact "Rename extract_mediation to extract_med"
+# Other change types: feature | fix | internal
+python3 -m lib.deps --path . --format text impact \
+    --package medfit --change-type feature \
+    --affected-exports extract_mediation predict
 
-# Impact for function change
-/rforge:impact --function extract_mediation
+# Machine-readable JSON
+python3 -m lib.deps --path . --format json impact --package medfit --change-type breaking
+```
+
+The same logic is also importable as a Python API:
+
+```python
+from lib.discovery import detect_ecosystem
+from lib.deps import build_graph, analyze_impact
+graph = build_graph(detect_ecosystem("."))
+impact = analyze_impact(graph, "medfit", change_type="breaking")
+print(impact.risk_level, impact.update_sequence)
 ```
 
 ## Output
