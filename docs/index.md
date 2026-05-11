@@ -290,8 +290,7 @@ MIT
 
 ## Links
 
-- RForge MCP Server (archived as of v1.3.0): https://github.com/data-wise/rforge-mcp
-- v1.3.0 migration: [migration/rforge-mcp-deprecation.md](migration/rforge-mcp-deprecation.md)
+- v1.3.0 absorbed the prior `rforge-mcp` prototype (local-only, never published to GitHub or npm). See [migration/rforge-mcp-deprecation.md](migration/rforge-mcp-deprecation.md) for the migration narrative.
 - Claude Code: https://claude.com/code
 - Documentation: See `docs/` folder
 
