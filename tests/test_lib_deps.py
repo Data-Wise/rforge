@@ -198,6 +198,32 @@ def test_analyze_impact_unknown_package_raises(tmp_path, make_pkg):
 # ───────────────────────── Blockers ─────────────────────────
 
 
+def test_deps_cli_exits_1_on_missing_path(tmp_path):
+    """deps CLI: missing path → exit 1, error on stderr (both subcommands)."""
+    import subprocess
+    from pathlib import Path as _P
+
+    script = _P(__file__).resolve().parent.parent / "lib" / "deps.py"
+    missing = str(tmp_path / "ghost")
+
+    # graph subcommand
+    result = subprocess.run(
+        ["python3", str(script), "--path", missing, "--format", "json"],
+        capture_output=True, text=True,
+    )
+    assert result.returncode == 1
+    assert "does not exist" in result.stderr
+
+    # impact subcommand
+    result = subprocess.run(
+        ["python3", str(script), "--path", missing, "impact",
+         "--package", "anything", "--change-type", "feature"],
+        capture_output=True, text=True,
+    )
+    assert result.returncode == 1
+    assert "does not exist" in result.stderr
+
+
 def test_identify_blockers_sorted_by_blast_radius(tmp_path, make_pkg):
     # core ← a, b, c; impl ← top
     make_pkg("core")

@@ -407,7 +407,11 @@ def format_impact_text(impact: Impact) -> str:
 
 
 def _cmd_deps(args: argparse.Namespace) -> int:
-    eco = detect_ecosystem(args.path)
+    try:
+        eco = detect_ecosystem(args.path)
+    except (FileNotFoundError, NotADirectoryError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     graph = build_graph(eco)
     if args.format == "json":
         print(json.dumps(graph.to_dict(), indent=2, sort_keys=True))
@@ -417,7 +421,11 @@ def _cmd_deps(args: argparse.Namespace) -> int:
 
 
 def _cmd_impact(args: argparse.Namespace) -> int:
-    eco = detect_ecosystem(args.path)
+    try:
+        eco = detect_ecosystem(args.path)
+    except (FileNotFoundError, NotADirectoryError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     graph = build_graph(eco)
     try:
         impact = analyze_impact(

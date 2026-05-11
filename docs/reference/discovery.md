@@ -80,6 +80,10 @@ Returns an `Ecosystem` describing the layout: the packages found, their
 classification (single / ecosystem / hybrid), the MCP-compatible mode
 (minimal / standard / full), and whether an `.rforge.yaml` config exists.
 
+Raises:
+    FileNotFoundError: if `path` does not exist.
+    NotADirectoryError: if `path` exists but is not a directory.
+
 ### `find_r_packages()`
 
 ```python

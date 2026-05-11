@@ -270,8 +270,16 @@ def detect_ecosystem(path: str | os.PathLike = ".") -> Ecosystem:
     Returns an `Ecosystem` describing the layout: the packages found, their
     classification (single / ecosystem / hybrid), the MCP-compatible mode
     (minimal / standard / full), and whether an `.rforge.yaml` config exists.
+
+    Raises:
+        FileNotFoundError: if `path` does not exist.
+        NotADirectoryError: if `path` exists but is not a directory.
     """
     root = Path(path).resolve()
+    if not root.exists():
+        raise FileNotFoundError(f"path does not exist: {root}")
+    if not root.is_dir():
+        raise NotADirectoryError(f"path is not a directory: {root}")
     config_path = root / ".rforge.yaml"
     config_found = config_path.is_file()
 
@@ -337,7 +345,11 @@ def _main(argv: Optional[list[str]] = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    eco = detect_ecosystem(args.path)
+    try:
+        eco = detect_ecosystem(args.path)
+    except (FileNotFoundError, NotADirectoryError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     if args.format == "json":
         print(format_json(eco))
     else:

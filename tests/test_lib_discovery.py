@@ -192,3 +192,37 @@ def test_ecosystem_to_dict_is_json_serializable(tmp_path, make_pkg):
     parsed = json.loads(payload)
     assert parsed["kind"] == "ecosystem"
     assert {p["name"] for p in parsed["packages"]} == {"foo", "bar"}
+
+
+# ───────────────────────── Error paths ─────────────────────────
+
+
+def test_detect_ecosystem_missing_path_raises(tmp_path):
+    """Path that does not exist on disk → FileNotFoundError."""
+    missing = tmp_path / "definitely-not-here"
+    with pytest.raises(FileNotFoundError, match="does not exist"):
+        detect_ecosystem(missing)
+
+
+def test_detect_ecosystem_file_path_raises(tmp_path, make_pkg):
+    """Path that exists but is a file (not a directory) → NotADirectoryError."""
+    pkg = make_pkg("solo")
+    desc_file = pkg / "DESCRIPTION"  # exists but is a file
+    with pytest.raises(NotADirectoryError, match="not a directory"):
+        detect_ecosystem(desc_file)
+
+
+def test_discovery_cli_exits_1_on_missing_path(tmp_path):
+    """CLI: missing path → exit 1, error on stderr."""
+    import subprocess
+    from pathlib import Path as _P
+
+    script = _P(__file__).resolve().parent.parent / "lib" / "discovery.py"
+    result = subprocess.run(
+        ["python3", str(script), "--path", str(tmp_path / "nope"), "--format", "json"],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 1
+    assert "does not exist" in result.stderr
+    assert result.stdout == ""  # nothing on stdout
