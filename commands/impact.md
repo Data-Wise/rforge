@@ -23,23 +23,23 @@ Invoke via Bash. `--package` is required; `--change-type` defaults to `feature`.
 
 ```bash
 # Analyze the impact of a breaking change to a package
-python3 lib/deps.py --path . --format text impact \
+python3 -m lib.deps --path . --format text impact \
     --package medfit --change-type breaking
 
 # Other change types: feature | fix | internal
-python3 lib/deps.py --path . --format text impact \
+python3 -m lib.deps --path . --format text impact \
     --package medfit --change-type feature \
     --affected-exports extract_mediation predict
 
 # Machine-readable JSON
-python3 lib/deps.py --path . --format json impact --package medfit --change-type breaking
+python3 -m lib.deps --path . --format json impact --package medfit --change-type breaking
 ```
 
 The same logic is also importable as a Python API:
 
 ```python
-from discovery import detect_ecosystem
-from deps import build_graph, analyze_impact
+from lib.discovery import detect_ecosystem
+from lib.deps import build_graph, analyze_impact
 graph = build_graph(detect_ecosystem("."))
 impact = analyze_impact(graph, "medfit", change_type="breaking")
 print(impact.risk_level, impact.update_sequence)

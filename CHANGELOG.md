@@ -15,14 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   for `DESCRIPTION` files, classifies layouts as `single | ecosystem | hybrid`,
   preserves MCP-compatible `mode` field (`minimal | standard | full`) for
   side-by-side validation. Exposes `detect_ecosystem()` API and an
-  `argparse` CLI (`python3 lib/discovery.py --path . --format {text,json}`).
+  `argparse` CLI (`python3 -m lib.discovery --path . --format {text,json}`).
 - **`lib/deps.py`** — dependency-graph + impact analysis, ported from
   `rforge-mcp` `tools/deps/{deps,impact}.js`. Builds DAG from
   `Imports`/`Depends`/`Suggests`/`LinkingTo`, computes topological layers
   (leaves first), detects cycles, identifies blockers. `analyze_impact()`
   estimates direct/indirect dependents, risk level, work hours, and
   generates change-type-aware recommendations. CLI subcommands:
-  `python3 lib/deps.py [--path .] [--format {text,json}] [graph|impact ...]`.
+  `python3 -m lib.deps [--path .] [--format {text,json}] [graph|impact ...]`.
 - **`tests/test_lib_discovery.py` + `tests/test_lib_deps.py`** — 32 pytest cases
   covering DESCRIPTION parsing edge cases (continuation lines, version
   constraints, `R` filtering), FS traversal (hidden-dir handling, no descent

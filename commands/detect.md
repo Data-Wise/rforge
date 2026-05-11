@@ -20,19 +20,19 @@ Invoke the discovery script via Bash. Default path is the current directory.
 
 ```bash
 # Detect from current directory
-python3 lib/discovery.py --path . --format text
+python3 -m lib.discovery --path . --format text
 
 # Detect from a specific path
-python3 lib/discovery.py --path /path/to/packages --format text
+python3 -m lib.discovery --path /path/to/packages --format text
 
 # Machine-readable JSON
-python3 lib/discovery.py --path . --format json
+python3 -m lib.discovery --path . --format json
 ```
 
 The same logic is also importable as a Python API:
 
 ```python
-from discovery import detect_ecosystem
+from lib.discovery import detect_ecosystem
 eco = detect_ecosystem(".")
 print(eco.kind, [p.name for p in eco.packages])
 ```

@@ -180,9 +180,10 @@ lib_pytest() {
 }
 
 # Lib CLIs run end-to-end on an empty cwd without error.
+# lib/ is now a Python package — invoke via `python3 -m lib.<module>`.
 lib_cli_smoke() {
-    python3 lib/discovery.py --path . --format json > /dev/null && \
-    python3 lib/deps.py --path . --format json > /dev/null
+    python3 -m lib.discovery --path . --format json > /dev/null && \
+    python3 -m lib.deps --path . --format json > /dev/null
 }
 
 # Auto-extracted reference docs (docs/reference/*.md) must stay in sync with

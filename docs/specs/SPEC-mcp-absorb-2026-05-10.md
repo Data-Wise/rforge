@@ -66,7 +66,7 @@ These are pure-FS / pure-parsing logic. Smallest risk, biggest reward.
 
 **Acceptance:**
 - Existing `/rforge:detect` and `/rforge:deps` commands updated to invoke
-  `python3 lib/discovery.py` / `python3 lib/deps.py` (or equivalent)
+  `python3 -m lib.discovery` / `python3 -m lib.deps` (or equivalent)
 - Output matches what MCP server returned (run both side-by-side on
   mediationverse ecosystem; diff outputs)
 

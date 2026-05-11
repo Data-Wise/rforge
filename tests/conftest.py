@@ -8,9 +8,11 @@ from typing import Callable
 
 import pytest
 
-# Make `lib/` importable as top-level (matches CLI: `python3 lib/discovery.py`)
+# Make the repo root importable so `from lib.discovery import ...` works
+# regardless of pytest's invocation cwd. lib/ is a real Python package
+# (lib/__init__.py); we add the package's *parent* directory.
 _REPO_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_REPO_ROOT / "lib"))
+sys.path.insert(0, str(_REPO_ROOT))
 
 
 @pytest.fixture

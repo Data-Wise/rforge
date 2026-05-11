@@ -19,7 +19,7 @@ packages, build dependency graphs, or reason about change impact.
 
 ```mermaid
 flowchart LR
-    cmd["/rforge:detect<br>/rforge:deps<br>/rforge:impact"] -->|bash| py[python3 lib/discovery.py<br>python3 lib/deps.py]
+    cmd["/rforge:detect<br>/rforge:deps<br>/rforge:impact"] -->|bash| py[python3 -m lib.discovery<br>python3 -m lib.deps]
     py --> fs[(R DESCRIPTION<br>files on disk)]
     py --> out[text or JSON<br>to stdout]
 ```
@@ -28,8 +28,8 @@ flowchart LR
 
 | Module | Public functions | CLI entry point |
 |---|---|---|
-| `lib/discovery.py` | `detect_ecosystem`, `find_r_packages`, `parse_description`, `read_description` | `python3 lib/discovery.py --path . --format text\|json` |
-| `lib/deps.py` | `build_graph`, `analyze_impact`, `get_all_dependents`, `get_update_order`, `identify_blockers` | `python3 lib/deps.py [--path .] [--format text\|json] [graph\|impact ...]` |
+| `lib/discovery.py` | `detect_ecosystem`, `find_r_packages`, `parse_description`, `read_description` | `python3 -m lib.discovery --path . --format text\|json` |
+| `lib/deps.py` | `build_graph`, `analyze_impact`, `get_all_dependents`, `get_update_order`, `identify_blockers` | `python3 -m lib.deps [--path .] [--format text\|json] [graph\|impact ...]` |
 
 ## `lib/discovery.py` — Ecosystem detection
 
@@ -43,16 +43,16 @@ parses each into a structured record, and classifies the layout as
 
 ```bash
 # Text (human-readable, with emojis + tree layout)
-python3 lib/discovery.py --path . --format text
+python3 -m lib.discovery --path . --format text
 
 # JSON (machine-readable)
-python3 lib/discovery.py --path ~/projects/r-packages/active --format json
+python3 -m lib.discovery --path ~/projects/r-packages/active --format json
 ```
 
 ### Python API
 
 ```python
-from discovery import detect_ecosystem
+from lib.discovery import detect_ecosystem
 
 eco = detect_ecosystem(".")
 print(eco.kind)           # "single" | "ecosystem" | "hybrid"
@@ -111,15 +111,15 @@ radius of changes.
 
 ```bash
 # Default: print the graph
-python3 lib/deps.py --path . --format text
-python3 lib/deps.py --path . --format text graph   # explicit
+python3 -m lib.deps --path . --format text
+python3 -m lib.deps --path . --format text graph   # explicit
 
 # Impact analysis (requires --package)
-python3 lib/deps.py --path . --format text impact \
+python3 -m lib.deps --path . --format text impact \
     --package medfit --change-type breaking
 
 # JSON output
-python3 lib/deps.py --path . --format json impact --package medfit --change-type breaking
+python3 -m lib.deps --path . --format json impact --package medfit --change-type breaking
 ```
 
 `--change-type` accepts `breaking | feature | fix | internal` (default `feature`).
@@ -128,8 +128,8 @@ Optional `--affected-exports name1 name2` adds them to the recommendation list.
 ### Python API
 
 ```python
-from discovery import detect_ecosystem
-from deps import build_graph, analyze_impact
+from lib.discovery import detect_ecosystem
+from lib.deps import build_graph, analyze_impact
 
 eco = detect_ecosystem(".")
 graph = build_graph(eco)
@@ -174,7 +174,7 @@ original `rforge-mcp` heuristic (preserved for side-by-side comparability).
 Real-world layout: 5 R packages under `~/projects/r-packages/active`.
 
 ```bash
-$ python3 lib/discovery.py --path ~/projects/r-packages/active --format text
+$ python3 -m lib.discovery --path ~/projects/r-packages/active --format text
 🏗️  Ecosystem: /Users/.../r-packages/active
    Packages: 5 | mode: full | config: not found
 
@@ -184,7 +184,7 @@ $ python3 lib/discovery.py --path ~/projects/r-packages/active --format text
    ├─ medsim 0.0.0.9000
    └─ probmed 0.0.0.9000
 
-$ python3 lib/deps.py --path ~/projects/r-packages/active --format text
+$ python3 -m lib.deps --path ~/projects/r-packages/active --format text
 🔗 DEPENDENCY ANALYSIS
 
 Packages: 5
@@ -205,7 +205,7 @@ Internal dependencies: 2
   S7, checkmate, cli, dplyr, generics, ggplot2, methods, parallel,
   pbapply, rlang, stats, utils
 
-$ python3 lib/deps.py --path ~/projects/r-packages/active \
+$ python3 -m lib.deps --path ~/projects/r-packages/active \
     impact --package medfit --change-type breaking
 📊 IMPACT: medfit (breaking)
   Direct dependents:   2

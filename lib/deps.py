@@ -11,14 +11,14 @@ Pure Python — no R subprocess. Ported from
 Edge convention: `Edge(from_=importer, to=imported)`. Topological layers
 contain leaves first (deepest deps), which is the correct order to build in.
 
-Usage (CLI):
-    python3 lib/deps.py --path /path/to/eco --format text
-    python3 lib/deps.py impact --package medfit --change-type breaking \\
+Usage (CLI, from repo root):
+    python3 -m lib.deps --path /path/to/eco --format text
+    python3 -m lib.deps impact --package medfit --change-type breaking \\
         --path /path/to/eco --format json
 
 Usage (Python API):
-    from discovery import detect_ecosystem
-    from deps import build_graph, analyze_impact
+    from lib.discovery import detect_ecosystem
+    from lib.deps import build_graph, analyze_impact
     eco = detect_ecosystem(".")
     graph = build_graph(eco)
     impact = analyze_impact(graph, "medfit", change_type="breaking")
@@ -32,12 +32,7 @@ import sys
 from dataclasses import asdict, dataclass, field
 from typing import Literal, Optional
 
-# Allow `python3 lib/deps.py` invocation from the repo root.
-_HERE = __file__
-import os as _os
-sys.path.insert(0, _os.path.dirname(_os.path.abspath(_HERE)))
-
-from discovery import Ecosystem, Package, detect_ecosystem  # noqa: E402
+from .discovery import Ecosystem, Package, detect_ecosystem
 
 
 EdgeType = Literal["imports", "depends", "suggests", "linkingTo"]

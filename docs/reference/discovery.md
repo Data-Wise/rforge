@@ -13,12 +13,12 @@ an ecosystem, or a hybrid layout.
 Pure Python — no R subprocess, no external deps beyond the stdlib. Ported
 from `rforge-mcp/dist/tools/discovery/detect.js` (Path B Phase B.1).
 
-Usage (CLI):
-    python3 lib/discovery.py --path . --format text
-    python3 lib/discovery.py --path /path/to/eco --format json
+Usage (CLI, from repo root):
+    python3 -m lib.discovery --path . --format text
+    python3 -m lib.discovery --path /path/to/eco --format json
 
 Usage (Python API):
-    from discovery import detect_ecosystem
+    from lib.discovery import detect_ecosystem
     eco = detect_ecosystem(".")
     print(eco.kind, [p.name for p in eco.packages])
 

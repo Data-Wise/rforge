@@ -22,17 +22,17 @@ Invoke via Bash:
 
 ```bash
 # Dependency graph for the ecosystem (terminal output)
-python3 lib/deps.py --path . --format text
+python3 -m lib.deps --path . --format text
 
 # Machine-readable JSON
-python3 lib/deps.py --path . --format json
+python3 -m lib.deps --path . --format json
 ```
 
 The same logic is also importable as a Python API:
 
 ```python
-from discovery import detect_ecosystem
-from deps import build_graph
+from lib.discovery import detect_ecosystem
+from lib.deps import build_graph
 graph = build_graph(detect_ecosystem("."))
 print(graph.layers)
 ```

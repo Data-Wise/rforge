@@ -8,12 +8,12 @@ an ecosystem, or a hybrid layout.
 Pure Python — no R subprocess, no external deps beyond the stdlib. Ported
 from `rforge-mcp/dist/tools/discovery/detect.js` (Path B Phase B.1).
 
-Usage (CLI):
-    python3 lib/discovery.py --path . --format text
-    python3 lib/discovery.py --path /path/to/eco --format json
+Usage (CLI, from repo root):
+    python3 -m lib.discovery --path . --format text
+    python3 -m lib.discovery --path /path/to/eco --format json
 
 Usage (Python API):
-    from discovery import detect_ecosystem
+    from lib.discovery import detect_ecosystem
     eco = detect_ecosystem(".")
     print(eco.kind, [p.name for p in eco.packages])
 """
@@ -124,11 +124,11 @@ def parse_description(content: str) -> Optional[Description]:
     current_val = ""
 
     for raw_line in content.splitlines():
-        if raw_line and not raw_line[0].isspace() and _FIELD_RE.match(raw_line):
+        # Walrus binds the match in one shot — no double regex eval, no
+        # `assert` (which would be stripped under `python -O`).
+        if raw_line and not raw_line[0].isspace() and (match := _FIELD_RE.match(raw_line)):
             if current_key:
                 fields[current_key] = current_val.strip()
-            match = _FIELD_RE.match(raw_line)
-            assert match
             current_key = match.group(1)
             current_val = match.group(2)
         elif raw_line.startswith((" ", "\t")) and current_key:

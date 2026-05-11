@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from discovery import detect_ecosystem
-from deps import (
+from lib.discovery import detect_ecosystem
+from lib.deps import (
     analyze_impact,
     build_graph,
     get_all_dependents,
@@ -199,26 +199,31 @@ def test_analyze_impact_unknown_package_raises(tmp_path, make_pkg):
 
 
 def test_deps_cli_exits_1_on_missing_path(tmp_path):
-    """deps CLI: missing path → exit 1, error on stderr (both subcommands)."""
+    """deps CLI: missing path → exit 1, error on stderr (both subcommands).
+
+    Invoked via `python3 -m lib.deps` (lib/ is a package; `python3 lib/deps.py`
+    no longer works because of the relative import inside deps.py).
+    """
     import subprocess
     from pathlib import Path as _P
 
-    script = _P(__file__).resolve().parent.parent / "lib" / "deps.py"
+    repo_root = _P(__file__).resolve().parent.parent
     missing = str(tmp_path / "ghost")
+    base_cmd = ["python3", "-m", "lib.deps"]
 
     # graph subcommand
     result = subprocess.run(
-        ["python3", str(script), "--path", missing, "--format", "json"],
-        capture_output=True, text=True,
+        base_cmd + ["--path", missing, "--format", "json"],
+        cwd=repo_root, capture_output=True, text=True,
     )
     assert result.returncode == 1
     assert "does not exist" in result.stderr
 
     # impact subcommand
     result = subprocess.run(
-        ["python3", str(script), "--path", missing, "impact",
-         "--package", "anything", "--change-type", "feature"],
-        capture_output=True, text=True,
+        base_cmd + ["--path", missing, "impact",
+                    "--package", "anything", "--change-type", "feature"],
+        cwd=repo_root, capture_output=True, text=True,
     )
     assert result.returncode == 1
     assert "does not exist" in result.stderr
