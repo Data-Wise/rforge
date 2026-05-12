@@ -7,6 +7,12 @@
 
 **R package ecosystem orchestrator for Claude Code — 16 commands, R-aware hooks, validation skills.**
 
+!!! tip "TL;DR (30 seconds)"
+    - **What:** R package ecosystem analysis from inside Claude Code. 16 slash commands.
+    - **Why:** Fast feedback loops on multi-package R repos (discovery, deps, status, CRAN prep).
+    - **How:** `brew install data-wise/tap/rforge`, then `/rforge:analyze "<what changed>"`.
+    - **Next:** [Quick Start](QUICK-START.md) (3 min) → [REFCARD](REFCARD.md) for all commands.
+
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
 ## What's new in v2.0.0 (BREAKING)

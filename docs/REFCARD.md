@@ -1,10 +1,16 @@
-# RForge Plugin - Reference Card
+# 📚 RForge Plugin - Reference Card
 
 > **Version:** 2.0.0 | **Last Updated:** 2026-05-12
 
+!!! tip "TL;DR (30 seconds)"
+    - **What:** All 16 commands in one page — categorized by use case.
+    - **Why:** Forget command syntax? Scan the ASCII box below.
+    - **How:** Daily? `/rforge:status` `/rforge:quick`. After changes? `/rforge:analyze "what?"`. Pre-CRAN? `/rforge:thorough`.
+    - **Next:** [Commands reference](commands.md) for full per-command docs.
+
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  RFORGE PLUGIN REFERENCE                                            v1.3.0  │
+│  RFORGE PLUGIN REFERENCE                                            v2.0.0  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  COMMANDS (16)                                                              │
