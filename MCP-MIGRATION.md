@@ -1,8 +1,24 @@
 # MCP Server Migration Guide
 
+> ⚠️ **OUTDATED — kept only for historical reference.** This document
+> describes pre-v1.3.0 setup when rforge orchestrated an external
+> `rforge-mcp` MCP server. **As of v1.3.0+, rforge is fully
+> self-contained: there is no MCP server to install or configure.**
+>
+> If you have an `mcpServers.rforge` or `mcpServers.rforge-mcp` entry
+> in `~/.claude/settings.json` from a previous version, just **delete
+> it** — the plugin runs in-process via `lib/` modules.
+>
+> For the current migration narrative, see
+> [`docs/migration/rforge-mcp-deprecation.md`](docs/migration/rforge-mcp-deprecation.md).
+>
+> The text below is the original (now-stale) v1.0-1.2 setup guide.
+
+---
+
 ## RForge Plugin MCP Configuration
 
-RForge **requires** the `rforge-mcp` server for full functionality. This guide helps you configure it correctly.
+RForge **required** the `rforge-mcp` server for full functionality (in v1.0-1.2). This guide helped users configure it correctly.
 
 ## Quick Setup
 
