@@ -2230,7 +2230,16 @@
   
 
 
-<h1 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h1>
+<h1 id="troubleshooting">🩺 Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h1>
+<div class="admonition tip">
+<p class="admonition-title">TL;DR (30 seconds)</p>
+<ul>
+<li><strong>What:</strong> Symptom-organized error lookup for rforge.</li>
+<li><strong>Why:</strong> Find the fix without reading the whole page.</li>
+<li><strong>How:</strong> Match your error to a section below → run the suggested command.</li>
+<li><strong>Next:</strong> Still stuck? File an issue: <a href="https://github.com/Data-Wise/rforge/issues">https://github.com/Data-Wise/rforge/issues</a></li>
+</ul>
+</div>
 <p>Common errors and how to resolve them. Symptoms are listed first; click
 through to the section that matches what you're seeing.</p>
 <h2 id="quick-navigation">Quick navigation<a class="headerlink" href="#quick-navigation" title="Permanent link">&para;</a></h2>
@@ -2296,15 +2305,18 @@ permissions) and that <code>lib/discovery.py</code> is reachable:</p>
 <code>status</code>, and <code>init</code> all validate the path before doing anything. Fix
 the path or omit <code>--path</code> (defaults to current directory).</p>
 <h3 id="importerror-attempted-relative-import-with-no-known-parent-package"><code>ImportError: attempted relative import with no known parent package</code><a class="headerlink" href="#importerror-attempted-relative-import-with-no-known-parent-package" title="Permanent link">&para;</a></h3>
-<p>You ran a <code>lib/</code> module as a script:</p>
+<div class="admonition warning">
+<p class="admonition-title">Symptom: running as a script instead of as a package</p>
 <div class="language-zsh highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>lib/deps.py<span class="w">    </span><span class="c1"># ❌ won&#39;t work</span>
 </span></code></pre></div>
-<p>The modules use relative imports (<code>from .discovery import ...</code>) which
-require running them as a package:</p>
+</div>
+<div class="admonition success">
+<p class="admonition-title">Fix: use <code>python3 -m lib.&lt;module&gt;</code></p>
 <div class="language-zsh highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.deps<span class="w">    </span><span class="c1"># ✅ works</span>
 </span></code></pre></div>
+</div>
 <p>This is intentional — it forces the package layout that prevents
-sys.path collisions. Use <code>-m lib.&lt;module&gt;</code> everywhere.</p>
+<code>sys.path</code> collisions. Use <code>-m lib.&lt;module&gt;</code> everywhere.</p>
 <h3 id="modulenotfounderror-no-module-named-lib"><code>ModuleNotFoundError: No module named 'lib'</code><a class="headerlink" href="#modulenotfounderror-no-module-named-lib" title="Permanent link">&para;</a></h3>
 <p>You're running from a directory that doesn't contain the plugin's
 <code>lib/</code> as a subdirectory. The <code>-m lib.&lt;module&gt;</code> form requires
@@ -2323,10 +2335,13 @@ command, it's a bug — file an issue.</p>
 <hr />
 <h2 id="missing-r-rscript">Missing R / Rscript<a class="headerlink" href="#missing-r-rscript" title="Permanent link">&para;</a></h2>
 <h3 id="libstatus-reports-unknown-for-every-packages-checktest"><code>lib.status</code> reports <code>unknown</code> for every package's <code>check</code>/<code>test</code><a class="headerlink" href="#libstatus-reports-unknown-for-every-packages-checktest" title="Permanent link">&para;</a></h3>
-<p>This is expected in v1.3.0 — the R subprocess integration is deferred
-to v1.4.0. <code>status</code> currently just reads <code>.STATUS</code> files; it doesn't
-shell out to <code>R CMD check</code> or run test suites. The <code>unknown</code> placeholder
-is intentional.</p>
+<div class="admonition note">
+<p class="admonition-title">Expected behavior in v1.3.0+</p>
+<p>The R subprocess integration is deferred to v1.4.0. <code>lib.status</code>
+currently reads <code>.STATUS</code> files only — it doesn't shell out to
+<code>R CMD check</code> or run test suites. The <code>unknown</code> placeholder is
+<strong>intentional</strong>, not a bug.</p>
+</div>
 <h3 id="future-v140-behavior">Future v1.4.0 behavior<a class="headerlink" href="#future-v140-behavior" title="Permanent link">&para;</a></h3>
 <p>When the 4-mode contract lands, missing R will degrade gracefully:
 <code>default</code> and <code>debug</code> modes will continue to work; <code>optimize</code> and
@@ -2380,11 +2395,16 @@ v1.3.0).</p>
 <hr />
 <h2 id="hook-unexpectedly-blocks-an-edit">Hook unexpectedly blocks an edit<a class="headerlink" href="#hook-unexpectedly-blocks-an-edit" title="Permanent link">&para;</a></h2>
 <h3 id="refusing-to-edit-roxygen-generated-manrd-file">"Refusing to edit roxygen-generated man/*.Rd file"<a class="headerlink" href="#refusing-to-edit-roxygen-generated-manrd-file" title="Permanent link">&para;</a></h3>
-<p>This is the v1.2.0 <code>pretooluse</code> hook doing its job. <code>man/*.Rd</code> files
-are auto-generated by <code>devtools::document()</code> — hand-edits get lost the
-next time you run <code>document()</code>. Edit the <code>@param</code>/<code>@return</code>/<code>@examples</code>
-roxygen comments in the corresponding <code>R/</code> file instead, then run
-<code>devtools::document()</code> to regenerate.</p>
+<div class="admonition warning">
+<p class="admonition-title">This is by design — the hook is protecting you</p>
+<p><code>man/*.Rd</code> files are auto-generated by <code>devtools::document()</code>. Any
+hand-edit gets overwritten the next time you regenerate.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Fix: edit the roxygen comments, not the .Rd file</p>
+<p>Edit <code>@param</code> / <code>@return</code> / <code>@examples</code> in the corresponding <code>R/</code>
+file, then run <code>devtools::document()</code> to regenerate <code>man/*.Rd</code>.</p>
+</div>
 <p>If you need to bypass this in an emergency (e.g., the regenerator
 itself is broken):</p>
 <div class="language-zsh highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Disable the hook for one session</span>
