@@ -250,6 +250,24 @@ for old, new in required:
 expected = 'see /rforge:docs:check, /rforge:health, /rforge:r:check'
 if result != expected:
     print(f'recipe-equivalent substitution wrong: got {result!r}', file=sys.stderr); fail = 1
+# (c) The tutorial's *find* recipe must cover the same 3 names. The
+#     grep -E alternation pattern '/rforge:(doc-check|ecosystem-health|rpkg-check)'
+#     is the discovery half users run before the sed half. If a future
+#     rename adds a 4th name without updating the find pattern, users
+#     would miss it in their local scripts. Validates the alternation
+#     contains exactly the 3 expected names.
+m = re.search(r'/rforge:\(([a-z\-|]+)\)', tutorial)
+if not m:
+    print('tutorial missing grep -E alternation pattern (/rforge:(...|...|...))', file=sys.stderr); fail = 1
+else:
+    alternatives = set(m.group(1).split('|'))
+    expected_names = {'doc-check', 'ecosystem-health', 'rpkg-check'}
+    missing = expected_names - alternatives
+    extra = alternatives - expected_names
+    if missing:
+        print(f'tutorial grep pattern missing names: {missing}', file=sys.stderr); fail = 1
+    if extra:
+        print(f'tutorial grep pattern has unexpected alternatives: {extra}', file=sys.stderr); fail = 1
 sys.exit(fail)
 "
 }
