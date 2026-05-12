@@ -2,7 +2,7 @@
 
 > **Status:** draft
 > **Created:** 2026-05-11
-> **From Brainstorm:** [BRAINSTORM-phase3-namespacing-2026-05-11.md](../../BRAINSTORM-phase3-namespacing-2026-05-11.md)
+> **From Brainstorm:** [BRAINSTORM-phase3-namespacing-2026-05-11.md](https://github.com/Data-Wise/rforge/blob/feature/phase3-namespacing-v2/BRAINSTORM-phase3-namespacing-2026-05-11.md) (in repo root, not deployed to site)
 > **Target Version:** v2.0.0 (major; BREAKING)
 > **Predecessor:** v1.3.0 (released 2026-05-11; Path B complete)
 > **Related:** craft-parity roadmap (this is Phase 3 of 4)
