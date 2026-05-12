@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.0] - 2026-05-12
+
+> **Breaking change:** 3 of 16 commands renamed to align with craft's hybrid
+> namespacing. The other 13 commands are unchanged. See
+> [`docs/migration/v2.0.0-rename.md`](docs/migration/v2.0.0-rename.md) for
+> the full mapping table and a `sed` recipe to update local scripts.
+
+### Changed (BREAKING)
+
+- `/rforge:doc-check` → `/rforge:docs:check` — aligns with craft's `docs:` namespace.
+- `/rforge:ecosystem-health` → `/rforge:health` — shorter daily-use name; no sub-namespace needed for a single command.
+- `/rforge:rpkg-check` → `/rforge:r:check` — R-specific commands get an `r:` prefix.
+
+### Added
+
+- **`docs/migration/v2.0.0-rename.md`** — single-page migration tutorial with mapping table and POSIX `sed` recipes for macOS + Linux.
+- **Rename-error stubs** at the 3 old filenames (`commands/doc-check.md`, `commands/ecosystem-health.md`, `commands/rpkg-check.md`). Typing an old name in Claude Code produces a verbatim error message pointing at the new name plus a link to the migration tutorial. Stubs ship through the v2.x line; slated for removal in v3.0.0.
+- **`rename_stubs_present` test** in `tests/test-all.sh` — asserts each stub exists, retains its old slash-command name in frontmatter, contains a `RENAMED` marker, and references its new name. Wording-tolerant (key-string match, not exact prose).
+
+### Internal
+
+- New `commands/docs/` and `commands/r/` subdirectories for the renamed commands; explicit `name:` frontmatter added to the two files that lacked it (`commands/health.md` and `commands/r/check.md`) so the colon-namespaced names resolve.
+- Cross-reference sweep across `docs/commands.md`, `docs/quickstart.md`, `docs/configuration.md`, the `description-sync` skill, `commands/complete.md`, and `commands/impact.md`.
+
+---
+
 ## [1.3.0] - 2026-05-11
 
 > **Path B complete** — `rforge-mcp` is fully absorbed into the plugin via

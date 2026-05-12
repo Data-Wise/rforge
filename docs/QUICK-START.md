@@ -72,7 +72,7 @@ brew install data-wise/tap/rforge
 
 ## The 3 Headline Commands
 
-These are the entry points most users start with. The plugin ships **15 commands total** — see [REFCARD.md](REFCARD.md) for the full set (ecosystem management, dependency tracking, CRAN release planning, doc-drift checks, and more).
+These are the entry points most users start with. The plugin ships **16 commands total** — see [REFCARD.md](REFCARD.md) for the full set (ecosystem management, dependency tracking, CRAN release planning, doc-drift checks, and more).
 
 | Command | Speed | When to Use |
 |---------|-------|-------------|

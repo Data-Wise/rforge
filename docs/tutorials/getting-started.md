@@ -171,7 +171,7 @@ Expected output (abbreviated):
 
 ## Three headline commands
 
-Use these for daily work; the rest of the plugin's 15 commands are
+Use these for daily work; the rest of the plugin's 16 commands are
 specialized.
 
 | Command | When | What |
@@ -182,7 +182,7 @@ specialized.
 
 ## What's next
 
-- **[REFCARD](../REFCARD.md)** — all 15 commands in one page
+- **[REFCARD](../REFCARD.md)** — all 16 commands in one page
 - **[Hooks & Skills](../hooks-and-skills.md)** — the `pretooluse` hook
   that flags R-aware mistakes on every Write/Edit
 - **[Architecture](../architecture.md)** — how the plugin's `lib/`

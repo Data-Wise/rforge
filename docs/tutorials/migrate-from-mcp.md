@@ -140,20 +140,25 @@ in-plugin Python modules instead of the MCP server.
 
 ## Rollback (if something goes wrong)
 
+`rforge-mcp` was never published to npm or GitHub — it was a local-only
+prototype during pre-v1.3.0 development. So "reinstalling" only applies
+if you have the original local source dir.
+
 ```zsh
-# Reinstall rforge-mcp
-npm install -g rforge-mcp
+# If you still have the local source (typical author location):
+cd ~/projects/dev-tools/mcp-servers/rforge-archived  # or rforge/ if not tombstoned
+npm link    # re-creates the global symlink
 
 # Restore the mcpServers.rforge block in ~/.claude/settings.json
-# (you backed it up before deleting, right? if not, see the v1.2.x docs)
+# (point command/args at your local source dist/index.js)
 
-# Downgrade the plugin
-brew install data-wise/tap/rforge@1.2.0
+# Downgrade the plugin (formula version-pinning)
+brew uninstall rforge && brew install data-wise/tap/rforge@1.2.0
 ```
 
-The `rforge-mcp` repo is archived (read-only on GitHub), but the npm
-package and any local installs remain functional. Don't be afraid to
-roll back; nothing is destroyed.
+Don't be afraid to roll back; the plugin's `lib/` modules are independent
+of the MCP server, so a downgrade only affects which command surface
+Claude Code sees.
 
 ## Next steps
 

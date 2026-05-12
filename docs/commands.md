@@ -1,13 +1,56 @@
 # RForge Commands Reference
 
-Complete reference for all 15 RForge commands. Commands are organized by category with usage examples and parameter details.
+Complete reference for all 16 RForge commands. Commands are organized by category with usage examples and parameter details.
 
 ## Command Categories
 
-- [Status & Analysis](#status--analysis) (4 commands)
+- [Setup & State](#setup-state) (1 command)
+- [Status & Analysis](#status-analysis) (4 commands)
 - [Ecosystem Management](#ecosystem-management) (5 commands)
-- [Documentation & Tasks](#documentation--tasks) (4 commands)
+- [Documentation & Tasks](#documentation-tasks) (4 commands)
 - [Health Checks](#health-checks) (2 commands)
+
+---
+
+## Setup & State
+
+### /rforge:init
+
+Initialize the active rforge context for the current R package or ecosystem. Writes per-user state to `~/.rforge/context.json` so other commands know which package you're working on.
+
+**Usage:**
+```bash
+/rforge:init [--path PATH] [--quick] [--format FORMAT]
+```
+
+**Parameters:**
+- `--path` (optional) — Package or ecosystem root (defaults to current directory)
+- `--quick` (optional) — Skip comprehensive analysis (faster, lighter context file)
+- `--format` (optional) — Output format: `text` (default) or `json`
+
+**Examples:**
+```bash
+# Initialize from the current directory
+/rforge:init
+
+# Quick init (skip analysis)
+/rforge:init --quick
+
+# Initialize a specific package
+/rforge:init --path ~/projects/medfit
+```
+
+**What this does:**
+- Detects the package or ecosystem layout (uses `lib/discovery.py`)
+- Writes `~/.rforge/context.json` marking the path as the active context
+- Idempotent — re-running on the same path is a no-op for state, may refresh analysis
+- Per-user, not per-package — switching contexts overwrites the state file
+
+**When to run:** First time using rforge on a package, or when switching active context. Other commands (`/rforge:status`, `/rforge:deps`, etc.) read this file to know which package they're operating on.
+
+**Time budget:** <5s (`--quick`), <15s (default)
+
+**Underlying module:** `python3 -m lib.init` — see [init API reference](reference/init.md).
 
 ---
 
@@ -300,13 +343,13 @@ Build and visualize dependency graph across R package ecosystem.
 
 ## Documentation & Tasks
 
-### /rforge:doc-check
+### /rforge:docs:check
 
 Check for documentation drift and inconsistencies across packages.
 
 **Usage:**
 ```bash
-/rforge:doc-check
+/rforge:docs:check
 ```
 
 **No parameters**
@@ -314,7 +357,7 @@ Check for documentation drift and inconsistencies across packages.
 **Examples:**
 ```bash
 # Check documentation status
-/rforge:doc-check
+/rforge:docs:check
 ```
 
 **Validates:**
@@ -416,13 +459,13 @@ Get ecosystem-aware next task recommendation.
 
 ## Health Checks
 
-### /rforge:ecosystem-health
+### /rforge:health
 
 Comprehensive ecosystem health metrics with visual dashboard.
 
 **Usage:**
 ```bash
-/rforge:ecosystem-health [--format FORMAT]
+/rforge:health [--format FORMAT]
 ```
 
 **Parameters:**
@@ -431,10 +474,10 @@ Comprehensive ecosystem health metrics with visual dashboard.
 **Examples:**
 ```bash
 # Visual health dashboard
-/rforge:ecosystem-health
+/rforge:health
 
 # JSON metrics
-/rforge:ecosystem-health --format json
+/rforge:health --format json
 ```
 
 **Metrics:**
@@ -446,13 +489,13 @@ Comprehensive ecosystem health metrics with visual dashboard.
 
 ---
 
-### /rforge:rpkg-check
+### /rforge:r:check
 
 R CMD check integration with detailed error reporting.
 
 **Usage:**
 ```bash
-/rforge:rpkg-check [package]
+/rforge:r:check [package]
 ```
 
 **Parameters:**
@@ -461,10 +504,10 @@ R CMD check integration with detailed error reporting.
 **Examples:**
 ```bash
 # Check current package
-/rforge:rpkg-check
+/rforge:r:check
 
 # Check specific package
-/rforge:rpkg-check mypackage
+/rforge:r:check mypackage
 ```
 
 **Executes:**
@@ -484,9 +527,9 @@ R CMD check integration with detailed error reporting.
 | Time | Commands |
 |------|----------|
 | <10s | `status`, `quick`, `detect`, `deps` (visual), `next` |
-| <30s | `analyze` (default), `cascade`, `impact`, `doc-check` |
+| <30s | `analyze` (default), `cascade`, `impact`, `docs:check` |
 | <2min | `analyze` (debug/optimize) |
-| <5min | `thorough`, `analyze` (release), `rpkg-check` |
+| <5min | `thorough`, `analyze` (release), `r:check` |
 
 ### By Use Case
 
@@ -504,13 +547,13 @@ R CMD check integration with detailed error reporting.
 - `/rforge:analyze --mode release` - Full audit
 - `/rforge:thorough` - Comprehensive checks
 - `/rforge:release` - Plan submission order
-- `/rforge:rpkg-check` - R CMD check execution
+- `/rforge:r:check` - R CMD check execution
 
 **Ecosystem Management:**
 - `/rforge:detect` - Understand structure
 - `/rforge:deps` - Visualize dependencies
 - `/rforge:cascade` - Plan coordinated updates
-- `/rforge:ecosystem-health` - Overall metrics
+- `/rforge:health` - Overall metrics
 
 ## Global Flags
 

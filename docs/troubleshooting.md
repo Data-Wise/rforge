@@ -5,11 +5,11 @@ through to the section that matches what you're seeing.
 
 ## Quick navigation
 
-- [Install / setup issues](#install--setup-issues)
-- [Command not found / not loading](#command-not-found--not-loading)
+- [Install / setup issues](#install-setup-issues)
+- [Command not found / not loading](#command-not-found-not-loading)
 - [Path errors from `lib/` modules](#path-errors-from-lib-modules)
-- [Missing R / Rscript](#missing-r--rscript)
-- [`init` / context state issues](#init--context-state-issues)
+- [Missing R / Rscript](#missing-r-rscript)
+- [`init` / context state issues](#init-context-state-issues)
 - [Leftover rforge-mcp signals](#leftover-rforge-mcp-signals)
 - [Hook unexpectedly blocks an edit](#hook-unexpectedly-blocks-an-edit)
 - [Tests fail after a fresh install](#tests-fail-after-a-fresh-install)
@@ -68,7 +68,7 @@ order:
 1. Restart Claude Code (quit + reopen)
 2. If still missing: `ls ~/.claude/plugins/rforge/commands/` — should
    list 15 `.md` files
-3. If empty: re-run install (see [Install issues](#install--setup-issues))
+3. If empty: re-run install (see [Install issues](#install-setup-issues))
 
 ### `/rforge:detect` runs but produces no output
 
@@ -203,10 +203,23 @@ entry as of v1.3.0; removing it eliminates a stale config reference.
 ### Claude Code logs say "MCP server `rforge` failed to start"
 
 The MCP server config is still in `~/.claude/settings.json` but the
-binary isn't installed (because you uninstalled rforge-mcp). Either:
+binary isn't installed (because you uninstalled rforge-mcp, or never
+had it). Remove the config block:
 
-- Remove the config block (recommended — see migration Step 2), or
-- Reinstall `rforge-mcp` if you specifically want it back
+```json
+// Delete this from ~/.claude/settings.json:
+{
+  "mcpServers": {
+    "rforge": { ... }
+  }
+}
+```
+
+The plugin doesn't need this entry as of v1.3.0 — `lib/` modules run
+in-process via the standard Bash tool. There's no rforge MCP server to
+reinstall (`rforge-mcp` was never published; it lived as a local
+working directory during v1.0–v1.2 development and was tombstoned in
+v1.3.0).
 
 ---
 

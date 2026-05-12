@@ -9,7 +9,7 @@ Get intelligent recommendations for what to work on next based on ecosystem cont
 
 ## What It Does
 
-Uses the `rforge_next` MCP tool to:
+Helps you:
 - Analyze all .STATUS files
 - Consider dependencies
 - Evaluate blocking issues

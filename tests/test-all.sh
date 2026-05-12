@@ -168,6 +168,184 @@ for field in ('name:', 'description:', 'category:'):
 "
 }
 
+# v2.0.0 rename targets — the 3 NEW command files must exist at their
+# new paths AND have explicit `name:` frontmatter set to the new
+# colon-namespaced names. Colon-namespacing requires explicit frontmatter;
+# filename-based inference doesn't cover `r:check` etc. Without this
+# check, deleting the frontmatter from a renamed file would silently
+# break the slash-command resolution while leaving the file in place.
+rename_targets_present() {
+    python3 -c "
+import sys
+targets = {
+    'commands/docs/check.md': 'rforge:docs:check',
+    'commands/health.md':     'rforge:health',
+    'commands/r/check.md':    'rforge:r:check',
+}
+fail = 0
+for path, expected_name in targets.items():
+    try:
+        body = open(path).read()
+    except FileNotFoundError:
+        print(f'MISSING: {path} (rename target gone)', file=sys.stderr); fail = 1; continue
+    if f'name: {expected_name}' not in body:
+        print(f'{path}: frontmatter must contain \"name: {expected_name}\"', file=sys.stderr); fail = 1
+sys.exit(fail)
+"
+}
+
+# Every command must have a unique `name:` frontmatter value. Catches
+# copy-paste errors where two files claim the same slash-command name
+# (which would produce undefined resolution). Walks commands/**/*.md;
+# files without a `name:` field are ignored (some pre-frontmatter
+# commands still rely on filename inference and that's OK — they just
+# can't collide on a value they don't declare).
+command_names_unique() {
+    python3 -c "
+import pathlib, re, sys
+seen = {}
+fail = 0
+for p in sorted(pathlib.Path('commands').rglob('*.md')):
+    body = p.read_text()
+    m = re.search(r'^name:\s*(\S+)', body, re.MULTILINE)
+    if not m:
+        continue
+    name = m.group(1)
+    if name in seen:
+        print(f'NAME COLLISION: {name} appears in both {seen[name]} and {p}', file=sys.stderr)
+        fail = 1
+    else:
+        seen[name] = p
+sys.exit(fail)
+"
+}
+
+# E2E: the migration tutorial's `sed` recipe must (a) declare all 3
+# substitutions in the right direction, AND (b) actually produce the
+# expected rewrites when applied to a fixture. Catches doc-rot where
+# the recipe drifts from the rename table (most likely failure: a
+# rename added/changed in the SPEC but the tutorial isn't updated).
+migration_recipe_works() {
+    python3 -c "
+import sys, re
+tutorial = open('docs/migration/v2.0.0-rename.md').read()
+required = [
+    ('/rforge:doc-check',        '/rforge:docs:check'),
+    ('/rforge:ecosystem-health', '/rforge:health'),
+    ('/rforge:rpkg-check',       '/rforge:r:check'),
+]
+fail = 0
+# (a) Recipe declares each substitution as s|OLD|NEW|g
+for old, new in required:
+    pattern = f's|{old}|{new}|g'
+    if pattern not in tutorial:
+        print(f'tutorial missing sed substitution: {pattern}', file=sys.stderr); fail = 1
+# (b) Apply substitutions to a fixture containing all 3 old names and
+#     verify the rewrites land correctly. Uses Python str.replace as a
+#     pure surrogate for sed s|...|...|g (no regex special chars here).
+fixture = 'see /rforge:doc-check, /rforge:ecosystem-health, /rforge:rpkg-check'
+result = fixture
+for old, new in required:
+    result = result.replace(old, new)
+expected = 'see /rforge:docs:check, /rforge:health, /rforge:r:check'
+if result != expected:
+    print(f'recipe-equivalent substitution wrong: got {result!r}', file=sys.stderr); fail = 1
+# (c) The tutorial's *find* recipe must cover the same 3 names. The
+#     grep -E alternation pattern '/rforge:(doc-check|ecosystem-health|rpkg-check)'
+#     is the discovery half users run before the sed half. If a future
+#     rename adds a 4th name without updating the find pattern, users
+#     would miss it in their local scripts. Validates the alternation
+#     contains exactly the 3 expected names.
+m = re.search(r'/rforge:\(([a-z\-|]+)\)', tutorial)
+if not m:
+    print('tutorial missing grep -E alternation pattern (/rforge:(...|...|...))', file=sys.stderr); fail = 1
+else:
+    alternatives = set(m.group(1).split('|'))
+    expected_names = {'doc-check', 'ecosystem-health', 'rpkg-check'}
+    missing = expected_names - alternatives
+    extra = alternatives - expected_names
+    if missing:
+        print(f'tutorial grep pattern missing names: {missing}', file=sys.stderr); fail = 1
+    if extra:
+        print(f'tutorial grep pattern has unexpected alternatives: {extra}', file=sys.stderr); fail = 1
+sys.exit(fail)
+"
+}
+
+# E2E (/help simulation): the 3 stubs' frontmatter `description:` must
+# start with a warning marker so users browsing /help in Claude Code
+# see the rename hint BEFORE invocation. Without this, a user has to
+# actually type the old name to discover the rename.
+stub_help_listings_show_warning() {
+    python3 -c "
+import sys, re
+stubs = ['commands/doc-check.md', 'commands/ecosystem-health.md', 'commands/rpkg-check.md']
+fail = 0
+for path in stubs:
+    body = open(path).read()
+    m = re.search(r'^description:\s*(.+)$', body, re.MULTILINE)
+    if not m:
+        print(f'{path}: no description frontmatter', file=sys.stderr); fail = 1; continue
+    desc = m.group(1).strip()
+    # Warning marker = ⚠️ or RENAMED — either is acceptable signal.
+    if not (desc.startswith('⚠️') or 'RENAMED' in desc.upper()):
+        print(f'{path}: description should lead with ⚠️ or RENAMED for /help visibility — got: {desc!r}', file=sys.stderr); fail = 1
+sys.exit(fail)
+"
+}
+
+# Dogfood: run lib/discovery on the rforge plugin's own repo and verify
+# it handles a non-R-package directory gracefully (valid JSON, no
+# crash). Catches regressions in the negative code path that's easy
+# to miss when all dev work happens in actual R-package fixtures.
+lib_discovery_on_self() {
+    python3 -c "
+import json, subprocess, sys
+r = subprocess.run(
+    ['python3', '-m', 'lib.discovery', '--path', '.', '--format', 'json'],
+    capture_output=True, text=True
+)
+if r.returncode != 0:
+    print(f'lib.discovery exited {r.returncode}; stderr: {r.stderr[:400]}', file=sys.stderr); sys.exit(1)
+try:
+    data = json.loads(r.stdout)
+except json.JSONDecodeError as e:
+    print(f'lib.discovery output is not valid JSON: {e}', file=sys.stderr); sys.exit(1)
+# Don't pin specific keys — we want this test to survive lib output
+# evolution. Just assert: ran cleanly, parsed, returned a dict.
+if not isinstance(data, dict):
+    print(f'expected dict, got {type(data).__name__}', file=sys.stderr); sys.exit(1)
+"
+}
+
+# v2.0.0 rename stubs — the 3 old command filenames must still exist as
+# rename-error stubs, each pointing at its new name. Asserts on the
+# contract (file present + key strings), not the exact wording, so this
+# survives prompt-control iteration without breaking.
+rename_stubs_present() {
+    python3 -c "
+import sys
+stubs = {
+    'commands/doc-check.md':         ('rforge:doc-check',        '/rforge:docs:check'),
+    'commands/ecosystem-health.md':  ('rforge:ecosystem-health', '/rforge:health'),
+    'commands/rpkg-check.md':        ('rforge:rpkg-check',       '/rforge:r:check'),
+}
+fail = 0
+for path, (old_name, new_slash) in stubs.items():
+    try:
+        body = open(path).read()
+    except FileNotFoundError:
+        print(f'MISSING: {path}', file=sys.stderr); fail = 1; continue
+    if f'name: {old_name}' not in body:
+        print(f'{path}: frontmatter name: missing or wrong (want \"{old_name}\")', file=sys.stderr); fail = 1
+    if 'RENAMED' not in body.upper():
+        print(f'{path}: no rename-error marker found (looking for RENAMED)', file=sys.stderr); fail = 1
+    if new_slash not in body:
+        print(f'{path}: target name {new_slash} not referenced', file=sys.stderr); fail = 1
+sys.exit(fail)
+"
+}
+
 # Lib modules — pytest suite for lib/discovery.py + lib/deps.py + lib/status.py + lib/init.py.
 # Requires pytest. If not installed, we emit a clear hint and fail —
 # pytest is a dev-time dependency, expected in CI and local dev.
@@ -231,6 +409,12 @@ run "plugin.json parses"      python3 -c "import json; json.load(open('.claude-p
 run "package.json parses"     python3 -c "import json; json.load(open('package.json'))"
 run "All 4 version sources agree (plugin/marketplace/package)" versions_match
 run "CHANGELOG has current version entry"          changelog_has_current_version
+run "v2.0.0 rename stubs present + point at new names" rename_stubs_present
+run "v2.0.0 rename targets present + have new-name frontmatter" rename_targets_present
+run "Command name: frontmatter values are unique"   command_names_unique
+run "E2E: migration tutorial sed recipe is correct"  migration_recipe_works
+run "E2E: stubs' /help descriptions show rename warning" stub_help_listings_show_warning
+run "Dogfood: lib.discovery handles non-R-package repo" lib_discovery_on_self
 
 # Docs site
 run "mkdocs.yml parses"            mkdocs_parses

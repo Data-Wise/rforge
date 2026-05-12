@@ -10,7 +10,7 @@ Quickly capture ideas, tasks, and TODOs with automatic context detection.
 
 ## What It Does
 
-Uses the `rforge_capture` MCP tool to:
+Helps you:
 - Capture tasks to .STATUS file
 - Auto-detect context (which package)
 - Add metadata (timestamp, status)

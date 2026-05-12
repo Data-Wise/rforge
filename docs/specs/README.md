@@ -38,5 +38,5 @@ single-PR features. The PR description is the right home for those.
 
 ## See also
 
-- [`CHANGELOG.md`](../../CHANGELOG.md) — release-level decisions
+- [`CHANGELOG.md`](https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md) — release-level decisions
 - `.STATUS` — current session log + active backlog

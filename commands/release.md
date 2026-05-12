@@ -10,7 +10,7 @@ Plan the optimal CRAN submission sequence for your R package ecosystem.
 
 ## What It Does
 
-Uses the `rforge_release_plan` MCP tool to:
+Helps you:
 - Calculate submission order
 - Identify blockers
 - Check readiness

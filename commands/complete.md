@@ -10,7 +10,7 @@ Mark tasks complete and automatically trigger documentation cascade updates.
 
 ## What It Does
 
-Uses the `rforge_complete` MCP tool to:
+Helps you:
 - Mark task as complete in .STATUS
 - Detect documentation changes needed
 - Auto-update NEWS.md if needed
@@ -114,4 +114,4 @@ Next: Consider running /rforge:release to plan CRAN submission
 - `/rforge:capture` - Capture new tasks
 - `/rforge:next` - Get next task
 - `/rforge:cascade` - Plan doc updates
-- `/rforge:doc-check` - Verify documentation
+- `/rforge:docs:check` - Verify documentation

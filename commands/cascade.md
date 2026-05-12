@@ -10,7 +10,7 @@ Plan coordinated updates across your R package ecosystem dependencies.
 
 ## What It Does
 
-Uses the `rforge_cascade_plan` MCP tool to:
+Helps you:
 - Create update sequence
 - Identify blocking issues
 - Estimate timeline

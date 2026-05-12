@@ -2,7 +2,7 @@
 
 > **Date:** 2026-05-10
 > **Status:** Shipped (pending v1.3.0 PR merge) — Path A shipped in v1.2.0; Phases B.1 (discovery + deps), B.2 (status), B.3 (init), B.4 (archive paperwork) all complete on `feature/mcp-absorb-rest` (2026-05-11). See [Scope correction](#scope-correction-2026-05-11) below.
-> **Related:** [Path A in CHANGELOG v1.2.0](../../CHANGELOG.md), [rforge-mcp repo](https://github.com/data-wise/rforge-mcp). ORCHESTRATE files for each phase were deleted at merge time per the CLAUDE.md cleanup rule — see PR #3 (B.1) and PR #4 (B.2+B.3+B.4) for the as-shipped commits.
+> **Related:** [Path A in CHANGELOG v1.2.0](https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md). The `rforge-mcp` prototype lived only as a local working directory at `~/projects/dev-tools/mcp-servers/rforge/` — not on GitHub, not on npm (see [Scope correction #2](#scope-correction-2--phase-b4-archival-2026-05-11) at the bottom). ORCHESTRATE files for each phase were deleted at merge time per the CLAUDE.md cleanup rule — see PR #3 (B.1) and PR #4 (B.2+B.3+B.4) for the as-shipped commits.
 
 ## Summary
 
@@ -136,7 +136,7 @@ git worktree add ~/.git-worktrees/rforge/feature-mcp-absorb-discovery \
   -b feature/mcp-absorb-discovery dev
 
 cd ~/.git-worktrees/rforge/feature-mcp-absorb-discovery
-# Reference: rforge-mcp source at https://github.com/data-wise/rforge-mcp
+# Reference: rforge-mcp source at ~/projects/dev-tools/mcp-servers/rforge/
 # Local install: /opt/homebrew/lib/node_modules/rforge-mcp/
 # Compiled tools: dist/tools/{discovery,deps}/
 ```
@@ -159,3 +159,17 @@ descoped to a future v1.4.0 SPEC, to be informed by real-user requests for
 specific check depths.
 
 All other phase B.3 / B.4 acceptance criteria ship as planned.
+
+## Scope correction #2 — Phase B.4 archival (2026-05-11)
+
+After v1.3.0 shipped, attempting Phase B.4's `gh repo archive
+data-wise/rforge-mcp` revealed the repo never existed on GitHub.
+`rforge-mcp` was a local-only working directory during pre-v1.3.0
+development — never pushed to GitHub, never published to npm.
+
+Phase B.4 was rewritten in
+[`docs/migration/v1.3.0-post-merge-checklist.md`](../migration/v1.3.0-post-merge-checklist.md)
+to reflect the actual cleanup tasks: drop the global `npm link` symlink
+and tombstone the local source directory. The SPEC's assumption that
+rforge-mcp had public artifacts to retire is preserved here as historical
+context, but **not action-guidance**.
