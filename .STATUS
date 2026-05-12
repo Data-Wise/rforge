@@ -158,17 +158,50 @@ decisions:
         rforge's lib/. 4 phases. Drops 6 placeholder MCP tools entirely.
         Estimated 3-4 sessions, not urgent — A already unblocks npm install.
 
+## 🎯 Next Action
+
+Quick post-release loop on this machine:
+
+A) 🟢 ⚡ **`brew upgrade rforge`** — local install is still at v1.3.0 (Cellar shows /opt/homebrew/Cellar/rforge/1.3.0). `brew info` confirms `1.3.0 → stable 2.0.0` available. ~30s task.
+
+B) 🟢 ⚡ **Phase 2.2 live-test (post-upgrade)** — now feasible from the production install. Fresh `claude` session, type each of the 3 old slash commands, paste outputs into issue #9. ~5 min. Validates the stub format end-to-end and serves as the first feedback data point.
+
+C) 🟡 Watch issue #9 for ~2-4 weeks. No active task; just keep an eye out for rename-ergonomics signal that would inform Phase 4 / v2.1.0 scope.
+
+After A+B done: backlog is the medium-term roadmap below.
+
+---
+
 backlog:
-  - title: "Phase 4 — discovery engine + agents (v2.1.0)"
-    notes: "Last craft-parity item. Adds agent definitions mirroring craft's discovery engine. Most natural to bundle with Issue #7 (analyze.md cleanup) since that command's orchestration prose is what gets restructured."
-  - title: "Issue #7 — commands/analyze.md MCP-ref cleanup"
-    url: https://github.com/Data-Wise/rforge/issues/7
-    notes: "9 stale rforge_X refs in load-bearing orchestration prose, deferred from PR #6. Needs before/after smoke-test on a real R ecosystem to confirm no behavior change. Bundle with Phase 4."
+  # Immediate (post-release housekeeping)
+  - title: "brew upgrade local rforge install to v2.0.0"
+    priority: high
+    effort: "< 1 min"
+    notes: "`brew upgrade data-wise/tap/rforge`. Local Cellar still at 1.3.0 (the previous version we used for the brew-outdated UX demo). Currently /opt/homebrew/opt/rforge points at 1.3.0 install. After upgrade, /rforge:* slash commands will see the v2.0.0 manifest including rename-error stubs."
+  - title: "Phase 2.2 live-test of rename-error stubs (post brew upgrade)"
+    priority: high
+    effort: "5 min"
+    notes: "Carried over from PR #6 review. Now executable from the production v2.0.0 install. Steps: fresh `claude` session → type /rforge:doc-check, /rforge:ecosystem-health, /rforge:rpkg-check → paste verbatim outputs into issue #9 as the first feedback data point. If a stub paraphrases instead of emitting verbatim, file as a v2.0.1 patch."
+
+  # Watch (no active task; passive monitoring)
   - title: "Issue #9 — v2.0.0 rename feedback collection"
     url: https://github.com/Data-Wise/rforge/issues/9
-    notes: "Open-ended feedback thread for rename ergonomics + the deferred quick/thorough rename decision. Watch for ~2-4 weeks; decisions inform v2.1.0 scope."
+    priority: low
+    notes: "Open-ended feedback thread for rename ergonomics + the deferred /rforge:quick + /rforge:thorough rename decision. Watch ~2-4 weeks; decisions inform v2.1.0 scope."
+
+  # Medium-term work (v2.1.0 horizon)
+  - title: "Phase 4 — discovery engine + agents (v2.1.0)"
+    priority: medium
+    notes: "Last craft-parity item. Adds agent definitions mirroring craft's discovery engine. Most natural to bundle with Issue #7 since that command's orchestration prose is what gets restructured."
+  - title: "Issue #7 — commands/analyze.md MCP-ref cleanup"
+    url: https://github.com/Data-Wise/rforge/issues/7
+    priority: medium
+    notes: "9 stale rforge_X refs in load-bearing orchestration prose, deferred from PR #6. Needs before/after smoke-test on a real R ecosystem to confirm no behavior change. Bundle with Phase 4."
+
+  # Parked (waits on external signal)
   - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"
     spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
+    priority: parked
     notes: "lib/status.py shipped as a thin faithful port in v1.3.0. The 4-mode contract (default/debug/optimize/release with R subprocess) was descoped pending real-user input on what depth is wanted. Open a new SPEC when there's demand."
 
 shipped:
