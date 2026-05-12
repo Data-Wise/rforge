@@ -477,7 +477,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="migration/rforge-mcp-deprecation/" class="md-tabs__link">
+        <a href="migration/v2.0.0-rename/" class="md-tabs__link">
           
   
   
@@ -599,6 +599,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#upcoming-in-v200-breaking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Upcoming in v2.0.0 (BREAKING)
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#whats-new-in-v130" class="md-nav__link">
@@ -1543,6 +1554,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 namespacing (v2.0.0)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1599,6 +1638,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="migration/v2.0.0-rename/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v2.0.0 command rename
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -1688,6 +1755,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#upcoming-in-v200-breaking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Upcoming in v2.0.0 (BREAKING)
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#whats-new-in-v130" class="md-nav__link">
@@ -1997,6 +2075,10 @@
 <a href="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev" /></a></p>
 <p><strong>R package ecosystem orchestrator for Claude Code — 16 commands, R-aware hooks, validation skills.</strong></p>
 <p>Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python <code>lib/</code> modules handle discovery, dependencies, status, and init. No MCP server required.</p>
+<h2 id="upcoming-in-v200-breaking">Upcoming in v2.0.0 (BREAKING)<a class="headerlink" href="#upcoming-in-v200-breaking" title="Permanent link">&para;</a></h2>
+<ul>
+<li>🔀 <strong>3 commands renamed</strong> for cleaner namespacing — <code>/rforge:doc-check</code> → <code>/rforge:docs:check</code>, <code>/rforge:ecosystem-health</code> → <code>/rforge:health</code>, <code>/rforge:rpkg-check</code> → <code>/rforge:r:check</code>. The other 13 commands are unchanged. Typing an old name produces a helpful rename-error pointing at the new name — no silent failures. See the <a href="migration/v2.0.0-rename/">v2.0.0 migration tutorial</a> for the full mapping table and a <code>sed</code> recipe to mass-update local scripts.</li>
+</ul>
 <h2 id="whats-new-in-v130">What's new in v1.3.0<a class="headerlink" href="#whats-new-in-v130" title="Permanent link">&para;</a></h2>
 <ul>
 <li>🎯 <strong>MCP absorption complete</strong> — <code>rforge-mcp</code> has been absorbed into the plugin. All 7 implemented tools now ship as pure-Python <code>lib/</code> modules. See <a href="migration/rforge-mcp-deprecation/">migration guide</a>.</li>
@@ -2267,7 +2349,7 @@ manually. See <a href="migration/rforge-mcp-deprecation/">migration guide</a>.</
 </span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>│   └── skills/
 </span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>│       └── validation/
 </span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>│           └── description-sync.md  # DESCRIPTION ↔ NEWS.md drift check
-</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>├── commands/                # 15 slash commands (/rforge:*)
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>├── commands/                # 16 slash commands (/rforge:*)
 </span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>├── agents/
 </span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>│   └── orchestrator.md      # Pattern recognition + delegation
 </span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>├── lib/

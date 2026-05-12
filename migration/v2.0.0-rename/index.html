@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/reference/deps/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/migration/v2.0.0-rename/">
       
       
-        <link rel="prev" href="../discovery/">
+        <link rel="prev" href="../../specs/SPEC-phase3-namespacing-2026-05-11/">
       
       
-        <link rel="next" href="../status/">
+        <link rel="next" href="../rforge-mcp-deprecation/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>deps API - RForge Plugin</title>
+        <title>v2.0.0 command rename - RForge Plugin</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#libdepspy-api-reference" class="md-skip">
+        <a href="#migrating-to-rforge-v200" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              deps API
+              v2.0.0 command rename
             
           </span>
         </div>
@@ -433,13 +433,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../discovery/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../reference/discovery/" class="md-tabs__link">
           
   
   
@@ -475,11 +473,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../migration/v2.0.0-rename/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -951,29 +951,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
         
           
-          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="">
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
             
   
   
@@ -991,7 +986,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_12">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1009,7 +1004,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../discovery/" class="md-nav__link">
+      <a href="../../reference/discovery/" class="md-nav__link">
         
   
   
@@ -1034,37 +1029,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    deps API
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../reference/deps/" class="md-nav__link">
         
   
   
@@ -1080,181 +1048,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#module-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Module overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dataclasses" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dataclasses
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Dataclasses">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#class-depgraph" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class DepGraph
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-edge" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Edge
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-impact" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Impact
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Functions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#analyze_impact" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        analyze_impact()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#build_graph" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        build_graph()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_graph_text" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_graph_text()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_impact_text" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_impact_text()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get_all_dependents" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_all_dependents()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get_update_order" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_update_order()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#identify_blockers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        identify_blockers()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1267,7 +1060,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../status/" class="md-nav__link">
+      <a href="../../reference/status/" class="md-nav__link">
         
   
   
@@ -1295,7 +1088,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../init/" class="md-nav__link">
+      <a href="../../reference/init/" class="md-nav__link">
         
   
   
@@ -1468,24 +1261,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" checked>
         
           
-          <label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="">
             
   
   
@@ -1503,7 +1301,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_14">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1518,10 +1316,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../migration/v2.0.0-rename/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v2.0.0 command rename
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1537,6 +1362,109 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rename-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rename mapping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#safety-net-typing-the-old-name-still-works-briefly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Safety net: typing the old name still works (briefly)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-these-renames" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why these renames?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-about-my-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What about my scripts?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What about my scripts?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-find-every-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Find every reference
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-mass-update-in-place" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Mass-update in place
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anything-else-changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anything else changed?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1549,7 +1477,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../migration/rforge-mcp-deprecation/" class="md-nav__link">
+      <a href="../rforge-mcp-deprecation/" class="md-nav__link">
         
   
   
@@ -1577,7 +1505,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../migration/v1.3.0-post-merge-checklist/" class="md-nav__link">
+      <a href="../v1.3.0-post-merge-checklist/" class="md-nav__link">
         
   
   
@@ -1632,10 +1560,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#module-overview" class="md-nav__link">
+  <a href="#rename-mapping" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Module overview
+        Rename mapping
       
     </span>
   </a>
@@ -1643,22 +1571,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dataclasses" class="md-nav__link">
+  <a href="#safety-net-typing-the-old-name-still-works-briefly" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Dataclasses
+        Safety net: typing the old name still works (briefly)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Dataclasses">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-these-renames" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why these renames?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-about-my-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What about my scripts?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What about my scripts?">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#class-depgraph" class="md-nav__link">
+  <a href="#1-find-every-reference" class="md-nav__link">
     <span class="md-ellipsis">
       
-        class DepGraph
+        1. Find every reference
       
     </span>
   </a>
@@ -1666,21 +1616,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#class-edge" class="md-nav__link">
+  <a href="#2-mass-update-in-place" class="md-nav__link">
     <span class="md-ellipsis">
       
-        class Edge
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-impact" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Impact
+        2. Mass-update in place
       
     </span>
   </a>
@@ -1693,96 +1632,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#functions" class="md-nav__link">
+  <a href="#anything-else-changed" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Functions
+        Anything else changed?
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#analyze_impact" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        analyze_impact()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#build_graph" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        build_graph()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_graph_text" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_graph_text()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_impact_text" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_impact_text()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get_all_dependents" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_all_dependents()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#get_update_order" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_update_order()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#identify_blockers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        identify_blockers()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1803,7 +1659,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/reference/deps.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/migration/v2.0.0-rename.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1811,194 +1667,113 @@
   
 
 
-<h1 id="libdepspy-api-reference"><code>lib/deps.py</code> — API Reference<a class="headerlink" href="#libdepspy-api-reference" title="Permanent link">&para;</a></h1>
+<h1 id="migrating-to-rforge-v200">Migrating to rforge v2.0.0<a class="headerlink" href="#migrating-to-rforge-v200" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p>Auto-generated by <code>scripts/gen_lib_reference.py</code>. Do not edit by hand — re-run the generator to update.</p>
+<p><strong>3 commands renamed.</strong> Update your habits or scripts using the table below.
+The other 13 commands are unchanged.</p>
 </blockquote>
-<h2 id="module-overview">Module overview<a class="headerlink" href="#module-overview" title="Permanent link">&para;</a></h2>
-<p>R ecosystem dependency analysis.</p>
-<p>Builds a dependency graph across the packages discovered by <code>discovery.py</code>,
-exposes topological layers (build order), detects circular dependencies, and
-analyzes downstream impact of a change to one package.</p>
-<p>Pure Python — no R subprocess. Ported from
-<code>rforge-mcp/dist/tools/deps/{deps,impact}.js</code> (Path B Phase B.1).</p>
-<p>Edge convention: <code>Edge(from_=importer, to=imported)</code>. Topological layers
-contain leaves first (deepest deps), which is the correct order to build in.</p>
-<p>Usage (CLI, from repo root):
-    python3 -m lib.deps --path /path/to/eco --format text
-    python3 -m lib.deps impact --package medfit --change-type breaking \
-        --path /path/to/eco --format json</p>
-<p>Usage (Python API):
-    from lib.discovery import detect_ecosystem
-    from lib.deps import build_graph, analyze_impact
-    eco = detect_ecosystem(".")
-    graph = build_graph(eco)
-    impact = analyze_impact(graph, "medfit", change_type="breaking")</p>
-<h2 id="dataclasses">Dataclasses<a class="headerlink" href="#dataclasses" title="Permanent link">&para;</a></h2>
-<h3 id="class-depgraph"><code>class DepGraph</code><a class="headerlink" href="#class-depgraph" title="Permanent link">&para;</a></h3>
-<p>Dependency graph for an ecosystem.</p>
-<p>Attributes:
-    nodes: package names in the ecosystem.
-    edges: directed edges (importer → imported).
-    layers: topological layers, leaves first. Layer i+1 depends only on
-        layers ≤ i. Within a layer, packages can be built in parallel.
-    circular: any cycles detected (each cycle is a list of node names
-        forming the loop, not closed — i.e. last → first is implied).</p>
+<h2 id="rename-mapping">Rename mapping<a class="headerlink" href="#rename-mapping" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
+<th>You used to type</th>
+<th>In v2.0.0+, type</th>
+<th>Why</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>nodes</code></td>
-<td><code>list[str]</code></td>
-<td>—</td>
+<td><code>/rforge:doc-check</code></td>
+<td><code>/rforge:docs:check</code></td>
+<td>Aligns with craft's <code>docs:</code> namespace</td>
 </tr>
 <tr>
-<td><code>edges</code></td>
-<td><code>list[Edge]</code></td>
-<td>—</td>
+<td><code>/rforge:ecosystem-health</code></td>
+<td><code>/rforge:health</code></td>
+<td>Shorter, daily-use friendly</td>
 </tr>
 <tr>
-<td><code>layers</code></td>
-<td><code>list[list[str]]</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>circular</code></td>
-<td><code>list[list[str]]</code></td>
-<td><code>list()</code></td>
+<td><code>/rforge:rpkg-check</code></td>
+<td><code>/rforge:r:check</code></td>
+<td>R-specific commands get an <code>r:</code> prefix</td>
 </tr>
 </tbody>
 </table>
-<h3 id="class-edge"><code>class Edge</code><a class="headerlink" href="#class-edge" title="Permanent link">&para;</a></h3>
-<p>Edge(from_: 'str', to: 'str', type: 'EdgeType')</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>from_</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>to</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>type</code></td>
-<td><code>EdgeType</code></td>
-<td>—</td>
-</tr>
-</tbody>
-</table>
-<h3 id="class-impact"><code>class Impact</code><a class="headerlink" href="#class-impact" title="Permanent link">&para;</a></h3>
-<p>Impact(package: 'str', change_type: 'ChangeType', direct_dependents: 'list[str]', indirect_dependents: 'list[str]', affected_tests: 'int', update_sequence: 'list[str]', estimated_work: 'str', risk_level: 'RiskLevel', recommendations: 'list[str]')</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>package</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>change_type</code></td>
-<td><code>ChangeType</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>direct_dependents</code></td>
-<td><code>list[str]</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>indirect_dependents</code></td>
-<td><code>list[str]</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>affected_tests</code></td>
-<td><code>int</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>update_sequence</code></td>
-<td><code>list[str]</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>estimated_work</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>risk_level</code></td>
-<td><code>RiskLevel</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>recommendations</code></td>
-<td><code>list[str]</code></td>
-<td>—</td>
-</tr>
-</tbody>
-</table>
-<h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
-<h3 id="analyze_impact"><code>analyze_impact()</code><a class="headerlink" href="#analyze_impact" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">analyze_impact</span><span class="p">(</span><span class="n">graph</span><span class="p">:</span> <span class="s1">&#39;DepGraph&#39;</span><span class="p">,</span> <span class="n">package</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">change_type</span><span class="p">:</span> <span class="s1">&#39;ChangeType&#39;</span> <span class="o">=</span> <span class="s1">&#39;feature&#39;</span><span class="p">,</span> <span class="n">affected_exports</span><span class="p">:</span> <span class="s1">&#39;Optional[list[str]]&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Impact&#39;</span>
+<p>Unchanged: <code>analyze</code>, <code>capture</code>, <code>cascade</code>, <code>complete</code>, <code>deps</code>, <code>detect</code>,
+<code>impact</code>, <code>init</code>, <code>next</code>, <code>quick</code>, <code>release</code>, <code>status</code>, <code>thorough</code>.</p>
+<h2 id="safety-net-typing-the-old-name-still-works-briefly">Safety net: typing the old name still works (briefly)<a class="headerlink" href="#safety-net-typing-the-old-name-still-works-briefly" title="Permanent link">&para;</a></h2>
+<p>Each renamed command keeps a stub at its old name that responds with a
+rename-error pointing at the new name. So typing <code>/rforge:doc-check</code>
+in Claude Code produces:</p>
+<blockquote>
+<p>❌ <strong>Renamed:</strong> this command (<code>/rforge:doc-check</code>) was renamed in v2.0.0.</p>
+<p><strong>Use instead:</strong> <code>/rforge:docs:check</code></p>
+<p>See the migration tutorial: <a href="https://data-wise.github.io/rforge/migration/v2.0.0-rename/">https://data-wise.github.io/rforge/migration/v2.0.0-rename/</a></p>
+</blockquote>
+<p>You won't silently get nothing — you'll get a helpful pointer. The stubs
+are retained through the v2.x line and slated for removal in v3.0.0.</p>
+<h2 id="why-these-renames">Why these renames?<a class="headerlink" href="#why-these-renames" title="Permanent link">&para;</a></h2>
+<p>rforge's namespacing now mirrors craft's <strong>hybrid</strong> scheme:</p>
+<ul>
+<li><strong>High-frequency daily commands stay flat</strong> (<code>/rforge:status</code>,
+  <code>/rforge:next</code>, <code>/rforge:analyze</code>). Typing a colon-namespace prefix for
+  a command you run 20× a day adds friction without payoff.</li>
+<li><strong>Sub-namespaces are used only where there's a real grouping.</strong> craft
+  has a <code>docs:</code> sub-namespace for documentation operations, so rforge's
+  documentation drift check moves to <code>docs:check</code> for cross-plugin
+  consistency. R-specific commands get their own <code>r:</code> prefix.</li>
+<li><strong>Single-command sub-namespaces are avoided.</strong> <code>ecosystem-health</code> was
+  a one-off — wrapping it in a <code>health:</code> sub-namespace would force you
+  to type more for no grouping benefit, so it becomes the shorter,
+  flat <code>health</code>.</li>
+</ul>
+<p>The net is a <strong>smaller</strong> breaking change than a full namespacing
+overhaul, hitting only the 3 commands where the old names felt either
+out of step with craft (<code>doc-check</code> vs craft's <code>docs:*</code>) or
+unnecessarily long (<code>ecosystem-health</code>, <code>rpkg-check</code>).</p>
+<p>For the longer rationale and rejected alternatives, see the SPEC at
+<a href="../../specs/SPEC-phase3-namespacing-2026-05-11/"><code>docs/specs/SPEC-phase3-namespacing-2026-05-11.md</code></a>.</p>
+<h2 id="what-about-my-scripts">What about my scripts?<a class="headerlink" href="#what-about-my-scripts" title="Permanent link">&para;</a></h2>
+<p>If you have shell scripts, aliases, or notes referencing the old names,
+update them in two steps.</p>
+<h3 id="1-find-every-reference">1. Find every reference<a class="headerlink" href="#1-find-every-reference" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>grep<span class="w"> </span>-rn<span class="w"> </span>-E<span class="w"> </span><span class="s1">&#39;/rforge:(doc-check|ecosystem-health|rpkg-check)&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span>~/your-project<span class="w"> </span>~/your-notes
 </span></code></pre></div>
-<p>Compute the downstream blast radius of a change to <code>package</code>.</p>
-<p>Mirrors <code>rforge-mcp/dist/tools/deps/impact.js</code> — same heuristic for
-affected tests, work estimate, and risk level. Useful for pre-flight
-questions like "what does breaking medfit cost us?"</p>
-<h3 id="build_graph"><code>build_graph()</code><a class="headerlink" href="#build_graph" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">build_graph</span><span class="p">(</span><span class="n">ecosystem</span><span class="p">:</span> <span class="s1">&#39;Ecosystem&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;DepGraph&#39;</span>
+<h3 id="2-mass-update-in-place">2. Mass-update in place<a class="headerlink" href="#2-mass-update-in-place" title="Permanent link">&para;</a></h3>
+<p>POSIX <code>sed</code> (works on both macOS and Linux):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Preview the changes first (no -i)</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>find<span class="w"> </span>.<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.sh&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.md&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.txt&#39;</span><span class="w"> </span><span class="se">\)</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>-exec<span class="w"> </span>sed<span class="w"> </span>-E<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:doc-check|/rforge:docs:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:ecosystem-health|/rforge:health|g&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:rpkg-check|/rforge:r:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># Apply in place (after preview looks right)</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># macOS:</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>find<span class="w"> </span>.<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.sh&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.md&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.txt&#39;</span><span class="w"> </span><span class="se">\)</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span>-exec<span class="w"> </span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span>-E<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:doc-check|/rforge:docs:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:ecosystem-health|/rforge:health|g&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:rpkg-check|/rforge:r:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">    </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="c1"># Linux (GNU sed):</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>find<span class="w"> </span>.<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.sh&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.md&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.txt&#39;</span><span class="w"> </span><span class="se">\)</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">  </span>-exec<span class="w"> </span>sed<span class="w"> </span>-i<span class="w"> </span>-E<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:doc-check|/rforge:docs:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:ecosystem-health|/rforge:health|g&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:rpkg-check|/rforge:r:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">    </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span>
 </span></code></pre></div>
-<p>Build a dependency graph from an <code>Ecosystem</code>.</p>
-<p>Only edges where both endpoints are <em>internal</em> packages are recorded —
-external CRAN deps are filtered out (they're not part of our graph).</p>
-<h3 id="format_graph_text"><code>format_graph_text()</code><a class="headerlink" href="#format_graph_text" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_graph_text</span><span class="p">(</span><span class="n">graph</span><span class="p">:</span> <span class="s1">&#39;DepGraph&#39;</span><span class="p">,</span> <span class="n">ecosystem</span><span class="p">:</span> <span class="s1">&#39;Ecosystem&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
-</span></code></pre></div>
-<p><em>(no docstring)</em></p>
-<h3 id="format_impact_text"><code>format_impact_text()</code><a class="headerlink" href="#format_impact_text" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_impact_text</span><span class="p">(</span><span class="n">impact</span><span class="p">:</span> <span class="s1">&#39;Impact&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
-</span></code></pre></div>
-<p><em>(no docstring)</em></p>
-<h3 id="get_all_dependents"><code>get_all_dependents()</code><a class="headerlink" href="#get_all_dependents" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_all_dependents</span><span class="p">(</span><span class="n">package</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="s1">&#39;DepGraph&#39;</span><span class="p">,</span> <span class="n">hard_only</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;tuple[list[str], list[str]]&#39;</span>
-</span></code></pre></div>
-<p>Find packages that depend on <code>package</code> — directly and transitively.</p>
-<p>Returns (direct, indirect). 'Direct' = immediate importers. 'Indirect' =
-packages reachable by following dependent edges further out.</p>
-<h3 id="get_update_order"><code>get_update_order()</code><a class="headerlink" href="#get_update_order" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_update_order</span><span class="p">(</span><span class="n">packages</span><span class="p">:</span> <span class="s1">&#39;list[str]&#39;</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="s1">&#39;DepGraph&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[str]&#39;</span>
-</span></code></pre></div>
-<p>Order <code>packages</code> according to the graph's topological layers.</p>
-<h3 id="identify_blockers"><code>identify_blockers()</code><a class="headerlink" href="#identify_blockers" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">identify_blockers</span><span class="p">(</span><span class="n">graph</span><span class="p">:</span> <span class="s1">&#39;DepGraph&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[dict]&#39;</span>
-</span></code></pre></div>
-<p>Find packages that block others from releasing.</p>
-<p>A blocker sits in an earlier topo layer and has dependents in later
-layers. Sorted by blast radius, most-blocking first.</p>
+<p>The <code>|</code> separator avoids quoting headaches with the <code>:</code> in the new names.</p>
+<h2 id="anything-else-changed">Anything else changed?<a class="headerlink" href="#anything-else-changed" title="Permanent link">&para;</a></h2>
+<p>No. v2.0.0's only behavioral break is the 3 renames. APIs, config
+options, hook contracts, lib/* modules, and state files are unchanged
+from v1.3.0.</p>
+<p>For the full release notes, see the <a href="https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md">v2.0.0 entry in
+CHANGELOG.md</a>.</p>
 
 
 

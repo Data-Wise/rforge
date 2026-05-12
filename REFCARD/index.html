@@ -479,7 +479,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../migration/rforge-mcp-deprecation/" class="md-tabs__link">
+        <a href="../migration/v2.0.0-rename/" class="md-tabs__link">
           
   
   
@@ -684,10 +684,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#quick-command-reference" class="md-nav__link">
+  <a href="#how-it-works-v130" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick Command Reference
+        How It Works (v1.3.0+)
       
     </span>
   </a>
@@ -695,10 +695,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pattern-recognition" class="md-nav__link">
+  <a href="#common-workflows" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pattern Recognition
+        Common Workflows
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requirements
       
     </span>
   </a>
@@ -721,6 +732,17 @@
     <span class="md-ellipsis">
       
         Hooks &amp; Skills (v1.2.0+)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pattern-recognition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern Recognition
       
     </span>
   </a>
@@ -1429,6 +1451,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 namespacing (v2.0.0)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1485,6 +1535,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/v2.0.0-rename/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v2.0.0 command rename
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -1576,10 +1654,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#quick-command-reference" class="md-nav__link">
+  <a href="#how-it-works-v130" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick Command Reference
+        How It Works (v1.3.0+)
       
     </span>
   </a>
@@ -1587,10 +1665,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pattern-recognition" class="md-nav__link">
+  <a href="#common-workflows" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pattern Recognition
+        Common Workflows
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requirements
       
     </span>
   </a>
@@ -1613,6 +1702,17 @@
     <span class="md-ellipsis">
       
         Hooks &amp; Skills (v1.2.0+)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pattern-recognition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern Recognition
       
     </span>
   </a>
@@ -1762,161 +1862,123 @@
 
 <h1 id="rforge-plugin-reference-card">RForge Plugin - Reference Card<a class="headerlink" href="#rforge-plugin-reference-card" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>Version:</strong> 1.3.0 | <strong>Last Updated:</strong> 2026-05-11</p>
+<p><strong>Version:</strong> 2.0.0 | <strong>Last Updated:</strong> 2026-05-12</p>
 </blockquote>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────────────────────────────────────────────────┐
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  RFORGE ORCHESTRATOR REFERENCE                                     v0.1.0  │
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  RFORGE PLUGIN REFERENCE                                            v1.3.0  │
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├─────────────────────────────────────────────────────────────────────────────┤
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│                                                                             │
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  COMMANDS (3)                                                               │
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  COMMANDS (16)                                                              │
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│  ─────────                                                                  │
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│                                                                             │
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│  /rforge:analyze [task]           Balanced analysis (~30 sec)              │
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│    Auto-detects patterns, delegates to RForge MCP, synthesizes results     │
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│    Example: /rforge:analyze &quot;Update bootstrap algorithm&quot;                   │
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│                                                                             │
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│  /rforge:quick                    Ultra-fast check (~10 sec)               │
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│    Quick health check with minimal tool calls                              │
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│    Use: Pre-commit checks, quick status                                    │
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│                                                                             │
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│  /rforge:thorough [milestone]     Comprehensive review (2-5 min)           │
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│    Full analysis with all tools, detailed recommendations                  │
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│    Example: /rforge:thorough &quot;Prepare for CRAN release&quot;                    │
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│  DAILY                                                                      │
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│    /rforge:status         Ecosystem status dashboard                        │
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│    /rforge:next           Get next-task recommendation                      │
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│    /rforge:quick          Ultra-fast snapshot (&lt;10s)                        │
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│                                                                             │
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│  ANALYSIS                                                                   │
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│    /rforge:analyze        Mode-aware analysis (~30s)                        │
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│    /rforge:thorough       Comprehensive analysis + R CMD check (2-5m)       │
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│    /rforge:impact         Change impact across ecosystem                    │
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│    /rforge:deps           Dependency graph                                  │
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│    /rforge:detect         Auto-detect project structure                     │
 </span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│                                                                             │
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>├─────────────────────────────────────────────────────────────────────────────┤
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>│  HOW IT WORKS                                                               │
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>├─────────────────────────────────────────────────────────────────────────────┤
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>│                                                                             │
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>│  1. Pattern Recognition → Analyzes your task description                   │
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>│     • CODE_CHANGE - Code modifications                                     │
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>│     • BUG_FIX - Bug fixes                                                  │
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>│     • RELEASE_PREP - Release preparation                                   │
-</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│     • HEALTH_CHECK - Quick status check                                    │
-</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│     • FEATURE_ADD - New features                                           │
-</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│                                                                             │
-</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>│  2. Tool Selection → Picks appropriate RForge MCP tools                     │
-</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>│     • impact - Code change impact analysis                                 │
-</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>│     • tests - Test coverage and execution                                  │
-</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>│     • docs - Documentation completeness                                    │
-</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>│     • health - Package health check                                        │
-</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>│     • rdoc - R documentation check                                         │
-</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>│                                                                             │
-</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>│  3. Parallel Execution → Calls multiple tools simultaneously               │
-</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>│     ⚡ 4 tools × 8 sec each = 8 sec total (not 32 sec!)                     │
-</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>│                                                                             │
-</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>│  4. Results Synthesis → Combines into actionable summary                   │
-</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>│     • Impact assessment                                                    │
-</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>│     • Quality metrics                                                      │
-</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>│     • Maintenance concerns                                                 │
-</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>│     • Next steps                                                           │
-</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>│                                                                             │
-</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a>├─────────────────────────────────────────────────────────────────────────────┤
-</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>│  COMMON WORKFLOWS                                                           │
-</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>├─────────────────────────────────────────────────────────────────────────────┤
-</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a>│                                                                             │
-</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>│  After Code Changes              │  Before Commit                          │
-</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>│  1. Make changes                 │  1. /rforge:quick                       │
-</span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a>│  2. /rforge:analyze &quot;what changed&quot;│  2. Fix any issues                      │
-</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a>│  3. Review impact + next steps   │  3. git commit                          │
-</span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a>│  4. Run suggested checks         │                                         │
-</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a>│                                  │  Release Preparation                    │
-</span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a>│  Feature Development             │  1. /rforge:thorough &quot;CRAN release&quot;     │
-</span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58" href="#__codelineno-0-58"></a>│  1. /rforge:analyze &quot;add feature&quot;│  2. Address all recommendations         │
-</span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59" href="#__codelineno-0-59"></a>│  2. Check impact on tests/docs   │  3. Run R CMD check                     │
-</span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60" href="#__codelineno-0-60"></a>│  3. Update based on suggestions  │  4. Submit to CRAN                      │
-</span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61" href="#__codelineno-0-61"></a>│  4. /rforge:quick (verify)       │                                         │
-</span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62" href="#__codelineno-0-62"></a>│                                  │                                         │
-</span><span id="__span-0-63"><a id="__codelineno-0-63" name="__codelineno-0-63" href="#__codelineno-0-63"></a>├─────────────────────────────────────────────────────────────────────────────┤
-</span><span id="__span-0-64"><a id="__codelineno-0-64" name="__codelineno-0-64" href="#__codelineno-0-64"></a>│  REQUIREMENTS                                                               │
-</span><span id="__span-0-65"><a id="__codelineno-0-65" name="__codelineno-0-65" href="#__codelineno-0-65"></a>│  • Claude Code CLI installed                                               │
-</span><span id="__span-0-66"><a id="__codelineno-0-66" name="__codelineno-0-66" href="#__codelineno-0-66"></a>│  • RForge MCP server configured in ~/.claude/settings.json                 │
-</span><span id="__span-0-67"><a id="__codelineno-0-67" name="__codelineno-0-67" href="#__codelineno-0-67"></a>│  • R package project (DESCRIPTION file required)                           │
-</span><span id="__span-0-68"><a id="__codelineno-0-68" name="__codelineno-0-68" href="#__codelineno-0-68"></a>├─────────────────────────────────────────────────────────────────────────────┤
-</span><span id="__span-0-69"><a id="__codelineno-0-69" name="__codelineno-0-69" href="#__codelineno-0-69"></a>│  TIPS                                                                       │
-</span><span id="__span-0-70"><a id="__codelineno-0-70" name="__codelineno-0-70" href="#__codelineno-0-70"></a>│  • Use /rforge:quick for pre-commit checks - it&#39;s fast!                     │
-</span><span id="__span-0-71"><a id="__codelineno-0-71" name="__codelineno-0-71" href="#__codelineno-0-71"></a>│  • /rforge:analyze is best for understanding impact of changes              │
-</span><span id="__span-0-72"><a id="__codelineno-0-72" name="__codelineno-0-72" href="#__codelineno-0-72"></a>│  • /rforge:thorough before CRAN submission finds issues early               │
-</span><span id="__span-0-73"><a id="__codelineno-0-73" name="__codelineno-0-73" href="#__codelineno-0-73"></a>│  • Orchestrator runs tools in parallel - much faster than sequential        │
-</span><span id="__span-0-74"><a id="__codelineno-0-74" name="__codelineno-0-74" href="#__codelineno-0-74"></a>│  • Pattern recognition improves - describe tasks clearly for best results   │
-</span><span id="__span-0-75"><a id="__codelineno-0-75" name="__codelineno-0-75" href="#__codelineno-0-75"></a>└─────────────────────────────────────────────────────────────────────────────┘
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>│  ECOSYSTEM                                                                  │
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>│    /rforge:health         Ecosystem health check                            │
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>│    /rforge:cascade        Plan coordinated updates across packages          │
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>│    /rforge:release        Plan CRAN submission sequence                     │
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>│                                                                             │
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>│  TASKS                                                                      │
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>│    /rforge:capture        Capture tasks / ideas                             │
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>│    /rforge:complete       Mark complete (with doc cascade)                  │
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│                                                                             │
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│  CHECKS                                                                     │
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│    /rforge:r:check        R CMD check (smart output parsing)                │
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>│    /rforge:docs:check     Documentation drift check                         │
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>│                                                                             │
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>│  SETUP                                                                      │
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>│    /rforge:init           Initialize ~/.rforge/context.json                 │
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>│                                                                             │
+</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>└─────────────────────────────────────────────────────────────────────────────┘
 </span></code></pre></div>
 <hr />
-<h2 id="quick-command-reference">Quick Command Reference<a class="headerlink" href="#quick-command-reference" title="Permanent link">&para;</a></h2>
+<h2 id="how-it-works-v130">How It Works (v1.3.0+)<a class="headerlink" href="#how-it-works-v130" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>User invokes /rforge:&lt;command&gt;
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    ↓
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Claude reads commands/&lt;name&gt;.md as its prompt
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    ↓
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>Claude orchestrates lib/ modules + Bash tools as needed
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    ├── python3 -m lib.discovery   (ecosystem + package detection)
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    ├── python3 -m lib.deps        (dependency graph + impact)
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    ├── python3 -m lib.status      (health snapshot)
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    └── python3 -m lib.init        (~/.rforge/context.json setup)
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    ↓
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>PreToolUse hook diagnoses risky Write/Edit ops (man/*.Rd block, etc.)
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    ↓
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>Validation skills run autonomously (description-sync, etc.)
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    ↓
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>Results synthesized into actionable summary
+</span></code></pre></div>
+<p>No MCP server. No Node.js. No R subprocess for status/discovery/deps —
+only <code>r:check</code> and <code>thorough</code> shell out to R.</p>
+<hr />
+<h2 id="common-workflows">Common Workflows<a class="headerlink" href="#common-workflows" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Command</th>
-<th>Speed</th>
-<th>When to Use</th>
-<th>Output</th>
+<th>Daily check-in</th>
+<th>Pre-commit</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>/rforge:init</code></td>
-<td>&lt;5s</td>
-<td>First run on a package or ecosystem</td>
-<td>Writes <code>~/.rforge/context.json</code></td>
+<td>1. <code>/rforge:status</code></td>
+<td>1. <code>/rforge:quick</code></td>
 </tr>
 <tr>
-<td><code>/rforge:quick</code></td>
-<td>~10s</td>
-<td>Pre-commit, quick status</td>
-<td>Basic health check</td>
+<td>2. <code>/rforge:next</code></td>
+<td>2. Fix any issues</td>
 </tr>
 <tr>
-<td><code>/rforge:analyze</code></td>
-<td>~30s</td>
-<td>After changes, understand impact</td>
-<td>Impact + recommendations</td>
+<td></td>
+<td>3. <code>git commit</code></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>After code changes</th>
+<th>Pre-CRAN release</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. <code>/rforge:analyze "what?"</code></td>
+<td>1. <code>/rforge:thorough</code></td>
 </tr>
 <tr>
-<td><code>/rforge:thorough</code></td>
-<td>2-5m</td>
-<td>Release prep, major changes</td>
-<td>Comprehensive analysis</td>
+<td>2. Review impact + tests</td>
+<td>2. <code>/rforge:r:check</code></td>
+</tr>
+<tr>
+<td>3. <code>/rforge:cascade</code> if dep</td>
+<td>3. <code>/rforge:docs:check</code></td>
+</tr>
+<tr>
+<td>updates needed</td>
+<td>4. <code>/rforge:release</code></td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="pattern-recognition">Pattern Recognition<a class="headerlink" href="#pattern-recognition" title="Permanent link">&para;</a></h2>
-<p>The orchestrator automatically detects task types:</p>
-<table>
-<thead>
-<tr>
-<th>Pattern</th>
-<th>Triggers When...</th>
-<th>Tools Called</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>CODE_CHANGE</strong></td>
-<td>"update", "modify", "change code"</td>
-<td>impact, tests, docs</td>
-</tr>
-<tr>
-<td><strong>BUG_FIX</strong></td>
-<td>"fix", "bug", "error"</td>
-<td>impact, tests</td>
-</tr>
-<tr>
-<td><strong>RELEASE_PREP</strong></td>
-<td>"release", "CRAN", "publish"</td>
-<td>health, tests, docs, rdoc</td>
-</tr>
-<tr>
-<td><strong>HEALTH_CHECK</strong></td>
-<td>"check", "status", "quick"</td>
-<td>health</td>
-</tr>
-<tr>
-<td><strong>FEATURE_ADD</strong></td>
-<td>"add feature", "new function"</td>
-<td>impact, tests, docs</td>
-</tr>
-</tbody>
-</table>
+<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Claude Code CLI</strong> installed</li>
+<li><strong>Python 3.10+</strong> (for <code>lib/</code> modules)</li>
+<li><strong>R 4.0+</strong> — only needed for <code>r:check</code> / <code>thorough</code> workflows</li>
+</ul>
+<p>No MCP server or Node.js required (since v1.3.0).</p>
 <hr />
 <h2 id="rforge-lib-modules-v130">RForge Lib Modules (v1.3.0+)<a class="headerlink" href="#rforge-lib-modules-v130" title="Permanent link">&para;</a></h2>
 <p>As of v1.3.0 the plugin is self-contained — slash commands dispatch to pure-Python <code>lib/</code> modules instead of an MCP server. CLI form: <code>python3 -m lib.&lt;module&gt;</code>.</p>
@@ -1988,34 +2050,65 @@ slash command.</p>
 shell, no R required. Runs in <code>release</code> mode pre-CRAN.</p>
 <p>See <a href="../hooks-and-skills/">Hooks &amp; Skills Reference</a> for full details.</p>
 <hr />
+<h2 id="pattern-recognition">Pattern Recognition<a class="headerlink" href="#pattern-recognition" title="Permanent link">&para;</a></h2>
+<p>When <code>/rforge:analyze</code> runs, it detects task types and selects which <code>lib/</code> modules to invoke:</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Triggers When...</th>
+<th>Modules / Tools</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CODE_CHANGE</strong></td>
+<td>"update", "modify", "change code"</td>
+<td><code>lib.deps</code> (impact), <code>lib.discovery</code></td>
+</tr>
+<tr>
+<td><strong>BUG_FIX</strong></td>
+<td>"fix", "bug", "error"</td>
+<td><code>lib.deps</code>, <code>lib.status</code></td>
+</tr>
+<tr>
+<td><strong>RELEASE_PREP</strong></td>
+<td>"release", "CRAN", "publish"</td>
+<td><code>lib.status</code>, R CMD check, <code>description-sync</code></td>
+</tr>
+<tr>
+<td><strong>HEALTH_CHECK</strong></td>
+<td>"check", "status", "quick"</td>
+<td><code>lib.status</code></td>
+</tr>
+<tr>
+<td><strong>FEATURE_ADD</strong></td>
+<td>"add feature", "new function"</td>
+<td><code>lib.deps</code>, <code>lib.discovery</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
 <p><strong>Claude Code marketplace (Recommended, v1.2.0+):</strong></p>
 <p>From inside Claude Code:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>/plugin marketplace add Data-Wise/rforge
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>/plugin install rforge
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/plugin marketplace add Data-Wise/rforge
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>/plugin install rforge
 </span></code></pre></div>
 <p>Update later with <code>/plugin update rforge</code>. Works on macOS, Linux, Windows.</p>
 <p><strong>Homebrew (macOS):</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew<span class="w"> </span>install<span class="w"> </span>data-wise/tap/rforge
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>brew<span class="w"> </span>install<span class="w"> </span>data-wise/tap/rforge
 </span></code></pre></div>
 <p><strong>Manual:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Data-Wise/rforge.git
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>ln<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/rforge&quot;</span><span class="w"> </span>~/.claude/plugins/rforge
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Data-Wise/rforge.git
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>ln<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/rforge&quot;</span><span class="w"> </span>~/.claude/plugins/rforge
 </span></code></pre></div>
 <p>See the <a href="../#installation">Home page</a> for the full matrix of
 install options.</p>
 <hr />
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p>RForge MCP server must be configured in <code>~/.claude/settings.json</code>:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nt">&quot;rforge-mcp&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;node&quot;</span><span class="p">,</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;/path/to/rforge-mcp/dist/index.js&quot;</span><span class="p">]</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">}</span>
-</span></code></pre></div>
+<p>User-tunable settings live in <code>.claude-plugin/config.json</code> (CRAN mirror, vignette engine, R version pin, CLAUDE.md budget). See <a href="../configuration/"><code>docs/configuration.md</code></a> for the full list of options.</p>
+<p>No <code>~/.claude/settings.json</code> entries required since v1.3.0 — the plugin is fully self-contained.</p>
 <hr />
 <h2 id="file-structure">File Structure<a class="headerlink" href="#file-structure" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>rforge/
@@ -2025,15 +2118,22 @@ install options.</p>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>│   ├── config.json
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>│   ├── hooks/pretooluse.py
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>│   └── skills/validation/description-sync.md
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>├── commands/              # 15 slash commands (/rforge:*)
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>├── agents/                # 1 orchestrator agent
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>│   └── orchestrator.md
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>├── scripts/               # Installation scripts
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>│   ├── install.sh
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>│   └── uninstall.sh
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>├── lib/formatters.py
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>└── docs/                  # Documentation
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    └── REFCARD.md (this file)
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>├── commands/              # 16 slash commands (/rforge:*)
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>│   ├── docs/check.md      # /rforge:docs:check (v2.0.0+)
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>│   └── r/check.md         # /rforge:r:check (v2.0.0+)
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>├── agents/                # 1 orchestrator agent
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>│   └── orchestrator.md
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>├── scripts/               # Installation scripts
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>│   ├── install.sh
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>│   └── uninstall.sh
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>├── lib/                   # Pure-Python analysis modules (v1.3.0+)
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>│   ├── discovery.py
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>│   ├── deps.py
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>│   ├── status.py
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>│   ├── init.py
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>│   └── formatters.py
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>└── docs/                  # Documentation
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>    └── REFCARD.md (this file)
 </span></code></pre></div>
 <hr />
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
@@ -2050,12 +2150,12 @@ install options.</p>
 <td>Restart Claude Code, check <code>~/.claude/plugins/</code></td>
 </tr>
 <tr>
-<td>"RForge MCP not configured"</td>
-<td>Add rforge-mcp to settings.json</td>
+<td><code>/rforge:&lt;old-name&gt;</code> says "RENAMED"</td>
+<td>Use the new v2.0.0 name (see <a href="../migration/v2.0.0-rename/">migration tutorial</a>)</td>
 </tr>
 <tr>
 <td>Slow performance</td>
-<td>Check RForge MCP server is running</td>
+<td>Check Python 3.10+ is on PATH; <code>lib/</code> modules should run in seconds</td>
 </tr>
 <tr>
 <td>Pattern not recognized</td>
@@ -2065,6 +2165,10 @@ install options.</p>
 <td>No R package found</td>
 <td>Must be in R package directory (has DESCRIPTION)</td>
 </tr>
+<tr>
+<td>R CMD check missing</td>
+<td>Install R 4.0+ from CRAN; required for <code>r:check</code> / <code>thorough</code> only</td>
+</tr>
 </tbody>
 </table>
 <hr />
@@ -2073,30 +2177,30 @@ install options.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:analyze &quot;Updated bootstrap algorithm in mediate() function&quot;
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>→ Pattern: CODE_CHANGE
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>→ Tools: impact, tests, docs
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>→ Modules: lib.deps (impact), lib.discovery
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>→ Result: Impact assessment + test status + doc updates needed
 </span></code></pre></div>
 <h3 id="quick-pre-commit-check">Quick Pre-commit Check<a class="headerlink" href="#quick-pre-commit-check" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>/rforge:quick
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>→ Pattern: HEALTH_CHECK
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>→ Tools: health (minimal)
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>→ Module: lib.status
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>→ Result: Quick health status + blocking issues
 </span></code></pre></div>
 <h3 id="before-cran-release">Before CRAN Release<a class="headerlink" href="#before-cran-release" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/rforge:thorough &quot;Prepare v2.0.0 for CRAN submission&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/rforge:thorough &quot;Prepare for CRAN submission&quot;
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>→ Pattern: RELEASE_PREP
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>→ Tools: health, tests, docs, rdoc (all tools)
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>→ Modules: lib.status + R CMD check + description-sync skill
 </span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>→ Result: Comprehensive checklist + recommendations
 </span></code></pre></div>
 <hr />
 <h2 id="more-documentation">More Documentation<a class="headerlink" href="#more-documentation" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Main README:</strong> <code>README.md</code></li>
-<li><strong>Installation Guide:</strong> Homebrew formula includes full guide</li>
-<li><strong>Plugin Repository:</strong> https://github.com/Data-Wise/rforge</li>
-<li><strong>GitHub Releases:</strong> https://github.com/Data-Wise/rforge/releases</li>
+<li><strong>Main README:</strong> <a href="https://github.com/Data-Wise/rforge/blob/main/README.md">README.md</a> on GitHub</li>
+<li><strong>Plugin Repository:</strong> <a href="https://github.com/Data-Wise/rforge">https://github.com/Data-Wise/rforge</a></li>
+<li><strong>GitHub Releases:</strong> <a href="https://github.com/Data-Wise/rforge/releases">https://github.com/Data-Wise/rforge/releases</a></li>
+<li><strong>Migration tutorials:</strong> <a href="migration/"><code>docs/migration/</code></a></li>
 </ul>
 <hr />
 <h2 id="comparison-when-to-use-each-command">Comparison: When to Use Each Command<a class="headerlink" href="#comparison-when-to-use-each-command" title="Permanent link">&para;</a></h2>
@@ -2136,13 +2240,23 @@ install options.</p>
 </tr>
 <tr>
 <td>Daily development</td>
-<td><code>/rforge:quick</code></td>
-<td>Regular health checks</td>
+<td><code>/rforge:status</code> + <code>/rforge:next</code></td>
+<td>Dashboard + decision</td>
+</tr>
+<tr>
+<td>Running R CMD check</td>
+<td><code>/rforge:r:check</code></td>
+<td>Single-package deep check</td>
+</tr>
+<tr>
+<td>Documentation drift</td>
+<td><code>/rforge:docs:check</code></td>
+<td>NEWS.md, API consistency</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<p><strong>Quick Start:</strong> <code>/rforge:quick</code> → Get instant health check of your R package!</p>
+<p><strong>Quick Start:</strong> <code>/rforge:status</code> → Get instant health snapshot of your R package ecosystem!</p>
 
 
 

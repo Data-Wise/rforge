@@ -479,7 +479,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../migration/rforge-mcp-deprecation/" class="md-tabs__link">
+        <a href="../migration/v2.0.0-rename/" class="md-tabs__link">
           
   
   
@@ -895,10 +895,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rforgedoc-check" class="md-nav__link">
+  <a href="#rforgedocscheck" class="md-nav__link">
     <span class="md-ellipsis">
       
-        /rforge:doc-check
+        /rforge:docs:check
       
     </span>
   </a>
@@ -956,10 +956,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rforgeecosystem-health" class="md-nav__link">
+  <a href="#rforgehealth" class="md-nav__link">
     <span class="md-ellipsis">
       
-        /rforge:ecosystem-health
+        /rforge:health
       
     </span>
   </a>
@@ -967,10 +967,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#rforgerpkg-check" class="md-nav__link">
+  <a href="#rforgercheck" class="md-nav__link">
     <span class="md-ellipsis">
       
-        /rforge:rpkg-check
+        /rforge:r:check
       
     </span>
   </a>
@@ -1602,6 +1602,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 namespacing (v2.0.0)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1658,6 +1686,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/v2.0.0-rename/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v2.0.0 command rename
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -1933,10 +1989,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rforgedoc-check" class="md-nav__link">
+  <a href="#rforgedocscheck" class="md-nav__link">
     <span class="md-ellipsis">
       
-        /rforge:doc-check
+        /rforge:docs:check
       
     </span>
   </a>
@@ -1994,10 +2050,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rforgeecosystem-health" class="md-nav__link">
+  <a href="#rforgehealth" class="md-nav__link">
     <span class="md-ellipsis">
       
-        /rforge:ecosystem-health
+        /rforge:health
       
     </span>
   </a>
@@ -2005,10 +2061,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#rforgerpkg-check" class="md-nav__link">
+  <a href="#rforgercheck" class="md-nav__link">
     <span class="md-ellipsis">
       
-        /rforge:rpkg-check
+        /rforge:r:check
       
     </span>
   </a>
@@ -2347,15 +2403,15 @@
 - External dependencies</p>
 <hr />
 <h2 id="documentation-tasks">Documentation &amp; Tasks<a class="headerlink" href="#documentation-tasks" title="Permanent link">&para;</a></h2>
-<h3 id="rforgedoc-check">/rforge:doc-check<a class="headerlink" href="#rforgedoc-check" title="Permanent link">&para;</a></h3>
+<h3 id="rforgedocscheck">/rforge:docs:check<a class="headerlink" href="#rforgedocscheck" title="Permanent link">&para;</a></h3>
 <p>Check for documentation drift and inconsistencies across packages.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>/rforge:doc-check
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>/rforge:docs:check
 </span></code></pre></div></p>
 <p><strong>No parameters</strong></p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Check documentation status</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>/rforge:doc-check
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>/rforge:docs:check
 </span></code></pre></div></p>
 <p><strong>Validates:</strong>
 - Exported functions have documentation
@@ -2425,19 +2481,19 @@
 - 2-3 alternatives</p>
 <hr />
 <h2 id="health-checks">Health Checks<a class="headerlink" href="#health-checks" title="Permanent link">&para;</a></h2>
-<h3 id="rforgeecosystem-health">/rforge:ecosystem-health<a class="headerlink" href="#rforgeecosystem-health" title="Permanent link">&para;</a></h3>
+<h3 id="rforgehealth">/rforge:health<a class="headerlink" href="#rforgehealth" title="Permanent link">&para;</a></h3>
 <p>Comprehensive ecosystem health metrics with visual dashboard.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>/rforge:ecosystem-health<span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>FORMAT<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>/rforge:health<span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>FORMAT<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>--format</code> (optional) - Output format: <code>terminal</code>, <code>json</code>, <code>markdown</code></p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="c1"># Visual health dashboard</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>/rforge:ecosystem-health
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>/rforge:health
 </span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
 </span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="c1"># JSON metrics</span>
-</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>/rforge:ecosystem-health<span class="w"> </span>--format<span class="w"> </span>json
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>/rforge:health<span class="w"> </span>--format<span class="w"> </span>json
 </span></code></pre></div></p>
 <p><strong>Metrics:</strong>
 - Overall health score (0-100)
@@ -2446,19 +2502,19 @@
 - Dependency freshness
 - Documentation completeness</p>
 <hr />
-<h3 id="rforgerpkg-check">/rforge:rpkg-check<a class="headerlink" href="#rforgerpkg-check" title="Permanent link">&para;</a></h3>
+<h3 id="rforgercheck">/rforge:r:check<a class="headerlink" href="#rforgercheck" title="Permanent link">&para;</a></h3>
 <p>R CMD check integration with detailed error reporting.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>/rforge:rpkg-check<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>/rforge:r:check<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>package</code> (optional) - Package to check (defaults to current)</p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="c1"># Check current package</span>
-</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>/rforge:rpkg-check
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>/rforge:r:check
 </span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>
 </span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="c1"># Check specific package</span>
-</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>/rforge:rpkg-check<span class="w"> </span>mypackage
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>/rforge:r:check<span class="w"> </span>mypackage
 </span></code></pre></div></p>
 <p><strong>Executes:</strong>
 - R CMD check with standard flags
@@ -2483,7 +2539,7 @@
 </tr>
 <tr>
 <td>&lt;30s</td>
-<td><code>analyze</code> (default), <code>cascade</code>, <code>impact</code>, <code>doc-check</code></td>
+<td><code>analyze</code> (default), <code>cascade</code>, <code>impact</code>, <code>docs:check</code></td>
 </tr>
 <tr>
 <td>&lt;2min</td>
@@ -2491,7 +2547,7 @@
 </tr>
 <tr>
 <td>&lt;5min</td>
-<td><code>thorough</code>, <code>analyze</code> (release), <code>rpkg-check</code></td>
+<td><code>thorough</code>, <code>analyze</code> (release), <code>r:check</code></td>
 </tr>
 </tbody>
 </table>
@@ -2508,12 +2564,12 @@
 - <code>/rforge:analyze --mode release</code> - Full audit
 - <code>/rforge:thorough</code> - Comprehensive checks
 - <code>/rforge:release</code> - Plan submission order
-- <code>/rforge:rpkg-check</code> - R CMD check execution</p>
+- <code>/rforge:r:check</code> - R CMD check execution</p>
 <p><strong>Ecosystem Management:</strong>
 - <code>/rforge:detect</code> - Understand structure
 - <code>/rforge:deps</code> - Visualize dependencies
 - <code>/rforge:cascade</code> - Plan coordinated updates
-- <code>/rforge:ecosystem-health</code> - Overall metrics</p>
+- <code>/rforge:health</code> - Overall metrics</p>
 <h2 id="global-flags">Global Flags<a class="headerlink" href="#global-flags" title="Permanent link">&para;</a></h2>
 <p>All analysis commands support:</p>
 <p><strong>Mode flags:</strong>

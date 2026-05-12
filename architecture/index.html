@@ -479,7 +479,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../migration/rforge-mcp-deprecation/" class="md-tabs__link">
+        <a href="../migration/v2.0.0-rename/" class="md-tabs__link">
           
   
   
@@ -760,22 +760,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#path-b-lib-modules" class="md-nav__link">
+  <a href="#lib-modules-the-analysis-runtime" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Path B: lib/ modules
+        lib/ modules — the analysis runtime
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Path B: lib/ modules">
+    <nav class="md-nav" aria-label="lib/ modules — the analysis runtime">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#two-execution-paths" class="md-nav__link">
+  <a href="#single-execution-path-v130" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Two execution paths
+        Single execution path (v1.3.0+)
       
     </span>
   </a>
@@ -783,21 +783,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-two-paths" class="md-nav__link">
+  <a href="#module-summary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why two paths?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#whats-still-mcp-only" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's still MCP-only
+        Module summary
       
     </span>
   </a>
@@ -1054,10 +1043,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-tool-integration" class="md-nav__link">
+  <a href="#lib-module-integration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP Tool Integration
+        Lib Module Integration
       
     </span>
   </a>
@@ -1813,6 +1802,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 namespacing (v2.0.0)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1869,6 +1886,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration/v2.0.0-rename/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v2.0.0 command rename
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -1982,22 +2027,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#path-b-lib-modules" class="md-nav__link">
+  <a href="#lib-modules-the-analysis-runtime" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Path B: lib/ modules
+        lib/ modules — the analysis runtime
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Path B: lib/ modules">
+    <nav class="md-nav" aria-label="lib/ modules — the analysis runtime">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#two-execution-paths" class="md-nav__link">
+  <a href="#single-execution-path-v130" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Two execution paths
+        Single execution path (v1.3.0+)
       
     </span>
   </a>
@@ -2005,21 +2050,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-two-paths" class="md-nav__link">
+  <a href="#module-summary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why two paths?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#whats-still-mcp-only" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's still MCP-only
+        Module summary
       
     </span>
   </a>
@@ -2276,10 +2310,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-tool-integration" class="md-nav__link">
+  <a href="#lib-module-integration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP Tool Integration
+        Lib Module Integration
       
     </span>
   </a>
@@ -2531,8 +2565,12 @@
 <h1 id="rforge-architecture-guide">RForge Architecture Guide<a class="headerlink" href="#rforge-architecture-guide" title="Permanent link">&para;</a></h1>
 <p>Deep dive into how RForge works internally: auto-delegation orchestration, pattern recognition, parallel execution, and result synthesis.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>RForge is an <strong>orchestrator plugin</strong> that intelligently delegates to RForge MCP server tools. It doesn't execute R code directly - instead, it acts as an intelligent coordinator that recognizes patterns, selects appropriate tools, executes them in parallel, and synthesizes results.</p>
-<p><strong>Key Innovation:</strong> Auto-delegation with parallel execution that completes 4 tool calls in the time it takes to execute 1.</p>
+<p>RForge is a <strong>self-contained Claude Code plugin</strong> for R package ecosystems. Slash commands are markdown prompts that Claude reads; the plugin ships pure-Python <code>lib/</code> modules (discovery, deps, status, init) that Claude orchestrates via Bash to gather ecosystem data, then synthesizes results into actionable summaries.</p>
+<p><strong>Architecture in one line (v1.3.0+):</strong> <code>/rforge:&lt;command&gt;</code> → Claude reads <code>commands/&lt;name&gt;.md</code> → Claude orchestrates <code>python3 -m lib.&lt;module&gt;</code> calls + Bash tools → synthesized output.</p>
+<p><strong>Key innovation:</strong> Auto-delegation with parallel <code>lib/</code> invocations — multiple modules complete in the time it would take to run them sequentially.</p>
+<blockquote>
+<p><strong>Historical note:</strong> v1.0–v1.2 of rforge orchestrated an external <code>rforge-mcp</code> MCP server. v1.3.0 absorbed those tools as pure-Python <code>lib/</code> modules; no MCP server is required at runtime. See <a href="../specs/SPEC-mcp-absorb-2026-05-10/">Path B SPEC</a> for the migration narrative. This document describes the v1.3.0+ architecture; some legacy sections below retain MCP-era examples where the underlying concept (parallel orchestration, pattern recognition) hasn't changed.</p>
+</blockquote>
 <h2 id="plugin-surface">Plugin Surface<a class="headerlink" href="#plugin-surface" title="Permanent link">&para;</a></h2>
 <blockquote>
 <p>Added in v1.2.0. Mirrors craft's <code>.claude-plugin/</code> layout.</p>
@@ -2547,17 +2585,17 @@ different lifecycle stage:</p>
     subgraph Plugin[".claude-plugin/"]
         MP[marketplace.json&lt;br/&gt;&lt;i&gt;install-time&lt;/i&gt;]
         CFG[config.json&lt;br/&gt;&lt;i&gt;plugin-load&lt;/i&gt;]
-        CMD[commands/*.md&lt;br/&gt;&lt;i&gt;15 slash commands&lt;/i&gt;]
+        CMD[commands/*.md&lt;br/&gt;&lt;i&gt;16 slash commands&lt;/i&gt;]
         AGT[agents/orchestrator.md&lt;br/&gt;&lt;i&gt;auto-delegation&lt;/i&gt;]
         HK[hooks/pretooluse.py&lt;br/&gt;&lt;i&gt;every Write/Edit&lt;/i&gt;]
         SK[skills/validation/*.md&lt;br/&gt;&lt;i&gt;auto-discovered&lt;/i&gt;]
     end
 
-    subgraph MCP["RForge MCP server"]
-        T1[health]
-        T2[tests]
-        T3[docs]
-        T4[impact]
+    subgraph LIB["lib/ modules (v1.3.0+)"]
+        L1[lib.discovery]
+        L2[lib.deps]
+        L3[lib.status]
+        L4[lib.init]
     end
 
     subgraph R["R environment"]
@@ -2572,14 +2610,14 @@ different lifecycle stage:</p>
     HK --&gt;|reads| DESCR
     HK --&gt;|protects| RD
     CMD --&gt;|delegates| AGT
-    AGT --&gt;|invokes| T1
-    AGT --&gt;|invokes| T2
-    AGT --&gt;|invokes| T3
-    AGT --&gt;|invokes| T4
-    T1 --&gt; R
-    T2 --&gt; R
-    T3 --&gt; R
-    T4 --&gt; R
+    AGT --&gt;|python3 -m| L1
+    AGT --&gt;|python3 -m| L2
+    AGT --&gt;|python3 -m| L3
+    AGT --&gt;|python3 -m| L4
+    L1 --&gt; DESCR
+    L2 --&gt; DESCR
+    L3 --&gt; DESCR
+    L4 --&gt; DESCR
     SK -.-&gt;|optional| DESCR
     CFG -.-&gt;|reads| CMD
     CFG -.-&gt;|reads| AGT</code></pre>
@@ -2631,106 +2669,95 @@ different lifecycle stage:</p>
 </tr>
 </tbody>
 </table>
-<p>The orchestrator-and-MCP machinery (covered in the rest of this document)
-is the <em>runtime brain</em>. The four pieces above are the <em>static surface</em>
+<p>The orchestrator-and-<code>lib/</code> machinery (covered in the rest of this document)
+is the <em>runtime brain</em>. The pieces above are the <em>static surface</em>
 the plugin advertises to Claude Code.</p>
 <p>For a user-facing tour of the new hook + skill, see
 <a href="../hooks-and-skills/">Hooks &amp; Skills Reference</a>.</p>
 <hr />
-<h2 id="path-b-lib-modules">Path B: <code>lib/</code> modules<a class="headerlink" href="#path-b-lib-modules" title="Permanent link">&para;</a></h2>
+<h2 id="lib-modules-the-analysis-runtime"><code>lib/</code> modules — the analysis runtime<a class="headerlink" href="#lib-modules-the-analysis-runtime" title="Permanent link">&para;</a></h2>
 <blockquote>
-<p><strong>Added in v1.3.0.</strong> Three former MCP tools (<code>rforge_detect</code>, <code>rforge_deps</code>,
-<code>rforge_impact</code>) ported to self-contained Python in <code>lib/</code>. Path A (v1.2.0)
-dropped the <em>peer dependency</em> on <code>rforge-mcp</code>; Path B absorbs the <em>logic</em>.
-The MCP server is still supported — <code>lib/</code> runs in parallel.</p>
+<p><strong>Completed in v1.3.0.</strong> All R-package analysis runs through pure-Python <code>lib/</code> modules. The plugin no longer has any runtime dependency on an MCP server.</p>
 </blockquote>
-<h3 id="two-execution-paths">Two execution paths<a class="headerlink" href="#two-execution-paths" title="Permanent link">&para;</a></h3>
-<p>Commands like <code>/rforge:detect</code> and <code>/rforge:deps</code> now have a choice: they
-can shell out to the in-plugin Python modules (no external service
-required) or, if the user has <code>rforge-mcp</code> installed, delegate to the MCP
-server. The output shape is equivalent for the three ported tools.</p>
+<h3 id="single-execution-path-v130">Single execution path (v1.3.0+)<a class="headerlink" href="#single-execution-path-v130" title="Permanent link">&para;</a></h3>
 <pre class="mermaid"><code>graph TB
     subgraph User["You / Claude Code session"]
-        UR[User: /rforge:detect or /rforge:deps]
+        UR[User: /rforge:detect, /rforge:deps, /rforge:status, etc.]
     end
 
     subgraph Cmd[commands/*.md]
         DT[detect.md]
         DP[deps.md]
         IM[impact.md]
+        ST[status.md]
+        IN[init.md]
     end
 
-    subgraph LibPath["Path B (v1.3+, default)"]
+    subgraph Lib["lib/ modules (pure Python)"]
         L1[lib/discovery.py]
         L2[lib/deps.py]
-    end
-
-    subgraph MCPPath["MCP path (still supported)"]
-        T1[rforge_detect]
-        T2[rforge_deps]
-        T3[rforge_impact]
+        L3[lib/status.py]
+        L4[lib/init.py]
     end
 
     subgraph FS["Filesystem"]
         DESCR[R DESCRIPTION files]
-        CFG[.rforge.yaml]
+        STATUS[.STATUS files]
+        CTX[~/.rforge/context.json]
     end
 
     UR --&gt; DT
     UR --&gt; DP
     UR --&gt; IM
-    DT --&gt;|bash python3| L1
-    DP --&gt;|bash python3| L2
-    IM --&gt;|bash python3| L2
-    DT -.-&gt;|optional MCP| T1
-    DP -.-&gt;|optional MCP| T2
-    IM -.-&gt;|optional MCP| T3
+    UR --&gt; ST
+    UR --&gt; IN
+    DT --&gt;|bash python3 -m| L1
+    DP --&gt;|bash python3 -m| L2
+    IM --&gt;|bash python3 -m| L2
+    ST --&gt;|bash python3 -m| L3
+    IN --&gt;|bash python3 -m| L4
     L1 --&gt; DESCR
-    L1 --&gt; CFG
     L2 --&gt; DESCR
-    T1 --&gt; DESCR
-    T2 --&gt; DESCR
-    T3 --&gt; DESCR</code></pre>
-<p>Solid arrows: the in-plugin path (v1.3+ default). Dashed arrows: the
-legacy MCP path, still functional for users who installed <code>rforge-mcp</code>.</p>
-<h3 id="why-two-paths">Why two paths?<a class="headerlink" href="#why-two-paths" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Non-breaking migration.</strong> Existing users keep working without forced
-  reinstall; new users get pure-Python analysis with zero peer deps.</li>
-<li><strong>Capability ceiling.</strong> Commands that need R subprocess (e.g.,
-  <code>/rforge:status</code> with <code>optimize</code>/<code>release</code> modes) still rely on the MCP
-  server until Phase B.2 ports <code>status</code> to <code>lib/status.py</code>. See the
-  <a href="../specs/SPEC-mcp-absorb-2026-05-10/">Path B SPEC</a> for the full plan.</li>
-<li><strong>Wire compatibility.</strong> <code>lib/discovery.py</code> preserves the MCP server's
-  <code>mode</code> field (<code>minimal</code>/<code>standard</code>/<code>full</code>) for direct side-by-side
-  validation against <code>rforge_detect</code> output. The user-facing <code>kind</code> field
-  (<code>single</code>/<code>ecosystem</code>/<code>hybrid</code>) is layered on top.</li>
-</ul>
-<h3 id="whats-still-mcp-only">What's still MCP-only<a class="headerlink" href="#whats-still-mcp-only" title="Permanent link">&para;</a></h3>
+    L3 --&gt; DESCR
+    L3 --&gt; STATUS
+    L4 --&gt; CTX</code></pre>
+<h3 id="module-summary">Module summary<a class="headerlink" href="#module-summary" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Tool</th>
-<th>Phase</th>
-<th>Status</th>
+<th>Module</th>
+<th>Powers</th>
+<th>Speed</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>rforge_status</code></td>
-<td>B.2</td>
-<td>Pending — mode-aware execution (default/debug/optimize/release) with R subprocess</td>
+<td><code>lib.discovery</code></td>
+<td><code>/rforge:detect</code> — ecosystem + package detection (single/ecosystem/hybrid)</td>
+<td>&lt;2s</td>
 </tr>
 <tr>
-<td><code>rforge_init</code></td>
-<td>B.3</td>
-<td>Pending — <code>.rforge/context.json</code> state file</td>
+<td><code>lib.deps</code></td>
+<td><code>/rforge:deps</code>, <code>/rforge:impact</code> — dependency graph + change impact</td>
+<td>~8s</td>
+</tr>
+<tr>
+<td><code>lib.status</code></td>
+<td><code>/rforge:status</code> — ecosystem health snapshot from DESCRIPTION + .STATUS</td>
+<td>&lt;5s</td>
+</tr>
+<tr>
+<td><code>lib.init</code></td>
+<td><code>/rforge:init</code> — initialize <code>~/.rforge/context.json</code></td>
+<td>&lt;5s</td>
 </tr>
 </tbody>
 </table>
+<p>For deep-R workflows (<code>/rforge:r:check</code>, <code>/rforge:thorough</code>) the command bodies invoke <code>R CMD check</code> / <code>Rscript</code> directly via Bash — there's no R-subprocess-wrapper module.</p>
 <p>See <a href="../lib-modules/"><code>docs/lib-modules.md</code></a> for the user-facing reference,
 and the auto-extracted <a href="../reference/discovery/"><code>reference/discovery.md</code></a> /
-<a href="../reference/deps/"><code>reference/deps.md</code></a> for full API listings.</p>
+<a href="../reference/deps/"><code>reference/deps.md</code></a> / <a href="../reference/status/"><code>reference/status.md</code></a> /
+<a href="../reference/init/"><code>reference/init.md</code></a> for full API listings.</p>
 <hr />
 <h2 id="architecture-layers">Architecture Layers<a class="headerlink" href="#architecture-layers" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────────────────────────────┐
@@ -2743,13 +2770,13 @@ and the auto-extracted <a href="../reference/discovery/"><code>reference/discove
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>└─────────────────────────────────────────────────────────┘
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                           ↓
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>┌─────────────────────────────────────────────────────────┐
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│              Tool Selection Layer                        │
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│  Selects appropriate MCP tools based on pattern         │
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│              Module Selection Layer                      │
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│  Selects appropriate lib/ modules based on pattern      │
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>└─────────────────────────────────────────────────────────┘
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>                           ↓
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>┌─────────────────────────────────────────────────────────┐
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│              Parallel Execution Layer                    │
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│  Executes multiple MCP tools simultaneously             │
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│  Invokes multiple lib/ modules + Bash tools in parallel │
 </span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>└─────────────────────────────────────────────────────────┘
 </span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>                           ↓
 </span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>┌─────────────────────────────────────────────────────────┐
@@ -2766,75 +2793,76 @@ and the auto-extracted <a href="../reference/discovery/"><code>reference/discove
 <p>RForge recognizes 6 primary task patterns:</p>
 <h3 id="1-code_change">1. CODE_CHANGE<a class="headerlink" href="#1-code_change" title="Permanent link">&para;</a></h3>
 <p><strong>Triggers:</strong> "updated", "modified", "changed code", "implemented"</p>
-<p><strong>Selected Tools:</strong>
-- <code>rforge-mcp.impact</code> - Assess change impact
-- <code>rforge-mcp.tests</code> - Verify tests still pass
-- <code>rforge-mcp.docs</code> - Check if docs need updating</p>
+<p><strong>Selected modules / tools:</strong>
+- <code>lib.deps</code> (impact) — assess change impact across ecosystem
+- Bash: <code>Rscript -e 'devtools::test()'</code> — verify tests still pass
+- <code>lib.discovery</code> — locate affected packages
+- <code>/rforge:docs:check</code> body — surface docs-drift hints</p>
 <p><strong>Example:</strong>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>User: &quot;I updated the bootstrap function in RMediation&quot;
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>→ Pattern: CODE_CHANGE
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>→ Tools: [impact, tests, docs]
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>→ Modules: [lib.deps, lib.discovery] + Bash tests
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>→ Output: &quot;3 packages affected, 42 tests passing, docs up-to-date&quot;
 </span></code></pre></div></p>
 <h3 id="2-bug_fix">2. BUG_FIX<a class="headerlink" href="#2-bug_fix" title="Permanent link">&para;</a></h3>
 <p><strong>Triggers:</strong> "bug", "error", "fix", "issue"</p>
-<p><strong>Selected Tools:</strong>
-- <code>rforge-mcp.tests</code> - Verify fix works
-- <code>rforge-mcp.regression</code> - Check for regressions
-- <code>rforge-mcp.health</code> - Overall package health</p>
+<p><strong>Selected modules / tools:</strong>
+- Bash: <code>Rscript -e 'devtools::test()'</code> — verify the fix works
+- <code>lib.deps</code> — check for downstream regressions in dependent packages
+- <code>lib.status</code> — overall package health snapshot</p>
 <p><strong>Example:</strong>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>User: &quot;Fixed edge case in mediation calculation&quot;
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>→ Pattern: BUG_FIX
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>→ Tools: [tests, regression, health]
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>→ Modules: [lib.deps, lib.status] + Bash tests
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>→ Output: &quot;Fix verified, no regressions, health score: 85/100&quot;
 </span></code></pre></div></p>
 <h3 id="3-cran_release">3. CRAN_RELEASE<a class="headerlink" href="#3-cran_release" title="Permanent link">&para;</a></h3>
 <p><strong>Triggers:</strong> "CRAN", "release", "submit", "publish"</p>
-<p><strong>Selected Tools:</strong>
-- <code>rforge-mcp.check</code> - R CMD check
-- <code>rforge-mcp.docs</code> - Documentation completeness
-- <code>rforge-mcp.deps</code> - Dependency validation
-- <code>rforge-mcp.health</code> - Overall readiness</p>
+<p><strong>Selected modules / tools:</strong>
+- Bash: <code>R CMD check --as-cran</code> — full CRAN compliance check
+- <code>/rforge:docs:check</code> body — documentation completeness
+- <code>lib.deps</code> — dependency validation
+- <code>lib.status</code> — overall readiness; <code>description-sync</code> skill verifies CHANGELOG ↔ DESCRIPTION</p>
 <p><strong>Example:</strong>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>User: &quot;Prepare for CRAN submission&quot;
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>→ Pattern: CRAN_RELEASE
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>→ Tools: [check, docs, deps, health]
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>→ Modules: [lib.deps, lib.status] + R CMD check + description-sync skill
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>→ Output: &quot;3 warnings to address, docs 95% complete, ready in 1-2 hours&quot;
 </span></code></pre></div></p>
 <h3 id="4-documentation">4. DOCUMENTATION<a class="headerlink" href="#4-documentation" title="Permanent link">&para;</a></h3>
 <p><strong>Triggers:</strong> "document", "docs", "README", "vignette"</p>
-<p><strong>Selected Tools:</strong>
-- <code>rforge-mcp.docs</code> - Documentation status
-- <code>rforge-mcp.examples</code> - Runnable examples check
-- <code>rforge-mcp.vignettes</code> - Vignette validation</p>
+<p><strong>Selected modules / tools:</strong>
+- <code>/rforge:docs:check</code> body — documentation status (NEWS.md, examples, vignettes)
+- Bash: <code>Rscript -e 'devtools::check_examples()'</code> — runnable examples
+- <code>description-sync</code> skill — DESCRIPTION ↔ CHANGELOG drift</p>
 <p><strong>Example:</strong>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>User: &quot;Update documentation for new features&quot;
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>→ Pattern: DOCUMENTATION
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>→ Tools: [docs, examples, vignettes]
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>→ Modules: docs:check prompt + Bash example-runner
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>→ Output: &quot;2 functions undocumented, 3 examples need updating&quot;
 </span></code></pre></div></p>
 <h3 id="5-dependency_update">5. DEPENDENCY_UPDATE<a class="headerlink" href="#5-dependency_update" title="Permanent link">&para;</a></h3>
 <p><strong>Triggers:</strong> "dependency", "upgrade", "version bump", "import"</p>
-<p><strong>Selected Tools:</strong>
-- <code>rforge-mcp.deps</code> - Dependency analysis
-- <code>rforge-mcp.impact</code> - Cross-package impact
-- <code>rforge-mcp.cascade</code> - Update planning</p>
+<p><strong>Selected modules / tools:</strong>
+- <code>lib.deps</code> (graph) — dependency analysis
+- <code>lib.deps</code> (impact) — cross-package impact
+- <code>/rforge:cascade</code> body — update planning prose</p>
 <p><strong>Example:</strong>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>User: &quot;Updated ggplot2 dependency to v3.5.0&quot;
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>→ Pattern: DEPENDENCY_UPDATE
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>→ Tools: [deps, impact, cascade]
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>→ Modules: [lib.deps] + cascade prompt
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>→ Output: &quot;5 packages affected, update order: base → extension1 → extension2&quot;
 </span></code></pre></div></p>
 <h3 id="6-general_status">6. GENERAL_STATUS<a class="headerlink" href="#6-general_status" title="Permanent link">&para;</a></h3>
 <p><strong>Triggers:</strong> "status", "health", "check", "overview"</p>
-<p><strong>Selected Tools:</strong>
-- <code>rforge-mcp.health</code> - Overall health
-- <code>rforge-mcp.git</code> - Git status
-- <code>rforge-mcp.tests</code> - Test summary</p>
+<p><strong>Selected modules / tools:</strong>
+- <code>lib.status</code> — overall health from DESCRIPTION + .STATUS
+- Bash: <code>git status</code> — repository state
+- Bash: <code>Rscript -e 'devtools::test()'</code> — test summary (when full run requested)</p>
 <p><strong>Example:</strong>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>User: &quot;What&#39;s the current status?&quot;
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>→ Pattern: GENERAL_STATUS
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>→ Tools: [health, git, tests]
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>→ Modules: [lib.status] + Bash git/test
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>→ Output: &quot;Health: 85/100, main branch clean, 42/45 tests passing&quot;
 </span></code></pre></div></p>
 <h2 id="parallel-execution">Parallel Execution<a class="headerlink" href="#parallel-execution" title="Permanent link">&para;</a></h2>
@@ -2897,7 +2925,7 @@ and the auto-extracted <a href="../reference/discovery/"><code>reference/discove
 </tr>
 </tbody>
 </table>
-<p><strong>Note:</strong> These are orchestration times. Actual MCP tool execution happens asynchronously in background.</p>
+<p><strong>Note:</strong> These are orchestration times. Actual <code>lib/</code> module execution happens asynchronously in background (each <code>python3 -m lib.&lt;module&gt;</code> subprocess).</p>
 <h2 id="mode-system-integration">Mode System Integration<a class="headerlink" href="#mode-system-integration" title="Permanent link">&para;</a></h2>
 <p>RForge's mode system controls <strong>which tools are called</strong> and <strong>how detailed the analysis is</strong>:</p>
 <h3 id="default-mode-10s">Default Mode (&lt;10s)<a class="headerlink" href="#default-mode-10s" title="Permanent link">&para;</a></h3>
@@ -2998,62 +3026,73 @@ and the auto-extracted <a href="../reference/discovery/"><code>reference/discove
 </span><span id="__span-17-21"><a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a>│                                          │
 </span><span id="__span-17-22"><a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a>╰──────────────────────────────────────────╯
 </span></code></pre></div></p>
-<h2 id="mcp-tool-integration">MCP Tool Integration<a class="headerlink" href="#mcp-tool-integration" title="Permanent link">&para;</a></h2>
-<p>RForge delegates to these RForge MCP server tools:</p>
+<h2 id="lib-module-integration">Lib Module Integration<a class="headerlink" href="#lib-module-integration" title="Permanent link">&para;</a></h2>
+<p>RForge orchestrates these <code>lib/</code> modules and Bash invocations:</p>
 <table>
 <thead>
 <tr>
-<th>Tool</th>
+<th>Surface</th>
 <th>Purpose</th>
 <th>Typical Time</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>rforge-mcp.health</code></td>
-<td>Package health metrics</td>
+<td><code>python3 -m lib.status</code></td>
+<td>Package + ecosystem health from DESCRIPTION + .STATUS</td>
 <td>2-3s</td>
 </tr>
 <tr>
-<td><code>rforge-mcp.tests</code></td>
-<td>Test execution status</td>
-<td>5-10s</td>
+<td><code>python3 -m lib.discovery</code></td>
+<td>Project structure detection (single/ecosystem/hybrid)</td>
+<td>&lt;2s</td>
 </tr>
 <tr>
-<td><code>rforge-mcp.coverage</code></td>
-<td>Test coverage analysis</td>
-<td>8-15s</td>
+<td><code>python3 -m lib.deps</code></td>
+<td>Dependency graph + impact analysis</td>
+<td>2-8s</td>
 </tr>
 <tr>
-<td><code>rforge-mcp.docs</code></td>
-<td>Documentation completeness</td>
-<td>3-5s</td>
+<td><code>python3 -m lib.init</code></td>
+<td>Initialize <code>~/.rforge/context.json</code> state file</td>
+<td>&lt;5s</td>
 </tr>
 <tr>
-<td><code>rforge-mcp.deps</code></td>
-<td>Dependency analysis</td>
-<td>2-4s</td>
+<td>Bash: <code>Rscript -e 'devtools::test()'</code></td>
+<td>Test execution</td>
+<td>5-30s</td>
 </tr>
 <tr>
-<td><code>rforge-mcp.impact</code></td>
-<td>Change impact assessment</td>
-<td>4-8s</td>
+<td>Bash: <code>Rscript -e 'covr::package_coverage()'</code></td>
+<td>Test coverage</td>
+<td>30-90s</td>
 </tr>
 <tr>
-<td><code>rforge-mcp.check</code></td>
-<td>R CMD check execution</td>
+<td>Bash: <code>R CMD check</code></td>
+<td>Full R CMD check (CRAN-equivalent)</td>
 <td>30-180s</td>
 </tr>
 <tr>
-<td><code>rforge-mcp.git</code></td>
-<td>Git status</td>
-<td>1s</td>
+<td>Bash: <code>git status</code> / <code>git log</code></td>
+<td>Repository state</td>
+<td>&lt;1s</td>
+</tr>
+<tr>
+<td><code>description-sync</code> skill</td>
+<td>DESCRIPTION ↔ CHANGELOG drift check</td>
+<td>&lt;1s</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Communication:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>RForge Plugin → Task Tool → RForge MCP Server → R Environment
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>/rforge:&lt;command&gt; → Claude reads commands/&lt;name&gt;.md → Claude orchestrates:
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    ├── python3 -m lib.&lt;module&gt;     (in-plugin Python; no external service)
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    ├── Bash: Rscript / R CMD ...    (R subprocesses for r:check / thorough)
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    └── Bash: git / grep / Read      (filesystem inspection)
 </span></code></pre></div></p>
+<p>No MCP server, no Node.js. The <code>description-sync</code> skill auto-discovers
+itself when Claude needs to verify DESCRIPTION version against the
+CHANGELOG.</p>
 <h2 id="project-structure-detection">Project Structure Detection<a class="headerlink" href="#project-structure-detection" title="Permanent link">&para;</a></h2>
 <p>RForge auto-detects three project types:</p>
 <h3 id="detection-algorithm">Detection Algorithm<a class="headerlink" href="#detection-algorithm" title="Permanent link">&para;</a></h3>
