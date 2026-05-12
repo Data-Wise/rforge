@@ -232,9 +232,9 @@ from a previous version, remove it (see
 
 ## 📝 Document Maintenance
 
-**Last Updated:** 2026-05-11
-**Plugin Version:** 1.3.0
-**Documentation Version:** 1.3.0
+**Last Updated:** 2026-05-12
+**Plugin Version:** 2.0.0
+**Documentation Version:** 2.0.0
 
 **Releases:** https://github.com/Data-Wise/rforge/releases
 

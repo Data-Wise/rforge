@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased] — staged for v2.0.0 (BREAKING)
+## [2.0.0] - 2026-05-12
 
 > **Breaking change:** 3 of 16 commands renamed to align with craft's hybrid
 > namespacing. The other 13 commands are unchanged. See
