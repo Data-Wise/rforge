@@ -189,7 +189,7 @@ No `~/.claude/settings.json` entries required since v1.3.0 — the plugin is ful
 
 ```text
 rforge/
-├── .claude-plugin/        # Plugin manifest + extras (v1.3.0)
+├── .claude-plugin/        # Plugin manifest + extras (v2.0.0)
 │   ├── plugin.json
 │   ├── marketplace.json
 │   ├── config.json

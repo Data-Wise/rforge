@@ -9,7 +9,7 @@
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
-## Upcoming in v2.0.0 (BREAKING)
+## What's new in v2.0.0 (BREAKING)
 
 - 🔀 **3 commands renamed** for cleaner namespacing — `/rforge:doc-check` → `/rforge:docs:check`, `/rforge:ecosystem-health` → `/rforge:health`, `/rforge:rpkg-check` → `/rforge:r:check`. The other 13 commands are unchanged. Typing an old name produces a helpful rename-error pointing at the new name — no silent failures. See the [v2.0.0 migration tutorial](migration/v2.0.0-rename.md) for the full mapping table and a `sed` recipe to mass-update local scripts.
 
@@ -263,7 +263,7 @@ Plugin settings in `plugin.json`:
 ```
 ~/.claude/plugins/rforge/
 ├── .claude-plugin/
-│   ├── plugin.json          # Plugin manifest (v1.3.0)
+│   ├── plugin.json          # Plugin manifest (v2.0.0)
 │   ├── marketplace.json     # Marketplace install metadata
 │   ├── config.json          # User-tunable options (CRAN mirror, etc.)
 │   ├── hooks/

@@ -80,7 +80,7 @@ Perfect for:
 ```
 rforge/
 ├── .claude-plugin/            # Claude Code plugin manifest + extras
-│   ├── plugin.json            # Plugin manifest (v1.3.0)
+│   ├── plugin.json            # Plugin manifest (v2.0.0)
 │   ├── marketplace.json       # Marketplace install metadata
 │   ├── config.json            # User-tunable options
 │   ├── hooks/
