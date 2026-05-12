@@ -24,7 +24,7 @@ graph LR
     subgraph Plugin[".claude-plugin/"]
         MP[marketplace.json<br/><i>install-time</i>]
         CFG[config.json<br/><i>plugin-load</i>]
-        CMD[commands/*.md<br/><i>15 slash commands</i>]
+        CMD[commands/*.md<br/><i>16 slash commands</i>]
         AGT[agents/orchestrator.md<br/><i>auto-delegation</i>]
         HK[hooks/pretooluse.py<br/><i>every Write/Edit</i>]
         SK[skills/validation/*.md<br/><i>auto-discovered</i>]

@@ -271,7 +271,7 @@ Plugin settings in `plugin.json`:
 │   └── skills/
 │       └── validation/
 │           └── description-sync.md  # DESCRIPTION ↔ NEWS.md drift check
-├── commands/                # 15 slash commands (/rforge:*)
+├── commands/                # 16 slash commands (/rforge:*)
 ├── agents/
 │   └── orchestrator.md      # Pattern recognition + delegation
 ├── lib/

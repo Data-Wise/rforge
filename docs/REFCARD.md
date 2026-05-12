@@ -202,7 +202,7 @@ rforge/
 │   ├── config.json
 │   ├── hooks/pretooluse.py
 │   └── skills/validation/description-sync.md
-├── commands/              # 15 slash commands (/rforge:*)
+├── commands/              # 16 slash commands (/rforge:*)
 ├── agents/                # 1 orchestrator agent
 │   └── orchestrator.md
 ├── scripts/               # Installation scripts
