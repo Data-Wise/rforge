@@ -601,10 +601,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#upcoming-in-v200-breaking" class="md-nav__link">
+  <a href="#whats-new-in-v200-breaking" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Upcoming in v2.0.0 (BREAKING)
+        What's new in v2.0.0 (BREAKING)
       
     </span>
   </a>
@@ -1757,10 +1757,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#upcoming-in-v200-breaking" class="md-nav__link">
+  <a href="#whats-new-in-v200-breaking" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Upcoming in v2.0.0 (BREAKING)
+        What's new in v2.0.0 (BREAKING)
       
     </span>
   </a>
@@ -2075,7 +2075,7 @@
 <a href="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev" /></a></p>
 <p><strong>R package ecosystem orchestrator for Claude Code — 16 commands, R-aware hooks, validation skills.</strong></p>
 <p>Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python <code>lib/</code> modules handle discovery, dependencies, status, and init. No MCP server required.</p>
-<h2 id="upcoming-in-v200-breaking">Upcoming in v2.0.0 (BREAKING)<a class="headerlink" href="#upcoming-in-v200-breaking" title="Permanent link">&para;</a></h2>
+<h2 id="whats-new-in-v200-breaking">What's new in v2.0.0 (BREAKING)<a class="headerlink" href="#whats-new-in-v200-breaking" title="Permanent link">&para;</a></h2>
 <ul>
 <li>🔀 <strong>3 commands renamed</strong> for cleaner namespacing — <code>/rforge:doc-check</code> → <code>/rforge:docs:check</code>, <code>/rforge:ecosystem-health</code> → <code>/rforge:health</code>, <code>/rforge:rpkg-check</code> → <code>/rforge:r:check</code>. The other 13 commands are unchanged. Typing an old name produces a helpful rename-error pointing at the new name — no silent failures. See the <a href="migration/v2.0.0-rename/">v2.0.0 migration tutorial</a> for the full mapping table and a <code>sed</code> recipe to mass-update local scripts.</li>
 </ul>
@@ -2341,7 +2341,7 @@ manually. See <a href="migration/rforge-mcp-deprecation/">migration guide</a>.</
 <p><strong>Plugin structure:</strong>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>~/.claude/plugins/rforge/
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>├── .claude-plugin/
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>│   ├── plugin.json          # Plugin manifest (v1.3.0)
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>│   ├── plugin.json          # Plugin manifest (v2.0.0)
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>│   ├── marketplace.json     # Marketplace install metadata
 </span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>│   ├── config.json          # User-tunable options (CRAN mirror, etc.)
 </span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>│   ├── hooks/
