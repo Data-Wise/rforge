@@ -2,6 +2,15 @@
 name: rforge:thorough
 description: Comprehensive R package analysis (status rollup plus user-run R checks)
 argument-hint: Optional context (e.g., "Prepare for CRAN release")
+arguments:
+  - name: context
+    description: What to focus the thorough analysis on (e.g., "CRAN prep")
+    required: false
+    type: string
+  - name: package
+    description: Optional package path (defaults to current directory)
+    required: false
+    type: string
 ---
 
 # /rforge:thorough - Comprehensive R Package Analysis

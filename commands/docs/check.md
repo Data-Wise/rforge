@@ -1,6 +1,16 @@
 ---
 name: rforge:docs:check
 description: Check for documentation drift and inconsistencies across packages
+arguments:
+  - name: package
+    description: Specific package to check (defaults to ecosystem-wide)
+    required: false
+    type: string
+  - name: detailed
+    description: Include examples and vignette cross-references
+    required: false
+    type: boolean
+    default: false
 ---
 
 # /rforge:docs:check - Documentation Drift Checker

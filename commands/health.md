@@ -1,6 +1,16 @@
 ---
 name: rforge:health
 description: Check health across R package ecosystem
+arguments:
+  - name: context
+    description: Optional focus area or package name
+    required: false
+    type: string
+  - name: format
+    description: Output format (text, json)
+    required: false
+    type: string
+    default: "text"
 ---
 
 # Ecosystem Health Check

@@ -65,6 +65,7 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - 📦 Installation: installation.md
   - 🚀 Quick Start: QUICK-START.md
   - 📖 Detailed Quick Start: quickstart.md
   - 📚 Reference Card: REFCARD.md

@@ -338,8 +338,8 @@ If a mode exceeds its time budget:
 
 - `/rforge:status` - Quick status check (also mode-aware)
 - `/rforge:quick` - Ultra-fast analysis (always < 10s, ignores modes)
-- `/rforge:plan` - Generate implementation plan from analysis
-- `/rforge:cascade` - Cascade dependency updates
+- `/rforge:cascade` - Cascade dependency updates across packages
+- `/rforge:thorough` - Comprehensive analysis with R subprocess checks
 
 ## Troubleshooting
 

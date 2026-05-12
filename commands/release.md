@@ -2,6 +2,16 @@
 name: rforge:release
 description: Plan CRAN submission sequence based on dependencies
 argument-hint: Optional package name or version
+arguments:
+  - name: package
+    description: Package to release (defaults to ecosystem-wide CRAN sequence)
+    required: false
+    type: string
+  - name: detailed
+    description: Show full submission sequence with reverse-dependency checks
+    required: false
+    type: boolean
+    default: false
 ---
 
 # /rforge:release - CRAN Release Planner

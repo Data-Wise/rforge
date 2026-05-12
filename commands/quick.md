@@ -1,6 +1,15 @@
 ---
 name: rforge:quick
 description: Ultra-fast ecosystem snapshot using only quick lib modules (< 10 seconds)
+arguments:
+  - name: context
+    description: Free-form context for the snapshot (used for narration only)
+    required: false
+    type: string
+  - name: package
+    description: Path to a specific package (defaults to current directory)
+    required: false
+    type: string
 ---
 
 # /rforge:quick - Ultra-Fast R Package Snapshot

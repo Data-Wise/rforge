@@ -2,6 +2,16 @@
 name: rforge:cascade
 description: Plan coordinated updates across dependent packages
 argument-hint: Optional version or change description
+arguments:
+  - name: context
+    description: Optional change description to plan around (e.g., "Update bootstrap algorithm")
+    required: false
+    type: string
+  - name: detailed
+    description: Show full update sequence with verification steps per package
+    required: false
+    type: boolean
+    default: false
 ---
 
 # /rforge:cascade - Cascade Update Planner

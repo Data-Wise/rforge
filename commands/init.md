@@ -1,6 +1,21 @@
 ---
 name: rforge:init
 description: Initialize rforge context for an R package directory (idempotent)
+arguments:
+  - name: path
+    description: Package or ecosystem root (defaults to current directory)
+    required: false
+    type: string
+  - name: quick
+    description: Skip comprehensive analysis (lighter context file)
+    required: false
+    type: boolean
+    default: false
+  - name: format
+    description: Output format (text, json)
+    required: false
+    type: string
+    default: "text"
 ---
 
 # /rforge:init - Initialize RForge Context
