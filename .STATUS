@@ -4,7 +4,19 @@ status: Active
 version: 1.3.0 (released)
 last_release: 2026-05-11 v1.3.0 (PR #5 dev → main, tag https://github.com/Data-Wise/rforge/releases/tag/v1.3.0, tap formula bumped to stable v1.3.0, manifest synced to match)
 
-worktrees: []
+worktrees:
+  - branch: feature/phase3-namespacing-v2
+    path: ~/.git-worktrees/rforge/feature-phase3-namespacing-v2
+    state: SCAFFOLDED
+    base: dev
+    spec: docs/specs/SPEC-phase3-namespacing-2026-05-11.md
+    orchestrate: ORCHESTRATE-phase3-namespacing.md (in worktree)
+    created: 2026-05-11
+    summary: |
+      Phase 3 of craft-parity roadmap — command namespacing for v2.0.0
+      (BREAKING). 6-phase plan: rename → stubs → tests → docs → tap-docs
+      → release. ORCHESTRATE file committed in worktree (commit 6fa5572);
+      implementation requires fresh Claude session in the worktree.
 
 recent:
   - date: 2026-05-11
