@@ -68,7 +68,7 @@ Parse the user's request to detect mode:
 - Cache validation
 - Environment inspection
 
-**Tools:** All RForge MCP tools with detailed flags
+**Tools:** All `lib/*` modules with `--format json` (recursive deps via `lib.deps graph`, complete file scans via `lib.discovery`, deep status via `lib.status`)
 
 **Time Budget:** SHOULD complete in < 2 minutes
 
@@ -92,7 +92,7 @@ Parse the user's request to detect mode:
 - Benchmark comparisons
 - Test execution time analysis
 
-**Tools:** `rforge_profile`, performance benchmarks, load time analysis
+**Tools:** R subprocess via `Bash` for profiling (`profvis`, `system.time`, `microbenchmark`); `lib.deps` for dependency-bloat detection; `lib.status` for ecosystem context. *Note: `lib/*` modules don't do code-level profiling — that delegates to R itself.*
 
 **Time Budget:** SHOULD complete in < 3 minutes
 
@@ -115,7 +115,7 @@ Parse the user's request to detect mode:
 - Reverse dependency checks
 - NEWS.md and version validation
 
-**Tools:** `rforge_validate`, `rforge_test_all`, CRAN checks
+**Tools:** `R CMD check --as-cran` (via `/rforge:r:check` or direct subprocess); `testthat::test_local()` (R); `lib.status` for ecosystem-level health; `description-sync` validation skill for NEWS.md / DESCRIPTION sync
 
 **Time Budget:** SHOULD complete in < 5 minutes
 
@@ -128,7 +128,7 @@ Parse the user's request to detect mode:
 
 ## Implementation Instructions
 
-You are orchestrating the analysis using RForge MCP tools. Follow this workflow:
+You are orchestrating the analysis using in-plugin `lib/*` modules (via `Bash` calling `python3 -m lib.<module>`) and R subprocesses (via `Bash` calling `R -e "..."` or `Rscript`). As of v1.3.0 the plugin is self-contained — no MCP server is involved. Follow this workflow:
 
 ### Step 1: Detect Mode
 
@@ -167,25 +167,27 @@ Start timer
 4. Return actionable summary
 
 **For Debug Mode:**
-1. Call all analysis tools with detailed flags
-2. Recursive dependency analysis
-3. Complete file scans
-4. Detailed error traces
-5. Environment diagnostics
+1. Run `python3 -m lib.discovery --format json` (complete ecosystem scan)
+2. Run `python3 -m lib.deps graph --format json` (recursive dependency analysis)
+3. Run `python3 -m lib.status --format json` (full health snapshot)
+4. Read `.STATUS` files per-package for blocker context
+5. Surface detailed error traces and environment diagnostics
 
 **For Optimize Mode:**
-1. Call `rforge_profile` for performance data
-2. Analyze load times
-3. Identify slow functions
-4. Check memory usage
-5. Benchmark critical paths
+1. Run R subprocess for profiling: `Rscript -e 'profvis::profvis(library(<pkg>); <hot path>)'`
+2. Measure load times: `Rscript -e 'system.time(library(<pkg>))'`
+3. Identify slow functions via the profvis output
+4. Check memory usage via `Rscript -e 'pryr::object_size(...)'` or `gc()`
+5. Run `python3 -m lib.deps impact` to surface dependency bloat
+6. Benchmark critical paths with `microbenchmark` (R)
 
 **For Release Mode:**
-1. Call `rforge_validate` for CRAN checks
-2. Run complete test suite
-3. Check documentation completeness
-4. Validate NEWS.md and version
-5. Check reverse dependencies
+1. Run `R CMD check --as-cran <pkg>` (via `/rforge:r:check` for smart parsing, or direct subprocess)
+2. Run complete test suite: `Rscript -e 'testthat::test_local("<pkg>")'`
+3. Check documentation completeness via `roxygen2::roxygenise()` + the `description-sync` validation skill
+4. Validate NEWS.md and DESCRIPTION version alignment (the `description-sync` skill catches drift)
+5. Run `python3 -m lib.status` for ecosystem-level release readiness
+6. Check reverse dependencies via R's `tools::package_dependencies(reverse=TRUE)` or `revdepcheck`
 
 ### Step 4: Format Output
 
@@ -363,7 +365,7 @@ When executing this command:
 
 1. **Parse mode** from user request (explicit flag or context clues)
 2. **Respect time budget** - default mode MUST be < 10s
-3. **Use Task tool** for delegation to RForge MCP with mode parameter
+3. **Use Bash tool** for `python3 -m lib.<module>` calls and R subprocess invocations (or **Task tool** with a subagent for parallel mode-specific workloads)
 4. **Format appropriately** based on format parameter
 5. **Always verify** results are actionable
 6. **Track timing** and warn if approaching budget
@@ -375,16 +377,26 @@ When executing this command:
 - NO automatic mode detection (explicit only, except context hints)
 - Always provide next steps based on findings
 
-**Example Task Delegation:**
+**Example Bash invocations per mode:**
 
+```bash
+# Default mode: ecosystem snapshot via lib/*
+python3 -m lib.discovery --format json
+python3 -m lib.status --format json
+
+# Debug mode: add deps graph + per-package .STATUS scan
+python3 -m lib.deps graph --format json
+cat /path/to/<pkg>/.STATUS 2>/dev/null
+
+# Optimize mode: delegate to R for profiling
+Rscript -e 'profvis::profvis({ library(medfit); medfit::mediate(...) })'
+
+# Release mode: CRAN validation
+R CMD check --as-cran /path/to/<pkg>
+Rscript -e 'testthat::test_local("/path/to/<pkg>")'
 ```
-Use Task tool to delegate to RForge MCP tools:
-- Mode: {{mode}}
-- Context: {{context}}
-- Time Budget: {{time_budget}}
-- Focus: [mode-specific focus areas]
-- Output Format: {{format}}
-```
+
+If parallelizing mode-specific workloads, use the **Task tool** with a subagent — but for the typical case, direct `Bash` invocations from this orchestrator are simpler and faster.
 
 ---
 
