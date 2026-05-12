@@ -168,6 +168,58 @@ for field in ('name:', 'description:', 'category:'):
 "
 }
 
+# v2.0.0 rename targets — the 3 NEW command files must exist at their
+# new paths AND have explicit `name:` frontmatter set to the new
+# colon-namespaced names. Colon-namespacing requires explicit frontmatter;
+# filename-based inference doesn't cover `r:check` etc. Without this
+# check, deleting the frontmatter from a renamed file would silently
+# break the slash-command resolution while leaving the file in place.
+rename_targets_present() {
+    python3 -c "
+import sys
+targets = {
+    'commands/docs/check.md': 'rforge:docs:check',
+    'commands/health.md':     'rforge:health',
+    'commands/r/check.md':    'rforge:r:check',
+}
+fail = 0
+for path, expected_name in targets.items():
+    try:
+        body = open(path).read()
+    except FileNotFoundError:
+        print(f'MISSING: {path} (rename target gone)', file=sys.stderr); fail = 1; continue
+    if f'name: {expected_name}' not in body:
+        print(f'{path}: frontmatter must contain \"name: {expected_name}\"', file=sys.stderr); fail = 1
+sys.exit(fail)
+"
+}
+
+# Every command must have a unique `name:` frontmatter value. Catches
+# copy-paste errors where two files claim the same slash-command name
+# (which would produce undefined resolution). Walks commands/**/*.md;
+# files without a `name:` field are ignored (some pre-frontmatter
+# commands still rely on filename inference and that's OK — they just
+# can't collide on a value they don't declare).
+command_names_unique() {
+    python3 -c "
+import pathlib, re, sys
+seen = {}
+fail = 0
+for p in sorted(pathlib.Path('commands').rglob('*.md')):
+    body = p.read_text()
+    m = re.search(r'^name:\s*(\S+)', body, re.MULTILINE)
+    if not m:
+        continue
+    name = m.group(1)
+    if name in seen:
+        print(f'NAME COLLISION: {name} appears in both {seen[name]} and {p}', file=sys.stderr)
+        fail = 1
+    else:
+        seen[name] = p
+sys.exit(fail)
+"
+}
+
 # v2.0.0 rename stubs — the 3 old command filenames must still exist as
 # rename-error stubs, each pointing at its new name. Asserts on the
 # contract (file present + key strings), not the exact wording, so this
@@ -260,6 +312,8 @@ run "package.json parses"     python3 -c "import json; json.load(open('package.j
 run "All 4 version sources agree (plugin/marketplace/package)" versions_match
 run "CHANGELOG has current version entry"          changelog_has_current_version
 run "v2.0.0 rename stubs present + point at new names" rename_stubs_present
+run "v2.0.0 rename targets present + have new-name frontmatter" rename_targets_present
+run "Command name: frontmatter values are unique"   command_names_unique
 
 # Docs site
 run "mkdocs.yml parses"            mkdocs_parses
