@@ -124,16 +124,15 @@ decisions:
         Estimated 3-4 sessions, not urgent — A already unblocks npm install.
 
 backlog:
-  - title: "Release v1.3.0 (dev → main + GitHub release + tap formula bump)"
-    notes: "Pre-flight done: 65/65 pytest, 23/23 test-all.sh, all 4 version sources still sync at 1.2.0 (needs bump). Path: /craft:release or manual dev→main PR per established playbook."
-  - title: "Path B B.4 cross-repo paperwork — archive data-wise/rforge-mcp on GitHub"
-    notes: "DEPRECATED.md drafted in docs/migration/rforge-mcp-deprecation.md. Per docs/migration/v1.3.0-post-merge-checklist.md, archive step executes AFTER v1.3.0 release ships. Manual: add DEPRECATED.md to data-wise/rforge-mcp + `gh repo archive` button."
   - title: "craft-parity Phase 3 — command namespacing (BREAKING, v2.0.0)"
+    notes: "Biggest open item. Rename all 16 /rforge:* commands per craft's namespacing scheme, write migration tutorial, bump major. Start with /brainstorm to scope rename mechanics + user-migration ergonomics before writing code."
   - title: "craft-parity Phase 4 — discovery engine + agents (v2.1.0)"
+    notes: "Depends on Phase 3 landing. Adds agent definitions that mirror craft's discovery engine."
   - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"
     spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
     notes: "lib/status.py shipped as a thin faithful port in v1.3.0. The 4-mode contract (default/debug/optimize/release with R subprocess) was descoped pending real-user input on what depth is wanted. Open a new SPEC when there's demand."
 
 shipped:
+  - "v1.3.0 — 2026-05-11 — Path B complete (rforge-mcp absorbed into lib/ pure-Python modules); /rforge:init promoted to first-class command (16 total); rforge-mcp local prototype tombstoned (was never public on GitHub or npm — SPEC scope-corrected); tap formula + manifest + docs Pages all synced; brew outdated UX verified via Cellar-rename trick"
   - "v1.2.0 — 2026-05-10 — craft parity foundations + post-merge polish + MCP decoupling"
   - "v1.1.0 — 2026-01-09 — initial standalone release"
