@@ -114,4 +114,4 @@ Next: Consider running /rforge:release to plan CRAN submission
 - `/rforge:capture` - Capture new tasks
 - `/rforge:next` - Get next task
 - `/rforge:cascade` - Plan doc updates
-- `/rforge:doc-check` - Verify documentation
+- `/rforge:docs:check` - Verify documentation

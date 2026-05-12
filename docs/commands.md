@@ -343,13 +343,13 @@ Build and visualize dependency graph across R package ecosystem.
 
 ## Documentation & Tasks
 
-### /rforge:doc-check
+### /rforge:docs:check
 
 Check for documentation drift and inconsistencies across packages.
 
 **Usage:**
 ```bash
-/rforge:doc-check
+/rforge:docs:check
 ```
 
 **No parameters**
@@ -357,7 +357,7 @@ Check for documentation drift and inconsistencies across packages.
 **Examples:**
 ```bash
 # Check documentation status
-/rforge:doc-check
+/rforge:docs:check
 ```
 
 **Validates:**
@@ -459,13 +459,13 @@ Get ecosystem-aware next task recommendation.
 
 ## Health Checks
 
-### /rforge:ecosystem-health
+### /rforge:health
 
 Comprehensive ecosystem health metrics with visual dashboard.
 
 **Usage:**
 ```bash
-/rforge:ecosystem-health [--format FORMAT]
+/rforge:health [--format FORMAT]
 ```
 
 **Parameters:**
@@ -474,10 +474,10 @@ Comprehensive ecosystem health metrics with visual dashboard.
 **Examples:**
 ```bash
 # Visual health dashboard
-/rforge:ecosystem-health
+/rforge:health
 
 # JSON metrics
-/rforge:ecosystem-health --format json
+/rforge:health --format json
 ```
 
 **Metrics:**
@@ -489,13 +489,13 @@ Comprehensive ecosystem health metrics with visual dashboard.
 
 ---
 
-### /rforge:rpkg-check
+### /rforge:r:check
 
 R CMD check integration with detailed error reporting.
 
 **Usage:**
 ```bash
-/rforge:rpkg-check [package]
+/rforge:r:check [package]
 ```
 
 **Parameters:**
@@ -504,10 +504,10 @@ R CMD check integration with detailed error reporting.
 **Examples:**
 ```bash
 # Check current package
-/rforge:rpkg-check
+/rforge:r:check
 
 # Check specific package
-/rforge:rpkg-check mypackage
+/rforge:r:check mypackage
 ```
 
 **Executes:**
@@ -527,9 +527,9 @@ R CMD check integration with detailed error reporting.
 | Time | Commands |
 |------|----------|
 | <10s | `status`, `quick`, `detect`, `deps` (visual), `next` |
-| <30s | `analyze` (default), `cascade`, `impact`, `doc-check` |
+| <30s | `analyze` (default), `cascade`, `impact`, `docs:check` |
 | <2min | `analyze` (debug/optimize) |
-| <5min | `thorough`, `analyze` (release), `rpkg-check` |
+| <5min | `thorough`, `analyze` (release), `r:check` |
 
 ### By Use Case
 
@@ -547,13 +547,13 @@ R CMD check integration with detailed error reporting.
 - `/rforge:analyze --mode release` - Full audit
 - `/rforge:thorough` - Comprehensive checks
 - `/rforge:release` - Plan submission order
-- `/rforge:rpkg-check` - R CMD check execution
+- `/rforge:r:check` - R CMD check execution
 
 **Ecosystem Management:**
 - `/rforge:detect` - Understand structure
 - `/rforge:deps` - Visualize dependencies
 - `/rforge:cascade` - Plan coordinated updates
-- `/rforge:ecosystem-health` - Overall metrics
+- `/rforge:health` - Overall metrics
 
 ## Global Flags
 

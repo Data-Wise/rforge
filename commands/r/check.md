@@ -1,3 +1,8 @@
+---
+name: rforge:r:check
+description: Run R CMD check on package with smart output parsing
+---
+
 # R Package Quick Check
 
 You are performing a quick health check on an R package.

@@ -1,3 +1,8 @@
+---
+name: rforge:health
+description: Check health across R package ecosystem
+---
+
 # Ecosystem Health Check
 
 You are conducting a comprehensive health check of the MediationVerse R package ecosystem.

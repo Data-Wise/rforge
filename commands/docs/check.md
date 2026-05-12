@@ -1,9 +1,9 @@
 ---
-name: rforge:doc-check
+name: rforge:docs:check
 description: Check for documentation drift and inconsistencies across packages
 ---
 
-# /rforge:doc-check - Documentation Drift Checker
+# /rforge:docs:check - Documentation Drift Checker
 
 Check for documentation inconsistencies and drift across your R package ecosystem.
 
@@ -20,13 +20,13 @@ Uses the `rforge_doc_check` MCP tool to:
 
 ```bash
 # Check all documentation
-/rforge:doc-check
+/rforge:docs:check
 
 # Check specific package
-/rforge:doc-check medfit
+/rforge:docs:check medfit
 
 # Detailed check with examples
-/rforge:doc-check --detailed
+/rforge:docs:check --detailed
 ```
 
 ## Output
