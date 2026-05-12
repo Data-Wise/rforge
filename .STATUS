@@ -1,8 +1,8 @@
 project: rforge
 updated: 2026-05-12
 status: Active
-version: 1.3.0 (released); v2.0.0 staged on dev (BREAKING rename, awaiting release pipeline)
-last_release: 2026-05-11 v1.3.0 (PR #5 dev → main, tag https://github.com/Data-Wise/rforge/releases/tag/v1.3.0, tap formula bumped to stable v1.3.0, manifest synced to match)
+version: 2.0.0 (released)
+last_release: 2026-05-12 v2.0.0 BREAKING (PR #8 dev → main commit 5d3ed95, tag https://github.com/Data-Wise/rforge/releases/tag/v2.0.0, tap formula + manifest synced to v2.0.0, feedback thread at issue #9)
 
 worktrees: []
 
@@ -159,20 +159,20 @@ decisions:
         Estimated 3-4 sessions, not urgent — A already unblocks npm install.
 
 backlog:
-  - title: "Phase 5 — homebrew-tap docs/formulas/plugins.md update for v2.0.0"
-    notes: "Cross-repo. Update rforge install instructions in the tap site to reference v2.0.0 names (mostly install-time, not slash-command refs, but verify). Quick (~30 min). Lives in ~/projects/dev-tools/homebrew-tap; per CLAUDE.md tap pushes from rforge-session work without bypass."
-  - title: "Phase 6 — Release v2.0.0 (dev → main + GitHub release + tap formula bump)"
-    notes: "After Phase 5. /craft:release playbook same as v1.3.0 but with major-version emphasis. 4-source version bump, CHANGELOG [Unreleased] → [2.0.0], tap formula update + manifest sync (per reference_homebrew_tap_drift memory). Include GitHub Discussions thread for user feedback on renames (informs the deferred quick/thorough rename decision)."
+  - title: "Phase 4 — discovery engine + agents (v2.1.0)"
+    notes: "Last craft-parity item. Adds agent definitions mirroring craft's discovery engine. Most natural to bundle with Issue #7 (analyze.md cleanup) since that command's orchestration prose is what gets restructured."
   - title: "Issue #7 — commands/analyze.md MCP-ref cleanup"
     url: https://github.com/Data-Wise/rforge/issues/7
-    notes: "9 stale rforge_X refs in load-bearing orchestration prose, deferred from PR #6. Needs before/after smoke-test on a real R ecosystem to confirm no behavior change in /rforge:analyze. Most natural to do as part of Phase 4 since that's when this command's behavior is most likely to be revisited anyway."
-  - title: "Phase 4 — discovery engine + agents (v2.1.0)"
-    notes: "After v2.0.0 release. Adds agent definitions mirroring craft's discovery engine. Last craft-parity item."
+    notes: "9 stale rforge_X refs in load-bearing orchestration prose, deferred from PR #6. Needs before/after smoke-test on a real R ecosystem to confirm no behavior change. Bundle with Phase 4."
+  - title: "Issue #9 — v2.0.0 rename feedback collection"
+    url: https://github.com/Data-Wise/rforge/issues/9
+    notes: "Open-ended feedback thread for rename ergonomics + the deferred quick/thorough rename decision. Watch for ~2-4 weeks; decisions inform v2.1.0 scope."
   - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"
     spec: docs/specs/SPEC-mcp-absorb-2026-05-10.md
     notes: "lib/status.py shipped as a thin faithful port in v1.3.0. The 4-mode contract (default/debug/optimize/release with R subprocess) was descoped pending real-user input on what depth is wanted. Open a new SPEC when there's demand."
 
 shipped:
+  - "v2.0.0 — 2026-05-12 — BREAKING: Phase 3 command namespacing — 3 of 16 commands renamed (doc-check → docs:check, ecosystem-health → health, rpkg-check → r:check); old names retained as rename-error stubs through v2.x; tests 29/29 (+6 new rename-specific); v1.3.0+ post-MCP doc cleanup bundled; tap formula + manifest synced; feedback thread at issue #9"
   - "v1.3.0 — 2026-05-11 — Path B complete (rforge-mcp absorbed into lib/ pure-Python modules); /rforge:init promoted to first-class command (16 total); rforge-mcp local prototype tombstoned (was never public on GitHub or npm — SPEC scope-corrected); tap formula + manifest + docs Pages all synced; brew outdated UX verified via Cellar-rename trick"
   - "v1.2.0 — 2026-05-10 — craft parity foundations + post-merge polish + MCP decoupling"
   - "v1.1.0 — 2026-01-09 — initial standalone release"
