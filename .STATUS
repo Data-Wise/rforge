@@ -192,11 +192,7 @@ backlog:
   # Medium-term work (v2.1.0 horizon)
   - title: "Phase 4 — discovery engine + agents (v2.1.0)"
     priority: medium
-    notes: "Last craft-parity item. Adds agent definitions mirroring craft's discovery engine. Most natural to bundle with Issue #7 since that command's orchestration prose is what gets restructured."
-  - title: "Issue #7 — commands/analyze.md MCP-ref cleanup"
-    url: https://github.com/Data-Wise/rforge/issues/7
-    priority: medium
-    notes: "9 stale rforge_X refs in load-bearing orchestration prose, deferred from PR #6. Needs before/after smoke-test on a real R ecosystem to confirm no behavior change. Bundle with Phase 4."
+    notes: "Last craft-parity item. Adds agent definitions mirroring craft's discovery engine."
 
   # Parked (waits on external signal)
   - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"
