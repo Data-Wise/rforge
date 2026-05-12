@@ -22,7 +22,7 @@ You are conducting a comprehensive health check of the MediationVerse R package 
 
 ### Step 1: Package Status
 For each package, check:
-- [ ] R CMD check status (use r_check tool if available)
+- [ ] R CMD check status (run `R CMD check <path>` via Bash if a fresh run is needed)
 - [ ] Test coverage (aim for >80%)
 - [ ] Documentation completeness
 - [ ] DESCRIPTION version and dependencies
@@ -98,7 +98,14 @@ For each package, check:
 - statistical-research-workflow
 
 ## Tools to Use
-- r_check (for each package)
-- r_test (for each package)
+- Bash (to run `R CMD check`, `Rscript -e 'devtools::test()'` per package)
 - Read (for DESCRIPTION files)
 - Glob (for finding test files)
+- `lib/status` (for the lightweight non-R-subprocess health snapshot)
+
+## Related Commands
+
+- `/rforge:status` - Fast ecosystem-wide status dashboard (no R subprocess)
+- `/rforge:r:check` - Single-package R CMD check with detailed output
+- `/rforge:thorough` - Comprehensive multi-package analysis with R CMD check
+- `/rforge:deps` - Dependency graph (sibling perspective on ecosystem)

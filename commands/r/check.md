@@ -22,10 +22,11 @@ Read DESCRIPTION file:
 - R version requirement
 
 ### Step 2: R CMD Check
-Run r_check tool with default settings.
+Run `R CMD check` via the Bash tool (e.g., `R CMD check --as-cran <path>`).
 
 ### Step 3: Test Summary
-Run r_test tool to get test results.
+Run the package's tests via Bash (e.g., `Rscript -e 'devtools::test()'`).
+`R CMD check` also runs them and surfaces failures.
 
 ### Step 4: Documentation Check
 - Are all exported functions documented?
@@ -69,7 +70,12 @@ Run r_test tool to get test results.
 ```
 
 ## Tools to Use
-- r_check
-- r_test
+- Bash (to run `R CMD check`, `Rscript`, `devtools::test()`)
 - Read (for DESCRIPTION, README)
 - Grep (for TODOs, FIXMEs)
+
+## Related Commands
+
+- `/rforge:thorough` - Comprehensive multi-package check including R CMD check
+- `/rforge:status` - Lightweight health snapshot without R subprocess
+- `/rforge:docs:check` - Documentation drift check (complements R CMD check)

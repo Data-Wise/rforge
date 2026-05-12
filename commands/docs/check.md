@@ -9,7 +9,7 @@ Check for documentation inconsistencies and drift across your R package ecosyste
 
 ## What It Does
 
-Uses the `rforge_doc_check` MCP tool to:
+Helps you:
 - Verify NEWS.md completeness
 - Check API contract consistency
 - Find outdated examples

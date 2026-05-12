@@ -10,7 +10,7 @@ Mark tasks complete and automatically trigger documentation cascade updates.
 
 ## What It Does
 
-Uses the `rforge_complete` MCP tool to:
+Helps you:
 - Mark task as complete in .STATUS
 - Detect documentation changes needed
 - Auto-update NEWS.md if needed
