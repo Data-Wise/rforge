@@ -54,9 +54,9 @@ Perfect for:
 - One-page printable reference
 
 **Contents:**
-- All commands in tables (15 total)
+- All commands in tables (16 total)
 - Pattern recognition guide
-- RForge MCP tools overview
+- `lib/` modules overview
 - Common workflows
 - Troubleshooting quick reference
 
@@ -87,7 +87,7 @@ rforge/
 │   │   └── pretooluse.py      # R-aware Write/Edit guard
 │   └── skills/
 │       └── validation/        # Autonomous validation skills
-├── commands/                  # 15 slash commands (/rforge:*)
+├── commands/                  # 16 slash commands (/rforge:*)
 ├── agents/                    # Orchestrator agent
 │   └── orchestrator.md        # Pattern recognition + delegation
 ├── docs/                      # 👈 You are here
@@ -130,7 +130,7 @@ rforge/
 **Troubleshoot issues**
 → [QUICK-START.md](QUICK-START.md#troubleshooting) or [REFCARD.md](REFCARD.md#troubleshooting)
 
-**Configure RForge MCP**
+**Installation & setup**
 → [QUICK-START.md](QUICK-START.md#prerequisites)
 
 ---
@@ -142,11 +142,11 @@ The orchestrator uses a **4-step process**:
 1. **Pattern Recognition** - Analyzes your task description
    - CODE_CHANGE, BUG_FIX, RELEASE_PREP, HEALTH_CHECK, FEATURE_ADD
 
-2. **Tool Selection** - Picks appropriate RForge MCP tools
-   - impact, tests, docs, health, rdoc
+2. **Module Selection** - Picks appropriate `lib/` modules + Bash tools
+   - `lib.discovery`, `lib.deps`, `lib.status`, `lib.init`, R CMD check, etc.
 
-3. **Parallel Execution** - Calls multiple tools simultaneously
-   - 4 tools × 8 sec = 8 sec total (not 32 sec!)
+3. **Parallel Execution** - Invokes multiple modules simultaneously
+   - 4 modules × 8 sec = 8 sec total (not 32 sec!)
 
 4. **Results Synthesis** - Combines into actionable summary
    - Impact + quality + maintenance + next steps
@@ -219,20 +219,14 @@ brew uninstall rforge
 
 ## ⚙️ Configuration
 
-RForge MCP server must be configured in `~/.claude/settings.json`:
+User-tunable settings live in `.claude-plugin/config.json` (CRAN mirror,
+vignette engine, R version pin, CLAUDE.md budget). See
+[configuration.md](configuration.md) for the full option list.
 
-```json
-{
-  "mcpServers": {
-    "rforge-mcp": {
-      "command": "node",
-      "args": ["/path/to/rforge-mcp/dist/index.js"]
-    }
-  }
-}
-```
-
-See [QUICK-START.md](QUICK-START.md#prerequisites) for details.
+No `~/.claude/settings.json` entries required since v1.3.0 — the plugin
+runs entirely in-process. If you have a stale `mcpServers.rforge` entry
+from a previous version, remove it (see
+[migration/rforge-mcp-deprecation.md](migration/rforge-mcp-deprecation.md)).
 
 ---
 

@@ -109,5 +109,5 @@ exit 0
 ## See Also
 
 - `/rforge:release` — CRAN submission planner.
-- `/rforge:doc-check` — broader documentation drift.
+- `/rforge:docs:check` — broader documentation drift.
 - `.claude-plugin/hooks/pretooluse.py` — also validates Version SemVer on every Edit.

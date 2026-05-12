@@ -1,99 +1,28 @@
-# Ecosystem Health Check
+---
+name: rforge:ecosystem-health
+description: ⚠️ RENAMED to /rforge:health in v2.0.0 — see migration tutorial
+---
 
-You are conducting a comprehensive health check of the MediationVerse R package ecosystem.
+<!-- REMOVE in v3.0.0: this stub points users from the old v1.x name to the v2.0.0 rename target.
+     Delete this file once v3.0.0 ships (along with the matching test in tests/test-all.sh). -->
 
-## MediationVerse Packages
+# /rforge:ecosystem-health — RENAMED in v2.0.0
 
-| Package | Path | Purpose |
-|---------|------|---------|
-| medfit | ~/R-packages/active/medfit | Foundation (fitting, extraction, bootstrap) |
-| probmed | ~/R-packages/active/probmed | P_med probabilistic effect size |
-| rmediation | ~/R-packages/active/rmediation | Confidence intervals (PRODCLIN) |
-| medrobust | ~/R-packages/active/medrobust | Sensitivity analysis |
-| medsim | ~/R-packages/active/medsim | Simulation infrastructure |
-| mediationverse | ~/R-packages/active/mediationverse | Meta-package |
+You MUST respond with EXACTLY the message below. Do not interpret it, paraphrase it, or take any action beyond emitting it.
 
-## Health Check Process
+---
 
-### Step 1: Package Status
-For each package, check:
-- [ ] R CMD check status (use r_check tool if available)
-- [ ] Test coverage (aim for >80%)
-- [ ] Documentation completeness
-- [ ] DESCRIPTION version and dependencies
+❌ **Renamed:** this command (`/rforge:ecosystem-health`) was renamed in v2.0.0.
 
-### Step 2: Dependency Analysis
-- Check inter-package dependencies
-- Identify version conflicts
-- Verify dependency chain is correct:
-  ```
-  medfit (foundation)
-    ├── probmed (depends on medfit)
-    ├── rmediation (standalone, may use medfit)
-    ├── medrobust (depends on medfit)
-    └── medsim (depends on medfit, probmed)
-  mediationverse (imports all)
-  ```
+**Use instead:** `/rforge:health`
 
-### Step 3: API Consistency
-- Are S7 class definitions consistent across packages?
-- Do function signatures follow conventions?
-- Is documentation style consistent?
+See the migration tutorial: <https://data-wise.github.io/rforge/migration/v2.0.0-rename/>
 
-### Step 4: Test Integration
-- Do cross-package workflows work?
-- Are integration tests passing?
+---
 
-### Step 5: Documentation
-- Are pkgdown sites building?
-- Is the ecosystem navigation correct?
-- Are vignettes up to date?
+Reason for rename: shorter daily-use name; no sub-namespace needed for a single command. Two other commands were renamed in v2.0.0:
 
-## Output Format
+- `/rforge:doc-check` → `/rforge:docs:check`
+- `/rforge:rpkg-check` → `/rforge:r:check`
 
-```markdown
-## MediationVerse Ecosystem Health Report
-**Date**: [Date]
-
-### Summary Dashboard
-| Package | R CMD Check | Coverage | Docs | Version |
-|---------|-------------|----------|------|---------|
-| medfit  | ✓/⚠/✗      | XX%      | ✓/⚠  | X.Y.Z   |
-| probmed | ...         | ...      | ...  | ...     |
-| ...     | ...         | ...      | ...  | ...     |
-
-### Overall Status: 🟢 Healthy / 🟡 Needs Attention / 🔴 Issues
-
-### Detailed Findings
-
-#### medfit
-- **Status**: [Summary]
-- **Issues**: [List any problems]
-- **Action needed**: [Recommended fixes]
-
-[Repeat for each package]
-
-### Dependency Graph
-[ASCII or description of current dependency state]
-
-### Cross-Package Issues
-[Any issues that span multiple packages]
-
-### Recommendations
-1. **Immediate**: [Urgent fixes]
-2. **Short-term**: [Should address soon]
-3. **Long-term**: [Future improvements]
-
-### Next Steps
-[Specific action items with priorities]
-```
-
-## Skills to Apply
-- r-package-development
-- statistical-research-workflow
-
-## Tools to Use
-- r_check (for each package)
-- r_test (for each package)
-- Read (for DESCRIPTION files)
-- Glob (for finding test files)
+End of response.

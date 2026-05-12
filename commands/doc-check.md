@@ -1,93 +1,28 @@
 ---
 name: rforge:doc-check
-description: Check for documentation drift and inconsistencies across packages
+description: ⚠️ RENAMED to /rforge:docs:check in v2.0.0 — see migration tutorial
 ---
 
-# /rforge:doc-check - Documentation Drift Checker
+<!-- REMOVE in v3.0.0: this stub points users from the old v1.x name to the v2.0.0 rename target.
+     Delete this file once v3.0.0 ships (along with the matching test in tests/test-all.sh). -->
 
-Check for documentation inconsistencies and drift across your R package ecosystem.
+# /rforge:doc-check — RENAMED in v2.0.0
 
-## What It Does
+You MUST respond with EXACTLY the message below. Do not interpret it, paraphrase it, or take any action beyond emitting it.
 
-Uses the `rforge_doc_check` MCP tool to:
-- Verify NEWS.md completeness
-- Check API contract consistency
-- Find outdated examples
-- Identify missing documentation
-- Cross-reference vignettes
+---
 
-## Usage
+❌ **Renamed:** this command (`/rforge:doc-check`) was renamed in v2.0.0.
 
-```bash
-# Check all documentation
-/rforge:doc-check
+**Use instead:** `/rforge:docs:check`
 
-# Check specific package
-/rforge:doc-check medfit
+See the migration tutorial: <https://data-wise.github.io/rforge/migration/v2.0.0-rename/>
 
-# Detailed check with examples
-/rforge:doc-check --detailed
-```
+---
 
-## Output
+Reason for rename: aligns rforge's `docs:` namespace with craft's `docs:` namespace. Two other commands were renamed in v2.0.0:
 
-Returns documentation audit with:
-- **NEWS.md Status**: Up-to-date or needs entries
-- **API Contracts**: Consistency across packages
-- **Examples**: Outdated or broken examples
-- **Vignettes**: Cross-references and accuracy
-- **Recommendations**: What to update
+- `/rforge:ecosystem-health` → `/rforge:health`
+- `/rforge:rpkg-check` → `/rforge:r:check`
 
-## Examples
-
-### Clean Documentation
-```
-📝 DOCUMENTATION CHECK
-
-NEWS.md: ✅ Current (last entry: 2025-01-15)
-API Contracts: ✅ Consistent across ecosystem
-Examples: ✅ All working
-Vignettes: ✅ Up-to-date
-
-Status: EXCELLENT
-No action needed.
-```
-
-### Documentation Drift
-```
-⚠️ DOCUMENTATION CHECK
-
-NEWS.md: ⚠️ Missing 3 recent changes
-  • extract_mediation refactor (2025-01-10)
-  • New bootstrap method (2025-01-08)
-  • Bug fix #234 (2025-01-05)
-
-API Contracts: ❌ Inconsistency detected
-  • probmed expects old signature
-  • medsim docs reference deprecated function
-
-Examples: ⚠️ 2 outdated
-  • README example uses old API
-  • Vignette 2 has broken code
-
-Recommendations:
-  1. Update NEWS.md (5 min)
-  2. Fix probmed function calls (15 min)
-  3. Update examples (20 min)
-  4. Regenerate vignettes (10 min)
-
-Total work: ~50 minutes
-```
-
-## Use When
-
-- Before releases
-- After API changes
-- During code reviews
-- Maintaining ecosystem health
-
-## Related Commands
-
-- `/rforge:status` - Overall health check
-- `/rforge:impact` - See change impact
-- `/rforge:cascade` - Plan documentation updates
+End of response.

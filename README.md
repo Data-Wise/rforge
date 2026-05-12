@@ -9,6 +9,10 @@
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
+## Upcoming in v2.0.0 (BREAKING)
+
+- 🔀 **3 commands renamed** for cleaner namespacing — `/rforge:doc-check` → `/rforge:docs:check`, `/rforge:ecosystem-health` → `/rforge:health`, `/rforge:rpkg-check` → `/rforge:r:check`. The other 13 commands are unchanged. Typing an old name produces a helpful rename-error pointing at the new name — no silent failures. See [`docs/migration/v2.0.0-rename.md`](docs/migration/v2.0.0-rename.md) for the full mapping table and a `sed` recipe to mass-update local scripts.
+
 ## What's new in v1.3.0
 
 - 🎯 **MCP absorption complete** — `rforge-mcp` has been absorbed into the plugin. All 7 implemented tools now ship as pure-Python `lib/` modules. The MCP server is no longer required (and is being archived). See [`docs/migration/rforge-mcp-deprecation.md`](docs/migration/rforge-mcp-deprecation.md).
@@ -248,29 +252,21 @@ RForge automatically loads when you open Claude Desktop. Commands work the same 
 > `rforge-orchestrator` setup. v1.3.0 doesn't use any MCP server, so the
 > end state is just: remove these entries entirely.
 
-If you previously used `rforge-orchestrator` from the monorepo:
-
-**Important:** The MCP server name changed from `rforge-orchestrator` to `rforge-mcp` in v1.2.x, then `rforge-mcp` was absorbed into the plugin in v1.3.0.
-
-**Update your settings:**
+If your `~/.claude/settings.json` has either an `rforge-orchestrator` or `rforge-mcp` entry under `mcpServers`, **delete it**:
 
 ```json
-// OLD (remove this):
+// Delete BOTH of these patterns if present:
 {
   "mcpServers": {
-    "rforge-orchestrator": { ... }
-  }
-}
-
-// NEW (use this):
-{
-  "mcpServers": {
+    "rforge-orchestrator": { ... },
     "rforge-mcp": { ... }
   }
 }
 ```
 
-**See [MCP-MIGRATION.md](MCP-MIGRATION.md) for complete migration guide.**
+In v1.3.0+ the plugin runs entirely in-process via `lib/` modules — there's no MCP server to configure. The plugin loads via `/plugin install rforge`; no `settings.json` entries are required.
+
+For the full transition narrative, see [`docs/migration/rforge-mcp-deprecation.md`](docs/migration/rforge-mcp-deprecation.md).
 
 ## Pattern Recognition
 

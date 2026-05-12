@@ -1,70 +1,28 @@
-# R Package Quick Check
+---
+name: rforge:rpkg-check
+description: ⚠️ RENAMED to /rforge:r:check in v2.0.0 — see migration tutorial
+---
 
-You are performing a quick health check on an R package.
+<!-- REMOVE in v3.0.0: this stub points users from the old v1.x name to the v2.0.0 rename target.
+     Delete this file once v3.0.0 ships (along with the matching test in tests/test-all.sh). -->
 
-## Task
+# /rforge:rpkg-check — RENAMED in v2.0.0
 
-Check R package at: **$ARGUMENTS**
+You MUST respond with EXACTLY the message below. Do not interpret it, paraphrase it, or take any action beyond emitting it.
 
-If no path specified, check current directory.
+---
 
-## Quick Check Process
+❌ **Renamed:** this command (`/rforge:rpkg-check`) was renamed in v2.0.0.
 
-### Step 1: Basic Info
-Read DESCRIPTION file:
-- Package name and version
-- Dependencies (Imports, Suggests)
-- R version requirement
+**Use instead:** `/rforge:r:check`
 
-### Step 2: R CMD Check
-Run r_check tool with default settings.
+See the migration tutorial: <https://data-wise.github.io/rforge/migration/v2.0.0-rename/>
 
-### Step 3: Test Summary
-Run r_test tool to get test results.
+---
 
-### Step 4: Documentation Check
-- Are all exported functions documented?
-- Do examples run without error?
-- Is there a README?
+Reason for rename: R-specific commands get an `r:` prefix for cleaner grouping. Two other commands were renamed in v2.0.0:
 
-### Step 5: Code Quality
-- Any obvious style issues?
-- Are there TODOs or FIXMEs?
-- Is test coverage adequate?
+- `/rforge:doc-check` → `/rforge:docs:check`
+- `/rforge:ecosystem-health` → `/rforge:health`
 
-## Output Format
-
-```markdown
-## Package Check: [package-name] v[version]
-
-### Status: 🟢 / 🟡 / 🔴
-
-### R CMD Check
-- Errors: X
-- Warnings: Y
-- Notes: Z
-
-### Tests
-- Passed: X
-- Failed: Y
-- Coverage: Z%
-
-### Documentation
-- [ ] All exports documented
-- [ ] Examples run
-- [ ] README exists
-
-### Issues Found
-1. [Issue 1]
-2. [Issue 2]
-
-### Recommended Actions
-1. [Action 1]
-2. [Action 2]
-```
-
-## Tools to Use
-- r_check
-- r_test
-- Read (for DESCRIPTION, README)
-- Grep (for TODOs, FIXMEs)
+End of response.

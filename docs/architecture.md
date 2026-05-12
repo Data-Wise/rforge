@@ -4,9 +4,13 @@ Deep dive into how RForge works internally: auto-delegation orchestration, patte
 
 ## Overview
 
-RForge is an **orchestrator plugin** that intelligently delegates to RForge MCP server tools. It doesn't execute R code directly - instead, it acts as an intelligent coordinator that recognizes patterns, selects appropriate tools, executes them in parallel, and synthesizes results.
+RForge is a **self-contained Claude Code plugin** for R package ecosystems. Slash commands are markdown prompts that Claude reads; the plugin ships pure-Python `lib/` modules (discovery, deps, status, init) that Claude orchestrates via Bash to gather ecosystem data, then synthesizes results into actionable summaries.
 
-**Key Innovation:** Auto-delegation with parallel execution that completes 4 tool calls in the time it takes to execute 1.
+**Architecture in one line (v1.3.0+):** `/rforge:<command>` → Claude reads `commands/<name>.md` → Claude orchestrates `python3 -m lib.<module>` calls + Bash tools → synthesized output.
+
+**Key innovation:** Auto-delegation with parallel `lib/` invocations — multiple modules complete in the time it would take to run them sequentially.
+
+> **Historical note:** v1.0–v1.2 of rforge orchestrated an external `rforge-mcp` MCP server. v1.3.0 absorbed those tools as pure-Python `lib/` modules; no MCP server is required at runtime. See [Path B SPEC](specs/SPEC-mcp-absorb-2026-05-10.md) for the migration narrative. This document describes the v1.3.0+ architecture; some legacy sections below retain MCP-era examples where the underlying concept (parallel orchestration, pattern recognition) hasn't changed.
 
 ## Plugin Surface
 
@@ -24,17 +28,17 @@ graph LR
     subgraph Plugin[".claude-plugin/"]
         MP[marketplace.json<br/><i>install-time</i>]
         CFG[config.json<br/><i>plugin-load</i>]
-        CMD[commands/*.md<br/><i>15 slash commands</i>]
+        CMD[commands/*.md<br/><i>16 slash commands</i>]
         AGT[agents/orchestrator.md<br/><i>auto-delegation</i>]
         HK[hooks/pretooluse.py<br/><i>every Write/Edit</i>]
         SK[skills/validation/*.md<br/><i>auto-discovered</i>]
     end
 
-    subgraph MCP["RForge MCP server"]
-        T1[health]
-        T2[tests]
-        T3[docs]
-        T4[impact]
+    subgraph LIB["lib/ modules (v1.3.0+)"]
+        L1[lib.discovery]
+        L2[lib.deps]
+        L3[lib.status]
+        L4[lib.init]
     end
 
     subgraph R["R environment"]
@@ -49,14 +53,14 @@ graph LR
     HK -->|reads| DESCR
     HK -->|protects| RD
     CMD -->|delegates| AGT
-    AGT -->|invokes| T1
-    AGT -->|invokes| T2
-    AGT -->|invokes| T3
-    AGT -->|invokes| T4
-    T1 --> R
-    T2 --> R
-    T3 --> R
-    T4 --> R
+    AGT -->|python3 -m| L1
+    AGT -->|python3 -m| L2
+    AGT -->|python3 -m| L3
+    AGT -->|python3 -m| L4
+    L1 --> DESCR
+    L2 --> DESCR
+    L3 --> DESCR
+    L4 --> DESCR
     SK -.->|optional| DESCR
     CFG -.->|reads| CMD
     CFG -.->|reads| AGT
@@ -71,8 +75,8 @@ graph LR
 | `hooks/pretooluse.py` | Every `Write`/`Edit` tool call | `.claude-plugin/hooks/` | Claude Code hook system |
 | `skills/validation/*.md` | When Claude needs to verify state | `.claude-plugin/skills/` | Claude Code skill discovery |
 
-The orchestrator-and-MCP machinery (covered in the rest of this document)
-is the *runtime brain*. The four pieces above are the *static surface*
+The orchestrator-and-`lib/` machinery (covered in the rest of this document)
+is the *runtime brain*. The pieces above are the *static surface*
 the plugin advertises to Claude Code.
 
 For a user-facing tour of the new hook + skill, see
@@ -80,91 +84,71 @@ For a user-facing tour of the new hook + skill, see
 
 ---
 
-## Path B: `lib/` modules {#path-b-lib-modules}
+## `lib/` modules — the analysis runtime
 
-> **Added in v1.3.0.** Three former MCP tools (`rforge_detect`, `rforge_deps`,
-> `rforge_impact`) ported to self-contained Python in `lib/`. Path A (v1.2.0)
-> dropped the *peer dependency* on `rforge-mcp`; Path B absorbs the *logic*.
-> The MCP server is still supported — `lib/` runs in parallel.
+> **Completed in v1.3.0.** All R-package analysis runs through pure-Python `lib/` modules. The plugin no longer has any runtime dependency on an MCP server.
 
-### Two execution paths
-
-Commands like `/rforge:detect` and `/rforge:deps` now have a choice: they
-can shell out to the in-plugin Python modules (no external service
-required) or, if the user has `rforge-mcp` installed, delegate to the MCP
-server. The output shape is equivalent for the three ported tools.
+### Single execution path (v1.3.0+)
 
 ```mermaid
 graph TB
     subgraph User["You / Claude Code session"]
-        UR[User: /rforge:detect or /rforge:deps]
+        UR[User: /rforge:detect, /rforge:deps, /rforge:status, etc.]
     end
 
     subgraph Cmd[commands/*.md]
         DT[detect.md]
         DP[deps.md]
         IM[impact.md]
+        ST[status.md]
+        IN[init.md]
     end
 
-    subgraph LibPath["Path B (v1.3+, default)"]
+    subgraph Lib["lib/ modules (pure Python)"]
         L1[lib/discovery.py]
         L2[lib/deps.py]
-    end
-
-    subgraph MCPPath["MCP path (still supported)"]
-        T1[rforge_detect]
-        T2[rforge_deps]
-        T3[rforge_impact]
+        L3[lib/status.py]
+        L4[lib/init.py]
     end
 
     subgraph FS["Filesystem"]
         DESCR[R DESCRIPTION files]
-        CFG[.rforge.yaml]
+        STATUS[.STATUS files]
+        CTX[~/.rforge/context.json]
     end
 
     UR --> DT
     UR --> DP
     UR --> IM
-    DT -->|bash python3| L1
-    DP -->|bash python3| L2
-    IM -->|bash python3| L2
-    DT -.->|optional MCP| T1
-    DP -.->|optional MCP| T2
-    IM -.->|optional MCP| T3
+    UR --> ST
+    UR --> IN
+    DT -->|bash python3 -m| L1
+    DP -->|bash python3 -m| L2
+    IM -->|bash python3 -m| L2
+    ST -->|bash python3 -m| L3
+    IN -->|bash python3 -m| L4
     L1 --> DESCR
-    L1 --> CFG
     L2 --> DESCR
-    T1 --> DESCR
-    T2 --> DESCR
-    T3 --> DESCR
+    L3 --> DESCR
+    L3 --> STATUS
+    L4 --> CTX
 ```
 
-Solid arrows: the in-plugin path (v1.3+ default). Dashed arrows: the
-legacy MCP path, still functional for users who installed `rforge-mcp`.
+### Module summary
 
-### Why two paths?
-
-- **Non-breaking migration.** Existing users keep working without forced
-  reinstall; new users get pure-Python analysis with zero peer deps.
-- **Capability ceiling.** Commands that need R subprocess (e.g.,
-  `/rforge:status` with `optimize`/`release` modes) still rely on the MCP
-  server until Phase B.2 ports `status` to `lib/status.py`. See the
-  [Path B SPEC](specs/SPEC-mcp-absorb-2026-05-10.md) for the full plan.
-- **Wire compatibility.** `lib/discovery.py` preserves the MCP server's
-  `mode` field (`minimal`/`standard`/`full`) for direct side-by-side
-  validation against `rforge_detect` output. The user-facing `kind` field
-  (`single`/`ecosystem`/`hybrid`) is layered on top.
-
-### What's still MCP-only
-
-| Tool | Phase | Status |
+| Module | Powers | Speed |
 |---|---|---|
-| `rforge_status` | B.2 | Pending — mode-aware execution (default/debug/optimize/release) with R subprocess |
-| `rforge_init` | B.3 | Pending — `.rforge/context.json` state file |
+| `lib.discovery` | `/rforge:detect` — ecosystem + package detection (single/ecosystem/hybrid) | <2s |
+| `lib.deps` | `/rforge:deps`, `/rforge:impact` — dependency graph + change impact | ~8s |
+| `lib.status` | `/rforge:status` — ecosystem health snapshot from DESCRIPTION + .STATUS | <5s |
+| `lib.init` | `/rforge:init` — initialize `~/.rforge/context.json` | <5s |
+
+For deep-R workflows (`/rforge:r:check`, `/rforge:thorough`) the command bodies invoke `R CMD check` / `Rscript` directly via Bash — there's no R-subprocess-wrapper module.
 
 See [`docs/lib-modules.md`](lib-modules.md) for the user-facing reference,
 and the auto-extracted [`reference/discovery.md`](reference/discovery.md) /
-[`reference/deps.md`](reference/deps.md) for full API listings.
+[`reference/deps.md`](reference/deps.md) / [`reference/status.md`](reference/status.md) /
+[`reference/init.md`](reference/init.md) for full API listings.
 
 ---
 
@@ -181,13 +165,13 @@ and the auto-extracted [`reference/discovery.md`](reference/discovery.md) /
 └─────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────┐
-│              Tool Selection Layer                        │
-│  Selects appropriate MCP tools based on pattern         │
+│              Module Selection Layer                      │
+│  Selects appropriate lib/ modules based on pattern      │
 └─────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────┐
 │              Parallel Execution Layer                    │
-│  Executes multiple MCP tools simultaneously             │
+│  Invokes multiple lib/ modules + Bash tools in parallel │
 └─────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────┐
@@ -208,97 +192,98 @@ RForge recognizes 6 primary task patterns:
 ### 1. CODE_CHANGE
 **Triggers:** "updated", "modified", "changed code", "implemented"
 
-**Selected Tools:**
-- `rforge-mcp.impact` - Assess change impact
-- `rforge-mcp.tests` - Verify tests still pass
-- `rforge-mcp.docs` - Check if docs need updating
+**Selected modules / tools:**
+- `lib.deps` (impact) — assess change impact across ecosystem
+- Bash: `Rscript -e 'devtools::test()'` — verify tests still pass
+- `lib.discovery` — locate affected packages
+- `/rforge:docs:check` body — surface docs-drift hints
 
 **Example:**
 ```
 User: "I updated the bootstrap function in RMediation"
 → Pattern: CODE_CHANGE
-→ Tools: [impact, tests, docs]
+→ Modules: [lib.deps, lib.discovery] + Bash tests
 → Output: "3 packages affected, 42 tests passing, docs up-to-date"
 ```
 
 ### 2. BUG_FIX
 **Triggers:** "bug", "error", "fix", "issue"
 
-**Selected Tools:**
-- `rforge-mcp.tests` - Verify fix works
-- `rforge-mcp.regression` - Check for regressions
-- `rforge-mcp.health` - Overall package health
+**Selected modules / tools:**
+- Bash: `Rscript -e 'devtools::test()'` — verify the fix works
+- `lib.deps` — check for downstream regressions in dependent packages
+- `lib.status` — overall package health snapshot
 
 **Example:**
 ```
 User: "Fixed edge case in mediation calculation"
 → Pattern: BUG_FIX
-→ Tools: [tests, regression, health]
+→ Modules: [lib.deps, lib.status] + Bash tests
 → Output: "Fix verified, no regressions, health score: 85/100"
 ```
 
 ### 3. CRAN_RELEASE
 **Triggers:** "CRAN", "release", "submit", "publish"
 
-**Selected Tools:**
-- `rforge-mcp.check` - R CMD check
-- `rforge-mcp.docs` - Documentation completeness
-- `rforge-mcp.deps` - Dependency validation
-- `rforge-mcp.health` - Overall readiness
+**Selected modules / tools:**
+- Bash: `R CMD check --as-cran` — full CRAN compliance check
+- `/rforge:docs:check` body — documentation completeness
+- `lib.deps` — dependency validation
+- `lib.status` — overall readiness; `description-sync` skill verifies CHANGELOG ↔ DESCRIPTION
 
 **Example:**
 ```
 User: "Prepare for CRAN submission"
 → Pattern: CRAN_RELEASE
-→ Tools: [check, docs, deps, health]
+→ Modules: [lib.deps, lib.status] + R CMD check + description-sync skill
 → Output: "3 warnings to address, docs 95% complete, ready in 1-2 hours"
 ```
 
 ### 4. DOCUMENTATION
 **Triggers:** "document", "docs", "README", "vignette"
 
-**Selected Tools:**
-- `rforge-mcp.docs` - Documentation status
-- `rforge-mcp.examples` - Runnable examples check
-- `rforge-mcp.vignettes` - Vignette validation
+**Selected modules / tools:**
+- `/rforge:docs:check` body — documentation status (NEWS.md, examples, vignettes)
+- Bash: `Rscript -e 'devtools::check_examples()'` — runnable examples
+- `description-sync` skill — DESCRIPTION ↔ CHANGELOG drift
 
 **Example:**
 ```
 User: "Update documentation for new features"
 → Pattern: DOCUMENTATION
-→ Tools: [docs, examples, vignettes]
+→ Modules: docs:check prompt + Bash example-runner
 → Output: "2 functions undocumented, 3 examples need updating"
 ```
 
 ### 5. DEPENDENCY_UPDATE
 **Triggers:** "dependency", "upgrade", "version bump", "import"
 
-**Selected Tools:**
-- `rforge-mcp.deps` - Dependency analysis
-- `rforge-mcp.impact` - Cross-package impact
-- `rforge-mcp.cascade` - Update planning
+**Selected modules / tools:**
+- `lib.deps` (graph) — dependency analysis
+- `lib.deps` (impact) — cross-package impact
+- `/rforge:cascade` body — update planning prose
 
 **Example:**
 ```
 User: "Updated ggplot2 dependency to v3.5.0"
 → Pattern: DEPENDENCY_UPDATE
-→ Tools: [deps, impact, cascade]
+→ Modules: [lib.deps] + cascade prompt
 → Output: "5 packages affected, update order: base → extension1 → extension2"
 ```
 
 ### 6. GENERAL_STATUS
 **Triggers:** "status", "health", "check", "overview"
 
-**Selected Tools:**
-- `rforge-mcp.health` - Overall health
-- `rforge-mcp.git` - Git status
-- `rforge-mcp.tests` - Test summary
+**Selected modules / tools:**
+- `lib.status` — overall health from DESCRIPTION + .STATUS
+- Bash: `git status` — repository state
+- Bash: `Rscript -e 'devtools::test()'` — test summary (when full run requested)
 
 **Example:**
 ```
 User: "What's the current status?"
 → Pattern: GENERAL_STATUS
-→ Tools: [health, git, tests]
+→ Modules: [lib.status] + Bash git/test
 → Output: "Health: 85/100, main branch clean, 42/45 tests passing"
 ```
 
@@ -356,7 +341,7 @@ From Phase 1 testing on mediationverse ecosystem (5 R packages):
 | Tools called | 4 simultaneously |
 | Speedup | 1,250× under target |
 
-**Note:** These are orchestration times. Actual MCP tool execution happens asynchronously in background.
+**Note:** These are orchestration times. Actual `lib/` module execution happens asynchronously in background (each `python3 -m lib.<module>` subprocess).
 
 ## Mode System Integration
 
@@ -472,25 +457,33 @@ After parallel execution, RForge synthesizes results into a unified, actionable 
 ╰──────────────────────────────────────────╯
 ```
 
-## MCP Tool Integration
+## Lib Module Integration
 
-RForge delegates to these RForge MCP server tools:
+RForge orchestrates these `lib/` modules and Bash invocations:
 
-| Tool | Purpose | Typical Time |
-|------|---------|--------------|
-| `rforge-mcp.health` | Package health metrics | 2-3s |
-| `rforge-mcp.tests` | Test execution status | 5-10s |
-| `rforge-mcp.coverage` | Test coverage analysis | 8-15s |
-| `rforge-mcp.docs` | Documentation completeness | 3-5s |
-| `rforge-mcp.deps` | Dependency analysis | 2-4s |
-| `rforge-mcp.impact` | Change impact assessment | 4-8s |
-| `rforge-mcp.check` | R CMD check execution | 30-180s |
-| `rforge-mcp.git` | Git status | 1s |
+| Surface | Purpose | Typical Time |
+|---------|---------|--------------|
+| `python3 -m lib.status` | Package + ecosystem health from DESCRIPTION + .STATUS | 2-3s |
+| `python3 -m lib.discovery` | Project structure detection (single/ecosystem/hybrid) | <2s |
+| `python3 -m lib.deps` | Dependency graph + impact analysis | 2-8s |
+| `python3 -m lib.init` | Initialize `~/.rforge/context.json` state file | <5s |
+| Bash: `Rscript -e 'devtools::test()'` | Test execution | 5-30s |
+| Bash: `Rscript -e 'covr::package_coverage()'` | Test coverage | 30-90s |
+| Bash: `R CMD check` | Full R CMD check (CRAN-equivalent) | 30-180s |
+| Bash: `git status` / `git log` | Repository state | <1s |
+| `description-sync` skill | DESCRIPTION ↔ CHANGELOG drift check | <1s |
 
 **Communication:**
 ```
-RForge Plugin → Task Tool → RForge MCP Server → R Environment
+/rforge:<command> → Claude reads commands/<name>.md → Claude orchestrates:
+    ├── python3 -m lib.<module>     (in-plugin Python; no external service)
+    ├── Bash: Rscript / R CMD ...    (R subprocesses for r:check / thorough)
+    └── Bash: git / grep / Read      (filesystem inspection)
 ```
+
+No MCP server, no Node.js. The `description-sync` skill auto-discovers
+itself when Claude needs to verify DESCRIPTION version against the
+CHANGELOG.
 
 ## Project Structure Detection
 

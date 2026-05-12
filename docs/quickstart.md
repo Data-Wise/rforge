@@ -344,14 +344,14 @@ Now that you're set up, explore:
 /rforge:deps                      # Visualize dependencies
 
 # Documentation
-/rforge:doc-check                 # Check documentation drift
+/rforge:docs:check                # Check documentation drift
 /rforge:complete                  # Mark tasks complete
 /rforge:capture                   # Quick capture ideas
 /rforge:next                      # Get next task suggestion
 
 # Health checks
-/rforge:ecosystem-health          # Ecosystem health metrics
-/rforge:rpkg-check                # R CMD check integration
+/rforge:health                    # Ecosystem health metrics
+/rforge:r:check                   # R CMD check integration
 ```
 
 ## Getting Help
