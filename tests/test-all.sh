@@ -168,6 +168,34 @@ for field in ('name:', 'description:', 'category:'):
 "
 }
 
+# v2.0.0 rename stubs — the 3 old command filenames must still exist as
+# rename-error stubs, each pointing at its new name. Asserts on the
+# contract (file present + key strings), not the exact wording, so this
+# survives prompt-control iteration without breaking.
+rename_stubs_present() {
+    python3 -c "
+import sys
+stubs = {
+    'commands/doc-check.md':         ('rforge:doc-check',        '/rforge:docs:check'),
+    'commands/ecosystem-health.md':  ('rforge:ecosystem-health', '/rforge:health'),
+    'commands/rpkg-check.md':        ('rforge:rpkg-check',       '/rforge:r:check'),
+}
+fail = 0
+for path, (old_name, new_slash) in stubs.items():
+    try:
+        body = open(path).read()
+    except FileNotFoundError:
+        print(f'MISSING: {path}', file=sys.stderr); fail = 1; continue
+    if f'name: {old_name}' not in body:
+        print(f'{path}: frontmatter name: missing or wrong (want \"{old_name}\")', file=sys.stderr); fail = 1
+    if 'RENAMED' not in body.upper():
+        print(f'{path}: no rename-error marker found (looking for RENAMED)', file=sys.stderr); fail = 1
+    if new_slash not in body:
+        print(f'{path}: target name {new_slash} not referenced', file=sys.stderr); fail = 1
+sys.exit(fail)
+"
+}
+
 # Lib modules — pytest suite for lib/discovery.py + lib/deps.py + lib/status.py + lib/init.py.
 # Requires pytest. If not installed, we emit a clear hint and fail —
 # pytest is a dev-time dependency, expected in CI and local dev.
@@ -231,6 +259,7 @@ run "plugin.json parses"      python3 -c "import json; json.load(open('.claude-p
 run "package.json parses"     python3 -c "import json; json.load(open('package.json'))"
 run "All 4 version sources agree (plugin/marketplace/package)" versions_match
 run "CHANGELOG has current version entry"          changelog_has_current_version
+run "v2.0.0 rename stubs present + point at new names" rename_stubs_present
 
 # Docs site
 run "mkdocs.yml parses"            mkdocs_parses
