@@ -1230,6 +1230,99 @@ fail-fast `check_pkgdown()`. Add flags `--strict`, `--articles-only`, `--devel`.
 - `test_r_snippet_site_strict_uses_check_pkgdown` / default uses `pkgdown_sitrep`.
 - `test_r_snippet_site_articles_only_uses_build_articles`.
 
+## Addendum 2 (2026-05-31) — quality commands folded into v2.1.0
+
+Per BRAINSTORM-r-command-expansion, four quality commands join this feature
+(they reuse `lib/rcmd.py`). Now **16 → 28 commands**. These are optional-engine
+commands (🟡 + install hint if the engine is absent).
+
+### E. New kinds in `r_snippet` (Task 4)
+
+```python
+    if kind == "lint":
+        return _guard("lintr",
+            f'ls <- lintr::lint_package({p}); '
+            f'cat(jsonlite::toJSON(list(lints=lapply(ls, function(x) list('
+            f'file=x$filename, line=x$line_number, linter=x$linter, '
+            f'message=x$message))), auto_unbox=TRUE, null="list"))')
+    if kind == "spell":
+        return _guard("spelling",
+            f'sp <- spelling::spell_check_package({p}); '
+            f'cat(jsonlite::toJSON(list(misspelled=lapply(seq_len(nrow(sp)), '
+            f'function(i) list(word=sp$word[i], files=sp$found[[i]]))), '
+            f'auto_unbox=TRUE, null="list"))')
+    if kind == "urlcheck":
+        return _guard("urlchecker",
+            f'u <- urlchecker::url_check({p}); '
+            f'cat(jsonlite::toJSON(list(broken=lapply(seq_len(nrow(u)), '
+            f'function(i) list(url=u$URL[i], message=u$message[i], '
+            f'new_url=u$newURL[i]))), auto_unbox=TRUE, null="list"))')
+    if kind == "style":
+        return _guard("styler",
+            f'res <- styler::style_pkg({p}); '
+            f'cat(jsonlite::toJSON(list(changed_files='
+            f'as.list(res$file[isTRUE(res$changed) | res$changed %in% TRUE])), '
+            f'auto_unbox=TRUE, null="list"))')
+```
+
+> `urlchecker::url_check()` column names vary by version — the implementer must
+> verify (`names(urlchecker::url_check("."))`) and adjust `URL`/`message`/`newURL`.
+
+### F. `normalize` blocks (Task 2)
+
+```python
+    elif kind == "lint":
+        lints = raw.get("lints", [])
+        env["lint"] = {"count": len(lints), "lints": lints}
+    elif kind == "spell":
+        miss = raw.get("misspelled", [])
+        env["spell"] = {"count": len(miss), "misspelled": miss}
+    elif kind == "urlcheck":
+        broken = raw.get("broken", [])
+        env["urlcheck"] = {"count": len(broken), "broken": broken}
+    elif kind == "style":
+        changed = raw.get("changed_files", [])
+        env["style"] = {"count": len(changed), "changed_files": changed}
+```
+
+And in `_status_for` (Task 2): lint/spell/urlcheck → `warn` if their count > 0
+else `ok` (findings are advisory, never `error`); style → `ok` if exit 0.
+
+```python
+    if kind in ("lint", "spell", "urlcheck"):
+        counts = {"lint": "lints", "spell": "misspelled", "urlcheck": "broken"}
+        return "warn" if raw.get(counts[kind]) else "ok"
+    if kind == "style":
+        return "ok" if exit_code == 0 else "error"
+```
+
+### G. `main` choices (Task 5)
+
+Add `"lint", "spell", "urlcheck", "style"` to the `--kind` `choices` list.
+
+### H. Command files (Task 7) — create four more under `commands/r/`
+
+Mirror `build.md`'s shape. Key per-file specifics:
+
+- **`r:lint`** → `--kind lint`; Output: count + group lints by file (`R/foo.R:3 — object_name_linter: …`); 🟢 if 0 / 🟡 if any. Read-only.
+- **`r:spell`** → `--kind spell`; Output: list misspelled words + locations; suggest "add to `inst/WORDLIST`" for false positives; 🟢/🟡.
+- **`r:urlcheck`** → `--kind urlcheck`; Output: each broken URL + status + suggested replacement; 🟢/🟡.
+- **`r:style`** → `--kind style`; **mutates source** — after running, show `git diff --stat` then a brief summary of what reformatted; note "review with `git diff`, undo with `git checkout`". 🟢 always (it's an action); list `changed_files`.
+
+Each: if engine in `engine_missing`, report 🟡 + the `install.packages()` hint.
+
+### I. Tests (Task 5/10)
+
+- `test_r_snippet_lint_uses_lintr` / `spell`→spelling / `urlcheck`→urlchecker / `style`→styler.
+- `test_normalize_lint_warns_when_findings` (count>0 ⇒ warn; count 0 ⇒ ok).
+- `test_normalize_style_ok_on_exit0`.
+
+### J. Docs (Task 9)
+
+Tables/REFCARD/mkdocs now list **28** commands. Group the four under a "Quality"
+heading adjacent to the dev-cycle list. CHANGELOG `[2.1.0]` Added section gains
+the four quality commands.
+
 ---
 
 ## Self-Review (completed by plan author)
