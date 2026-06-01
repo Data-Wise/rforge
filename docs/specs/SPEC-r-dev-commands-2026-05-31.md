@@ -80,6 +80,36 @@ for structured counts; report shape unchanged).
 - Any dependency on flow-cli, or on `devtools` (see Architecture).
 - A config/profile layer or generic `r:` runner (rejected approach "C").
 
+## Duplicate & overlap audit (avoid redundancy)
+
+Audited against the existing 16 commands (+3 v2.0.0 rename stubs) on 2026-05-31.
+
+**Name collisions:** none. The only overlapping name is `rforge:r:check`, which
+is the **intended retrofit** of the existing command, not a new one. The
+`tests/test-all.sh` command-name-uniqueness gate must stay green.
+
+**Functional boundaries (cross-link, do NOT reimplement):**
+
+| New | Existing it could duplicate | Boundary to honor |
+|-----|-----------------------------|-------------------|
+| `r:check` | `thorough` (ecosystem rollup incl. R CMD check); `rpkg-check` (stub → r:check) | r:check = **single** package, structured; `thorough` = **multi-package** status rollup. Each links the other |
+| `r:cycle` | `thorough` | cycle = single-package local dev loop; `thorough` = ecosystem. Cross-link |
+| `r:document` | `docs:check` (doc **drift** across packages); `doc-check` (stub) | document = **regenerate** Rd/NAMESPACE; docs:check = **detect** inconsistency. Complementary |
+| `r:coverage` | (none — `thorough` does not compute covr) | net-new |
+| `r:lint/spell/urlcheck/style` | (none existing) | net-new quality layer |
+
+**Internal DRY rules (within this feature):**
+
+- `r:cycle` MUST call `run("document")/run("test")/run("check")` — never
+  reimplement those stages (the plan's `_run_cycle` already does this).
+- All `r:` commands route through the single `lib/rcmd.py` envelope — no
+  per-command output parsing is duplicated.
+- The four quality commands and the dev-cycle commands share `r_snippet`,
+  `normalize`, and `run` — one code path per concern.
+
+Every new `commands/r/*.md` MUST carry a "Related Commands" section pointing at
+its boundary neighbor(s) above, so users are routed, not confused.
+
 ## Architecture (Approach B, refined: R emits JSON → thin Python normalizer)
 
 Two layers, matching rforge's existing `lib/` (interpretation) vs
