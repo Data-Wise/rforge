@@ -6,7 +6,7 @@
     - **How:** Jump to a category below, or `Ctrl+F` for a specific command.
     - **Next:** [REFCARD](REFCARD.md) for the at-a-glance summary.
 
-Complete reference for all 16 RForge commands. Commands are organized by category with usage examples and parameter details.
+Complete reference for all **28** RForge commands. Commands are organized by category with usage examples and parameter details.
 
 ## Command Categories
 
@@ -15,6 +15,8 @@ Complete reference for all 16 RForge commands. Commands are organized by categor
 - [Ecosystem Management](#ecosystem-management) (5 commands)
 - [Documentation & Tasks](#documentation-tasks) (4 commands)
 - [Health Checks](#health-checks) (2 commands)
+- [R Development Cycle](#r-development-cycle) (8 commands)
+- [R Quality](#r-quality) (4 commands)
 
 ---
 
@@ -526,6 +528,399 @@ R CMD check integration with detailed error reporting.
 
 ---
 
+## R Development Cycle
+
+### /rforge:r:load
+
+Load the package into a namespace via `pkgload::load_all()` for interactive development.
+
+**Usage:**
+
+```bash
+/rforge:r:load [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path to load (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Load current package
+/rforge:r:load
+
+# Load specific package
+/rforge:r:load ~/projects/mypackage
+```
+
+**Executes:**
+
+- Simulate-installs the package into a namespace via `pkgload::load_all()`
+- Reports load status and any errors
+
+**Related commands:** `/rforge:r:test` (auto-loads inside test_local), `/rforge:r:document`
+
+---
+
+### /rforge:r:document
+
+Regenerate `man/*.Rd` documentation and `NAMESPACE` via `roxygen2::roxygenize()`.
+
+**Usage:**
+
+```bash
+/rforge:r:document [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Regenerate docs for current package
+/rforge:r:document
+```
+
+**Executes:**
+
+- Runs `roxygen2::roxygenize()` (the blessed regeneration path — hand-edits to `man/*.Rd` are blocked by the PreToolUse hook)
+- Reports success and recommends reviewing `git diff man/ NAMESPACE`
+
+**Related commands:** `/rforge:r:check` (verify after regenerating), `/rforge:docs:check` (detect drift)
+
+---
+
+### /rforge:r:test
+
+Run package tests via `testthat` and report pass/fail/skip counts.
+
+**Usage:**
+
+```bash
+/rforge:r:test [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Test current package
+/rforge:r:test
+```
+
+**Executes:**
+
+- Runs `testthat::test_local()` (self-loads the package via pkgload)
+- Reports passed, failed, skipped, and warning counts
+- Lists failing files when failures are present
+
+**Related commands:** `/rforge:r:cycle` (document → test → check), `/rforge:r:coverage`
+
+---
+
+### /rforge:r:coverage
+
+Compute test coverage via `covr` — total percentage, per-file breakdown, and untested lines.
+
+**Usage:**
+
+```bash
+/rforge:r:coverage [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Coverage for current package
+/rforge:r:coverage
+```
+
+**Executes:**
+
+- Runs `covr::package_coverage()` plus `zero_coverage()` for gap detection
+- Reports total %, lowest-covered files, and specific untested line ranges
+- If `covr` is missing, reports 🟡 with install hint
+
+**Related commands:** `/rforge:r:test`
+
+---
+
+### /rforge:r:build
+
+Build a source tarball via `pkgbuild::build()` and report the artifact path and size.
+
+**Usage:**
+
+```bash
+/rforge:r:build [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Build current package
+/rforge:r:build
+```
+
+**Executes:**
+
+- Builds a `.tar.gz` source tarball via `pkgbuild::build()`
+- Reports the artifact path and size in KB
+
+**Related commands:** `/rforge:r:check` (validate before building), `/rforge:r:install`
+
+---
+
+### /rforge:r:install
+
+Install the package locally via `R CMD INSTALL` and report the installed version.
+
+**Usage:**
+
+```bash
+/rforge:r:install [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Install current package
+/rforge:r:install
+```
+
+**Executes:**
+
+- Runs `R CMD INSTALL` on the package
+- Reports exit status and installed version, or surfaces dependency errors
+
+**Related commands:** `/rforge:r:build`
+
+---
+
+### /rforge:r:site
+
+Build the pkgdown website (vignettes → articles) with optional preview.
+
+**Usage:**
+
+```bash
+/rforge:r:site [package] [--preview] [--strict] [--articles-only] [--devel]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+- `--preview` (optional) - Open the built site via `pkgdown::preview_site()`
+- `--strict` (optional) - Fail-fast config check via `check_pkgdown` (useful in CI)
+- `--articles-only` (optional) - Build only articles/vignettes (reinstalls first)
+- `--devel` (optional) - Fast in-process build via `load_all` (lower fidelity)
+
+**Examples:**
+
+```bash
+# Build site for current package
+/rforge:r:site
+
+# Build and preview in browser
+/rforge:r:site --preview
+
+# CI-strict config check then build
+/rforge:r:site --strict
+
+# Rebuild only articles quickly
+/rforge:r:site --articles-only
+
+# Fast dev build (no install)
+/rforge:r:site --devel
+```
+
+**Executes:**
+
+- Validates config via `pkgdown_sitrep()` (or `check_pkgdown()` with `--strict`)
+- Builds the site; needs `pandoc` to render vignettes
+- If `pkgdown` is missing, reports 🟡 with install hint
+
+**Related commands:** `/rforge:r:document` (ensure Rd docs exist before building)
+
+---
+
+### /rforge:r:cycle
+
+Full dev cycle — runs `document` → `test` → `check` in sequence, stopping at the first hard error.
+
+**Usage:**
+
+```bash
+/rforge:r:cycle [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Full cycle for current package
+/rforge:r:cycle
+```
+
+**Executes:**
+
+- Runs `/rforge:r:document`, `/rforge:r:test`, `/rforge:r:check` in order
+- Stops at first hard failure and reports the failing stage with detail
+- Returns a stage-by-stage status table
+
+**Related commands:** `/rforge:r:check`, `/rforge:r:test`, `/rforge:r:document`, `/rforge:thorough` (ecosystem rollup)
+
+---
+
+## R Quality
+
+### /rforge:r:lint
+
+Static analysis of the package via `lintr` — grouped report of style and code-quality issues.
+
+**Usage:**
+
+```bash
+/rforge:r:lint [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Lint current package
+/rforge:r:lint
+```
+
+**Executes:**
+
+- Runs `lintr::lint_package()` (read-only; no files are changed)
+- Groups findings by file with line numbers and lint rule names
+- If `lintr` is missing, reports 🟡 with install hint
+
+**Related commands:** `/rforge:r:style` (auto-format fixes many style lints)
+
+---
+
+### /rforge:r:spell
+
+Spell-check the package documentation via `spelling` and triage typos vs. technical terms.
+
+**Usage:**
+
+```bash
+/rforge:r:spell [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Spell-check current package
+/rforge:r:spell
+```
+
+**Executes:**
+
+- Runs `spelling::spell_check_package()`
+- Lists misspelled words with file and line location
+- Recommends fixing real typos or adding technical terms to `inst/WORDLIST`
+- If `spelling` is missing, reports 🟡 with install hint
+
+**Related commands:** `/rforge:r:check` (spelling NOTEs also surface in R CMD check)
+
+---
+
+### /rforge:r:urlcheck
+
+Check package URLs for breakage and redirects via `urlchecker` — a common CRAN rejection cause.
+
+**Usage:**
+
+```bash
+/rforge:r:urlcheck [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Check URLs in current package
+/rforge:r:urlcheck
+```
+
+**Executes:**
+
+- Runs `urlchecker::url_check()`
+- Lists broken or redirected URLs with suggested replacements
+- If `urlchecker` is missing, reports 🟡 with install hint
+
+**Related commands:** `/rforge:r:check` (broken URLs also flagged by R CMD check)
+
+---
+
+### /rforge:r:style
+
+Auto-format the package source via `styler::style_pkg()` and show the diff.
+
+**Usage:**
+
+```bash
+/rforge:r:style [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Style-format current package
+/rforge:r:style
+```
+
+**Executes:**
+
+- Runs `styler::style_pkg()` — **this rewrites files**
+- Reports file count changed and shows `git diff --stat` summary
+- Recommends `git diff` review and `git checkout -- <files>` if the changes are unwanted
+- If `styler` is missing, reports 🟡 with install hint
+
+**Related commands:** `/rforge:r:lint` (find issues that styler does not auto-fix)
+
+---
+
 ## Command Categories Summary
 
 ### By Time Budget
@@ -534,8 +929,9 @@ R CMD check integration with detailed error reporting.
 |------|----------|
 | <10s | `status`, `quick`, `detect`, `deps` (visual), `next` |
 | <30s | `analyze` (default), `cascade`, `impact`, `docs:check` |
-| <2min | `analyze` (debug/optimize) |
-| <5min | `thorough`, `analyze` (release), `r:check` |
+| <1min | `r:load`, `r:document`, `r:lint`, `r:spell`, `r:urlcheck`, `r:style` |
+| <2min | `analyze` (debug/optimize), `r:test`, `r:coverage`, `r:build`, `r:install` |
+| <5min | `thorough`, `analyze` (release), `r:check`, `r:site`, `r:cycle` |
 
 ### By Use Case
 
@@ -549,11 +945,26 @@ R CMD check integration with detailed error reporting.
 - `/rforge:impact` - Assess ecosystem effects
 - `/rforge:complete` - Mark features done
 
+**R Package Development:**
+- `/rforge:r:load` - Load package into namespace
+- `/rforge:r:document` - Regenerate Rd docs and NAMESPACE
+- `/rforge:r:test` - Run testthat suite
+- `/rforge:r:coverage` - Coverage gaps and untested lines
+- `/rforge:r:cycle` - document → test → check in one pass
+
+**R Quality Checks:**
+- `/rforge:r:lint` - Static analysis (lintr)
+- `/rforge:r:spell` - Spell-check docs
+- `/rforge:r:urlcheck` - Validate URLs
+- `/rforge:r:style` - Auto-format source (styler)
+
 **Release Preparation:**
 - `/rforge:analyze --mode release` - Full audit
 - `/rforge:thorough` - Comprehensive checks
 - `/rforge:release` - Plan submission order
 - `/rforge:r:check` - R CMD check execution
+- `/rforge:r:build` - Build source tarball
+- `/rforge:r:site` - Build pkgdown website
 
 **Ecosystem Management:**
 - `/rforge:detect` - Understand structure
