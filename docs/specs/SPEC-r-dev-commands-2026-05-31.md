@@ -44,7 +44,7 @@ and with parsed output, the way `/rforge:r:check` already works.
 | `/rforge:r:test`     | `testthat::test_local(load_package="source", reporter="list")` | **Self-loads** via `pkgload::load_all()` (no separate load step); `as.data.frame()` → pass/fail/skip/warn + failing files |
 | `/rforge:r:document` | `roxygen2::roxygenize()`                             | Regenerates `man/*.Rd` + `NAMESPACE` (blessed path, see Hook interaction) |
 | `/rforge:r:install`  | `R CMD INSTALL` (via Bash) or `pkgbuild::build()`+install | No structured result; report installed version + exit status |
-| `/rforge:r:coverage` | `covr::package_coverage()` + `coverage_to_list()`    | Total % + per-file %, lowest offenders |
+| `/rforge:r:coverage` | `covr::package_coverage()` + `coverage_to_list()` + `zero_coverage()` | Total % + per-file %, lowest offenders, **+ exact untested lines** (feeds "what to test next") |
 | `/rforge:r:site`     | `pkgdown::pkgdown_sitrep()` (report all) → `build_site(preview=FALSE, install=TRUE)` | Flags: `--preview` (`preview_site()`), `--strict` (`check_pkgdown()` fail-fast / CI), `--articles-only` (`build_articles()`, reinstall first), `--devel` (`load_all`, fast iteration). Classify **vignette render errors** (abort) vs **config/index** problems (warn). Needs `pandoc` |
 | `/rforge:r:lint`     | `lintr::lint_package()`                              | Structured lints (file/line/linter/message) → grouped report; read-only. 🟡 if any |
 | `/rforge:r:spell`    | `spelling::spell_check_package()`                    | Misspelled words + locations; AI triages real typos vs WORDLIST. 🟡 if any |
@@ -156,7 +156,8 @@ Normalized envelope:
   "check":    { "errors": [], "warnings": ["..."], "notes": ["...","..."] },
   "tests":    { "passed": 41, "failed": 0, "skipped": 3, "warnings": 0,
                 "failing_files": [] },
-  "coverage": { "total_pct": 87.4, "per_file": {"R/foo.R": 12.0} },
+  "coverage": { "total_pct": 87.4, "per_file": {"R/foo.R": 12.0},
+                "untested": [{"file":"R/foo.R","first_line":12,"last_line":18}] },
   "build":    { "artifact": "foo_0.2.0.tar.gz", "bytes": 184320 },
   "site":     { "checked": true, "built": true, "problems": [] },
   "install":  { "installed_version": "0.2.0", "exit": 0 },
@@ -307,7 +308,8 @@ Three parallel research agents reviewed the r-lib docs/sources:
   `$session_info`, `$checkdir`. No JSON method — serialize with `jsonlite`.
   Use `error_on="never"`.
 - **`covr`**: `coverage_to_list()` → `{filecoverage, totalcoverage}`;
-  `percent_coverage()` → total numeric.
+  `percent_coverage()` → total numeric; `zero_coverage()` → data frame of
+  uncovered lines (`filename`, `first_line`, `last_line`) → the "untested" list.
 - **`testthat` / `pkgload`**: `devtools::test()` ≈ `testthat::test_local(path,
   load_package="source")`. `test_local()` **self-loads** the source package via
   `pkgload::load_all()` (its default `load_package="source"`), so no explicit
