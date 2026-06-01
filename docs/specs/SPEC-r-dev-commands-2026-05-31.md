@@ -39,13 +39,23 @@ and with parsed output, the way `/rforge:r:check` already works.
 
 | Command            | R engine (direct, not via devtools)                    | Notes |
 |--------------------|--------------------------------------------------------|-------|
+| `/rforge:r:load`     | `pkgload::load_all()`                                | Mirrors `devtools::load_all`; simulate-install into namespace. Report exit status |
 | `/rforge:r:build`    | `pkgbuild::build()`                                  | Returns tarball path string; report path + size |
-| `/rforge:r:test`     | `testthat::test_local(reporter="list")`              | `as.data.frame()` → pass/fail/skip/warn + failing files |
+| `/rforge:r:test`     | `testthat::test_local(load_package="source", reporter="list")` | **Self-loads** via `pkgload::load_all()` (no separate load step); `as.data.frame()` → pass/fail/skip/warn + failing files |
 | `/rforge:r:document` | `roxygen2::roxygenize()`                             | Regenerates `man/*.Rd` + `NAMESPACE` (blessed path, see Hook interaction) |
 | `/rforge:r:install`  | `R CMD INSTALL` (via Bash) or `pkgbuild::build()`+install | No structured result; report installed version + exit status |
 | `/rforge:r:coverage` | `covr::package_coverage()` + `coverage_to_list()`    | Total % + per-file %, lowest offenders |
-| `/rforge:r:site`     | `pkgdown::check_pkgdown()` → `build_site(preview=FALSE)`; `--preview` → `preview_site()` | Exit-code gate for build; structured problems from check |
+| `/rforge:r:site`     | `pkgdown::pkgdown_sitrep()` (report all) → `build_site(preview=FALSE, install=TRUE)` | Flags: `--preview` (`preview_site()`), `--strict` (`check_pkgdown()` fail-fast / CI), `--articles-only` (`build_articles()`, reinstall first), `--devel` (`load_all`, fast iteration). Classify **vignette render errors** (abort) vs **config/index** problems (warn). Needs `pandoc` |
 | `/rforge:r:cycle`    | `roxygenize()` → `test_local()` → `rcmdcheck()`      | Combined ADHD summary; stops early on hard error |
+
+> **Vignettes/articles:** pkgdown renders `vignettes/*.Rmd` *source* (not the
+> R-CMD-built vignette) into the site's "Articles"; `vignettes/articles/*.Rmd`
+> are web-only (`.Rbuildignore`d). A vignette **chunk error aborts** the build
+> (non-zero exit) — surface the failing `.Rmd`; index/url/OpenGraph gaps only
+> **warn**. Default `build_site(install=TRUE)` installs to a temp lib for
+> fidelity; `--devel` uses `pkgload::load_all()` for speed. `--articles-only`
+> must reinstall first (standalone `build_articles()` renders the *installed*
+> version).
 
 Plus a retrofit of the **existing** `/rforge:r:check` onto the shared module
 (it already runs `R CMD check`; switch it to `rcmdcheck::rcmdcheck(error_on="never")`
@@ -154,10 +164,15 @@ Confirmed in the dev environment (R 4.6.0): `rcmdcheck` 1.4.0, `testthat`
 
 - **Required for full functionality:** `rcmdcheck`, `pkgbuild`, `roxygen2`,
   `testthat`, `jsonlite` (for the JSON bridge — near-universal, but treat as
-  required and hint if missing).
+  required and hint if missing). `pkgload` powers `r:load` and is pulled in
+  automatically by `testthat` (it's in testthat's `Imports`), so it is present
+  whenever `testthat` is.
 - **Optional (command-specific):** `covr` (r:coverage), `pkgdown` (r:site).
   These commands must detect absence and emit a clean
   `install.packages("pkgdown")` hint via `engine_missing[]`, not a stack trace.
+- **System dependency:** `pandoc` is required to render vignettes/articles in
+  `r:site`. If absent, `r:site` reports 🟡 with the pandoc-install hint rather
+  than a render stack trace.
 - **Deliberately NOT required:** `devtools`, `usethis` — the commands call the
   lower-level engines directly. This is lighter and matches what's installed.
 
@@ -211,7 +226,7 @@ Per rforge conventions (~15-file scope):
   retrofit `commands/r/check.md`.
 - `docs/reference/rcmd.md` (generated).
 - README.md + docs/index.md + docs/REFCARD.md command tables and counts
-  (16 → 23 commands).
+  (16 → 24 commands).
 - `mkdocs.yml` nav additions.
 - CHANGELOG.md `[Unreleased]` → `[2.1.0]`.
 - 4-source version bump + live-version doc refs (per CLAUDE.md).
@@ -249,15 +264,25 @@ Three parallel research agents reviewed the r-lib docs/sources:
   Use `error_on="never"`.
 - **`covr`**: `coverage_to_list()` → `{filecoverage, totalcoverage}`;
   `percent_coverage()` → total numeric.
-- **`testthat`**: `test_local(reporter="list")` → `testthat_results`;
-  `as.data.frame()` → 13 cols (`file,context,test,nb,failed,skipped,error,
-  warning,...,passed,result`). Failing files = rows with `failed>0 | error`.
-  `JunitReporter` is an XML alternative. Console fallback line:
-  `[ FAIL 2 | WARN 0 | SKIP 1 | PASS 41 ]`.
-- **`pkgdown`**: `build_site(preview=FALSE, quiet=TRUE)` returns invisibly
-  (success = exit code); `check_pkgdown()` fails fast on first problem;
-  `pkgdown_sitrep()` reports all problems (human text). `preview_site()` opens
-  the built site (→ `--preview`).
+- **`testthat` / `pkgload`**: `devtools::test()` ≈ `testthat::test_local(path,
+  load_package="source")`. `test_local()` **self-loads** the source package via
+  `pkgload::load_all()` (its default `load_package="source"`), so no explicit
+  load step is needed (a preceding `load_all()` double-loads). Per-function:
+  `test_local`→source(load_all), `test_dir`→none, `test_package`/`test_check`
+  →installed(`library()`). `pkgload` is in testthat's `Imports` ⇒ no devtools
+  needed. `as.data.frame(results)` → 13 cols (`file,...,failed,skipped,error,
+  warning,...,passed,result`); failing files = rows with `failed>0 | error`.
+  Console fallback line: `[ FAIL 2 | WARN 0 | SKIP 1 | PASS 41 ]`.
+- **`pkgdown` (vignettes/articles)**: renders `vignettes/*.Rmd` *source* into
+  the site's "Articles" (`vignettes/articles/*.Rmd` = web-only). A vignette
+  **chunk error aborts** `build_site()`; index/url/OpenGraph gaps only **warn**.
+  Use `pkgdown_sitrep()` (reports all, non-fatal) by default; reserve
+  `check_pkgdown()` (fail-fast) for `--strict`/CI. `build_site(install=TRUE)`
+  installs to a temp lib for fidelity; `--devel` uses `load_all` for speed;
+  `build_articles()` is an articles-only fast path but renders the *installed*
+  version (reinstall first). Common issues: missing `pandoc`, erroring/network
+  vignette chunks, missing `url:`, un-indexed topics. `preview_site()` →
+  `--preview`. (Refs: pkgdown #635/#1283/#2093/#1230/#861/#2830.)
 - **`checkthat`**: a real CRAN package (Ian Cero, 2023) — *"Intuitive Unit
   Testing Tools for Data Manipulation"*, a tidyverse data-validation toolkit,
   **unrelated** to build/test/site. Intended meaning is `testthat`/`rcmdcheck`,
