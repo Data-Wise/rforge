@@ -1,24 +1,50 @@
-# R Dev-Cycle Commands Implementation Plan
+# R Dev-Cycle + Quality Commands Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+>
+> **This is the consolidated plan** (addenda folded in 2026-05-31). It is the single source of truth — no superseding sections.
 
-**Goal:** Add a full R package dev-cycle (`build`, `test`, `document`, `install`, `coverage`, `site`, `cycle`) to the rforge plugin's `r:` command namespace, backed by a single structured-output module `lib/rcmd.py`.
+**Goal:** Add a full R package dev cycle **and** a quality layer to the rforge plugin's `r:` namespace — 12 new commands backed by one structured-output module `lib/rcmd.py`. Total commands 16 → **28**.
 
-**Architecture:** Each command is a `commands/r/<verb>.md` prompt file that shells out to `python3 -m lib.rcmd --kind <kind>`. `lib/rcmd.py` runs the *lower-level* R engine for that kind (`rcmdcheck`, `pkgbuild`, `roxygen2`, `testthat`, `covr`, `pkgdown` — **not** `devtools`), which serializes its structured result to JSON via `jsonlite`; Python normalizes that into one envelope. R subprocess output is JSON, never regex-scraped (console regex is a documented fallback only). CI stays R-free by mocking `Rscript`.
+**Architecture:** Each command is a `commands/r/<verb>.md` prompt that shells out to `python3 -m lib.rcmd --kind <kind>`. `lib/rcmd.py` runs the *lower-level* R engine for that kind (`rcmdcheck`, `pkgbuild`, `roxygen2`, `testthat`, `pkgload`, `covr`, `pkgdown`, `lintr`, `spelling`, `urlchecker`, `styler` — **never** `devtools`), which serializes its structured result to JSON via `jsonlite`; Python normalizes that into one envelope. R output is JSON, never regex-scraped (console regex is a documented fallback only). CI stays R-free by mocking `Rscript`.
 
-**Tech Stack:** Python 3 (stdlib only: `argparse`, `json`, `subprocess`, `pathlib`, `re`, `shutil`), R 4.x with `rcmdcheck`/`pkgbuild`/`roxygen2`/`testthat`/`covr`/`pkgdown`/`jsonlite`, pytest, rforge's `commands/*.md` + `lib/` conventions.
+**Tech Stack:** Python 3 (stdlib only), R 4.x with the engine packages above + `jsonlite`, pytest, rforge's `commands/*.md` + `lib/` conventions.
 
 **Spec:** `docs/specs/SPEC-r-dev-commands-2026-05-31.md`
 
 ---
 
+## The 12 new commands (+ `r:check` retrofit)
+
+| Kind | Command | Engine | Status rule |
+|------|---------|--------|-------------|
+| `load` | `r:load` | `pkgload::load_all()` | ok if exit 0 |
+| `document` | `r:document` | `roxygen2::roxygenize()` | ok if exit 0 |
+| `test` | `r:test` | `testthat::test_local(load_package="source")` | error if failed/exit≠0; warn if skip/warn |
+| `check` | `r:check` *(retrofit)* | `rcmdcheck::rcmdcheck(error_on="never")` | error if errors; warn if warnings/notes |
+| `coverage` | `r:coverage` | `covr::package_coverage` + `coverage_to_list` + `zero_coverage` | always ok (advisory) |
+| `build` | `r:build` | `pkgbuild::build()` | ok if exit 0 |
+| `install` | `r:install` | `R CMD INSTALL` (Python) | ok if exit 0 |
+| `site` | `r:site` | `pkgdown::pkgdown_sitrep` → `build_site`; flags below | error if build fails; warn if problems |
+| `cycle` | `r:cycle` | document→test→check (reuses `run()`) | worst of stages |
+| `lint` | `r:lint` | `lintr::lint_package()` | warn if any lints |
+| `spell` | `r:spell` | `spelling::spell_check_package()` | warn if any misspellings |
+| `urlcheck` | `r:urlcheck` | `urlchecker::url_check()` | warn if any broken |
+| `style` | `r:style` | `styler::style_pkg()` (mutates → show git diff) | ok if exit 0 |
+
+`r:site` flags: `--preview` (`preview_site()`), `--strict` (`check_pkgdown()` fail-fast / CI), `--articles-only` (`build_articles()`, reinstall first), `--devel` (`load_all`, fast).
+
+---
+
 ## Pre-flight (read before starting)
 
-- **You are in the worktree** `~/.git-worktrees/rforge/feature-r-dev-commands` on branch `feature/r-dev-commands`. Verify: `git branch --show-current` → `feature/r-dev-commands`. All work happens here.
-- **Run lib as a package:** `python3 -m lib.rcmd ...` — never `python3 lib/rcmd.py` (relative imports / package convention; see CLAUDE.md).
-- **Conventions to mirror:** read `commands/r/check.md` (command-file shape) and `lib/status.py` (lib module shape: `argparse` CLI, `main()`, module-level docstring) before Task 1.
-- **Test gates (must pass before PR):** `python3 -m pytest tests/` and `bash tests/test-all.sh`.
-- **Commit style:** conventional commits, sign-off footer `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`.
+- **You are in the worktree** `~/.git-worktrees/rforge/feature-r-dev-commands` on branch `feature/r-dev-commands`. Verify: `git branch --show-current`.
+- **Run lib as a package:** `python3 -m lib.rcmd ...` — never `python3 lib/rcmd.py`.
+- **Mirror conventions:** read `commands/r/check.md` (command shape) and `lib/status.py` (lib module shape) first.
+- **Engines:** required `rcmdcheck`/`pkgbuild`/`roxygen2`/`testthat`/`jsonlite` (`pkgload` rides along with testthat). Optional, degrade to 🟡 + install hint: `covr`/`pkgdown`/`lintr`/`spelling`/`urlchecker`/`styler`. System dep `pandoc` for `r:site` vignettes.
+- **Gates (must pass before PR):** `python3 -m pytest tests/` and `bash tests/test-all.sh`.
+- **Commits:** conventional + `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`.
+- **Do NOT touch** the rename stubs `commands/{doc-check,ecosystem-health,rpkg-check}.md`.
 
 ---
 
@@ -26,31 +52,23 @@
 
 | File | Responsibility |
 |------|----------------|
-| `lib/rcmd.py` (create) | Locate package, build per-kind R snippet, run `Rscript`, normalize JSON → common envelope, compute status dot, console fallback, graceful degradation |
-| `tests/test_rcmd.py` (create) | Unit tests for `find_package`, `normalize`, `console_fallback`, `r_snippet`, `main` (R subprocess mocked) |
-| `tests/fixtures/rcmd/*.json` (create) | Captured raw-engine JSON blobs + console samples |
+| `lib/rcmd.py` (create) | Locate package; per-kind R snippet; run `Rscript`; normalize JSON → envelope; status; console fallback; graceful degradation; cycle orchestration; install |
+| `tests/test_rcmd.py` (create) | Unit tests for every function; R subprocess mocked |
 | `commands/r/check.md` (modify) | Retrofit onto `lib.rcmd --kind check` |
-| `commands/r/build.md` (create) | `--kind build` prompt + report |
-| `commands/r/test.md` (create) | `--kind test` prompt + report |
-| `commands/r/document.md` (create) | `--kind document` prompt + report |
-| `commands/r/install.md` (create) | `--kind install` prompt + report |
-| `commands/r/coverage.md` (create) | `--kind coverage` prompt + report |
-| `commands/r/site.md` (create) | `--kind site` (+`--preview`) prompt + report |
-| `commands/r/cycle.md` (create) | document→test→check orchestration prompt |
-| `docs/reference/rcmd.md` (generate) | Auto-generated lib reference page |
-| `README.md`, `docs/index.md`, `docs/REFCARD.md` (modify) | Command tables + 16→23 count |
-| `mkdocs.yml` (modify) | Nav entries for new pages |
+| `commands/r/{load,build,test,document,install,coverage,site,cycle,lint,spell,urlcheck,style}.md` (create) | One prompt per kind |
+| `docs/reference/rcmd.md` (generate) | Auto-generated lib reference |
+| `README.md`, `docs/index.md`, `docs/REFCARD.md` (modify) | Command tables + 16→28 count |
+| `mkdocs.yml` (modify) | Nav entries |
 | `CHANGELOG.md` (modify) | `[Unreleased]` → `[2.1.0]` |
 | 4 version sources + doc refs (modify) | Bump to 2.1.0 |
+| `tests/test-all.sh` (modify) | `lib.rcmd` CLI smoke check |
 | `.STATUS` (modify) | Feature entry; Phase 4 → v2.2.0 |
 
 ---
 
 ## Task 1: `lib/rcmd.py` — package locator (TDD)
 
-**Files:**
-- Create: `lib/rcmd.py`
-- Test: `tests/test_rcmd.py`
+**Files:** Create `lib/rcmd.py`; Test `tests/test_rcmd.py`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -65,49 +83,58 @@ from lib import rcmd
 
 def _write_desc(tmp_path: Path, name="foo", version="0.2.0"):
     (tmp_path / "DESCRIPTION").write_text(
-        textwrap.dedent(f"""\
-            Package: {name}
-            Version: {version}
-            Title: Test
-            """)
+        textwrap.dedent(f"Package: {name}\nVersion: {version}\nTitle: Test\n")
     )
     return tmp_path
 
 
 def test_find_package_reads_description(tmp_path):
     _write_desc(tmp_path, "mypkg", "1.4.0")
-    info = rcmd.find_package(str(tmp_path))
-    assert info == {"package": "mypkg", "version": "1.4.0"}
+    assert rcmd.find_package(str(tmp_path)) == {"package": "mypkg", "version": "1.4.0"}
 
 
 def test_find_package_missing_returns_none(tmp_path):
     assert rcmd.find_package(str(tmp_path)) is None
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **Step 2: Run to verify fail**
 
-Run: `python3 -m pytest tests/test_rcmd.py -v`
-Expected: FAIL — `ModuleNotFoundError: No module named 'lib.rcmd'` (or `AttributeError`).
+Run: `python3 -m pytest tests/test_rcmd.py -v` → FAIL (`No module named 'lib.rcmd'`).
 
-- [ ] **Step 3: Write minimal implementation**
+- [ ] **Step 3: Implement**
 
 ```python
 # lib/rcmd.py
-"""Run R package dev-cycle engines and normalize their output to one JSON envelope.
+"""Run R package dev-cycle + quality engines and normalize output to one JSON envelope.
 
 Each "kind" maps to a lower-level R package (NOT devtools):
-  check -> rcmdcheck | build -> pkgbuild | document -> roxygen2
-  test  -> testthat  | coverage -> covr  | site -> pkgdown | install -> R CMD INSTALL
+  load->pkgload | document->roxygen2 | test->testthat | check->rcmdcheck
+  coverage->covr | build->pkgbuild | install->R CMD INSTALL | site->pkgdown
+  lint->lintr | spell->spelling | urlcheck->urlchecker | style->styler
 
 The R subprocess emits JSON via jsonlite; this module normalizes it. Console
-regex parsing exists only as a fallback when jsonlite/structured output is absent.
+regex parsing is only a fallback when jsonlite/structured output is absent.
 
-Usage:  python3 -m lib.rcmd --kind <kind> [--path .] [--as-cran] [--preview]
+Usage: python3 -m lib.rcmd --kind <kind> [--path .] [--as-cran]
+       [--preview] [--strict] [--articles-only] [--devel]
 """
 from __future__ import annotations
 
+import argparse
+import json
 import re
+import shutil
+import subprocess
+import sys
 from pathlib import Path
+
+OPTIONAL_ENGINES = {"covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler"}
+INSTALL_HINT = {
+    p: f'install.packages("{p}")'
+    for p in ("rcmdcheck", "pkgbuild", "roxygen2", "testthat", "pkgload",
+              "covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
+              "jsonlite")
+}
 
 
 def find_package(path: str = ".") -> dict | None:
@@ -125,10 +152,9 @@ def find_package(path: str = ".") -> dict | None:
     return {"package": fields["Package"], "version": fields.get("Version", "")}
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [ ] **Step 4: Run to verify pass**
 
-Run: `python3 -m pytest tests/test_rcmd.py -v`
-Expected: PASS (both tests).
+Run: `python3 -m pytest tests/test_rcmd.py -v` → PASS.
 
 - [ ] **Step 5: Commit**
 
@@ -141,60 +167,68 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 ---
 
-## Task 2: `normalize()` — envelope + status logic (TDD)
+## Task 2: `normalize()` + status for all kinds (TDD)
 
-**Files:**
-- Modify: `lib/rcmd.py`
-- Test: `tests/test_rcmd.py`
+**Files:** Modify `lib/rcmd.py`; Test `tests/test_rcmd.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [ ] **Step 1: Write failing tests**
 
 ```python
 # append to tests/test_rcmd.py
-def test_normalize_check_clean_is_ok():
-    raw = {"errors": [], "warnings": [], "notes": []}
-    env = rcmd.normalize("check", raw, exit_code=0, pkg={"package": "foo", "version": "1.0"})
+def test_normalize_check_clean_ok():
+    env = rcmd.normalize("check", {"errors": [], "warnings": [], "notes": []}, 0,
+                         {"package": "foo", "version": "1.0"})
+    assert env["status"] == "ok" and env["package"] == "foo"
+
+
+def test_normalize_check_notes_warn():
+    assert rcmd.normalize("check", {"notes": ["n"]}, 0, None)["status"] == "warn"
+
+
+def test_normalize_check_errors_error():
+    assert rcmd.normalize("check", {"errors": ["e"]}, 1, None)["status"] == "error"
+
+
+def test_normalize_test_failures_error():
+    env = rcmd.normalize("test", {"passed": 40, "failed": 2, "skipped": 1,
+                                  "warnings": 0, "failing_files": ["t-a.R"]}, 1, None)
+    assert env["status"] == "error" and env["tests"]["failing_files"] == ["t-a.R"]
+
+
+def test_normalize_coverage_includes_untested():
+    raw = {"total_pct": 80.0, "per_file": {"R/a.R": 50.0},
+           "untested": [{"file": "R/a.R", "first_line": 3, "last_line": 7}]}
+    env = rcmd.normalize("coverage", raw, 0, None)
     assert env["status"] == "ok"
-    assert env["check"] == {"errors": [], "warnings": [], "notes": []}
-    assert env["package"] == "foo"
+    assert env["coverage"]["untested"][0]["first_line"] == 3
 
 
-def test_normalize_check_notes_is_warn():
-    raw = {"errors": [], "warnings": [], "notes": ["one note"]}
-    env = rcmd.normalize("check", raw, exit_code=0, pkg=None)
-    assert env["status"] == "warn"
+@pytest.mark.parametrize("kind,key", [("lint", "lints"), ("spell", "misspelled"),
+                                      ("urlcheck", "broken")])
+def test_normalize_quality_warns_when_findings(kind, key):
+    assert rcmd.normalize(kind, {key: [{"x": 1}]}, 0, None)["status"] == "warn"
+    assert rcmd.normalize(kind, {key: []}, 0, None)["status"] == "ok"
 
 
-def test_normalize_check_errors_is_error():
-    raw = {"errors": ["boom"], "warnings": [], "notes": []}
-    env = rcmd.normalize("check", raw, exit_code=1, pkg=None)
-    assert env["status"] == "error"
+def test_normalize_style_ok_on_exit0():
+    assert rcmd.normalize("style", {"changed_files": ["R/a.R"]}, 0, None)["status"] == "ok"
 
 
-def test_normalize_test_failures_is_error():
-    raw = {"passed": 40, "failed": 2, "skipped": 1, "warnings": 0,
-           "failing_files": ["test-a.R"]}
-    env = rcmd.normalize("test", raw, exit_code=1, pkg=None)
-    assert env["status"] == "error"
-    assert env["tests"]["failing_files"] == ["test-a.R"]
-
-
-def test_normalize_engine_missing_is_error():
-    raw = {"engine_missing": ["pkgdown"]}
-    env = rcmd.normalize("site", raw, exit_code=1, pkg=None)
-    assert env["status"] == "error"
-    assert env["engine_missing"] == ["pkgdown"]
+def test_normalize_engine_missing_error():
+    env = rcmd.normalize("site", {"engine_missing": ["pkgdown"]}, 1, None)
+    assert env["status"] == "error" and env["engine_missing"] == ["pkgdown"]
 ```
 
 - [ ] **Step 2: Run to verify fail**
 
-Run: `python3 -m pytest tests/test_rcmd.py -k normalize -v`
-Expected: FAIL — `AttributeError: module 'lib.rcmd' has no attribute 'normalize'`.
+Run: `python3 -m pytest tests/test_rcmd.py -k normalize -v` → FAIL (no `normalize`).
 
 - [ ] **Step 3: Implement**
 
 ```python
 # add to lib/rcmd.py
+_QUALITY_KEY = {"lint": "lints", "spell": "misspelled", "urlcheck": "broken"}
+
 
 def _status_for(kind: str, raw: dict, exit_code: int) -> str:
     if raw.get("engine_missing"):
@@ -202,22 +236,20 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
     if kind == "check":
         if raw.get("errors"):
             return "error"
-        if raw.get("warnings") or raw.get("notes"):
-            return "warn"
-        return "ok"
+        return "warn" if (raw.get("warnings") or raw.get("notes")) else "ok"
     if kind == "test":
         if raw.get("failed") or exit_code != 0:
             return "error"
-        if raw.get("warnings") or raw.get("skipped"):
-            return "warn"
-        return "ok"
+        return "warn" if (raw.get("warnings") or raw.get("skipped")) else "ok"
     if kind == "site":
         if exit_code != 0 or not raw.get("built", True):
             return "error"
         return "warn" if raw.get("problems") else "ok"
     if kind == "coverage":
-        return "ok"  # informational; low files surfaced, not failed
-    # build, document, install: success == exit 0
+        return "ok"  # advisory; untested lines surfaced, never "error"
+    if kind in _QUALITY_KEY:
+        return "warn" if raw.get(_QUALITY_KEY[kind]) else "ok"
+    # load, document, install, build, style: success == exit 0
     return "ok" if exit_code == 0 else "error"
 
 
@@ -235,14 +267,13 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
     if kind == "check":
         env["check"] = {k: raw.get(k, []) for k in ("errors", "warnings", "notes")}
     elif kind == "test":
-        env["tests"] = {
-            "passed": raw.get("passed", 0), "failed": raw.get("failed", 0),
-            "skipped": raw.get("skipped", 0), "warnings": raw.get("warnings", 0),
-            "failing_files": raw.get("failing_files", []),
-        }
+        env["tests"] = {k: raw.get(k, 0) for k in
+                        ("passed", "failed", "skipped", "warnings")}
+        env["tests"]["failing_files"] = raw.get("failing_files", [])
     elif kind == "coverage":
         env["coverage"] = {"total_pct": raw.get("total_pct"),
-                           "per_file": raw.get("per_file", {})}
+                           "per_file": raw.get("per_file", {}),
+                           "untested": raw.get("untested", [])}
     elif kind == "build":
         env["build"] = {"artifact": raw.get("artifact"), "bytes": raw.get("bytes")}
     elif kind == "site":
@@ -252,91 +283,85 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
     elif kind == "install":
         env["install"] = {"installed_version": raw.get("installed_version"),
                           "exit": exit_code}
+    elif kind == "lint":
+        env["lint"] = {"count": len(raw.get("lints", [])), "lints": raw.get("lints", [])}
+    elif kind == "spell":
+        env["spell"] = {"count": len(raw.get("misspelled", [])),
+                        "misspelled": raw.get("misspelled", [])}
+    elif kind == "urlcheck":
+        env["urlcheck"] = {"count": len(raw.get("broken", [])),
+                           "broken": raw.get("broken", [])}
+    elif kind == "style":
+        env["style"] = {"count": len(raw.get("changed_files", [])),
+                        "changed_files": raw.get("changed_files", [])}
+    # load: no extra block — status carries the result
     return env
 ```
 
 - [ ] **Step 4: Run to verify pass**
 
-Run: `python3 -m pytest tests/test_rcmd.py -k normalize -v`
-Expected: PASS (5 tests).
+Run: `python3 -m pytest tests/test_rcmd.py -k normalize -v` → PASS.
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add lib/rcmd.py tests/test_rcmd.py
-git commit -m "feat(rcmd): normalize raw engine output into common envelope
+git commit -m "feat(rcmd): normalize all kinds into common envelope
 
 Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 ```
 
 ---
 
-## Task 3: `console_fallback()` — regex fallback (TDD)
+## Task 3: `console_fallback()` (TDD)
 
-**Files:**
-- Modify: `lib/rcmd.py`
-- Test: `tests/test_rcmd.py`
+**Files:** Modify `lib/rcmd.py`; Test `tests/test_rcmd.py`
 
-- [ ] **Step 1: Write failing tests**
+- [ ] **Step 1: Failing tests**
 
 ```python
 # append to tests/test_rcmd.py
-def test_console_fallback_testthat_summary():
-    text = "Some chatter\n[ FAIL 2 | WARN 0 | SKIP 1 | PASS 41 ]\n"
-    raw = rcmd.console_fallback("test", text)
+def test_console_fallback_testthat():
+    raw = rcmd.console_fallback("test", "[ FAIL 2 | WARN 0 | SKIP 1 | PASS 41 ]\n")
     assert raw == {"failed": 2, "warnings": 0, "skipped": 1, "passed": 41}
 
 
-def test_console_fallback_rcmdcheck_summary():
-    text = "... \n0 errors v | 1 warning x | 2 notes x\n"
-    raw = rcmd.console_fallback("check", text)
-    assert len(raw["errors"]) == 0
-    assert len(raw["warnings"]) == 1
-    assert len(raw["notes"]) == 2
+def test_console_fallback_rcmdcheck():
+    raw = rcmd.console_fallback("check", "0 errors v | 1 warning x | 2 notes x\n")
+    assert len(raw["errors"]) == 0 and len(raw["warnings"]) == 1 and len(raw["notes"]) == 2
 
 
 def test_console_fallback_unknown_returns_messages():
-    raw = rcmd.console_fallback("test", "no summary line here")
-    assert "messages" in raw
+    assert "messages" in rcmd.console_fallback("test", "nothing here")
 ```
 
-- [ ] **Step 2: Run to verify fail**
-
-Run: `python3 -m pytest tests/test_rcmd.py -k console -v`
-Expected: FAIL — no attribute `console_fallback`.
+- [ ] **Step 2: Run → FAIL** (`python3 -m pytest tests/test_rcmd.py -k console -v`).
 
 - [ ] **Step 3: Implement**
 
 ```python
 # add to lib/rcmd.py
-
 def console_fallback(kind: str, text: str) -> dict:
-    """Best-effort parse of human console output when JSON is unavailable.
-
-    Recognized formats:
-      testthat: '[ FAIL 2 | WARN 0 | SKIP 1 | PASS 41 ]'
-      rcmdcheck: '0 errors X | 1 warning Y | 2 notes Z'
+    """Best-effort parse when JSON is unavailable.
+    testthat: '[ FAIL 2 | WARN 0 | SKIP 1 | PASS 41 ]'
+    rcmdcheck: '0 errors X | 1 warning Y | 2 notes Z'
     """
     if kind == "test":
         m = re.search(r"FAIL\s+(\d+)\s*\|\s*WARN\s+(\d+)\s*\|\s*"
                       r"SKIP\s+(\d+)\s*\|\s*PASS\s+(\d+)", text)
         if m:
-            return {"failed": int(m.group(1)), "warnings": int(m.group(2)),
-                    "skipped": int(m.group(3)), "passed": int(m.group(4))}
+            return {"failed": int(m[1]), "warnings": int(m[2]),
+                    "skipped": int(m[3]), "passed": int(m[4])}
     if kind == "check":
         m = re.search(r"(\d+)\s+errors?\b.*?(\d+)\s+warnings?\b.*?(\d+)\s+notes?\b",
                       text, re.IGNORECASE | re.DOTALL)
         if m:
-            return {"errors": [""] * int(m.group(1)),
-                    "warnings": [""] * int(m.group(2)),
-                    "notes": [""] * int(m.group(3))}
+            return {"errors": [""] * int(m[1]), "warnings": [""] * int(m[2]),
+                    "notes": [""] * int(m[3])}
     return {"messages": [ln for ln in text.splitlines() if ln.strip()][-10:]}
 ```
 
-- [ ] **Step 4: Run to verify pass**
-
-Run: `python3 -m pytest tests/test_rcmd.py -k console -v`
-Expected: PASS (3 tests).
+- [ ] **Step 4: Run → PASS.**
 
 - [ ] **Step 5: Commit**
 
@@ -351,63 +376,68 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 ## Task 4: `r_snippet()` — per-kind R source (TDD)
 
-**Files:**
-- Modify: `lib/rcmd.py`
-- Test: `tests/test_rcmd.py`
+**Files:** Modify `lib/rcmd.py`; Test `tests/test_rcmd.py`
 
-- [ ] **Step 1: Write failing tests**
+> `install` is NOT in `r_snippet` — it runs `R CMD INSTALL` from Python (Task 5).
+> `load` has its own snippet. Signature carries the `r:site` flags.
+
+- [ ] **Step 1: Failing tests**
 
 ```python
 # append to tests/test_rcmd.py
 @pytest.mark.parametrize("kind,needle", [
-    ("check", "rcmdcheck::rcmdcheck"),
-    ("build", "pkgbuild::build"),
-    ("document", "roxygen2::roxygenize"),
-    ("test", "testthat::test_local"),
-    ("coverage", "covr::package_coverage"),
-    ("site", "pkgdown::build_site"),
+    ("check", "rcmdcheck::rcmdcheck"), ("build", "pkgbuild::build"),
+    ("document", "roxygen2::roxygenize"), ("test", "testthat::test_local"),
+    ("coverage", "covr::package_coverage"), ("site", "pkgdown::build_site"),
+    ("load", "pkgload::load_all"), ("lint", "lintr::lint_package"),
+    ("spell", "spelling::spell_check_package"), ("urlcheck", "urlchecker::url_check"),
+    ("style", "styler::style_pkg"),
 ])
 def test_r_snippet_uses_lower_level_engine(kind, needle):
-    src = rcmd.r_snippet(kind, path="/tmp/foo", as_cran=False, preview=False)
-    assert needle in src
-    assert "jsonlite::toJSON" in src
-    assert "devtools::" not in src  # never the meta-wrapper
+    src = rcmd.r_snippet(kind, "/tmp/foo")
+    assert needle in src and "jsonlite::toJSON" in src and "devtools::" not in src
 
 
-def test_r_snippet_check_as_cran_flag():
-    src = rcmd.r_snippet("check", "/tmp/foo", as_cran=True, preview=False)
-    assert "--as-cran" in src
-    assert 'error_on = "never"' in src
+def test_r_snippet_check_as_cran():
+    src = rcmd.r_snippet("check", "/tmp/foo", as_cran=True)
+    assert "--as-cran" in src and 'error_on = "never"' in src
 
 
-def test_r_snippet_site_preview():
-    assert "preview_site" in rcmd.r_snippet("site", "/tmp/f", False, preview=True)
-    assert "preview_site" not in rcmd.r_snippet("site", "/tmp/f", False, preview=False)
+def test_r_snippet_test_uses_load_package_source():
+    assert 'load_package="source"' in rcmd.r_snippet("test", "/tmp/foo")
+
+
+def test_r_snippet_coverage_uses_zero_coverage():
+    assert "zero_coverage" in rcmd.r_snippet("coverage", "/tmp/foo")
+
+
+def test_r_snippet_site_flags():
+    assert "preview_site" in rcmd.r_snippet("site", "/tmp/f", preview=True)
+    assert "preview_site" not in rcmd.r_snippet("site", "/tmp/f")
+    assert "check_pkgdown" in rcmd.r_snippet("site", "/tmp/f", strict=True)
+    assert "pkgdown_sitrep" in rcmd.r_snippet("site", "/tmp/f")  # default
+    assert "build_articles" in rcmd.r_snippet("site", "/tmp/f", articles_only=True)
 ```
 
-- [ ] **Step 2: Run to verify fail**
-
-Run: `python3 -m pytest tests/test_rcmd.py -k snippet -v`
-Expected: FAIL — no attribute `r_snippet`.
+- [ ] **Step 2: Run → FAIL** (no `r_snippet`).
 
 - [ ] **Step 3: Implement**
 
 ```python
 # add to lib/rcmd.py
-import json as _json
-
-# Each engine is gated: if requireNamespace fails, emit engine_missing JSON.
 def _guard(pkg_name: str, body: str) -> str:
+    """Prefix that emits engine_missing JSON if the package or jsonlite is absent."""
     return (
         f'if (!requireNamespace("{pkg_name}", quietly=TRUE) || '
         f'!requireNamespace("jsonlite", quietly=TRUE)) {{'
-        f'cat(\'{{"engine_missing":["{pkg_name}"]}}\'); quit(status=0)}}; '
-        + body
+        f'cat(\'{{"engine_missing":["{pkg_name}"]}}\'); quit(status=0)}}; ' + body
     )
 
 
-def r_snippet(kind: str, path: str, as_cran: bool, preview: bool) -> str:
-    p = _json.dumps(path)  # safely quote the path for R
+def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = False,
+              strict: bool = False, articles_only: bool = False,
+              devel: bool = False) -> str:
+    p = json.dumps(path)  # safely quote path for R
     if kind == "check":
         args = 'c("--as-cran")' if as_cran else "character()"
         return _guard("rcmdcheck",
@@ -420,124 +450,144 @@ def r_snippet(kind: str, path: str, as_cran: bool, preview: bool) -> str:
             f'cat(jsonlite::toJSON(list(artifact=basename(p), '
             f'bytes=as.integer(file.info(p)$size)), auto_unbox=TRUE))')
     if kind == "document":
-        return _guard("roxygen2",
-            f'roxygen2::roxygenize({p}); cat(\'{{"documented":true}}\')')
+        return _guard("roxygen2", f'roxygen2::roxygenize({p}); cat(\'{{"documented":true}}\')')
+    if kind == "load":
+        return _guard("pkgload", f'pkgload::load_all({p}); cat(\'{{"loaded":true}}\')')
     if kind == "test":
         return _guard("testthat",
-            f'res <- testthat::test_local({p}, reporter="list", stop_on_failure=FALSE); '
-            f'df <- as.data.frame(res); '
+            f'res <- testthat::test_local({p}, load_package="source", '
+            f'reporter="list", stop_on_failure=FALSE); df <- as.data.frame(res); '
             f'cat(jsonlite::toJSON(list(passed=sum(df$passed), failed=sum(df$failed), '
             f'skipped=sum(df$skipped), warnings=sum(df$warning), '
             f'failing_files=unique(df$file[df$failed>0 | df$error>0])), auto_unbox=TRUE))')
     if kind == "coverage":
         return _guard("covr",
             f'cv <- covr::package_coverage({p}); l <- covr::coverage_to_list(cv); '
+            f'z <- covr::zero_coverage(cv); '
+            f'untested <- if (nrow(z)) {{ag <- stats::aggregate(line ~ filename, z, '
+            f'function(x) c(first=min(x), last=max(x))); lapply(seq_len(nrow(ag)), '
+            f'function(i) list(file=ag$filename[i], '
+            f'first_line=as.integer(ag$line[i,"first"]), '
+            f'last_line=as.integer(ag$line[i,"last"])))}} else list(); '
             f'cat(jsonlite::toJSON(list(total_pct=covr::percent_coverage(cv), '
-            f'per_file=as.list(l$filecoverage)), auto_unbox=TRUE))')
+            f'per_file=as.list(l$filecoverage), untested=untested), '
+            f'auto_unbox=TRUE, null="list"))')
     if kind == "site":
-        prev = ('pkgdown::preview_site(' + p + '); ' if preview else '')
+        prev = f'pkgdown::preview_site({p}); ' if preview else ''
+        gate = (f'pkgdown::check_pkgdown({p}); ' if strict
+                else f'probs <- paste(utils::capture.output('
+                     f'pkgdown::pkgdown_sitrep({p})), collapse="\\n"); ')
+        build = (f'pkgdown::build_articles({p}, preview=FALSE)' if articles_only
+                 else f'pkgdown::build_site({p}, preview=FALSE, new_process=TRUE, '
+                      f'quiet=TRUE, devel={"TRUE" if devel else "FALSE"})')
+        probs = 'character()' if strict else 'if (exists("probs")) probs else ""'
         return _guard("pkgdown",
-            f'chk <- tryCatch({{pkgdown::check_pkgdown({p}); list(ok=TRUE, problems=character())}}, '
-            f'error=function(e) list(ok=FALSE, problems=conditionMessage(e))); '
-            f'pkgdown::build_site({p}, preview=FALSE, new_process=TRUE, quiet=TRUE); {prev}'
+            f'{gate}{build}; {prev}'
             f'cat(jsonlite::toJSON(list(checked=TRUE, built=TRUE, '
-            f'problems=as.list(chk$problems)), auto_unbox=TRUE))')
+            f'problems=as.list({probs})), auto_unbox=TRUE, null="list"))')
+    if kind == "lint":
+        return _guard("lintr",
+            f'ls <- lintr::lint_package({p}); '
+            f'cat(jsonlite::toJSON(list(lints=lapply(ls, function(x) list('
+            f'file=x$filename, line=x$line_number, linter=x$linter, '
+            f'message=x$message))), auto_unbox=TRUE, null="list"))')
+    if kind == "spell":
+        return _guard("spelling",
+            f'sp <- spelling::spell_check_package({p}); '
+            f'cat(jsonlite::toJSON(list(misspelled=lapply(seq_len(nrow(sp)), '
+            f'function(i) list(word=sp$word[i], files=sp$found[[i]]))), '
+            f'auto_unbox=TRUE, null="list"))')
+    if kind == "urlcheck":
+        # NOTE: verify column names with names(urlchecker::url_check(".")) — vary by version
+        return _guard("urlchecker",
+            f'u <- urlchecker::url_check({p}); '
+            f'cat(jsonlite::toJSON(list(broken=lapply(seq_len(nrow(u)), '
+            f'function(i) list(url=u$URL[i], message=u$message[i], '
+            f'new_url=u$newURL[i]))), auto_unbox=TRUE, null="list"))')
+    if kind == "style":
+        return _guard("styler",
+            f'res <- styler::style_pkg({p}); '
+            f'cat(jsonlite::toJSON(list(changed_files='
+            f'as.list(res$file[res$changed %in% TRUE])), auto_unbox=TRUE, null="list"))')
     raise ValueError(f"unknown kind: {kind}")
 ```
 
-> NOTE for `install`: handled in Python (`R CMD INSTALL`), not via `r_snippet` — see Task 5.
-
-- [ ] **Step 4: Run to verify pass**
-
-Run: `python3 -m pytest tests/test_rcmd.py -k snippet -v`
-Expected: PASS (8 parametrized + 2).
+- [ ] **Step 4: Run → PASS** (`python3 -m pytest tests/test_rcmd.py -k snippet -v`).
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add lib/rcmd.py tests/test_rcmd.py
-git commit -m "feat(rcmd): per-kind R snippets using lower-level engines
+git commit -m "feat(rcmd): per-kind R snippets (lower-level engines, JSON out)
 
 Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 ```
 
 ---
 
-## Task 5: `run()` + `main()` CLI with mocked R (TDD)
+## Task 5: `run()`, `main()`, cycle, install (TDD)
 
-**Files:**
-- Modify: `lib/rcmd.py`
-- Test: `tests/test_rcmd.py`
+**Files:** Modify `lib/rcmd.py`; Test `tests/test_rcmd.py`
 
-- [ ] **Step 1: Write failing tests** (mock the R subprocess via monkeypatch)
+- [ ] **Step 1: Failing tests**
 
 ```python
 # append to tests/test_rcmd.py
-def test_run_check_happy_path(tmp_path, monkeypatch):
+def test_run_check_happy(tmp_path, monkeypatch):
     _write_desc(tmp_path, "foo", "0.2.0")
-
-    def fake_invoke(snippet):  # returns (stdout, exit_code)
-        return ('{"errors":[],"warnings":["W"],"notes":[]}', 0)
-
-    monkeypatch.setattr(rcmd, "_invoke_r", lambda snippet: fake_invoke(snippet))
-    env = rcmd.run("check", str(tmp_path), as_cran=False, preview=False)
-    assert env["status"] == "warn"
-    assert env["package"] == "foo"
+    monkeypatch.setattr(rcmd, "_invoke_r",
+                        lambda s: ('{"errors":[],"warnings":["W"],"notes":[]}', 0))
+    env = rcmd.run("check", str(tmp_path))
+    assert env["status"] == "warn" and env["package"] == "foo"
     assert env["check"]["warnings"] == ["W"]
 
 
-def test_run_no_description_errors(tmp_path):
-    env = rcmd.run("check", str(tmp_path), as_cran=False, preview=False)
-    assert env["status"] == "error"
-    assert "detect" in " ".join(env["messages"]).lower()
+def test_run_no_description_error(tmp_path):
+    env = rcmd.run("check", str(tmp_path))
+    assert env["status"] == "error" and "detect" in " ".join(env["messages"]).lower()
 
 
 def test_run_falls_back_on_nonjson(tmp_path, monkeypatch):
     _write_desc(tmp_path)
     monkeypatch.setattr(rcmd, "_invoke_r",
                         lambda s: ("[ FAIL 1 | WARN 0 | SKIP 0 | PASS 9 ]", 1))
-    env = rcmd.run("test", str(tmp_path), as_cran=False, preview=False)
-    assert env["tests"]["failed"] == 1
-    assert env["status"] == "error"
+    env = rcmd.run("test", str(tmp_path))
+    assert env["tests"]["failed"] == 1 and env["status"] == "error"
+
+
+def test_run_optional_engine_missing_downgrades_to_warn(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"engine_missing":["pkgdown"]}', 0))
+    env = rcmd.run("site", str(tmp_path))
+    assert env["status"] == "warn"  # optional engine → warn, not error
+    assert any("pkgdown" in m for m in env["messages"])
+
+
+def test_cycle_stops_on_first_error(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    calls = []
+    def fake_run(kind, path, **kw):
+        calls.append(kind)
+        return {"kind": kind, "status": "error" if kind == "test" else "ok",
+                "engine_missing": [], "messages": []}
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cycle(str(tmp_path))
+    assert env["failed_stage"] == "test" and calls == ["document", "test"]
 
 
 def test_main_emits_json(tmp_path, monkeypatch, capsys):
     _write_desc(tmp_path)
-    monkeypatch.setattr(rcmd, "_invoke_r",
-                        lambda s: ('{"errors":[],"warnings":[],"notes":[]}', 0))
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"errors":[],"warnings":[],"notes":[]}', 0))
     rc = rcmd.main(["--kind", "check", "--path", str(tmp_path)])
-    out = json.loads(capsys.readouterr().out)
-    assert out["status"] == "ok"
-    assert rc == 0
+    assert json.loads(capsys.readouterr().out)["status"] == "ok" and rc == 0
 ```
 
-- [ ] **Step 2: Run to verify fail**
-
-Run: `python3 -m pytest tests/test_rcmd.py -k "run or main" -v`
-Expected: FAIL — no attribute `run`/`_invoke_r`/`main`.
+- [ ] **Step 2: Run → FAIL** (no `run`/`_invoke_r`/`main`).
 
 - [ ] **Step 3: Implement**
 
 ```python
 # add to lib/rcmd.py
-import argparse
-import json
-import shutil
-import subprocess
-import sys
-
-OPTIONAL_ENGINES = {"covr", "pkgdown"}
-INSTALL_HINT = {
-    "rcmdcheck": 'install.packages("rcmdcheck")',
-    "pkgbuild": 'install.packages("pkgbuild")',
-    "roxygen2": 'install.packages("roxygen2")',
-    "testthat": 'install.packages("testthat")',
-    "covr": 'install.packages("covr")',
-    "pkgdown": 'install.packages("pkgdown")',
-    "jsonlite": 'install.packages("jsonlite")',
-}
-
-
 def _invoke_r(snippet: str) -> tuple[str, int]:
     """Run an R snippet via Rscript; return (stdout, exit_code). Mocked in tests."""
     rscript = shutil.which("Rscript")
@@ -553,13 +603,12 @@ def _install_package(path: str) -> tuple[dict, int]:
     rbin = shutil.which("R")
     if rbin is None:
         return ({"engine_missing": ["R"]}, 127)
-    proc = subprocess.run([rbin, "CMD", "INSTALL", path],
-                          capture_output=True, text=True)
+    proc = subprocess.run([rbin, "CMD", "INSTALL", path], capture_output=True, text=True)
     return ({"installed_version": pkg.get("version")}, proc.returncode)
 
 
-def run(kind: str, path: str = ".", *, as_cran: bool = False,
-        preview: bool = False) -> dict:
+def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = False,
+        strict: bool = False, articles_only: bool = False, devel: bool = False) -> dict:
     pkg = find_package(path)
     if pkg is None:
         return {"kind": kind, "status": "error", "engine_missing": [],
@@ -568,38 +617,22 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False,
     if kind == "install":
         raw, code = _install_package(path)
     else:
-        stdout, code = _invoke_r(r_snippet(kind, path, as_cran, preview))
+        if kind == "site" and articles_only:
+            _install_package(path)  # standalone build_articles renders installed version
+        snippet = r_snippet(kind, path, as_cran=as_cran, preview=preview,
+                            strict=strict, articles_only=articles_only, devel=devel)
+        stdout, code = _invoke_r(snippet)
         try:
             raw = json.loads(stdout) if stdout else {}
         except json.JSONDecodeError:
             raw = console_fallback(kind, stdout)
     env = normalize(kind, raw, code, pkg)
-    # attach install hints for any missing engine
     for eng in env.get("engine_missing", []):
-        hint = INSTALL_HINT.get(eng)
-        if hint:
-            env.setdefault("messages", []).append(f"Missing R package — run: {hint}")
+        if INSTALL_HINT.get(eng):
+            env.setdefault("messages", []).append(f"Missing R package — run: {INSTALL_HINT[eng]}")
         if eng in OPTIONAL_ENGINES and env["status"] == "error":
-            env["status"] = "warn"  # optional engines downgrade
+            env["status"] = "warn"
     return env
-
-
-def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(prog="python3 -m lib.rcmd",
-                                 description="Run an R dev-cycle engine, emit JSON.")
-    ap.add_argument("--kind", required=True,
-                    choices=["check", "build", "test", "document",
-                             "install", "coverage", "site", "cycle"])
-    ap.add_argument("--path", default=".")
-    ap.add_argument("--as-cran", action="store_true")
-    ap.add_argument("--preview", action="store_true")
-    ns = ap.parse_args(argv)
-    if ns.kind == "cycle":
-        env = _run_cycle(ns.path)
-    else:
-        env = run(ns.kind, ns.path, as_cran=ns.as_cran, preview=ns.preview)
-    print(json.dumps(env, indent=2))
-    return 0 if env.get("status") != "error" else 1
 
 
 def _run_cycle(path: str) -> dict:
@@ -618,39 +651,39 @@ def _run_cycle(path: str) -> dict:
             "engine_missing": [], "messages": []}
 
 
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog="python3 -m lib.rcmd",
+                                 description="Run an R dev-cycle/quality engine, emit JSON.")
+    ap.add_argument("--kind", required=True,
+                    choices=["load", "document", "test", "check", "coverage", "build",
+                             "install", "site", "cycle", "lint", "spell", "urlcheck", "style"])
+    ap.add_argument("--path", default=".")
+    ap.add_argument("--as-cran", action="store_true")
+    ap.add_argument("--preview", action="store_true")
+    ap.add_argument("--strict", action="store_true")
+    ap.add_argument("--articles-only", action="store_true")
+    ap.add_argument("--devel", action="store_true")
+    ns = ap.parse_args(argv)
+    if ns.kind == "cycle":
+        env = _run_cycle(ns.path)
+    else:
+        env = run(ns.kind, ns.path, as_cran=ns.as_cran, preview=ns.preview,
+                  strict=ns.strict, articles_only=ns.articles_only, devel=ns.devel)
+    print(json.dumps(env, indent=2))
+    return 0 if env.get("status") != "error" else 1
+
+
 if __name__ == "__main__":
     sys.exit(main())
 ```
 
-- [ ] **Step 4: Run full suite**
+- [ ] **Step 4: Run full suite → PASS** (`python3 -m pytest tests/test_rcmd.py -v`, ~30 tests).
 
-Run: `python3 -m pytest tests/test_rcmd.py -v`
-Expected: PASS (all ~20 tests).
-
-- [ ] **Step 5: Add a `cycle` test, then commit**
-
-```python
-# append to tests/test_rcmd.py
-def test_cycle_stops_on_first_error(tmp_path, monkeypatch):
-    _write_desc(tmp_path)
-    calls = []
-
-    def fake_run(kind, path, **kw):
-        calls.append(kind)
-        return {"kind": kind, "status": "error" if kind == "test" else "ok",
-                "engine_missing": [], "messages": []}
-
-    monkeypatch.setattr(rcmd, "run", fake_run)
-    env = rcmd._run_cycle(str(tmp_path))
-    assert env["failed_stage"] == "test"
-    assert calls == ["document", "test"]  # never reached "check"
-```
-
-Run: `python3 -m pytest tests/test_rcmd.py -k cycle -v` → PASS, then:
+- [ ] **Step 5: Commit**
 
 ```bash
 git add lib/rcmd.py tests/test_rcmd.py
-git commit -m "feat(rcmd): run/main CLI + cycle orchestration
+git commit -m "feat(rcmd): run/main CLI, cycle orchestration, install
 
 Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 ```
@@ -659,59 +692,44 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 ## Task 6: Retrofit `commands/r/check.md`
 
-**Files:**
-- Modify: `commands/r/check.md`
+**Files:** Modify `commands/r/check.md` (keep frontmatter `name`/`arguments`; replace body)
 
-- [ ] **Step 1: Replace the body** (keep frontmatter `name`/`arguments`; update process to call lib.rcmd)
-
-Replace everything below the frontmatter with:
+- [ ] **Step 1: Replace body below frontmatter**
 
 ````markdown
 # R Package Check
 
-Run `R CMD check` (via `rcmdcheck`) on an R package and report structured results.
+Run `R CMD check` (via `rcmdcheck`) and report structured results.
 
 ## Process
 
-1. Resolve the package path from `$ARGUMENTS` (default: current directory).
-2. Run the check through the shared runner:
-
-   ```bash
-   python3 -m lib.rcmd --kind check --path "<path>"   # add --as-cran if requested
-   ```
-
-3. Parse the JSON envelope and render the report below. Do **not** re-run R yourself.
+1. Resolve package path from `$ARGUMENTS` (default: current dir).
+2. `python3 -m lib.rcmd --kind check --path "<path>"` (add `--as-cran` if requested).
+3. Render the JSON envelope below. Do not re-run R yourself.
 
 ## Output Format
 
 ```markdown
 ## Package Check: {package} v{version}
-
-### Status: {🟢 if ok / 🟡 if warn / 🔴 if error}
-
+### Status: {🟢 ok / 🟡 warn / 🔴 error}
 ### R CMD Check
 - Errors: {len check.errors}
 - Warnings: {len check.warnings}
 - Notes: {len check.notes}
-
-{If any errors/warnings/notes: list each message as a bullet}
-
+{list each message as a bullet, if any}
 ### Recommended Actions
-{1-3 concrete next steps, or "None — package is clean ✅"}
+{1-3 steps, or "None — package is clean ✅"}
 ```
 
-If `engine_missing` is non-empty, report 🔴 and surface the install hint from `messages`.
+If `engine_missing` is non-empty, report 🔴 with the install hint from `messages`.
 
 ## Related Commands
 - `/rforge:r:cycle` — document → test → check in one pass
-- `/rforge:thorough` — multi-package rollup including R CMD check
+- `/rforge:thorough` — **ecosystem** rollup incl. R CMD check (this is **single-package**)
 - `/rforge:docs:check` — documentation drift (complements R CMD check)
 ````
 
-- [ ] **Step 2: Verify frontmatter still valid**
-
-Run: `bash tests/test-all.sh 2>&1 | grep -iE "frontmatter|command-name|uniqueness"`
-Expected: those checks PASS.
+- [ ] **Step 2: Verify** `bash tests/test-all.sh 2>&1 | grep -iE "frontmatter|uniqueness"` → PASS.
 
 - [ ] **Step 3: Commit**
 
@@ -724,16 +742,18 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 ---
 
-## Task 7: New command files (`build`, `test`, `document`, `install`, `coverage`, `site`, `cycle`)
+## Task 7: Create the 12 new command files
 
-**Files:** Create all seven under `commands/r/`. Each mirrors `check.md`'s shape: frontmatter (`name: rforge:r:<verb>`, `description`, `arguments`) + a `## Process` calling `python3 -m lib.rcmd --kind <verb>` + an `## Output Format` rendering the relevant envelope fields.
+**Files:** Create under `commands/r/`. Each mirrors `check.md`: frontmatter (`name: rforge:r:<verb>`, `description`, `arguments`) + `## Process` calling `python3 -m lib.rcmd --kind <verb>` + `## Output Format` + `## Related Commands` (with boundary cross-links per the dedup audit).
 
-- [ ] **Step 1: Create `commands/r/build.md`**
+> Full content for each is below. After creating all, run the gate in Step 13.
+
+- [ ] **Step 1: `commands/r/load.md`**
 
 ````markdown
 ---
-name: rforge:r:build
-description: Build an R package tarball (pkgbuild) and report the artifact
+name: rforge:r:load
+description: Load the package into a namespace (pkgload::load_all) for dev
 arguments:
   - name: package
     description: Package path (defaults to current directory)
@@ -741,76 +761,29 @@ arguments:
     type: string
 ---
 
-# R Package Build
+# R Package Load
 
-Build a source tarball via `pkgbuild::build()` and report the artifact.
+Simulate-install the package into a namespace via `pkgload::load_all()`.
 
 ## Process
-
 ```bash
-python3 -m lib.rcmd --kind build --path "<path from $ARGUMENTS or .>"
+python3 -m lib.rcmd --kind load --path "<path>"
 ```
 
-Render the JSON envelope. Do not run R directly.
-
 ## Output Format
-
 ```markdown
-## Build: {package} v{version}
+## Load: {package} v{version}
 ### Status: {🟢/🔴}
-- Artifact: `{build.artifact}`
-- Size: {build.bytes / 1024} KB
-{If engine_missing or status error: show messages / install hint}
+{On success: "Loaded {package} into the namespace."}
+{On error or engine_missing: surface messages}
 ```
 
 ## Related Commands
-- `/rforge:r:check` — validate before building
-- `/rforge:r:install` — install the built package
+- `/rforge:r:test` — load happens automatically inside test_local
+- `/rforge:r:document` — regenerate docs after changing exports
 ````
 
-- [ ] **Step 2: Create `commands/r/test.md`**
-
-````markdown
----
-name: rforge:r:test
-description: Run package tests (testthat) and report pass/fail/skip counts
-arguments:
-  - name: package
-    description: Package path (defaults to current directory)
-    required: false
-    type: string
----
-
-# R Package Tests
-
-Run the test suite via `testthat::test_local()` and report results.
-
-## Process
-
-```bash
-python3 -m lib.rcmd --kind test --path "<path>"
-```
-
-## Output Format
-
-```markdown
-## Tests: {package} v{version}
-### Status: {🟢 if 0 failed / 🟡 if skips or warnings / 🔴 if failures}
-- Passed: {tests.passed}
-- Failed: {tests.failed}
-- Skipped: {tests.skipped}
-- Warnings: {tests.warnings}
-{If failing_files: list each under "### Failing files"}
-### Recommended Actions
-{Next steps or "All green ✅"}
-```
-
-## Related Commands
-- `/rforge:r:cycle` — document → test → check
-- `/rforge:r:coverage` — test coverage report
-````
-
-- [ ] **Step 3: Create `commands/r/document.md`**
+- [ ] **Step 2: `commands/r/document.md`**
 
 ````markdown
 ---
@@ -827,32 +800,143 @@ arguments:
 
 Regenerate `man/*.Rd` and `NAMESPACE` via `roxygen2::roxygenize()`.
 
-> This is the blessed regeneration path. The PreToolUse hook blocks *hand-edits*
-> to `man/*.Rd`; running roxygen via this command (Bash) is allowed.
+> Blessed regeneration path. The PreToolUse hook blocks *hand-edits* to
+> `man/*.Rd`; running roxygen via this command (Bash) is allowed.
 
 ## Process
-
 ```bash
 python3 -m lib.rcmd --kind document --path "<path>"
 ```
 
 ## Output Format
-
 ```markdown
 ## Document: {package} v{version}
 ### Status: {🟢/🔴}
 {On success: "Regenerated man/ and NAMESPACE."}
-{On error: surface messages}
 ### Recommended Actions
-- Review changes: `git diff man/ NAMESPACE`
+- Review: `git diff man/ NAMESPACE`
 ```
 
 ## Related Commands
 - `/rforge:r:check` — verify docs after regenerating
-- `/rforge:docs:check` — documentation drift across packages
+- `/rforge:docs:check` — **detect** doc drift across packages (this **regenerates**)
 ````
 
-- [ ] **Step 4: Create `commands/r/install.md`**
+- [ ] **Step 3: `commands/r/test.md`**
+
+````markdown
+---
+name: rforge:r:test
+description: Run package tests (testthat) and report pass/fail/skip counts
+arguments:
+  - name: package
+    description: Package path (defaults to current directory)
+    required: false
+    type: string
+---
+
+# R Package Tests
+
+Run the suite via `testthat::test_local()` (self-loads the package via pkgload).
+
+## Process
+```bash
+python3 -m lib.rcmd --kind test --path "<path>"
+```
+
+## Output Format
+```markdown
+## Tests: {package} v{version}
+### Status: {🟢 0 failed / 🟡 skips or warnings / 🔴 failures}
+- Passed: {tests.passed}
+- Failed: {tests.failed}
+- Skipped: {tests.skipped}
+- Warnings: {tests.warnings}
+{If failing_files: list under "### Failing files"}
+### Recommended Actions
+{Next steps or "All green ✅"}
+```
+
+## Related Commands
+- `/rforge:r:cycle` — document → test → check
+- `/rforge:r:coverage` — which lines the tests miss
+````
+
+- [ ] **Step 4: `commands/r/coverage.md`**
+
+````markdown
+---
+name: rforge:r:coverage
+description: Test coverage (covr) — total, per-file, and untested lines
+arguments:
+  - name: package
+    description: Package path (defaults to current directory)
+    required: false
+    type: string
+---
+
+# R Package Coverage
+
+Compute coverage via `covr::package_coverage()` (+ `zero_coverage()` for gaps).
+`covr` is optional — if `engine_missing` includes `covr`, report 🟡 + install hint.
+
+## Process
+```bash
+python3 -m lib.rcmd --kind coverage --path "<path>"
+```
+
+## Output Format
+```markdown
+## Coverage: {package} v{version}
+### Total: {coverage.total_pct}%
+### Lowest-covered files
+{Top 5 ascending from coverage.per_file: "- R/foo.R — 12.0%"}
+### Untested lines
+{From coverage.untested: "- R/foo.R:12-18"}
+### Recommended Actions
+{Point at untested ranges ("add tests for R/foo.R:12-18"), or "Healthy ✅"}
+```
+
+## Related Commands
+- `/rforge:r:test` — run the tests behind the coverage
+````
+
+- [ ] **Step 5: `commands/r/build.md`**
+
+````markdown
+---
+name: rforge:r:build
+description: Build an R package tarball (pkgbuild) and report the artifact
+arguments:
+  - name: package
+    description: Package path (defaults to current directory)
+    required: false
+    type: string
+---
+
+# R Package Build
+
+Build a source tarball via `pkgbuild::build()`.
+
+## Process
+```bash
+python3 -m lib.rcmd --kind build --path "<path>"
+```
+
+## Output Format
+```markdown
+## Build: {package} v{version}
+### Status: {🟢/🔴}
+- Artifact: `{build.artifact}`
+- Size: {build.bytes / 1024} KB
+```
+
+## Related Commands
+- `/rforge:r:check` — validate before building
+- `/rforge:r:install` — install the built package
+````
+
+- [ ] **Step 6: `commands/r/install.md`**
 
 ````markdown
 ---
@@ -867,81 +951,53 @@ arguments:
 
 # R Package Install
 
-Install the package via `R CMD INSTALL` and report the installed version.
+Install via `R CMD INSTALL`.
 
 ## Process
-
 ```bash
 python3 -m lib.rcmd --kind install --path "<path>"
 ```
 
 ## Output Format
-
 ```markdown
 ## Install: {package} v{version}
-### Status: {🟢 if exit 0 / 🔴}
+### Status: {🟢 exit 0 / 🔴}
 - Installed version: {install.installed_version}
 {On error: surface messages (e.g. unmet dependencies)}
 ```
 
 ## Related Commands
 - `/rforge:r:build` — build before installing
-- `/rforge:r:check` — validate first
 ````
 
-- [ ] **Step 5: Create `commands/r/coverage.md`**
-
-````markdown
----
-name: rforge:r:coverage
-description: Test coverage report (covr) — total and per-file
-arguments:
-  - name: package
-    description: Package path (defaults to current directory)
-    required: false
-    type: string
----
-
-# R Package Coverage
-
-Compute coverage via `covr::package_coverage()`.
-
-## Process
-
-```bash
-python3 -m lib.rcmd --kind coverage --path "<path>"
-```
-
-`covr` is optional — if `engine_missing` includes `covr`, report 🟡 with the install hint.
-
-## Output Format
-
-```markdown
-## Coverage: {package} v{version}
-### Total: {coverage.total_pct}%
-### Lowest-covered files
-{Sorted ascending from coverage.per_file, top 5: "- R/foo.R — 12.0%"}
-### Recommended Actions
-{Point at the lowest files, or "Coverage looks healthy ✅"}
-```
-
-## Related Commands
-- `/rforge:r:test` — run the tests behind the coverage
-````
-
-- [ ] **Step 6: Create `commands/r/site.md`**
+- [ ] **Step 7: `commands/r/site.md`**
 
 ````markdown
 ---
 name: rforge:r:site
-description: Build the pkgdown website; optionally preview it
+description: Build the pkgdown website (vignettes→articles); optional preview
 arguments:
   - name: package
     description: Package path (defaults to current directory)
     required: false
     type: string
   - name: preview
-    description: Open the built site locally (pkgdown::preview_site)
+    description: Open the built site (pkgdown::preview_site)
+    required: false
+    type: boolean
+    default: false
+  - name: strict
+    description: Fail-fast config check (check_pkgdown) for CI
+    required: false
+    type: boolean
+    default: false
+  - name: articles-only
+    description: Build only articles/vignettes (reinstalls first)
+    required: false
+    type: boolean
+    default: false
+  - name: devel
+    description: Fast in-process build via load_all (lower fidelity)
     required: false
     type: boolean
     default: false
@@ -949,24 +1005,22 @@ arguments:
 
 # R Package Website
 
-Validate and build the pkgdown site via `check_pkgdown()` + `build_site()`.
+Validate (`pkgdown_sitrep`, or `check_pkgdown` with `--strict`) then build the site.
+`pkgdown` is optional — if `engine_missing` includes `pkgdown`, report 🟡 + hint.
+Needs `pandoc` to render vignettes; if absent, report 🟡 with the pandoc hint.
 
 ## Process
-
 ```bash
-python3 -m lib.rcmd --kind site --path "<path>"   # add --preview if requested
+python3 -m lib.rcmd --kind site --path "<path>"   # + --preview / --strict / --articles-only / --devel
 ```
 
-`pkgdown` is optional — if `engine_missing` includes `pkgdown`, report 🟡 with the install hint.
-
 ## Output Format
-
 ```markdown
 ## Website: {package} v{version}
 ### Status: {🟢 built clean / 🟡 built with problems / 🔴 build failed}
-- Checked: {site.checked}
-- Built: {site.built}
-{If site.problems: list each under "### Problems"}
+- Checked: {site.checked} · Built: {site.built}
+{If status 🔴: "### Vignette/render errors" — point at the failing .Rmd from messages}
+{If site.problems: "### Config/index problems" — list each (url, un-indexed topics)}
 ### Recommended Actions
 {Fix problems, or "Site built to docs/ ✅"}
 ```
@@ -975,7 +1029,7 @@ python3 -m lib.rcmd --kind site --path "<path>"   # add --preview if requested
 - `/rforge:r:document` — ensure Rd docs exist before building the site
 ````
 
-- [ ] **Step 7: Create `commands/r/cycle.md`**
+- [ ] **Step 8: `commands/r/cycle.md`**
 
 ````markdown
 ---
@@ -993,16 +1047,14 @@ arguments:
 Run `document` → `test` → `check` in sequence, stopping at the first hard error.
 
 ## Process
-
 ```bash
 python3 -m lib.rcmd --kind cycle --path "<path>"
 ```
 
 ## Output Format
-
 ```markdown
 ## Dev Cycle: {package}
-### Status: {🟢 all ok / 🟡 warnings / 🔴 failed at a stage}
+### Status: {🟢 all ok / 🟡 warnings / 🔴 failed}
 | Stage | Result |
 |-------|--------|
 | document | {stages[0].status dot} |
@@ -1010,23 +1062,168 @@ python3 -m lib.rcmd --kind cycle --path "<path>"
 | check | {stages[2].status dot} |
 {If failed_stage: "Stopped at **{failed_stage}** — {detail summary}"}
 ### Recommended Actions
-{Next steps based on which stage failed}
+{Next steps based on the failing stage}
 ```
 
 ## Related Commands
 - `/rforge:r:check`, `/rforge:r:test`, `/rforge:r:document` — individual stages
+- `/rforge:thorough` — **ecosystem** rollup (this is **single-package**)
 ````
 
-- [ ] **Step 8: Verify all command files parse**
+- [ ] **Step 9: `commands/r/lint.md`**
+
+````markdown
+---
+name: rforge:r:lint
+description: Static analysis of the package (lintr) — grouped report
+arguments:
+  - name: package
+    description: Package path (defaults to current directory)
+    required: false
+    type: string
+---
+
+# R Package Lint
+
+Run `lintr::lint_package()` (read-only).
+`lintr` is optional — if `engine_missing` includes `lintr`, report 🟡 + hint.
+
+## Process
+```bash
+python3 -m lib.rcmd --kind lint --path "<path>"
+```
+
+## Output Format
+```markdown
+## Lint: {package} v{version}
+### Status: {🟢 0 lints / 🟡 {lint.count} lints}
+{Group lint.lints by file: "R/foo.R:3 — object_name_linter: <message>"}
+### Recommended Actions
+{Top offenders to fix, or "Clean ✅"}
+```
+
+## Related Commands
+- `/rforge:r:style` — auto-format (fixes many style lints)
+````
+
+- [ ] **Step 10: `commands/r/spell.md`**
+
+````markdown
+---
+name: rforge:r:spell
+description: Spell-check the package (spelling) and triage typos
+arguments:
+  - name: package
+    description: Package path (defaults to current directory)
+    required: false
+    type: string
+---
+
+# R Package Spell Check
+
+Run `spelling::spell_check_package()`.
+`spelling` is optional — if `engine_missing` includes `spelling`, report 🟡 + hint.
+
+## Process
+```bash
+python3 -m lib.rcmd --kind spell --path "<path>"
+```
+
+## Output Format
+```markdown
+## Spell: {package} v{version}
+### Status: {🟢 0 / 🟡 {spell.count} words}
+{List spell.misspelled: "- teh (R/foo.R:3)"}
+### Recommended Actions
+{Real typos to fix vs words to add to `inst/WORDLIST`}
+```
+
+## Related Commands
+- `/rforge:r:check` — spelling NOTEs also surface in R CMD check
+````
+
+- [ ] **Step 11: `commands/r/urlcheck.md`**
+
+````markdown
+---
+name: rforge:r:urlcheck
+description: Check package URLs for breakage/redirects (urlchecker)
+arguments:
+  - name: package
+    description: Package path (defaults to current directory)
+    required: false
+    type: string
+---
+
+# R Package URL Check
+
+Run `urlchecker::url_check()` — a common CRAN rejection cause.
+`urlchecker` is optional — if `engine_missing` includes it, report 🟡 + hint.
+
+## Process
+```bash
+python3 -m lib.rcmd --kind urlcheck --path "<path>"
+```
+
+## Output Format
+```markdown
+## URL Check: {package} v{version}
+### Status: {🟢 0 / 🟡 {urlcheck.count} URLs}
+{List urlcheck.broken: "- http://x — <message> → suggested: <new_url>"}
+### Recommended Actions
+{Replace redirected URLs with suggestions, fix dead links}
+```
+
+## Related Commands
+- `/rforge:r:check` — broken URLs also flagged by R CMD check
+````
+
+- [ ] **Step 12: `commands/r/style.md`**
+
+````markdown
+---
+name: rforge:r:style
+description: Auto-format the package (styler) and show the diff
+arguments:
+  - name: package
+    description: Package path (defaults to current directory)
+    required: false
+    type: string
+---
+
+# R Package Style
+
+Reformat source via `styler::style_pkg()`. **This rewrites files.**
+`styler` is optional — if `engine_missing` includes `styler`, report 🟡 + hint.
+
+## Process
+1. `python3 -m lib.rcmd --kind style --path "<path>"`
+2. Then show what changed: run `git -C "<path>" diff --stat` via Bash and summarize.
+
+## Output Format
+```markdown
+## Style: {package} v{version}
+### Status: {🟢 reformatted / 🔴}
+- Files changed: {style.count}
+{git diff --stat summary}
+### Recommended Actions
+- Review: `git diff` · Undo if unwanted: `git checkout -- <files>`
+```
+
+## Related Commands
+- `/rforge:r:lint` — find issues that styler does **not** auto-fix
+````
+
+- [ ] **Step 13: Verify all parse + uniqueness**
 
 Run: `bash tests/test-all.sh 2>&1 | tail -30`
-Expected: frontmatter-valid, command-name-uniqueness, skills-valid all PASS. Fix any reported issue.
+Expected: frontmatter-valid, **command-name-uniqueness**, skills-valid all PASS.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 14: Commit**
 
 ```bash
 git add commands/r/
-git commit -m "feat(r): add build/test/document/install/coverage/site/cycle commands
+git commit -m "feat(r): 12 dev-cycle + quality commands
 
 Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 ```
@@ -1035,24 +1232,11 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 ## Task 8: Reference docs + CI gen-check
 
-**Files:**
-- Generate: `docs/reference/rcmd.md`
-- Verify: `scripts/gen_lib_reference.py`
+**Files:** Generate `docs/reference/rcmd.md`; maybe modify `scripts/gen_lib_reference.py`
 
-- [ ] **Step 1: Inspect the generator to confirm it discovers public modules**
-
-Run: `python3 scripts/gen_lib_reference.py --help` and read `scripts/gen_lib_reference.py` to find the module list (it currently covers discovery/deps/status/init). Add `rcmd` to its public-module list if the list is hardcoded.
-
-- [ ] **Step 2: Generate the reference page**
-
-Run: `python3 scripts/gen_lib_reference.py`
-Expected: writes/updates `docs/reference/rcmd.md`.
-
-- [ ] **Step 3: Verify the CI gate is satisfied**
-
-Run: `python3 scripts/gen_lib_reference.py --check`
-Expected: exit 0 (no drift).
-
+- [ ] **Step 1:** Read `scripts/gen_lib_reference.py`; if its public-module list is hardcoded (currently discovery/deps/status/init), add `rcmd`.
+- [ ] **Step 2:** `python3 scripts/gen_lib_reference.py` → writes `docs/reference/rcmd.md`.
+- [ ] **Step 3:** `python3 scripts/gen_lib_reference.py --check` → exit 0 (no drift).
 - [ ] **Step 4: Commit**
 
 ```bash
@@ -1068,27 +1252,12 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 **Files:** `README.md`, `docs/index.md`, `docs/REFCARD.md`, `mkdocs.yml`, `CHANGELOG.md`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `package.json`, `.STATUS`
 
-- [ ] **Step 1: Add the 7 commands to every command table**
-
-Grep current tables: `grep -rn "r:check" README.md docs/index.md docs/REFCARD.md`. Add rows for `r:build`, `r:test`, `r:document`, `r:install`, `r:coverage`, `r:site`, `r:cycle` adjacent to `r:check`. Update any "16 commands" count to "23".
-
-- [ ] **Step 2: Add nav entries in `mkdocs.yml`**
-
-Add `docs/reference/rcmd.md` under the Reference section and any command pages under their nav group (mirror how `r:check`/`docs:check` are listed).
-
-- [ ] **Step 3: CHANGELOG** — convert `[Unreleased]` → `## [2.1.0] - 2026-05-31` with an "Added" section listing the 7 commands + `lib/rcmd.py`.
-
-- [ ] **Step 4: Bump version to 2.1.0 in all 4 sources**
-
-Edit: `.claude-plugin/plugin.json` `version`; `.claude-plugin/marketplace.json` `metadata.version` AND `plugins[0].version`; `package.json` `version`. Then update live-version doc refs listed in CLAUDE.md (REFCARD header + ASCII box, docs/README.md, README.md tree comments, docs/index.md).
-
-- [ ] **Step 5: Grep for stale version strings**
-
-Run: `grep -rn "2\.0\.0" --include='*.md' --include='*.json' . | grep -iv changelog`
-Expected: no remaining live refs to the old version (history entries in CHANGELOG are fine).
-
-- [ ] **Step 6: Update `.STATUS`** — add a "v2.1.0: r: dev-cycle commands" entry; move "Phase 4 (agents)" target to v2.2.0; note the worktree.
-
+- [ ] **Step 1:** Add the 12 commands to every command table (`grep -rn "r:check" README.md docs/index.md docs/REFCARD.md`). Group the four quality commands under a "Quality" heading next to the dev-cycle list. Update any "16 commands" → **"28"**.
+- [ ] **Step 2:** `mkdocs.yml` nav — add `docs/reference/rcmd.md` and command pages (mirror how `r:check`/`docs:check` are listed).
+- [ ] **Step 3:** CHANGELOG — `[Unreleased]` → `## [2.1.0] - 2026-05-31`, "Added" listing all 12 commands + `lib/rcmd.py`.
+- [ ] **Step 4:** Bump version to 2.1.0 in all 4 sources (`plugin.json` `version`; `marketplace.json` `metadata.version` AND `plugins[0].version`; `package.json` `version`) + live-version doc refs per CLAUDE.md (REFCARD header + ASCII box, docs/README.md, README.md tree comments, docs/index.md).
+- [ ] **Step 5:** `grep -rn "2\.0\.0" --include='*.md' --include='*.json' . | grep -iv changelog` → no remaining live refs.
+- [ ] **Step 6:** `.STATUS` — add "v2.1.0: r: dev-cycle + quality commands"; move Phase 4 (agents) → v2.2.0.
 - [ ] **Step 7: Commit**
 
 ```bash
@@ -1100,21 +1269,18 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 ---
 
-## Task 10: Full gate + add lib smoke check
+## Task 10: Full gate + lib smoke check
 
-**Files:** `tests/test-all.sh`
+**Files:** Modify `tests/test-all.sh`
 
-- [ ] **Step 1: Add a `lib.rcmd` CLI smoke line** to `tests/test-all.sh`
-
-Mirror the existing "lib CLI smoke" lines (for discovery/deps/status/init). Add a check that runs the module against a fixture package directory and asserts it emits valid JSON — using a stubbed `Rscript` on PATH (or a `--path` to `tests/fixtures/` with `_invoke_r` short-circuited). Keep CI R-free: assert `python3 -m lib.rcmd --kind check --path tests/fixtures/<pkg>` exits 0 and prints JSON when R is absent it should still emit an `engine_missing`/`error` envelope and exit non-zero — assert the JSON parses either way.
-
-- [ ] **Step 2: Run both gates**
+- [ ] **Step 1:** Add a `lib.rcmd` CLI smoke line mirroring the existing discovery/deps/status/init smoke lines: assert `python3 -m lib.rcmd --kind check --path tests/fixtures/<pkg>` prints parseable JSON and exits cleanly. Keep CI R-free — with R absent the module emits an `engine_missing`/`error` envelope; assert the JSON parses either way. Create a minimal `tests/fixtures/<pkg>/DESCRIPTION` if none exists.
+- [ ] **Step 2:** Run both gates:
 
 ```bash
-python3 -m pytest tests/ -v          # expect 65 + ~21 new = ~86 passing
-bash tests/test-all.sh                # expect prior 29 checks + new smoke = PASS
+python3 -m pytest tests/ -v          # 65 existing + ~30 new
+bash tests/test-all.sh                # prior 29 + new smoke
 ```
-Expected: both green. Fix anything red before proceeding.
+Both green; fix anything red.
 
 - [ ] **Step 3: Commit**
 
@@ -1127,272 +1293,34 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 ---
 
-## Task 11: Live sanity check (optional, needs R) + PR
+## Task 11: Live sanity (optional, needs R) + PR
 
-- [ ] **Step 1: If R is available, run against a real package**
+- [ ] **Step 1:** If R is available, spot-check against a real package:
 
 ```bash
-python3 -m lib.rcmd --kind check --path ~/projects/r-packages/<somepkg>
-python3 -m lib.rcmd --kind test  --path ~/projects/r-packages/<somepkg>
+python3 -m lib.rcmd --kind check    --path ~/projects/r-packages/<pkg>
+python3 -m lib.rcmd --kind test     --path ~/projects/r-packages/<pkg>
+python3 -m lib.rcmd --kind coverage --path ~/projects/r-packages/<pkg>
+python3 -m lib.rcmd --kind lint     --path ~/projects/r-packages/<pkg>
 ```
-Confirm envelopes look right. (covr/pkgdown may report `engine_missing` — expected.)
+(covr/pkgdown/lintr may report `engine_missing` — expected.)
 
-- [ ] **Step 2: Final gate, then PR to dev**
+- [ ] **Step 2:** Final gate + PR to dev:
 
 ```bash
 git fetch origin dev && git rebase origin/dev
 python3 -m pytest tests/ && bash tests/test-all.sh
-gh pr create --base dev --title "feat: r: dev-cycle commands (build/test/site + lib/rcmd)" \
-  --body "Implements docs/specs/SPEC-r-dev-commands-2026-05-31.md. Adds 7 r: commands backed by lib/rcmd.py (structured JSON from rcmdcheck/pkgbuild/roxygen2/testthat/covr/pkgdown). Ships v2.1.0."
+gh pr create --base dev --title "feat: r: dev-cycle + quality commands (v2.1.0)" \
+  --body "Implements docs/specs/SPEC-r-dev-commands-2026-05-31.md. 12 r: commands backed by lib/rcmd.py (structured JSON from rcmdcheck/pkgbuild/roxygen2/testthat/pkgload/covr/pkgdown/lintr/spelling/urlchecker/styler). 16→28 commands. Ships v2.1.0."
 ```
 
-- [ ] **Step 3: Cleanup after merge** — remove this `ORCHESTRATE-r-dev-commands.md` as part of the merge (per CLAUDE.md: ORCHESTRATE files don't belong on `dev`), then `git worktree remove ~/.git-worktrees/rforge/feature-r-dev-commands`.
-
----
-
-## Addendum (2026-05-31, post-research) — SUPERSEDES the snippets it names
-
-Research on `pkgload`/`testthat` and `pkgdown` vignettes refined three things.
-Where this addendum conflicts with earlier tasks, **the addendum wins.**
-
-### A. `r:test` snippet — make the self-load explicit (Task 4)
-
-`testthat::test_local()` already loads the source package via `pkgload::load_all()`
-(default `load_package="source"`); do **not** add a separate `load_all()` (double-load).
-In Task 4's `test` branch of `r_snippet`, change the call to:
-
-```r
-testthat::test_local({p}, load_package="source", reporter="list", stop_on_failure=FALSE)
-```
-
-### B. New command `r:load` (extends Tasks 4, 5, 7) — 8th new command
-
-- **`r_snippet` (Task 4):** add a `load` branch:
-
-```python
-    if kind == "load":
-        return _guard("pkgload",
-            f'pkgload::load_all({p}); cat(\'{{"loaded":true}}\')')
-```
-
-- **`main` choices (Task 5):** add `"load"` to the `--kind` `choices` list.
-- **`normalize` (Task 2):** `load` needs no special block — status falls through
-  to the default (`ok` if exit 0 else `error`); add a test asserting that.
-- **Command file `commands/r/load.md` (Task 7):** mirror `build.md`; engine
-  `pkgload::load_all()`; report 🟢/🔴 + "Loaded {package} into namespace."; relate
-  to `/rforge:r:test`. Add to the Task 9 command tables (now **16 → 24**).
-
-### C. `r:site` snippet + flags (Tasks 4, 5, 7) — pkgdown vignette-aware
-
-Default to `pkgdown_sitrep()` (reports all problems, non-fatal), not the
-fail-fast `check_pkgdown()`. Add flags `--strict`, `--articles-only`, `--devel`.
-
-- **Signature change:** extend `r_snippet(kind, path, as_cran, preview, *,
-  strict=False, articles_only=False, devel=False)` and thread the same kwargs
-  through `run()` and `main()` (add `--strict`, `--articles-only`, `--devel`
-  to the argparse in Task 5; pass them into `run()`).
-- **`site` branch of `r_snippet` (replaces Task 4's `site` branch):**
-
-```python
-    if kind == "site":
-        prev = (f'pkgdown::preview_site({p}); ' if preview else '')
-        gate = (f'pkgdown::check_pkgdown({p}); '          # --strict: abort on first
-                if strict else
-                f'probs <- paste(utils::capture.output('   # default: report all
-                f'pkgdown::pkgdown_sitrep({p})), collapse="\\n"); ')
-        if articles_only:
-            build = f'pkgdown::build_articles({p}, preview=FALSE)'  # reinstall handled in run()
-        else:
-            build = (f'pkgdown::build_site({p}, preview=FALSE, new_process=TRUE, '
-                     f'quiet=TRUE, devel={"TRUE" if devel else "FALSE"})')
-        probs_expr = 'character()' if strict else 'if (exists("probs")) probs else ""'
-        return _guard("pkgdown",
-            f'{gate}{build}; {prev}'
-            f'cat(jsonlite::toJSON(list(checked=TRUE, built=TRUE, '
-            f'problems=as.list({probs_expr})), auto_unbox=TRUE))')
-```
-
-- **`run()` (Task 5):** when `kind=="site"` and `articles_only`, reinstall first
-  (`_install_package(path)`), since standalone `build_articles()` renders the
-  *installed* version. A non-zero exit during the build = **vignette render error**
-  (status `error`); sitrep-only problems with exit 0 = **config/index** (status
-  `warn`) — `_status_for("site", ...)` already encodes this.
-- **`commands/r/site.md` (Task 7):** document the four flags; in Output Format,
-  separate a "### Vignette/render errors" section (when status 🔴) from a
-  "### Config/index problems" section (sitrep warnings). Add the pandoc-missing
-  note (🟡 + install hint).
-
-### D. Tests to add (Task 5/10)
-
-- `test_r_snippet_test_uses_load_package_source` — asserts `load_package="source"`.
-- `test_r_snippet_load_uses_pkgload` — asserts `pkgload::load_all` in `load` snippet.
-- `test_normalize_load_ok` — exit 0 ⇒ `ok`.
-- `test_r_snippet_site_strict_uses_check_pkgdown` / default uses `pkgdown_sitrep`.
-- `test_r_snippet_site_articles_only_uses_build_articles`.
-
-## Addendum 2 (2026-05-31) — quality commands folded into v2.1.0
-
-Per BRAINSTORM-r-command-expansion, four quality commands join this feature
-(they reuse `lib/rcmd.py`). Now **16 → 28 commands**. These are optional-engine
-commands (🟡 + install hint if the engine is absent).
-
-### E. New kinds in `r_snippet` (Task 4)
-
-```python
-    if kind == "lint":
-        return _guard("lintr",
-            f'ls <- lintr::lint_package({p}); '
-            f'cat(jsonlite::toJSON(list(lints=lapply(ls, function(x) list('
-            f'file=x$filename, line=x$line_number, linter=x$linter, '
-            f'message=x$message))), auto_unbox=TRUE, null="list"))')
-    if kind == "spell":
-        return _guard("spelling",
-            f'sp <- spelling::spell_check_package({p}); '
-            f'cat(jsonlite::toJSON(list(misspelled=lapply(seq_len(nrow(sp)), '
-            f'function(i) list(word=sp$word[i], files=sp$found[[i]]))), '
-            f'auto_unbox=TRUE, null="list"))')
-    if kind == "urlcheck":
-        return _guard("urlchecker",
-            f'u <- urlchecker::url_check({p}); '
-            f'cat(jsonlite::toJSON(list(broken=lapply(seq_len(nrow(u)), '
-            f'function(i) list(url=u$URL[i], message=u$message[i], '
-            f'new_url=u$newURL[i]))), auto_unbox=TRUE, null="list"))')
-    if kind == "style":
-        return _guard("styler",
-            f'res <- styler::style_pkg({p}); '
-            f'cat(jsonlite::toJSON(list(changed_files='
-            f'as.list(res$file[isTRUE(res$changed) | res$changed %in% TRUE])), '
-            f'auto_unbox=TRUE, null="list"))')
-```
-
-> `urlchecker::url_check()` column names vary by version — the implementer must
-> verify (`names(urlchecker::url_check("."))`) and adjust `URL`/`message`/`newURL`.
-
-### F. `normalize` blocks (Task 2)
-
-```python
-    elif kind == "lint":
-        lints = raw.get("lints", [])
-        env["lint"] = {"count": len(lints), "lints": lints}
-    elif kind == "spell":
-        miss = raw.get("misspelled", [])
-        env["spell"] = {"count": len(miss), "misspelled": miss}
-    elif kind == "urlcheck":
-        broken = raw.get("broken", [])
-        env["urlcheck"] = {"count": len(broken), "broken": broken}
-    elif kind == "style":
-        changed = raw.get("changed_files", [])
-        env["style"] = {"count": len(changed), "changed_files": changed}
-```
-
-And in `_status_for` (Task 2): lint/spell/urlcheck → `warn` if their count > 0
-else `ok` (findings are advisory, never `error`); style → `ok` if exit 0.
-
-```python
-    if kind in ("lint", "spell", "urlcheck"):
-        counts = {"lint": "lints", "spell": "misspelled", "urlcheck": "broken"}
-        return "warn" if raw.get(counts[kind]) else "ok"
-    if kind == "style":
-        return "ok" if exit_code == 0 else "error"
-```
-
-### G. `main` choices (Task 5)
-
-Add `"lint", "spell", "urlcheck", "style"` to the `--kind` `choices` list.
-
-### H. Command files (Task 7) — create four more under `commands/r/`
-
-Mirror `build.md`'s shape. Key per-file specifics:
-
-- **`r:lint`** → `--kind lint`; Output: count + group lints by file (`R/foo.R:3 — object_name_linter: …`); 🟢 if 0 / 🟡 if any. Read-only.
-- **`r:spell`** → `--kind spell`; Output: list misspelled words + locations; suggest "add to `inst/WORDLIST`" for false positives; 🟢/🟡.
-- **`r:urlcheck`** → `--kind urlcheck`; Output: each broken URL + status + suggested replacement; 🟢/🟡.
-- **`r:style`** → `--kind style`; **mutates source** — after running, show `git diff --stat` then a brief summary of what reformatted; note "review with `git diff`, undo with `git checkout`". 🟢 always (it's an action); list `changed_files`.
-
-Each: if engine in `engine_missing`, report 🟡 + the `install.packages()` hint.
-
-### I. Tests (Task 5/10)
-
-- `test_r_snippet_lint_uses_lintr` / `spell`→spelling / `urlcheck`→urlchecker / `style`→styler.
-- `test_normalize_lint_warns_when_findings` (count>0 ⇒ warn; count 0 ⇒ ok).
-- `test_normalize_style_ok_on_exit0`.
-
-### J. Docs (Task 9)
-
-Tables/REFCARD/mkdocs now list **28** commands. Group the four under a "Quality"
-heading adjacent to the dev-cycle list. CHANGELOG `[2.1.0]` Added section gains
-the four quality commands.
-
-## Addendum 3 (2026-05-31) — de-duplication requirements
-
-Audit against the existing 16 commands found **no name collisions** (only
-`r:check`, the intended retrofit). Honor these to avoid *functional* duplicates
-(see spec "Duplicate & overlap audit"):
-
-- **Cross-link, don't merge.** Add to "Related Commands":
-  - `commands/r/check.md` → `/rforge:thorough` (already present) — note "single
-    package vs ecosystem rollup".
-  - `commands/r/cycle.md` → `/rforge:thorough` — same boundary note.
-  - `commands/r/document.md` → `/rforge:docs:check` (already present) — "regenerate
-    vs detect drift".
-- **DRY:** `_run_cycle` calls `run("document"/"test"/"check")` — do not duplicate
-  those snippets. All `r:` commands go through the one `lib/rcmd.py` path.
-- **Gate:** Task 7 Step 8 already runs `bash tests/test-all.sh` — confirm the
-  **command-name-uniqueness** check passes after adding all 12 files.
-- **Do NOT modify** the rename stubs `commands/{doc-check,ecosystem-health,rpkg-check}.md`
-  — they intentionally emit "renamed to …" messages (removed in v3.0.0).
-
-## Addendum 4 (2026-05-31) — `r:coverage` reports untested lines
-
-Enhance `r:coverage` to also surface exact untested lines via `covr::zero_coverage()`.
-
-### `coverage` branch of `r_snippet` (replaces Task 4's `coverage` branch)
-
-```python
-    if kind == "coverage":
-        return _guard("covr",
-            f'cv <- covr::package_coverage({p}); l <- covr::coverage_to_list(cv); '
-            f'z <- covr::zero_coverage(cv); '
-            f'agg <- if (nrow(z)) stats::aggregate(line ~ filename, z, '
-            f'function(x) c(first=min(x), last=max(x))) else '
-            f'data.frame(filename=character(), line=I(list())); '
-            f'untested <- if (nrow(z)) lapply(seq_len(nrow(agg)), function(i) '
-            f'list(file=agg$filename[i], first_line=as.integer(agg$line[i,"first"]), '
-            f'last_line=as.integer(agg$line[i,"last"]))) else list(); '
-            f'cat(jsonlite::toJSON(list(total_pct=covr::percent_coverage(cv), '
-            f'per_file=as.list(l$filecoverage), untested=untested), '
-            f'auto_unbox=TRUE, null="list"))')
-```
-
-> `zero_coverage()` returns one row per uncovered line; the snippet aggregates
-> to first/last line per file. If the implementer prefers per-line granularity,
-> emit the raw rows instead — keep the `untested[]` envelope shape either way.
-
-### `normalize` coverage block (replaces Task 2's coverage block)
-
-```python
-    elif kind == "coverage":
-        env["coverage"] = {"total_pct": raw.get("total_pct"),
-                           "per_file": raw.get("per_file", {}),
-                           "untested": raw.get("untested", [])}
-```
-
-### `commands/r/coverage.md` (extends Task 7 Step 5)
-
-Add an "### Untested lines" section after the lowest-covered files:
-render `coverage.untested` as `- R/foo.R:12-18`. In "Recommended Actions",
-point at those ranges ("add tests covering R/foo.R:12-18") and cross-link
-`/rforge:r:test`. (Pairs with the deferred `r:use-test` scaffolding command.)
-
-### Test (Task 5/10)
-
-`test_normalize_coverage_includes_untested` — raw with `untested` list survives
-into `env["coverage"]["untested"]`.
+- [ ] **Step 3:** After merge — delete `ORCHESTRATE-r-dev-commands.md` (per CLAUDE.md), then `git worktree remove ~/.git-worktrees/rforge/feature-r-dev-commands`.
 
 ---
 
 ## Self-Review (completed by plan author)
 
-- **Spec coverage:** all 7 commands + `r:check` retrofit (Tasks 6-7), `lib/rcmd.py` with JSON-not-regex + fallback (Tasks 1-5), engine-missing degradation incl. optional covr/pkgdown (Task 5), hook interaction noted in `document.md` (Task 7), testing both gates + R-free CI (Tasks 1-5,10), docs/version/.STATUS (Tasks 8-9). ✅
-- **Placeholder scan:** no TBD/TODO; every code step shows full code. ✅
-- **Type consistency:** envelope keys (`check`/`tests`/`coverage`/`build`/`site`/`install`, `engine_missing`, `messages`, `status`) used identically across `normalize` (Task 2), `run` (Task 5), and all command render specs (Tasks 6-7). `_invoke_r` is the single mock seam used by tests. `r_snippet` excludes `install` (handled by `_install_package`) — consistent with Task 4 note and Task 5 `run()`. ✅
+- **Spec coverage:** all 12 commands + `r:check` retrofit (Tasks 6-7); `lib/rcmd.py` JSON-not-regex + fallback + cycle + install (Tasks 1-5); coverage untested lines (Tasks 2,4,7); site flags + vignette-error classification (Tasks 4-5,7); quality commands with optional-engine degrade (Tasks 2,4,5,7); dedup boundaries cross-linked in command files (Tasks 6-7); both gates, R-free CI (Tasks 1-5,10); docs/version/.STATUS (Tasks 8-9). ✅
+- **Placeholder scan:** no TBD/TODO; every code step shows full code. (One explicit verify-step: `urlchecker` column names in Task 4 — flagged, not a placeholder.) ✅
+- **Type consistency:** envelope keys (`check/tests/coverage/build/site/install/lint/spell/urlcheck/style`, `engine_missing`, `messages`, `status`) identical across `normalize` (Task 2), `run` (Task 5), and all command renders (Tasks 6-7). `_invoke_r` is the single test mock seam. `r_snippet` excludes `install` (Python `_install_package`) and includes `load` — consistent across Tasks 4-5. `r:site` kwargs (`strict/articles_only/devel/preview`) threaded identically through `r_snippet`→`run`→`main` (Tasks 4-5). `_run_cycle` reuses `run()` (no duplicated stage logic). ✅
+- **No duplicates:** no name collisions (only `r:check` retrofit); functional boundaries cross-linked (check/cycle↔thorough, document↔docs:check); stubs untouched. ✅
