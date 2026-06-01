@@ -111,3 +111,52 @@ def test_r_snippet_site_flags():
     assert "check_pkgdown" in rcmd.r_snippet("site", "/tmp/f", strict=True)
     assert "pkgdown_sitrep" in rcmd.r_snippet("site", "/tmp/f")  # default
     assert "build_articles" in rcmd.r_snippet("site", "/tmp/f", articles_only=True)
+
+
+def test_run_check_happy(tmp_path, monkeypatch):
+    _write_desc(tmp_path, "foo", "0.2.0")
+    monkeypatch.setattr(rcmd, "_invoke_r",
+                        lambda s: ('{"errors":[],"warnings":["W"],"notes":[]}', 0))
+    env = rcmd.run("check", str(tmp_path))
+    assert env["status"] == "warn" and env["package"] == "foo"
+    assert env["check"]["warnings"] == ["W"]
+
+
+def test_run_no_description_error(tmp_path):
+    env = rcmd.run("check", str(tmp_path))
+    assert env["status"] == "error" and "detect" in " ".join(env["messages"]).lower()
+
+
+def test_run_falls_back_on_nonjson(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r",
+                        lambda s: ("[ FAIL 1 | WARN 0 | SKIP 0 | PASS 9 ]", 1))
+    env = rcmd.run("test", str(tmp_path))
+    assert env["tests"]["failed"] == 1 and env["status"] == "error"
+
+
+def test_run_optional_engine_missing_downgrades_to_warn(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"engine_missing":["pkgdown"]}', 0))
+    env = rcmd.run("site", str(tmp_path))
+    assert env["status"] == "warn"  # optional engine → warn, not error
+    assert any("pkgdown" in m for m in env["messages"])
+
+
+def test_cycle_stops_on_first_error(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    calls = []
+    def fake_run(kind, path, **kw):
+        calls.append(kind)
+        return {"kind": kind, "status": "error" if kind == "test" else "ok",
+                "engine_missing": [], "messages": []}
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cycle(str(tmp_path))
+    assert env["failed_stage"] == "test" and calls == ["document", "test"]
+
+
+def test_main_emits_json(tmp_path, monkeypatch, capsys):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"errors":[],"warnings":[],"notes":[]}', 0))
+    rc = rcmd.main(["--kind", "check", "--path", str(tmp_path)])
+    assert json.loads(capsys.readouterr().out)["status"] == "ok" and rc == 0
