@@ -1,12 +1,65 @@
 project: rforge
-updated: 2026-05-12
+updated: 2026-06-01
 status: Active
-version: 2.0.0 (released)
+version: 2.1.0 (merged to dev via PR #11; pending dev → main release)
 last_release: 2026-05-12 v2.0.0 BREAKING (PR #8 dev → main commit 5d3ed95, tag https://github.com/Data-Wise/rforge/releases/tag/v2.0.0, tap formula + manifest synced to v2.0.0, feedback thread at issue #9)
 
 worktrees: []
 
 recent:
+  - date: 2026-06-01
+    pr: 11
+    branch: feature/r-dev-commands
+    title: "feat: r: dev-cycle + quality commands (v2.1.0)"
+    state: MERGED
+    merge_commit: 6d14c24
+    summary: |
+      12 new r: commands (load/document/test/coverage/build/install/site/
+      cycle/lint/spell/urlcheck/style) + r:check retrofit, backed by a new
+      lib/rcmd.py (lower-level engines → JSON via jsonlite → normalized
+      envelope; never devtools). 16 → 28 commands; version → 2.1.0.
+
+      Merged to dev (PR #11, merge 6d14c24). CI "Validate Plugin Structure"
+      green; 110 pytest + 30/30 test-all.sh. Post-implementation live R
+      sanity on a scratch package caught + fixed 3 serialization bugs before
+      merge (06f819a): stdout contamination (urlchecker/pkgdown progress
+      broke JSON parse — site falsely reported built:false), jsonlite
+      auto_unbox length-1 collapse (broke len() counts), and wrong
+      urlchecker column names (URL/Status/Message/New). Worktree removed,
+      feature branch deleted, local dev rebased to preserve the final spec +
+      BRAINSTORM-r-command-expansion (deferred: deps-sync, scaffolding,
+      cran-prep).
+
+      Pending: dev → main release (4-source bump already at 2.1.0,
+      CHANGELOG [2.1.0] present), then tap formula + manifest sync.
+      Phase 4 (agents) → v2.2.0.
+
+  - date: 2026-06-01
+    pr: 10
+    branch: dev
+    title: "docs: website restructure — 5-tab nav, 5 new pages, ADHD enhancements"
+    state: MERGED
+    merge_commit: 1505377
+    summary: |
+      Docs-only release. dev → main (PR #10), RForge CI + Deploy Documentation
+      both green, site live at data-wise.github.io/rforge.
+
+      - Rewrote stale index.md (removed MCP-era/v0.1.0 cruft; added
+        "What rforge is/isn't" + "Where to start")
+      - 5 new pages: tutorials/{rforge-in-the-r-lifecycle, understanding-modes,
+        ecosystem-orchestration, cran-release-prep} + workflows/index.md
+      - ADHD: docs/stylesheets/extra.css (mermaid overflow, 44px touch targets,
+        mobile sizing), TL;DR boxes + emoji headings across user pages
+      - Nav grouped 14 → 5 intent-based tabs (Home/Get Started/Learn/Reference/Project)
+      - Fixed stale "Parallel MCP" refs + broken anchors (explicit heading IDs);
+        added diff-aware spec to nav; refreshed specs/README statuses
+      - Commits 9494611 + 194a387; all 29 test-all.sh gates pass throughout
+      - Auto-generated reference/*.md left untouched (gen_lib_reference gate green)
+
+      Also this session: fixed broken rforge plugin install — deleted stale
+      v1.1.0 plugin cache (empty lib/ → ModuleNotFoundError); brew v2.0.0
+      confirmed working. Recommended /plugin reinstall to repoint registry.
+
   - date: 2026-05-12
     pr: 6
     branch: feature/phase3-namespacing-v2
@@ -189,8 +242,8 @@ backlog:
     priority: low
     notes: "Open-ended feedback thread for rename ergonomics + the deferred /rforge:quick + /rforge:thorough rename decision. Watch ~2-4 weeks; decisions inform v2.1.0 scope."
 
-  # Medium-term work (v2.1.0 horizon)
-  - title: "Phase 4 — discovery engine + agents (v2.1.0)"
+  # Medium-term work (v2.2.0 horizon)
+  - title: "Phase 4 — discovery engine + agents (v2.2.0)"
     priority: medium
     notes: "Last craft-parity item. Adds agent definitions mirroring craft's discovery engine."
 
@@ -201,6 +254,7 @@ backlog:
     notes: "lib/status.py shipped as a thin faithful port in v1.3.0. The 4-mode contract (default/debug/optimize/release with R subprocess) was descoped pending real-user input on what depth is wanted. Open a new SPEC when there's demand."
 
 shipped:
+  - "v2.1.0 — 2026-05-31 — 12 new r: commands (r:load, r:document, r:test, r:coverage, r:build, r:install, r:site, r:cycle, r:lint, r:spell, r:urlcheck, r:style) + lib/rcmd.py; 16→28 commands; r:check retrofitted onto lib.rcmd envelope"
   - "v2.0.0 — 2026-05-12 — BREAKING: Phase 3 command namespacing — 3 of 16 commands renamed (doc-check → docs:check, ecosystem-health → health, rpkg-check → r:check); old names retained as rename-error stubs through v2.x; tests 29/29 (+6 new rename-specific); v1.3.0+ post-MCP doc cleanup bundled; tap formula + manifest synced; feedback thread at issue #9"
   - "v1.3.0 — 2026-05-11 — Path B complete (rforge-mcp absorbed into lib/ pure-Python modules); /rforge:init promoted to first-class command (16 total); rforge-mcp local prototype tombstoned (was never public on GitHub or npm — SPEC scope-corrected); tap formula + manifest + docs Pages all synced; brew outdated UX verified via Cellar-rename trick"
   - "v1.2.0 — 2026-05-10 — craft parity foundations + post-merge polish + MCP decoupling"

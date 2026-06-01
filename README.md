@@ -5,9 +5,15 @@
 [![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
 [![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
-**R package ecosystem orchestrator for Claude Code — 16 commands, R-aware hooks, validation skills.**
+**R package ecosystem orchestrator for Claude Code — 28 commands, R-aware hooks, validation skills.**
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
+
+## What's new in v2.1.0
+
+- 🔬 **12 new `r:` commands** — full R package dev cycle + quality layer: `r:load`, `r:document`, `r:test`, `r:coverage`, `r:build`, `r:install`, `r:site`, `r:cycle`, `r:lint`, `r:spell`, `r:urlcheck`, `r:style`.
+- 🐍 **`lib/rcmd.py`** — new pure-Python module driving each command via lower-level R engines (`rcmdcheck`, `pkgbuild`, `roxygen2`, `testthat`, `pkgload`, `covr`, `pkgdown`, `lintr`, `spelling`, `urlchecker`, `styler`). JSON output, never regex-scraped. Optional engines degrade gracefully to 🟡 + install hint.
+- **Total: 16 → 28 commands.** `r:check` retrofit: now drives its report from `lib.rcmd` rather than raw subprocess.
 
 ## What's new in v2.0.0 (BREAKING)
 
@@ -411,7 +417,7 @@ Plugin settings in `plugin.json`:
 ```
 ~/.claude/plugins/rforge/
 ├── .claude-plugin/
-│   ├── plugin.json          # Plugin manifest (v2.0.0)
+│   ├── plugin.json          # Plugin manifest (v2.1.0)
 │   ├── marketplace.json     # Marketplace install metadata
 │   ├── config.json          # User-tunable options (CRAN mirror, etc.)
 │   ├── hooks/
@@ -419,7 +425,7 @@ Plugin settings in `plugin.json`:
 │   └── skills/
 │       └── validation/
 │           └── description-sync.md  # DESCRIPTION ↔ NEWS.md drift check
-├── commands/                # 16 slash commands (/rforge:*)
+├── commands/                # 28 slash commands (/rforge:*)
 ├── agents/
 │   └── orchestrator.md      # Pattern recognition + delegation
 ├── lib/                     # Pure-Python analysis modules
@@ -427,6 +433,7 @@ Plugin settings in `plugin.json`:
 │   ├── deps.py              # Dependency graph + impact
 │   ├── status.py            # DESCRIPTION + .STATUS health snapshot
 │   ├── init.py              # ~/.rforge/context.json initializer
+│   ├── rcmd.py              # R dev-cycle + quality engines (v2.1.0)
 │   └── formatters.py        # Output formatting helpers
 └── docs/                    # User-facing docs
 ```
@@ -452,6 +459,6 @@ MIT
 
 ---
 
-**Version:** 0.1.0
+**Version:** 2.1.0
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+

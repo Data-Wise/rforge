@@ -1,0 +1,8 @@
+Package: mypkg
+Version: 0.1.0
+Title: Test Fixture Package
+Description: Minimal DESCRIPTION for rcmd smoke tests.
+Authors@R: person("Test", "User", email = "test@example.com", role = c("aut", "cre"))
+License: MIT
+Encoding: UTF-8
+RoxygenNote: 7.0.0

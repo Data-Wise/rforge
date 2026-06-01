@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.1.0] - 2026-05-31
+
+### Added
+
+- **`lib/rcmd.py`** — new pure-Python module that runs lower-level R engines (`rcmdcheck`, `pkgbuild`, `roxygen2`, `testthat`, `pkgload`, `covr`, `pkgdown`, `lintr`, `spelling`, `urlchecker`, `styler`) and normalizes JSON output to a common envelope. CLI: `python3 -m lib.rcmd --kind <kind> --path <path>`. Never uses `devtools`.
+- **12 new `r:` commands** (`r:load`, `r:document`, `r:test`, `r:coverage`, `r:build`, `r:install`, `r:site`, `r:cycle`, `r:lint`, `r:spell`, `r:urlcheck`, `r:style`) — total 16 → **28** commands.
+- **`r:cycle`** — orchestrates `document → test → check` in sequence, stopping at the first hard error.
+- **`r:site`** flags: `--preview`, `--strict`, `--articles-only`, `--devel`.
+- **`docs/reference/rcmd.md`** — auto-generated API reference for `lib/rcmd.py`.
+
+### Changed
+
+- **`r:check`** — retrofitted to drive its report from `python3 -m lib.rcmd --kind check`. No longer calls `R CMD check` directly.
+
+---
+
 ## [2.0.0] - 2026-05-12
 
 > **Breaking change:** 3 of 16 commands renamed to align with craft's hybrid
