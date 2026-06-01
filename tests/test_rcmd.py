@@ -63,3 +63,17 @@ def test_normalize_style_ok_on_exit0():
 def test_normalize_engine_missing_error():
     env = rcmd.normalize("site", {"engine_missing": ["pkgdown"]}, 1, None)
     assert env["status"] == "error" and env["engine_missing"] == ["pkgdown"]
+
+
+def test_console_fallback_testthat():
+    raw = rcmd.console_fallback("test", "[ FAIL 2 | WARN 0 | SKIP 1 | PASS 41 ]\n")
+    assert raw == {"failed": 2, "warnings": 0, "skipped": 1, "passed": 41}
+
+
+def test_console_fallback_rcmdcheck():
+    raw = rcmd.console_fallback("check", "0 errors v | 1 warning x | 2 notes x\n")
+    assert len(raw["errors"]) == 0 and len(raw["warnings"]) == 1 and len(raw["notes"]) == 2
+
+
+def test_console_fallback_unknown_returns_messages():
+    assert "messages" in rcmd.console_fallback("test", "nothing here")

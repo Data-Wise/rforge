@@ -114,3 +114,23 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
                         "changed_files": raw.get("changed_files", [])}
     # load: no extra block — status carries the result
     return env
+
+
+def console_fallback(kind: str, text: str) -> dict:
+    """Best-effort parse when JSON is unavailable.
+    testthat: '[ FAIL 2 | WARN 0 | SKIP 1 | PASS 41 ]'
+    rcmdcheck: '0 errors X | 1 warning Y | 2 notes Z'
+    """
+    if kind == "test":
+        m = re.search(r"FAIL\s+(\d+)\s*\|\s*WARN\s+(\d+)\s*\|\s*"
+                      r"SKIP\s+(\d+)\s*\|\s*PASS\s+(\d+)", text)
+        if m:
+            return {"failed": int(m[1]), "warnings": int(m[2]),
+                    "skipped": int(m[3]), "passed": int(m[4])}
+    if kind == "check":
+        m = re.search(r"(\d+)\s+errors?\b.*?(\d+)\s+warnings?\b.*?(\d+)\s+notes?\b",
+                      text, re.IGNORECASE | re.DOTALL)
+        if m:
+            return {"errors": [""] * int(m[1]), "warnings": [""] * int(m[2]),
+                    "notes": [""] * int(m[3])}
+    return {"messages": [ln for ln in text.splitlines() if ln.strip()][-10:]}
