@@ -1,10 +1,18 @@
-# RForge Plugin - Quick Start
+# 🚀 RForge Plugin - Quick Start
 
 > **Get up and running in 3 minutes**
 
+!!! tip "TL;DR (30 seconds)"
+    - **What:** Install rforge + run your first command.
+    - **Why:** Goes from "never used rforge" to "useful output" in 3 minutes.
+    - **How:** Install → run `/rforge:status` in an R-package directory.
+    - **Next:** [REFCARD](REFCARD.md) for all 16 commands, or [tutorials](tutorials/README.md) for deeper dives.
+
+⏱️ **3 minutes** • 🟢 Beginner • ✓ 3 steps (install → invoke → next)
+
 ---
 
-## Install (1 minute)
+## ⏱️ Install (1 minute)
 
 **Recommended (Claude Code marketplace, v1.2.0+):**
 

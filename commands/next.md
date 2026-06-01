@@ -1,6 +1,15 @@
 ---
 name: rforge:next
 description: Get ecosystem-aware next task recommendation
+arguments:
+  - name: package
+    description: Optional package to focus the recommendation on
+    required: false
+    type: string
+  - name: context
+    description: Free-form context (e.g., "Before release", "Daily check-in")
+    required: false
+    type: string
 ---
 
 # /rforge:next - Smart Task Recommendation

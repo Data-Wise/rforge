@@ -1,4 +1,10 @@
-# Lib Modules (`lib/`)
+# 🐍 Lib Modules (`lib/`)
+
+!!! tip "TL;DR (30 seconds)"
+    - **What:** The four pure-Python modules (`discovery`, `deps`, `status`, `init`) that power every command.
+    - **Why:** No MCP server, no Node, no external deps — just `python3 -m lib.<module>`, fast and scriptable.
+    - **How:** Each takes `--path` and `--format text|json`; importable as a Python API too.
+    - **Next:** [Reference API docs](reference/discovery.md) for signatures, or [Architecture](architecture.md#path-b-lib-modules) for fit.
 
 Pure-Python R ecosystem analysis, callable from plugin commands or directly
 from any shell. Ships with rforge v1.3+ (no R subprocess, no MCP server, no

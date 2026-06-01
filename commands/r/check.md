@@ -1,6 +1,16 @@
 ---
 name: rforge:r:check
 description: Run R CMD check on package with smart output parsing
+arguments:
+  - name: package
+    description: Package path to check (defaults to current directory)
+    required: false
+    type: string
+  - name: as-cran
+    description: Run with --as-cran flag (stricter CRAN-compliance checks)
+    required: false
+    type: boolean
+    default: false
 ---
 
 # R Package Quick Check

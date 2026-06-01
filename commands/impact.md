@@ -2,6 +2,20 @@
 name: rforge:impact
 description: Analyze change impact across ecosystem packages
 argument-hint: Optional description of changes (e.g., "Breaking API change in extract_mediation")
+arguments:
+  - name: package
+    description: Package whose change is being analyzed
+    required: false
+    type: string
+  - name: change-type
+    description: Nature of change (breaking, feature, fix, refactor)
+    required: false
+    type: string
+    default: "feature"
+  - name: affected-exports
+    description: Space-separated list of changed exports (e.g., "extract_mediation predict")
+    required: false
+    type: string
 ---
 
 # /rforge:impact - Change Impact Analysis

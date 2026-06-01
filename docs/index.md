@@ -7,96 +7,90 @@
 
 **R package ecosystem orchestrator for Claude Code — 16 commands, R-aware hooks, validation skills.**
 
-Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
+!!! tip "TL;DR (30 seconds)"
+    - **What:** R package *ecosystem* analysis from inside Claude Code. 16 slash commands.
+    - **Why:** Fast feedback on multi-package R repos — discovery, dependencies, change impact, CRAN cascade planning.
+    - **How:** `brew install data-wise/tap/rforge`, then `/rforge:analyze "<what changed>"`.
+    - **Next:** [Quick Start](QUICK-START.md) (3 min) → [Where to start](#where-to-start) below.
 
-## Upcoming in v2.0.0 (BREAKING)
+Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. **No MCP server, no Node.js, no R subprocess** for the fast commands (only `/rforge:r:check` and `/rforge:thorough` shell out to R).
+
+## What rforge is — and isn't
+
+!!! abstract "rforge orchestrates an ecosystem; it does not build packages"
+    rforge sits **alongside** the standard R toolchain, it doesn't replace it.
+
+    - **`usethis` / `devtools`** scaffold, document, test, and build a *single* package.
+    - **rforge** answers cross-cutting questions: *Which packages exist here? What depends on what? If I change `medfit`, what breaks downstream? In what order do I submit to CRAN?*
+
+    If you're looking for `create_package()` or `document()`, that's `usethis`/`devtools`. rforge picks up where they leave off — see **[rforge in the R package lifecycle](tutorials/rforge-in-the-r-lifecycle.md)** for exactly where each tool plugs in.
+
+## Where to start
+
+| If you're… | Go to | Time |
+|---|---|---|
+| Brand new — just want it working | [Quick Start](QUICK-START.md) | 3 min |
+| New to rforge, have an R package to try | [Getting started tutorial](tutorials/getting-started.md) | 10 min |
+| Wondering how rforge fits with devtools/usethis | [rforge in the R package lifecycle](tutorials/rforge-in-the-r-lifecycle.md) | 12 min |
+| Managing several inter-dependent packages | [Ecosystem orchestration](tutorials/ecosystem-orchestration.md) | 15 min |
+| Preparing a CRAN submission | [CRAN release prep](tutorials/cran-release-prep.md) | 15 min |
+| Looking up a command's syntax | [Reference Card](REFCARD.md) | <1 min |
+
+## The 3 headline commands
+
+Most daily work runs through these. The other 13 commands are specialized — see the [Reference Card](REFCARD.md).
+
+```bash
+# Ultra-fast snapshot (< 10 seconds) — pre-commit
+/rforge:quick
+
+# Balanced analysis with impact + recommendations (~30 seconds) — after changes
+/rforge:analyze "Update RMediation bootstrap algorithm"
+
+# Comprehensive validation incl. R CMD check (2-5 minutes) — before CRAN
+/rforge:thorough "Prepare for CRAN release"
+```
+
+## What's new in v2.0.0 (BREAKING)
 
 - 🔀 **3 commands renamed** for cleaner namespacing — `/rforge:doc-check` → `/rforge:docs:check`, `/rforge:ecosystem-health` → `/rforge:health`, `/rforge:rpkg-check` → `/rforge:r:check`. The other 13 commands are unchanged. Typing an old name produces a helpful rename-error pointing at the new name — no silent failures. See the [v2.0.0 migration tutorial](migration/v2.0.0-rename.md) for the full mapping table and a `sed` recipe to mass-update local scripts.
 
 ## What's new in v1.3.0
 
-- 🎯 **MCP absorption complete** — `rforge-mcp` has been absorbed into the plugin. All 7 implemented tools now ship as pure-Python `lib/` modules. See [migration guide](migration/rforge-mcp-deprecation.md).
-- 🐍 **`lib/status.py`** — ecosystem health snapshot (`DESCRIPTION` + `.STATUS` parsing). `python3 -m lib.status`.
-- 🌱 **`lib/init.py`** — `~/.rforge/context.json` initializer. New `/rforge:init` command.
+- 🎯 **MCP absorption complete** — the prior `rforge-mcp` prototype was absorbed into the plugin. All capabilities now ship as pure-Python `lib/` modules. See the [migration guide](migration/rforge-mcp-deprecation.md).
+- 🐍 **`lib/status.py`** — ecosystem health snapshot (`DESCRIPTION` + `.STATUS` parsing): `python3 -m lib.status`.
+- 🌱 **`lib/init.py`** — `~/.rforge/context.json` initializer behind the new `/rforge:init` command.
 - 📦 **No runtime dependencies beyond Python 3.10+**.
-
-## What's new in v1.2.0
-
-- 🛒 **Marketplace install** — `/plugin marketplace add Data-Wise/rforge`
-- 🪝 **R-aware `PreToolUse` hook** — 4 rules (block `man/*.Rd` edits, warn on `R/*.R` and DESCRIPTION SemVer drift, warn on outside-worktree writes). See [Hooks & Skills](hooks-and-skills.md).
-- 🔍 **`description-sync` validation skill** — pure-shell DESCRIPTION ↔ NEWS.md drift check. No R required.
-- 📐 **Plugin Surface diagram** in [Architecture](architecture.md) (Mermaid).
-- 🔓 **MCP decoupled** — `npm install` works without `rforge-mcp` (was failing with 404 for fresh users). Absorbed entirely in v1.3.0.
-- ⚙️ **User options** — see [Configuration](configuration.md) for `cran_mirror`, `vignette_engine`, `r_version_pin`, `claude_md_budget`.
 
 Full release notes: [CHANGELOG.md](https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md).
 
-## Quick Start
+## How it works
 
-```bash
-# Quick analysis (< 30 seconds)
-/rforge:analyze "Update RMediation bootstrap algorithm"
-
-# Ultra-fast (< 10 seconds)
-/rforge:quick
-
-# Comprehensive (2-5 minutes)
-/rforge:thorough "Prepare for CRAN release"
-```
-
-## Features
-
-✨ **Auto-delegation** - Recognizes task patterns, selects appropriate tools
-⚡ **Parallel execution** - Calls multiple MCP tools simultaneously
-📊 **Live progress** - Real-time updates as tools complete
-🎯 **Smart synthesis** - Combines results into actionable summary
-🧠 **ADHD-friendly** - Fast feedback, clear structure, visual progress
-
-## How It Works
-
-```
-User Request
+```text
+You invoke /rforge:<command>
     ↓
-Pattern Recognition (CODE_CHANGE, BUG_FIX, etc.)
+Claude reads commands/<name>.md as its prompt
     ↓
-Tool Selection (impact, tests, docs, health)
+Claude orchestrates pure-Python lib/ modules + Bash tools as needed
+    ├── python3 -m lib.discovery   (ecosystem + package detection)
+    ├── python3 -m lib.deps        (dependency graph + change impact)
+    ├── python3 -m lib.status      (health snapshot)
+    └── python3 -m lib.init        (~/.rforge/context.json setup)
     ↓
-Parallel MCP Calls (4 tools × 8 sec = 8 sec total, not 32 sec!)
+PreToolUse hook diagnoses risky Write/Edit ops (blocks man/*.Rd edits, etc.)
     ↓
-Results Synthesis (impact + quality + maintenance + next steps)
+Validation skills run autonomously (description-sync, etc.)
     ↓
-Actionable Summary
-```
-
-## Skills
-
-### /rforge:analyze
-Balanced analysis with recommendations (< 30 seconds)
-```bash
-/rforge:analyze "Update code"
-```
-
-### /rforge:quick
-Ultra-fast status check (< 10 seconds)
-```bash
-/rforge:quick
-```
-
-### /rforge:thorough
-Comprehensive analysis with R CMD check (2-5 minutes)
-```bash
-/rforge:thorough "Prepare for CRAN"
+Results synthesized into an actionable summary
 ```
 
 ## Requirements
 
-1. **Python 3.10+** — `lib/` modules run via `python3 -m lib.<tool>`
-2. **R Environment**
-   - R >= 4.0.0
-   - devtools (optional, for `/rforge:thorough`)
-   - testthat (optional)
-   - covr (optional, for coverage)
-3. **Claude Code** - This is a Claude Code plugin
+| Requirement | Needed for |
+|---|---|
+| **Claude Code CLI** | everything (this is a Claude Code plugin) |
+| **Python 3.10+** on PATH | the `lib/` modules (`discovery`, `deps`, `status`, `init`) |
+| **R 4.0+** (+ optional `devtools`, `testthat`, `covr`) | only `/rforge:r:check` and `/rforge:thorough` |
 
 ## Installation
 
@@ -105,201 +99,27 @@ Comprehensive analysis with R CMD check (2-5 minutes)
 /plugin install rforge
 ```
 
-Alternative options (Homebrew, npm, manual symlink) are documented in
-the main [README](https://github.com/Data-Wise/rforge#installation).
+Restart Claude Code so the commands register, then verify with `/help` (look for `/rforge:` entries). Homebrew, npm, and from-source options are in [Installation](installation.md).
 
-> **Migrating from v1.2.x?** If `~/.claude/settings.json` has an
-> `mcpServers.rforge` entry, it's no longer needed in v1.3.0 — remove it
-> manually. See [migration guide](migration/rforge-mcp-deprecation.md).
+> **Migrating from v1.2.x?** If `~/.claude/settings.json` still has an `mcpServers.rforge` entry, it's no longer needed — remove it. See the [migration guide](migration/rforge-mcp-deprecation.md).
 
-3. **Restart Claude Code**
+## Design principles (ADHD-friendly)
 
-4. **Test it**
-   ```bash
-   cd /path/to/r-package
-   /rforge:analyze "Test installation"
-   ```
+1. **Fast feedback** — `/rforge:quick` returns in seconds, not minutes.
+2. **Clear structure** — consistent, scannable output across commands.
+3. **Visual progress** — you see what's happening as it happens.
+4. **Always actionable** — every result ends with next steps.
+5. **Interruptible & incremental** — results stream as they complete.
 
-## Pattern Recognition
+## More documentation
 
-The orchestrator automatically detects what you're doing:
-
-| Your Request | Pattern | Tools Used |
-|-------------|---------|------------|
-| "Update algorithm" | CODE_CHANGE | impact, tests, docs, health |
-| "Add function" | NEW_FUNCTION | detect, tests, docs |
-| "Fix bug" | BUG_FIX | tests, impact |
-| "Update docs" | DOCUMENTATION | docs, detect |
-| "Release 2.1.0" | RELEASE | health, impact, tests, docs |
-
-## Example Outputs
-
-### Quick Analysis
-```
-⚡ Quick analysis running...
-✅ Done! (8.2 seconds)
-
-📊 QUICK SUMMARY:
-✅ Impact: 2 packages (MEDIUM)
-✅ Tests: 187/187 passing
-⚠️ Docs: NEWS.md needs update
-✅ Health: 87/100 (B+)
-```
-
-### Full Analysis
-```
-🎯 IMPACT: MEDIUM
-  • 2 packages affected (mediate, sensitivity)
-  • Estimated cascade: 4 hours
-
-✅ QUALITY: EXCELLENT
-  • Tests: 187/187 passing (94% coverage)
-  • CRAN: Clean
-
-📝 MAINTENANCE: 2 items
-  • NEWS.md needs entry
-  • Vignette example outdated
-
-📋 NEXT STEPS:
-  1. Implement changes (3 hours)
-  2. Auto-fix documentation
-  3. Run cascade for dependents
-```
-
-## Architecture
-
-```
-┌─────────────────────────────────────┐
-│      Claude Code Session            │
-│                                     │
-│  ┌───────────────────────────────┐ │
-│  │  RForge Orchestrator Plugin   │ │
-│  │                               │ │
-│  │  • Pattern Recognition        │ │
-│  │  • Tool Selection             │ │
-│  │  • Parallel Execution         │ │
-│  │  • Progress Display           │ │
-│  │  • Results Synthesis          │ │
-│  └───────┬───────────────────────┘ │
-│          │                          │
-└──────────┼──────────────────────────┘
-           │ Parallel MCP calls
-           ↓
-    ┌──────┴──────┬──────┬──────┐
-    ↓             ↓      ↓      ↓
-[Impact]     [Tests] [Docs] [Health]
-    ↓             ↓      ↓      ↓
-  (8s)          (5s)   (3s)   (7s)
-    │             │      │      │
-    └─────────────┴──────┴──────┘
-                  │
-                  ↓
-         Results synthesized
-         by orchestrator
-```
-
-## Performance
-
-| Mode | Tools | Time | Use Case |
-|------|-------|------|----------|
-| Quick | 4 quick tools | ~10s | Status check |
-| Analyze | 4 quick + synthesis | ~30s | Daily dev |
-| Thorough | Background R | 2-5m | Pre-release |
-
-**Time savings:** Parallel execution = 4x faster than sequential!
-
-## ADHD-Friendly Design
-
-1. **Fast feedback** - Results in seconds, not minutes
-2. **Clear structure** - Consistent output format
-3. **Visual progress** - See what's happening
-4. **Actionable** - Always provides next steps
-5. **Interruptible** - Can cancel/resume anytime
-6. **Incremental** - Results stream as they complete
-
-## Troubleshooting
-
-**"python3: command not found"**
-```bash
-# Verify Python 3.10+ is on PATH
-python3 --version
-
-# macOS: install via Homebrew
-brew install python@3.12
-```
-
-**"Package not detected"**
-```bash
-# Run from package directory
-cd /path/to/package
-
-# Or specify path explicitly
-/rforge:analyze --package /path/to/package
-```
-
-**"Analysis too slow"**
-- Use `/rforge:quick` for fast status
-- Use `/rforge:analyze` for balanced speed/depth
-- Only use `/rforge:thorough` when needed
-
-## Configuration
-
-Plugin settings in `plugin.json`:
-
-```json
-{
-  "settings": {
-    "default_mode": "quick",           // quick, analyze, or thorough
-    "parallel_execution": true,         // Run tools in parallel
-    "show_progress": true,              // Show progress bars
-    "auto_synthesize": true             // Auto-generate summary
-  }
-}
-```
-
-## Development
-
-**Plugin structure:**
-```
-~/.claude/plugins/rforge/
-├── .claude-plugin/
-│   ├── plugin.json          # Plugin manifest (v1.3.0)
-│   ├── marketplace.json     # Marketplace install metadata
-│   ├── config.json          # User-tunable options (CRAN mirror, etc.)
-│   ├── hooks/
-│   │   └── pretooluse.py    # R-aware Write/Edit guard (4 rules)
-│   └── skills/
-│       └── validation/
-│           └── description-sync.md  # DESCRIPTION ↔ NEWS.md drift check
-├── commands/                # 16 slash commands (/rforge:*)
-├── agents/
-│   └── orchestrator.md      # Pattern recognition + delegation
-├── lib/
-│   └── formatters.py        # Output formatting helpers
-└── docs/                    # User-facing docs
-```
-
-## Contributing
-
-Ideas for improvement:
-- [ ] Add caching for repeated analyses
-- [ ] Track user preferences for tool selection
-- [ ] Add more pattern types
-- [ ] Improve time estimates
-- [ ] Add result export (markdown, JSON)
+- **[Reference Card](REFCARD.md)** — all 16 commands on one page
+- **[Commands](commands.md)** — full per-command reference
+- **[Architecture](architecture.md)** — how the `lib/` modules fit together
+- **[Hooks & Skills](hooks-and-skills.md)** — the R-aware `PreToolUse` hook
+- **[Configuration](configuration.md)** — CRAN mirror, vignette engine, R version pin, CLAUDE.md budget
+- **[Troubleshooting](troubleshooting.md)** — when commands misbehave
 
 ## License
 
-MIT
-
-## Links
-
-- v1.3.0 absorbed the prior `rforge-mcp` prototype (local-only, never published to GitHub or npm). See [migration/rforge-mcp-deprecation.md](migration/rforge-mcp-deprecation.md) for the migration narrative.
-- Claude Code: https://claude.com/code
-- Documentation: See `docs/` folder
-
----
-
-**Version:** 0.1.0
-**Status:** Active development
-**Compatibility:** Claude Code 0.1.0+
+MIT. Source: <https://github.com/Data-Wise/rforge>

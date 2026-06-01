@@ -1,4 +1,12 @@
-# Configuring RForge for Your R Package
+# ⚙️ Configuring RForge for Your R Package
+
+!!! tip "TL;DR (30 seconds)"
+    - **What:** Tune 4 options (CRAN mirror, vignette engine, R version pin, CLAUDE.md budget).
+    - **Why:** Defaults work for most repos; override when you need CRAN-specific behavior or mirror selection.
+    - **How:** Edit `.claude-plugin/config.json` in your repo root.
+    - **Next:** Most users skip this entirely — the defaults are sensible.
+
+⏱️ **5 minutes** • 🟢 Beginner • Optional
 
 > Added in v1.2.0. Stub configuration; more options will be added in
 > later phases.

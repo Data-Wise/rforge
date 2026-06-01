@@ -160,7 +160,7 @@ specific check depths.
 
 All other phase B.3 / B.4 acceptance criteria ship as planned.
 
-## Scope correction #2 — Phase B.4 archival (2026-05-11)
+## Scope correction #2 — Phase B.4 archival (2026-05-11) { #scope-correction-2--phase-b4-archival-2026-05-11 }
 
 After v1.3.0 shipped, attempting Phase B.4's `gh repo archive
 data-wise/rforge-mcp` revealed the repo never existed on GitHub.

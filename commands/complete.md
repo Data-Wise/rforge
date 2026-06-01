@@ -2,6 +2,16 @@
 name: rforge:complete
 description: Mark tasks complete with automatic documentation cascade
 argument-hint: Task ID or description
+arguments:
+  - name: task_id
+    description: Task ID (e.g., T-YYYY-MM-DD-NNN) or short description
+    required: false
+    type: string
+  - name: no-cascade
+    description: Skip the documentation cascade detection
+    required: false
+    type: boolean
+    default: false
 ---
 
 # /rforge:complete - Task Completion with Doc Cascade

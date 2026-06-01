@@ -1,6 +1,16 @@
 ---
 name: rforge:detect
 description: Auto-detect R package project structure (single package, ecosystem, or hybrid)
+arguments:
+  - name: path
+    description: Path to scan (defaults to current directory)
+    required: false
+    type: string
+  - name: format
+    description: Output format (text, json)
+    required: false
+    type: string
+    default: "text"
 ---
 
 # /rforge:detect - Project Structure Detection

@@ -1,4 +1,10 @@
-# RForge Commands Reference
+# 📖 RForge Commands Reference
+
+!!! tip "TL;DR (30 seconds)"
+    - **What:** Full per-command reference (parameters, examples, output format).
+    - **Why:** REFCARD is a cheat sheet; this page is the deep dive.
+    - **How:** Jump to a category below, or `Ctrl+F` for a specific command.
+    - **Next:** [REFCARD](REFCARD.md) for the at-a-glance summary.
 
 Complete reference for all 16 RForge commands. Commands are organized by category with usage examples and parameter details.
 
@@ -129,7 +135,7 @@ Deep analysis with mode system support and intelligent recommendations.
 **Performs:**
 - Pattern recognition (CODE_CHANGE, BUG_FIX, CRAN_RELEASE, etc.)
 - Tool selection based on context
-- Parallel MCP execution
+- Parallel pure-Python `lib/` module execution (no MCP server)
 - Results synthesis with actionable recommendations
 
 **Time budget:** <30s (default), up to 300s (release mode)

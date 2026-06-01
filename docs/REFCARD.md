@@ -1,10 +1,16 @@
-# RForge Plugin - Reference Card
+# 📚 RForge Plugin - Reference Card
 
 > **Version:** 2.0.0 | **Last Updated:** 2026-05-12
 
+!!! tip "TL;DR (30 seconds)"
+    - **What:** All 16 commands in one page — categorized by use case.
+    - **Why:** Forget command syntax? Scan the ASCII box below.
+    - **How:** Daily? `/rforge:status` `/rforge:quick`. After changes? `/rforge:analyze "what?"`. Pre-CRAN? `/rforge:thorough`.
+    - **Next:** [Commands reference](commands.md) for full per-command docs.
+
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  RFORGE PLUGIN REFERENCE                                            v1.3.0  │
+│  RFORGE PLUGIN REFERENCE                                            v2.0.0  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  COMMANDS (16)                                                              │
@@ -189,7 +195,7 @@ No `~/.claude/settings.json` entries required since v1.3.0 — the plugin is ful
 
 ```text
 rforge/
-├── .claude-plugin/        # Plugin manifest + extras (v1.3.0)
+├── .claude-plugin/        # Plugin manifest + extras (v2.0.0)
 │   ├── plugin.json
 │   ├── marketplace.json
 │   ├── config.json
@@ -267,7 +273,7 @@ rforge/
 - **Main README:** [README.md](https://github.com/Data-Wise/rforge/blob/main/README.md) on GitHub
 - **Plugin Repository:** <https://github.com/Data-Wise/rforge>
 - **GitHub Releases:** <https://github.com/Data-Wise/rforge/releases>
-- **Migration tutorials:** [`docs/migration/`](migration/)
+- **Migration tutorials:** [v2.0.0 rename](migration/v2.0.0-rename.md) · [rforge-mcp deprecation](migration/rforge-mcp-deprecation.md)
 
 ---
 

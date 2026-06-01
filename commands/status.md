@@ -1,6 +1,16 @@
 ---
 name: rforge:status
 description: Ecosystem-wide status dashboard (health, packages, .STATUS aggregation)
+arguments:
+  - name: package
+    description: Optional package to drill into (defaults to ecosystem-wide)
+    required: false
+    type: string
+  - name: format
+    description: Output format (text, json)
+    required: false
+    type: string
+    default: "text"
 ---
 
 # /rforge:status - Ecosystem Status Dashboard

@@ -35,6 +35,9 @@ theme:
   icon:
     repo: fontawesome/brands/github
 
+extra_css:
+  - stylesheets/extra.css
+
 plugins:
   - search
 
@@ -65,29 +68,39 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - 🚀 Quick Start: QUICK-START.md
-  - 📖 Detailed Quick Start: quickstart.md
-  - 📚 Reference Card: REFCARD.md
-  - Commands: commands.md
-  - Architecture: architecture.md
-  - Hooks & Skills: hooks-and-skills.md
-  - Configuration: configuration.md
-  - Lib Modules: lib-modules.md
-  - Troubleshooting: troubleshooting.md
-  - Tutorials:
-    - Overview: tutorials/README.md
+  - Get Started:
+    - 📦 Installation: installation.md
+    - 🚀 Quick Start (3 min): QUICK-START.md
+    - 📖 Detailed Quick Start: quickstart.md
+  - Learn:
+    - 📊 Visual Workflows: workflows/index.md
+    - Tutorials Overview: tutorials/README.md
     - "Getting started": tutorials/getting-started.md
+    - "rforge in the R package lifecycle": tutorials/rforge-in-the-r-lifecycle.md
+    - "Understanding modes": tutorials/understanding-modes.md
+    - "Ecosystem orchestration": tutorials/ecosystem-orchestration.md
+    - "CRAN release prep": tutorials/cran-release-prep.md
     - "Migrating from rforge-mcp": tutorials/migrate-from-mcp.md
   - Reference:
-    - "discovery API": reference/discovery.md
-    - "deps API": reference/deps.md
-    - "status API": reference/status.md
-    - "init API": reference/init.md
-  - Specs:
-    - Overview: specs/README.md
-    - "MCP absorb (Path B)": specs/SPEC-mcp-absorb-2026-05-10.md
-    - "Phase 3 namespacing (v2.0.0)": specs/SPEC-phase3-namespacing-2026-05-11.md
-  - Migration:
-    - "v2.0.0 command rename": migration/v2.0.0-rename.md
-    - "rforge-mcp deprecation": migration/rforge-mcp-deprecation.md
-    - "v1.3.0 post-merge checklist": migration/v1.3.0-post-merge-checklist.md
+    - 📚 Reference Card: REFCARD.md
+    - Commands: commands.md
+    - Configuration: configuration.md
+    - Lib Modules: lib-modules.md
+    - Troubleshooting: troubleshooting.md
+    - API:
+      - "discovery": reference/discovery.md
+      - "deps": reference/deps.md
+      - "status": reference/status.md
+      - "init": reference/init.md
+  - Project:
+    - Architecture: architecture.md
+    - Hooks & Skills: hooks-and-skills.md
+    - Specs:
+      - Overview: specs/README.md
+      - "MCP absorb (Path B)": specs/SPEC-mcp-absorb-2026-05-10.md
+      - "Phase 3 namespacing (v2.0.0)": specs/SPEC-phase3-namespacing-2026-05-11.md
+      - "Diff-aware checks & coverage": specs/SPEC-diff-aware-checks-and-coverage-2026-05-31.md
+    - Migration:
+      - "v2.0.0 command rename": migration/v2.0.0-rename.md
+      - "rforge-mcp deprecation": migration/rforge-mcp-deprecation.md
+      - "v1.3.0 post-merge checklist": migration/v1.3.0-post-merge-checklist.md

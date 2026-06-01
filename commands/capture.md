@@ -2,6 +2,11 @@
 name: rforge:capture
 description: Quick capture ideas and tasks for later (with automatic doc cascade detection)
 argument-hint: Task description or idea to capture
+arguments:
+  - name: context
+    description: Free-form task or idea text to capture
+    required: false
+    type: string
 ---
 
 # /rforge:capture - Quick Task Capture
