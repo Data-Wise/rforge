@@ -30,6 +30,34 @@ INSTALL_HINT = {
 }
 
 
+def _as_list(x) -> list:
+    """Coerce a value to a list. jsonlite's auto_unbox=TRUE collapses length-1
+    vectors to scalars, so a single finding can arrive as a str/dict, not a list."""
+    if x is None:
+        return []
+    return x if isinstance(x, list) else [x]
+
+
+def _parse_json(stdout: str) -> dict | None:
+    """Parse a JSON object from R stdout, tolerating progress/log lines before it.
+
+    Our snippets `cat()` a single-line JSON object as the final write, but some
+    engines (urlchecker progress, pkgdown build log) also print to stdout. Try
+    the whole output first, then the last non-empty line. Returns None if no line
+    parses to a dict (caller falls back to console_fallback)."""
+    if not stdout:
+        return {}
+    candidates = [stdout] + [ln for ln in reversed(stdout.splitlines()) if ln.strip()]
+    for cand in candidates:
+        try:
+            obj = json.loads(cand.strip())
+        except json.JSONDecodeError:
+            continue
+        if isinstance(obj, dict):
+            return obj
+    return None
+
+
 def find_package(path: str = ".") -> dict | None:
     """Return {'package','version'} from DESCRIPTION, or None if not a package."""
     desc = Path(path) / "DESCRIPTION"
@@ -62,7 +90,8 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
     if kind == "site":
         if exit_code != 0 or not raw.get("built", True):
             return "error"
-        return "warn" if raw.get("problems") else "ok"
+        probs = [p for p in _as_list(raw.get("problems")) if str(p).strip()]
+        return "warn" if probs else "ok"
     if kind == "coverage":
         return "ok"  # advisory; untested lines surfaced, never "error"
     if kind in _QUALITY_KEY:
@@ -83,35 +112,37 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
         env["package"] = pkg.get("package", "")
         env["version"] = pkg.get("version", "")
     if kind == "check":
-        env["check"] = {k: raw.get(k, []) for k in ("errors", "warnings", "notes")}
+        env["check"] = {k: _as_list(raw.get(k)) for k in ("errors", "warnings", "notes")}
     elif kind == "test":
         env["tests"] = {k: raw.get(k, 0) for k in
                         ("passed", "failed", "skipped", "warnings")}
-        env["tests"]["failing_files"] = raw.get("failing_files", [])
+        env["tests"]["failing_files"] = _as_list(raw.get("failing_files"))
     elif kind == "coverage":
         env["coverage"] = {"total_pct": raw.get("total_pct"),
                            "per_file": raw.get("per_file", {}),
-                           "untested": raw.get("untested", [])}
+                           "untested": _as_list(raw.get("untested"))}
     elif kind == "build":
         env["build"] = {"artifact": raw.get("artifact"), "bytes": raw.get("bytes")}
     elif kind == "site":
+        problems = [p for p in _as_list(raw.get("problems")) if str(p).strip()]
         env["site"] = {"checked": raw.get("checked", False),
                        "built": raw.get("built", False),
-                       "problems": raw.get("problems", [])}
+                       "problems": problems}
     elif kind == "install":
         env["install"] = {"installed_version": raw.get("installed_version"),
                           "exit": exit_code}
     elif kind == "lint":
-        env["lint"] = {"count": len(raw.get("lints", [])), "lints": raw.get("lints", [])}
+        lints = _as_list(raw.get("lints"))
+        env["lint"] = {"count": len(lints), "lints": lints}
     elif kind == "spell":
-        env["spell"] = {"count": len(raw.get("misspelled", [])),
-                        "misspelled": raw.get("misspelled", [])}
+        misspelled = _as_list(raw.get("misspelled"))
+        env["spell"] = {"count": len(misspelled), "misspelled": misspelled}
     elif kind == "urlcheck":
-        env["urlcheck"] = {"count": len(raw.get("broken", [])),
-                           "broken": raw.get("broken", [])}
+        broken = _as_list(raw.get("broken"))
+        env["urlcheck"] = {"count": len(broken), "broken": broken}
     elif kind == "style":
-        env["style"] = {"count": len(raw.get("changed_files", [])),
-                        "changed_files": raw.get("changed_files", [])}
+        changed = _as_list(raw.get("changed_files"))
+        env["style"] = {"count": len(changed), "changed_files": changed}
     # load: no extra block — status carries the result
     return env
 
@@ -213,12 +244,12 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             f'function(i) list(word=sp$word[i], files=sp$found[[i]]))), '
             f'auto_unbox=TRUE, null="list"))')
     if kind == "urlcheck":
-        # NOTE: verify column names with names(urlchecker::url_check(".")) — vary by version
+        # urlchecker::url_check() columns (v1.0.x): URL, From, Status, Message, New
         return _guard("urlchecker",
             f'u <- urlchecker::url_check({p}); '
             f'cat(jsonlite::toJSON(list(broken=lapply(seq_len(nrow(u)), '
-            f'function(i) list(url=u$URL[i], message=u$message[i], '
-            f'new_url=u$newURL[i]))), auto_unbox=TRUE, null="list"))')
+            f'function(i) list(url=u$URL[i], status=u$Status[i], '
+            f'message=u$Message[i], new_url=u$New[i]))), auto_unbox=TRUE, null="list"))')
     if kind == "style":
         return _guard("styler",
             f'res <- styler::style_pkg({p}); '
@@ -261,9 +292,8 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
         snippet = r_snippet(kind, path, as_cran=as_cran, preview=preview,
                             strict=strict, articles_only=articles_only, devel=devel)
         stdout, code = _invoke_r(snippet)
-        try:
-            raw = json.loads(stdout) if stdout else {}
-        except json.JSONDecodeError:
+        raw = _parse_json(stdout)
+        if raw is None:
             raw = console_fallback(kind, stdout)
     env = normalize(kind, raw, code, pkg)
     for eng in env.get("engine_missing", []):

@@ -160,3 +160,62 @@ def test_main_emits_json(tmp_path, monkeypatch, capsys):
     monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"errors":[],"warnings":[],"notes":[]}', 0))
     rc = rcmd.main(["--kind", "check", "--path", str(tmp_path)])
     assert json.loads(capsys.readouterr().out)["status"] == "ok" and rc == 0
+
+
+# --- Regression tests: bugs found in live R sanity check (2026-06-01) ---
+
+def test_parse_json_tolerates_leading_progress_lines():
+    # urlchecker prints "fetching [...]" and pkgdown prints a build log to stdout
+    # before the JSON. _parse_json must recover the trailing JSON object.
+    stdout = 'fetching [ 0 / 1 ]\n-- Building site --\n{"checked":true,"built":true,"problems":[]}'
+    assert rcmd._parse_json(stdout) == {"checked": True, "built": True, "problems": []}
+
+
+def test_parse_json_clean_single_line():
+    assert rcmd._parse_json('{"errors":[],"warnings":[],"notes":[]}') == {
+        "errors": [], "warnings": [], "notes": []}
+
+
+def test_parse_json_empty_is_empty_dict():
+    assert rcmd._parse_json("") == {}
+
+
+def test_parse_json_no_json_returns_none():
+    assert rcmd._parse_json("just logs\nno json here") is None
+
+
+def test_as_list_wraps_scalars():
+    # jsonlite auto_unbox collapses a length-1 vector to a scalar.
+    assert rcmd._as_list("one warning") == ["one warning"]
+    assert rcmd._as_list({"file": "R/a.R"}) == [{"file": "R/a.R"}]
+    assert rcmd._as_list(None) == []
+    assert rcmd._as_list(["a", "b"]) == ["a", "b"]
+
+
+def test_normalize_check_unboxed_single_warning_becomes_list():
+    # A single check warning arrives as a bare string; counts must still work.
+    env = rcmd.normalize("check", {"errors": [], "warnings": "one WARNING", "notes": []},
+                         0, None)
+    assert env["check"]["warnings"] == ["one WARNING"]
+    assert len(env["check"]["warnings"]) == 1
+    assert env["status"] == "warn"
+
+
+def test_normalize_lint_unboxed_single_lint_counts_one():
+    env = rcmd.normalize("lint", {"lints": {"file": "R/a.R", "line": 3}}, 0, None)
+    assert env["lint"]["count"] == 1 and len(env["lint"]["lints"]) == 1
+
+
+def test_normalize_site_filters_empty_problems():
+    # sitrep capture can yield [""]; that must not count as a problem (spurious warn).
+    env = rcmd.normalize("site", {"checked": True, "built": True, "problems": [""]}, 0, None)
+    assert env["site"]["problems"] == [] and env["status"] == "ok"
+
+
+def test_run_site_recovers_from_build_log(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r",
+                        lambda s: ('-- Building site --\nWriting 404.html\n'
+                                   '{"checked":true,"built":true,"problems":[""]}', 0))
+    env = rcmd.run("site", str(tmp_path))
+    assert env["site"]["built"] is True and env["status"] == "ok"
