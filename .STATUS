@@ -1,5 +1,5 @@
 project: rforge
-updated: 2026-05-12
+updated: 2026-06-01
 status: Active
 version: 2.0.0 (released)
 last_release: 2026-05-12 v2.0.0 BREAKING (PR #8 dev → main commit 5d3ed95, tag https://github.com/Data-Wise/rforge/releases/tag/v2.0.0, tap formula + manifest synced to v2.0.0, feedback thread at issue #9)
@@ -7,6 +7,32 @@ last_release: 2026-05-12 v2.0.0 BREAKING (PR #8 dev → main commit 5d3ed95, tag
 worktrees: []
 
 recent:
+  - date: 2026-06-01
+    pr: 10
+    branch: dev
+    title: "docs: website restructure — 5-tab nav, 5 new pages, ADHD enhancements"
+    state: MERGED
+    merge_commit: 1505377
+    summary: |
+      Docs-only release. dev → main (PR #10), RForge CI + Deploy Documentation
+      both green, site live at data-wise.github.io/rforge.
+
+      - Rewrote stale index.md (removed MCP-era/v0.1.0 cruft; added
+        "What rforge is/isn't" + "Where to start")
+      - 5 new pages: tutorials/{rforge-in-the-r-lifecycle, understanding-modes,
+        ecosystem-orchestration, cran-release-prep} + workflows/index.md
+      - ADHD: docs/stylesheets/extra.css (mermaid overflow, 44px touch targets,
+        mobile sizing), TL;DR boxes + emoji headings across user pages
+      - Nav grouped 14 → 5 intent-based tabs (Home/Get Started/Learn/Reference/Project)
+      - Fixed stale "Parallel MCP" refs + broken anchors (explicit heading IDs);
+        added diff-aware spec to nav; refreshed specs/README statuses
+      - Commits 9494611 + 194a387; all 29 test-all.sh gates pass throughout
+      - Auto-generated reference/*.md left untouched (gen_lib_reference gate green)
+
+      Also this session: fixed broken rforge plugin install — deleted stale
+      v1.1.0 plugin cache (empty lib/ → ModuleNotFoundError); brew v2.0.0
+      confirmed working. Recommended /plugin reinstall to repoint registry.
+
   - date: 2026-05-12
     pr: 6
     branch: feature/phase3-namespacing-v2
