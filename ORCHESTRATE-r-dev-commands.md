@@ -1323,6 +1323,25 @@ Tables/REFCARD/mkdocs now list **28** commands. Group the four under a "Quality"
 heading adjacent to the dev-cycle list. CHANGELOG `[2.1.0]` Added section gains
 the four quality commands.
 
+## Addendum 3 (2026-05-31) — de-duplication requirements
+
+Audit against the existing 16 commands found **no name collisions** (only
+`r:check`, the intended retrofit). Honor these to avoid *functional* duplicates
+(see spec "Duplicate & overlap audit"):
+
+- **Cross-link, don't merge.** Add to "Related Commands":
+  - `commands/r/check.md` → `/rforge:thorough` (already present) — note "single
+    package vs ecosystem rollup".
+  - `commands/r/cycle.md` → `/rforge:thorough` — same boundary note.
+  - `commands/r/document.md` → `/rforge:docs:check` (already present) — "regenerate
+    vs detect drift".
+- **DRY:** `_run_cycle` calls `run("document"/"test"/"check")` — do not duplicate
+  those snippets. All `r:` commands go through the one `lib/rcmd.py` path.
+- **Gate:** Task 7 Step 8 already runs `bash tests/test-all.sh` — confirm the
+  **command-name-uniqueness** check passes after adding all 12 files.
+- **Do NOT modify** the rename stubs `commands/{doc-check,ecosystem-health,rpkg-check}.md`
+  — they intentionally emit "renamed to …" messages (removed in v3.0.0).
+
 ---
 
 ## Self-Review (completed by plan author)
