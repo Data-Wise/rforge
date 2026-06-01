@@ -1,23 +1,39 @@
 project: rforge
 updated: 2026-06-01
 status: Active
-version: 2.1.0 (in progress — feature/r-dev-commands → dev → main)
+version: 2.1.0 (merged to dev via PR #11; pending dev → main release)
 last_release: 2026-05-12 v2.0.0 BREAKING (PR #8 dev → main commit 5d3ed95, tag https://github.com/Data-Wise/rforge/releases/tag/v2.0.0, tap formula + manifest synced to v2.0.0, feedback thread at issue #9)
 
-worktrees:
-  - path: ~/.git-worktrees/rforge/feature-r-dev-commands
-    branch: feature/r-dev-commands
-    created: 2026-05-31
-    status: implementing
-    started: 2026-05-31
-    target: v2.1.0
-    scope: "r: dev-cycle + quality commands (12 new: load/document/test/coverage/build/install/site/cycle/lint/spell/urlcheck/style) + r:check retrofit, backed by lib/rcmd.py. Commands 16 → 28."
-    plan: ORCHESTRATE-r-dev-commands.md (consolidated; 11 TDD tasks)
-    spec: docs/specs/SPEC-r-dev-commands-2026-05-31.md
-    progress: "Plan + spec committed. Implementation started in worktree session 2026-05-31 — no code commits yet (lib/rcmd.py pending Task 1)."
-    notes: "Phase 4 (agents) bumped to v2.2.0. Deferred to own specs: r:deps-sync, scaffolding theme (r:create/use-test/use-package/use-vignette — creation confirmed in mission), r:cran-prep."
+worktrees: []
 
 recent:
+  - date: 2026-06-01
+    pr: 11
+    branch: feature/r-dev-commands
+    title: "feat: r: dev-cycle + quality commands (v2.1.0)"
+    state: MERGED
+    merge_commit: 6d14c24
+    summary: |
+      12 new r: commands (load/document/test/coverage/build/install/site/
+      cycle/lint/spell/urlcheck/style) + r:check retrofit, backed by a new
+      lib/rcmd.py (lower-level engines → JSON via jsonlite → normalized
+      envelope; never devtools). 16 → 28 commands; version → 2.1.0.
+
+      Merged to dev (PR #11, merge 6d14c24). CI "Validate Plugin Structure"
+      green; 110 pytest + 30/30 test-all.sh. Post-implementation live R
+      sanity on a scratch package caught + fixed 3 serialization bugs before
+      merge (06f819a): stdout contamination (urlchecker/pkgdown progress
+      broke JSON parse — site falsely reported built:false), jsonlite
+      auto_unbox length-1 collapse (broke len() counts), and wrong
+      urlchecker column names (URL/Status/Message/New). Worktree removed,
+      feature branch deleted, local dev rebased to preserve the final spec +
+      BRAINSTORM-r-command-expansion (deferred: deps-sync, scaffolding,
+      cran-prep).
+
+      Pending: dev → main release (4-source bump already at 2.1.0,
+      CHANGELOG [2.1.0] present), then tap formula + manifest sync.
+      Phase 4 (agents) → v2.2.0.
+
   - date: 2026-06-01
     pr: 10
     branch: dev
