@@ -1,0 +1,50 @@
+/* rforge docs — ADHD-friendly + mobile responsive enhancements.
+   Loaded via mkdocs.yml `extra_css`. Material palette handles colors;
+   this file only adds mobile fixes and touch-target sizing. */
+
+/* --- Mermaid: prevent horizontal overflow on narrow screens --- */
+.md-typeset .mermaid {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.md-typeset .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- Tables: scroll instead of breaking layout on mobile --- */
+.md-typeset__table {
+  min-width: 100%;
+}
+.md-typeset table:not([class]) {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* --- Touch targets: ≥44px on coarse pointers (phones/tablets) --- */
+@media (pointer: coarse) {
+  .md-typeset a,
+  .md-nav__link,
+  .md-tabs__link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .md-typeset .md-button {
+    min-height: 44px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+/* --- Narrow viewport: tighten code blocks so they don't force zoom --- */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset pre > code {
+    font-size: 0.74rem;
+  }
+  .md-typeset h1 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+}

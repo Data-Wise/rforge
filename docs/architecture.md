@@ -1,4 +1,10 @@
-# RForge Architecture Guide
+# 🏗️ RForge Architecture Guide
+
+!!! tip "TL;DR (30 seconds)"
+    - **What:** How rforge works internally — command → `lib/` modules → synthesized output.
+    - **Why:** Understand the moving parts before extending or debugging the plugin.
+    - **How:** `/rforge:<command>` reads a markdown prompt; Claude runs `python3 -m lib.<module>` and synthesizes.
+    - **Next:** [Lib Modules](lib-modules.md) for the module-by-module breakdown.
 
 Deep dive into how RForge works internally: auto-delegation orchestration, pattern recognition, parallel execution, and result synthesis.
 
@@ -84,7 +90,7 @@ For a user-facing tour of the new hook + skill, see
 
 ---
 
-## `lib/` modules — the analysis runtime
+## `lib/` modules — the analysis runtime { #path-b-lib-modules }
 
 > **Completed in v1.3.0.** All R-package analysis runs through pure-Python `lib/` modules. The plugin no longer has any runtime dependency on an MCP server.
 

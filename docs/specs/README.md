@@ -29,12 +29,18 @@ single-PR features. The PR description is the right home for those.
   more useful than goals — they prevent scope creep.
 - Link from `CHANGELOG.md` and `.STATUS` so SPECs aren't orphaned.
 
-## Active specs
+## Specs
 
 - **[MCP absorb (Path B)](SPEC-mcp-absorb-2026-05-10.md)** — Status:
-  Draft. Migration plan to absorb `rforge-mcp`'s implemented tools into
-  the plugin's `lib/`. Path A (decoupling at the npm peer-dep level)
-  shipped in v1.2.0; Path B is the longer-term self-sufficiency move.
+  Shipped (v1.3.0). Migration plan that absorbed `rforge-mcp`'s implemented
+  tools into the plugin's `lib/`. Path A (decoupling at the npm peer-dep
+  level) shipped in v1.2.0; Path B delivered full self-sufficiency.
+- **[Phase 3 namespacing (v2.0.0)](SPEC-phase3-namespacing-2026-05-11.md)** —
+  Status: Shipped (v2.0.0). The command-rename / sub-namespacing plan
+  (`docs:check`, `r:check`, `health`).
+- **[Diff-aware checks & coverage](SPEC-diff-aware-checks-and-coverage-2026-05-31.md)** —
+  Status: Draft. Proposal for diff-scoped checks, coverage integration, and
+  ecosystem NOTE classification.
 
 ## See also
 

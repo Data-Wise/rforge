@@ -1,4 +1,10 @@
-# Hooks & Skills Reference
+# 🪝 Hooks & Skills Reference
+
+!!! tip "TL;DR (30 seconds)"
+    - **What:** The tooling that runs automatically — a `PreToolUse` hook + validation skills.
+    - **Why:** Catches R-specific mistakes (editing generated `man/*.Rd`, version drift) before they land.
+    - **How:** Fires on every `Write`/`Edit`; only the `man/*.Rd` rule blocks — the rest warn.
+    - **Next:** [Configuration](configuration.md) to tune behavior, or [Architecture](architecture.md) for the full surface.
 
 > Added in v1.2.0. Mirrors craft's `.claude-plugin/` layout.
 

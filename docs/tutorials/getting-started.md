@@ -1,4 +1,4 @@
-# Getting started with rforge
+# 🚀 Getting started with rforge
 
 > **For whom:** First-time rforge user. You have Claude Code installed
 > and at least one R package directory you want to analyze.
@@ -181,6 +181,18 @@ specialized.
 | `/rforge:thorough "release prep"` | Before CRAN submission | 2-5 min — full validation |
 
 ## What's next
+
+Now that the basics work, follow the learning path:
+
+- **[rforge in the R package lifecycle](rforge-in-the-r-lifecycle.md)** —
+  where rforge fits alongside `devtools`/`usethis` (read this next)
+- **[Understanding modes](understanding-modes.md)** — the `--mode` flag on
+  `/rforge:analyze`, explained simply
+- **[Ecosystem orchestration](ecosystem-orchestration.md)** — managing
+  several inter-dependent packages
+- **[CRAN release prep](cran-release-prep.md)** — taking a package to CRAN
+
+Reference material:
 
 - **[REFCARD](../REFCARD.md)** — all 16 commands in one page
 - **[Hooks & Skills](../hooks-and-skills.md)** — the `pretooluse` hook

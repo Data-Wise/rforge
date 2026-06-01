@@ -1,6 +1,11 @@
-# RForge Quick Start Guide
+# 📖 RForge Quick Start Guide
 
 Get started with RForge in 5 minutes. This guide walks you through installation, basic usage, and your first analysis.
+
+!!! tip "New here? Start with the 3-minute Quick Start instead"
+    This is the **detailed** quick start. If you just want it working fast,
+    use **[Quick Start](QUICK-START.md)** (3 min). Come back here when you
+    want the fuller tour (modes, output formats, project-structure detection).
 
 ## Prerequisites
 
@@ -129,17 +134,24 @@ This performs:
 
 ### Mode System
 
-RForge supports 4 analysis modes with different time budgets:
+`/rforge:analyze` is **mode-aware** — one command, four depth/time tradeoffs.
+(`/rforge:status` and `/rforge:quick` are always fast and ignore modes.)
 
-| Mode | Command | Time | Use Case |
-|------|---------|------|----------|
-| **default** | `/rforge:status` | <10s | Quick daily checks |
-| **debug** | `/rforge:analyze --mode debug` | <120s | Detailed diagnostics |
-| **optimize** | `/rforge:analyze --mode optimize` | <180s | Performance analysis |
-| **release** | `/rforge:analyze --mode release` | <300s | CRAN preparation |
+| Mode | Command | Time budget | Use Case |
+|------|---------|-------------|----------|
+| **default** | `/rforge:analyze` | <10s | Daily check-ins, balanced output |
+| **debug** | `/rforge:analyze --mode debug` | <120s | Deep inspection, root-cause traces |
+| **optimize** | `/rforge:analyze --mode optimize` | <180s | Performance profiling (R subprocess) |
+| **release** | `/rforge:analyze --mode release` | <300s | CRAN prep, R CMD check equivalent |
+
+No `--mode` flag = default mode. rforge also infers mode from context words
+("debug", "optimize", "CRAN") when you don't pass the flag explicitly.
 
 **Example:**
 ```bash
+# Default mode — fast, balanced (no flag needed)
+/rforge:analyze "Updated bootstrap algorithm"
+
 # Debug mode for investigating test failures
 /rforge:analyze --mode debug "Why are tests failing on CI?"
 
@@ -324,8 +336,9 @@ If analysis is slow:
 
 Now that you're set up, explore:
 
-- **[Commands Reference](commands.md)** - All 15 RForge commands
+- **[Commands Reference](commands.md)** - All 16 RForge commands
 - **[Architecture Guide](architecture.md)** - How RForge works internally
+- **[rforge in the R package lifecycle](tutorials/rforge-in-the-r-lifecycle.md)** - Where rforge fits with devtools/usethis
 
 ## Common Commands Cheat Sheet
 

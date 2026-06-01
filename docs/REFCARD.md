@@ -273,7 +273,7 @@ rforge/
 - **Main README:** [README.md](https://github.com/Data-Wise/rforge/blob/main/README.md) on GitHub
 - **Plugin Repository:** <https://github.com/Data-Wise/rforge>
 - **GitHub Releases:** <https://github.com/Data-Wise/rforge/releases>
-- **Migration tutorials:** [`docs/migration/`](migration/)
+- **Migration tutorials:** [v2.0.0 rename](migration/v2.0.0-rename.md) · [rforge-mcp deprecation](migration/rforge-mcp-deprecation.md)
 
 ---
 

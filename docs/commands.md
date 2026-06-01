@@ -135,7 +135,7 @@ Deep analysis with mode system support and intelligent recommendations.
 **Performs:**
 - Pattern recognition (CODE_CHANGE, BUG_FIX, CRAN_RELEASE, etc.)
 - Tool selection based on context
-- Parallel MCP execution
+- Parallel pure-Python `lib/` module execution (no MCP server)
 - Results synthesis with actionable recommendations
 
 **Time budget:** <30s (default), up to 300s (release mode)

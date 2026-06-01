@@ -159,7 +159,7 @@ See [REFCARD.md](REFCARD.md) for detailed pattern recognition guide.
 
 ✨ **Auto-delegation** - Recognizes task patterns, selects appropriate tools
 
-⚡ **Parallel execution** - Calls multiple MCP tools simultaneously
+⚡ **Parallel execution** - Runs multiple pure-Python `lib/` modules at once (no MCP server)
 
 📊 **Live progress** - Real-time updates as tools complete
 

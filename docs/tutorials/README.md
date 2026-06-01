@@ -14,27 +14,52 @@ scenario and walks through the exact commands and expected output.
 | If you're... | Start here | Time |
 |---|---|---|
 | New to rforge, want to try it on an R package | [Getting started](getting-started.md) | ~10 min |
+| Wondering how rforge fits with `devtools`/`usethis` | [rforge in the R package lifecycle](rforge-in-the-r-lifecycle.md) | ~12 min |
+| Confused by the `--mode` flag | [Understanding modes](understanding-modes.md) | ~5 min |
+| Managing several inter-dependent packages | [Ecosystem orchestration](ecosystem-orchestration.md) | ~15 min |
+| Preparing a CRAN submission | [CRAN release prep](cran-release-prep.md) | ~15 min |
 | Coming from `rforge-mcp` (the deprecated MCP server) | [Migrating from rforge-mcp](migrate-from-mcp.md) | ~5 min |
 | Upgrading from v1.x and hit a renamed-command error | [v2.0.0 rename migration](../migration/v2.0.0-rename.md) | ~2 min |
 | Looking up a specific command's syntax | [REFCARD](../REFCARD.md) (not a tutorial) | <1 min |
+
+## Suggested learning path
+
+```mermaid
+flowchart LR
+    A["Getting started<br/>install + first analysis"] --> B["rforge in the<br/>R lifecycle<br/>what it is vs devtools"]
+    B --> C["Understanding modes<br/>the --mode flag"]
+    C --> D["Ecosystem orchestration<br/>impact / cascade / deps"]
+    D --> E["CRAN release prep<br/>thorough / r:check / release"]
+```
 
 ## Available tutorials
 
 - **[Getting started](getting-started.md)** — Fresh install → first
   analysis on an R package. Covers `/rforge:detect`, `/rforge:status`,
   `/rforge:analyze`. ~10 min, no prior rforge experience required.
+- **[rforge in the R package lifecycle](rforge-in-the-r-lifecycle.md)** —
+  Where rforge fits *alongside* `devtools`/`usethis`: they build a package,
+  rforge orchestrates the ecosystem. Honest about what rforge does and
+  doesn't do. ~12 min.
+- **[Understanding modes](understanding-modes.md)** — Plain-language guide
+  to the `--mode` flag on `/rforge:analyze` (default / debug / optimize /
+  release), and why only that one command has modes. ~5 min.
+- **[Ecosystem orchestration](ecosystem-orchestration.md)** — The
+  multi-package commands with worked examples: `/rforge:deps` (map) →
+  `/rforge:impact` (blast radius) → `/rforge:cascade` (plan). ~15 min.
+- **[CRAN release prep](cran-release-prep.md)** — End to end:
+  `/rforge:docs:check` → `/rforge:r:check` → `/rforge:thorough` →
+  `/rforge:release`. ~15 min.
 - **[Migrating from rforge-mcp](migrate-from-mcp.md)** — For users
   currently running `rforge-mcp` (the deprecated MCP server). Steps to
   upgrade to v1.3.0+ and clean up the old install. ~5 min.
 
-## What's NOT covered here yet
+## Still want more?
 
-These workflows have command references in [REFCARD](../REFCARD.md) but no
-dedicated tutorial. File an issue if a step-by-step would help:
-
-- Multi-package ecosystem orchestration (`/rforge:cascade`, `/rforge:impact`)
-- Pre-CRAN release prep (`/rforge:thorough`, `/rforge:release`, `/rforge:r:check`)
-- Custom configuration (CRAN mirror, vignette engine — see [Configuration](../configuration.md))
+Have a workflow that isn't covered? [File an issue](https://github.com/Data-Wise/rforge/issues)
+describing the scenario — the tutorial backlog is driven by what users
+actually get stuck on. Custom configuration (CRAN mirror, vignette engine)
+is documented in [Configuration](../configuration.md).
 
 ## Adding a tutorial
 
