@@ -4,7 +4,11 @@ status: Active
 version: 2.1.0 (in progress — feature/r-dev-commands → dev → main)
 last_release: 2026-05-12 v2.0.0 BREAKING (PR #8 dev → main commit 5d3ed95, tag https://github.com/Data-Wise/rforge/releases/tag/v2.0.0, tap formula + manifest synced to v2.0.0, feedback thread at issue #9)
 
-worktrees: []
+worktrees:
+  - path: ~/.git-worktrees/rforge/feature-r-dev-commands
+    branch: feature/r-dev-commands
+    created: 2026-05-31
+    purpose: "v2.1.0 r: dev-cycle commands (build/test/document/install/coverage/site/cycle) + lib/rcmd.py. Plan: ORCHESTRATE-r-dev-commands.md. Spec: docs/specs/SPEC-r-dev-commands-2026-05-31.md. Implement in a NEW session cd'd into the worktree. Note: Phase 4 (agents) moves to v2.2.0."
 
 recent:
   - date: 2026-06-01
