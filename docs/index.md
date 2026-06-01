@@ -5,10 +5,10 @@
 [![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
 [![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
-**R package ecosystem orchestrator for Claude Code — 16 commands, R-aware hooks, validation skills.**
+**R package ecosystem orchestrator for Claude Code — 28 commands, R-aware hooks, validation skills.**
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** R package *ecosystem* analysis from inside Claude Code. 16 slash commands.
+    - **What:** R package *ecosystem* analysis from inside Claude Code. 28 slash commands.
     - **Why:** Fast feedback on multi-package R repos — discovery, dependencies, change impact, CRAN cascade planning.
     - **How:** `brew install data-wise/tap/rforge`, then `/rforge:analyze "<what changed>"`.
     - **Next:** [Quick Start](QUICK-START.md) (3 min) → [Where to start](#where-to-start) below.
@@ -38,7 +38,7 @@ Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fu
 
 ## The 3 headline commands
 
-Most daily work runs through these. The other 13 commands are specialized — see the [Reference Card](REFCARD.md).
+Most daily work runs through these. The other 25 commands are specialized — see the [Reference Card](REFCARD.md).
 
 ```bash
 # Ultra-fast snapshot (< 10 seconds) — pre-commit
@@ -50,6 +50,12 @@ Most daily work runs through these. The other 13 commands are specialized — se
 # Comprehensive validation incl. R CMD check (2-5 minutes) — before CRAN
 /rforge:thorough "Prepare for CRAN release"
 ```
+
+## What's new in v2.1.0
+
+- 🔬 **12 new `r:` commands** (`r:load`, `r:document`, `r:test`, `r:coverage`, `r:build`, `r:install`, `r:site`, `r:cycle`, `r:lint`, `r:spell`, `r:urlcheck`, `r:style`) — full R package dev cycle + quality layer.
+- 🐍 **`lib/rcmd.py`** — new module running lower-level R engines (`rcmdcheck`, `pkgbuild`, `roxygen2`, `testthat`, `pkgload`, `covr`, `pkgdown`, `lintr`, `spelling`, `urlchecker`, `styler`); structured JSON output; optional engines degrade gracefully.
+- **Total: 16 → 28 commands.**
 
 ## What's new in v2.0.0 (BREAKING)
 
@@ -90,7 +96,7 @@ Results synthesized into an actionable summary
 |---|---|
 | **Claude Code CLI** | everything (this is a Claude Code plugin) |
 | **Python 3.10+** on PATH | the `lib/` modules (`discovery`, `deps`, `status`, `init`) |
-| **R 4.0+** (+ optional `devtools`, `testthat`, `covr`) | only `/rforge:r:check` and `/rforge:thorough` |
+| **R 4.0+** (+ optional engines via `lib.rcmd`) | all `r:*` commands and `/rforge:thorough` |
 
 ## Installation
 
@@ -113,7 +119,7 @@ Restart Claude Code so the commands register, then verify with `/help` (look for
 
 ## More documentation
 
-- **[Reference Card](REFCARD.md)** — all 16 commands on one page
+- **[Reference Card](REFCARD.md)** — all 28 commands on one page
 - **[Commands](commands.md)** — full per-command reference
 - **[Architecture](architecture.md)** — how the `lib/` modules fit together
 - **[Hooks & Skills](hooks-and-skills.md)** — the R-aware `PreToolUse` hook

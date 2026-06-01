@@ -1,7 +1,7 @@
 {
   "name": "rforge",
-  "version": "2.0.0",
-  "description": "RForge toolkit for Claude Code: 16 commands for R package development, ecosystem management, and intelligent orchestration",
+  "version": "2.1.0",
+  "description": "RForge toolkit for Claude Code: 28 commands for R package development, ecosystem management, and intelligent orchestration",
   "author": {
     "name": "Data-Wise",
     "email": "dt@stat-wise.com"

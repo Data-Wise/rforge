@@ -1,19 +1,19 @@
 # 📚 RForge Plugin - Reference Card
 
-> **Version:** 2.0.0 | **Last Updated:** 2026-05-12
+> **Version:** 2.1.0 | **Last Updated:** 2026-05-31
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** All 16 commands in one page — categorized by use case.
+    - **What:** All 28 commands in one page — categorized by use case.
     - **Why:** Forget command syntax? Scan the ASCII box below.
     - **How:** Daily? `/rforge:status` `/rforge:quick`. After changes? `/rforge:analyze "what?"`. Pre-CRAN? `/rforge:thorough`.
     - **Next:** [Commands reference](commands.md) for full per-command docs.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  RFORGE PLUGIN REFERENCE                                            v2.0.0  │
+│  RFORGE PLUGIN REFERENCE                                            v2.1.0  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│  COMMANDS (16)                                                              │
+│  COMMANDS (28)                                                              │
 │  ─────────                                                                  │
 │                                                                             │
 │  DAILY                                                                      │
@@ -38,11 +38,27 @@
 │    /rforge:complete       Mark complete (with doc cascade)                  │
 │                                                                             │
 │  CHECKS                                                                     │
-│    /rforge:r:check        R CMD check (smart output parsing)                │
 │    /rforge:docs:check     Documentation drift check                         │
 │                                                                             │
 │  SETUP                                                                      │
 │    /rforge:init           Initialize ~/.rforge/context.json                 │
+│                                                                             │
+│  R DEV CYCLE (v2.1.0)                                                       │
+│    /rforge:r:load         Load package namespace (pkgload)                  │
+│    /rforge:r:document     Regenerate Rd docs + NAMESPACE (roxygen2)         │
+│    /rforge:r:test         Run tests, pass/fail/skip counts (testthat)       │
+│    /rforge:r:check        R CMD check with structured output (rcmdcheck)    │
+│    /rforge:r:coverage     Coverage report + untested lines (covr)           │
+│    /rforge:r:build        Build source tarball (pkgbuild)                   │
+│    /rforge:r:install      Install locally (R CMD INSTALL)                   │
+│    /rforge:r:site         Build pkgdown website                             │
+│    /rforge:r:cycle        document → test → check in one pass               │
+│                                                                             │
+│  R QUALITY (v2.1.0)                                                         │
+│    /rforge:r:lint         Static analysis (lintr)                           │
+│    /rforge:r:spell        Spell check (spelling)                            │
+│    /rforge:r:urlcheck     URL breakage check (urlchecker)                   │
+│    /rforge:r:style        Auto-format source (styler)                       │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -70,7 +86,7 @@ Results synthesized into actionable summary
 ```
 
 No MCP server. No Node.js. No R subprocess for status/discovery/deps —
-only `r:check` and `thorough` shell out to R.
+only `r:*` commands and `thorough` shell out to R (via `lib.rcmd`).
 
 ---
 
@@ -95,7 +111,7 @@ only `r:check` and `thorough` shell out to R.
 
 - **Claude Code CLI** installed
 - **Python 3.10+** (for `lib/` modules)
-- **R 4.0+** — only needed for `r:check` / `thorough` workflows
+- **R 4.0+** — needed for all `r:*` commands and `thorough`
 
 No MCP server or Node.js required (since v1.3.0).
 
@@ -111,6 +127,7 @@ As of v1.3.0 the plugin is self-contained — slash commands dispatch to pure-Py
 | `lib.deps` | Dependency graph + impact analysis | ~8s |
 | `lib.status` | Ecosystem health snapshot | <5s |
 | `lib.init` | Initialize `~/.rforge/context.json` | <5s |
+| `lib.rcmd` | R dev-cycle + quality engines (v2.1.0) | R-bound |
 
 See [`docs/lib-modules.md`](lib-modules.md) and the [reference API docs](reference/discovery.md) for full call signatures.
 
@@ -195,15 +212,15 @@ No `~/.claude/settings.json` entries required since v1.3.0 — the plugin is ful
 
 ```text
 rforge/
-├── .claude-plugin/        # Plugin manifest + extras (v2.0.0)
+├── .claude-plugin/        # Plugin manifest + extras (v2.1.0)
 │   ├── plugin.json
 │   ├── marketplace.json
 │   ├── config.json
 │   ├── hooks/pretooluse.py
 │   └── skills/validation/description-sync.md
-├── commands/              # 16 slash commands (/rforge:*)
+├── commands/              # 28 slash commands (/rforge:*)
 │   ├── docs/check.md      # /rforge:docs:check (v2.0.0+)
-│   └── r/check.md         # /rforge:r:check (v2.0.0+)
+│   └── r/                 # /rforge:r:* (v2.0.0+, expanded v2.1.0)
 ├── agents/                # 1 orchestrator agent
 │   └── orchestrator.md
 ├── scripts/               # Installation scripts
@@ -214,6 +231,7 @@ rforge/
 │   ├── deps.py
 │   ├── status.py
 │   ├── init.py
+│   ├── rcmd.py            # R dev-cycle + quality engines (v2.1.0)
 │   └── formatters.py
 └── docs/                  # Documentation
     └── REFCARD.md (this file)

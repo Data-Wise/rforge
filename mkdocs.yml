@@ -1,5 +1,5 @@
 site_name: RForge Plugin
-site_description: R package ecosystem orchestrator - 16 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)
+site_description: R package ecosystem orchestrator - 28 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)
 site_url: https://data-wise.github.io/rforge/
 
 repo_name: Data-Wise/rforge
@@ -92,6 +92,7 @@ nav:
       - "deps": reference/deps.md
       - "status": reference/status.md
       - "init": reference/init.md
+      - "rcmd": reference/rcmd.md
   - Project:
     - Architecture: architecture.md
     - Hooks & Skills: hooks-and-skills.md

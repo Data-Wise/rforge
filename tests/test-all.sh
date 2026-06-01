@@ -383,6 +383,25 @@ lib_reference_in_sync() {
     python3 scripts/gen_lib_reference.py --check
 }
 
+# lib.rcmd CLI smoke — with R absent the module emits an engine_missing/error
+# envelope; with R present it runs for real. Either way we assert parseable JSON.
+lib_rcmd_smoke() {
+    local out
+    out=$(python3 -m lib.rcmd --kind check --path tests/fixtures/mypkg 2>/dev/null)
+    # Feed the envelope via stdin (not string interpolation) so apostrophes,
+    # newlines, and other control chars in real R output can't break parsing.
+    printf '%s' "$out" | python3 -c "
+import json, sys
+try:
+    d = json.load(sys.stdin)
+except Exception as e:
+    print(f'Not valid JSON: {e}', file=sys.stderr); sys.exit(1)
+if 'status' not in d:
+    print('Missing status key in envelope', file=sys.stderr); sys.exit(1)
+# Accept ok/warn/error — engine_missing when R absent is expected
+" 2>&1
+}
+
 echo "═══════════════════════════════════════════════════════════════"
 echo "  RForge plugin — full validation suite"
 echo "═══════════════════════════════════════════════════════════════"
@@ -428,6 +447,7 @@ run "Skill: frontmatter has required fields" skill_frontmatter_complete
 run "Lib: pytest suite (discovery + deps + status + init)"   lib_pytest
 run "Lib: CLI smoke (discovery + deps + status + init)" lib_cli_smoke
 run "Lib: reference docs in sync with source" lib_reference_in_sync
+run "Lib: rcmd CLI smoke (R-free — accepts engine_missing envelope)" lib_rcmd_smoke
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
