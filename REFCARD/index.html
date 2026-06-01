@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 16 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 28 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -1402,6 +1402,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/rcmd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    rcmd
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2077,22 +2105,22 @@
 
 <h1 id="rforge-plugin-reference-card">📚 RForge Plugin - Reference Card<a class="headerlink" href="#rforge-plugin-reference-card" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>Version:</strong> 2.0.0 | <strong>Last Updated:</strong> 2026-05-12</p>
+<p><strong>Version:</strong> 2.1.0 | <strong>Last Updated:</strong> 2026-05-31</p>
 </blockquote>
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
-<li><strong>What:</strong> All 16 commands in one page — categorized by use case.</li>
+<li><strong>What:</strong> All 28 commands in one page — categorized by use case.</li>
 <li><strong>Why:</strong> Forget command syntax? Scan the ASCII box below.</li>
 <li><strong>How:</strong> Daily? <code>/rforge:status</code> <code>/rforge:quick</code>. After changes? <code>/rforge:analyze "what?"</code>. Pre-CRAN? <code>/rforge:thorough</code>.</li>
 <li><strong>Next:</strong> <a href="../commands/">Commands reference</a> for full per-command docs.</li>
 </ul>
 </div>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────────────────────────────────────────────────┐
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  RFORGE PLUGIN REFERENCE                                            v2.0.0  │
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  RFORGE PLUGIN REFERENCE                                            v2.1.0  │
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├─────────────────────────────────────────────────────────────────────────────┤
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│                                                                             │
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  COMMANDS (16)                                                              │
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  COMMANDS (28)                                                              │
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│  ─────────                                                                  │
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│                                                                             │
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│  DAILY                                                                      │
@@ -2117,13 +2145,29 @@
 </span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>│    /rforge:complete       Mark complete (with doc cascade)                  │
 </span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│                                                                             │
 </span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│  CHECKS                                                                     │
-</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│    /rforge:r:check        R CMD check (smart output parsing)                │
-</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>│    /rforge:docs:check     Documentation drift check                         │
-</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>│                                                                             │
-</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>│  SETUP                                                                      │
-</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>│    /rforge:init           Initialize ~/.rforge/context.json                 │
-</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>│                                                                             │
-</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>└─────────────────────────────────────────────────────────────────────────────┘
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│    /rforge:docs:check     Documentation drift check                         │
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>│                                                                             │
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>│  SETUP                                                                      │
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>│    /rforge:init           Initialize ~/.rforge/context.json                 │
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>│                                                                             │
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>│  R DEV CYCLE (v2.1.0)                                                       │
+</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>│    /rforge:r:load         Load package namespace (pkgload)                  │
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>│    /rforge:r:document     Regenerate Rd docs + NAMESPACE (roxygen2)         │
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>│    /rforge:r:test         Run tests, pass/fail/skip counts (testthat)       │
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>│    /rforge:r:check        R CMD check with structured output (rcmdcheck)    │
+</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>│    /rforge:r:coverage     Coverage report + untested lines (covr)           │
+</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>│    /rforge:r:build        Build source tarball (pkgbuild)                   │
+</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>│    /rforge:r:install      Install locally (R CMD INSTALL)                   │
+</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>│    /rforge:r:site         Build pkgdown website                             │
+</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>│    /rforge:r:cycle        document → test → check in one pass               │
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>│                                                                             │
+</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>│  R QUALITY (v2.1.0)                                                         │
+</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a>│    /rforge:r:lint         Static analysis (lintr)                           │
+</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>│    /rforge:r:spell        Spell check (spelling)                            │
+</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>│    /rforge:r:urlcheck     URL breakage check (urlchecker)                   │
+</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a>│    /rforge:r:style        Auto-format source (styler)                       │
+</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>│                                                                             │
+</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>└─────────────────────────────────────────────────────────────────────────────┘
 </span></code></pre></div>
 <hr />
 <h2 id="how-it-works-v130">How It Works (v1.3.0+)<a class="headerlink" href="#how-it-works-v130" title="Permanent link">&para;</a></h2>
@@ -2144,7 +2188,7 @@
 </span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>Results synthesized into actionable summary
 </span></code></pre></div>
 <p>No MCP server. No Node.js. No R subprocess for status/discovery/deps —
-only <code>r:check</code> and <code>thorough</code> shell out to R.</p>
+only <code>r:*</code> commands and <code>thorough</code> shell out to R (via <code>lib.rcmd</code>).</p>
 <hr />
 <h2 id="common-workflows">Common Workflows<a class="headerlink" href="#common-workflows" title="Permanent link">&para;</a></h2>
 <table>
@@ -2200,7 +2244,7 @@ only <code>r:check</code> and <code>thorough</code> shell out to R.</p>
 <ul>
 <li><strong>Claude Code CLI</strong> installed</li>
 <li><strong>Python 3.10+</strong> (for <code>lib/</code> modules)</li>
-<li><strong>R 4.0+</strong> — only needed for <code>r:check</code> / <code>thorough</code> workflows</li>
+<li><strong>R 4.0+</strong> — needed for all <code>r:*</code> commands and <code>thorough</code></li>
 </ul>
 <p>No MCP server or Node.js required (since v1.3.0).</p>
 <hr />
@@ -2234,6 +2278,11 @@ only <code>r:check</code> and <code>thorough</code> shell out to R.</p>
 <td><code>lib.init</code></td>
 <td>Initialize <code>~/.rforge/context.json</code></td>
 <td>&lt;5s</td>
+</tr>
+<tr>
+<td><code>lib.rcmd</code></td>
+<td>R dev-cycle + quality engines (v2.1.0)</td>
+<td>R-bound</td>
 </tr>
 </tbody>
 </table>
@@ -2336,15 +2385,15 @@ install options.</p>
 <hr />
 <h2 id="file-structure">File Structure<a class="headerlink" href="#file-structure" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>rforge/
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>├── .claude-plugin/        # Plugin manifest + extras (v2.0.0)
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>├── .claude-plugin/        # Plugin manifest + extras (v2.1.0)
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>│   ├── plugin.json
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>│   ├── marketplace.json
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>│   ├── config.json
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>│   ├── hooks/pretooluse.py
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>│   └── skills/validation/description-sync.md
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>├── commands/              # 16 slash commands (/rforge:*)
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>├── commands/              # 28 slash commands (/rforge:*)
 </span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>│   ├── docs/check.md      # /rforge:docs:check (v2.0.0+)
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>│   └── r/check.md         # /rforge:r:check (v2.0.0+)
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>│   └── r/                 # /rforge:r:* (v2.0.0+, expanded v2.1.0)
 </span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>├── agents/                # 1 orchestrator agent
 </span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>│   └── orchestrator.md
 </span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>├── scripts/               # Installation scripts
@@ -2355,9 +2404,10 @@ install options.</p>
 </span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>│   ├── deps.py
 </span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>│   ├── status.py
 </span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>│   ├── init.py
-</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>│   └── formatters.py
-</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>└── docs/                  # Documentation
-</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>    └── REFCARD.md (this file)
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>│   ├── rcmd.py            # R dev-cycle + quality engines (v2.1.0)
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>│   └── formatters.py
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>└── docs/                  # Documentation
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>    └── REFCARD.md (this file)
 </span></code></pre></div>
 <hr />
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 16 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 28 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -458,6 +458,17 @@
     <span class="md-ellipsis">
       
         The 3 headline commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-new-in-v210" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.1.0
       
     </span>
   </a>
@@ -1334,6 +1345,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reference/rcmd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    rcmd
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1834,6 +1873,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#whats-new-in-v210" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.1.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-new-in-v200-breaking" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1951,11 +2001,11 @@
 <a href="https://www.npmjs.com/package/@data-wise/rforge-plugin"><img alt="npm" src="https://img.shields.io/npm/v/@data-wise/rforge-plugin?label=npm&amp;color=red" /></a>
 <a href="https://github.com/Data-Wise/rforge/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/Data-Wise/rforge?color=green" /></a>
 <a href="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev" /></a></p>
-<p><strong>R package ecosystem orchestrator for Claude Code — 16 commands, R-aware hooks, validation skills.</strong></p>
+<p><strong>R package ecosystem orchestrator for Claude Code — 28 commands, R-aware hooks, validation skills.</strong></p>
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
-<li><strong>What:</strong> R package <em>ecosystem</em> analysis from inside Claude Code. 16 slash commands.</li>
+<li><strong>What:</strong> R package <em>ecosystem</em> analysis from inside Claude Code. 28 slash commands.</li>
 <li><strong>Why:</strong> Fast feedback on multi-package R repos — discovery, dependencies, change impact, CRAN cascade planning.</li>
 <li><strong>How:</strong> <code>brew install data-wise/tap/rforge</code>, then <code>/rforge:analyze "&lt;what changed&gt;"</code>.</li>
 <li><strong>Next:</strong> <a href="QUICK-START/">Quick Start</a> (3 min) → <a href="#where-to-start">Where to start</a> below.</li>
@@ -2015,7 +2065,7 @@
 </tbody>
 </table>
 <h2 id="the-3-headline-commands">The 3 headline commands<a class="headerlink" href="#the-3-headline-commands" title="Permanent link">&para;</a></h2>
-<p>Most daily work runs through these. The other 13 commands are specialized — see the <a href="REFCARD/">Reference Card</a>.</p>
+<p>Most daily work runs through these. The other 25 commands are specialized — see the <a href="REFCARD/">Reference Card</a>.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Ultra-fast snapshot (&lt; 10 seconds) — pre-commit</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>/rforge:quick
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
@@ -2025,6 +2075,12 @@
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Comprehensive validation incl. R CMD check (2-5 minutes) — before CRAN</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Prepare for CRAN release&quot;</span>
 </span></code></pre></div>
+<h2 id="whats-new-in-v210">What's new in v2.1.0<a class="headerlink" href="#whats-new-in-v210" title="Permanent link">&para;</a></h2>
+<ul>
+<li>🔬 <strong>12 new <code>r:</code> commands</strong> (<code>r:load</code>, <code>r:document</code>, <code>r:test</code>, <code>r:coverage</code>, <code>r:build</code>, <code>r:install</code>, <code>r:site</code>, <code>r:cycle</code>, <code>r:lint</code>, <code>r:spell</code>, <code>r:urlcheck</code>, <code>r:style</code>) — full R package dev cycle + quality layer.</li>
+<li>🐍 <strong><code>lib/rcmd.py</code></strong> — new module running lower-level R engines (<code>rcmdcheck</code>, <code>pkgbuild</code>, <code>roxygen2</code>, <code>testthat</code>, <code>pkgload</code>, <code>covr</code>, <code>pkgdown</code>, <code>lintr</code>, <code>spelling</code>, <code>urlchecker</code>, <code>styler</code>); structured JSON output; optional engines degrade gracefully.</li>
+<li><strong>Total: 16 → 28 commands.</strong></li>
+</ul>
 <h2 id="whats-new-in-v200-breaking">What's new in v2.0.0 (BREAKING)<a class="headerlink" href="#whats-new-in-v200-breaking" title="Permanent link">&para;</a></h2>
 <ul>
 <li>🔀 <strong>3 commands renamed</strong> for cleaner namespacing — <code>/rforge:doc-check</code> → <code>/rforge:docs:check</code>, <code>/rforge:ecosystem-health</code> → <code>/rforge:health</code>, <code>/rforge:rpkg-check</code> → <code>/rforge:r:check</code>. The other 13 commands are unchanged. Typing an old name produces a helpful rename-error pointing at the new name — no silent failures. See the <a href="migration/v2.0.0-rename/">v2.0.0 migration tutorial</a> for the full mapping table and a <code>sed</code> recipe to mass-update local scripts.</li>
@@ -2072,8 +2128,8 @@
 <td>the <code>lib/</code> modules (<code>discovery</code>, <code>deps</code>, <code>status</code>, <code>init</code>)</td>
 </tr>
 <tr>
-<td><strong>R 4.0+</strong> (+ optional <code>devtools</code>, <code>testthat</code>, <code>covr</code>)</td>
-<td>only <code>/rforge:r:check</code> and <code>/rforge:thorough</code></td>
+<td><strong>R 4.0+</strong> (+ optional engines via <code>lib.rcmd</code>)</td>
+<td>all <code>r:*</code> commands and <code>/rforge:thorough</code></td>
 </tr>
 </tbody>
 </table>
@@ -2095,7 +2151,7 @@
 </ol>
 <h2 id="more-documentation">More documentation<a class="headerlink" href="#more-documentation" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong><a href="REFCARD/">Reference Card</a></strong> — all 16 commands on one page</li>
+<li><strong><a href="REFCARD/">Reference Card</a></strong> — all 28 commands on one page</li>
 <li><strong><a href="commands/">Commands</a></strong> — full per-command reference</li>
 <li><strong><a href="architecture/">Architecture</a></strong> — how the <code>lib/</code> modules fit together</li>
 <li><strong><a href="hooks-and-skills/">Hooks &amp; Skills</a></strong> — the R-aware <code>PreToolUse</code> hook</li>

@@ -69,6 +69,10 @@
          <lastmod>2026-06-01</lastmod>
     </url>
     <url>
+         <loc>https://data-wise.github.io/rforge/reference/rcmd/</loc>
+         <lastmod>2026-06-01</lastmod>
+    </url>
+    <url>
          <loc>https://data-wise.github.io/rforge/reference/status/</loc>
          <lastmod>2026-06-01</lastmod>
     </url>
@@ -86,6 +90,10 @@
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/specs/SPEC-phase3-namespacing-2026-05-11/</loc>
+         <lastmod>2026-06-01</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/specs/SPEC-r-dev-commands-2026-05-31/</loc>
          <lastmod>2026-06-01</lastmod>
     </url>
     <url>
