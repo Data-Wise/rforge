@@ -1,12 +1,29 @@
 project: rforge
 updated: 2026-06-01
 status: Active
-version: 2.1.0 (merged to dev via PR #11; pending dev → main release)
-last_release: 2026-05-12 v2.0.0 BREAKING (PR #8 dev → main commit 5d3ed95, tag https://github.com/Data-Wise/rforge/releases/tag/v2.0.0, tap formula + manifest synced to v2.0.0, feedback thread at issue #9)
+version: 2.1.0 (released)
+last_release: 2026-06-01 v2.1.0 (PR #12 dev → main merge d76a45a, release https://github.com/Data-Wise/rforge/releases/tag/v2.1.0, tap data-wise/tap synced to 2.1.0 + brew install/test green; r: dev-cycle + quality commands, 16→28)
 
 worktrees: []
 
 recent:
+  - date: 2026-06-01
+    pr: 12
+    branch: dev
+    title: "Release: v2.1.0 — r: dev-cycle + quality commands"
+    state: MERGED
+    merge_commit: d76a45a
+    summary: |
+      Shipped v2.1.0 dev → main. CI green (RForge CI + Deploy Documentation);
+      tagged v2.1.0 + GitHub release. Homebrew tap synced (PR #107): manifest
+      + regenerated Formula/rforge.rb at 2.1.0, --diff IDENTICAL, command count
+      fixed 16/15→28. brew install + test now PASS — fixed a latent (since
+      v2.0.0) brew-test bug where the formula asserted a top-level skills/ dir
+      rforge never had (its skill is under .claude-plugin/); tap PR #108 changed
+      the test_path to lib/. All 12 r: commands live-verified against real R.
+      Deferred to own specs: r:deps-sync, scaffolding theme, r:cran-prep
+      (BRAINSTORM-r-command-expansion). Phase 4 (agents) → v2.2.0.
+
   - date: 2026-06-01
     pr: 11
     branch: feature/r-dev-commands
