@@ -41,6 +41,11 @@ single-PR features. The PR description is the right home for those.
 - **[Diff-aware checks & coverage](SPEC-diff-aware-checks-and-coverage-2026-05-31.md)** —
   Status: Draft. Proposal for diff-scoped checks, coverage integration, and
   ecosystem NOTE classification.
+- **[r: dev-cycle + quality commands (v2.1.0)](SPEC-r-dev-commands-2026-05-31.md)** —
+  Status: Shipped (v2.1.0). 12 new `r:` commands (build/test/document/install/
+  coverage/site/cycle + lint/spell/urlcheck/style) backed by `lib/rcmd.py`.
+  16 → 28 commands. Deferred follow-ups (deps-sync, scaffolding, cran-prep)
+  noted in the appendix.
 
 ## See also
 
