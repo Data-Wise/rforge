@@ -1342,6 +1342,53 @@ Audit against the existing 16 commands found **no name collisions** (only
 - **Do NOT modify** the rename stubs `commands/{doc-check,ecosystem-health,rpkg-check}.md`
   — they intentionally emit "renamed to …" messages (removed in v3.0.0).
 
+## Addendum 4 (2026-05-31) — `r:coverage` reports untested lines
+
+Enhance `r:coverage` to also surface exact untested lines via `covr::zero_coverage()`.
+
+### `coverage` branch of `r_snippet` (replaces Task 4's `coverage` branch)
+
+```python
+    if kind == "coverage":
+        return _guard("covr",
+            f'cv <- covr::package_coverage({p}); l <- covr::coverage_to_list(cv); '
+            f'z <- covr::zero_coverage(cv); '
+            f'agg <- if (nrow(z)) stats::aggregate(line ~ filename, z, '
+            f'function(x) c(first=min(x), last=max(x))) else '
+            f'data.frame(filename=character(), line=I(list())); '
+            f'untested <- if (nrow(z)) lapply(seq_len(nrow(agg)), function(i) '
+            f'list(file=agg$filename[i], first_line=as.integer(agg$line[i,"first"]), '
+            f'last_line=as.integer(agg$line[i,"last"]))) else list(); '
+            f'cat(jsonlite::toJSON(list(total_pct=covr::percent_coverage(cv), '
+            f'per_file=as.list(l$filecoverage), untested=untested), '
+            f'auto_unbox=TRUE, null="list"))')
+```
+
+> `zero_coverage()` returns one row per uncovered line; the snippet aggregates
+> to first/last line per file. If the implementer prefers per-line granularity,
+> emit the raw rows instead — keep the `untested[]` envelope shape either way.
+
+### `normalize` coverage block (replaces Task 2's coverage block)
+
+```python
+    elif kind == "coverage":
+        env["coverage"] = {"total_pct": raw.get("total_pct"),
+                           "per_file": raw.get("per_file", {}),
+                           "untested": raw.get("untested", [])}
+```
+
+### `commands/r/coverage.md` (extends Task 7 Step 5)
+
+Add an "### Untested lines" section after the lowest-covered files:
+render `coverage.untested` as `- R/foo.R:12-18`. In "Recommended Actions",
+point at those ranges ("add tests covering R/foo.R:12-18") and cross-link
+`/rforge:r:test`. (Pairs with the deferred `r:use-test` scaffolding command.)
+
+### Test (Task 5/10)
+
+`test_normalize_coverage_includes_untested` — raw with `untested` list survives
+into `env["coverage"]["untested"]`.
+
 ---
 
 ## Self-Review (completed by plan author)
