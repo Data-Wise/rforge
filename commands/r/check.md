@@ -13,79 +13,33 @@ arguments:
     default: false
 ---
 
-# R Package Quick Check
+# R Package Check
 
-You are performing a quick health check on an R package.
+Run `R CMD check` (via `rcmdcheck`) and report structured results.
 
-## Task
+## Process
 
-Check R package at: **$ARGUMENTS**
-
-If no path specified, check current directory.
-
-## Quick Check Process
-
-### Step 1: Basic Info
-Read DESCRIPTION file:
-- Package name and version
-- Dependencies (Imports, Suggests)
-- R version requirement
-
-### Step 2: R CMD Check
-Run `R CMD check` via the Bash tool (e.g., `R CMD check --as-cran <path>`).
-
-### Step 3: Test Summary
-Run the package's tests via Bash (e.g., `Rscript -e 'devtools::test()'`).
-`R CMD check` also runs them and surfaces failures.
-
-### Step 4: Documentation Check
-- Are all exported functions documented?
-- Do examples run without error?
-- Is there a README?
-
-### Step 5: Code Quality
-- Any obvious style issues?
-- Are there TODOs or FIXMEs?
-- Is test coverage adequate?
+1. Resolve package path from `$ARGUMENTS` (default: current dir).
+2. `python3 -m lib.rcmd --kind check --path "<path>"` (add `--as-cran` if requested).
+3. Render the JSON envelope below. Do not re-run R yourself.
 
 ## Output Format
 
 ```markdown
-## Package Check: [package-name] v[version]
-
-### Status: 🟢 / 🟡 / 🔴
-
+## Package Check: {package} v{version}
+### Status: {🟢 ok / 🟡 warn / 🔴 error}
 ### R CMD Check
-- Errors: X
-- Warnings: Y
-- Notes: Z
-
-### Tests
-- Passed: X
-- Failed: Y
-- Coverage: Z%
-
-### Documentation
-- [ ] All exports documented
-- [ ] Examples run
-- [ ] README exists
-
-### Issues Found
-1. [Issue 1]
-2. [Issue 2]
-
+- Errors: {len check.errors}
+- Warnings: {len check.warnings}
+- Notes: {len check.notes}
+{list each message as a bullet, if any}
 ### Recommended Actions
-1. [Action 1]
-2. [Action 2]
+{1-3 steps, or "None — package is clean ✅"}
 ```
 
-## Tools to Use
-- Bash (to run `R CMD check`, `Rscript`, `devtools::test()`)
-- Read (for DESCRIPTION, README)
-- Grep (for TODOs, FIXMEs)
+If `engine_missing` is non-empty, report 🔴 with the install hint from `messages`.
 
 ## Related Commands
-
-- `/rforge:thorough` - Comprehensive multi-package check including R CMD check
-- `/rforge:status` - Lightweight health snapshot without R subprocess
-- `/rforge:docs:check` - Documentation drift check (complements R CMD check)
+- `/rforge:r:cycle` — document → test → check in one pass
+- `/rforge:thorough` — **ecosystem** rollup incl. R CMD check (this is **single-package**)
+- `/rforge:docs:check` — documentation drift (complements R CMD check)
