@@ -43,3 +43,74 @@ def find_package(path: str = ".") -> dict | None:
     if "Package" not in fields:
         return None
     return {"package": fields["Package"], "version": fields.get("Version", "")}
+
+
+_QUALITY_KEY = {"lint": "lints", "spell": "misspelled", "urlcheck": "broken"}
+
+
+def _status_for(kind: str, raw: dict, exit_code: int) -> str:
+    if raw.get("engine_missing"):
+        return "error"
+    if kind == "check":
+        if raw.get("errors"):
+            return "error"
+        return "warn" if (raw.get("warnings") or raw.get("notes")) else "ok"
+    if kind == "test":
+        if raw.get("failed") or exit_code != 0:
+            return "error"
+        return "warn" if (raw.get("warnings") or raw.get("skipped")) else "ok"
+    if kind == "site":
+        if exit_code != 0 or not raw.get("built", True):
+            return "error"
+        return "warn" if raw.get("problems") else "ok"
+    if kind == "coverage":
+        return "ok"  # advisory; untested lines surfaced, never "error"
+    if kind in _QUALITY_KEY:
+        return "warn" if raw.get(_QUALITY_KEY[kind]) else "ok"
+    # load, document, install, build, style: success == exit 0
+    return "ok" if exit_code == 0 else "error"
+
+
+def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
+    """Fold a raw engine result into the common envelope."""
+    env: dict = {
+        "kind": kind,
+        "status": _status_for(kind, raw, exit_code),
+        "engine_missing": raw.get("engine_missing", []),
+        "messages": raw.get("messages", []),
+    }
+    if pkg:
+        env["package"] = pkg.get("package", "")
+        env["version"] = pkg.get("version", "")
+    if kind == "check":
+        env["check"] = {k: raw.get(k, []) for k in ("errors", "warnings", "notes")}
+    elif kind == "test":
+        env["tests"] = {k: raw.get(k, 0) for k in
+                        ("passed", "failed", "skipped", "warnings")}
+        env["tests"]["failing_files"] = raw.get("failing_files", [])
+    elif kind == "coverage":
+        env["coverage"] = {"total_pct": raw.get("total_pct"),
+                           "per_file": raw.get("per_file", {}),
+                           "untested": raw.get("untested", [])}
+    elif kind == "build":
+        env["build"] = {"artifact": raw.get("artifact"), "bytes": raw.get("bytes")}
+    elif kind == "site":
+        env["site"] = {"checked": raw.get("checked", False),
+                       "built": raw.get("built", False),
+                       "problems": raw.get("problems", [])}
+    elif kind == "install":
+        env["install"] = {"installed_version": raw.get("installed_version"),
+                          "exit": exit_code}
+    elif kind == "lint":
+        env["lint"] = {"count": len(raw.get("lints", [])), "lints": raw.get("lints", [])}
+    elif kind == "spell":
+        env["spell"] = {"count": len(raw.get("misspelled", [])),
+                        "misspelled": raw.get("misspelled", [])}
+    elif kind == "urlcheck":
+        env["urlcheck"] = {"count": len(raw.get("broken", [])),
+                           "broken": raw.get("broken", [])}
+    elif kind == "style":
+        env["style"] = {"count": len(raw.get("changed_files", [])),
+                        "changed_files": raw.get("changed_files", [])}
+    # load: no extra block — status carries the result
+    return env

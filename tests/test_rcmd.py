@@ -19,3 +19,47 @@ def test_find_package_reads_description(tmp_path):
 
 def test_find_package_missing_returns_none(tmp_path):
     assert rcmd.find_package(str(tmp_path)) is None
+
+
+def test_normalize_check_clean_ok():
+    env = rcmd.normalize("check", {"errors": [], "warnings": [], "notes": []}, 0,
+                         {"package": "foo", "version": "1.0"})
+    assert env["status"] == "ok" and env["package"] == "foo"
+
+
+def test_normalize_check_notes_warn():
+    assert rcmd.normalize("check", {"notes": ["n"]}, 0, None)["status"] == "warn"
+
+
+def test_normalize_check_errors_error():
+    assert rcmd.normalize("check", {"errors": ["e"]}, 1, None)["status"] == "error"
+
+
+def test_normalize_test_failures_error():
+    env = rcmd.normalize("test", {"passed": 40, "failed": 2, "skipped": 1,
+                                  "warnings": 0, "failing_files": ["t-a.R"]}, 1, None)
+    assert env["status"] == "error" and env["tests"]["failing_files"] == ["t-a.R"]
+
+
+def test_normalize_coverage_includes_untested():
+    raw = {"total_pct": 80.0, "per_file": {"R/a.R": 50.0},
+           "untested": [{"file": "R/a.R", "first_line": 3, "last_line": 7}]}
+    env = rcmd.normalize("coverage", raw, 0, None)
+    assert env["status"] == "ok"
+    assert env["coverage"]["untested"][0]["first_line"] == 3
+
+
+@pytest.mark.parametrize("kind,key", [("lint", "lints"), ("spell", "misspelled"),
+                                      ("urlcheck", "broken")])
+def test_normalize_quality_warns_when_findings(kind, key):
+    assert rcmd.normalize(kind, {key: [{"x": 1}]}, 0, None)["status"] == "warn"
+    assert rcmd.normalize(kind, {key: []}, 0, None)["status"] == "ok"
+
+
+def test_normalize_style_ok_on_exit0():
+    assert rcmd.normalize("style", {"changed_files": ["R/a.R"]}, 0, None)["status"] == "ok"
+
+
+def test_normalize_engine_missing_error():
+    env = rcmd.normalize("site", {"engine_missing": ["pkgdown"]}, 1, None)
+    assert env["status"] == "error" and env["engine_missing"] == ["pkgdown"]
