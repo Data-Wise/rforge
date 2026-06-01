@@ -3,7 +3,7 @@
 - **Status:** Draft — awaiting user review
 - **Date:** 2026-05-31
 - **Target version:** v2.1.0 (bumps the parked Phase 4 "agents" work to v2.2.0)
-- **Author:** brainstormed with Claude
+- **Author:** brainstormed with Claude (research-backed, see Appendix)
 - **Branch plan:** `feature/r-dev-commands` off `dev`
 
 ## Summary
@@ -13,13 +13,14 @@ rforge plugin as Claude-Code-native slash commands, mirroring the daily R
 development loop offered by flow-cli's `r` dispatcher (`r build`, `r test`,
 `r pkgdown`, ...). rforge already ships one such command — `/rforge:r:check`
 (R CMD check with smart output parsing). This spec extends the existing `r:`
-namespace into a full dev cycle and factors the output-parsing logic into a
-single shared, testable `lib/` module.
+namespace into a full dev cycle and factors the output-handling logic into a
+single shared, testable `lib/rcmd.py` module.
 
-The value-add over the instant ZSH `r` dispatcher is **AI-assisted output
-parsing**: each command runs R via a subprocess and turns raw devtools/`R CMD
-check` output into a consistent ADHD-optimized report (status dot,
-errors/warnings/notes counts, test pass/fail, next actions).
+The value-add over the instant ZSH `r` dispatcher is **AI-assisted,
+structured output**: each command runs R via a subprocess that emits JSON
+(not free text), which is rendered into a consistent ADHD-optimized report
+(status dot, errors/warnings/notes counts, test pass/fail, coverage %, next
+actions).
 
 ## Motivation
 
@@ -29,158 +30,242 @@ deps, status, init, cascade, release planning, and ideation. The literal R
 dev workflow (build/test/document/install/pkgdown) lives in flow-cli's `r`
 dispatcher (`lib/dispatchers/r-dispatcher.zsh`, ~25 actions).
 
-The user wants those build/test/website actions available **inside Claude
-Code**, ecosystem-aware and with parsed output, the way `/rforge:r:check`
-already works. This closes the gap: rforge can drive the full edit → document
-→ test → check → build → site loop without leaving the assistant.
+The user wants those actions available **inside Claude Code**, ecosystem-aware
+and with parsed output, the way `/rforge:r:check` already works.
 
 ## Scope
 
 ### In scope (decided)
 
-| Command            | Wraps                                              | Notes |
-|--------------------|----------------------------------------------------|-------|
-| `/rforge:r:build`    | `devtools::build()`                              | Source/binary tarball; report artifact path + size |
-| `/rforge:r:test`     | `devtools::test()`                               | Parse pass/fail/skip/warn counts; surface failing files |
-| `/rforge:r:document` | `devtools::document()`                           | Regenerates `man/*.Rd` + `NAMESPACE` (blessed path, see Hook interaction) |
-| `/rforge:r:install`  | `devtools::install()`                            | Report installed version; warn on unmet deps |
-| `/rforge:r:coverage` | `covr::package_coverage()`                       | Parse total % + per-file low-coverage offenders |
-| `/rforge:r:site`     | `pkgdown::build_site()` (+ `--preview` → `preview_site()`) | Parse broken links, missing topics, build errors |
-| `/rforge:r:cycle`    | `document()` → `test()` → `check()` in sequence  | Combined ADHD summary; stops early on hard error |
+| Command            | R engine (direct, not via devtools)                    | Notes |
+|--------------------|--------------------------------------------------------|-------|
+| `/rforge:r:build`    | `pkgbuild::build()`                                  | Returns tarball path string; report path + size |
+| `/rforge:r:test`     | `testthat::test_local(reporter="list")`              | `as.data.frame()` → pass/fail/skip/warn + failing files |
+| `/rforge:r:document` | `roxygen2::roxygenize()`                             | Regenerates `man/*.Rd` + `NAMESPACE` (blessed path, see Hook interaction) |
+| `/rforge:r:install`  | `R CMD INSTALL` (via Bash) or `pkgbuild::build()`+install | No structured result; report installed version + exit status |
+| `/rforge:r:coverage` | `covr::package_coverage()` + `coverage_to_list()`    | Total % + per-file %, lowest offenders |
+| `/rforge:r:site`     | `pkgdown::check_pkgdown()` → `build_site(preview=FALSE)`; `--preview` → `preview_site()` | Exit-code gate for build; structured problems from check |
+| `/rforge:r:cycle`    | `roxygenize()` → `test_local()` → `rcmdcheck()`      | Combined ADHD summary; stops early on hard error |
 
-Plus a retrofit of the **existing** `/rforge:r:check` to consume the new
-shared parser (no behavior change to its report shape).
+Plus a retrofit of the **existing** `/rforge:r:check` onto the shared module
+(it already runs `R CMD check`; switch it to `rcmdcheck::rcmdcheck(error_on="never")`
+for structured counts; report shape unchanged).
 
 ### Out of scope (YAGNI)
 
-- CRAN-specific variants beyond what `r:check --as-cran` already covers
-  (`win`, `fast`, `spell`) — can be added later if requested.
-- Version-bump commands (`r patch/minor/major`) — rforge already manages
-  versioning through `/rforge:release` and the 4-source manual bump.
+- CRAN-specific variants beyond `r:check --as-cran` (`win`, `fast`, `spell`).
+- Version-bump commands — handled by `/rforge:release` + the 4-source bump.
+- Package scaffolding (`usethis::create_package`) — different feature; if
+  wanted, it gets its own spec (`r:create` / extend `/rforge:init`).
+- The CRAN package literally named `checkthat` — it is a tidyverse
+  data-validation tool, unrelated to build/test/site (see Appendix).
+- Any dependency on flow-cli, or on `devtools` (see Architecture).
 - A config/profile layer or generic `r:` runner (rejected approach "C").
-- Any dependency on flow-cli being installed (see Architecture).
 
-## Architecture (Approach B: shared parser + prompt commands)
+## Architecture (Approach B, refined: R emits JSON → thin Python normalizer)
 
 Two layers, matching rforge's existing `lib/` (interpretation) vs
-`commands/` (presentation) split.
+`commands/` (presentation) split. The research changed the *mechanism*: R
+serializes structured objects to JSON; Python does not regex free text.
 
-### 1. `lib/rcmd.py` — shared R-output parser (new public module)
+### Core principle: do not text-parse
 
-A pure-Python module that takes raw R subprocess output on stdin (or a file
-path) and emits a normalized JSON structure of what the output *means*:
+`rcmdcheck`, `testthat`, and `covr` return structured objects. The R
+subprocess serializes them with `jsonlite::toJSON(..., auto_unbox=TRUE)`;
+`lib/rcmd.py` consumes that with `json.loads()`. Regex over `R CMD check`
+console text is only a **fallback** when `jsonlite` or a structured path is
+unavailable (the known console formats are recorded below).
+
+### 1. `lib/rcmd.py` — shared runner + normalizer (new public module)
+
+Responsibilities:
+
+1. **Locate the package** (DESCRIPTION in CWD or a `--path` arg); fail fast
+   with a pointer to `/rforge:detect` if none.
+2. **Hold the R snippets**, one per `kind` (`check`/`test`/`build`/`document`/
+   `install`/`coverage`/`site`). Each snippet calls the lower-level package
+   and prints a single JSON blob to stdout.
+3. **Run** via `Rscript -e '<snippet>'` (subprocess), capture stdout + exit code.
+4. **Normalize** the JSON into a common envelope and print it (the command
+   prompt renders it; `lib/rcmd.py` itself does no formatting beyond JSON).
+5. **Degrade gracefully**: missing engine package → `status:"error"` with the
+   exact install hint; unparseable output → `status:"warn"` + raw lines in
+   `messages[]` (never a false 🟢).
+
+Invocation (package-module convention — never `python3 lib/rcmd.py`):
+
+```bash
+python3 -m lib.rcmd --kind check --path . [--as-cran] [--preview]
+```
+
+Normalized envelope:
 
 ```jsonc
 {
-  "kind": "check" | "test" | "build" | "coverage" | "site" | "install",
+  "kind": "check",
   "status": "ok" | "warn" | "error",        // drives 🟢/🟡/🔴
-  "check":   { "errors": 0, "warnings": 1, "notes": 2 },   // when kind=check
-  "tests":   { "passed": 41, "failed": 0, "skipped": 3, "warnings": 1,
-               "failing_files": [] },                       // when kind=test
-  "coverage":{ "total_pct": 87.4, "low_files": [["R/foo.R", 12.0]] },
-  "build":   { "artifact": "pkg_0.2.0.tar.gz", "bytes": 184320 },
-  "site":    { "built": true, "broken_links": [], "missing_topics": [] },
+  "package": "foo", "version": "0.2.0",
+  "check":    { "errors": [], "warnings": ["..."], "notes": ["...","..."] },
+  "tests":    { "passed": 41, "failed": 0, "skipped": 3, "warnings": 0,
+                "failing_files": [] },
+  "coverage": { "total_pct": 87.4, "per_file": {"R/foo.R": 12.0} },
+  "build":    { "artifact": "foo_0.2.0.tar.gz", "bytes": 184320 },
+  "site":     { "checked": true, "built": true, "problems": [] },
+  "install":  { "installed_version": "0.2.0", "exit": 0 },
+  "engine_missing": [],                       // e.g. ["pkgdown"]
   "messages": ["raw lines worth surfacing verbatim"]
 }
 ```
 
-- **Invocation:** `python3 -m lib.rcmd --kind test` (reads R output from stdin).
-  Follows the package-module convention — never `python3 lib/rcmd.py`.
-- **Why a module, not prose:** one source of truth for "3 NOTEs + 0 errors =
-  🟡" shared across `r:check`, `r:build`, `r:cycle`. Parsers are regex over
-  well-known devtools / `R CMD check` output shapes.
-- **Becomes the 5th public lib module** (alongside discovery, deps, status,
-  init) → gets a `docs/reference/rcmd.md` page generated by
-  `scripts/gen_lib_reference.py`, gated in CI by `--check`.
+Counts derive directly from the structured objects:
+`length(chk$errors/$warnings/$notes)`; testthat `as.data.frame()` columns
+(`passed`/`failed`/`skipped`/`warning`, failing files = rows where
+`failed>0 | error`); `covr::percent_coverage()` + `coverage_to_list()`.
+
+Becomes the **5th public lib module** → `docs/reference/rcmd.md` generated by
+`scripts/gen_lib_reference.py`, gated in CI by `--check`.
 
 ### 2. `commands/r/*.md` — prompt commands
 
 Each new command is a `commands/r/<verb>.md` file with the same frontmatter
-shape as `commands/r/check.md`. The prompt instructs Claude to:
-
-1. Detect the package (DESCRIPTION in CWD or `$ARGUMENTS` path).
-2. Run the relevant `Rscript -e 'devtools::...'` / `R CMD ...` via **Bash**,
-   capturing output.
-3. Pipe that output through `python3 -m lib.rcmd --kind <kind>`.
-4. Render the parsed JSON as the standard ADHD report (status dot, counts,
-   failing items, recommended next actions).
-
-Commands call R **directly** — self-contained, no flow-cli runtime
-dependency. rforge stays installable standalone via Homebrew.
+shape as `commands/r/check.md`. The prompt instructs Claude to call
+`python3 -m lib.rcmd --kind <kind> ...` via Bash and render the returned JSON
+as the standard ADHD report (status dot, counts, failing items, recommended
+next actions). Self-contained — no flow-cli runtime dependency.
 
 ### Data flow
 
 ```
 user → /rforge:r:test
-  → Claude reads DESCRIPTION (package + version)
-  → Bash: Rscript -e 'devtools::test()'  2>&1
-  → Bash: ... | python3 -m lib.rcmd --kind test   → normalized JSON
-  → Claude renders ADHD report from JSON
+  → Claude: python3 -m lib.rcmd --kind test --path .
+        → lib.rcmd finds DESCRIPTION (package + version)
+        → Rscript -e 'res<-testthat::test_local(".",reporter="list",
+              stop_on_failure=FALSE); df<-as.data.frame(res);
+              jsonlite::toJSON(...summary...)'
+        → json.loads, normalize → envelope JSON to stdout
+  → Claude renders ADHD report from envelope
 ```
+
+## Underlying packages & runtime dependencies
+
+Confirmed in the dev environment (R 4.6.0): `rcmdcheck` 1.4.0, `testthat`
+3.3.2, `covr` 3.6.5, `roxygen2` 8.0.0, `pkgbuild` 1.4.8, `checkmate` 2.3.4.
+**Not installed:** `devtools`, `usethis`, `pkgdown`.
+
+- **Required for full functionality:** `rcmdcheck`, `pkgbuild`, `roxygen2`,
+  `testthat`, `jsonlite` (for the JSON bridge — near-universal, but treat as
+  required and hint if missing).
+- **Optional (command-specific):** `covr` (r:coverage), `pkgdown` (r:site).
+  These commands must detect absence and emit a clean
+  `install.packages("pkgdown")` hint via `engine_missing[]`, not a stack trace.
+- **Deliberately NOT required:** `devtools`, `usethis` — the commands call the
+  lower-level engines directly. This is lighter and matches what's installed.
 
 ## Hook interaction (R-aware PreToolUse hook)
 
 `/rforge:r:document` regenerates `man/*.Rd` and `NAMESPACE`. The hook's
 **BLOCK rule 1** ("no hand-edits to `man/*.Rd`") fires on the **Write/Edit**
-tools only. `r:document` regenerates these files via `devtools::document()`
-run through **Bash** — a different tool surface — so it is the explicitly
-blessed regeneration path and does not trip the hook. No hook change needed;
-the spec records this so it isn't "fixed" later by mistake.
+tools only. `r:document` regenerates these via `roxygen2::roxygenize()` run
+through **Bash** — a different tool surface — so it is the explicitly blessed
+regeneration path and does not trip the hook. No hook change needed.
 
 ## Error handling
 
-- **R / devtools / covr / pkgdown not installed:** detect a non-zero exit or
-  "there is no package called" message; report 🔴 with the exact
-  `install.packages()` / `pak::pak()` line to fix, rather than a raw stack.
-- **Not an R package (no DESCRIPTION):** fail fast with a one-line message
-  pointing at `/rforge:detect`.
-- **`r:cycle` early stop:** if `document()` or `test()` errors hard, stop
-  before `check()` and report which stage failed and why.
-- **Parser sees unrecognized output:** `lib/rcmd.py` degrades to
-  `status: "warn"` and passes raw lines through `messages[]` rather than
-  asserting a false 🟢.
+- **Engine package missing** (`devtools`-free world): detect "there is no
+  package called X" / non-zero exit → 🔴 (or 🟡 for optional covr/pkgdown)
+  with the exact `install.packages()` line; list it in `engine_missing[]`.
+- **Not an R package (no DESCRIPTION):** fail fast → pointer to `/rforge:detect`.
+- **`rcmdcheck` on a failing package:** always pass `error_on="never"` so the
+  object is returned and serialized even when the check fails.
+- **`pkgdown` build:** success = process exit 0 (build_site returns nothing
+  structured); structured problems come from `check_pkgdown()`/sitrep, surfaced
+  in `site.problems[]`.
+- **`r:cycle` early stop:** if `roxygenize()` or `test_local()` errors hard,
+  stop before `rcmdcheck()` and report which stage failed.
+- **Unrecognized output / no jsonlite:** fall back to the documented console
+  formats (`[ FAIL 2 | WARN 0 | SKIP 1 | PASS 41 ]` for testthat;
+  `0 errors ✔ | 1 warning ✖ | 0 notes ✔` for rcmdcheck), `status:"warn"`.
 
 ## Testing
 
 Both existing gates must continue to pass, with additions:
 
-- **`tests/test-all.sh`** (currently 29 checks): the new command files are
-  covered automatically by the frontmatter-valid, command-name-uniqueness,
-  and skills-valid checks. Add a **lib CLI smoke** line for
-  `python3 -m lib.rcmd` (parses a captured fixture without error).
-- **`python3 -m pytest tests/`** (currently 65 lib cases): add a
-  `tests/test_rcmd.py` suite with captured-output fixtures for each `kind`
-  (clean check, check-with-notes, failing test run, low coverage, broken-link
-  site build, missing-package error). Target ~15–20 cases.
+- **`tests/test-all.sh`** (currently 29 checks): new command files covered by
+  frontmatter-valid / command-name-uniqueness / skills-valid checks. Add a
+  **lib CLI smoke** line for `python3 -m lib.rcmd --kind check` against a
+  fixture (mock Rscript or a captured JSON blob — no live R in CI).
+- **`python3 -m pytest tests/`** (currently 65 lib cases): add
+  `tests/test_rcmd.py` (~15–20 cases) feeding captured JSON blobs and console
+  fallbacks through the normalizer: clean check, check-with-notes, failing
+  tests, low coverage, pkgdown problems, missing-engine, no-DESCRIPTION,
+  no-jsonlite fallback. R subprocess is mocked (inject a fake `Rscript`),
+  keeping CI R-free per the existing lib test pattern.
 - **lib reference docs in sync:** `scripts/gen_lib_reference.py --check` must
   pass after `docs/reference/rcmd.md` is generated and committed.
 
 ## Documentation impact
 
-Per the global ~15-file doc-update scope and rforge conventions:
+Per rforge conventions (~15-file scope):
 
 - `commands/r/{build,test,document,install,coverage,site,cycle}.md` (new) +
-  retrofit `commands/r/check.md` to mention the shared parser.
+  retrofit `commands/r/check.md`.
 - `docs/reference/rcmd.md` (generated).
 - README.md + docs/index.md + docs/REFCARD.md command tables and counts
   (16 → 23 commands).
-- `mkdocs.yml` nav: add the new command/reference pages.
-- CHANGELOG.md: `[Unreleased]` → `[2.1.0]` section.
-- 4-source version bump (plugin.json, marketplace.json ×2, package.json) +
-  the live-version doc refs listed in CLAUDE.md.
+- `mkdocs.yml` nav additions.
+- CHANGELOG.md `[Unreleased]` → `[2.1.0]`.
+- 4-source version bump + live-version doc refs (per CLAUDE.md).
 - `.STATUS`: move "Phase 4 agents (v2.1.0)" → v2.2.0; add this feature.
+
+## Implementation order (for the plan)
+
+1. `lib/rcmd.py` + `tests/test_rcmd.py` (TDD: envelope + normalizer + fallbacks).
+2. Retrofit `commands/r/check.md` onto `lib.rcmd` (proves the pattern end-to-end).
+3. Add the six new `commands/r/*.md` files.
+4. `r:cycle` orchestrator.
+5. Docs: reference page (generated), tables, REFCARD, mkdocs nav, CHANGELOG.
+6. Version bump (4 sources + doc refs) + `.STATUS`.
+7. Run both gates; PR `feature/r-dev-commands` → `dev`.
 
 ## Open questions / risks
 
-- **Overlap with `/rforge:r:check` and `/rforge:thorough`:** `r:cycle`
-  includes a check step. Acceptable — `r:cycle` is the single-package daily
-  loop; `thorough` is the multi-package rollup. Cross-link them in "Related
-  Commands" rather than dedupe.
-- **`covr` / `pkgdown` are heavier optional deps:** commands must treat them
-  as optional and give a clean install hint, not assume presence.
+- **Overlap with `r:check`/`thorough`:** `r:cycle` includes a check step;
+  acceptable — cross-link rather than dedupe.
+- **`jsonlite` assumption:** near-universal but not guaranteed; the console
+  fallback covers its absence.
+- **`pkgdown`/`covr` optional:** commands must degrade cleanly, not error.
 
-## Version & release notes
+## Appendix: research findings (2026-05-31)
 
-Ships as **v2.1.0**. Phase 4 (agents) moves to v2.2.0. Follows the standard
-rforge release pipeline (manual 4-source bump → PR `feature` → `dev` →
-release PR `dev` → `main` → tap manifest sync).
+Three parallel research agents reviewed the r-lib docs/sources:
+
+- **devtools is a free-text meta-wrapper** over `pkgbuild` (build),
+  `rcmdcheck` (check), `roxygen2` (document), `testthat` (test). Calling the
+  lower-level packages directly yields structured objects *and* a lighter dep
+  tree → chosen.
+- **`rcmdcheck::rcmdcheck()`** returns `$errors`/`$warnings`/`$notes` as
+  character vectors (counts via `length()`), plus `$status`, `$test_output`,
+  `$session_info`, `$checkdir`. No JSON method — serialize with `jsonlite`.
+  Use `error_on="never"`.
+- **`covr`**: `coverage_to_list()` → `{filecoverage, totalcoverage}`;
+  `percent_coverage()` → total numeric.
+- **`testthat`**: `test_local(reporter="list")` → `testthat_results`;
+  `as.data.frame()` → 13 cols (`file,context,test,nb,failed,skipped,error,
+  warning,...,passed,result`). Failing files = rows with `failed>0 | error`.
+  `JunitReporter` is an XML alternative. Console fallback line:
+  `[ FAIL 2 | WARN 0 | SKIP 1 | PASS 41 ]`.
+- **`pkgdown`**: `build_site(preview=FALSE, quiet=TRUE)` returns invisibly
+  (success = exit code); `check_pkgdown()` fails fast on first problem;
+  `pkgdown_sitrep()` reports all problems (human text). `preview_site()` opens
+  the built site (→ `--preview`).
+- **`checkthat`**: a real CRAN package (Ian Cero, 2023) — *"Intuitive Unit
+  Testing Tools for Data Manipulation"*, a tidyverse data-validation toolkit,
+  **unrelated** to build/test/site. Intended meaning is `testthat`/`rcmdcheck`,
+  already the engines here. `checkmate` (installed) is runtime arg validation —
+  also not relevant.
+
+Key URLs: rcmdcheck.r-lib.org/reference/rcmdcheck.html ·
+covr.r-lib.org/reference/package_coverage.html ·
+testthat.r-lib.org/reference/testthat_results.html ·
+pkgdown.r-lib.org/reference/{build_site,check_pkgdown}.html ·
+devtools.r-lib.org/reference/index.html · cran.r-project.org/package=checkthat
