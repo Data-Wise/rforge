@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/reference/discovery/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/tutorials/understanding-modes/">
       
       
-        <link rel="prev" href="../../troubleshooting/">
+        <link rel="prev" href="../rforge-in-the-r-lifecycle/">
       
       
-        <link rel="next" href="../deps/">
+        <link rel="next" href="../ecosystem-orchestration/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>discovery - RForge Plugin</title>
+        <title>Understanding modes - RForge Plugin</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#libdiscoverypy-api-reference" class="md-skip">
+        <a href="#understanding-modes" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              discovery
+              Understanding modes
             
           </span>
         </div>
@@ -264,10 +264,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../../workflows/" class="md-tabs__link">
           
   
@@ -284,12 +286,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../../REFCARD/" class="md-tabs__link">
           
   
@@ -539,24 +539,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -574,7 +579,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -620,7 +625,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -648,7 +653,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/getting-started/" class="md-nav__link">
+      <a href="../getting-started/" class="md-nav__link">
         
   
   
@@ -676,7 +681,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
+      <a href="../rforge-in-the-r-lifecycle/" class="md-nav__link">
         
   
   
@@ -701,10 +706,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../tutorials/understanding-modes/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Understanding modes
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -720,6 +752,103 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-one-thing-to-understand-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The one thing to understand first
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-four-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The four modes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-would-i-use-each-decision-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When would I use each? (decision guide)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#you-usually-dont-even-type-the-flag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        You usually don't even type the flag
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#but-which-command-should-i-use-at-all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "But which command should I use at all?"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-confusion-cleared-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common confusion, cleared up
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -732,7 +861,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/ecosystem-orchestration/" class="md-nav__link">
+      <a href="../ecosystem-orchestration/" class="md-nav__link">
         
   
   
@@ -760,7 +889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/cran-release-prep/" class="md-nav__link">
+      <a href="../cran-release-prep/" class="md-nav__link">
         
   
   
@@ -788,7 +917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/migrate-from-mcp/" class="md-nav__link">
+      <a href="../migrate-from-mcp/" class="md-nav__link">
         
   
   
@@ -820,29 +949,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -860,7 +984,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1015,8 +1139,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1027,11 +1149,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
         
           
           <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
@@ -1052,7 +1174,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1067,37 +1189,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    discovery
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../reference/discovery/" class="md-nav__link">
         
   
   
@@ -1113,170 +1208,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#module-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Module overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dataclasses" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dataclasses
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Dataclasses">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#class-description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Description
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Ecosystem
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-package" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Package
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Functions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#detect_ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        detect_ecosystem()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#find_r_packages" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        find_r_packages()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_json" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_json()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_text" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_text()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#parse_description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        parse_description()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#read_description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        read_description()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1289,7 +1220,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../deps/" class="md-nav__link">
+      <a href="../../reference/deps/" class="md-nav__link">
         
   
   
@@ -1317,7 +1248,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../status/" class="md-nav__link">
+      <a href="../../reference/status/" class="md-nav__link">
         
   
   
@@ -1345,7 +1276,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../init/" class="md-nav__link">
+      <a href="../../reference/init/" class="md-nav__link">
         
   
   
@@ -1833,10 +1764,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#module-overview" class="md-nav__link">
+  <a href="#the-one-thing-to-understand-first" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Module overview
+        The one thing to understand first
       
     </span>
   </a>
@@ -1844,135 +1775,68 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dataclasses" class="md-nav__link">
+  <a href="#the-four-modes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Dataclasses
+        The four modes
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Dataclasses">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#class-description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Description
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Ecosystem
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-package" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Package
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#functions" class="md-nav__link">
+  <a href="#when-would-i-use-each-decision-guide" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Functions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#detect_ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        detect_ecosystem()
+        When would I use each? (decision guide)
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#find_r_packages" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#you-usually-dont-even-type-the-flag" class="md-nav__link">
     <span class="md-ellipsis">
       
-        find_r_packages()
+        You usually don't even type the flag
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#format_json" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#but-which-command-should-i-use-at-all" class="md-nav__link">
     <span class="md-ellipsis">
       
-        format_json()
+        "But which command should I use at all?"
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#format_text" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#common-confusion-cleared-up" class="md-nav__link">
     <span class="md-ellipsis">
       
-        format_text()
+        Common confusion, cleared up
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#parse_description" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        parse_description()
+        What's next
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#read_description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        read_description()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1993,7 +1857,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/reference/discovery.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/tutorials/understanding-modes.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2001,205 +1865,193 @@
   
 
 
-<h1 id="libdiscoverypy-api-reference"><code>lib/discovery.py</code> — API Reference<a class="headerlink" href="#libdiscoverypy-api-reference" title="Permanent link">&para;</a></h1>
+<h1 id="understanding-modes">🎛️ Understanding modes<a class="headerlink" href="#understanding-modes" title="Permanent link">&para;</a></h1>
+<div class="admonition tip">
+<p class="admonition-title">TL;DR (30 seconds)</p>
+<ul>
+<li><strong>What:</strong> "Modes" are four depth settings for <strong>one command</strong> — <code>/rforge:analyze</code>.</li>
+<li><strong>Why:</strong> Same command, dial how deep (and how slow) the analysis goes.</li>
+<li><strong>How:</strong> <code>/rforge:analyze</code> = fast default. Add <code>--mode debug</code> / <code>optimize</code> / <code>release</code> to go deeper.</li>
+<li><strong>The catch:</strong> <em>Only</em> <code>/rforge:analyze</code> has modes. <code>/rforge:quick</code>, <code>/rforge:status</code>, and the rest do not.</li>
+</ul>
+</div>
 <blockquote>
-<p>Auto-generated by <code>scripts/gen_lib_reference.py</code>. Do not edit by hand — re-run the generator to update.</p>
+<p><strong>For whom:</strong> Anyone confused by the <code>--mode</code> flag (you are not alone —
+this is the most common rforge question).
+<strong>Estimated time:</strong> 5 minutes.</p>
 </blockquote>
-<h2 id="module-overview">Module overview<a class="headerlink" href="#module-overview" title="Permanent link">&para;</a></h2>
-<p>R ecosystem discovery.</p>
-<p>Walks a directory tree looking for R <code>DESCRIPTION</code> files, parses them into
-structured <code>Package</code> records, and classifies the result as a single package,
-an ecosystem, or a hybrid layout.</p>
-<p>Pure Python — no R subprocess, no external deps beyond the stdlib. Ported
-from <code>rforge-mcp/dist/tools/discovery/detect.js</code> (Path B Phase B.1).</p>
-<p>Usage (CLI, from repo root):
-    python3 -m lib.discovery --path . --format text
-    python3 -m lib.discovery --path /path/to/eco --format json</p>
-<p>Usage (Python API):
-    from lib.discovery import detect_ecosystem
-    eco = detect_ecosystem(".")
-    print(eco.kind, [p.name for p in eco.packages])</p>
-<h2 id="dataclasses">Dataclasses<a class="headerlink" href="#dataclasses" title="Permanent link">&para;</a></h2>
-<h3 id="class-description"><code>class Description</code><a class="headerlink" href="#class-description" title="Permanent link">&para;</a></h3>
-<p>Parsed contents of an R DESCRIPTION file.</p>
+<h2 id="the-one-thing-to-understand-first">The one thing to understand first<a class="headerlink" href="#the-one-thing-to-understand-first" title="Permanent link">&para;</a></h2>
+<p><strong>A "mode" is just how deep you want <code>/rforge:analyze</code> to dig.</strong></p>
+<p>Think of it like a camera:</p>
+<ul>
+<li><strong>default</strong> = a quick snapshot (point and shoot, &lt; 10 seconds)</li>
+<li><strong>debug</strong> = zoom in to inspect every detail</li>
+<li><strong>optimize</strong> = a stopwatch — measure what's <em>slow</em></li>
+<li><strong>release</strong> = a full inspection before you hand it to someone else (CRAN)</li>
+</ul>
+<p>Same camera (<code>/rforge:analyze</code>), four settings. You pick the setting with
+the <code>--mode</code> flag — or you pick nothing and get the fast default.</p>
+<div class="admonition warning">
+<p class="admonition-title">Modes belong to ONE command</p>
+<p>This is the part that trips people up. <strong>Only <code>/rforge:analyze</code> has
+modes.</strong> <code>/rforge:quick</code> is <em>always</em> fast. <code>/rforge:status</code> is <em>always</em>
+a snapshot. They ignore <code>--mode</code> entirely. If you find yourself typing
+<code>/rforge:status --mode debug</code>, you want <code>/rforge:analyze --mode debug</code>
+instead.</p>
+</div>
+<h2 id="the-four-modes">The four modes<a class="headerlink" href="#the-four-modes" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
+<th>Mode</th>
+<th>Plain-English question it answers</th>
+<th>Speed</th>
+<th>Needs R?</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>package</code></td>
-<td><code>str</code></td>
-<td>—</td>
+<td><strong>default</strong></td>
+<td>"Quick — is anything obviously wrong?"</td>
+<td>&lt; 10s</td>
+<td>no</td>
 </tr>
 <tr>
-<td><code>version</code></td>
-<td><code>str</code></td>
-<td>—</td>
+<td><strong>debug</strong></td>
+<td>"Something's broken — show me <em>why</em>, in detail."</td>
+<td>&lt; 2 min</td>
+<td>no¹</td>
 </tr>
 <tr>
-<td><code>title</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
+<td><strong>optimize</strong></td>
+<td>"What's <em>slow</em>? Where are the bottlenecks?"</td>
+<td>&lt; 3 min</td>
+<td><strong>yes</strong></td>
 </tr>
 <tr>
-<td><code>description</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
-</tr>
-<tr>
-<td><code>license</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
-</tr>
-<tr>
-<td><code>depends</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
-</tr>
-<tr>
-<td><code>imports</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
-</tr>
-<tr>
-<td><code>suggests</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
-</tr>
-<tr>
-<td><code>linking_to</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
-</tr>
-<tr>
-<td><code>url</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
+<td><strong>release</strong></td>
+<td>"Is this <em>actually ready</em> to ship to CRAN?"</td>
+<td>&lt; 5 min</td>
+<td><strong>yes</strong></td>
 </tr>
 </tbody>
 </table>
-<h3 id="class-ecosystem"><code>class Ecosystem</code><a class="headerlink" href="#class-ecosystem" title="Permanent link">&para;</a></h3>
-<p>Result of <code>detect_ecosystem()</code>.</p>
+<p>¹ debug reads more files and runs the deps graph, but still pure-Python.
+optimize and release shell out to R (profiling / <code>R CMD check</code>).</p>
+<h2 id="when-would-i-use-each-decision-guide">When would I use each? (decision guide)<a class="headerlink" href="#when-would-i-use-each-decision-guide" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart TD
+    A["I want to run /rforge:analyze"] --&gt; B{"What do I need?"}
+    B -- "Just a quick sanity check" --&gt; D["default&lt;br/&gt;(no flag)"]
+    B -- "Something's broken,&lt;br/&gt;need detail" --&gt; E["--mode debug"]
+    B -- "It works but feels slow" --&gt; F["--mode optimize"]
+    B -- "About to submit to CRAN" --&gt; G["--mode release"]</code></pre>
+<p>In words:</p>
+<ul>
+<li><strong>You made a change and want to make sure nothing obvious broke</strong> →
+  <code>default</code>. Just run <code>/rforge:analyze "what I changed"</code>. No flag.</li>
+<li><strong>A test is failing and you don't know why</strong> → <code>--mode debug</code>. It reads
+  every file, traces the full dependency tree, and surfaces root causes.</li>
+<li><strong>The package loads slowly or a function is sluggish</strong> → <code>--mode optimize</code>.
+  It profiles your R code and reports the top bottlenecks.</li>
+<li><strong>You're preparing a CRAN submission</strong> → <code>--mode release</code>. It runs the
+  <code>R CMD check</code>-equivalent validation and gives you a readiness score.</li>
+</ul>
+<h2 id="you-usually-dont-even-type-the-flag">You usually don't even type the flag<a class="headerlink" href="#you-usually-dont-even-type-the-flag" title="Permanent link">&para;</a></h2>
+<p><code>/rforge:analyze</code> reads your description and <strong>infers</strong> the mode from
+context words. All three of these pick the right mode automatically:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;why are tests failing?&quot;</span><span class="w">        </span><span class="c1"># → infers debug</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;the package loads slowly&quot;</span><span class="w">      </span><span class="c1"># → infers optimize</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;prepare for CRAN submission&quot;</span><span class="w">   </span><span class="c1"># → infers release</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;updated the bootstrap code&quot;</span><span class="w">    </span><span class="c1"># → stays default</span>
+</span></code></pre></div>
+<p>So in practice: <strong>describe what you're doing in plain words, and let rforge
+choose.</strong> The explicit <code>--mode</code> flag is there for when you want to force a
+specific depth regardless of wording.</p>
+<h2 id="but-which-command-should-i-use-at-all">"But which command should I use at all?"<a class="headerlink" href="#but-which-command-should-i-use-at-all" title="Permanent link">&para;</a></h2>
+<p>Modes are a within-<code>analyze</code> choice. Here's the bigger picture of which
+<em>command</em> to reach for — most of the time you won't touch modes:</p>
 <table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
+<th>Situation</th>
+<th>Command</th>
+<th>Mode?</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>root</code></td>
-<td><code>str</code></td>
-<td>—</td>
+<td>Pre-commit, "is it healthy?"</td>
+<td><code>/rforge:quick</code></td>
+<td>n/a — always fast</td>
 </tr>
 <tr>
-<td><code>packages</code></td>
-<td><code>list[Package]</code></td>
-<td>—</td>
+<td>Daily dashboard</td>
+<td><code>/rforge:status</code></td>
+<td>n/a — always fast</td>
 </tr>
 <tr>
-<td><code>kind</code></td>
-<td><code>Kind</code></td>
-<td>—</td>
+<td>After a change, "what's the impact?"</td>
+<td><code>/rforge:analyze "..."</code></td>
+<td>default (auto)</td>
 </tr>
 <tr>
-<td><code>mode</code></td>
-<td><code>Mode</code></td>
-<td>—</td>
+<td>Chasing a bug</td>
+<td><code>/rforge:analyze "..."</code></td>
+<td>debug (auto/flag)</td>
 </tr>
 <tr>
-<td><code>config_found</code></td>
-<td><code>bool</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>config_path</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
+<td>Pre-CRAN, full validation</td>
+<td><code>/rforge:thorough</code></td>
+<td>n/a — its own flow</td>
 </tr>
 </tbody>
 </table>
-<h3 id="class-package"><code>class Package</code><a class="headerlink" href="#class-package" title="Permanent link">&para;</a></h3>
-<p>An R package discovered on disk.</p>
+<div class="admonition abstract">
+<p class="admonition-title">Honest simplification</p>
+<p>For 90% of daily work you only need <strong><code>/rforge:quick</code></strong> (snapshot) and
+<strong><code>/rforge:analyze "what changed"</code></strong> (default mode). Reach for the
+explicit <code>--mode</code> flag only when the default isn't deep enough. Don't
+overthink it.</p>
+</div>
+<h2 id="common-confusion-cleared-up">Common confusion, cleared up<a class="headerlink" href="#common-confusion-cleared-up" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
+<th>You thought…</th>
+<th>Actually…</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>name</code></td>
-<td><code>str</code></td>
-<td>—</td>
+<td>"Every command has modes"</td>
+<td>Only <code>/rforge:analyze</code> does.</td>
 </tr>
 <tr>
-<td><code>version</code></td>
-<td><code>str</code></td>
-<td>—</td>
+<td>"<code>/rforge:status --mode release</code> does a CRAN check"</td>
+<td><code>status</code> ignores <code>--mode</code>. Use <code>/rforge:analyze --mode release</code> or <code>/rforge:thorough</code>.</td>
 </tr>
 <tr>
-<td><code>path</code></td>
-<td><code>str</code></td>
-<td>—</td>
+<td>"I must pick a mode every time"</td>
+<td>No — default is automatic. Just run <code>/rforge:analyze "..."</code>.</td>
 </tr>
 <tr>
-<td><code>category</code></td>
-<td><code>Literal['active', 'stable', 'archived']</code></td>
-<td><code>'active'</code></td>
+<td>"<code>optimize</code> checks my code style"</td>
+<td>No — it profiles <em>speed</em> (bottlenecks, load time), not style.</td>
 </tr>
 <tr>
-<td><code>description</code></td>
-<td><code>Optional[Description]</code></td>
-<td><code>None</code></td>
+<td>"More mode = always better"</td>
+<td>No — deeper modes are slower. Use the lightest one that answers your question.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
-<h3 id="detect_ecosystem"><code>detect_ecosystem()</code><a class="headerlink" href="#detect_ecosystem" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">detect_ecosystem</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Ecosystem&#39;</span>
-</span></code></pre></div>
-<p>Detect R ecosystem at <code>path</code>.</p>
-<p>Returns an <code>Ecosystem</code> describing the layout: the packages found, their
-classification (single / ecosystem / hybrid), the MCP-compatible mode
-(minimal / standard / full), and whether an <code>.rforge.yaml</code> config exists.</p>
-<p>Raises:
-    FileNotFoundError: if <code>path</code> does not exist.
-    NotADirectoryError: if <code>path</code> exists but is not a directory.</p>
-<h3 id="find_r_packages"><code>find_r_packages()</code><a class="headerlink" href="#find_r_packages" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">find_r_packages</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[Package]&#39;</span>
-</span></code></pre></div>
-<p>Find all R packages under <code>root</code>, recursing at most <code>max_depth</code> levels.</p>
-<p>Mirrors the MCP server's traversal: if a directory is itself an R package,
-it's recorded and we don't descend into it. Hidden directories (<code>.git</code>,
-<code>.Rproj.user</code>, etc.) are skipped.</p>
-<h3 id="format_json"><code>format_json()</code><a class="headerlink" href="#format_json" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_json</span><span class="p">(</span><span class="n">eco</span><span class="p">:</span> <span class="s1">&#39;Ecosystem&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
-</span></code></pre></div>
-<p><em>(no docstring)</em></p>
-<h3 id="format_text"><code>format_text()</code><a class="headerlink" href="#format_text" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_text</span><span class="p">(</span><span class="n">eco</span><span class="p">:</span> <span class="s1">&#39;Ecosystem&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
-</span></code></pre></div>
-<p>Terminal-friendly rendering of an Ecosystem.</p>
-<h3 id="parse_description"><code>parse_description()</code><a class="headerlink" href="#parse_description" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_description</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Description]&#39;</span>
-</span></code></pre></div>
-<p>Parse the content of a DESCRIPTION file.</p>
-<p>DESCRIPTION uses an RFC-822-ish format: <code>Field: value</code> lines, with
-indented continuation lines belonging to the previous field.</p>
-<h3 id="read_description"><code>read_description()</code><a class="headerlink" href="#read_description" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_description</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Description]&#39;</span>
-</span></code></pre></div>
-<p>Read and parse a DESCRIPTION file. Returns None on any error.</p>
+<h2 id="whats-next">What's next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><a href="../getting-started/">Getting started</a></strong> — the basic install + first
+  commands, if you skipped it.</li>
+<li><strong><a href="../rforge-in-the-r-lifecycle/">rforge in the R package lifecycle</a></strong> —
+  where <code>/rforge:analyze</code> fits among your other R tools.</li>
+<li><strong><a href="../../REFCARD/">REFCARD</a></strong> — every command at a glance.</li>
+</ul>
 
 
 

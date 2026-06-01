@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/reference/discovery/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/tutorials/rforge-in-the-r-lifecycle/">
       
       
-        <link rel="prev" href="../../troubleshooting/">
+        <link rel="prev" href="../getting-started/">
       
       
-        <link rel="next" href="../deps/">
+        <link rel="next" href="../understanding-modes/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>discovery - RForge Plugin</title>
+        <title>rforge in the R package lifecycle - RForge Plugin</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#libdiscoverypy-api-reference" class="md-skip">
+        <a href="#rforge-in-the-r-package-lifecycle" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              discovery
+              rforge in the R package lifecycle
             
           </span>
         </div>
@@ -264,10 +264,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../../workflows/" class="md-tabs__link">
           
   
@@ -284,12 +286,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../../REFCARD/" class="md-tabs__link">
           
   
@@ -539,24 +539,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -574,7 +579,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -620,7 +625,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -648,7 +653,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/getting-started/" class="md-nav__link">
+      <a href="../getting-started/" class="md-nav__link">
         
   
   
@@ -673,10 +678,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    rforge in the R package lifecycle
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -692,6 +724,153 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-one-sentence-answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The one-sentence answer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#who-does-what" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Who does what
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-rforge-plugs-into-the-standard-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where rforge plugs into the standard loop
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-concrete-first-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A concrete first session
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="A concrete first session">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-see-the-lay-of-the-land" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. See the lay of the land
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-understand-who-depends-on-whom" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Understand who depends on whom
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-register-the-package-youll-work-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Register the package you'll work in
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-develop-using-your-normal-r-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Develop using your normal R tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-before-you-commit-check-the-ecosystem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Before you commit, check the ecosystem
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-reach-for-rforge-vs-plain-r" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to reach for rforge vs. plain R
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -704,7 +883,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/understanding-modes/" class="md-nav__link">
+      <a href="../understanding-modes/" class="md-nav__link">
         
   
   
@@ -732,7 +911,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/ecosystem-orchestration/" class="md-nav__link">
+      <a href="../ecosystem-orchestration/" class="md-nav__link">
         
   
   
@@ -760,7 +939,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/cran-release-prep/" class="md-nav__link">
+      <a href="../cran-release-prep/" class="md-nav__link">
         
   
   
@@ -788,7 +967,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/migrate-from-mcp/" class="md-nav__link">
+      <a href="../migrate-from-mcp/" class="md-nav__link">
         
   
   
@@ -820,29 +999,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -860,7 +1034,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1015,8 +1189,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1027,11 +1199,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
         
           
           <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
@@ -1052,7 +1224,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1067,37 +1239,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    discovery
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../reference/discovery/" class="md-nav__link">
         
   
   
@@ -1113,170 +1258,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#module-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Module overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dataclasses" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dataclasses
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Dataclasses">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#class-description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Description
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Ecosystem
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-package" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Package
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Functions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#detect_ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        detect_ecosystem()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#find_r_packages" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        find_r_packages()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_json" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_json()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_text" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_text()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#parse_description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        parse_description()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#read_description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        read_description()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1289,7 +1270,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../deps/" class="md-nav__link">
+      <a href="../../reference/deps/" class="md-nav__link">
         
   
   
@@ -1317,7 +1298,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../status/" class="md-nav__link">
+      <a href="../../reference/status/" class="md-nav__link">
         
   
   
@@ -1345,7 +1326,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../init/" class="md-nav__link">
+      <a href="../../reference/init/" class="md-nav__link">
         
   
   
@@ -1833,10 +1814,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#module-overview" class="md-nav__link">
+  <a href="#the-one-sentence-answer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Module overview
+        The one-sentence answer
       
     </span>
   </a>
@@ -1844,22 +1825,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dataclasses" class="md-nav__link">
+  <a href="#who-does-what" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Dataclasses
+        Who does what
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Dataclasses">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-rforge-plugs-into-the-standard-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where rforge plugs into the standard loop
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-concrete-first-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A concrete first session
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="A concrete first session">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#class-description" class="md-nav__link">
+  <a href="#1-see-the-lay-of-the-land" class="md-nav__link">
     <span class="md-ellipsis">
       
-        class Description
+        1. See the lay of the land
       
     </span>
   </a>
@@ -1867,10 +1870,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#class-ecosystem" class="md-nav__link">
+  <a href="#2-understand-who-depends-on-whom" class="md-nav__link">
     <span class="md-ellipsis">
       
-        class Ecosystem
+        2. Understand who depends on whom
       
     </span>
   </a>
@@ -1878,10 +1881,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#class-package" class="md-nav__link">
+  <a href="#3-register-the-package-youll-work-in" class="md-nav__link">
     <span class="md-ellipsis">
       
-        class Package
+        3. Register the package you'll work in
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-develop-using-your-normal-r-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Develop using your normal R tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-before-you-commit-check-the-ecosystem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Before you commit, check the ecosystem
       
     </span>
   </a>
@@ -1894,85 +1919,24 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#functions" class="md-nav__link">
+  <a href="#when-to-reach-for-rforge-vs-plain-r" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Functions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#detect_ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        detect_ecosystem()
+        When to reach for rforge vs. plain R
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#find_r_packages" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        find_r_packages()
+        What's next
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_json" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_json()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_text" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_text()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#parse_description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        parse_description()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#read_description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        read_description()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1993,7 +1957,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/reference/discovery.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/tutorials/rforge-in-the-r-lifecycle.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2001,205 +1965,237 @@
   
 
 
-<h1 id="libdiscoverypy-api-reference"><code>lib/discovery.py</code> — API Reference<a class="headerlink" href="#libdiscoverypy-api-reference" title="Permanent link">&para;</a></h1>
+<h1 id="rforge-in-the-r-package-lifecycle">🔄 rforge in the R package lifecycle<a class="headerlink" href="#rforge-in-the-r-package-lifecycle" title="Permanent link">&para;</a></h1>
+<div class="admonition tip">
+<p class="admonition-title">TL;DR (30 seconds)</p>
+<ul>
+<li><strong>What:</strong> Where rforge fits among the tools you already use to build R packages.</li>
+<li><strong>Why:</strong> rforge does <em>not</em> scaffold or build packages — it orchestrates an <em>ecosystem</em> of them. Knowing the boundary saves confusion.</li>
+<li><strong>How:</strong> <code>usethis</code>/<code>devtools</code> build each package; rforge answers cross-package questions (deps, impact, CRAN order).</li>
+<li><strong>Next:</strong> <a href="../ecosystem-orchestration/">Ecosystem orchestration</a> for the multi-package commands.</li>
+</ul>
+</div>
 <blockquote>
-<p>Auto-generated by <code>scripts/gen_lib_reference.py</code>. Do not edit by hand — re-run the generator to update.</p>
+<p><strong>For whom:</strong> R developer who knows <code>devtools</code>/<code>usethis</code> and wants to
+understand what rforge adds.
+<strong>Estimated time:</strong> 12 minutes.
+<strong>Prior knowledge:</strong> You've built or maintained at least one R package.</p>
 </blockquote>
-<h2 id="module-overview">Module overview<a class="headerlink" href="#module-overview" title="Permanent link">&para;</a></h2>
-<p>R ecosystem discovery.</p>
-<p>Walks a directory tree looking for R <code>DESCRIPTION</code> files, parses them into
-structured <code>Package</code> records, and classifies the result as a single package,
-an ecosystem, or a hybrid layout.</p>
-<p>Pure Python — no R subprocess, no external deps beyond the stdlib. Ported
-from <code>rforge-mcp/dist/tools/discovery/detect.js</code> (Path B Phase B.1).</p>
-<p>Usage (CLI, from repo root):
-    python3 -m lib.discovery --path . --format text
-    python3 -m lib.discovery --path /path/to/eco --format json</p>
-<p>Usage (Python API):
-    from lib.discovery import detect_ecosystem
-    eco = detect_ecosystem(".")
-    print(eco.kind, [p.name for p in eco.packages])</p>
-<h2 id="dataclasses">Dataclasses<a class="headerlink" href="#dataclasses" title="Permanent link">&para;</a></h2>
-<h3 id="class-description"><code>class Description</code><a class="headerlink" href="#class-description" title="Permanent link">&para;</a></h3>
-<p>Parsed contents of an R DESCRIPTION file.</p>
+<h2 id="the-one-sentence-answer">The one-sentence answer<a class="headerlink" href="#the-one-sentence-answer" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><strong><code>usethis</code> and <code>devtools</code> operate on a single package. rforge operates on the <em>set</em> of packages and the relationships between them.</strong></p>
+</blockquote>
+<p>rforge is not a replacement for the standard R toolchain — it's a layer
+<em>on top of it</em>. If you're looking for <code>create_package()</code>, <code>document()</code>,
+or <code>check()</code>, those are <code>usethis</code>/<code>devtools</code> and rforge will never
+reimplement them. rforge starts where they stop: once you have one or
+more packages on disk, rforge tells you how they relate, what a change
+ripples into, and in what order to ship.</p>
+<h2 id="who-does-what">Who does what<a class="headerlink" href="#who-does-what" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
+<th>Concern</th>
+<th>Tool</th>
+<th>Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>package</code></td>
-<td><code>str</code></td>
-<td>—</td>
+<td>Create a package skeleton</td>
+<td><code>usethis</code></td>
+<td><code>usethis::create_package("medfit")</code></td>
 </tr>
 <tr>
-<td><code>version</code></td>
-<td><code>str</code></td>
-<td>—</td>
+<td>Add a function + test + doc</td>
+<td><code>usethis</code> / <code>devtools</code></td>
+<td><code>usethis::use_r("mediate")</code>, <code>usethis::use_test("mediate")</code></td>
 </tr>
 <tr>
-<td><code>title</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
+<td>Generate <code>man/*.Rd</code> from roxygen</td>
+<td><code>devtools</code></td>
+<td><code>devtools::document()</code></td>
 </tr>
 <tr>
-<td><code>description</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
+<td>Run tests</td>
+<td><code>devtools</code> / <code>testthat</code></td>
+<td><code>devtools::test()</code></td>
 </tr>
 <tr>
-<td><code>license</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
+<td>Run <code>R CMD check</code></td>
+<td><code>devtools</code> / R</td>
+<td><code>devtools::check()</code> or <code>R CMD check --as-cran</code></td>
 </tr>
 <tr>
-<td><code>depends</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
+<td><strong>See every package in a repo</strong></td>
+<td><strong>rforge</strong></td>
+<td><code>/rforge:detect</code></td>
 </tr>
 <tr>
-<td><code>imports</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
+<td><strong>Map dependencies between them</strong></td>
+<td><strong>rforge</strong></td>
+<td><code>/rforge:deps</code></td>
 </tr>
 <tr>
-<td><code>suggests</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
+<td><strong>Know what a change breaks downstream</strong></td>
+<td><strong>rforge</strong></td>
+<td><code>/rforge:impact</code></td>
 </tr>
 <tr>
-<td><code>linking_to</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
+<td><strong>Plan a coordinated multi-package update</strong></td>
+<td><strong>rforge</strong></td>
+<td><code>/rforge:cascade</code></td>
 </tr>
 <tr>
-<td><code>url</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
+<td><strong>Order CRAN submissions by dependency</strong></td>
+<td><strong>rforge</strong></td>
+<td><code>/rforge:release</code></td>
+</tr>
+<tr>
+<td><strong>Roll up health across all packages</strong></td>
+<td><strong>rforge</strong></td>
+<td><code>/rforge:status</code>, <code>/rforge:health</code></td>
 </tr>
 </tbody>
 </table>
-<h3 id="class-ecosystem"><code>class Ecosystem</code><a class="headerlink" href="#class-ecosystem" title="Permanent link">&para;</a></h3>
-<p>Result of <code>detect_ecosystem()</code>.</p>
+<div class="admonition note">
+<p class="admonition-title">rforge does shell out to R for two commands</p>
+<p><code>/rforge:r:check</code> and <code>/rforge:thorough</code> call <code>R CMD check</code> / <code>devtools</code>
+under the hood (they need an R toolchain). Every other command runs on
+pure-Python <code>lib/</code> modules and needs no R — so discovery, deps, impact,
+and status stay fast even on machines without R installed.</p>
+</div>
+<h2 id="where-rforge-plugs-into-the-standard-loop">Where rforge plugs into the standard loop<a class="headerlink" href="#where-rforge-plugs-into-the-standard-loop" title="Permanent link">&para;</a></h2>
+<p>Here's a typical R development loop with the rforge touchpoints marked. The
+R steps are unchanged from how you work today; rforge adds the
+<strong>ecosystem-aware</strong> checkpoints.</p>
+<pre class="mermaid"><code>flowchart TD
+    A["usethis::create_package()&lt;br/&gt;— scaffold (R)"] --&gt; B["/rforge:init&lt;br/&gt;— register with rforge"]
+    B --&gt; C["Write code + tests&lt;br/&gt;usethis::use_r / use_test (R)"]
+    C --&gt; D["/rforge:quick&lt;br/&gt;— 10s ecosystem snapshot"]
+    D --&gt; E{"Change touches&lt;br/&gt;a shared package?"}
+    E -- "no" --&gt; F["devtools::test() (R)"]
+    E -- "yes" --&gt; G["/rforge:impact&lt;br/&gt;— what breaks downstream?"]
+    G --&gt; H["/rforge:cascade&lt;br/&gt;— plan the coordinated update"]
+    H --&gt; F
+    F --&gt; I["/rforge:docs:check&lt;br/&gt;— NEWS/doc drift"]
+    I --&gt; J["/rforge:thorough&lt;br/&gt;— pre-release rollup + R CMD check"]
+    J --&gt; K["/rforge:release&lt;br/&gt;— CRAN submission order"]</code></pre>
+<p>The mental model: <strong>R tools change one package; rforge tells you what that
+change means for the rest.</strong></p>
+<h2 id="a-concrete-first-session">A concrete first session<a class="headerlink" href="#a-concrete-first-session" title="Permanent link">&para;</a></h2>
+<p>Say you maintain an ecosystem: a core package <code>medfit</code> and three packages
+that build on it (<code>probmed</code>, <code>medsim</code>, <code>mediationverse</code>). You've just been
+handed the repo.</p>
+<h3 id="1-see-the-lay-of-the-land">1. See the lay of the land<a class="headerlink" href="#1-see-the-lay-of-the-land" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/rforge:detect
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>🏗️  Ecosystem: /Users/you/r/mediationverse
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>   Packages: 4 | mode: standard | config: not found
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>   ├─ medfit 1.0.0
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>   ├─ probmed 0.1.0
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>   ├─ medsim 0.3.2
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>   └─ mediationverse 1.2.0
+</span></code></pre></div>
+<p>This is the question <code>devtools</code> can't answer: <em>what packages live here, and
+are they related?</em> rforge walked the tree for <code>DESCRIPTION</code> files and
+classified the layout.</p>
+<h3 id="2-understand-who-depends-on-whom">2. Understand who depends on whom<a class="headerlink" href="#2-understand-who-depends-on-whom" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/rforge:deps
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>🔗 DEPENDENCY GRAPH
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Level 0 (Core):      medfit
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Level 1 (Impl.):     probmed → medfit, medsim → medfit
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>Level 2 (Meta):      mediationverse → medfit, probmed, medsim
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>Topological order: medfit → {probmed, medsim} → mediationverse
+</span></code></pre></div>
+<p>Now you know that <code>medfit</code> is the thing everything else rests on — so a
+change there is high-stakes.</p>
+<h3 id="3-register-the-package-youll-work-in">3. Register the package you'll work in<a class="headerlink" href="#3-register-the-package-youll-work-in" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>cd medfit
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>/rforge:init
+</span></code></pre></div>
+<p><code>/rforge:init</code> writes <code>~/.rforge/context.json</code> marking <code>medfit</code> as the
+active package. It's per-user state (one active context at a time), and
+it's idempotent — safe to re-run. Switch contexts later by <code>cd</code>-ing
+elsewhere and running it again.</p>
+<h3 id="4-develop-using-your-normal-r-tools">4. Develop using your normal R tools<a class="headerlink" href="#4-develop-using-your-normal-r-tools" title="Permanent link">&para;</a></h3>
+<p>rforge steps back here. Use <code>usethis</code>/<code>devtools</code> exactly as you always do:</p>
+<div class="language-r highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">usethis</span><span class="o">::</span><span class="nf">use_r</span><span class="p">(</span><span class="s">&quot;bootstrap&quot;</span><span class="p">)</span><span class="w">       </span><span class="c1"># create R/bootstrap.R</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">usethis</span><span class="o">::</span><span class="nf">use_test</span><span class="p">(</span><span class="s">&quot;bootstrap&quot;</span><span class="p">)</span><span class="w">    </span><span class="c1"># create tests/testthat/test-bootstrap.R</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="c1"># ... write code ...</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">devtools</span><span class="o">::</span><span class="nf">document</span><span class="p">()</span><span class="w">              </span><span class="c1"># regenerate man/*.Rd from roxygen</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">devtools</span><span class="o">::</span><span class="nf">test</span><span class="p">()</span><span class="w">                  </span><span class="c1"># run the test suite</span>
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">rforge's hook will stop you editing generated docs</p>
+<p>If you try to hand-edit a <code>man/*.Rd</code> file, rforge's <code>PreToolUse</code> hook
+<strong>blocks</strong> it — those are roxygen output. Edit the roxygen comment in
+<code>R/*.R</code> and re-run <code>devtools::document()</code> instead. See
+<a href="../../hooks-and-skills/">Hooks &amp; Skills</a>.</p>
+</div>
+<h3 id="5-before-you-commit-check-the-ecosystem">5. Before you commit, check the ecosystem<a class="headerlink" href="#5-before-you-commit-check-the-ecosystem" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:quick
+</span></code></pre></div>
+<p>A sub-10-second snapshot of all four packages. This is the rforge habit
+that replaces "I <em>think</em> my change is isolated" with "I <em>know</em> whether it
+is."</p>
+<h2 id="when-to-reach-for-rforge-vs-plain-r">When to reach for rforge vs. plain R<a class="headerlink" href="#when-to-reach-for-rforge-vs-plain-r" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
+<th>You're about to…</th>
+<th>Use</th>
+<th>Not</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>root</code></td>
-<td><code>str</code></td>
-<td>—</td>
+<td>Add a function to one package</td>
+<td><code>usethis::use_r()</code></td>
+<td>rforge (it doesn't scaffold)</td>
 </tr>
 <tr>
-<td><code>packages</code></td>
-<td><code>list[Package]</code></td>
-<td>—</td>
+<td>Change a function other packages call</td>
+<td><code>/rforge:impact</code> first</td>
+<td>committing blind</td>
 </tr>
 <tr>
-<td><code>kind</code></td>
-<td><code>Kind</code></td>
-<td>—</td>
+<td>Bump a core package's version</td>
+<td><code>/rforge:cascade</code> to plan dependents</td>
+<td>bumping each by hand</td>
 </tr>
 <tr>
-<td><code>mode</code></td>
-<td><code>Mode</code></td>
-<td>—</td>
+<td>Submit several packages to CRAN</td>
+<td><code>/rforge:release</code> for the order</td>
+<td>guessing the sequence</td>
 </tr>
 <tr>
-<td><code>config_found</code></td>
-<td><code>bool</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>config_path</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
+<td>Just run <code>R CMD check</code> on one package</td>
+<td><code>/rforge:r:check</code> (smart parsing) <strong>or</strong> <code>devtools::check()</code></td>
+<td>— both are fine</td>
 </tr>
 </tbody>
 </table>
-<h3 id="class-package"><code>class Package</code><a class="headerlink" href="#class-package" title="Permanent link">&para;</a></h3>
-<p>An R package discovered on disk.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>name</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>version</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>path</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>category</code></td>
-<td><code>Literal['active', 'stable', 'archived']</code></td>
-<td><code>'active'</code></td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td><code>Optional[Description]</code></td>
-<td><code>None</code></td>
-</tr>
-</tbody>
-</table>
-<h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
-<h3 id="detect_ecosystem"><code>detect_ecosystem()</code><a class="headerlink" href="#detect_ecosystem" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">detect_ecosystem</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Ecosystem&#39;</span>
-</span></code></pre></div>
-<p>Detect R ecosystem at <code>path</code>.</p>
-<p>Returns an <code>Ecosystem</code> describing the layout: the packages found, their
-classification (single / ecosystem / hybrid), the MCP-compatible mode
-(minimal / standard / full), and whether an <code>.rforge.yaml</code> config exists.</p>
-<p>Raises:
-    FileNotFoundError: if <code>path</code> does not exist.
-    NotADirectoryError: if <code>path</code> exists but is not a directory.</p>
-<h3 id="find_r_packages"><code>find_r_packages()</code><a class="headerlink" href="#find_r_packages" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">find_r_packages</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[Package]&#39;</span>
-</span></code></pre></div>
-<p>Find all R packages under <code>root</code>, recursing at most <code>max_depth</code> levels.</p>
-<p>Mirrors the MCP server's traversal: if a directory is itself an R package,
-it's recorded and we don't descend into it. Hidden directories (<code>.git</code>,
-<code>.Rproj.user</code>, etc.) are skipped.</p>
-<h3 id="format_json"><code>format_json()</code><a class="headerlink" href="#format_json" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_json</span><span class="p">(</span><span class="n">eco</span><span class="p">:</span> <span class="s1">&#39;Ecosystem&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
-</span></code></pre></div>
-<p><em>(no docstring)</em></p>
-<h3 id="format_text"><code>format_text()</code><a class="headerlink" href="#format_text" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_text</span><span class="p">(</span><span class="n">eco</span><span class="p">:</span> <span class="s1">&#39;Ecosystem&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
-</span></code></pre></div>
-<p>Terminal-friendly rendering of an Ecosystem.</p>
-<h3 id="parse_description"><code>parse_description()</code><a class="headerlink" href="#parse_description" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_description</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Description]&#39;</span>
-</span></code></pre></div>
-<p>Parse the content of a DESCRIPTION file.</p>
-<p>DESCRIPTION uses an RFC-822-ish format: <code>Field: value</code> lines, with
-indented continuation lines belonging to the previous field.</p>
-<h3 id="read_description"><code>read_description()</code><a class="headerlink" href="#read_description" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_description</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Description]&#39;</span>
-</span></code></pre></div>
-<p>Read and parse a DESCRIPTION file. Returns None on any error.</p>
+<div class="admonition abstract">
+<p class="admonition-title">Rule of thumb</p>
+<p>If the question is about <strong>one package's internals</strong>, it's an R-tool job.
+If the question is about <strong>how packages relate or ship together</strong>, it's
+an rforge job.</p>
+</div>
+<h2 id="whats-next">What's next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><a href="../ecosystem-orchestration/">Ecosystem orchestration</a></strong> — deep dive on
+  <code>/rforge:impact</code>, <code>/rforge:cascade</code>, <code>/rforge:deps</code> with worked examples.</li>
+<li><strong><a href="../cran-release-prep/">CRAN release prep</a></strong> — <code>/rforge:thorough</code>,
+  <code>/rforge:r:check</code>, <code>/rforge:release</code> end to end.</li>
+<li><strong><a href="../getting-started/">Getting started</a></strong> — if you skipped the basic
+  install + first-analysis walkthrough.</li>
+<li><strong><a href="../../REFCARD/">REFCARD</a></strong> — all 16 commands on one page.</li>
+</ul>
 
 
 

@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/reference/discovery/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/tutorials/ecosystem-orchestration/">
       
       
-        <link rel="prev" href="../../troubleshooting/">
+        <link rel="prev" href="../understanding-modes/">
       
       
-        <link rel="next" href="../deps/">
+        <link rel="next" href="../cran-release-prep/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>discovery - RForge Plugin</title>
+        <title>Ecosystem orchestration - RForge Plugin</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#libdiscoverypy-api-reference" class="md-skip">
+        <a href="#ecosystem-orchestration-impact-cascade-deps" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              discovery
+              Ecosystem orchestration
             
           </span>
         </div>
@@ -264,10 +264,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../../workflows/" class="md-tabs__link">
           
   
@@ -284,12 +286,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../../REFCARD/" class="md-tabs__link">
           
   
@@ -539,24 +539,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -574,7 +579,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -620,7 +625,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -648,7 +653,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/getting-started/" class="md-nav__link">
+      <a href="../getting-started/" class="md-nav__link">
         
   
   
@@ -676,7 +681,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
+      <a href="../rforge-in-the-r-lifecycle/" class="md-nav__link">
         
   
   
@@ -704,7 +709,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/understanding-modes/" class="md-nav__link">
+      <a href="../understanding-modes/" class="md-nav__link">
         
   
   
@@ -729,10 +734,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../tutorials/ecosystem-orchestration/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ecosystem orchestration
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -748,6 +780,103 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-three-commands-and-when-each-fits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The three commands, and when each fits
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-map-the-dependency-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Map the dependency graph
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-assess-the-blast-radius-of-a-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Assess the blast radius of a change
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-plan-the-coordinated-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Plan the coordinated update
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-full-pipeline-end-to-end" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The full pipeline, end to end
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-mini-example-a-non-breaking-refactor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked mini-example: a non-breaking refactor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -760,7 +889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/cran-release-prep/" class="md-nav__link">
+      <a href="../cran-release-prep/" class="md-nav__link">
         
   
   
@@ -788,7 +917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/migrate-from-mcp/" class="md-nav__link">
+      <a href="../migrate-from-mcp/" class="md-nav__link">
         
   
   
@@ -820,29 +949,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -860,7 +984,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1015,8 +1139,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1027,11 +1149,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
         
           
           <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
@@ -1052,7 +1174,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1067,37 +1189,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    discovery
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../reference/discovery/" class="md-nav__link">
         
   
   
@@ -1113,170 +1208,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#module-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Module overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dataclasses" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dataclasses
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Dataclasses">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#class-description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Description
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Ecosystem
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-package" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Package
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Functions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#detect_ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        detect_ecosystem()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#find_r_packages" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        find_r_packages()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_json" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_json()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_text" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_text()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#parse_description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        parse_description()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#read_description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        read_description()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1289,7 +1220,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../deps/" class="md-nav__link">
+      <a href="../../reference/deps/" class="md-nav__link">
         
   
   
@@ -1317,7 +1248,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../status/" class="md-nav__link">
+      <a href="../../reference/status/" class="md-nav__link">
         
   
   
@@ -1345,7 +1276,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../init/" class="md-nav__link">
+      <a href="../../reference/init/" class="md-nav__link">
         
   
   
@@ -1833,10 +1764,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#module-overview" class="md-nav__link">
+  <a href="#the-three-commands-and-when-each-fits" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Module overview
+        The three commands, and when each fits
       
     </span>
   </a>
@@ -1844,135 +1775,68 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dataclasses" class="md-nav__link">
+  <a href="#step-1-map-the-dependency-graph" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Dataclasses
+        Step 1: Map the dependency graph
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Dataclasses">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#class-description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Description
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Ecosystem
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-package" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Package
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#functions" class="md-nav__link">
+  <a href="#step-2-assess-the-blast-radius-of-a-change" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Functions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#detect_ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        detect_ecosystem()
+        Step 2: Assess the blast radius of a change
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#find_r_packages" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#step-3-plan-the-coordinated-update" class="md-nav__link">
     <span class="md-ellipsis">
       
-        find_r_packages()
+        Step 3: Plan the coordinated update
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#format_json" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#the-full-pipeline-end-to-end" class="md-nav__link">
     <span class="md-ellipsis">
       
-        format_json()
+        The full pipeline, end to end
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#format_text" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#worked-mini-example-a-non-breaking-refactor" class="md-nav__link">
     <span class="md-ellipsis">
       
-        format_text()
+        Worked mini-example: a non-breaking refactor
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#parse_description" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        parse_description()
+        What's next
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#read_description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        read_description()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1993,7 +1857,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/reference/discovery.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/tutorials/ecosystem-orchestration.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2001,205 +1865,229 @@
   
 
 
-<h1 id="libdiscoverypy-api-reference"><code>lib/discovery.py</code> — API Reference<a class="headerlink" href="#libdiscoverypy-api-reference" title="Permanent link">&para;</a></h1>
+<h1 id="ecosystem-orchestration-impact-cascade-deps">🔗 Ecosystem orchestration: impact, cascade, deps<a class="headerlink" href="#ecosystem-orchestration-impact-cascade-deps" title="Permanent link">&para;</a></h1>
+<div class="admonition tip">
+<p class="admonition-title">TL;DR (30 seconds)</p>
+<ul>
+<li><strong>What:</strong> Coordinate changes across several inter-dependent R packages.</li>
+<li><strong>Why:</strong> A change to a core package ripples outward — these commands show the blast radius <em>before</em> you commit.</li>
+<li><strong>How:</strong> <code>/rforge:deps</code> (map) → <code>/rforge:impact</code> (blast radius) → <code>/rforge:cascade</code> (plan).</li>
+<li><strong>Next:</strong> <a href="../cran-release-prep/">CRAN release prep</a> once the cascade is done.</li>
+</ul>
+</div>
 <blockquote>
-<p>Auto-generated by <code>scripts/gen_lib_reference.py</code>. Do not edit by hand — re-run the generator to update.</p>
+<p><strong>For whom:</strong> Maintainer of multiple related R packages (a "verse").
+<strong>Estimated time:</strong> 15 minutes.
+<strong>Prior knowledge:</strong> You've run <a href="../getting-started/">Getting started</a> and
+understand <a href="../rforge-in-the-r-lifecycle/">rforge's role in the lifecycle</a>.</p>
 </blockquote>
-<h2 id="module-overview">Module overview<a class="headerlink" href="#module-overview" title="Permanent link">&para;</a></h2>
-<p>R ecosystem discovery.</p>
-<p>Walks a directory tree looking for R <code>DESCRIPTION</code> files, parses them into
-structured <code>Package</code> records, and classifies the result as a single package,
-an ecosystem, or a hybrid layout.</p>
-<p>Pure Python — no R subprocess, no external deps beyond the stdlib. Ported
-from <code>rforge-mcp/dist/tools/discovery/detect.js</code> (Path B Phase B.1).</p>
-<p>Usage (CLI, from repo root):
-    python3 -m lib.discovery --path . --format text
-    python3 -m lib.discovery --path /path/to/eco --format json</p>
-<p>Usage (Python API):
-    from lib.discovery import detect_ecosystem
-    eco = detect_ecosystem(".")
-    print(eco.kind, [p.name for p in eco.packages])</p>
-<h2 id="dataclasses">Dataclasses<a class="headerlink" href="#dataclasses" title="Permanent link">&para;</a></h2>
-<h3 id="class-description"><code>class Description</code><a class="headerlink" href="#class-description" title="Permanent link">&para;</a></h3>
-<p>Parsed contents of an R DESCRIPTION file.</p>
+<p>This tutorial uses a running example: an ecosystem of four packages where
+<code>medfit</code> is the core and <code>probmed</code>, <code>medsim</code>, and <code>mediationverse</code> build on
+it.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>medfit  ◄── probmed
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>   ▲    ◄── medsim
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>   └─────── mediationverse (also ◄── probmed, medsim)
+</span></code></pre></div>
+<h2 id="the-three-commands-and-when-each-fits">The three commands, and when each fits<a class="headerlink" href="#the-three-commands-and-when-each-fits" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
+<th>Command</th>
+<th>Answers</th>
+<th>Run it…</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>package</code></td>
-<td><code>str</code></td>
-<td>—</td>
+<td><code>/rforge:deps</code></td>
+<td><em>How are these packages wired together?</em></td>
+<td>First, to understand structure</td>
 </tr>
 <tr>
-<td><code>version</code></td>
-<td><code>str</code></td>
-<td>—</td>
+<td><code>/rforge:impact</code></td>
+<td><em>If I change X, what breaks?</em></td>
+<td>Before making a change</td>
 </tr>
 <tr>
-<td><code>title</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
-</tr>
-<tr>
-<td><code>license</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
-</tr>
-<tr>
-<td><code>depends</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
-</tr>
-<tr>
-<td><code>imports</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
-</tr>
-<tr>
-<td><code>suggests</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
-</tr>
-<tr>
-<td><code>linking_to</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
-</tr>
-<tr>
-<td><code>url</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
+<td><code>/rforge:cascade</code></td>
+<td><em>In what order, and how long, to update everything?</em></td>
+<td>After deciding to change X</td>
 </tr>
 </tbody>
 </table>
-<h3 id="class-ecosystem"><code>class Ecosystem</code><a class="headerlink" href="#class-ecosystem" title="Permanent link">&para;</a></h3>
-<p>Result of <code>detect_ecosystem()</code>.</p>
+<p>They form a pipeline: <strong>map → assess → plan.</strong></p>
+<h2 id="step-1-map-the-dependency-graph">Step 1: Map the dependency graph<a class="headerlink" href="#step-1-map-the-dependency-graph" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>/rforge:deps
+</span></code></pre></div>
+<p>Under the hood this runs the pure-Python deps module — no R required:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.deps<span class="w"> </span>--path<span class="w"> </span>.<span class="w"> </span>--format<span class="w"> </span>text
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>🔗 DEPENDENCY GRAPH
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Level 0 (Core):
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>  └─ medfit
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>Level 1 (Implementations):
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  ├─ probmed → medfit
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>  └─ medsim → medfit
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>Level 2 (Meta):
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>  └─ mediationverse → medfit, probmed, medsim
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>Topological order: medfit → {probmed, medsim} → mediationverse
+</span></code></pre></div>
+<p><strong>Reading it:</strong> the topological order is the <em>safe build/update order</em> —
+always leaves-first. You never update <code>mediationverse</code> before the packages
+it depends on. rforge also flags circular dependencies here if any exist.</p>
+<div class="admonition tip">
+<p class="admonition-title">Want JSON for scripting?</p>
+<p>Every ecosystem command takes <code>--format json</code>:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.deps<span class="w"> </span>--path<span class="w"> </span>.<span class="w"> </span>--format<span class="w"> </span>json
+</span></code></pre></div>
+Pipe it into <code>jq</code> to drive your own automation.</p>
+</div>
+<h2 id="step-2-assess-the-blast-radius-of-a-change">Step 2: Assess the blast radius of a change<a class="headerlink" href="#step-2-assess-the-blast-radius-of-a-change" title="Permanent link">&para;</a></h2>
+<p>You're about to change <code>extract_mediation()</code> in <code>medfit</code>. Before touching
+it, ask what depends on it:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>/rforge:impact
+</span></code></pre></div>
+<p>The command maps to the deps module's impact analysis. For a breaking
+change to <code>medfit</code>:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.deps<span class="w"> </span>--path<span class="w"> </span>.<span class="w"> </span>--format<span class="w"> </span>text<span class="w"> </span>impact<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span>--package<span class="w"> </span>medfit<span class="w"> </span>--change-type<span class="w"> </span>breaking<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span>--affected-exports<span class="w"> </span>extract_mediation
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>⚠️ IMPACT ANALYSIS
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>Severity: HIGH (Breaking change)
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>Affected: 3 packages + indirect
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>Direct Impact:
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>  • probmed: 5 functions, 47 test cases
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>  • medsim: 2 examples, 1 vignette
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>Indirect Impact:
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>  • mediationverse: may need meta-update (via probmed, medsim)
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>Total cascade: 8-12 hours
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>Recommended: Deprecation path + major version bump
+</span></code></pre></div>
+<p><strong><code>--change-type</code> drives the severity.</strong> The realistic options:</p>
 <table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
+<th><code>--change-type</code></th>
+<th>Meaning</th>
+<th>Typical severity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>root</code></td>
-<td><code>str</code></td>
-<td>—</td>
+<td><code>breaking</code></td>
+<td>Signature/behavior change dependents must adapt to</td>
+<td>HIGH / CRITICAL</td>
 </tr>
 <tr>
-<td><code>packages</code></td>
-<td><code>list[Package]</code></td>
-<td>—</td>
+<td><code>feature</code></td>
+<td>Additive — new export, backward compatible</td>
+<td>LOW / MEDIUM</td>
 </tr>
 <tr>
-<td><code>kind</code></td>
-<td><code>Kind</code></td>
-<td>—</td>
+<td><code>fix</code></td>
+<td>Bug fix, no API change</td>
+<td>LOW</td>
 </tr>
 <tr>
-<td><code>mode</code></td>
-<td><code>Mode</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>config_found</code></td>
-<td><code>bool</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>config_path</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
+<td><code>internal</code></td>
+<td>No exported surface affected</td>
+<td>minimal</td>
 </tr>
 </tbody>
 </table>
-<h3 id="class-package"><code>class Package</code><a class="headerlink" href="#class-package" title="Permanent link">&para;</a></h3>
-<p>An R package discovered on disk.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>name</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>version</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>path</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>category</code></td>
-<td><code>Literal['active', 'stable', 'archived']</code></td>
-<td><code>'active'</code></td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td><code>Optional[Description]</code></td>
-<td><code>None</code></td>
-</tr>
-</tbody>
-</table>
-<h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
-<h3 id="detect_ecosystem"><code>detect_ecosystem()</code><a class="headerlink" href="#detect_ecosystem" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">detect_ecosystem</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Ecosystem&#39;</span>
+<p>A <code>feature</code> change to the same package looks very different:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.deps<span class="w"> </span>--path<span class="w"> </span>.<span class="w"> </span>--format<span class="w"> </span>text<span class="w"> </span>impact<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span>--package<span class="w"> </span>medfit<span class="w"> </span>--change-type<span class="w"> </span>feature<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span>--affected-exports<span class="w"> </span>new_helper
 </span></code></pre></div>
-<p>Detect R ecosystem at <code>path</code>.</p>
-<p>Returns an <code>Ecosystem</code> describing the layout: the packages found, their
-classification (single / ecosystem / hybrid), the MCP-compatible mode
-(minimal / standard / full), and whether an <code>.rforge.yaml</code> config exists.</p>
-<p>Raises:
-    FileNotFoundError: if <code>path</code> does not exist.
-    NotADirectoryError: if <code>path</code> exists but is not a directory.</p>
-<h3 id="find_r_packages"><code>find_r_packages()</code><a class="headerlink" href="#find_r_packages" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">find_r_packages</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[Package]&#39;</span>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>📊 IMPACT ANALYSIS
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>Severity: LOW
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>Affected: 0 packages (additive export, no dependents call it yet)
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>Recommended: Minor version bump, no cascade required
 </span></code></pre></div>
-<p>Find all R packages under <code>root</code>, recursing at most <code>max_depth</code> levels.</p>
-<p>Mirrors the MCP server's traversal: if a directory is itself an R package,
-it's recorded and we don't descend into it. Hidden directories (<code>.git</code>,
-<code>.Rproj.user</code>, etc.) are skipped.</p>
-<h3 id="format_json"><code>format_json()</code><a class="headerlink" href="#format_json" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_json</span><span class="p">(</span><span class="n">eco</span><span class="p">:</span> <span class="s1">&#39;Ecosystem&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
+<div class="admonition abstract">
+<p class="admonition-title">Why assess before changing?</p>
+<p>The difference between a 30-minute change and a two-week cascade is
+often invisible until you see the dependent test counts. <code>/rforge:impact</code>
+turns "I hope this is isolated" into a number you can plan around.</p>
+</div>
+<h2 id="step-3-plan-the-coordinated-update">Step 3: Plan the coordinated update<a class="headerlink" href="#step-3-plan-the-coordinated-update" title="Permanent link">&para;</a></h2>
+<p>You've decided to go ahead with the breaking change. Now plan the rollout:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>/rforge:cascade &quot;medfit 1.0.0 → 2.0.0 breaking&quot;
 </span></code></pre></div>
-<p><em>(no docstring)</em></p>
-<h3 id="format_text"><code>format_text()</code><a class="headerlink" href="#format_text" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_text</span><span class="p">(</span><span class="n">eco</span><span class="p">:</span> <span class="s1">&#39;Ecosystem&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>⚠️ CASCADE PLAN: Breaking API change
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>Phase 1: Preparation (Week 1)
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>  1. Add deprecation warnings to medfit
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>  2. Update all docs + write migration guide
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>  ⏱ 4 hours
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>Phase 2: Core Package (Week 2)
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>  1. medfit → 2.0.0 (major bump)
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>     • Implement breaking change
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>     • Update all tests
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>     ⏱ 8 hours
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>
+</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>Phase 3: Dependent Updates (Weeks 3-4)
+</span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>  2. probmed → API migration + tests   ⏱ 6 hours
+</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>  3. medsim  → API migration + tests   ⏱ 4 hours
+</span><span id="__span-11-17"><a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>
+</span><span id="__span-11-18"><a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>Phase 4: Meta Package (Week 5)
+</span><span id="__span-11-19"><a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>  4. mediationverse → version alignment ⏱ 1 hour
+</span><span id="__span-11-20"><a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>
+</span><span id="__span-11-21"><a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a>Total: ~23 hours over 5 weeks
+</span><span id="__span-11-22"><a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a>Blockers: medfit must reach CRAN before dependents submit
 </span></code></pre></div>
-<p>Terminal-friendly rendering of an Ecosystem.</p>
-<h3 id="parse_description"><code>parse_description()</code><a class="headerlink" href="#parse_description" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_description</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Description]&#39;</span>
+<p>Add <code>--detailed</code> for the full per-package verification checklist:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>/rforge:cascade &quot;medfit 2.0.0 breaking&quot; --detailed
 </span></code></pre></div>
-<p>Parse the content of a DESCRIPTION file.</p>
-<p>DESCRIPTION uses an RFC-822-ish format: <code>Field: value</code> lines, with
-indented continuation lines belonging to the previous field.</p>
-<h3 id="read_description"><code>read_description()</code><a class="headerlink" href="#read_description" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_description</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Description]&#39;</span>
+<p><strong>The cascade respects the topological order from Step 1</strong> — core first,
+meta last — so you never update a package before its dependencies are ready.</p>
+<h2 id="the-full-pipeline-end-to-end">The full pipeline, end to end<a class="headerlink" href="#the-full-pipeline-end-to-end" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart LR
+    A["/rforge:deps&lt;br/&gt;map structure"] --&gt; B["/rforge:impact&lt;br/&gt;--change-type breaking&lt;br/&gt;assess blast radius"]
+    B --&gt; C{"Severity&lt;br/&gt;acceptable?"}
+    C -- "yes" --&gt; D["/rforge:cascade&lt;br/&gt;plan the rollout"]
+    C -- "reconsider" --&gt; E["Redesign as&lt;br/&gt;--change-type feature&lt;br/&gt;+ deprecation path"]
+    E --&gt; B
+    D --&gt; F["Execute updates&lt;br/&gt;in topological order"]
+    F --&gt; G["/rforge:release&lt;br/&gt;(see CRAN tutorial)"]</code></pre>
+<h2 id="worked-mini-example-a-non-breaking-refactor">Worked mini-example: a non-breaking refactor<a class="headerlink" href="#worked-mini-example-a-non-breaking-refactor" title="Permanent link">&para;</a></h2>
+<p>Not every change is a crisis. Here's the common case — an internal refactor
+of <code>medfit</code> with no API change:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>/rforge:impact          # --change-type internal
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>→ Severity: minimal, 0 dependents affected
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>/rforge:quick           # 10s sanity snapshot
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>→ ✅ ecosystem healthy
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a># ... make the change, run devtools::test() in medfit ...
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>/rforge:cascade
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>→ No cascade needed — change is internal to medfit
 </span></code></pre></div>
-<p>Read and parse a DESCRIPTION file. Returns None on any error.</p>
+<p>When impact is minimal, skip the cascade entirely. The tools tell you when
+coordination <em>isn't</em> needed, which is just as valuable.</p>
+<h2 id="whats-next">What's next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><a href="../cran-release-prep/">CRAN release prep</a></strong> — once your cascade is
+  executed, turn it into an ordered CRAN submission.</li>
+<li><strong><a href="../../REFCARD/">REFCARD</a></strong> — <code>deps</code>, <code>impact</code>, <code>cascade</code>, <code>release</code>
+  syntax at a glance.</li>
+<li><strong><a href="../../reference/deps/">deps API reference</a></strong> — the underlying
+  <code>lib.deps</code> call signatures for scripting.</li>
+</ul>
 
 
 

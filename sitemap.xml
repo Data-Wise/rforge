@@ -2,98 +2,122 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://data-wise.github.io/rforge/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/QUICK-START/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/REFCARD/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/architecture/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/commands/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/configuration/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/hooks-and-skills/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/installation/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/lib-modules/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/quickstart/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/troubleshooting/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/migration/rforge-mcp-deprecation/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/migration/v1.3.0-post-merge-checklist/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/migration/v2.0.0-rename/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/reference/deps/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/reference/discovery/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/reference/init/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/reference/status/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/specs/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/specs/SPEC-diff-aware-checks-and-coverage-2026-05-31/</loc>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/specs/SPEC-mcp-absorb-2026-05-10/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/specs/SPEC-phase3-namespacing-2026-05-11/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/tutorials/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/tutorials/cran-release-prep/</loc>
+         <lastmod>2026-06-01</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/tutorials/ecosystem-orchestration/</loc>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/tutorials/getting-started/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/tutorials/migrate-from-mcp/</loc>
-         <lastmod>2026-05-12</lastmod>
+         <lastmod>2026-06-01</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/tutorials/rforge-in-the-r-lifecycle/</loc>
+         <lastmod>2026-06-01</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/tutorials/understanding-modes/</loc>
+         <lastmod>2026-06-01</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/workflows/</loc>
+         <lastmod>2026-06-01</lastmod>
     </url>
 </urlset>

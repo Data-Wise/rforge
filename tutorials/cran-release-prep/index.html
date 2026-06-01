@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/reference/discovery/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/tutorials/cran-release-prep/">
       
       
-        <link rel="prev" href="../../troubleshooting/">
+        <link rel="prev" href="../ecosystem-orchestration/">
       
       
-        <link rel="next" href="../deps/">
+        <link rel="next" href="../migrate-from-mcp/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>discovery - RForge Plugin</title>
+        <title>CRAN release prep - RForge Plugin</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#libdiscoverypy-api-reference" class="md-skip">
+        <a href="#cran-release-prep-thorough-rcheck-release" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              discovery
+              CRAN release prep
             
           </span>
         </div>
@@ -264,10 +264,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../../workflows/" class="md-tabs__link">
           
   
@@ -284,12 +286,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../../REFCARD/" class="md-tabs__link">
           
   
@@ -539,24 +539,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -574,7 +579,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -620,7 +625,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -648,7 +653,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/getting-started/" class="md-nav__link">
+      <a href="../getting-started/" class="md-nav__link">
         
   
   
@@ -676,7 +681,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
+      <a href="../rforge-in-the-r-lifecycle/" class="md-nav__link">
         
   
   
@@ -704,7 +709,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/understanding-modes/" class="md-nav__link">
+      <a href="../understanding-modes/" class="md-nav__link">
         
   
   
@@ -732,7 +737,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/ecosystem-orchestration/" class="md-nav__link">
+      <a href="../ecosystem-orchestration/" class="md-nav__link">
         
   
   
@@ -757,10 +762,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../tutorials/cran-release-prep/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRAN release prep
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -776,6 +808,114 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-release-pipeline-at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The release pipeline at a glance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-catch-documentation-drift-early" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Catch documentation drift early
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-run-r-cmd-check-with-smart-parsing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Run R CMD check with smart parsing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-roll-up-the-whole-ecosystem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Roll up the whole ecosystem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-plan-the-submission-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Plan the submission order
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-realistic-single-package-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A realistic single-package release
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pre-submission-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pre-submission checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -788,7 +928,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/migrate-from-mcp/" class="md-nav__link">
+      <a href="../migrate-from-mcp/" class="md-nav__link">
         
   
   
@@ -820,29 +960,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -860,7 +995,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1015,8 +1150,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1027,11 +1160,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
         
           
           <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
@@ -1052,7 +1185,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1067,37 +1200,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    discovery
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../reference/discovery/" class="md-nav__link">
         
   
   
@@ -1113,170 +1219,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#module-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Module overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dataclasses" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dataclasses
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Dataclasses">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#class-description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Description
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Ecosystem
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-package" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Package
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Functions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#detect_ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        detect_ecosystem()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#find_r_packages" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        find_r_packages()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_json" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_json()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_text" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_text()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#parse_description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        parse_description()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#read_description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        read_description()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1289,7 +1231,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../deps/" class="md-nav__link">
+      <a href="../../reference/deps/" class="md-nav__link">
         
   
   
@@ -1317,7 +1259,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../status/" class="md-nav__link">
+      <a href="../../reference/status/" class="md-nav__link">
         
   
   
@@ -1345,7 +1287,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../init/" class="md-nav__link">
+      <a href="../../reference/init/" class="md-nav__link">
         
   
   
@@ -1833,10 +1775,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#module-overview" class="md-nav__link">
+  <a href="#the-release-pipeline-at-a-glance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Module overview
+        The release pipeline at a glance
       
     </span>
   </a>
@@ -1844,135 +1786,79 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dataclasses" class="md-nav__link">
+  <a href="#step-1-catch-documentation-drift-early" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Dataclasses
+        Step 1: Catch documentation drift early
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Dataclasses">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#class-description" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Description
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Ecosystem
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#class-package" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Package
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#functions" class="md-nav__link">
+  <a href="#step-2-run-r-cmd-check-with-smart-parsing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Functions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#detect_ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        detect_ecosystem()
+        Step 2: Run R CMD check with smart parsing
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#find_r_packages" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#step-3-roll-up-the-whole-ecosystem" class="md-nav__link">
     <span class="md-ellipsis">
       
-        find_r_packages()
+        Step 3: Roll up the whole ecosystem
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#format_json" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#step-4-plan-the-submission-order" class="md-nav__link">
     <span class="md-ellipsis">
       
-        format_json()
+        Step 4: Plan the submission order
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#format_text" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#a-realistic-single-package-release" class="md-nav__link">
     <span class="md-ellipsis">
       
-        format_text()
+        A realistic single-package release
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#parse_description" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#pre-submission-checklist" class="md-nav__link">
     <span class="md-ellipsis">
       
-        parse_description()
+        Pre-submission checklist
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#read_description" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        read_description()
+        What's next
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1993,7 +1879,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/reference/discovery.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/tutorials/cran-release-prep.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2001,205 +1887,198 @@
   
 
 
-<h1 id="libdiscoverypy-api-reference"><code>lib/discovery.py</code> — API Reference<a class="headerlink" href="#libdiscoverypy-api-reference" title="Permanent link">&para;</a></h1>
+<h1 id="cran-release-prep-thorough-rcheck-release">📦 CRAN release prep: thorough, r:check, release<a class="headerlink" href="#cran-release-prep-thorough-rcheck-release" title="Permanent link">&para;</a></h1>
+<div class="admonition tip">
+<p class="admonition-title">TL;DR (30 seconds)</p>
+<ul>
+<li><strong>What:</strong> Take one or more packages from "code complete" to "submitted to CRAN."</li>
+<li><strong>Why:</strong> rforge sequences the submission and surfaces drift; R does the heavy <code>R CMD check</code>.</li>
+<li><strong>How:</strong> <code>/rforge:docs:check</code> → <code>/rforge:r:check</code> → <code>/rforge:thorough</code> → <code>/rforge:release</code>.</li>
+<li><strong>Next:</strong> Submit via CRAN's web form (rforge plans the order; it doesn't upload).</li>
+</ul>
+</div>
 <blockquote>
-<p>Auto-generated by <code>scripts/gen_lib_reference.py</code>. Do not edit by hand — re-run the generator to update.</p>
+<p><strong>For whom:</strong> Maintainer preparing a CRAN submission (single package or
+ecosystem).
+<strong>Estimated time:</strong> 15 minutes to read; the actual checks take longer
+because <code>R CMD check</code> is slow.
+<strong>Prior knowledge:</strong> You've built the package and want to ship it.</p>
 </blockquote>
-<h2 id="module-overview">Module overview<a class="headerlink" href="#module-overview" title="Permanent link">&para;</a></h2>
-<p>R ecosystem discovery.</p>
-<p>Walks a directory tree looking for R <code>DESCRIPTION</code> files, parses them into
-structured <code>Package</code> records, and classifies the result as a single package,
-an ecosystem, or a hybrid layout.</p>
-<p>Pure Python — no R subprocess, no external deps beyond the stdlib. Ported
-from <code>rforge-mcp/dist/tools/discovery/detect.js</code> (Path B Phase B.1).</p>
-<p>Usage (CLI, from repo root):
-    python3 -m lib.discovery --path . --format text
-    python3 -m lib.discovery --path /path/to/eco --format json</p>
-<p>Usage (Python API):
-    from lib.discovery import detect_ecosystem
-    eco = detect_ecosystem(".")
-    print(eco.kind, [p.name for p in eco.packages])</p>
-<h2 id="dataclasses">Dataclasses<a class="headerlink" href="#dataclasses" title="Permanent link">&para;</a></h2>
-<h3 id="class-description"><code>class Description</code><a class="headerlink" href="#class-description" title="Permanent link">&para;</a></h3>
-<p>Parsed contents of an R DESCRIPTION file.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>package</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>version</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>title</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
-</tr>
-<tr>
-<td><code>license</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
-</tr>
-<tr>
-<td><code>depends</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
-</tr>
-<tr>
-<td><code>imports</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
-</tr>
-<tr>
-<td><code>suggests</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
-</tr>
-<tr>
-<td><code>linking_to</code></td>
-<td><code>list[str]</code></td>
-<td><code>list()</code></td>
-</tr>
-<tr>
-<td><code>url</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
-</tr>
-</tbody>
-</table>
-<h3 id="class-ecosystem"><code>class Ecosystem</code><a class="headerlink" href="#class-ecosystem" title="Permanent link">&para;</a></h3>
-<p>Result of <code>detect_ecosystem()</code>.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>root</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>packages</code></td>
-<td><code>list[Package]</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>kind</code></td>
-<td><code>Kind</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>mode</code></td>
-<td><code>Mode</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>config_found</code></td>
-<td><code>bool</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>config_path</code></td>
-<td><code>Optional[str]</code></td>
-<td><code>None</code></td>
-</tr>
-</tbody>
-</table>
-<h3 id="class-package"><code>class Package</code><a class="headerlink" href="#class-package" title="Permanent link">&para;</a></h3>
-<p>An R package discovered on disk.</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>name</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>version</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>path</code></td>
-<td><code>str</code></td>
-<td>—</td>
-</tr>
-<tr>
-<td><code>category</code></td>
-<td><code>Literal['active', 'stable', 'archived']</code></td>
-<td><code>'active'</code></td>
-</tr>
-<tr>
-<td><code>description</code></td>
-<td><code>Optional[Description]</code></td>
-<td><code>None</code></td>
-</tr>
-</tbody>
-</table>
-<h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
-<h3 id="detect_ecosystem"><code>detect_ecosystem()</code><a class="headerlink" href="#detect_ecosystem" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">detect_ecosystem</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Ecosystem&#39;</span>
+<div class="admonition warning">
+<p class="admonition-title">Division of labor — read this first</p>
+<p>rforge does <strong>not</strong> run heavy R checks for you, and it does <strong>not</strong>
+upload to CRAN. It <strong>aggregates</strong> lib-module health, <strong>parses</strong> the
+<code>R CMD check</code> output you run, and <strong>plans</strong> the submission order. The
+actual <code>R CMD check --as-cran</code> runs in <em>your</em> shell with <em>your</em> R
+toolchain. This is by design — those checks need R and can take minutes.</p>
+</div>
+<h2 id="the-release-pipeline-at-a-glance">The release pipeline at a glance<a class="headerlink" href="#the-release-pipeline-at-a-glance" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart TD
+    A["/rforge:docs:check&lt;br/&gt;NEWS + doc drift"] --&gt; B["/rforge:r:check&lt;br/&gt;R CMD check, parsed"]
+    B --&gt; C["/rforge:thorough&lt;br/&gt;ecosystem rollup +&lt;br/&gt;R-check recommendations"]
+    C --&gt; D{"All green?"}
+    D -- "no" --&gt; E["Fix blockers&lt;br/&gt;(loop back)"]
+    E --&gt; A
+    D -- "yes" --&gt; F["/rforge:release&lt;br/&gt;CRAN submission order"]
+    F --&gt; G["Submit via&lt;br/&gt;CRAN web form"]</code></pre>
+<h2 id="step-1-catch-documentation-drift-early">Step 1: Catch documentation drift early<a class="headerlink" href="#step-1-catch-documentation-drift-early" title="Permanent link">&para;</a></h2>
+<p>Documentation problems are the most common avoidable CRAN rejection. Check
+first, while fixes are cheap:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/rforge:docs:check
 </span></code></pre></div>
-<p>Detect R ecosystem at <code>path</code>.</p>
-<p>Returns an <code>Ecosystem</code> describing the layout: the packages found, their
-classification (single / ecosystem / hybrid), the MCP-compatible mode
-(minimal / standard / full), and whether an <code>.rforge.yaml</code> config exists.</p>
-<p>Raises:
-    FileNotFoundError: if <code>path</code> does not exist.
-    NotADirectoryError: if <code>path</code> exists but is not a directory.</p>
-<h3 id="find_r_packages"><code>find_r_packages()</code><a class="headerlink" href="#find_r_packages" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">find_r_packages</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[Package]&#39;</span>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>⚠️ DOCUMENTATION CHECK
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>NEWS.md: ⚠️ Missing 3 recent changes
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  • extract_mediation refactor
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>  • New bootstrap method
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  • Bug fix #234
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>Examples: ⚠️ 2 outdated
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>  • README example uses old API
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>  • Vignette 2 has broken code
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>Recommendations:
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>  1. Update NEWS.md (5 min)
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>  2. Update examples (20 min)
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>  3. Regenerate vignettes (10 min)
 </span></code></pre></div>
-<p>Find all R packages under <code>root</code>, recursing at most <code>max_depth</code> levels.</p>
-<p>Mirrors the MCP server's traversal: if a directory is itself an R package,
-it's recorded and we don't descend into it. Hidden directories (<code>.git</code>,
-<code>.Rproj.user</code>, etc.) are skipped.</p>
-<h3 id="format_json"><code>format_json()</code><a class="headerlink" href="#format_json" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_json</span><span class="p">(</span><span class="n">eco</span><span class="p">:</span> <span class="s1">&#39;Ecosystem&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
+<div class="admonition note">
+<p class="admonition-title">The description-sync skill backs this up automatically</p>
+<p>rforge ships a <code>description-sync</code> validation skill that checks your
+<code>DESCRIPTION</code> <code>Version:</code> matches the top entry in <code>NEWS.md</code> /
+<code>CHANGELOG.md</code> — the single most common pre-CRAN slip. It's pure shell,
+needs no R, and runs autonomously. See <a href="../../hooks-and-skills/">Hooks &amp; Skills</a>.</p>
+</div>
+<h2 id="step-2-run-r-cmd-check-with-smart-parsing">Step 2: Run R CMD check with smart parsing<a class="headerlink" href="#step-2-run-r-cmd-check-with-smart-parsing" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/rforge:r:check --as-cran
 </span></code></pre></div>
-<p><em>(no docstring)</em></p>
-<h3 id="format_text"><code>format_text()</code><a class="headerlink" href="#format_text" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_text</span><span class="p">(</span><span class="n">eco</span><span class="p">:</span> <span class="s1">&#39;Ecosystem&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
+<p>This invokes <code>R CMD check --as-cran</code> via Bash and parses the output into a
+scannable summary:</p>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="gu">## Package Check: medfit v2.0.0</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="gu">### Status: 🟡</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="gu">### R CMD Check</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">-</span><span class="w"> </span>Errors: 0
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="k">-</span><span class="w"> </span>Warnings: 0
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="k">-</span><span class="w"> </span>Notes: 1
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>  • checking CRAN incoming feasibility ... NOTE (new submission)
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="gu">### Tests</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="k">-</span><span class="w"> </span>Passed: 187
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="k">-</span><span class="w"> </span>Failed: 0
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="gu">### Documentation</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="k">- [x]</span> All exports documented
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="k">- [x]</span> Examples run
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="k">- [x]</span> README exists
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="gu">### Recommended Actions</span>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="k">1.</span> The single NOTE is the standard &quot;new submission&quot; note — expected, not a blocker.
 </span></code></pre></div>
-<p>Terminal-friendly rendering of an Ecosystem.</p>
-<h3 id="parse_description"><code>parse_description()</code><a class="headerlink" href="#parse_description" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_description</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Description]&#39;</span>
+<div class="admonition tip">
+<p class="admonition-title">NOTEs are not all equal</p>
+<p>A "new submission" NOTE is routine. A NOTE about non-standard files,
+undefined globals, or large installed size needs fixing. rforge's parse
+helps you tell them apart — but the judgment call is yours. Run this on
+each package you're submitting.</p>
+</div>
+<p><code>/rforge:r:check</code> is single-package. For one quick check it's equivalent to
+<code>devtools::check()</code> — use whichever you prefer; rforge's value-add is the
+parsed, consistent summary.</p>
+<h2 id="step-3-roll-up-the-whole-ecosystem">Step 3: Roll up the whole ecosystem<a class="headerlink" href="#step-3-roll-up-the-whole-ecosystem" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/rforge:thorough &quot;Prepare mediationverse for CRAN&quot;
 </span></code></pre></div>
-<p>Parse the content of a DESCRIPTION file.</p>
-<p>DESCRIPTION uses an RFC-822-ish format: <code>Field: value</code> lines, with
-indented continuation lines belonging to the previous field.</p>
-<h3 id="read_description"><code>read_description()</code><a class="headerlink" href="#read_description" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_description</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Description]&#39;</span>
+<p><code>/rforge:thorough</code> runs the status rollup across all packages…</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.status<span class="w"> </span>--path<span class="w"> </span>.<span class="w"> </span>--format<span class="w"> </span>text
 </span></code></pre></div>
-<p>Read and parse a DESCRIPTION file. Returns None on any error.</p>
+<p>…and then <strong>recommends the R-side checks for you to run yourself</strong> (it does
+not run them — that's Step 2's territory, per package):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Recommended R-side checks (run in your shell):
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>  R CMD check --as-cran .
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>  Rscript -e &#39;devtools::test()&#39;
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>  Rscript -e &#39;covr::package_coverage()&#39;
+</span></code></pre></div>
+<p>Paste the results back and rforge combines them with the lib-status rollup
+into a release-readiness summary.</p>
+<div class="admonition abstract">
+<p class="admonition-title">Why thorough doesn't just run everything</p>
+<p>Earlier (MCP-era) versions tried to orchestrate background R tasks.
+v1.3.0 deliberately descoped that: R checks are slow, environment-
+specific, and better run in your own terminal where you can see
+progress and re-run individually. <code>/rforge:thorough</code> focuses on the fast
+aggregation and points you at the right R commands.</p>
+</div>
+<h2 id="step-4-plan-the-submission-order">Step 4: Plan the submission order<a class="headerlink" href="#step-4-plan-the-submission-order" title="Permanent link">&para;</a></h2>
+<p>For an ecosystem, you can't submit in arbitrary order — CRAN needs each
+dependency <em>approved and available</em> before its dependents pass incoming
+checks. <code>/rforge:release</code> computes the sequence:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>/rforge:release
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>🚀 CRAN RELEASE PLAN
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>Submission Order (by dependency):
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>1. medfit v2.0.0
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>   Status: ✅ Ready
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>   Submit: Now
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>2. probmed v1.5.0
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>   Status: ⏳ Waiting (needs medfit on CRAN)
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>   Submit: +2 weeks (after medfit approval)
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>3. medsim v1.3.0
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>   Status: ⏳ Waiting
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>   Submit: +2 weeks
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>4. mediationverse v1.1.0
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>   Status: ⏳ Waiting (needs all deps)
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>   Submit: +4 weeks
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>
+</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>Timeline: 4-6 weeks total
+</span></code></pre></div>
+<p>Add <code>--detailed</code> for per-package readiness with reverse-dependency checks:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/rforge:release --detailed
+</span></code></pre></div>
+<p>If a package isn't ready, the plan tells you exactly what's blocking it:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>1. medfit v2.0.0
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>   Status: ❌ NOT READY
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>   Blockers:
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>     • 3 failing tests
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>     • NEWS.md incomplete
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>     • R CMD check has 1 actionable NOTE
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>   Fix time: ~4 hours
+</span></code></pre></div>
+<p>That's your signal to loop back to Steps 1–2 for that package.</p>
+<h2 id="a-realistic-single-package-release">A realistic single-package release<a class="headerlink" href="#a-realistic-single-package-release" title="Permanent link">&para;</a></h2>
+<p>Most releases are one package, not a whole verse. The condensed flow:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>/rforge:docs:check medfit        # 1. drift check
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>/rforge:r:check --as-cran        # 2. R CMD check (in medfit/)
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>/rforge:thorough &quot;CRAN prep&quot;     # 3. rollup + recommendations
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a># ... fix anything flagged, re-run ...
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>/rforge:release medfit           # 4. confirm it&#39;s ready
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a># → submit via https://cran.r-project.org/submit.html
+</span></code></pre></div>
+<h2 id="pre-submission-checklist">Pre-submission checklist<a class="headerlink" href="#pre-submission-checklist" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] <code>/rforge:docs:check</code> clean (NEWS.md current, examples run)</li>
+<li>[ ] <code>description-sync</code> passes (DESCRIPTION version == NEWS top entry)</li>
+<li>[ ] <code>/rforge:r:check --as-cran</code> → 0 errors, 0 warnings, only benign NOTEs</li>
+<li>[ ] <code>devtools::test()</code> → all passing</li>
+<li>[ ] <code>covr::package_coverage()</code> → acceptable for your project</li>
+<li>[ ] <code>/rforge:release</code> → package shows ✅ Ready</li>
+<li>[ ] For ecosystems: submit in the order <code>/rforge:release</code> gives, waiting
+      for each approval before the next</li>
+</ul>
+<h2 id="whats-next">What's next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><a href="../ecosystem-orchestration/">Ecosystem orchestration</a></strong> — if the
+  release surfaced a needed cross-package change, plan it with
+  <code>/rforge:cascade</code>.</li>
+<li><strong><a href="../../REFCARD/">REFCARD</a></strong> — <code>thorough</code>, <code>r:check</code>, <code>docs:check</code>,
+  <code>release</code> syntax.</li>
+<li><strong><a href="../../configuration/">Configuration</a></strong> — set your <code>cran_mirror</code> and
+  <code>vignette_engine</code> so checks use the right defaults.</li>
+</ul>
 
 
 
