@@ -8,7 +8,14 @@ worktrees:
   - path: ~/.git-worktrees/rforge/feature-r-dev-commands
     branch: feature/r-dev-commands
     created: 2026-05-31
-    purpose: "v2.1.0 r: dev-cycle commands (build/test/document/install/coverage/site/cycle) + lib/rcmd.py. Plan: ORCHESTRATE-r-dev-commands.md. Spec: docs/specs/SPEC-r-dev-commands-2026-05-31.md. Implement in a NEW session cd'd into the worktree. Note: Phase 4 (agents) moves to v2.2.0."
+    status: implementing
+    started: 2026-05-31
+    target: v2.1.0
+    scope: "r: dev-cycle + quality commands (12 new: load/document/test/coverage/build/install/site/cycle/lint/spell/urlcheck/style) + r:check retrofit, backed by lib/rcmd.py. Commands 16 → 28."
+    plan: ORCHESTRATE-r-dev-commands.md (consolidated; 11 TDD tasks)
+    spec: docs/specs/SPEC-r-dev-commands-2026-05-31.md
+    progress: "Plan + spec committed. Implementation started in worktree session 2026-05-31 — no code commits yet (lib/rcmd.py pending Task 1)."
+    notes: "Phase 4 (agents) bumped to v2.2.0. Deferred to own specs: r:deps-sync, scaffolding theme (r:create/use-test/use-package/use-vignette — creation confirmed in mission), r:cran-prep."
 
 recent:
   - date: 2026-06-01
