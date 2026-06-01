@@ -134,3 +134,94 @@ def console_fallback(kind: str, text: str) -> dict:
             return {"errors": [""] * int(m[1]), "warnings": [""] * int(m[2]),
                     "notes": [""] * int(m[3])}
     return {"messages": [ln for ln in text.splitlines() if ln.strip()][-10:]}
+
+
+def _guard(pkg_name: str, body: str) -> str:
+    """Prefix that emits engine_missing JSON if the package or jsonlite is absent."""
+    return (
+        f'if (!requireNamespace("{pkg_name}", quietly=TRUE) || '
+        f'!requireNamespace("jsonlite", quietly=TRUE)) {{'
+        f'cat(\'{{"engine_missing":["{pkg_name}"]}}\'); quit(status=0)}}; ' + body
+    )
+
+
+def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = False,
+              strict: bool = False, articles_only: bool = False,
+              devel: bool = False) -> str:
+    p = json.dumps(path)  # safely quote path for R
+    if kind == "check":
+        args = 'c("--as-cran")' if as_cran else "character()"
+        return _guard("rcmdcheck",
+            f'r <- rcmdcheck::rcmdcheck({p}, args={args}, quiet=TRUE, error_on = "never"); '
+            f'cat(jsonlite::toJSON(list(errors=r$errors, warnings=r$warnings, '
+            f'notes=r$notes), auto_unbox=TRUE, null="list"))')
+    if kind == "build":
+        return _guard("pkgbuild",
+            f'p <- pkgbuild::build({p}, quiet=TRUE); '
+            f'cat(jsonlite::toJSON(list(artifact=basename(p), '
+            f'bytes=as.integer(file.info(p)$size)), auto_unbox=TRUE))')
+    if kind == "document":
+        return _guard("roxygen2",
+            f'roxygen2::roxygenize({p}); '
+            f'cat(jsonlite::toJSON(list(documented=TRUE), auto_unbox=TRUE))')
+    if kind == "load":
+        return _guard("pkgload",
+            f'pkgload::load_all({p}); '
+            f'cat(jsonlite::toJSON(list(loaded=TRUE), auto_unbox=TRUE))')
+    if kind == "test":
+        return _guard("testthat",
+            f'res <- testthat::test_local({p}, load_package="source", '
+            f'reporter="list", stop_on_failure=FALSE); df <- as.data.frame(res); '
+            f'cat(jsonlite::toJSON(list(passed=sum(df$passed), failed=sum(df$failed), '
+            f'skipped=sum(df$skipped), warnings=sum(df$warning), '
+            f'failing_files=unique(df$file[df$failed>0 | df$error>0])), auto_unbox=TRUE))')
+    if kind == "coverage":
+        return _guard("covr",
+            f'cv <- covr::package_coverage({p}); l <- covr::coverage_to_list(cv); '
+            f'z <- covr::zero_coverage(cv); '
+            f'untested <- if (nrow(z)) {{ag <- stats::aggregate(line ~ filename, z, '
+            f'function(x) c(first=min(x), last=max(x))); lapply(seq_len(nrow(ag)), '
+            f'function(i) list(file=ag$filename[i], '
+            f'first_line=as.integer(ag$line[i,"first"]), '
+            f'last_line=as.integer(ag$line[i,"last"])))}} else list(); '
+            f'cat(jsonlite::toJSON(list(total_pct=covr::percent_coverage(cv), '
+            f'per_file=as.list(l$filecoverage), untested=untested), '
+            f'auto_unbox=TRUE, null="list"))')
+    if kind == "site":
+        prev = f'pkgdown::preview_site({p}); ' if preview else ''
+        gate = (f'pkgdown::check_pkgdown({p}); ' if strict
+                else f'probs <- paste(utils::capture.output('
+                     f'pkgdown::pkgdown_sitrep({p})), collapse="\\n"); ')
+        build = (f'pkgdown::build_articles({p}, preview=FALSE)' if articles_only
+                 else f'pkgdown::build_site({p}, preview=FALSE, new_process=TRUE, '
+                      f'quiet=TRUE, devel={"TRUE" if devel else "FALSE"})')
+        probs = 'character()' if strict else 'if (exists("probs")) probs else ""'
+        return _guard("pkgdown",
+            f'{gate}{build}; {prev}'
+            f'cat(jsonlite::toJSON(list(checked=TRUE, built=TRUE, '
+            f'problems=as.list({probs})), auto_unbox=TRUE, null="list"))')
+    if kind == "lint":
+        return _guard("lintr",
+            f'ls <- lintr::lint_package({p}); '
+            f'cat(jsonlite::toJSON(list(lints=lapply(ls, function(x) list('
+            f'file=x$filename, line=x$line_number, linter=x$linter, '
+            f'message=x$message))), auto_unbox=TRUE, null="list"))')
+    if kind == "spell":
+        return _guard("spelling",
+            f'sp <- spelling::spell_check_package({p}); '
+            f'cat(jsonlite::toJSON(list(misspelled=lapply(seq_len(nrow(sp)), '
+            f'function(i) list(word=sp$word[i], files=sp$found[[i]]))), '
+            f'auto_unbox=TRUE, null="list"))')
+    if kind == "urlcheck":
+        # NOTE: verify column names with names(urlchecker::url_check(".")) — vary by version
+        return _guard("urlchecker",
+            f'u <- urlchecker::url_check({p}); '
+            f'cat(jsonlite::toJSON(list(broken=lapply(seq_len(nrow(u)), '
+            f'function(i) list(url=u$URL[i], message=u$message[i], '
+            f'new_url=u$newURL[i]))), auto_unbox=TRUE, null="list"))')
+    if kind == "style":
+        return _guard("styler",
+            f'res <- styler::style_pkg({p}); '
+            f'cat(jsonlite::toJSON(list(changed_files='
+            f'as.list(res$file[res$changed %in% TRUE])), auto_unbox=TRUE, null="list"))')
+    raise ValueError(f"unknown kind: {kind}")

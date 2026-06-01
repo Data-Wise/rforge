@@ -77,3 +77,37 @@ def test_console_fallback_rcmdcheck():
 
 def test_console_fallback_unknown_returns_messages():
     assert "messages" in rcmd.console_fallback("test", "nothing here")
+
+
+@pytest.mark.parametrize("kind,needle", [
+    ("check", "rcmdcheck::rcmdcheck"), ("build", "pkgbuild::build"),
+    ("document", "roxygen2::roxygenize"), ("test", "testthat::test_local"),
+    ("coverage", "covr::package_coverage"), ("site", "pkgdown::build_site"),
+    ("load", "pkgload::load_all"), ("lint", "lintr::lint_package"),
+    ("spell", "spelling::spell_check_package"), ("urlcheck", "urlchecker::url_check"),
+    ("style", "styler::style_pkg"),
+])
+def test_r_snippet_uses_lower_level_engine(kind, needle):
+    src = rcmd.r_snippet(kind, "/tmp/foo")
+    assert needle in src and "jsonlite::toJSON" in src and "devtools::" not in src
+
+
+def test_r_snippet_check_as_cran():
+    src = rcmd.r_snippet("check", "/tmp/foo", as_cran=True)
+    assert "--as-cran" in src and 'error_on = "never"' in src
+
+
+def test_r_snippet_test_uses_load_package_source():
+    assert 'load_package="source"' in rcmd.r_snippet("test", "/tmp/foo")
+
+
+def test_r_snippet_coverage_uses_zero_coverage():
+    assert "zero_coverage" in rcmd.r_snippet("coverage", "/tmp/foo")
+
+
+def test_r_snippet_site_flags():
+    assert "preview_site" in rcmd.r_snippet("site", "/tmp/f", preview=True)
+    assert "preview_site" not in rcmd.r_snippet("site", "/tmp/f")
+    assert "check_pkgdown" in rcmd.r_snippet("site", "/tmp/f", strict=True)
+    assert "pkgdown_sitrep" in rcmd.r_snippet("site", "/tmp/f")  # default
+    assert "build_articles" in rcmd.r_snippet("site", "/tmp/f", articles_only=True)
