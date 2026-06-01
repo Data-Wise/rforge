@@ -114,5 +114,5 @@ flowchart LR
 ## See also
 
 - **[Tutorials](../tutorials/README.md)** — step-by-step versions of every workflow above
-- **[REFCARD](../REFCARD.md)** — all 16 commands on one page
+- **[REFCARD](../REFCARD.md)** — all 28 commands on one page
 - **[Architecture](../architecture.md)** — how the plugin's internals fit together

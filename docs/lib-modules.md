@@ -1,7 +1,7 @@
 # 🐍 Lib Modules (`lib/`)
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** The four pure-Python modules (`discovery`, `deps`, `status`, `init`) that power every command.
+    - **What:** Pure-Python analysis modules (`discovery`, `deps`, `status`, `init`) — no R, no Node — plus `rcmd` (v2.1.0), the R dev-cycle/quality runner behind the `r:` commands.
     - **Why:** No MCP server, no Node, no external deps — just `python3 -m lib.<module>`, fast and scriptable.
     - **How:** Each takes `--path` and `--format text|json`; importable as a Python API too.
     - **Next:** [Reference API docs](reference/discovery.md) for signatures, or [Architecture](architecture.md#path-b-lib-modules) for fit.
@@ -38,6 +38,15 @@ flowchart LR
 |---|---|---|
 | `lib/discovery.py` | `detect_ecosystem`, `find_r_packages`, `parse_description`, `read_description` | `python3 -m lib.discovery --path . --format text\|json` |
 | `lib/deps.py` | `build_graph`, `analyze_impact`, `get_all_dependents`, `get_update_order`, `identify_blockers` | `python3 -m lib.deps [--path .] [--format text\|json] [graph\|impact ...]` |
+| `lib/rcmd.py` | `run`, `normalize`, `find_package`, `r_snippet` (v2.1.0 R-runner) | `python3 -m lib.rcmd --kind <kind> [--path .] [--as-cran] [--preview] [--strict] [--articles-only] [--devel]` |
+
+> **`rcmd` differs from the analysis modules.** `discovery`/`deps`/`status`/`init`
+> are pure-stdlib and never touch R. `rcmd` (v2.1.0) shells out to `Rscript`
+> running lower-level engines (`rcmdcheck`/`pkgbuild`/`roxygen2`/`testthat`/
+> `pkgload`/`covr`/`pkgdown`/`lintr`/`spelling`/`urlchecker`/`styler`) that emit
+> JSON, which it normalizes into one envelope. It backs the 12 `r:` dev-cycle +
+> quality commands and never calls `devtools`. See
+> [reference/rcmd.md](reference/rcmd.md).
 
 ## `lib/discovery.py` — Ecosystem detection
 
@@ -239,14 +248,15 @@ transparently with no copy step.
 ## Testing
 
 ```bash
-python3 -m pytest tests/test_lib_discovery.py tests/test_lib_deps.py tests/test_lib_status.py tests/test_lib_init.py -v
+python3 -m pytest tests/test_lib_discovery.py tests/test_lib_deps.py tests/test_lib_status.py tests/test_lib_init.py tests/test_rcmd.py -v
 ```
 
-65 cases cover DESCRIPTION edge cases, FS traversal, classification,
+110 cases cover DESCRIPTION edge cases, FS traversal, classification,
 graph construction, cycle detection, impact heuristics, blockers,
-`.STATUS` parsing + health-score math, and `~/.rforge/context.json`
-round-trip with idempotency. Integrated into `tests/test-all.sh`
-(full plugin suite — 23 checks).
+`.STATUS` parsing + health-score math, `~/.rforge/context.json`
+round-trip with idempotency, and the `rcmd` envelope/normalizer/snippets
+(R subprocess mocked, so CI stays R-free). Integrated into
+`tests/test-all.sh` (full plugin suite — 30 checks).
 
 ## See also
 
