@@ -388,10 +388,12 @@ lib_reference_in_sync() {
 lib_rcmd_smoke() {
     local out
     out=$(python3 -m lib.rcmd --kind check --path tests/fixtures/mypkg 2>/dev/null)
-    python3 -c "
+    # Feed the envelope via stdin (not string interpolation) so apostrophes,
+    # newlines, and other control chars in real R output can't break parsing.
+    printf '%s' "$out" | python3 -c "
 import json, sys
 try:
-    d = json.loads('''$out''')
+    d = json.load(sys.stdin)
 except Exception as e:
     print(f'Not valid JSON: {e}', file=sys.stderr); sys.exit(1)
 if 'status' not in d:
