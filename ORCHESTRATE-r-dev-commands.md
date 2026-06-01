@@ -1150,6 +1150,88 @@ gh pr create --base dev --title "feat: r: dev-cycle commands (build/test/site + 
 
 ---
 
+## Addendum (2026-05-31, post-research) — SUPERSEDES the snippets it names
+
+Research on `pkgload`/`testthat` and `pkgdown` vignettes refined three things.
+Where this addendum conflicts with earlier tasks, **the addendum wins.**
+
+### A. `r:test` snippet — make the self-load explicit (Task 4)
+
+`testthat::test_local()` already loads the source package via `pkgload::load_all()`
+(default `load_package="source"`); do **not** add a separate `load_all()` (double-load).
+In Task 4's `test` branch of `r_snippet`, change the call to:
+
+```r
+testthat::test_local({p}, load_package="source", reporter="list", stop_on_failure=FALSE)
+```
+
+### B. New command `r:load` (extends Tasks 4, 5, 7) — 8th new command
+
+- **`r_snippet` (Task 4):** add a `load` branch:
+
+```python
+    if kind == "load":
+        return _guard("pkgload",
+            f'pkgload::load_all({p}); cat(\'{{"loaded":true}}\')')
+```
+
+- **`main` choices (Task 5):** add `"load"` to the `--kind` `choices` list.
+- **`normalize` (Task 2):** `load` needs no special block — status falls through
+  to the default (`ok` if exit 0 else `error`); add a test asserting that.
+- **Command file `commands/r/load.md` (Task 7):** mirror `build.md`; engine
+  `pkgload::load_all()`; report 🟢/🔴 + "Loaded {package} into namespace."; relate
+  to `/rforge:r:test`. Add to the Task 9 command tables (now **16 → 24**).
+
+### C. `r:site` snippet + flags (Tasks 4, 5, 7) — pkgdown vignette-aware
+
+Default to `pkgdown_sitrep()` (reports all problems, non-fatal), not the
+fail-fast `check_pkgdown()`. Add flags `--strict`, `--articles-only`, `--devel`.
+
+- **Signature change:** extend `r_snippet(kind, path, as_cran, preview, *,
+  strict=False, articles_only=False, devel=False)` and thread the same kwargs
+  through `run()` and `main()` (add `--strict`, `--articles-only`, `--devel`
+  to the argparse in Task 5; pass them into `run()`).
+- **`site` branch of `r_snippet` (replaces Task 4's `site` branch):**
+
+```python
+    if kind == "site":
+        prev = (f'pkgdown::preview_site({p}); ' if preview else '')
+        gate = (f'pkgdown::check_pkgdown({p}); '          # --strict: abort on first
+                if strict else
+                f'probs <- paste(utils::capture.output('   # default: report all
+                f'pkgdown::pkgdown_sitrep({p})), collapse="\\n"); ')
+        if articles_only:
+            build = f'pkgdown::build_articles({p}, preview=FALSE)'  # reinstall handled in run()
+        else:
+            build = (f'pkgdown::build_site({p}, preview=FALSE, new_process=TRUE, '
+                     f'quiet=TRUE, devel={"TRUE" if devel else "FALSE"})')
+        probs_expr = 'character()' if strict else 'if (exists("probs")) probs else ""'
+        return _guard("pkgdown",
+            f'{gate}{build}; {prev}'
+            f'cat(jsonlite::toJSON(list(checked=TRUE, built=TRUE, '
+            f'problems=as.list({probs_expr})), auto_unbox=TRUE))')
+```
+
+- **`run()` (Task 5):** when `kind=="site"` and `articles_only`, reinstall first
+  (`_install_package(path)`), since standalone `build_articles()` renders the
+  *installed* version. A non-zero exit during the build = **vignette render error**
+  (status `error`); sitrep-only problems with exit 0 = **config/index** (status
+  `warn`) — `_status_for("site", ...)` already encodes this.
+- **`commands/r/site.md` (Task 7):** document the four flags; in Output Format,
+  separate a "### Vignette/render errors" section (when status 🔴) from a
+  "### Config/index problems" section (sitrep warnings). Add the pandoc-missing
+  note (🟡 + install hint).
+
+### D. Tests to add (Task 5/10)
+
+- `test_r_snippet_test_uses_load_package_source` — asserts `load_package="source"`.
+- `test_r_snippet_load_uses_pkgload` — asserts `pkgload::load_all` in `load` snippet.
+- `test_normalize_load_ok` — exit 0 ⇒ `ok`.
+- `test_r_snippet_site_strict_uses_check_pkgdown` / default uses `pkgdown_sitrep`.
+- `test_r_snippet_site_articles_only_uses_build_articles`.
+
+---
+
 ## Self-Review (completed by plan author)
 
 - **Spec coverage:** all 7 commands + `r:check` retrofit (Tasks 6-7), `lib/rcmd.py` with JSON-not-regex + fallback (Tasks 1-5), engine-missing degradation incl. optional covr/pkgdown (Task 5), hook interaction noted in `document.md` (Task 7), testing both gates + R-free CI (Tasks 1-5,10), docs/version/.STATUS (Tasks 8-9). ✅
