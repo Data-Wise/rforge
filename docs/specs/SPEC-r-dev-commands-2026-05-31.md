@@ -46,6 +46,10 @@ and with parsed output, the way `/rforge:r:check` already works.
 | `/rforge:r:install`  | `R CMD INSTALL` (via Bash) or `pkgbuild::build()`+install | No structured result; report installed version + exit status |
 | `/rforge:r:coverage` | `covr::package_coverage()` + `coverage_to_list()`    | Total % + per-file %, lowest offenders |
 | `/rforge:r:site`     | `pkgdown::pkgdown_sitrep()` (report all) → `build_site(preview=FALSE, install=TRUE)` | Flags: `--preview` (`preview_site()`), `--strict` (`check_pkgdown()` fail-fast / CI), `--articles-only` (`build_articles()`, reinstall first), `--devel` (`load_all`, fast iteration). Classify **vignette render errors** (abort) vs **config/index** problems (warn). Needs `pandoc` |
+| `/rforge:r:lint`     | `lintr::lint_package()`                              | Structured lints (file/line/linter/message) → grouped report; read-only. 🟡 if any |
+| `/rforge:r:spell`    | `spelling::spell_check_package()`                    | Misspelled words + locations; AI triages real typos vs WORDLIST. 🟡 if any |
+| `/rforge:r:urlcheck` | `urlchecker::url_check()`                            | Broken/redirected URLs + suggested fix. 🟡 if any |
+| `/rforge:r:style`    | `styler::style_pkg()`                                | **Mutates source** — reformats, then reports the git diff summary (run + show diff; rely on git to undo) |
 | `/rforge:r:cycle`    | `roxygenize()` → `test_local()` → `rcmdcheck()`      | Combined ADHD summary; stops early on hard error |
 
 > **Vignettes/articles:** pkgdown renders `vignettes/*.Rmd` *source* (not the
@@ -65,8 +69,12 @@ for structured counts; report shape unchanged).
 
 - CRAN-specific variants beyond `r:check --as-cran` (`win`, `fast`, `spell`).
 - Version-bump commands — handled by `/rforge:release` + the 4-source bump.
-- Package scaffolding (`usethis::create_package`) — different feature; if
-  wanted, it gets its own spec (`r:create` / extend `/rforge:init`).
+- **Deferred to their own specs** (per BRAINSTORM-r-command-expansion-2026-05-31):
+  `r:deps-sync` (DESCRIPTION dep reconciliation); the **scaffolding theme**
+  `r:create`/`r:use-test`/`r:use-package`/`r:use-vignette` (package creation is
+  in rforge's mission — confirmed — but it's a file-writing/content-drafting
+  shape distinct from run-and-parse, so separate spec); `r:cran-prep`
+  (pre-CRAN orchestrator handing off to `/rforge:release`).
 - The CRAN package literally named `checkthat` — it is a tidyverse
   data-validation tool, unrelated to build/test/site (see Appendix).
 - Any dependency on flow-cli, or on `devtools` (see Architecture).
@@ -122,6 +130,10 @@ Normalized envelope:
   "build":    { "artifact": "foo_0.2.0.tar.gz", "bytes": 184320 },
   "site":     { "checked": true, "built": true, "problems": [] },
   "install":  { "installed_version": "0.2.0", "exit": 0 },
+  "lint":     { "count": 2, "lints": [{"file":"R/foo.R","line":3,"linter":"object_name_linter","message":"..."}] },
+  "spell":    { "count": 1, "misspelled": [{"word":"teh","files":["R/foo.R:3"]}] },
+  "urlcheck": { "count": 1, "broken": [{"url":"http://x","status":404,"new_url":null}] },
+  "style":    { "changed_files": ["R/foo.R"], "count": 1 },
   "engine_missing": [],                       // e.g. ["pkgdown"]
   "messages": ["raw lines worth surfacing verbatim"]
 }
@@ -167,9 +179,11 @@ Confirmed in the dev environment (R 4.6.0): `rcmdcheck` 1.4.0, `testthat`
   required and hint if missing). `pkgload` powers `r:load` and is pulled in
   automatically by `testthat` (it's in testthat's `Imports`), so it is present
   whenever `testthat` is.
-- **Optional (command-specific):** `covr` (r:coverage), `pkgdown` (r:site).
-  These commands must detect absence and emit a clean
-  `install.packages("pkgdown")` hint via `engine_missing[]`, not a stack trace.
+- **Optional (command-specific):** `covr` (r:coverage), `pkgdown` (r:site),
+  `lintr` (r:lint), `spelling` (r:spell), `urlchecker` (r:urlcheck),
+  `styler` (r:style). These commands must detect absence and emit a clean
+  `install.packages("<pkg>")` hint via `engine_missing[]`, not a stack trace
+  (🟡, not 🔴, since each is a single optional command).
 - **System dependency:** `pandoc` is required to render vignettes/articles in
   `r:site`. If absent, `r:site` reports 🟡 with the pandoc-install hint rather
   than a render stack trace.
@@ -226,7 +240,7 @@ Per rforge conventions (~15-file scope):
   retrofit `commands/r/check.md`.
 - `docs/reference/rcmd.md` (generated).
 - README.md + docs/index.md + docs/REFCARD.md command tables and counts
-  (16 → 24 commands).
+  (16 → 28 commands).
 - `mkdocs.yml` nav additions.
 - CHANGELOG.md `[Unreleased]` → `[2.1.0]`.
 - 4-source version bump + live-version doc refs (per CLAUDE.md).
