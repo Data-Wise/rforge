@@ -240,3 +240,16 @@ def test_main_dispatched_exits_zero(tmp_path, monkeypatch, capsys):
     rc = rcmd.main(["--kind", "rhub", "--path", str(tmp_path)])
     out = json.loads(capsys.readouterr().out)
     assert out["status"] == "dispatched" and rc == 0
+
+
+def test_classify_notes_spurious_vs_real():
+    notes = ["New submission", "checking foo ... NOTE\n  undefined global bar"]
+    out = rcmd._classify_notes(notes)
+    assert out[0]["kind"] == "spurious" and out[0]["reason"]
+    assert out[1]["kind"] == "real"
+
+
+def test_normalize_check_includes_notes_classified():
+    raw = {"errors": [], "warnings": [], "notes": ["New submission"]}
+    env = rcmd.normalize("check", raw, 0, None)
+    assert env["check"]["notes_classified"][0]["kind"] == "spurious"

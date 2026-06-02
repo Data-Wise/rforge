@@ -58,6 +58,28 @@ def _parse_json(stdout: str) -> dict | None:
     return None
 
 
+SPURIOUS_NOTE_PATTERNS = [
+    (r"New submission", "expected on first submission"),
+    (r"Days since last update", "resubmitting within CRAN cadence; expected"),
+    (r"checking CRAN incoming feasibility", "informational; incoming checks only"),
+    (r"[Pp]ossibly misspelled words in DESCRIPTION",
+     "CRAN spell-checker flags proper nouns / technical terms"),
+    (r"installed size is", "size note; justify in cran-comments if irreducible"),
+]
+
+
+def _classify_notes(notes) -> list:
+    out = []
+    for n in _as_list(notes):
+        kind, reason = "real", None
+        for pat, why in SPURIOUS_NOTE_PATTERNS:
+            if re.search(pat, str(n)):
+                kind, reason = "spurious", why
+                break
+        out.append({"text": n, "kind": kind, "reason": reason})
+    return out
+
+
 def find_package(path: str = ".") -> dict | None:
     """Return {'package','version'} from DESCRIPTION, or None if not a package."""
     desc = Path(path) / "DESCRIPTION"
@@ -115,6 +137,7 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
         env["version"] = pkg.get("version", "")
     if kind == "check":
         env["check"] = {k: _as_list(raw.get(k)) for k in ("errors", "warnings", "notes")}
+        env["check"]["notes_classified"] = _classify_notes(raw.get("notes"))
     elif kind == "test":
         env["tests"] = {k: raw.get(k, 0) for k in
                         ("passed", "failed", "skipped", "warnings")}
