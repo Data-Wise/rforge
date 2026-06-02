@@ -231,6 +231,7 @@ def test_status_dispatched_for_winbuilder_on_success():
 def test_status_dispatched_engine_missing_is_error():
     # engine_missing takes precedence (downgraded later in run())
     assert rcmd._status_for("winbuilder", {"engine_missing": ["devtools"]}, 0) == "error"
+    assert rcmd._status_for("rhub", {"engine_missing": ["rhub"]}, 0) == "error"
 
 
 def test_main_dispatched_exits_zero(tmp_path, monkeypatch, capsys):
