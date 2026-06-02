@@ -4,7 +4,16 @@ status: Active
 version: 2.1.0 (released)
 last_release: 2026-06-01 v2.1.0 (PR #12 dev → main merge d76a45a, release https://github.com/Data-Wise/rforge/releases/tag/v2.1.0, tap data-wise/tap synced to 2.1.0 + brew install/test green; r: dev-cycle + quality commands, 16→28)
 
-worktrees: []
+worktrees:
+  - path: ~/.git-worktrees/rforge/feature-r-cran-prep
+    branch: feature/r-cran-prep
+    created: 2026-06-01
+    status: planned (handoff — implement in a NEW session cd'd into the worktree)
+    target: v2.2.0
+    scope: "CRAN-submission suite — r:cran-prep orchestrator + r:revdep/r:goodpractice/r:winbuilder/r:rhub + r:check NOTE classifier. 28 → 33 commands. Reuses lib/rcmd.py run()."
+    plan: ORCHESTRATE-r-cran-prep.md (10 TDD tasks)
+    spec: docs/specs/SPEC-r-cran-prep-2026-06-01.md (research: RESEARCH-cran-dev-2026-06-01.md)
+    notes: "Phase 4 (agents) → v2.3.0. winbuilder uses devtools (optional engine, scoped exception). revdep/goodpractice/rhub R-API shapes marked VERIFY-LIVE — Task 9 (live R sanity) is mandatory before PR."
 
 recent:
   - date: 2026-06-01
