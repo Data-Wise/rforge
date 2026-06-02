@@ -1763,6 +1763,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specs/SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    r: dev-cycle + quality commands (v2.1.0)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2207,7 +2235,7 @@
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
-<li><strong>What:</strong> The four pure-Python modules (<code>discovery</code>, <code>deps</code>, <code>status</code>, <code>init</code>) that power every command.</li>
+<li><strong>What:</strong> Pure-Python analysis modules (<code>discovery</code>, <code>deps</code>, <code>status</code>, <code>init</code>) — no R, no Node — plus <code>rcmd</code> (v2.1.0), the R dev-cycle/quality runner behind the <code>r:</code> commands.</li>
 <li><strong>Why:</strong> No MCP server, no Node, no external deps — just <code>python3 -m lib.&lt;module&gt;</code>, fast and scriptable.</li>
 <li><strong>How:</strong> Each takes <code>--path</code> and <code>--format text|json</code>; importable as a Python API too.</li>
 <li><strong>Next:</strong> <a href="../reference/discovery/">Reference API docs</a> for signatures, or <a href="../architecture/#path-b-lib-modules">Architecture</a> for fit.</li>
@@ -2254,8 +2282,22 @@ ecosystem health, or initialize per-user state.</p>
 <td><code>build_graph</code>, <code>analyze_impact</code>, <code>get_all_dependents</code>, <code>get_update_order</code>, <code>identify_blockers</code></td>
 <td><code>python3 -m lib.deps [--path .] [--format text\|json] [graph\|impact ...]</code></td>
 </tr>
+<tr>
+<td><code>lib/rcmd.py</code></td>
+<td><code>run</code>, <code>normalize</code>, <code>find_package</code>, <code>r_snippet</code> (v2.1.0 R-runner)</td>
+<td><code>python3 -m lib.rcmd --kind &lt;kind&gt; [--path .] [--as-cran] [--preview] [--strict] [--articles-only] [--devel]</code></td>
+</tr>
 </tbody>
 </table>
+<blockquote>
+<p><strong><code>rcmd</code> differs from the analysis modules.</strong> <code>discovery</code>/<code>deps</code>/<code>status</code>/<code>init</code>
+are pure-stdlib and never touch R. <code>rcmd</code> (v2.1.0) shells out to <code>Rscript</code>
+running lower-level engines (<code>rcmdcheck</code>/<code>pkgbuild</code>/<code>roxygen2</code>/<code>testthat</code>/
+<code>pkgload</code>/<code>covr</code>/<code>pkgdown</code>/<code>lintr</code>/<code>spelling</code>/<code>urlchecker</code>/<code>styler</code>) that emit
+JSON, which it normalizes into one envelope. It backs the 12 <code>r:</code> dev-cycle +
+quality commands and never calls <code>devtools</code>. See
+<a href="../reference/rcmd/">reference/rcmd.md</a>.</p>
+</blockquote>
 <h2 id="libdiscoverypy-ecosystem-detection"><code>lib/discovery.py</code> — Ecosystem detection<a class="headerlink" href="#libdiscoverypy-ecosystem-detection" title="Permanent link">&para;</a></h2>
 <h3 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h3>
 <p>Walks a directory tree (depth ≤ 2 by default) for R <code>DESCRIPTION</code> files,
@@ -2499,13 +2541,14 @@ for the full migration table mapping old MCP tools to new <code>lib/</code> modu
 <code>~/.rforge/context.json</code> schema MCP used — so user state migrates
 transparently with no copy step.</p>
 <h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/test_lib_discovery.py<span class="w"> </span>tests/test_lib_deps.py<span class="w"> </span>tests/test_lib_status.py<span class="w"> </span>tests/test_lib_init.py<span class="w"> </span>-v
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/test_lib_discovery.py<span class="w"> </span>tests/test_lib_deps.py<span class="w"> </span>tests/test_lib_status.py<span class="w"> </span>tests/test_lib_init.py<span class="w"> </span>tests/test_rcmd.py<span class="w"> </span>-v
 </span></code></pre></div>
-<p>65 cases cover DESCRIPTION edge cases, FS traversal, classification,
+<p>110 cases cover DESCRIPTION edge cases, FS traversal, classification,
 graph construction, cycle detection, impact heuristics, blockers,
-<code>.STATUS</code> parsing + health-score math, and <code>~/.rforge/context.json</code>
-round-trip with idempotency. Integrated into <code>tests/test-all.sh</code>
-(full plugin suite — 23 checks).</p>
+<code>.STATUS</code> parsing + health-score math, <code>~/.rforge/context.json</code>
+round-trip with idempotency, and the <code>rcmd</code> envelope/normalizer/snippets
+(R subprocess mocked, so CI stays R-free). Integrated into
+<code>tests/test-all.sh</code> (full plugin suite — 30 checks).</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../reference/discovery/">Reference: <code>discovery</code> API</a> — auto-extracted signatures + docstrings</li>
