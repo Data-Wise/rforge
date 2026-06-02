@@ -298,7 +298,7 @@ def test_r_snippet_winbuilder_guards_devtools():
 
 def test_r_snippet_rhub_uses_rhub_check():
     src = rcmd.r_snippet("rhub", "/tmp/foo")
-    assert "rhub::rhub_check" in src
+    assert "rhub::rhub_check" in src and 'requireNamespace("rhub"' in src
 
 def test_run_winbuilder_missing_devtools_warns(tmp_path, monkeypatch):
     _write_desc(tmp_path)

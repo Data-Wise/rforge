@@ -39,7 +39,7 @@ python3 -m lib.rcmd --kind rhub --path "<path>"
 ## R-Hub: {package} v{version}
 ### Status: 🚀 dispatched
 - {rhub.note}
-- Run URL: {rhub.run_url} (may be null on first dispatch — check the repo's Actions tab)
+- Run URL: {rhub.run_url} (null until the run-URL capture lands — check the repo's Actions tab for results)
 ````
 
 ## Related Commands
