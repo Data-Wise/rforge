@@ -278,7 +278,9 @@ def test_normalize_revdep_new_problems_is_warn():
 # --- Task 4: r:goodpractice — advisory best-practice bundle (goodpractice) ---
 
 def test_r_snippet_goodpractice_uses_gp():
-    assert "goodpractice::gp" in rcmd.r_snippet("goodpractice", "/tmp/foo")
+    src = rcmd.r_snippet("goodpractice", "/tmp/foo")
+    assert "goodpractice::gp" in src and "jsonlite::toJSON" in src
+    assert "devtools::" not in src
 
 def test_normalize_goodpractice_warns_with_items():
     env = rcmd.normalize("goodpractice", {"checks": ["avoid T/F"]}, 0, None)
