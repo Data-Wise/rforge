@@ -726,6 +726,18 @@ python3 -m lib.rcmd --kind cran-prep --path <pkg>         # full sequence + cran
   new in v2.2.0"); update all `28`→`33` counts; extend `docs/lib-modules.md`
   (new kinds + `dispatched` status + gate/dispatch/advisory tiers); add
   `mkdocs.yml` nav for the new tutorial + any pages.
+- [ ] **Step 1b: Reconcile `commands/release.md`** (boundary fix, see spec
+  "Reconciliation with the existing `/rforge:release`"). NO logic change:
+  - Frontmatter `--detailed` description: `"Show full submission sequence with
+    reverse-dependency checks"` → `"Show full submission sequence with internal
+    dependency-order sequencing"`.
+  - Body: after "Readiness Check", add a line: "This is a **shallow** status
+    summary from `.STATUS`. For the authoritative per-package CRAN gate (runs
+    `R CMD check --as-cran`, generates `cran-comments.md`), run
+    `/rforge:r:cran-prep`."
+  - Related Commands: add `- \`/rforge:r:cran-prep\` - Per-package CRAN-readiness gate`.
+  - Verify `bash tests/test-all.sh` frontmatter/uniqueness still green.
+
 - [ ] **Step 2: New tutorial** `docs/tutorials/cran-submission-with-rforge.md` —
   end-to-end: `r:cran-prep` → read blockers → fix → re-run → `--multi-platform`
   → review `cran-comments.md` → handoff to `/rforge:release`. Add to nav + tutorials/README.
