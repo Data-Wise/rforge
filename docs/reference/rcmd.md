@@ -61,6 +61,14 @@ def r_snippet(kind: 'str', path: 'str', *, as_cran: 'bool' = False, preview: 'bo
 
 _(no docstring)_
 
+### `render_cran_comments()`
+
+```python
+def render_cran_comments(package: 'str', version: 'str', check_env: 'dict', revdep_env: 'dict | None') -> 'str'
+```
+
+_(no docstring)_
+
 ### `run()`
 
 ```python
