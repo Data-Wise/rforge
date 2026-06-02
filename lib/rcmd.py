@@ -404,6 +404,8 @@ def _run_cycle(path: str) -> dict:
 
 def render_cran_comments(package: str, version: str,
                          check_env: dict, revdep_env: dict | None) -> str:
+    # package/version are available for Task 8 (cran-prep command) to prepend
+    # a title line; this function generates only the body sections.
     chk = check_env.get("check", {})
     ne, nw = len(chk.get("errors", [])), len(chk.get("warnings", []))
     classified = chk.get("notes_classified", [])

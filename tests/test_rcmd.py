@@ -344,3 +344,11 @@ def test_cran_comments_flags_real_note_needs_review():
                                        "reason": None}]}}
     text = rcmd.render_cran_comments("foo", "1.0", check_env, None)
     assert "NEEDS REVIEW" in text and "undefined global foo" in text
+
+
+def test_cran_comments_broken_revdep():
+    """Broken packages are listed; empty check_env is handled without crash."""
+    revdep_env = {"revdep": {"broken": ["pkgA", "pkgB"], "new_problems": []}}
+    text = rcmd.render_cran_comments("foo", "0.2.0", {}, revdep_env)
+    assert "Broke 2 package(s): pkgA, pkgB" in text
+    assert "maintainers notified" in text
