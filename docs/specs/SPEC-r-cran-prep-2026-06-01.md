@@ -47,11 +47,13 @@ or a per-package submission orchestrator (#21). `/rforge:release` plans
 | `rhub` | `/rforge:r:rhub` | R-hub v2 `rhub_setup`/`rhub_doctor`/`rhub_check` | dispatch (GH Actions) |
 | — | `/rforge:r:check` (enhanced) | classify NOTEs spurious-vs-real | — |
 
-> **`winbuilder` engine note:** `devtools::check_win_devel()` is the documented
-> path but pulls in devtools. To honor the "no devtools" rule, prefer the
-> lower-level equivalent if one exists; otherwise `winbuilder` MAY depend on
-> devtools as an **optional** engine (degrade to 🟡 + install hint), since it is
-> a single dispatch command, not core. Implementer verifies at build time.
+> **`winbuilder` engine (decided):** uses `devtools::check_win_devel()` — there
+> is no clean lower-level equivalent. `devtools` is an **optional** engine for
+> this single async dispatch command only: the snippet is wrapped in
+> `_guard("devtools", ...)` (a `requireNamespace("devtools")` check) and degrades
+> to 🟡 + `install.packages("devtools")` if absent. The "no devtools" rule still
+> holds for every **gate** command (check/test/build/document/…); `r:winbuilder`
+> is the sole, explicit, scoped exception (it has no parseable result anyway).
 
 ### Out of scope (YAGNI / deferred)
 
@@ -83,9 +85,11 @@ JSON via `jsonlite`; `lib/rcmd.py` normalizes to the common envelope; the
   always `warn` if any advisory items, else `ok` (never `error` — advisory).
   **Opt-in only** (not run by `cran-prep` unless `--goodpractice`); never run
   inside `r:cycle`.
-- **`winbuilder`** — dispatch `check_win_devel()`; returns no parseable result
-  (emailed). New status **`dispatched`**. Envelope notes "results emailed to the
-  DESCRIPTION maintainer; check inbox."
+- **`winbuilder`** — `_guard("devtools", ...)` then dispatch
+  `devtools::check_win_devel()`; returns no parseable result (emailed). New
+  status **`dispatched`**. Envelope notes "results emailed to the DESCRIPTION
+  maintainer; check inbox." If `devtools` is absent → `engine_missing:["devtools"]`
+  → 🟡 + `install.packages("devtools")` hint (same degrade path as covr/pkgdown).
 - **`rhub`** — R-hub v2: ensure `rhub_setup()` (writes `.github/workflows/rhub.yaml`,
   idempotent) → `rhub_doctor()` (validate) → `rhub_check()` (dispatch). Returns
   the GitHub Actions run URL. Status **`dispatched`**; envelope includes the run
@@ -192,10 +196,11 @@ through the single `lib/rcmd.py`. The NOTE classifier lives once in `normalize`.
 Confirmed installed (R 4.6.0): `rcmdcheck`, `pkgbuild`, `roxygen2`, `testthat`,
 `pkgload`, `covr`, `pkgdown`, `lintr`, `urlchecker`, `styler`, `spelling`, `jsonlite`.
 
-- **New required engines (optional, command-specific — degrade to 🟡 + hint):**
-  `revdepcheck` (r:revdep), `goodpractice` (r:goodpractice), `rhub` (r:rhub).
-  `devtools` is acceptable **only** as an optional engine for `r:winbuilder`
-  (single dispatch command) if no lower-level path exists — never for the gate.
+- **New optional engines (command-specific — `requireNamespace` check → 🟡 +
+  `install.packages("<pkg>")` hint via `engine_missing[]`):** `revdepcheck`
+  (r:revdep), `goodpractice` (r:goodpractice), `rhub` (r:rhub), **`devtools`
+  (r:winbuilder only)**. `devtools` is barred from every gate command
+  (check/test/build/document/…) — `r:winbuilder` is the sole exception.
 - **System:** `pandoc` (already noted for `r:site`); a GitHub remote for `r:rhub` v2.
 
 ## Error handling
@@ -261,9 +266,10 @@ Both gates must pass; CI stays R-free (mock `Rscript` / inject fixtures):
 
 ## Open questions / risks
 
-- **`winbuilder` + devtools:** if no devtools-free path exists, it carries an
-  optional devtools dep — acceptable for one dispatch command; flagged for the
-  implementer to confirm.
+- **`winbuilder` + devtools:** RESOLVED (2026-06-01) — `r:winbuilder` uses
+  `devtools::check_win_devel()` with `devtools` as an optional engine behind a
+  `requireNamespace` check (🟡 + install hint if absent). Scoped, explicit
+  exception to the no-devtools rule for this one async dispatch command.
 - **`rhub` v2 requires a GitHub remote + one-time `rhub_setup`** committing a
   workflow file — `r:rhub` should detect/offer this, not silently commit.
 - **`revdep` is slow** (builds downstream pkgs) — document the runtime; keep it
