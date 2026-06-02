@@ -306,3 +306,41 @@ def test_run_winbuilder_missing_devtools_warns(tmp_path, monkeypatch):
     env = rcmd.run("winbuilder", str(tmp_path))
     assert env["status"] == "warn"  # optional engine downgrade
     assert any("devtools" in m for m in env["messages"])
+
+
+# --- Task 6: render_cran_comments — pure markdown generator ---
+
+def test_cran_comments_spurious_note_no_revdep():
+    """revdep_env=None → 'no downstream dependencies'; spurious note is tagged 'expected'."""
+    check_env = {"check": {"errors": [], "warnings": [], "notes": ["New submission"],
+                 "notes_classified": [{"text": "New submission", "kind": "spurious",
+                                       "reason": "expected on first submission"}]}}
+    text = rcmd.render_cran_comments("foo", "0.2.0", check_env, None)
+    assert "## R CMD check results" in text
+    assert "0 errors | 0 warnings | 1 note" in text
+    assert "New submission" in text and "expected on first submission" in text
+    assert "[expected]" in text
+    assert "## Reverse dependencies" in text
+    assert "no downstream dependencies" in text.lower()
+
+
+def test_cran_comments_spurious_note_clean_revdep():
+    """revdep_env provided with no broken packages → 'All reverse dependencies passed'."""
+    check_env = {"check": {"errors": [], "warnings": [], "notes": ["New submission"],
+                 "notes_classified": [{"text": "New submission", "kind": "spurious",
+                                       "reason": "expected on first submission"}]}}
+    revdep_env = {"revdep": {"broken": [], "new_problems": []}}
+    text = rcmd.render_cran_comments("foo", "0.2.0", check_env, revdep_env)
+    assert "## R CMD check results" in text
+    assert "0 errors | 0 warnings | 1 note" in text
+    assert "New submission" in text and "expected on first submission" in text
+    assert "## Reverse dependencies" in text
+    assert "all reverse dependencies passed" in text.lower()
+
+
+def test_cran_comments_flags_real_note_needs_review():
+    check_env = {"check": {"errors": [], "warnings": [],
+                 "notes_classified": [{"text": "undefined global foo", "kind": "real",
+                                       "reason": None}]}}
+    text = rcmd.render_cran_comments("foo", "1.0", check_env, None)
+    assert "NEEDS REVIEW" in text and "undefined global foo" in text

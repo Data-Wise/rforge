@@ -402,6 +402,34 @@ def _run_cycle(path: str) -> dict:
             "engine_missing": [], "messages": []}
 
 
+def render_cran_comments(package: str, version: str,
+                         check_env: dict, revdep_env: dict | None) -> str:
+    chk = check_env.get("check", {})
+    ne, nw = len(chk.get("errors", [])), len(chk.get("warnings", []))
+    classified = chk.get("notes_classified", [])
+    nn = len(classified)
+    lines = [f"## R CMD check results", "",
+             f"{ne} errors | {nw} warnings | {nn} note{'s' if nn != 1 else ''}", ""]
+    if classified:
+        lines.append("Remaining NOTEs:")
+        for c in classified:
+            tag = "expected" if c["kind"] == "spurious" else "NEEDS REVIEW"
+            reason = f" — {c['reason']}" if c.get("reason") else ""
+            lines.append(f"* [{tag}] {c['text'].splitlines()[0]}{reason}")
+        lines.append("")
+    lines += ["## Reverse dependencies", ""]
+    rv = (revdep_env or {}).get("revdep", {})
+    broken = rv.get("broken", [])
+    if not revdep_env:
+        lines.append("There are currently no downstream dependencies for this package.")
+    elif broken:
+        lines.append(f"Broke {len(broken)} package(s): {', '.join(broken)} — "
+                     "maintainers notified.")
+    else:
+        lines.append("All reverse dependencies passed (see revdep/cran.md).")
+    return "\n".join(lines) + "\n"
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python3 -m lib.rcmd",
                                  description="Run an R dev-cycle/quality engine, emit JSON.")
