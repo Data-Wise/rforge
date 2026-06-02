@@ -8,7 +8,7 @@ worktrees:
   - path: ~/.git-worktrees/rforge/feature-r-cran-prep
     branch: feature/r-cran-prep
     created: 2026-06-01
-    status: planned (handoff — implement in a NEW session cd'd into the worktree)
+    status: implementing (started 2026-06-01 — no code commits yet; Task 1 of ORCHESTRATE pending)
     target: v2.2.0
     scope: "CRAN-submission suite — r:cran-prep orchestrator + r:revdep/r:goodpractice/r:winbuilder/r:rhub + r:check NOTE classifier. 28 → 33 commands. Reuses lib/rcmd.py run()."
     plan: ORCHESTRATE-r-cran-prep.md (10 TDD tasks)
