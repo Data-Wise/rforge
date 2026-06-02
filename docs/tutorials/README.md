@@ -17,7 +17,8 @@ scenario and walks through the exact commands and expected output.
 | Wondering how rforge fits with `devtools`/`usethis` | [rforge in the R package lifecycle](rforge-in-the-r-lifecycle.md) | ~12 min |
 | Confused by the `--mode` flag | [Understanding modes](understanding-modes.md) | ~5 min |
 | Managing several inter-dependent packages | [Ecosystem orchestration](ecosystem-orchestration.md) | ~15 min |
-| Preparing a CRAN submission | [CRAN release prep](cran-release-prep.md) | ~15 min |
+| Preparing a CRAN submission — ecosystem ordering | [CRAN release prep](cran-release-prep.md) | ~15 min |
+| Running the full per-package CRAN gate | [CRAN submission with rforge](cran-submission-with-rforge.md) | ~15 min |
 | Coming from `rforge-mcp` (the deprecated MCP server) | [Migrating from rforge-mcp](migrate-from-mcp.md) | ~5 min |
 | Upgrading from v1.x and hit a renamed-command error | [v2.0.0 rename migration](../migration/v2.0.0-rename.md) | ~2 min |
 | Looking up a specific command's syntax | [REFCARD](../REFCARD.md) (not a tutorial) | <1 min |
@@ -50,6 +51,9 @@ flowchart LR
 - **[CRAN release prep](cran-release-prep.md)** — End to end:
   `/rforge:docs:check` → `/rforge:r:check` → `/rforge:thorough` →
   `/rforge:release`. ~15 min.
+- **[CRAN submission with rforge](cran-submission-with-rforge.md)** — Per-package
+  CRAN gate: `/rforge:r:cran-prep` → fix blockers → re-run → `--multi-platform`
+  → review `cran-comments.md` → `/rforge:release`. ~15 min.
 - **[Migrating from rforge-mcp](migrate-from-mcp.md)** — For users
   currently running `rforge-mcp` (the deprecated MCP server). Steps to
   upgrade to v1.3.0+ and clean up the old install. ~5 min.

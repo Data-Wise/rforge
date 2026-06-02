@@ -1,7 +1,7 @@
 # 🐍 Lib Modules (`lib/`)
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** Pure-Python analysis modules (`discovery`, `deps`, `status`, `init`) — no R, no Node — plus `rcmd` (v2.1.0), the R dev-cycle/quality runner behind the `r:` commands.
+    - **What:** Pure-Python analysis modules (`discovery`, `deps`, `status`, `init`) — no R, no Node — plus `rcmd` (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the `r:` commands.
     - **Why:** No MCP server, no Node, no external deps — just `python3 -m lib.<module>`, fast and scriptable.
     - **How:** Each takes `--path` and `--format text|json`; importable as a Python API too.
     - **Next:** [Reference API docs](reference/discovery.md) for signatures, or [Architecture](architecture.md#path-b-lib-modules) for fit.
@@ -38,14 +38,19 @@ flowchart LR
 |---|---|---|
 | `lib/discovery.py` | `detect_ecosystem`, `find_r_packages`, `parse_description`, `read_description` | `python3 -m lib.discovery --path . --format text\|json` |
 | `lib/deps.py` | `build_graph`, `analyze_impact`, `get_all_dependents`, `get_update_order`, `identify_blockers` | `python3 -m lib.deps [--path .] [--format text\|json] [graph\|impact ...]` |
-| `lib/rcmd.py` | `run`, `normalize`, `find_package`, `r_snippet` (v2.1.0 R-runner) | `python3 -m lib.rcmd --kind <kind> [--path .] [--as-cran] [--preview] [--strict] [--articles-only] [--devel]` |
+| `lib/rcmd.py` | `run`, `normalize`, `find_package`, `r_snippet`, `_run_cran_prep`, `_cran_prep_envelope`, `render_cran_comments` (v2.2.0 R-runner) | `python3 -m lib.rcmd --kind <kind> [--path .] [--as-cran] [--preview] [--strict] [--articles-only] [--devel] [--goodpractice] [--multi-platform] [--no-revdep]` |
 
 > **`rcmd` differs from the analysis modules.** `discovery`/`deps`/`status`/`init`
-> are pure-stdlib and never touch R. `rcmd` (v2.1.0) shells out to `Rscript`
+> are pure-stdlib and never touch R. `rcmd` (v2.2.0) shells out to `Rscript`
 > running lower-level engines (`rcmdcheck`/`pkgbuild`/`roxygen2`/`testthat`/
 > `pkgload`/`covr`/`pkgdown`/`lintr`/`spelling`/`urlchecker`/`styler`) that emit
-> JSON, which it normalizes into one envelope. It backs the 12 `r:` dev-cycle +
-> quality commands and never calls `devtools`. See
+> JSON, which it normalizes into one envelope. It backs the 17 `r:` dev-cycle +
+> quality + CRAN-submission commands and never calls `devtools` (with the exception
+> of `r:winbuilder` which requires `devtools::check_win_devel()`). CRAN-submission
+> kinds: `revdep`/`goodpractice`/`winbuilder`/`rhub`/`cran-prep` with three tiers:
+> **gate** (revdep — blocks submission), **dispatch** (winbuilder/rhub — async,
+> non-blocking), **advisory** (goodpractice — opt-in). The `dispatched` status
+> is added alongside ok/warn/error for async kinds. See
 > [reference/rcmd.md](reference/rcmd.md).
 
 ## `lib/discovery.py` — Ecosystem detection

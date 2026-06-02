@@ -4,11 +4,11 @@
 > Follows the global `~/.claude/CLAUDE.md`; this file only captures
 > rforge-specific patterns that don't apply to other dev-tools repos.
 
-## Current state (2026-06-01)
+## Current state (2026-06-02)
 
-**v2.1.0 released** — 28 commands. v2.1.0 added 12 `r:` dev-cycle + quality commands (`load`/`document`/`test`/`coverage`/`build`/`install`/`site`/`cycle` + `lint`/`spell`/`urlcheck`/`style`) backed by `lib/rcmd.py`; `r:check` retrofitted onto it. v2.0.0 (2026-05-12) introduced sub-namespacing (`docs:check`, `r:check`, `health`); v1.3.0 absorbed `rforge-mcp` into pure-Python `lib/*` modules.
+**v2.2.0 in-progress (feature/r-cran-prep)** — 33 commands. v2.2.0 adds 5 `r:` CRAN-submission commands (`r:revdep`/`r:goodpractice`/`r:winbuilder`/`r:rhub`/`r:cran-prep`) plus `r:check` NOTE classifier (`notes_classified` field). v2.1.0 added 12 `r:` dev-cycle + quality commands (`load`/`document`/`test`/`coverage`/`build`/`install`/`site`/`cycle` + `lint`/`spell`/`urlcheck`/`style`) backed by `lib/rcmd.py`; `r:check` retrofitted onto it. v2.0.0 (2026-05-12) introduced sub-namespacing (`docs:check`, `r:check`, `health`); v1.3.0 absorbed `rforge-mcp` into pure-Python `lib/*` modules.
 
-**Open backlog** (`.STATUS`): Issue #9 (feedback watch) → Phase 4 (agents, v2.2.0) → deferred specs (see `BRAINSTORM-r-command-expansion-2026-05-31.md`): `r:deps-sync`, scaffolding theme (`r:create`/`r:use-test`/…), `r:cran-prep` → Path B v1.4.0 (4-mode status, parked).
+**Open backlog** (`.STATUS`): Issue #9 (feedback watch) → Phase 4 (agents, v2.3.0) → deferred specs (see `BRAINSTORM-r-command-expansion-2026-05-31.md`): `r:deps-sync`, scaffolding theme (`r:create`/`r:use-test`/…) → Path B v1.4.0 (4-mode status, parked).
 
 ## Branch architecture
 
@@ -37,7 +37,7 @@ The `lib/` directory is a Python package (has `__init__.py`). Modules use relati
 - **Run modules as a package**: `python3 -m lib.<module>` (e.g., `python3 -m lib.discovery`)
 - **Never**: `python3 lib/<module>.py` — breaks relative imports
 - **Public modules** (with `docs/reference/` pages): `discovery`, `deps`, `status`, `init`, `rcmd`
-- **R-runner module** (`rcmd`, v2.1.0): unlike the analysis modules (pure-stdlib, no R), `rcmd` shells out to `Rscript` running lower-level R engines (`rcmdcheck`/`pkgbuild`/`roxygen2`/`testthat`/`pkgload`/`covr`/`pkgdown`/`lintr`/`spelling`/`urlchecker`/`styler`) which emit JSON; it normalizes to one envelope. Backs the 12 `r:` commands. Never calls `devtools`.
+- **R-runner module** (`rcmd`, v2.2.0): unlike the analysis modules (pure-stdlib, no R), `rcmd` shells out to `Rscript` running lower-level R engines (`rcmdcheck`/`pkgbuild`/`roxygen2`/`testthat`/`pkgload`/`covr`/`pkgdown`/`lintr`/`spelling`/`urlchecker`/`styler`/`revdepcheck`/`goodpractice`/`rhub`) which emit JSON; it normalizes to one envelope. Backs the 17 `r:` commands. The `devtools` engine is used only by `r:winbuilder`.
 - **Internal module** (no reference page, subject to refactor): `formatters` — used from command prompts; if importing externally, copy don't reuse
 - **Auto-generated reference docs**: `docs/reference/{discovery,deps,status,init,rcmd}.md` are produced by `scripts/gen_lib_reference.py`
 - **CI gate**: `scripts/gen_lib_reference.py --check` compares regenerated output against committed files; any drift fails CI
@@ -69,7 +69,7 @@ The `arguments:` array is the machine-readable spec; the `## Usage` body is the 
 Both must pass before any PR:
 
 - `bash tests/test-all.sh` — **30 checks** (versions, hook compile + behavior, manifests parse, skills valid, lib pytest, lib CLI smoke incl. `rcmd`, lib reference docs in sync, rename stubs/targets, command-name uniqueness, migration recipe E2E)
-- `python3 -m pytest tests/` — **110 lib/\* cases** (discovery, deps, status, init, rcmd)
+- `python3 -m pytest tests/` — **136 lib/\* cases** (discovery, deps, status, init, rcmd)
 
 ## Homebrew tap quirks (rforge-specific)
 
