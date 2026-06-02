@@ -260,6 +260,7 @@ def test_normalize_check_includes_notes_classified():
 def test_r_snippet_revdep_uses_revdepcheck():
     src = rcmd.r_snippet("revdep", "/tmp/foo")
     assert "revdepcheck" in src and "jsonlite::toJSON" in src
+    assert "devtools::" not in src
 
 def test_normalize_revdep_broken_is_error():
     env = rcmd.normalize("revdep", {"broken": ["pkgA"], "new_problems": []}, 0, None)

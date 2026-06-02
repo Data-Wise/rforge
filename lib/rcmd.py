@@ -301,6 +301,11 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             f'cat(jsonlite::toJSON(list(changed_files='
             f'as.list(res$file[res$changed %in% TRUE])), auto_unbox=TRUE, null="list"))')
     if kind == "revdep":
+        # NOTE: num_workers=4 is a fixed default (no CLI flag yet — add one to
+        # main() if CI core counts become a problem). new_problems and failures
+        # are hardcoded empty pending Task 9 live verification of revdepcheck's
+        # revdep_summary accessors; only `broken` is extracted today. The
+        # envelope keys stay stable so the renderer/orchestrator don't change.
         return _guard("revdepcheck",
             f'revdepcheck::revdep_check({p}, num_workers=4, quiet=TRUE); '
             f'br <- tryCatch(revdepcheck::revdep_summary({p}), error=function(e) list()); '
