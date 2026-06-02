@@ -246,7 +246,7 @@ def test_classify_notes_spurious_vs_real():
     notes = ["New submission", "checking foo ... NOTE\n  undefined global bar"]
     out = rcmd._classify_notes(notes)
     assert out[0]["kind"] == "spurious" and out[0]["reason"]
-    assert out[1]["kind"] == "real"
+    assert out[1]["kind"] == "real" and out[1]["reason"] is None
 
 
 def test_normalize_check_includes_notes_classified():

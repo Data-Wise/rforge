@@ -33,6 +33,7 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
 - Warnings: {len check.warnings}
 - Notes: {len check.notes}
 {list each message as a bullet, if any}
+{If check.notes_classified is non-empty:}
 ### NOTE classification
 {For each check.notes_classified: "🟢 expected — {text}" (kind=spurious) or
  "🔴 needs attention — {text}" (kind=real)}

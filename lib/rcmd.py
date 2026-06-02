@@ -76,6 +76,9 @@ def _classify_notes(notes) -> list:
             if re.search(pat, str(n)):
                 kind, reason = "spurious", why
                 break
+        # rcmdcheck notes are strings; str() above only guards a future dict
+        # note. `text` keeps the original `n` (a string in practice) so
+        # downstream renderers (render_cran_comments) can call .splitlines().
         out.append({"text": n, "kind": kind, "reason": reason})
     return out
 
