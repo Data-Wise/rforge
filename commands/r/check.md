@@ -33,6 +33,9 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
 - Warnings: {len check.warnings}
 - Notes: {len check.notes}
 {list each message as a bullet, if any}
+### NOTE classification
+{For each check.notes_classified: "🟢 expected — {text}" (kind=spurious) or
+ "🔴 needs attention — {text}" (kind=real)}
 ### Recommended Actions
 {1-3 steps, or "None — package is clean ✅"}
 ```
