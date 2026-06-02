@@ -273,3 +273,16 @@ def test_normalize_revdep_clean_is_ok():
 def test_normalize_revdep_new_problems_is_warn():
     env = rcmd.normalize("revdep", {"broken": [], "new_problems": ["pkgB"]}, 0, None)
     assert env["status"] == "warn"
+
+
+# --- Task 4: r:goodpractice — advisory best-practice bundle (goodpractice) ---
+
+def test_r_snippet_goodpractice_uses_gp():
+    assert "goodpractice::gp" in rcmd.r_snippet("goodpractice", "/tmp/foo")
+
+def test_normalize_goodpractice_warns_with_items():
+    env = rcmd.normalize("goodpractice", {"checks": ["avoid T/F"]}, 0, None)
+    assert env["status"] == "warn" and env["goodpractice"]["count"] == 1
+
+def test_normalize_goodpractice_clean_ok():
+    assert rcmd.normalize("goodpractice", {"checks": []}, 0, None)["status"] == "ok"

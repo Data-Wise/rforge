@@ -22,12 +22,12 @@ import sys
 from pathlib import Path
 
 OPTIONAL_ENGINES = {"covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
-                    "revdepcheck"}
+                    "revdepcheck", "goodpractice"}
 INSTALL_HINT = {
     p: f'install.packages("{p}")'
     for p in ("rcmdcheck", "pkgbuild", "roxygen2", "testthat", "pkgload",
               "covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
-              "revdepcheck", "jsonlite")
+              "revdepcheck", "goodpractice", "jsonlite")
 }
 
 
@@ -128,6 +128,8 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
         if raw.get("broken"):
             return "error"
         return "warn" if raw.get("new_problems") else "ok"
+    if kind == "goodpractice":
+        return "warn" if raw.get("checks") else "ok"
     # load, document, install, build, style: success == exit 0
     return "ok" if exit_code == 0 else "error"
 
@@ -188,6 +190,9 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
         env["revdep"] = {"broken": _as_list(raw.get("broken")),
                          "new_problems": _as_list(raw.get("new_problems")),
                          "failures": _as_list(raw.get("failures"))}
+    elif kind == "goodpractice":
+        checks = _as_list(raw.get("checks"))
+        env["goodpractice"] = {"count": len(checks), "checks": checks}
     # load: no extra block — status carries the result
     return env
 
@@ -313,6 +318,14 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             f'error=function(e) character()); '
             f'cat(jsonlite::toJSON(list(broken=broken, new_problems=character(), '
             f'failures=character()), auto_unbox=TRUE, null="list"))')
+    if kind == "goodpractice":
+        # NOTE: failed_checks accessor verified against live R in Task 9;
+        # tryCatch guards against API changes across goodpractice versions.
+        return _guard("goodpractice",
+            f'g <- goodpractice::gp({p}); '
+            f'ck <- tryCatch(as.character(goodpractice::failed_checks(g)), '
+            f'error=function(e) character()); '
+            f'cat(jsonlite::toJSON(list(checks=ck), auto_unbox=TRUE, null="list"))')
     # Task 5 replaces these stubs with real submission snippets.
     if kind == "winbuilder":
         return _guard("devtools",
@@ -391,7 +404,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--kind", required=True,
                     choices=["load", "document", "test", "check", "coverage", "build",
                              "install", "site", "cycle", "lint", "spell", "urlcheck", "style",
-                             "winbuilder", "rhub", "revdep"])
+                             "winbuilder", "rhub", "revdep", "goodpractice"])
     ap.add_argument("--path", default=".")
     ap.add_argument("--as-cran", action="store_true")
     ap.add_argument("--preview", action="store_true")
