@@ -96,6 +96,8 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
         return "ok"  # advisory; untested lines surfaced, never "error"
     if kind in _QUALITY_KEY:
         return "warn" if raw.get(_QUALITY_KEY[kind]) else "ok"
+    if kind in ("winbuilder", "rhub"):
+        return "dispatched" if exit_code == 0 else "error"
     # load, document, install, build, style: success == exit 0
     return "ok" if exit_code == 0 else "error"
 
@@ -143,6 +145,14 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
     elif kind == "style":
         changed = _as_list(raw.get("changed_files"))
         env["style"] = {"count": len(changed), "changed_files": changed}
+    elif kind == "winbuilder":
+        env["winbuilder"] = {"submitted": raw.get("submitted", True),
+                             "note": raw.get("note", "results emailed to the "
+                                     "DESCRIPTION maintainer; check inbox")}
+    elif kind == "rhub":
+        env["rhub"] = {"run_url": raw.get("run_url"),
+                       "note": raw.get("note", "dispatched to GitHub Actions; "
+                               "check the repo's Actions tab")}
     # load: no extra block — status carries the result
     return env
 
@@ -255,6 +265,13 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             f'res <- styler::style_pkg({p}); '
             f'cat(jsonlite::toJSON(list(changed_files='
             f'as.list(res$file[res$changed %in% TRUE])), auto_unbox=TRUE, null="list"))')
+    # Task 5 replaces these stubs with real submission snippets.
+    if kind == "winbuilder":
+        return _guard("devtools",
+            f'cat(\'{{\"submitted\":true}}\')')
+    if kind == "rhub":
+        return _guard("rhub",
+            f'cat(\'{{\"submitted\":true}}\')')
     raise ValueError(f"unknown kind: {kind}")
 
 
@@ -325,7 +342,8 @@ def main(argv: list[str] | None = None) -> int:
                                  description="Run an R dev-cycle/quality engine, emit JSON.")
     ap.add_argument("--kind", required=True,
                     choices=["load", "document", "test", "check", "coverage", "build",
-                             "install", "site", "cycle", "lint", "spell", "urlcheck", "style"])
+                             "install", "site", "cycle", "lint", "spell", "urlcheck", "style",
+                             "winbuilder", "rhub"])
     ap.add_argument("--path", default=".")
     ap.add_argument("--as-cran", action="store_true")
     ap.add_argument("--preview", action="store_true")
@@ -339,6 +357,7 @@ def main(argv: list[str] | None = None) -> int:
         env = run(ns.kind, ns.path, as_cran=ns.as_cran, preview=ns.preview,
                   strict=ns.strict, articles_only=ns.articles_only, devel=ns.devel)
     print(json.dumps(env, indent=2))
+    # "dispatched" (winbuilder/rhub) is non-error — exits 0 like "ok"/"warn"
     return 0 if env.get("status") != "error" else 1
 
 

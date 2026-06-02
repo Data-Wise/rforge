@@ -219,3 +219,23 @@ def test_run_site_recovers_from_build_log(tmp_path, monkeypatch):
                                    '{"checked":true,"built":true,"problems":[""]}', 0))
     env = rcmd.run("site", str(tmp_path))
     assert env["site"]["built"] is True and env["status"] == "ok"
+
+
+# --- Task 1: dispatched status for async engines (winbuilder/rhub) ---
+
+def test_status_dispatched_for_winbuilder_on_success():
+    assert rcmd._status_for("winbuilder", {}, 0) == "dispatched"
+    assert rcmd._status_for("rhub", {}, 0) == "dispatched"
+
+
+def test_status_dispatched_engine_missing_is_error():
+    # engine_missing takes precedence (downgraded later in run())
+    assert rcmd._status_for("winbuilder", {"engine_missing": ["devtools"]}, 0) == "error"
+
+
+def test_main_dispatched_exits_zero(tmp_path, monkeypatch, capsys):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"run_url":"https://x"}', 0))
+    rc = rcmd.main(["--kind", "rhub", "--path", str(tmp_path)])
+    out = json.loads(capsys.readouterr().out)
+    assert out["status"] == "dispatched" and rc == 0
