@@ -288,3 +288,21 @@ def test_normalize_goodpractice_warns_with_items():
 
 def test_normalize_goodpractice_clean_ok():
     assert rcmd.normalize("goodpractice", {"checks": []}, 0, None)["status"] == "ok"
+
+
+# --- Task 5: r:winbuilder + r:rhub — multi-platform dispatch ---
+
+def test_r_snippet_winbuilder_guards_devtools():
+    src = rcmd.r_snippet("winbuilder", "/tmp/foo")
+    assert "devtools::check_win_devel" in src and 'requireNamespace("devtools"' in src
+
+def test_r_snippet_rhub_uses_rhub_check():
+    src = rcmd.r_snippet("rhub", "/tmp/foo")
+    assert "rhub::rhub_check" in src
+
+def test_run_winbuilder_missing_devtools_warns(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"engine_missing":["devtools"]}', 0))
+    env = rcmd.run("winbuilder", str(tmp_path))
+    assert env["status"] == "warn"  # optional engine downgrade
+    assert any("devtools" in m for m in env["messages"])

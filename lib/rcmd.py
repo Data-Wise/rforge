@@ -22,12 +22,12 @@ import sys
 from pathlib import Path
 
 OPTIONAL_ENGINES = {"covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
-                    "revdepcheck", "goodpractice"}
+                    "revdepcheck", "goodpractice", "devtools", "rhub"}
 INSTALL_HINT = {
     p: f'install.packages("{p}")'
     for p in ("rcmdcheck", "pkgbuild", "roxygen2", "testthat", "pkgload",
               "covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
-              "revdepcheck", "goodpractice", "jsonlite")
+              "revdepcheck", "goodpractice", "devtools", "rhub", "jsonlite")
 }
 
 
@@ -326,13 +326,17 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             f'ck <- tryCatch(as.character(goodpractice::failed_checks(g)), '
             f'error=function(e) character()); '
             f'cat(jsonlite::toJSON(list(checks=ck), auto_unbox=TRUE, null="list"))')
-    # Task 5 replaces these stubs with real submission snippets.
     if kind == "winbuilder":
+        # NOTE: devtools::check_win_devel() submission verified live in Task 9.
         return _guard("devtools",
-            f'cat(\'{{\"submitted\":true}}\')')
+            f'devtools::check_win_devel({p}); '
+            f'cat(jsonlite::toJSON(list(submitted=TRUE), auto_unbox=TRUE))')
     if kind == "rhub":
+        # NOTE: rhub::rhub_check() run_url capture verified live in Task 9.
         return _guard("rhub",
-            f'cat(\'{{\"submitted\":true}}\')')
+            f'rhub::rhub_setup({p}); '              # idempotent; writes workflow
+            f'rhub::rhub_check({p}); '
+            f'cat(jsonlite::toJSON(list(run_url=NA), auto_unbox=TRUE))')
     raise ValueError(f"unknown kind: {kind}")
 
 
