@@ -191,6 +191,45 @@ are all new under `r:`). `tests/test-all.sh` command-name-uniqueness must stay g
 existing stage — never inline their snippets. All `r:` commands keep routing
 through the single `lib/rcmd.py`. The NOTE classifier lives once in `normalize`.
 
+### Reconciliation with the existing `/rforge:release` (added 2026-06-01)
+
+A review found the initial "no overlap" claim was directionally right but
+under-specified: **`/rforge:release` already exposes a `--package` (single-package)
+mode and a `--detailed` flag described as "reverse-dependency checks."** That
+created two real confusion points with the new commands, resolved as follows
+(decided 2026-06-01):
+
+**The model — Planner ⊕ Gate (they compose, neither duplicates):**
+
+- **`/rforge:release` = ecosystem PLANNER (advisory).** Computes submission
+  *order* by **internal** dependency topology, timeline, and a **shallow** status
+  summary read from `.STATUS`. It does NOT run `R CMD check --as-cran` or any deep
+  gate. Per-package readiness in `release` is a *summary that defers to
+  `r:cran-prep`* for the authoritative verdict.
+- **`r:cran-prep` = authoritative per-package DEEP gate.** Runs the real R
+  sequence, generates `cran-comments.md`, emits `ready/blocked`. Composes *into*
+  release: release says **what order / when**; cran-prep says **if ready**.
+- **`r:revdep` = sole owner of the term "reverse dependency"** (= external CRAN
+  *downstream* packages, via `revdepcheck`). `release` stops using that phrase.
+
+**Two confusion points + fixes:**
+
+| Collision | Resolution |
+|-----------|------------|
+| Both have a "Readiness Check" (release shallow `.STATUS`; cran-prep deep R gate) | `release` keeps a shallow *summary* but its docs say "for the authoritative per-package gate, run `/rforge:r:cran-prep`". cran-prep is the source of truth. |
+| `release --detailed` says "**reverse-dependency checks**" — collides with `r:revdep` (opposite meaning: internal ordering vs external CRAN downstream) | **Edit `commands/release.md`:** rename to "**internal dependency-order sequencing**". Only `r:revdep` uses "reverse dependency". |
+
+**Mediationverse trace (the test case):** `/rforge:release` → "order =
+`medfit` → {`probmed`, `medsim`} → `mediationverse`, ~5 wks" (conductor). Then per
+package in that order: `r:cran-prep medfit` → deep gate → `ready` → submit
+(instrument). No ambiguity once the wording above is fixed.
+
+**Required `commands/release.md` edit (folded into v2.2.0 — see Documentation
+impact):** (1) `--detailed` description "reverse-dependency checks" →
+"internal dependency-order sequencing"; (2) body: clarify "Readiness Check" is a
+shallow status summary + point to `/rforge:r:cran-prep`; (3) add
+`/rforge:r:cran-prep` to Related Commands. No logic change to `release`.
+
 ## Dependencies
 
 Confirmed installed (R 4.6.0): `rcmdcheck`, `pkgbuild`, `roxygen2`, `testthat`,
@@ -234,6 +273,10 @@ Both gates must pass; CI stays R-free (mock `Rscript` / inject fixtures):
 ## Documentation impact (per directive — full docs in this spec)
 
 - **5 new `commands/r/*.md`** + retrofit `commands/r/check.md` (classified NOTEs).
+- **Edit `commands/r/../release.md`** (the existing `/rforge:release`) — wording
+  reconciliation per the audit section: rename "reverse-dependency checks" →
+  "internal dependency-order sequencing"; clarify "Readiness Check" is shallow +
+  point to `/rforge:r:cran-prep`; add `r:cran-prep` to Related Commands. No logic change.
 - **`docs/reference/rcmd.md`** — regenerate (new functions).
 - **`docs/lib-modules.md`** — extend the `rcmd` row/notes for the new kinds +
   the `dispatched` status; note the gate-vs-dispatch-vs-advisory tiers.
