@@ -400,3 +400,56 @@ def test_cran_prep_warn_on_real_note(tmp_path, monkeypatch):
     env = rcmd._run_cran_prep(str(tmp_path))
     assert env["status"] == "warn"   # real NOTE → not "ready"
     assert any("real NOTE" in b or "real note" in b.lower() for b in env["blockers"])
+
+
+def test_cran_prep_no_description_blocked(tmp_path):
+    env = rcmd._run_cran_prep(str(tmp_path))
+    assert env["status"] == "blocked" and "DESCRIPTION" in env["blockers"][0]
+    assert env["stages"] == []
+
+
+def test_cran_prep_check_error_blocked(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    def fake_run(kind, path, **kw):
+        status = "error" if kind == "check" else "ok"
+        base = {"kind": kind, "status": status, "engine_missing": [], "messages": []}
+        if kind == "check":
+            base["check"] = {"errors": ["E"], "warnings": [], "notes": [],
+                             "notes_classified": []}
+        return base
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cran_prep(str(tmp_path))
+    assert env["status"] == "blocked" and env["failed_stage"] == "check"
+
+
+def test_cran_prep_revdep_error_adds_blocker(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    def fake_run(kind, path, **kw):
+        status = "error" if kind == "revdep" else "ok"
+        base = {"kind": kind, "status": status, "engine_missing": [], "messages": []}
+        if kind == "check":
+            base["check"] = {"errors": [], "warnings": [], "notes": [],
+                             "notes_classified": []}
+        if kind == "revdep":
+            base["revdep"] = {"broken": ["pkgA"], "new_problems": []}
+        return base
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cran_prep(str(tmp_path))
+    assert any("reverse" in b for b in env["blockers"])
+
+
+def test_cran_prep_multi_platform_populates_dispatched(tmp_path, monkeypatch):
+    _write_desc(tmp_path, "foo", "0.2.0")
+    def fake_run(kind, path, **kw):
+        status = "dispatched" if kind in ("winbuilder", "rhub") else "ok"
+        base = {"kind": kind, "status": status, "engine_missing": [], "messages": []}
+        if kind == "check":
+            base["check"] = {"errors": [], "warnings": [], "notes": [],
+                             "notes_classified": []}
+        if kind == "revdep":
+            base["revdep"] = {"broken": [], "new_problems": []}
+        return base
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cran_prep(str(tmp_path), multi_platform=True)
+    assert env["dispatched"] == ["winbuilder", "rhub"]
+    assert env["status"] == "ready"

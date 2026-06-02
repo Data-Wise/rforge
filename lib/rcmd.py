@@ -440,7 +440,7 @@ def _run_cran_prep(path: str = ".", *, no_revdep: bool = False,
                 "blockers": ["No DESCRIPTION — try /rforge:detect"], "stages": [],
                 "messages": []}
     stages, blockers, dispatched = [], [], []
-    check_env = revdep_env = None
+    revdep_env = None  # may stay None when no_revdep=True
 
     def stage(kind, **kw):
         env = run(kind, path, **kw)
@@ -493,6 +493,8 @@ def _run_cran_prep(path: str = ".", *, no_revdep: bool = False,
 
 
 def _cran_prep_envelope(pkg, status, stages, blockers, dispatched, **extra):
+    # status vocab for cran-prep: "ready" / "warn" / "blocked" (extends the
+    # standard "ok"/"warn"/"error"/"dispatched" set used by single-engine kinds)
     env = {"kind": "cran-prep", "status": status,
            "package": pkg.get("package", ""), "version": pkg.get("version", ""),
            "stages": stages, "blockers": blockers, "dispatched": dispatched,
