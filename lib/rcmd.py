@@ -21,12 +21,13 @@ import subprocess
 import sys
 from pathlib import Path
 
-OPTIONAL_ENGINES = {"covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler"}
+OPTIONAL_ENGINES = {"covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
+                    "revdepcheck"}
 INSTALL_HINT = {
     p: f'install.packages("{p}")'
     for p in ("rcmdcheck", "pkgbuild", "roxygen2", "testthat", "pkgload",
               "covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
-              "jsonlite")
+              "revdepcheck", "jsonlite")
 }
 
 
@@ -123,6 +124,10 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
         return "warn" if raw.get(_QUALITY_KEY[kind]) else "ok"
     if kind in ("winbuilder", "rhub"):
         return "dispatched" if exit_code == 0 else "error"
+    if kind == "revdep":
+        if raw.get("broken"):
+            return "error"
+        return "warn" if raw.get("new_problems") else "ok"
     # load, document, install, build, style: success == exit 0
     return "ok" if exit_code == 0 else "error"
 
@@ -179,6 +184,10 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
         env["rhub"] = {"run_url": raw.get("run_url"),
                        "note": raw.get("note", "dispatched to GitHub Actions; "
                                "check the repo's Actions tab")}
+    elif kind == "revdep":
+        env["revdep"] = {"broken": _as_list(raw.get("broken")),
+                         "new_problems": _as_list(raw.get("new_problems")),
+                         "failures": _as_list(raw.get("failures"))}
     # load: no extra block — status carries the result
     return env
 
@@ -291,6 +300,14 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             f'res <- styler::style_pkg({p}); '
             f'cat(jsonlite::toJSON(list(changed_files='
             f'as.list(res$file[res$changed %in% TRUE])), auto_unbox=TRUE, null="list"))')
+    if kind == "revdep":
+        return _guard("revdepcheck",
+            f'revdepcheck::revdep_check({p}, num_workers=4, quiet=TRUE); '
+            f'br <- tryCatch(revdepcheck::revdep_summary({p}), error=function(e) list()); '
+            f'broken <- tryCatch(names(Filter(function(x) isTRUE(x$status=="-"), br)), '
+            f'error=function(e) character()); '
+            f'cat(jsonlite::toJSON(list(broken=broken, new_problems=character(), '
+            f'failures=character()), auto_unbox=TRUE, null="list"))')
     # Task 5 replaces these stubs with real submission snippets.
     if kind == "winbuilder":
         return _guard("devtools",
@@ -369,7 +386,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--kind", required=True,
                     choices=["load", "document", "test", "check", "coverage", "build",
                              "install", "site", "cycle", "lint", "spell", "urlcheck", "style",
-                             "winbuilder", "rhub"])
+                             "winbuilder", "rhub", "revdep"])
     ap.add_argument("--path", default=".")
     ap.add_argument("--as-cran", action="store_true")
     ap.add_argument("--preview", action="store_true")

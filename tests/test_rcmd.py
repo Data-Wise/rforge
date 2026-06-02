@@ -253,3 +253,22 @@ def test_normalize_check_includes_notes_classified():
     raw = {"errors": [], "warnings": [], "notes": ["New submission"]}
     env = rcmd.normalize("check", raw, 0, None)
     assert env["check"]["notes_classified"][0]["kind"] == "spurious"
+
+
+# --- Task 3: r:revdep — reverse-dependency check (revdepcheck) ---
+
+def test_r_snippet_revdep_uses_revdepcheck():
+    src = rcmd.r_snippet("revdep", "/tmp/foo")
+    assert "revdepcheck" in src and "jsonlite::toJSON" in src
+
+def test_normalize_revdep_broken_is_error():
+    env = rcmd.normalize("revdep", {"broken": ["pkgA"], "new_problems": []}, 0, None)
+    assert env["status"] == "error" and env["revdep"]["broken"] == ["pkgA"]
+
+def test_normalize_revdep_clean_is_ok():
+    env = rcmd.normalize("revdep", {"broken": [], "new_problems": []}, 0, None)
+    assert env["status"] == "ok"
+
+def test_normalize_revdep_new_problems_is_warn():
+    env = rcmd.normalize("revdep", {"broken": [], "new_problems": ["pkgB"]}, 0, None)
+    assert env["status"] == "warn"
