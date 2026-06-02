@@ -432,28 +432,106 @@ def render_cran_comments(package: str, version: str,
     return "\n".join(lines) + "\n"
 
 
+def _run_cran_prep(path: str = ".", *, no_revdep: bool = False,
+                   goodpractice: bool = False, multi_platform: bool = False) -> dict:
+    pkg = find_package(path)
+    if pkg is None:
+        return {"kind": "cran-prep", "status": "blocked", "engine_missing": [],
+                "blockers": ["No DESCRIPTION — try /rforge:detect"], "stages": [],
+                "messages": []}
+    stages, blockers, dispatched = [], [], []
+    check_env = revdep_env = None
+
+    def stage(kind, **kw):
+        env = run(kind, path, **kw)
+        stages.append({"kind": kind, "status": env["status"]})
+        return env
+
+    # 1-6: hard sequence (stop at first ERROR)
+    for kind in ("document", "lint", "spell", "urlcheck", "test", "coverage"):
+        env = stage(kind)
+        if env["status"] == "error":
+            blockers.append(f"{kind} failed")
+            return _cran_prep_envelope(pkg, "blocked", stages, blockers, dispatched,
+                                       failed_stage=kind)
+    check_env = stage("check", as_cran=True)
+    if check_env["status"] == "error":
+        blockers.append("R CMD check --as-cran failed (errors/warnings)")
+        return _cran_prep_envelope(pkg, "blocked", stages, blockers, dispatched,
+                                   failed_stage="check")
+    real_notes = [c for c in check_env.get("check", {}).get("notes_classified", [])
+                  if c.get("kind") == "real"]
+    if real_notes:
+        blockers.append(f"{len(real_notes)} real NOTE(s) need attention")
+
+    # revdep (skip if opted out)
+    if not no_revdep:
+        revdep_env = stage("revdep")
+        if revdep_env["status"] == "error":
+            blockers.append("reverse dependencies broken")
+
+    # goodpractice (opt-in, advisory — never blocks)
+    if goodpractice:
+        stage("goodpractice")
+
+    # multi-platform dispatch (async)
+    if multi_platform:
+        for kind in ("winbuilder", "rhub"):
+            env = stage(kind)
+            if env["status"] == "dispatched":
+                dispatched.append(kind)
+
+    # write cran-comments.md
+    text = render_cran_comments(pkg["package"], pkg.get("version", ""),
+                                check_env, revdep_env)
+    cc_path = Path(path) / "cran-comments.md"
+    cc_path.write_text(text)
+
+    status = "ready" if not blockers else "warn"
+    return _cran_prep_envelope(pkg, status, stages, blockers, dispatched,
+                               cran_comments_path=str(cc_path))
+
+
+def _cran_prep_envelope(pkg, status, stages, blockers, dispatched, **extra):
+    env = {"kind": "cran-prep", "status": status,
+           "package": pkg.get("package", ""), "version": pkg.get("version", ""),
+           "stages": stages, "blockers": blockers, "dispatched": dispatched,
+           "engine_missing": [], "messages": [],
+           "handoff": ("ready for /rforge:release ecosystem sequencing"
+                       if status == "ready" else "not yet CRAN-ready")}
+    env.update(extra)
+    return env
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python3 -m lib.rcmd",
                                  description="Run an R dev-cycle/quality engine, emit JSON.")
     ap.add_argument("--kind", required=True,
                     choices=["load", "document", "test", "check", "coverage", "build",
                              "install", "site", "cycle", "lint", "spell", "urlcheck", "style",
-                             "winbuilder", "rhub", "revdep", "goodpractice"])
+                             "winbuilder", "rhub", "revdep", "goodpractice", "cran-prep"])
     ap.add_argument("--path", default=".")
     ap.add_argument("--as-cran", action="store_true")
     ap.add_argument("--preview", action="store_true")
     ap.add_argument("--strict", action="store_true")
     ap.add_argument("--articles-only", action="store_true")
     ap.add_argument("--devel", action="store_true")
+    ap.add_argument("--goodpractice", action="store_true")
+    ap.add_argument("--multi-platform", action="store_true")
+    ap.add_argument("--no-revdep", action="store_true")
     ns = ap.parse_args(argv)
     if ns.kind == "cycle":
         env = _run_cycle(ns.path)
+    elif ns.kind == "cran-prep":
+        env = _run_cran_prep(ns.path, no_revdep=ns.no_revdep,
+                             goodpractice=ns.goodpractice,
+                             multi_platform=ns.multi_platform)
     else:
         env = run(ns.kind, ns.path, as_cran=ns.as_cran, preview=ns.preview,
                   strict=ns.strict, articles_only=ns.articles_only, devel=ns.devel)
     print(json.dumps(env, indent=2))
     # "dispatched" (winbuilder/rhub) is non-error — exits 0 like "ok"/"warn"
-    return 0 if env.get("status") != "error" else 1
+    return 0 if env.get("status") not in ("error", "blocked") else 1
 
 
 if __name__ == "__main__":

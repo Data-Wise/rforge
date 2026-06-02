@@ -352,3 +352,51 @@ def test_cran_comments_broken_revdep():
     text = rcmd.render_cran_comments("foo", "0.2.0", {}, revdep_env)
     assert "Broke 2 package(s): pkgA, pkgB" in text
     assert "maintainers notified" in text
+
+
+# --- Task 7: _run_cran_prep orchestrator ---
+
+def test_cran_prep_stops_at_hard_error(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    calls = []
+    def fake_run(kind, path, **kw):
+        calls.append(kind)
+        status = "error" if kind == "test" else "ok"
+        return {"kind": kind, "status": status, "engine_missing": [], "messages": [],
+                "check": {"errors": [], "warnings": [], "notes": [], "notes_classified": []}}
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cran_prep(str(tmp_path))
+    assert env["status"] == "blocked" and env["failed_stage"] == "test"
+    assert "check" not in calls  # stopped before the gate
+
+def test_cran_prep_ready_when_clean(tmp_path, monkeypatch):
+    _write_desc(tmp_path, "foo", "0.2.0")
+    def fake_run(kind, path, **kw):
+        base = {"kind": kind, "status": "ok", "engine_missing": [], "messages": []}
+        if kind == "check":
+            base["check"] = {"errors": [], "warnings": [], "notes": [], "notes_classified": []}
+        if kind == "revdep":
+            base["revdep"] = {"broken": [], "new_problems": []}
+        return base
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cran_prep(str(tmp_path), no_revdep=False)
+    assert env["status"] == "ready"
+    assert env["cran_comments_path"].endswith("cran-comments.md")
+
+def test_cran_prep_warn_on_real_note(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    def fake_run(kind, path, **kw):
+        base = {"kind": kind, "status": "ok" if kind != "check" else "warn",
+                "engine_missing": [], "messages": []}
+        if kind == "check":
+            base["check"] = {"errors": [], "warnings": [],
+                             "notes": ["undefined global"],
+                             "notes_classified": [{"text": "undefined global",
+                                                   "kind": "real", "reason": None}]}
+        if kind == "revdep":
+            base["revdep"] = {"broken": [], "new_problems": []}
+        return base
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cran_prep(str(tmp_path))
+    assert env["status"] == "warn"   # real NOTE → not "ready"
+    assert any("real NOTE" in b or "real note" in b.lower() for b in env["blockers"])
