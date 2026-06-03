@@ -67,7 +67,11 @@ _(no docstring)_
 def render_cran_comments(package: 'str', version: 'str', check_env: 'dict', revdep_env: 'dict | None') -> 'str'
 ```
 
-_(no docstring)_
+Generate cran-comments.md body from check and revdep envelopes.
+
+Produces the two standard CRAN submission sections: R CMD check results
+(with NOTE classification tags) and reverse dependencies. Pass
+revdep_env=None when no revdep check was run (package has no dependents).
 
 ### `run()`
 

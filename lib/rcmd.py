@@ -404,8 +404,12 @@ def _run_cycle(path: str) -> dict:
 
 def render_cran_comments(package: str, version: str,
                          check_env: dict, revdep_env: dict | None) -> str:
-    # package/version are available for Task 8 (cran-prep command) to prepend
-    # a title line; this function generates only the body sections.
+    """Generate cran-comments.md body from check and revdep envelopes.
+
+    Produces the two standard CRAN submission sections: R CMD check results
+    (with NOTE classification tags) and reverse dependencies. Pass
+    revdep_env=None when no revdep check was run (package has no dependents).
+    """
     chk = check_env.get("check", {})
     ne, nw = len(chk.get("errors", [])), len(chk.get("warnings", []))
     classified = chk.get("notes_classified", [])
@@ -417,7 +421,8 @@ def render_cran_comments(package: str, version: str,
         for c in classified:
             tag = "expected" if c["kind"] == "spurious" else "NEEDS REVIEW"
             reason = f" — {c['reason']}" if c.get("reason") else ""
-            lines.append(f"* [{tag}] {c['text'].splitlines()[0]}{reason}")
+            first_line = (c['text'].splitlines() or [''])[0]
+            lines.append(f"* [{tag}] {first_line}{reason}")
         lines.append("")
     lines += ["## Reverse dependencies", ""]
     rv = (revdep_env or {}).get("revdep", {})
