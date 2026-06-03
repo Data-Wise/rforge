@@ -1,5 +1,5 @@
 project: rforge
-updated: 2026-06-02
+updated: 2026-06-03
 status: Active
 version: 2.2.0 (released)
 last_release: 2026-06-02 v2.2.0 (PR #15 dev → main merge 3b2bdda, release https://github.com/Data-Wise/rforge/releases/tag/v2.2.0, tap data-wise/tap synced to 2.2.0 + brew info green; CRAN-submission suite — r:cran-prep + r:revdep/r:goodpractice/r:winbuilder/r:rhub + NOTE classifier, 28→33 commands)
@@ -253,22 +253,6 @@ After A+B done: backlog is the medium-term roadmap below.
 ---
 
 backlog:
-  # Immediate (post-release housekeeping)
-  - title: "brew upgrade local rforge install to v2.0.0"
-    priority: high
-    effort: "< 1 min"
-    notes: "`brew upgrade data-wise/tap/rforge`. Local Cellar still at 1.3.0 (the previous version we used for the brew-outdated UX demo). Currently /opt/homebrew/opt/rforge points at 1.3.0 install. After upgrade, /rforge:* slash commands will see the v2.0.0 manifest including rename-error stubs."
-  - title: "Phase 2.2 live-test of rename-error stubs (post brew upgrade)"
-    priority: high
-    effort: "5 min"
-    notes: "Carried over from PR #6 review. Now executable from the production v2.0.0 install. Steps: fresh `claude` session → type /rforge:doc-check, /rforge:ecosystem-health, /rforge:rpkg-check → paste verbatim outputs into issue #9 as the first feedback data point. If a stub paraphrases instead of emitting verbatim, file as a v2.0.1 patch."
-
-  # Watch (no active task; passive monitoring)
-  - title: "Issue #9 — v2.0.0 rename feedback collection"
-    url: https://github.com/Data-Wise/rforge/issues/9
-    priority: low
-    notes: "Open-ended feedback thread for rename ergonomics + the deferred /rforge:quick + /rforge:thorough rename decision. Watch ~2-4 weeks; decisions inform v2.1.0 scope."
-
   # Medium-term work (v2.3.0 horizon)
   - title: "Phase 4 — discovery engine + agents (v2.3.0)"
     priority: medium
@@ -281,6 +265,7 @@ backlog:
     notes: "lib/status.py shipped as a thin faithful port in v1.3.0. The 4-mode contract (default/debug/optimize/release with R subprocess) was descoped pending real-user input on what depth is wanted. Open a new SPEC when there's demand."
 
 shipped:
+  - "v2.2.0 — 2026-06-02 — CRAN-submission suite: r:cran-prep orchestrator + r:revdep/r:goodpractice/r:winbuilder/r:rhub + r:check NOTE classifier (spurious/real); 28→33 commands; argument-hint added to all 17 commands lacking it; new tutorials: r-dev-cycle + cran-submission-with-rforge; workflow flowcharts updated"
   - "v2.1.0 — 2026-05-31 — 12 new r: commands (r:load, r:document, r:test, r:coverage, r:build, r:install, r:site, r:cycle, r:lint, r:spell, r:urlcheck, r:style) + lib/rcmd.py; 16→28 commands; r:check retrofitted onto lib.rcmd envelope"
   - "v2.0.0 — 2026-05-12 — BREAKING: Phase 3 command namespacing — 3 of 16 commands renamed (doc-check → docs:check, ecosystem-health → health, rpkg-check → r:check); old names retained as rename-error stubs through v2.x; tests 29/29 (+6 new rename-specific); v1.3.0+ post-MCP doc cleanup bundled; tap formula + manifest synced; feedback thread at issue #9"
   - "v1.3.0 — 2026-05-11 — Path B complete (rforge-mcp absorbed into lib/ pure-Python modules); /rforge:init promoted to first-class command (16 total); rforge-mcp local prototype tombstoned (was never public on GitHub or npm — SPEC scope-corrected); tap formula + manifest + docs Pages all synced; brew outdated UX verified via Cellar-rename trick"
