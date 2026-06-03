@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 28 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 33 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -1022,6 +1022,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../tutorials/r-dev-cycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../tutorials/cran-release-prep/" class="md-nav__link">
         
   
@@ -1030,6 +1058,34 @@
     
   
     CRAN release prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/cran-submission-with-rforge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRAN submission with rforge
   
 
     
@@ -2197,7 +2253,7 @@
 <li><strong>What:</strong> Install rforge + run your first command.</li>
 <li><strong>Why:</strong> Goes from "never used rforge" to "useful output" in 3 minutes.</li>
 <li><strong>How:</strong> Install → run <code>/rforge:status</code> in an R-package directory.</li>
-<li><strong>Next:</strong> <a href="../REFCARD/">REFCARD</a> for all 28 commands, or <a href="../tutorials/">tutorials</a> for deeper dives.</li>
+<li><strong>Next:</strong> <a href="../REFCARD/">REFCARD</a> for all 33 commands, or <a href="../tutorials/">tutorials</a> for deeper dives.</li>
 </ul>
 </div>
 <p>⏱️ <strong>3 minutes</strong> • 🟢 Beginner • ✓ 3 steps (install → invoke → next)</p>
@@ -2241,7 +2297,7 @@ server into the plugin. See
 <p><strong>Use:</strong> Before CRAN releases, major milestones.</p>
 <hr />
 <h2 id="the-3-headline-commands">The 3 Headline Commands<a class="headerlink" href="#the-3-headline-commands" title="Permanent link">&para;</a></h2>
-<p>These are the entry points most users start with. The plugin ships <strong>28 commands total</strong> — see <a href="../REFCARD/">REFCARD.md</a> for the full set (ecosystem management, dependency tracking, CRAN release planning, doc-drift checks, the full <code>r:</code> dev cycle, and more).</p>
+<p>These are the entry points most users start with. The plugin ships <strong>33 commands total</strong> — see <a href="../REFCARD/">REFCARD.md</a> for the full set (ecosystem management, dependency tracking, CRAN release planning, doc-drift checks, the full <code>r:</code> dev cycle, and more).</p>
 <table>
 <thead>
 <tr>
@@ -2314,16 +2370,17 @@ server into the plugin. See
 </span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>/rforge:quick
 </span></code></pre></div>
 <h3 id="before-cran-release">Before CRAN Release<a class="headerlink" href="#before-cran-release" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># 1. Comprehensive check</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Prepare v2.0.0 for CRAN&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># 1. Full per-package gate (document→lint→spell→urlcheck→test→coverage→check→revdep)</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>/rforge:r:cran-prep
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># 2. Review all recommendations</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># 2. Verdict: ready ✅ / warn 🟡 (review NOTEs) / blocked ❌ (fix and re-run)</span>
 </span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="c1"># 3. Fix all issues</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="c1"># 4. Run R CMD check</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="c1"># 3. Ecosystem submission order</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Prepare v2.0.0 for CRAN&quot;</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>/rforge:release
 </span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># 5. Submit to CRAN</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># 4. Submit via https://cran.r-project.org/submit.html</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="c1">#    Paste cran-comments.md into the Comments field</span>
 </span></code></pre></div>
 <hr />
 <h2 id="pattern-recognition">Pattern Recognition<a class="headerlink" href="#pattern-recognition" title="Permanent link">&para;</a></h2>

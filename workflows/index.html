@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 28 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 33 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -668,10 +668,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#daily-development-loop" class="md-nav__link">
+  <a href="#r-package-dev-cycle" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔁 Daily development loop
+        🔁 R package dev cycle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ecosystem-daily-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔁 Ecosystem daily loop
       
     </span>
   </a>
@@ -705,6 +716,17 @@
     <span class="md-ellipsis">
       
         📦 CRAN release pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-platform-verification-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🌐 Multi-platform verification (optional)
       
     </span>
   </a>
@@ -889,6 +911,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../tutorials/r-dev-cycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../tutorials/cran-release-prep/" class="md-nav__link">
         
   
@@ -897,6 +947,34 @@
     
   
     CRAN release prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/cran-submission-with-rforge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRAN submission with rforge
   
 
     
@@ -1831,10 +1909,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#daily-development-loop" class="md-nav__link">
+  <a href="#r-package-dev-cycle" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔁 Daily development loop
+        🔁 R package dev cycle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ecosystem-daily-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔁 Ecosystem daily loop
       
     </span>
   </a>
@@ -1868,6 +1957,17 @@
     <span class="md-ellipsis">
       
         📦 CRAN release pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-platform-verification-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🌐 Multi-platform verification (optional)
       
     </span>
   </a>
@@ -1941,7 +2041,23 @@ tutorial that walks it through in detail.</p>
     C --&gt; D["/rforge:status&lt;br/&gt;health snapshot"]
     D --&gt; E["/rforge:analyze&lt;br/&gt;first real analysis"]</code></pre>
 <p>→ <a href="../tutorials/getting-started/">Getting started</a> (~10 min)</p>
-<h2 id="daily-development-loop">🔁 Daily development loop<a class="headerlink" href="#daily-development-loop" title="Permanent link">&para;</a></h2>
+<h2 id="r-package-dev-cycle">🔁 R package dev cycle<a class="headerlink" href="#r-package-dev-cycle" title="Permanent link">&para;</a></h2>
+<p>The inner loop: every code change runs through these <code>r:</code> commands.</p>
+<pre class="mermaid"><code>flowchart TD
+    A["edit code in R/*.R"] --&gt; B["/rforge:r:cycle\ndocument → test → check"]
+    B --&gt; C{"All stages\npassed?"}
+    C -- "yes ✅" --&gt; D["commit / push"]
+    C -- "no ❌" --&gt; E["fix the failing stage"]
+    E --&gt; B
+
+    D --&gt; F["pre-commit quality\n(optional but recommended)"]
+    F --&gt; G["/rforge:r:lint\n/rforge:r:spell\n/rforge:r:urlcheck"]
+    G --&gt; H{"Clean?"}
+    H -- "yes ✅" --&gt; I["open PR"]
+    H -- "style issues" --&gt; J["/rforge:r:style\n(auto-fix formatting)"]
+    J --&gt; G</code></pre>
+<p>→ <a href="../tutorials/r-dev-cycle/">R package dev cycle</a> (~10 min)</p>
+<h2 id="ecosystem-daily-loop">🔁 Ecosystem daily loop<a class="headerlink" href="#ecosystem-daily-loop" title="Permanent link">&para;</a></h2>
 <p>The habit: change code with R tools, check the ecosystem with rforge.</p>
 <pre class="mermaid"><code>flowchart TD
     A["Write code + tests&lt;br/&gt;usethis / devtools (R)"] --&gt; B["/rforge:quick&lt;br/&gt;10s snapshot"]
@@ -1971,16 +2087,33 @@ tutorial that walks it through in detail.</p>
     D --&gt; F["execute in&lt;br/&gt;topological order"]</code></pre>
 <p>→ <a href="../tutorials/ecosystem-orchestration/">Ecosystem orchestration</a> (~15 min)</p>
 <h2 id="cran-release-pipeline">📦 CRAN release pipeline<a class="headerlink" href="#cran-release-pipeline" title="Permanent link">&para;</a></h2>
-<p>Drift check → R CMD check → rollup → submission order.</p>
+<p>Per-package gate → ecosystem rollup → submission order.</p>
 <pre class="mermaid"><code>flowchart TD
-    A["/rforge:docs:check&lt;br/&gt;NEWS + doc drift"] --&gt; B["/rforge:r:check&lt;br/&gt;R CMD check, parsed"]
-    B --&gt; C["/rforge:thorough&lt;br/&gt;ecosystem rollup"]
-    C --&gt; D{"All green?"}
-    D -- "no" --&gt; E["fix blockers&lt;br/&gt;(loop back)"]
-    E --&gt; A
-    D -- "yes" --&gt; F["/rforge:release&lt;br/&gt;CRAN submission order"]
-    F --&gt; G["submit via&lt;br/&gt;CRAN web form"]</code></pre>
-<p>→ <a href="../tutorials/cran-release-prep/">CRAN release prep</a> (~15 min)</p>
+    A["/rforge:docs:check\nNEWS + doc drift"] --&gt; B
+
+    subgraph gate["Per-package gate (v2.2.0+)"]
+        B["/rforge:r:cran-prep\ndocument→lint→spell→urlcheck\ntest→coverage→check(--as-cran)→revdep\nwrites cran-comments.md"]
+    end
+
+    B --&gt; C{"ready / warn\n/ blocked?"}
+    C -- "blocked ❌" --&gt; D["fix blockers\n(loop back)"]
+    D --&gt; A
+    C -- "ready ✅ or warn 🟡" --&gt; E["/rforge:thorough\necosystem rollup"]
+    E --&gt; F["/rforge:release\nCRAN submission order"]
+    F --&gt; G["submit via\nCRAN web form"]</code></pre>
+<p>→ <a href="../tutorials/cran-submission-with-rforge/">CRAN submission with rforge</a> (~15 min, per-package gate)
+→ <a href="../tutorials/cran-release-prep/">CRAN release prep</a> (~15 min, ecosystem pipeline)</p>
+<h2 id="multi-platform-verification-optional">🌐 Multi-platform verification (optional)<a class="headerlink" href="#multi-platform-verification-optional" title="Permanent link">&para;</a></h2>
+<p>Async dispatch to win-builder and R-hub before CRAN submission.</p>
+<pre class="mermaid"><code>flowchart LR
+    A["/rforge:r:cran-prep\n--multi-platform"] --&gt; B["/rforge:r:winbuilder\nasync dispatch"]
+    A --&gt; C["/rforge:r:rhub\nasync dispatch"]
+    B --&gt; D["results emailed\nto DESCRIPTION maintainer"]
+    C --&gt; E["results in repo's\nGitHub Actions tab"]
+    D --&gt; F["review + address\nany Windows-specific issues"]
+    E --&gt; F
+    F --&gt; G["submit to CRAN"]</code></pre>
+<p>→ <a href="../tutorials/cran-submission-with-rforge/">CRAN submission — multi-platform section</a></p>
 <h2 id="how-rforge-fits-with-rs-own-tools">How rforge fits with R's own tools<a class="headerlink" href="#how-rforge-fits-with-rs-own-tools" title="Permanent link">&para;</a></h2>
 <p>The boundary in one picture: R tools build a package; rforge orchestrates
 the set.</p>
@@ -2002,7 +2135,7 @@ the set.</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong><a href="../tutorials/">Tutorials</a></strong> — step-by-step versions of every workflow above</li>
-<li><strong><a href="../REFCARD/">REFCARD</a></strong> — all 28 commands on one page</li>
+<li><strong><a href="../REFCARD/">REFCARD</a></strong> — all 33 commands on one page</li>
 <li><strong><a href="../architecture/">Architecture</a></strong> — how the plugin's internals fit together</li>
 </ul>
 

@@ -6,17 +6,17 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 28 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 33 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
         <link rel="canonical" href="https://data-wise.github.io/rforge/tutorials/cran-release-prep/">
       
       
-        <link rel="prev" href="../ecosystem-orchestration/">
+        <link rel="prev" href="../r-dev-cycle/">
       
       
-        <link rel="next" href="../migrate-from-mcp/">
+        <link rel="next" href="../cran-submission-with-rforge/">
       
       
         
@@ -762,6 +762,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../r-dev-cycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -847,10 +875,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-run-r-cmd-check-with-smart-parsing" class="md-nav__link">
+  <a href="#step-2-run-the-full-cran-prep-gate-v220" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2: Run R CMD check with smart parsing
+        Step 2: Run the full CRAN-prep gate (v2.2.0+)
       
     </span>
   </a>
@@ -916,6 +944,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cran-submission-with-rforge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRAN submission with rforge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1853,10 +1909,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-run-r-cmd-check-with-smart-parsing" class="md-nav__link">
+  <a href="#step-2-run-the-full-cran-prep-gate-v220" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2: Run R CMD check with smart parsing
+        Step 2: Run the full CRAN-prep gate (v2.2.0+)
       
     </span>
   </a>
@@ -1948,8 +2004,9 @@
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
 <li><strong>What:</strong> Take one or more packages from "code complete" to "submitted to CRAN."</li>
-<li><strong>Why:</strong> rforge sequences the submission and surfaces drift; R does the heavy <code>R CMD check</code>.</li>
-<li><strong>How:</strong> <code>/rforge:docs:check</code> → <code>/rforge:r:check</code> → <code>/rforge:thorough</code> → <code>/rforge:release</code>.</li>
+<li><strong>Why:</strong> rforge can now run the full per-package gate (<code>r:cran-prep</code>) <strong>and</strong> plan ecosystem submission order (<code>release</code>).</li>
+<li><strong>How (single package):</strong> <code>/rforge:r:cran-prep</code> → fix blockers → repeat → <code>/rforge:release</code>.</li>
+<li><strong>How (ecosystem):</strong> <code>/rforge:docs:check</code> → <code>/rforge:r:cran-prep</code> per package → <code>/rforge:thorough</code> → <code>/rforge:release</code>.</li>
 <li><strong>Next:</strong> Submit via CRAN's web form (rforge plans the order; it doesn't upload).</li>
 </ul>
 </div>
@@ -1957,25 +2014,31 @@
 <p><strong>For whom:</strong> Maintainer preparing a CRAN submission (single package or
 ecosystem).
 <strong>Estimated time:</strong> 15 minutes to read; the actual checks take longer
-because <code>R CMD check</code> is slow.
+because <code>R CMD check --as-cran</code> and <code>revdepcheck</code> are slow.
 <strong>Prior knowledge:</strong> You've built the package and want to ship it.</p>
 </blockquote>
-<div class="admonition warning">
-<p class="admonition-title">Division of labor — read this first</p>
-<p>rforge does <strong>not</strong> run heavy R checks for you, and it does <strong>not</strong>
-upload to CRAN. It <strong>aggregates</strong> lib-module health, <strong>parses</strong> the
-<code>R CMD check</code> output you run, and <strong>plans</strong> the submission order. The
-actual <code>R CMD check --as-cran</code> runs in <em>your</em> shell with <em>your</em> R
-toolchain. This is by design — those checks need R and can take minutes.</p>
+<div class="admonition note">
+<p class="admonition-title">What rforge runs vs. what you run (v2.2.0+)</p>
+<p>As of v2.2.0, <code>/rforge:r:cran-prep</code> <strong>does</strong> run the heavy checks
+(document → lint → spell → urlcheck → test → coverage → <code>R CMD check
+--as-cran</code> → revdepcheck) and writes <code>cran-comments.md</code>. It still does
+<strong>not</strong> upload to CRAN — submission is via the CRAN web form.
+For ecosystem-level planning (submission order, cross-package deps),
+<code>/rforge:thorough</code> and <code>/rforge:release</code> remain orchestration-only.</p>
 </div>
 <h2 id="the-release-pipeline-at-a-glance">The release pipeline at a glance<a class="headerlink" href="#the-release-pipeline-at-a-glance" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>flowchart TD
-    A["/rforge:docs:check&lt;br/&gt;NEWS + doc drift"] --&gt; B["/rforge:r:check&lt;br/&gt;R CMD check, parsed"]
-    B --&gt; C["/rforge:thorough&lt;br/&gt;ecosystem rollup +&lt;br/&gt;R-check recommendations"]
-    C --&gt; D{"All green?"}
-    D -- "no" --&gt; E["Fix blockers&lt;br/&gt;(loop back)"]
-    E --&gt; A
-    D -- "yes" --&gt; F["/rforge:release&lt;br/&gt;CRAN submission order"]
+    A["/rforge:docs:check&lt;br/&gt;NEWS + doc drift"] --&gt; B
+
+    subgraph "Per-package gate (v2.2.0+)"
+        B["/rforge:r:cran-prep&lt;br/&gt;document→lint→spell→urlcheck&lt;br/&gt;test→coverage→check(--as-cran)→revdep&lt;br/&gt;writes cran-comments.md"]
+    end
+
+    B --&gt; C{"ready / warn / blocked?"}
+    C -- "blocked" --&gt; D["Fix blockers&lt;br/&gt;(loop back)"]
+    D --&gt; A
+    C -- "ready or warn" --&gt; E["/rforge:thorough&lt;br/&gt;ecosystem rollup"]
+    E --&gt; F["/rforge:release&lt;br/&gt;CRAN submission order"]
     F --&gt; G["Submit via&lt;br/&gt;CRAN web form"]</code></pre>
 <h2 id="step-1-catch-documentation-drift-early">Step 1: Catch documentation drift early<a class="headerlink" href="#step-1-catch-documentation-drift-early" title="Permanent link">&para;</a></h2>
 <p>Documentation problems are the most common avoidable CRAN rejection. Check
@@ -2005,122 +2068,149 @@ first, while fixes are cheap:</p>
 <code>CHANGELOG.md</code> — the single most common pre-CRAN slip. It's pure shell,
 needs no R, and runs autonomously. See <a href="../../hooks-and-skills/">Hooks &amp; Skills</a>.</p>
 </div>
-<h2 id="step-2-run-r-cmd-check-with-smart-parsing">Step 2: Run R CMD check with smart parsing<a class="headerlink" href="#step-2-run-r-cmd-check-with-smart-parsing" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/rforge:r:check --as-cran
+<h2 id="step-2-run-the-full-cran-prep-gate-v220">Step 2: Run the full CRAN-prep gate (v2.2.0+)<a class="headerlink" href="#step-2-run-the-full-cran-prep-gate-v220" title="Permanent link">&para;</a></h2>
+<p>For most submissions, use the orchestrating command:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/rforge:r:cran-prep
 </span></code></pre></div>
-<p>This invokes <code>R CMD check --as-cran</code> via Bash and parses the output into a
-scannable summary:</p>
-<div class="language-markdown highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="gu">## Package Check: medfit v2.0.0</span>
+<p>This sequences document → lint → spell → urlcheck → test → coverage →
+<code>R CMD check --as-cran</code> → revdep and writes <code>cran-comments.md</code>. It returns
+one of three verdicts:</p>
+<table>
+<thead>
+<tr>
+<th>Verdict</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ready</code></td>
+<td>All stages clean — proceed to submission</td>
+</tr>
+<tr>
+<td><code>warn</code></td>
+<td>Passed but has real NOTEs or new revdep problems — review before submitting</td>
+</tr>
+<tr>
+<td><code>blocked</code></td>
+<td>At least one stage errored — fix and re-run</td>
+</tr>
+</tbody>
+</table>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>✅ CRAN PREP — medfit v2.0.0
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="gu">### Status: 🟡</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="gu">### R CMD Check</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">-</span><span class="w"> </span>Errors: 0
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="k">-</span><span class="w"> </span>Warnings: 0
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="k">-</span><span class="w"> </span>Notes: 1
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>  • checking CRAN incoming feasibility ... NOTE (new submission)
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="gu">### Tests</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="k">-</span><span class="w"> </span>Passed: 187
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="k">-</span><span class="w"> </span>Failed: 0
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="gu">### Documentation</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="k">- [x]</span> All exports documented
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="k">- [x]</span> Examples run
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="k">- [x]</span> README exists
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>
-</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="gu">### Recommended Actions</span>
-</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="k">1.</span> The single NOTE is the standard &quot;new submission&quot; note — expected, not a blocker.
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>document   ok    ✅
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>lint       ok    ✅
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>spell      ok    ✅
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>urlcheck   ok    ✅
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>test       ok    ✅  (187 passed)
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>coverage   ok    ✅  (92%)
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>check      ok    ✅  1 NOTE (classified spurious — &quot;New submission&quot;)
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>revdep     ok    ✅  no broken packages
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>Verdict: ready
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>cran-comments.md written → review before submitting
 </span></code></pre></div>
 <div class="admonition tip">
-<p class="admonition-title">NOTEs are not all equal</p>
-<p>A "new submission" NOTE is routine. A NOTE about non-standard files,
-undefined globals, or large installed size needs fixing. rforge's parse
-helps you tell them apart — but the judgment call is yours. Run this on
-each package you're submitting.</p>
+<p class="admonition-title">NOTEs are classified automatically</p>
+<p><code>r:cran-prep</code> tags each NOTE as <code>spurious</code> (expected on first submission,
+e.g. "New submission" or "checking CRAN incoming feasibility") or <code>real</code>
+(needs attention). Spurious NOTEs do not block <code>ready</code>. Real NOTEs
+downgrade the verdict to <code>warn</code>.</p>
 </div>
-<p><code>/rforge:r:check</code> is single-package. For one quick check it's equivalent to
-<code>devtools::check()</code> — use whichever you prefer; rforge's value-add is the
-parsed, consistent summary.</p>
+<p><strong>Optional flags:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/rforge:r:cran-prep --no-revdep         # skip revdep (first submission, no dependents)
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>/rforge:r:cran-prep --goodpractice      # add advisory goodpractice checks
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>/rforge:r:cran-prep --multi-platform    # dispatch win-builder + R-hub async
+</span></code></pre></div>
+<p><strong>For a single targeted check</strong> (no orchestration), use:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>/rforge:r:check --as-cran
+</span></code></pre></div>
+<p>See <a href="../cran-submission-with-rforge/">CRAN submission with rforge</a> for the
+full per-package walkthrough.</p>
 <h2 id="step-3-roll-up-the-whole-ecosystem">Step 3: Roll up the whole ecosystem<a class="headerlink" href="#step-3-roll-up-the-whole-ecosystem" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/rforge:thorough &quot;Prepare mediationverse for CRAN&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:thorough &quot;Prepare mediationverse for CRAN&quot;
 </span></code></pre></div>
 <p><code>/rforge:thorough</code> runs the status rollup across all packages…</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.status<span class="w"> </span>--path<span class="w"> </span>.<span class="w"> </span>--format<span class="w"> </span>text
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.status<span class="w"> </span>--path<span class="w"> </span>.<span class="w"> </span>--format<span class="w"> </span>text
 </span></code></pre></div>
 <p>…and then <strong>recommends the R-side checks for you to run yourself</strong> (it does
 not run them — that's Step 2's territory, per package):</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Recommended R-side checks (run in your shell):
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>  R CMD check --as-cran .
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>  Rscript -e &#39;devtools::test()&#39;
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>  Rscript -e &#39;covr::package_coverage()&#39;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Recommended R-side checks (run in your shell):
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>  R CMD check --as-cran .
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>  Rscript -e &#39;devtools::test()&#39;
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>  Rscript -e &#39;covr::package_coverage()&#39;
 </span></code></pre></div>
 <p>Paste the results back and rforge combines them with the lib-status rollup
 into a release-readiness summary.</p>
 <div class="admonition abstract">
-<p class="admonition-title">Why thorough doesn't just run everything</p>
-<p>Earlier (MCP-era) versions tried to orchestrate background R tasks.
-v1.3.0 deliberately descoped that: R checks are slow, environment-
-specific, and better run in your own terminal where you can see
-progress and re-run individually. <code>/rforge:thorough</code> focuses on the fast
-aggregation and points you at the right R commands.</p>
+<p class="admonition-title">Why thorough doesn't run R checks</p>
+<p><code>/rforge:thorough</code> is an ecosystem rollup — it aggregates health across
+all packages, not a single one. The per-package R execution lives in
+<code>/rforge:r:cran-prep</code> (v2.2.0+). <code>thorough</code> focuses on fast cross-package
+aggregation and surfaces drift; <code>cran-prep</code> does the heavy single-package
+gate.</p>
 </div>
 <h2 id="step-4-plan-the-submission-order">Step 4: Plan the submission order<a class="headerlink" href="#step-4-plan-the-submission-order" title="Permanent link">&para;</a></h2>
 <p>For an ecosystem, you can't submit in arbitrary order — CRAN needs each
 dependency <em>approved and available</em> before its dependents pass incoming
 checks. <code>/rforge:release</code> computes the sequence:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>/rforge:release
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/rforge:release
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>🚀 CRAN RELEASE PLAN
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>Submission Order (by dependency):
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>1. medfit v2.0.0
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>   Status: ✅ Ready
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>   Submit: Now
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>2. probmed v1.5.0
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>   Status: ⏳ Waiting (needs medfit on CRAN)
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>   Submit: +2 weeks (after medfit approval)
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>3. medsim v1.3.0
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>   Status: ⏳ Waiting
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>   Submit: +2 weeks
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>4. mediationverse v1.1.0
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>   Status: ⏳ Waiting (needs all deps)
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>   Submit: +4 weeks
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>
-</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>Timeline: 4-6 weeks total
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>🚀 CRAN RELEASE PLAN
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>Submission Order (by dependency):
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>1. medfit v2.0.0
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>   Status: ✅ Ready
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>   Submit: Now
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>2. probmed v1.5.0
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>   Status: ⏳ Waiting (needs medfit on CRAN)
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>   Submit: +2 weeks (after medfit approval)
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>3. medsim v1.3.0
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>   Status: ⏳ Waiting
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>   Submit: +2 weeks
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>4. mediationverse v1.1.0
+</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>   Status: ⏳ Waiting (needs all deps)
+</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>   Submit: +4 weeks
+</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>
+</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>Timeline: 4-6 weeks total
 </span></code></pre></div>
 <p>Add <code>--detailed</code> for per-package readiness with reverse-dependency checks:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/rforge:release --detailed
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>/rforge:release --detailed
 </span></code></pre></div>
 <p>If a package isn't ready, the plan tells you exactly what's blocking it:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>1. medfit v2.0.0
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>   Status: ❌ NOT READY
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>   Blockers:
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>     • 3 failing tests
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>     • NEWS.md incomplete
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>     • R CMD check has 1 actionable NOTE
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>   Fix time: ~4 hours
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>1. medfit v2.0.0
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>   Status: ❌ NOT READY
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>   Blockers:
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>     • 3 failing tests
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>     • NEWS.md incomplete
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>     • R CMD check has 1 actionable NOTE
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>   Fix time: ~4 hours
 </span></code></pre></div>
 <p>That's your signal to loop back to Steps 1–2 for that package.</p>
 <h2 id="a-realistic-single-package-release">A realistic single-package release<a class="headerlink" href="#a-realistic-single-package-release" title="Permanent link">&para;</a></h2>
 <p>Most releases are one package, not a whole verse. The condensed flow:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>/rforge:docs:check medfit        # 1. drift check
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>/rforge:r:check --as-cran        # 2. R CMD check (in medfit/)
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>/rforge:thorough &quot;CRAN prep&quot;     # 3. rollup + recommendations
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a># ... fix anything flagged, re-run ...
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>/rforge:release medfit           # 4. confirm it&#39;s ready
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a># → submit via https://cran.r-project.org/submit.html
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>/rforge:docs:check medfit        # 1. drift check (NEWS, examples)
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>/rforge:r:cran-prep              # 2. full gate: runs all checks + writes cran-comments.md
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a># ... fix anything flagged, re-run until &quot;ready&quot; ...
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>/rforge:release medfit           # 3. confirm ecosystem readiness + submission order
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a># → review cran-comments.md, submit via https://cran.r-project.org/submit.html
+</span></code></pre></div>
+<p>For multi-platform verification before submission:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>/rforge:r:cran-prep --multi-platform   # dispatches win-builder + R-hub (async)
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>/rforge:r:winbuilder                   # or run individually
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>/rforge:r:rhub
 </span></code></pre></div>
 <h2 id="pre-submission-checklist">Pre-submission checklist<a class="headerlink" href="#pre-submission-checklist" title="Permanent link">&para;</a></h2>
 <ul>
 <li>[ ] <code>/rforge:docs:check</code> clean (NEWS.md current, examples run)</li>
 <li>[ ] <code>description-sync</code> passes (DESCRIPTION version == NEWS top entry)</li>
-<li>[ ] <code>/rforge:r:check --as-cran</code> → 0 errors, 0 warnings, only benign NOTEs</li>
-<li>[ ] <code>devtools::test()</code> → all passing</li>
-<li>[ ] <code>covr::package_coverage()</code> → acceptable for your project</li>
+<li>[ ] <code>/rforge:r:cran-prep</code> → verdict <code>ready</code> (or <code>warn</code> with all NOTEs reviewed)</li>
+<li>[ ] <code>cran-comments.md</code> reviewed and accurate — you'll paste this into the CRAN form</li>
+<li>[ ] Multi-platform: win-builder and/or R-hub dispatched and results reviewed</li>
 <li>[ ] <code>/rforge:release</code> → package shows ✅ Ready</li>
 <li>[ ] For ecosystems: submit in the order <code>/rforge:release</code> gives, waiting
       for each approval before the next</li>

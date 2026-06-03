@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 28 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 33 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -967,6 +967,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../tutorials/r-dev-cycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../tutorials/cran-release-prep/" class="md-nav__link">
         
   
@@ -975,6 +1003,34 @@
     
   
     CRAN release prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/cran-submission-with-rforge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRAN submission with rforge
   
 
     
@@ -2113,19 +2169,22 @@
 <p>After any method, confirm Claude Code sees the plugin:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>/help
 </span></code></pre></div>
-<p>Expected: 28 commands prefixed <code>/rforge:</code> appear in the listing. If they
+<p>Expected: 33 commands prefixed <code>/rforge:</code> appear in the listing. If they
 don't, restart Claude Code and try again.</p>
 <p>A quicker confirmation from the shell:</p>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ls<span class="w"> </span>~/.claude/plugins/rforge/commands/
+<div class="language-zsh highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ls<span class="w"> </span>~/.claude/plugins/rforge/commands/r/
 </span></code></pre></div>
-<p>Expected: a list of 16 <code>.md</code> files (analyze, capture, cascade, complete,
-deps, detect, health, impact, init, next, quick, release, status,
-thorough, plus <code>docs/check.md</code> and <code>r/check.md</code> in sub-namespaces).</p>
+<p>Expected: a list of 17 <code>.md</code> files in <code>commands/r/</code> (check, load, document,
+test, coverage, build, install, site, cycle, lint, spell, urlcheck, style,
+revdep, goodpractice, winbuilder, cran-prep) plus <code>commands/rhub.md</code>, and
+the 15 top-level commands in <code>commands/</code> (analyze, capture, cascade,
+complete, deps, detect, health, impact, init, next, quick, release, status,
+thorough, plus <code>docs/check.md</code>).</p>
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Claude Code CLI</strong> installed and configured</li>
 <li><strong>Python 3.10+</strong> on <code>PATH</code> (for the <code>lib/</code> modules)</li>
-<li><strong>R 4.0+</strong> — only needed for <code>/rforge:r:check</code> and <code>/rforge:thorough</code>
+<li><strong>R 4.0+</strong> — required for all <code>r:*</code> commands and <code>/rforge:thorough</code>
   workflows. The rest of the plugin runs without R.</li>
 </ul>
 <p>No MCP server or Node.js runtime is required at runtime as of v1.3.0.</p>

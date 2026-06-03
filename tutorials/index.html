@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 28 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 33 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -867,6 +867,34 @@
   
   
     <li class="md-nav__item">
+      <a href="r-dev-cycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="cran-release-prep/" class="md-nav__link">
         
   
@@ -875,6 +903,34 @@
     
   
     CRAN release prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="cran-submission-with-rforge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRAN submission with rforge
   
 
     
@@ -1920,8 +1976,18 @@ scenario and walks through the exact commands and expected output.</p>
 <td>~15 min</td>
 </tr>
 <tr>
-<td>Preparing a CRAN submission</td>
+<td>Using the 12 <code>r:</code> dev-cycle commands daily</td>
+<td><a href="r-dev-cycle/">R package dev cycle</a></td>
+<td>~10 min</td>
+</tr>
+<tr>
+<td>Preparing a CRAN submission — ecosystem ordering</td>
 <td><a href="cran-release-prep/">CRAN release prep</a></td>
+<td>~15 min</td>
+</tr>
+<tr>
+<td>Running the full per-package CRAN gate</td>
+<td><a href="cran-submission-with-rforge/">CRAN submission with rforge</a></td>
 <td>~15 min</td>
 </tr>
 <tr>
@@ -1946,7 +2012,8 @@ scenario and walks through the exact commands and expected output.</p>
     A["Getting started&lt;br/&gt;install + first analysis"] --&gt; B["rforge in the&lt;br/&gt;R lifecycle&lt;br/&gt;what it is vs devtools"]
     B --&gt; C["Understanding modes&lt;br/&gt;the --mode flag"]
     C --&gt; D["Ecosystem orchestration&lt;br/&gt;impact / cascade / deps"]
-    D --&gt; E["CRAN release prep&lt;br/&gt;thorough / r:check / release"]</code></pre>
+    D --&gt; E["R package dev cycle&lt;br/&gt;r:cycle / r:lint / r:coverage"]
+    E --&gt; F["CRAN release prep&lt;br/&gt;r:cran-prep / thorough / release"]</code></pre>
 <h2 id="available-tutorials">Available tutorials<a class="headerlink" href="#available-tutorials" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong><a href="getting-started/">Getting started</a></strong> — Fresh install → first
@@ -1962,9 +2029,16 @@ scenario and walks through the exact commands and expected output.</p>
 <li><strong><a href="ecosystem-orchestration/">Ecosystem orchestration</a></strong> — The
   multi-package commands with worked examples: <code>/rforge:deps</code> (map) →
   <code>/rforge:impact</code> (blast radius) → <code>/rforge:cascade</code> (plan). ~15 min.</li>
-<li><strong><a href="cran-release-prep/">CRAN release prep</a></strong> — End to end:
-  <code>/rforge:docs:check</code> → <code>/rforge:r:check</code> → <code>/rforge:thorough</code> →
+<li><strong><a href="r-dev-cycle/">R package dev cycle</a></strong> — The 12 <code>r:</code> commands in daily
+  use: <code>r:load</code>, <code>r:document</code>, <code>r:test</code>, <code>r:check</code>, <code>r:cycle</code> (dev loop) +
+  <code>r:lint</code>, <code>r:spell</code>, <code>r:urlcheck</code>, <code>r:style</code>, <code>r:coverage</code>, <code>r:build</code>,
+  <code>r:install</code>, <code>r:site</code> (quality layer). ~10 min.</li>
+<li><strong><a href="cran-release-prep/">CRAN release prep</a></strong> — Ecosystem-level pipeline:
+  <code>/rforge:docs:check</code> → <code>/rforge:r:cran-prep</code> → <code>/rforge:thorough</code> →
   <code>/rforge:release</code>. ~15 min.</li>
+<li><strong><a href="cran-submission-with-rforge/">CRAN submission with rforge</a></strong> — Per-package
+  CRAN gate: <code>/rforge:r:cran-prep</code> → fix blockers → re-run → <code>--multi-platform</code>
+  → review <code>cran-comments.md</code> → <code>/rforge:release</code>. ~15 min.</li>
 <li><strong><a href="migrate-from-mcp/">Migrating from rforge-mcp</a></strong> — For users
   currently running <code>rforge-mcp</code> (the deprecated MCP server). Steps to
   upgrade to v1.3.0+ and clean up the old install. ~5 min.</li>

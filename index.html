@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 28 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 33 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -458,6 +458,17 @@
     <span class="md-ellipsis">
       
         The 3 headline commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-new-in-v220" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.2.0
       
     </span>
   </a>
@@ -937,6 +948,34 @@
   
   
     <li class="md-nav__item">
+      <a href="tutorials/r-dev-cycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="tutorials/cran-release-prep/" class="md-nav__link">
         
   
@@ -945,6 +984,34 @@
     
   
     CRAN release prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/cran-submission-with-rforge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRAN submission with rforge
   
 
     
@@ -1901,6 +1968,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#whats-new-in-v220" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.2.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-new-in-v210" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2029,17 +2107,17 @@
 <a href="https://www.npmjs.com/package/@data-wise/rforge-plugin"><img alt="npm" src="https://img.shields.io/npm/v/@data-wise/rforge-plugin?label=npm&amp;color=red" /></a>
 <a href="https://github.com/Data-Wise/rforge/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/Data-Wise/rforge?color=green" /></a>
 <a href="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev" /></a></p>
-<p><strong>R package ecosystem orchestrator for Claude Code — 28 commands, R-aware hooks, validation skills.</strong></p>
+<p><strong>R package ecosystem orchestrator for Claude Code — 33 commands, R-aware hooks, validation skills.</strong></p>
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
-<li><strong>What:</strong> R package <em>ecosystem</em> analysis from inside Claude Code. 28 slash commands.</li>
+<li><strong>What:</strong> R package <em>ecosystem</em> analysis from inside Claude Code. 33 slash commands.</li>
 <li><strong>Why:</strong> Fast feedback on multi-package R repos — discovery, dependencies, change impact, CRAN cascade planning.</li>
 <li><strong>How:</strong> <code>brew install data-wise/tap/rforge</code>, then <code>/rforge:analyze "&lt;what changed&gt;"</code>.</li>
 <li><strong>Next:</strong> <a href="QUICK-START/">Quick Start</a> (3 min) → <a href="#where-to-start">Where to start</a> below.</li>
 </ul>
 </div>
-<p>Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python <code>lib/</code> modules handle discovery, dependencies, status, and init. <strong>No MCP server, no Node.js, no R subprocess</strong> for the fast commands (only <code>/rforge:r:check</code> and <code>/rforge:thorough</code> shell out to R).</p>
+<p>Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python <code>lib/</code> modules handle discovery, dependencies, status, and init. <strong>No MCP server, no Node.js</strong> at runtime. The fast ecosystem commands (analysis, deps, status) are pure Python; the <code>r:*</code> dev-cycle commands and <code>/rforge:thorough</code> shell out to R via <code>lib/rcmd.py</code>.</p>
 <h2 id="what-rforge-is-and-isnt">What rforge is — and isn't<a class="headerlink" href="#what-rforge-is-and-isnt" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">rforge orchestrates an ecosystem; it does not build packages</p>
@@ -2093,16 +2171,25 @@
 </tbody>
 </table>
 <h2 id="the-3-headline-commands">The 3 headline commands<a class="headerlink" href="#the-3-headline-commands" title="Permanent link">&para;</a></h2>
-<p>Most daily work runs through these. The other 25 commands are specialized — see the <a href="REFCARD/">Reference Card</a>.</p>
+<p>Most daily work runs through these. The other 30 commands are specialized — see the <a href="REFCARD/">Reference Card</a>.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Ultra-fast snapshot (&lt; 10 seconds) — pre-commit</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>/rforge:quick
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Balanced analysis with impact + recommendations (~30 seconds) — after changes</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;Update RMediation bootstrap algorithm&quot;</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Comprehensive validation incl. R CMD check (2-5 minutes) — before CRAN</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Prepare for CRAN release&quot;</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Per-package CRAN gate (v2.2.0+) — document→check→revdep, writes cran-comments.md</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>/rforge:r:cran-prep
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Ecosystem rollup (2-5 minutes) — cross-package validation + submission order</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Prepare for CRAN release&quot;</span>
 </span></code></pre></div>
+<h2 id="whats-new-in-v220">What's new in v2.2.0<a class="headerlink" href="#whats-new-in-v220" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>5 new <code>r:</code> CRAN-submission commands</strong>: <code>r:revdep</code>, <code>r:goodpractice</code>, <code>r:winbuilder</code>, <code>r:rhub</code>, <code>r:cran-prep</code> — full pre-submission gate that runs document→lint→spell→urlcheck→test→coverage→check(--as-cran)→revdep, generates <code>cran-comments.md</code>, and returns a <code>ready</code>/<code>warn</code>/<code>blocked</code> verdict.</li>
+<li><strong><code>r:check</code> NOTE classifier</strong>: notes are now classified as <code>spurious</code> (expected on CRAN submission) or <code>real</code> (needs attention) using <code>notes_classified</code> in the envelope.</li>
+<li><strong>Total: 28 → 33 commands.</strong></li>
+</ul>
 <h2 id="whats-new-in-v210">What's new in v2.1.0<a class="headerlink" href="#whats-new-in-v210" title="Permanent link">&para;</a></h2>
 <ul>
 <li>🔬 <strong>12 new <code>r:</code> commands</strong> (<code>r:load</code>, <code>r:document</code>, <code>r:test</code>, <code>r:coverage</code>, <code>r:build</code>, <code>r:install</code>, <code>r:site</code>, <code>r:cycle</code>, <code>r:lint</code>, <code>r:spell</code>, <code>r:urlcheck</code>, <code>r:style</code>) — full R package dev cycle + quality layer.</li>
@@ -2179,7 +2266,7 @@
 </ol>
 <h2 id="more-documentation">More documentation<a class="headerlink" href="#more-documentation" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong><a href="REFCARD/">Reference Card</a></strong> — all 28 commands on one page</li>
+<li><strong><a href="REFCARD/">Reference Card</a></strong> — all 33 commands on one page</li>
 <li><strong><a href="commands/">Commands</a></strong> — full per-command reference</li>
 <li><strong><a href="architecture/">Architecture</a></strong> — how the <code>lib/</code> modules fit together</li>
 <li><strong><a href="hooks-and-skills/">Hooks &amp; Skills</a></strong> — the R-aware <code>PreToolUse</code> hook</li>

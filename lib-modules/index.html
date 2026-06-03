@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 28 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 33 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -760,6 +760,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../tutorials/r-dev-cycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../tutorials/cran-release-prep/" class="md-nav__link">
         
   
@@ -768,6 +796,34 @@
     
   
     CRAN release prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/cran-submission-with-rforge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRAN submission with rforge
   
 
     
@@ -2235,7 +2291,7 @@
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
-<li><strong>What:</strong> Pure-Python analysis modules (<code>discovery</code>, <code>deps</code>, <code>status</code>, <code>init</code>) — no R, no Node — plus <code>rcmd</code> (v2.1.0), the R dev-cycle/quality runner behind the <code>r:</code> commands.</li>
+<li><strong>What:</strong> Pure-Python analysis modules (<code>discovery</code>, <code>deps</code>, <code>status</code>, <code>init</code>) — no R, no Node — plus <code>rcmd</code> (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the <code>r:</code> commands.</li>
 <li><strong>Why:</strong> No MCP server, no Node, no external deps — just <code>python3 -m lib.&lt;module&gt;</code>, fast and scriptable.</li>
 <li><strong>How:</strong> Each takes <code>--path</code> and <code>--format text|json</code>; importable as a Python API too.</li>
 <li><strong>Next:</strong> <a href="../reference/discovery/">Reference API docs</a> for signatures, or <a href="../architecture/#path-b-lib-modules">Architecture</a> for fit.</li>
@@ -2284,18 +2340,23 @@ ecosystem health, or initialize per-user state.</p>
 </tr>
 <tr>
 <td><code>lib/rcmd.py</code></td>
-<td><code>run</code>, <code>normalize</code>, <code>find_package</code>, <code>r_snippet</code> (v2.1.0 R-runner)</td>
-<td><code>python3 -m lib.rcmd --kind &lt;kind&gt; [--path .] [--as-cran] [--preview] [--strict] [--articles-only] [--devel]</code></td>
+<td><code>run</code>, <code>normalize</code>, <code>find_package</code>, <code>r_snippet</code>, <code>_run_cran_prep</code>, <code>_cran_prep_envelope</code>, <code>render_cran_comments</code> (v2.2.0 R-runner)</td>
+<td><code>python3 -m lib.rcmd --kind &lt;kind&gt; [--path .] [--as-cran] [--preview] [--strict] [--articles-only] [--devel] [--goodpractice] [--multi-platform] [--no-revdep]</code></td>
 </tr>
 </tbody>
 </table>
 <blockquote>
 <p><strong><code>rcmd</code> differs from the analysis modules.</strong> <code>discovery</code>/<code>deps</code>/<code>status</code>/<code>init</code>
-are pure-stdlib and never touch R. <code>rcmd</code> (v2.1.0) shells out to <code>Rscript</code>
+are pure-stdlib and never touch R. <code>rcmd</code> (v2.2.0) shells out to <code>Rscript</code>
 running lower-level engines (<code>rcmdcheck</code>/<code>pkgbuild</code>/<code>roxygen2</code>/<code>testthat</code>/
 <code>pkgload</code>/<code>covr</code>/<code>pkgdown</code>/<code>lintr</code>/<code>spelling</code>/<code>urlchecker</code>/<code>styler</code>) that emit
-JSON, which it normalizes into one envelope. It backs the 12 <code>r:</code> dev-cycle +
-quality commands and never calls <code>devtools</code>. See
+JSON, which it normalizes into one envelope. It backs the 17 <code>r:</code> dev-cycle +
+quality + CRAN-submission commands and never calls <code>devtools</code> (with the exception
+of <code>r:winbuilder</code> which requires <code>devtools::check_win_devel()</code>). CRAN-submission
+kinds: <code>revdep</code>/<code>goodpractice</code>/<code>winbuilder</code>/<code>rhub</code>/<code>cran-prep</code> with three tiers:
+<strong>gate</strong> (revdep — blocks submission), <strong>dispatch</strong> (winbuilder/rhub — async,
+non-blocking), <strong>advisory</strong> (goodpractice — opt-in). The <code>dispatched</code> status
+is added alongside ok/warn/error for async kinds. See
 <a href="../reference/rcmd/">reference/rcmd.md</a>.</p>
 </blockquote>
 <h2 id="libdiscoverypy-ecosystem-detection"><code>lib/discovery.py</code> — Ecosystem detection<a class="headerlink" href="#libdiscoverypy-ecosystem-detection" title="Permanent link">&para;</a></h2>

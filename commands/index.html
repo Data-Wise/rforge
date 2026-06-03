@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 28 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 33 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -760,6 +760,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../tutorials/r-dev-cycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../tutorials/cran-release-prep/" class="md-nav__link">
         
   
@@ -768,6 +796,34 @@
     
   
     CRAN release prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/cran-submission-with-rforge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRAN submission with rforge
   
 
     
@@ -1392,6 +1448,78 @@
     <span class="md-ellipsis">
       
         /rforge:r:style
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cran-submission" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CRAN Submission
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CRAN Submission">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rforgerrevdep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:r:revdep
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgergoodpractice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:r:goodpractice
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgerwinbuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:r:winbuilder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgerrhub" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:r:rhub
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgercran-prep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:r:cran-prep
       
     </span>
   </a>
@@ -2680,6 +2808,78 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#cran-submission" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CRAN Submission
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CRAN Submission">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rforgerrevdep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:r:revdep
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgergoodpractice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:r:goodpractice
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgerwinbuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:r:winbuilder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgerrhub" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:r:rhub
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rforgercran-prep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:r:cran-prep
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#command-categories-summary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2775,7 +2975,7 @@
 <li><strong>Next:</strong> <a href="../REFCARD/">REFCARD</a> for the at-a-glance summary.</li>
 </ul>
 </div>
-<p>Complete reference for all <strong>28</strong> RForge commands. Commands are organized by category with usage examples and parameter details.</p>
+<p>Complete reference for all <strong>33</strong> RForge commands. Commands are organized by category with usage examples and parameter details.</p>
 <h2 id="command-categories">Command Categories<a class="headerlink" href="#command-categories" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="#setup-state">Setup &amp; State</a> (1 command)</li>
@@ -2783,8 +2983,9 @@
 <li><a href="#ecosystem-management">Ecosystem Management</a> (5 commands)</li>
 <li><a href="#documentation-tasks">Documentation &amp; Tasks</a> (4 commands)</li>
 <li><a href="#health-checks">Health Checks</a> (2 commands)</li>
-<li><a href="#r-development-cycle">R Development Cycle</a> (8 commands)</li>
-<li><a href="#r-quality">R Quality</a> (4 commands)</li>
+<li><a href="#r-development-cycle">R Development Cycle</a> (9 commands)</li>
+<li><a href="#r-quality">R Quality</a> (5 commands)</li>
+<li><a href="#cran-submission">CRAN Submission</a> (5 commands)</li>
 </ul>
 <hr />
 <h2 id="setup-state">Setup &amp; State<a class="headerlink" href="#setup-state" title="Permanent link">&para;</a></h2>
@@ -3408,6 +3609,130 @@
 </ul>
 <p><strong>Related commands:</strong> <code>/rforge:r:lint</code> (find issues that styler does not auto-fix)</p>
 <hr />
+<h2 id="cran-submission">CRAN Submission<a class="headerlink" href="#cran-submission" title="Permanent link">&para;</a></h2>
+<h3 id="rforgerrevdep">/rforge:r:revdep<a class="headerlink" href="#rforgerrevdep" title="Permanent link">&para;</a></h3>
+<p>Reverse-dependency check against CRAN downstream packages via <code>revdepcheck</code>.</p>
+<p><strong>Usage:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-56-1"><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>/rforge:r:revdep<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>package</code> (optional) - Package path (defaults to current directory)</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-57-1"><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a><span class="c1"># Check reverse dependencies for current package</span>
+</span><span id="__span-57-2"><a id="__codelineno-57-2" name="__codelineno-57-2" href="#__codelineno-57-2"></a>/rforge:r:revdep
+</span><span id="__span-57-3"><a id="__codelineno-57-3" name="__codelineno-57-3" href="#__codelineno-57-3"></a>
+</span><span id="__span-57-4"><a id="__codelineno-57-4" name="__codelineno-57-4" href="#__codelineno-57-4"></a><span class="c1"># Check specific package</span>
+</span><span id="__span-57-5"><a id="__codelineno-57-5" name="__codelineno-57-5" href="#__codelineno-57-5"></a>/rforge:r:revdep<span class="w"> </span>~/projects/medfit
+</span></code></pre></div>
+<p><strong>Executes:</strong></p>
+<ul>
+<li>Runs <code>revdepcheck::revdep_check()</code> — a hard CRAN obligation for API-changing updates</li>
+<li>Reports broken downstream packages and new problems</li>
+<li><code>revdepcheck</code> is optional — if missing, reports 🟡 with install hint</li>
+<li>Note: can be slow (builds downstream packages)</li>
+</ul>
+<p><strong>Related commands:</strong> <code>/rforge:r:cran-prep</code> (runs revdep as part of the submission gate), <code>/rforge:deps</code> / <code>/rforge:impact</code> (internal ecosystem deps, not CRAN downstream)</p>
+<hr />
+<h3 id="rforgergoodpractice">/rforge:r:goodpractice<a class="headerlink" href="#rforgergoodpractice" title="Permanent link">&para;</a></h3>
+<p>Advisory best-practice bundle — goodpractice checks (opt-in, not part of <code>r:cycle</code>).</p>
+<p><strong>Usage:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-58-1"><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>/rforge:r:goodpractice<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>package</code> (optional) - Package path (defaults to current directory)</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-59-1"><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a><span class="c1"># Run advisory best-practice checks for current package</span>
+</span><span id="__span-59-2"><a id="__codelineno-59-2" name="__codelineno-59-2" href="#__codelineno-59-2"></a>/rforge:r:goodpractice
+</span></code></pre></div>
+<p><strong>Executes:</strong></p>
+<ul>
+<li>Runs <code>goodpractice::gp()</code> — re-runs R CMD check, lintr, and covr plus additional checks (cyclomatic complexity, TODO/FIXME scan, DESCRIPTION completeness, etc.)</li>
+<li>Reports advisories with counts and descriptions</li>
+<li><code>goodpractice</code> is optional — if missing, reports 🟡 with install hint</li>
+<li>Not part of <code>/rforge:r:cycle</code> to avoid double-running check/lint/coverage</li>
+</ul>
+<p><strong>Related commands:</strong> <code>/rforge:r:check</code>, <code>/rforge:r:lint</code>, <code>/rforge:r:coverage</code>, <code>/rforge:r:cran-prep</code></p>
+<hr />
+<h3 id="rforgerwinbuilder">/rforge:r:winbuilder<a class="headerlink" href="#rforgerwinbuilder" title="Permanent link">&para;</a></h3>
+<p>Submit to win-builder (R-devel) via <code>devtools::check_win_devel()</code> — async dispatch.</p>
+<p><strong>Usage:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-60-1"><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>/rforge:r:winbuilder<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>package</code> (optional) - Package path (defaults to current directory)</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-61-1"><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a><span class="c1"># Dispatch to win-builder</span>
+</span><span id="__span-61-2"><a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a>/rforge:r:winbuilder
+</span></code></pre></div>
+<p><strong>Executes:</strong></p>
+<ul>
+<li>Submits the package to <a href="https://win-builder.r-project.org/">win-builder</a> for a remote R-devel check on Windows</li>
+<li><strong>Async dispatch</strong> — results are emailed to the DESCRIPTION Maintainer; nothing returns synchronously</li>
+<li><code>devtools</code> is optional — if missing, reports 🟡 with install hint</li>
+<li>Run at least once per release after a clean <code>/rforge:r:check --as-cran</code> pass</li>
+</ul>
+<p><strong>Related commands:</strong> <code>/rforge:r:cran-prep</code> (runs winbuilder under <code>--multi-platform</code>), <code>/rforge:r:rhub</code></p>
+<hr />
+<h3 id="rforgerrhub">/rforge:r:rhub<a class="headerlink" href="#rforgerrhub" title="Permanent link">&para;</a></h3>
+<p>Multi-platform checks via R-hub v2 (<code>rhub::rhub_check</code>) — async dispatch via GitHub Actions.</p>
+<p><strong>Usage:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-62-1"><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>/rforge:r:rhub<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>package</code> (optional) - Package path (defaults to current directory)</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-63-1"><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a><span class="c1"># Dispatch to R-hub v2</span>
+</span><span id="__span-63-2"><a id="__codelineno-63-2" name="__codelineno-63-2" href="#__codelineno-63-2"></a>/rforge:r:rhub
+</span></code></pre></div>
+<p><strong>Executes:</strong></p>
+<ul>
+<li>Runs <code>rhub::rhub_check()</code> — triggers GitHub Actions workflows across Linux, macOS, Windows, and various R versions</li>
+<li><strong>Async dispatch</strong> — results appear in the repo's Actions tab</li>
+<li>First run calls <code>rhub::rhub_setup()</code> (writes <code>.github/workflows/rhub.yaml</code>); subsequent runs skip setup</li>
+<li>A GitHub remote is required</li>
+<li><code>rhub</code> is optional — if missing, reports 🟡 with install hint</li>
+</ul>
+<p><strong>Related commands:</strong> <code>/rforge:r:cran-prep</code> (includes rhub under <code>--multi-platform</code>), <code>/rforge:r:winbuilder</code></p>
+<hr />
+<h3 id="rforgercran-prep">/rforge:r:cran-prep<a class="headerlink" href="#rforgercran-prep" title="Permanent link">&para;</a></h3>
+<p>Per-package CRAN-readiness gate — runs the full pre-submission sequence and generates <code>cran-comments.md</code>.</p>
+<p><strong>Usage:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-64-1"><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>/rforge:r:cran-prep<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--goodpractice<span class="o">]</span><span class="w"> </span><span class="o">[</span>--multi-platform<span class="o">]</span><span class="w"> </span><span class="o">[</span>--no-revdep<span class="o">]</span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>package</code> (optional) - Package path (defaults to current directory)</li>
+<li><code>--goodpractice</code> (optional) - Also run the advisory goodpractice bundle (default: false)</li>
+<li><code>--multi-platform</code> (optional) - Dispatch win-builder + R-hub async checks (default: false)</li>
+<li><code>--no-revdep</code> (optional) - Skip the reverse-dependency check (default: false)</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-65-1"><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a><span class="c1"># Full CRAN-prep gate for current package</span>
+</span><span id="__span-65-2"><a id="__codelineno-65-2" name="__codelineno-65-2" href="#__codelineno-65-2"></a>/rforge:r:cran-prep
+</span><span id="__span-65-3"><a id="__codelineno-65-3" name="__codelineno-65-3" href="#__codelineno-65-3"></a>
+</span><span id="__span-65-4"><a id="__codelineno-65-4" name="__codelineno-65-4" href="#__codelineno-65-4"></a><span class="c1"># Include goodpractice advisory and multi-platform checks</span>
+</span><span id="__span-65-5"><a id="__codelineno-65-5" name="__codelineno-65-5" href="#__codelineno-65-5"></a>/rforge:r:cran-prep<span class="w"> </span>--goodpractice<span class="w"> </span>--multi-platform
+</span><span id="__span-65-6"><a id="__codelineno-65-6" name="__codelineno-65-6" href="#__codelineno-65-6"></a>
+</span><span id="__span-65-7"><a id="__codelineno-65-7" name="__codelineno-65-7" href="#__codelineno-65-7"></a><span class="c1"># Skip revdep (e.g., first CRAN submission with no dependents)</span>
+</span><span id="__span-65-8"><a id="__codelineno-65-8" name="__codelineno-65-8" href="#__codelineno-65-8"></a>/rforge:r:cran-prep<span class="w"> </span>--no-revdep
+</span></code></pre></div>
+<p><strong>Executes:</strong></p>
+<ul>
+<li>Full sequence: <code>document</code> → <code>lint</code> → <code>spell</code> → <code>urlcheck</code> → <code>test</code> → <code>coverage</code> → <code>check (--as-cran)</code> → <code>revdep</code></li>
+<li>Generates <code>cran-comments.md</code> with a <code>ready</code> / <code>warn</code> / <code>blocked</code> verdict</li>
+<li>Returns a stage-by-stage status table; lists blockers that must be fixed before submission</li>
+<li>Composes with <code>/rforge:release</code> (this = single-package gate; release = cross-package submission ordering)</li>
+</ul>
+<p><strong>Related commands:</strong> <code>/rforge:release</code> (ecosystem-level submission ordering), <code>/rforge:r:revdep</code>, <code>/rforge:r:check</code>, <code>/rforge:r:winbuilder</code>, <code>/rforge:r:rhub</code>, <code>/rforge:r:cycle</code></p>
+<hr />
 <h2 id="command-categories-summary">Command Categories Summary<a class="headerlink" href="#command-categories-summary" title="Permanent link">&para;</a></h2>
 <h3 id="by-time-budget">By Time Budget<a class="headerlink" href="#by-time-budget" title="Permanent link">&para;</a></h3>
 <table>
@@ -3484,7 +3809,7 @@
 - <code>--format json</code> - Machine-readable with metadata
 - <code>--format markdown</code> - Documentation-ready</p>
 <p><strong>Example:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-56-1"><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span>--format<span class="w"> </span>markdown<span class="w"> </span>&gt;<span class="w"> </span>analysis.md
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-66-1"><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span>--format<span class="w"> </span>markdown<span class="w"> </span>&gt;<span class="w"> </span>analysis.md
 </span></code></pre></div></p>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>

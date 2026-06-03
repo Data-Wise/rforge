@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 28 self-contained commands for R package development, ecosystem management, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 33 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -900,6 +900,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../r-dev-cycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../cran-release-prep/" class="md-nav__link">
         
   
@@ -908,6 +936,34 @@
     
   
     CRAN release prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cran-submission-with-rforge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRAN submission with rforge
   
 
     
@@ -2072,7 +2128,7 @@ features) read this file to know what package you're working on. It's
 </span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>   • Run tests on dependents after change
 </span></code></pre></div>
 <h2 id="three-headline-commands">Three headline commands<a class="headerlink" href="#three-headline-commands" title="Permanent link">&para;</a></h2>
-<p>Use these for daily work; the rest of the plugin's 28 commands are
+<p>Use these for daily work; the rest of the plugin's 33 commands are
 specialized.</p>
 <table>
 <thead>
@@ -2094,9 +2150,14 @@ specialized.</p>
 <td>~30s — impact + recommendations</td>
 </tr>
 <tr>
-<td><code>/rforge:thorough "release prep"</code></td>
+<td><code>/rforge:r:cran-prep</code></td>
 <td>Before CRAN submission</td>
-<td>2-5 min — full validation</td>
+<td>per-package gate — document→check→revdep, writes <code>cran-comments.md</code></td>
+</tr>
+<tr>
+<td><code>/rforge:thorough "release prep"</code></td>
+<td>Ecosystem rollup before release</td>
+<td>2-5 min — cross-package validation + submission order</td>
 </tr>
 </tbody>
 </table>
@@ -2113,7 +2174,7 @@ specialized.</p>
 </ul>
 <p>Reference material:</p>
 <ul>
-<li><strong><a href="../../REFCARD/">REFCARD</a></strong> — all 28 commands in one page</li>
+<li><strong><a href="../../REFCARD/">REFCARD</a></strong> — all 33 commands in one page</li>
 <li><strong><a href="../../hooks-and-skills/">Hooks &amp; Skills</a></strong> — the <code>pretooluse</code> hook
   that flags R-aware mistakes on every Write/Edit</li>
 <li><strong><a href="../../architecture/">Architecture</a></strong> — how the plugin's <code>lib/</code>
