@@ -6,7 +6,7 @@
     - **How:** Jump to a category below, or `Ctrl+F` for a specific command.
     - **Next:** [REFCARD](REFCARD.md) for the at-a-glance summary.
 
-Complete reference for all **28** RForge commands. Commands are organized by category with usage examples and parameter details.
+Complete reference for all **33** RForge commands. Commands are organized by category with usage examples and parameter details.
 
 ## Command Categories
 
@@ -15,8 +15,9 @@ Complete reference for all **28** RForge commands. Commands are organized by cat
 - [Ecosystem Management](#ecosystem-management) (5 commands)
 - [Documentation & Tasks](#documentation-tasks) (4 commands)
 - [Health Checks](#health-checks) (2 commands)
-- [R Development Cycle](#r-development-cycle) (8 commands)
-- [R Quality](#r-quality) (4 commands)
+- [R Development Cycle](#r-development-cycle) (9 commands)
+- [R Quality](#r-quality) (5 commands)
+- [CRAN Submission](#cran-submission) (5 commands)
 
 ---
 
@@ -918,6 +919,181 @@ Auto-format the package source via `styler::style_pkg()` and show the diff.
 - If `styler` is missing, reports 🟡 with install hint
 
 **Related commands:** `/rforge:r:lint` (find issues that styler does not auto-fix)
+
+---
+
+## CRAN Submission
+
+### /rforge:r:revdep
+
+Reverse-dependency check against CRAN downstream packages via `revdepcheck`.
+
+**Usage:**
+
+```bash
+/rforge:r:revdep [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Check reverse dependencies for current package
+/rforge:r:revdep
+
+# Check specific package
+/rforge:r:revdep ~/projects/medfit
+```
+
+**Executes:**
+
+- Runs `revdepcheck::revdep_check()` — a hard CRAN obligation for API-changing updates
+- Reports broken downstream packages and new problems
+- `revdepcheck` is optional — if missing, reports 🟡 with install hint
+- Note: can be slow (builds downstream packages)
+
+**Related commands:** `/rforge:r:cran-prep` (runs revdep as part of the submission gate), `/rforge:deps` / `/rforge:impact` (internal ecosystem deps, not CRAN downstream)
+
+---
+
+### /rforge:r:goodpractice
+
+Advisory best-practice bundle — goodpractice checks (opt-in, not part of `r:cycle`).
+
+**Usage:**
+
+```bash
+/rforge:r:goodpractice [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Run advisory best-practice checks for current package
+/rforge:r:goodpractice
+```
+
+**Executes:**
+
+- Runs `goodpractice::gp()` — re-runs R CMD check, lintr, and covr plus additional checks (cyclomatic complexity, TODO/FIXME scan, DESCRIPTION completeness, etc.)
+- Reports advisories with counts and descriptions
+- `goodpractice` is optional — if missing, reports 🟡 with install hint
+- Not part of `/rforge:r:cycle` to avoid double-running check/lint/coverage
+
+**Related commands:** `/rforge:r:check`, `/rforge:r:lint`, `/rforge:r:coverage`, `/rforge:r:cran-prep`
+
+---
+
+### /rforge:r:winbuilder
+
+Submit to win-builder (R-devel) via `devtools::check_win_devel()` — async dispatch.
+
+**Usage:**
+
+```bash
+/rforge:r:winbuilder [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Dispatch to win-builder
+/rforge:r:winbuilder
+```
+
+**Executes:**
+
+- Submits the package to [win-builder](https://win-builder.r-project.org/) for a remote R-devel check on Windows
+- **Async dispatch** — results are emailed to the DESCRIPTION Maintainer; nothing returns synchronously
+- `devtools` is optional — if missing, reports 🟡 with install hint
+- Run at least once per release after a clean `/rforge:r:check --as-cran` pass
+
+**Related commands:** `/rforge:r:cran-prep` (runs winbuilder under `--multi-platform`), `/rforge:r:rhub`
+
+---
+
+### /rforge:r:rhub
+
+Multi-platform checks via R-hub v2 (`rhub::rhub_check`) — async dispatch via GitHub Actions.
+
+**Usage:**
+
+```bash
+/rforge:r:rhub [package]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+
+**Examples:**
+
+```bash
+# Dispatch to R-hub v2
+/rforge:r:rhub
+```
+
+**Executes:**
+
+- Runs `rhub::rhub_check()` — triggers GitHub Actions workflows across Linux, macOS, Windows, and various R versions
+- **Async dispatch** — results appear in the repo's Actions tab
+- First run calls `rhub::rhub_setup()` (writes `.github/workflows/rhub.yaml`); subsequent runs skip setup
+- A GitHub remote is required
+- `rhub` is optional — if missing, reports 🟡 with install hint
+
+**Related commands:** `/rforge:r:cran-prep` (includes rhub under `--multi-platform`), `/rforge:r:winbuilder`
+
+---
+
+### /rforge:r:cran-prep
+
+Per-package CRAN-readiness gate — runs the full pre-submission sequence and generates `cran-comments.md`.
+
+**Usage:**
+
+```bash
+/rforge:r:cran-prep [package] [--goodpractice] [--multi-platform] [--no-revdep]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+- `--goodpractice` (optional) - Also run the advisory goodpractice bundle (default: false)
+- `--multi-platform` (optional) - Dispatch win-builder + R-hub async checks (default: false)
+- `--no-revdep` (optional) - Skip the reverse-dependency check (default: false)
+
+**Examples:**
+
+```bash
+# Full CRAN-prep gate for current package
+/rforge:r:cran-prep
+
+# Include goodpractice advisory and multi-platform checks
+/rforge:r:cran-prep --goodpractice --multi-platform
+
+# Skip revdep (e.g., first CRAN submission with no dependents)
+/rforge:r:cran-prep --no-revdep
+```
+
+**Executes:**
+
+- Full sequence: `document` → `lint` → `spell` → `urlcheck` → `test` → `coverage` → `check (--as-cran)` → `revdep`
+- Generates `cran-comments.md` with a `ready` / `warn` / `blocked` verdict
+- Returns a stage-by-stage status table; lists blockers that must be fixed before submission
+- Composes with `/rforge:release` (this = single-package gate; release = cross-package submission ordering)
+
+**Related commands:** `/rforge:release` (ecosystem-level submission ordering), `/rforge:r:revdep`, `/rforge:r:check`, `/rforge:r:winbuilder`, `/rforge:r:rhub`, `/rforge:r:cycle`
 
 ---
 

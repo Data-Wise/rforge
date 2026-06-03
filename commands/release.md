@@ -8,7 +8,7 @@ arguments:
     required: false
     type: string
   - name: detailed
-    description: Show full submission sequence with reverse-dependency checks
+    description: Show full submission sequence with internal dependency-order sequencing
     required: false
     type: boolean
     default: false
@@ -44,7 +44,7 @@ Helps you:
 
 Returns release plan with:
 - **Submission Order**: Dependency-based sequence
-- **Readiness Check**: Per-package status
+- **Readiness Check**: Per-package status from `.STATUS`. This is a **shallow** status summary from `.STATUS`. For the authoritative per-package CRAN gate (runs `R CMD check --as-cran`, generates `cran-comments.md`), run `/rforge:r:cran-prep`.
 - **Blockers**: What's preventing releases
 - **Timeline**: Expected approval dates
 - **Checklist**: Pre-submission tasks
@@ -119,3 +119,4 @@ Total timeline: 5-7 weeks
 - `/rforge:status` - Check readiness
 - `/rforge:cascade` - Plan updates
 - `/rforge:deps` - See dependency order
+- `/rforge:r:cran-prep` — Per-package CRAN-readiness gate

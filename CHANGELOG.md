@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.0] - 2026-06-02
+
+### Added
+
+- **5 new `r:` CRAN-submission commands**: `r:revdep` (reverse-dependency check via `revdepcheck`), `r:goodpractice` (advisory best-practice bundle), `r:winbuilder` (async dispatch to win-builder via `devtools`), `r:rhub` (async dispatch to R-hub v2 via `rhub`), `r:cran-prep` (full CRAN-readiness gate: document→lint→spell→urlcheck→test→coverage→check(--as-cran)→revdep + generates `cran-comments.md` with a `ready`/`warn`/`blocked` verdict).
+- **`r:check` NOTE classifier**: each R CMD check NOTE is now classified as `spurious` (expected on first CRAN submission) or `real` (needs attention) in the `notes_classified` field of the envelope.
+- **`render_cran_comments`** pure-Python function in `lib/rcmd.py` generates `cran-comments.md` from check + revdep envelopes.
+- **28 → 33 commands** total.
+- **Tutorial**: `docs/tutorials/cran-submission-with-rforge.md` — per-package CRAN gate walkthrough.
+
+### Changed
+
+- `r:check`: envelope now includes `check.notes_classified` (list of `{text, kind, reason}` dicts).
+- `lib/rcmd.py`: new CRAN-submission engine kinds (`revdep`, `goodpractice`, `winbuilder`, `rhub`, `cran-prep`); `OPTIONAL_ENGINES` and `INSTALL_HINT` extended; `_status_for` + `normalize` updated; `dispatched` status added for async kinds.
+
+---
+
 ## [2.1.0] - 2026-05-31
 
 ### Added

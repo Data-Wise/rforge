@@ -1,21 +1,30 @@
 project: rforge
-updated: 2026-06-01
+updated: 2026-06-02
 status: Active
-version: 2.1.0 (released)
+version: 2.2.0 (in-progress, feature/r-cran-prep branch)
 last_release: 2026-06-01 v2.1.0 (PR #12 dev → main merge d76a45a, release https://github.com/Data-Wise/rforge/releases/tag/v2.1.0, tap data-wise/tap synced to 2.1.0 + brew install/test green; r: dev-cycle + quality commands, 16→28)
 
 worktrees:
   - path: ~/.git-worktrees/rforge/feature-r-cran-prep
     branch: feature/r-cran-prep
     created: 2026-06-01
-    status: implementing (started 2026-06-01 — no code commits yet; Task 1 of ORCHESTRATE pending)
+    status: implementation complete — PR open
     target: v2.2.0
     scope: "CRAN-submission suite — r:cran-prep orchestrator + r:revdep/r:goodpractice/r:winbuilder/r:rhub + r:check NOTE classifier. 28 → 33 commands. Reuses lib/rcmd.py run()."
-    plan: ORCHESTRATE-r-cran-prep.md (10 TDD tasks)
+    plan: ORCHESTRATE-r-cran-prep.md (10 TDD tasks — all complete)
     spec: docs/specs/SPEC-r-cran-prep-2026-06-01.md (research: RESEARCH-cran-dev-2026-06-01.md)
-    notes: "Phase 4 (agents) → v2.3.0. winbuilder uses devtools (optional engine, scoped exception). revdep/goodpractice/rhub R-API shapes marked VERIFY-LIVE — Task 9 (live R sanity) is mandatory before PR."
 
 recent:
+  - date: 2026-06-02
+    branch: feature/r-cran-prep
+    state: in-progress
+    title: "feat: r: CRAN-submission commands (v2.2.0)"
+    summary: |
+      5 new r: CRAN-submission commands (r:revdep, r:goodpractice, r:winbuilder,
+      r:rhub, r:cran-prep) + r:check NOTE classifier (notes_classified). 28→33
+      commands; version bump 2.1.0→2.2.0. Docs: commands.md CRAN Submission
+      section, REFCARD CRAN SUBMISSION box, tutorial cran-submission-with-rforge.md.
+
   - date: 2026-06-01
     pr: 12
     branch: dev
@@ -268,10 +277,10 @@ backlog:
     priority: low
     notes: "Open-ended feedback thread for rename ergonomics + the deferred /rforge:quick + /rforge:thorough rename decision. Watch ~2-4 weeks; decisions inform v2.1.0 scope."
 
-  # Medium-term work (v2.2.0 horizon)
-  - title: "Phase 4 — discovery engine + agents (v2.2.0)"
+  # Medium-term work (v2.3.0 horizon)
+  - title: "Phase 4 — discovery engine + agents (v2.3.0)"
     priority: medium
-    notes: "Last craft-parity item. Adds agent definitions mirroring craft's discovery engine."
+    notes: "Last craft-parity item. Adds agent definitions mirroring craft's discovery engine. (Bumped from v2.2.0 — that slot was taken by r: CRAN-submission commands.)"
 
   # Parked (waits on external signal)
   - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"

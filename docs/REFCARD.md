@@ -1,19 +1,19 @@
 # 📚 RForge Plugin - Reference Card
 
-> **Version:** 2.1.0 | **Last Updated:** 2026-05-31
+> **Version:** 2.2.0 | **Last Updated:** 2026-06-02
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** All 28 commands in one page — categorized by use case.
+    - **What:** All 33 commands in one page — categorized by use case.
     - **Why:** Forget command syntax? Scan the ASCII box below.
     - **How:** Daily? `/rforge:status` `/rforge:quick`. After changes? `/rforge:analyze "what?"`. Pre-CRAN? `/rforge:thorough`.
     - **Next:** [Commands reference](commands.md) for full per-command docs.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  RFORGE PLUGIN REFERENCE                                            v2.1.0  │
+│  RFORGE PLUGIN REFERENCE                                            v2.2.0  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│  COMMANDS (28)                                                              │
+│  COMMANDS (33)                                                              │
 │  ─────────                                                                  │
 │                                                                             │
 │  DAILY                                                                      │
@@ -59,6 +59,13 @@
 │    /rforge:r:spell        Spell check (spelling)                            │
 │    /rforge:r:urlcheck     URL breakage check (urlchecker)                   │
 │    /rforge:r:style        Auto-format source (styler)                       │
+│                                                                             │
+│  CRAN SUBMISSION (v2.2.0)                                                   │
+│    /rforge:r:revdep       Reverse-dep check vs CRAN downstream (revdepcheck)│
+│    /rforge:r:goodpractice Advisory best-practice bundle (goodpractice)      │
+│    /rforge:r:winbuilder   Dispatch to win-builder R-devel — async           │
+│    /rforge:r:rhub         Multi-platform checks via R-hub v2 — async        │
+│    /rforge:r:cran-prep    Full CRAN-readiness gate + cran-comments.md       │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -127,7 +134,7 @@ As of v1.3.0 the plugin is self-contained — slash commands dispatch to pure-Py
 | `lib.deps` | Dependency graph + impact analysis | ~8s |
 | `lib.status` | Ecosystem health snapshot | <5s |
 | `lib.init` | Initialize `~/.rforge/context.json` | <5s |
-| `lib.rcmd` | R dev-cycle + quality engines (v2.1.0) | R-bound |
+| `lib.rcmd` | R dev-cycle + quality + CRAN-submission engines (v2.2.0) | R-bound |
 
 See [`docs/lib-modules.md`](lib-modules.md) and the [reference API docs](reference/discovery.md) for full call signatures.
 
@@ -212,15 +219,15 @@ No `~/.claude/settings.json` entries required since v1.3.0 — the plugin is ful
 
 ```text
 rforge/
-├── .claude-plugin/        # Plugin manifest + extras (v2.1.0)
+├── .claude-plugin/        # Plugin manifest + extras (v2.2.0)
 │   ├── plugin.json
 │   ├── marketplace.json
 │   ├── config.json
 │   ├── hooks/pretooluse.py
 │   └── skills/validation/description-sync.md
-├── commands/              # 28 slash commands (/rforge:*)
+├── commands/              # 33 slash commands (/rforge:*)
 │   ├── docs/check.md      # /rforge:docs:check (v2.0.0+)
-│   └── r/                 # /rforge:r:* (v2.0.0+, expanded v2.1.0)
+│   └── r/                 # /rforge:r:* (v2.0.0+, expanded v2.1.0, v2.2.0)
 ├── agents/                # 1 orchestrator agent
 │   └── orchestrator.md
 ├── scripts/               # Installation scripts
@@ -231,7 +238,7 @@ rforge/
 │   ├── deps.py
 │   ├── status.py
 │   ├── init.py
-│   ├── rcmd.py            # R dev-cycle + quality engines (v2.1.0)
+│   ├── rcmd.py            # R dev-cycle + quality + CRAN-submission engines (v2.2.0)
 │   └── formatters.py
 └── docs/                  # Documentation
     └── REFCARD.md (this file)
@@ -307,6 +314,11 @@ rforge/
 | Daily development | `/rforge:status` + `/rforge:next` | Dashboard + decision |
 | Running R CMD check | `/rforge:r:check` | Single-package deep check |
 | Documentation drift | `/rforge:docs:check` | NEWS.md, API consistency |
+| CRAN pre-submission gate | `/rforge:r:cran-prep` | Full gate + cran-comments.md |
+| CRAN Windows check | `/rforge:r:winbuilder` | Async R-devel on Windows |
+| CRAN multi-platform | `/rforge:r:rhub` | Async GitHub Actions matrix |
+| Reverse-dep check | `/rforge:r:revdep` | CRAN downstream obligation |
+| Advisory best practices | `/rforge:r:goodpractice` | Pre-submission advisory pass |
 
 ---
 

@@ -21,12 +21,13 @@ import subprocess
 import sys
 from pathlib import Path
 
-OPTIONAL_ENGINES = {"covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler"}
+OPTIONAL_ENGINES = {"covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
+                    "revdepcheck", "goodpractice", "devtools", "rhub"}
 INSTALL_HINT = {
     p: f'install.packages("{p}")'
     for p in ("rcmdcheck", "pkgbuild", "roxygen2", "testthat", "pkgload",
               "covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
-              "jsonlite")
+              "revdepcheck", "goodpractice", "devtools", "rhub", "jsonlite")
 }
 
 
@@ -56,6 +57,31 @@ def _parse_json(stdout: str) -> dict | None:
         if isinstance(obj, dict):
             return obj
     return None
+
+
+SPURIOUS_NOTE_PATTERNS = [
+    (r"New submission", "expected on first submission"),
+    (r"Days since last update", "resubmitting within CRAN cadence; expected"),
+    (r"checking CRAN incoming feasibility", "informational; incoming checks only"),
+    (r"[Pp]ossibly misspelled words in DESCRIPTION",
+     "CRAN spell-checker flags proper nouns / technical terms"),
+    (r"installed size is", "size note; justify in cran-comments if irreducible"),
+]
+
+
+def _classify_notes(notes) -> list:
+    out = []
+    for n in _as_list(notes):
+        kind, reason = "real", None
+        for pat, why in SPURIOUS_NOTE_PATTERNS:
+            if re.search(pat, str(n)):
+                kind, reason = "spurious", why
+                break
+        # rcmdcheck notes are strings; str() above only guards a future dict
+        # note. `text` keeps the original `n` (a string in practice) so
+        # downstream renderers (render_cran_comments) can call .splitlines().
+        out.append({"text": n, "kind": kind, "reason": reason})
+    return out
 
 
 def find_package(path: str = ".") -> dict | None:
@@ -96,6 +122,14 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
         return "ok"  # advisory; untested lines surfaced, never "error"
     if kind in _QUALITY_KEY:
         return "warn" if raw.get(_QUALITY_KEY[kind]) else "ok"
+    if kind in ("winbuilder", "rhub"):
+        return "dispatched" if exit_code == 0 else "error"
+    if kind == "revdep":
+        if raw.get("broken"):
+            return "error"
+        return "warn" if raw.get("new_problems") else "ok"
+    if kind == "goodpractice":
+        return "warn" if raw.get("checks") else "ok"
     # load, document, install, build, style: success == exit 0
     return "ok" if exit_code == 0 else "error"
 
@@ -113,6 +147,7 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
         env["version"] = pkg.get("version", "")
     if kind == "check":
         env["check"] = {k: _as_list(raw.get(k)) for k in ("errors", "warnings", "notes")}
+        env["check"]["notes_classified"] = _classify_notes(raw.get("notes"))
     elif kind == "test":
         env["tests"] = {k: raw.get(k, 0) for k in
                         ("passed", "failed", "skipped", "warnings")}
@@ -143,6 +178,21 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
     elif kind == "style":
         changed = _as_list(raw.get("changed_files"))
         env["style"] = {"count": len(changed), "changed_files": changed}
+    elif kind == "winbuilder":
+        env["winbuilder"] = {"submitted": raw.get("submitted", True),
+                             "note": raw.get("note", "results emailed to the "
+                                     "DESCRIPTION maintainer; check inbox")}
+    elif kind == "rhub":
+        env["rhub"] = {"run_url": raw.get("run_url"),
+                       "note": raw.get("note", "dispatched to GitHub Actions; "
+                               "check the repo's Actions tab")}
+    elif kind == "revdep":
+        env["revdep"] = {"broken": _as_list(raw.get("broken")),
+                         "new_problems": _as_list(raw.get("new_problems")),
+                         "failures": _as_list(raw.get("failures"))}
+    elif kind == "goodpractice":
+        checks = _as_list(raw.get("checks"))
+        env["goodpractice"] = {"count": len(checks), "checks": checks}
     # load: no extra block — status carries the result
     return env
 
@@ -255,6 +305,38 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             f'res <- styler::style_pkg({p}); '
             f'cat(jsonlite::toJSON(list(changed_files='
             f'as.list(res$file[res$changed %in% TRUE])), auto_unbox=TRUE, null="list"))')
+    if kind == "revdep":
+        # NOTE: num_workers=4 is a fixed default (no CLI flag yet — add one to
+        # main() if CI core counts become a problem). new_problems and failures
+        # are hardcoded empty pending Task 9 live verification of revdepcheck's
+        # revdep_summary accessors; only `broken` is extracted today. The
+        # envelope keys stay stable so the renderer/orchestrator don't change.
+        return _guard("revdepcheck",
+            f'revdepcheck::revdep_check({p}, num_workers=4, quiet=TRUE); '
+            f'br <- tryCatch(revdepcheck::revdep_summary({p}), error=function(e) list()); '
+            f'broken <- tryCatch(names(Filter(function(x) isTRUE(x$status=="-"), br)), '
+            f'error=function(e) character()); '
+            f'cat(jsonlite::toJSON(list(broken=broken, new_problems=character(), '
+            f'failures=character()), auto_unbox=TRUE, null="list"))')
+    if kind == "goodpractice":
+        # NOTE: failed_checks accessor verified against live R in Task 9;
+        # tryCatch guards against API changes across goodpractice versions.
+        return _guard("goodpractice",
+            f'g <- goodpractice::gp({p}); '
+            f'ck <- tryCatch(as.character(goodpractice::failed_checks(g)), '
+            f'error=function(e) character()); '
+            f'cat(jsonlite::toJSON(list(checks=ck), auto_unbox=TRUE, null="list"))')
+    if kind == "winbuilder":
+        # NOTE: devtools::check_win_devel() submission verified live in Task 9.
+        return _guard("devtools",
+            f'devtools::check_win_devel({p}); '
+            f'cat(jsonlite::toJSON(list(submitted=TRUE), auto_unbox=TRUE))')
+    if kind == "rhub":
+        # NOTE: rhub::rhub_check() run_url capture verified live in Task 9.
+        return _guard("rhub",
+            f'rhub::rhub_setup({p}); '              # idempotent; writes workflow
+            f'rhub::rhub_check({p}); '
+            f'cat(jsonlite::toJSON(list(run_url=NA), auto_unbox=TRUE))')
     raise ValueError(f"unknown kind: {kind}")
 
 
@@ -320,26 +402,143 @@ def _run_cycle(path: str) -> dict:
             "engine_missing": [], "messages": []}
 
 
+def render_cran_comments(package: str, version: str,
+                         check_env: dict, revdep_env: dict | None) -> str:
+    """Generate cran-comments.md body from check and revdep envelopes.
+
+    Produces the two standard CRAN submission sections: R CMD check results
+    (with NOTE classification tags) and reverse dependencies. Pass
+    revdep_env=None when no revdep check was run (package has no dependents).
+    """
+    chk = check_env.get("check", {})
+    ne, nw = len(chk.get("errors", [])), len(chk.get("warnings", []))
+    classified = chk.get("notes_classified", [])
+    nn = len(classified)
+    lines = [f"## R CMD check results", "",
+             f"{ne} errors | {nw} warnings | {nn} note{'s' if nn != 1 else ''}", ""]
+    if classified:
+        lines.append("Remaining NOTEs:")
+        for c in classified:
+            tag = "expected" if c["kind"] == "spurious" else "NEEDS REVIEW"
+            reason = f" — {c['reason']}" if c.get("reason") else ""
+            first_line = (c['text'].splitlines() or [''])[0]
+            lines.append(f"* [{tag}] {first_line}{reason}")
+        lines.append("")
+    lines += ["## Reverse dependencies", ""]
+    rv = (revdep_env or {}).get("revdep", {})
+    broken = rv.get("broken", [])
+    if not revdep_env:
+        lines.append("There are currently no downstream dependencies for this package.")
+    elif broken:
+        lines.append(f"Broke {len(broken)} package(s): {', '.join(broken)} — "
+                     "maintainers notified.")
+    else:
+        lines.append("All reverse dependencies passed (see revdep/cran.md).")
+    return "\n".join(lines) + "\n"
+
+
+def _run_cran_prep(path: str = ".", *, no_revdep: bool = False,
+                   goodpractice: bool = False, multi_platform: bool = False) -> dict:
+    pkg = find_package(path)
+    if pkg is None:
+        return {"kind": "cran-prep", "status": "blocked", "engine_missing": [],
+                "blockers": ["No DESCRIPTION — try /rforge:detect"], "stages": [],
+                "messages": []}
+    stages, blockers, dispatched = [], [], []
+    revdep_env = None  # may stay None when no_revdep=True
+
+    def stage(kind, **kw):
+        env = run(kind, path, **kw)
+        stages.append({"kind": kind, "status": env["status"]})
+        return env
+
+    # 1-6: hard sequence (stop at first ERROR)
+    for kind in ("document", "lint", "spell", "urlcheck", "test", "coverage"):
+        env = stage(kind)
+        if env["status"] == "error":
+            blockers.append(f"{kind} failed")
+            return _cran_prep_envelope(pkg, "blocked", stages, blockers, dispatched,
+                                       failed_stage=kind)
+    check_env = stage("check", as_cran=True)
+    if check_env["status"] == "error":
+        blockers.append("R CMD check --as-cran failed (errors/warnings)")
+        return _cran_prep_envelope(pkg, "blocked", stages, blockers, dispatched,
+                                   failed_stage="check")
+    real_notes = [c for c in check_env.get("check", {}).get("notes_classified", [])
+                  if c.get("kind") == "real"]
+    if real_notes:
+        blockers.append(f"{len(real_notes)} real NOTE(s) need attention")
+
+    # revdep (skip if opted out)
+    if not no_revdep:
+        revdep_env = stage("revdep")
+        if revdep_env["status"] == "error":
+            blockers.append("reverse dependencies broken")
+
+    # goodpractice (opt-in, advisory — never blocks)
+    if goodpractice:
+        stage("goodpractice")
+
+    # multi-platform dispatch (async)
+    if multi_platform:
+        for kind in ("winbuilder", "rhub"):
+            env = stage(kind)
+            if env["status"] == "dispatched":
+                dispatched.append(kind)
+
+    # write cran-comments.md
+    text = render_cran_comments(pkg["package"], pkg.get("version", ""),
+                                check_env, revdep_env)
+    cc_path = Path(path) / "cran-comments.md"
+    cc_path.write_text(text)
+
+    status = "ready" if not blockers else "warn"
+    return _cran_prep_envelope(pkg, status, stages, blockers, dispatched,
+                               cran_comments_path=str(cc_path))
+
+
+def _cran_prep_envelope(pkg, status, stages, blockers, dispatched, **extra):
+    # status vocab for cran-prep: "ready" / "warn" / "blocked" (extends the
+    # standard "ok"/"warn"/"error"/"dispatched" set used by single-engine kinds)
+    env = {"kind": "cran-prep", "status": status,
+           "package": pkg.get("package", ""), "version": pkg.get("version", ""),
+           "stages": stages, "blockers": blockers, "dispatched": dispatched,
+           "engine_missing": [], "messages": [],
+           "handoff": ("ready for /rforge:release ecosystem sequencing"
+                       if status == "ready" else "not yet CRAN-ready")}
+    env.update(extra)
+    return env
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python3 -m lib.rcmd",
                                  description="Run an R dev-cycle/quality engine, emit JSON.")
     ap.add_argument("--kind", required=True,
                     choices=["load", "document", "test", "check", "coverage", "build",
-                             "install", "site", "cycle", "lint", "spell", "urlcheck", "style"])
+                             "install", "site", "cycle", "lint", "spell", "urlcheck", "style",
+                             "winbuilder", "rhub", "revdep", "goodpractice", "cran-prep"])
     ap.add_argument("--path", default=".")
     ap.add_argument("--as-cran", action="store_true")
     ap.add_argument("--preview", action="store_true")
     ap.add_argument("--strict", action="store_true")
     ap.add_argument("--articles-only", action="store_true")
     ap.add_argument("--devel", action="store_true")
+    ap.add_argument("--goodpractice", action="store_true")
+    ap.add_argument("--multi-platform", action="store_true")
+    ap.add_argument("--no-revdep", action="store_true")
     ns = ap.parse_args(argv)
     if ns.kind == "cycle":
         env = _run_cycle(ns.path)
+    elif ns.kind == "cran-prep":
+        env = _run_cran_prep(ns.path, no_revdep=ns.no_revdep,
+                             goodpractice=ns.goodpractice,
+                             multi_platform=ns.multi_platform)
     else:
         env = run(ns.kind, ns.path, as_cran=ns.as_cran, preview=ns.preview,
                   strict=ns.strict, articles_only=ns.articles_only, devel=ns.devel)
     print(json.dumps(env, indent=2))
-    return 0 if env.get("status") != "error" else 1
+    # "dispatched" (winbuilder/rhub) is non-error — exits 0 like "ok"/"warn"
+    return 0 if env.get("status") not in ("error", "blocked") else 1
 
 
 if __name__ == "__main__":
