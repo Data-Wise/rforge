@@ -5,7 +5,7 @@
 !!! tip "TL;DR (30 seconds)"
     - **What:** All 33 commands in one page — categorized by use case.
     - **Why:** Forget command syntax? Scan the ASCII box below.
-    - **How:** Daily? `/rforge:status` `/rforge:quick`. After changes? `/rforge:analyze "what?"`. Pre-CRAN? `/rforge:thorough`.
+    - **How:** Daily? `/rforge:status` `/rforge:quick`. After changes? `/rforge:analyze "what?"`. Per-package CRAN gate? `/rforge:r:cran-prep`. Ecosystem rollup? `/rforge:thorough`.
     - **Next:** [Commands reference](commands.md) for full per-command docs.
 
 ```text

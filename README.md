@@ -63,7 +63,10 @@ Full changelog: [`CHANGELOG.md`](CHANGELOG.md).
 # Ultra-fast (< 10 seconds)
 /rforge:quick
 
-# Comprehensive (2-5 minutes)
+# CRAN submission gate (per-package)
+/rforge:r:cran-prep
+
+# Ecosystem rollup (2-5 minutes)
 /rforge:thorough "Prepare for CRAN release"
 ```
 
@@ -74,7 +77,7 @@ Full changelog: [`CHANGELOG.md`](CHANGELOG.md).
 📊 **Live progress** - Real-time updates as tools complete
 🎯 **Smart synthesis** - Combines results into actionable summary
 🧠 **ADHD-friendly** - Fast feedback, clear structure, visual progress
-🐍 **Pure-Python `lib/`** - `lib/discovery.py`, `lib/deps.py`, `lib/status.py`, `lib/init.py`. No R subprocess, no MCP server, no Node.js. See [`docs/lib-modules.md`](docs/lib-modules.md).
+🐍 **Pure-Python `lib/`** - `lib/discovery.py`, `lib/deps.py`, `lib/status.py`, `lib/init.py` (pure Python, no R); `lib/rcmd.py` runs R engines for the `r:*` dev-cycle + CRAN commands. No MCP server, no Node.js. See [`docs/lib-modules.md`](docs/lib-modules.md).
 
 ## How It Works
 

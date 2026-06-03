@@ -6,7 +6,7 @@
     - **What:** Install rforge + run your first command.
     - **Why:** Goes from "never used rforge" to "useful output" in 3 minutes.
     - **How:** Install → run `/rforge:status` in an R-package directory.
-    - **Next:** [REFCARD](REFCARD.md) for all 28 commands, or [tutorials](tutorials/README.md) for deeper dives.
+    - **Next:** [REFCARD](REFCARD.md) for all 33 commands, or [tutorials](tutorials/README.md) for deeper dives.
 
 ⏱️ **3 minutes** • 🟢 Beginner • ✓ 3 steps (install → invoke → next)
 
@@ -80,7 +80,7 @@ brew install data-wise/tap/rforge
 
 ## The 3 Headline Commands
 
-These are the entry points most users start with. The plugin ships **28 commands total** — see [REFCARD.md](REFCARD.md) for the full set (ecosystem management, dependency tracking, CRAN release planning, doc-drift checks, the full `r:` dev cycle, and more).
+These are the entry points most users start with. The plugin ships **33 commands total** — see [REFCARD.md](REFCARD.md) for the full set (ecosystem management, dependency tracking, CRAN release planning, doc-drift checks, the full `r:` dev cycle, and more).
 
 | Command | Speed | When to Use |
 |---------|-------|-------------|
@@ -149,16 +149,17 @@ git commit
 ### Before CRAN Release
 
 ```bash
-# 1. Comprehensive check
+# 1. Full per-package gate (document→lint→spell→urlcheck→test→coverage→check→revdep)
+/rforge:r:cran-prep
+
+# 2. Verdict: ready ✅ / warn 🟡 (review NOTEs) / blocked ❌ (fix and re-run)
+
+# 3. Ecosystem submission order
 /rforge:thorough "Prepare v2.0.0 for CRAN"
+/rforge:release
 
-# 2. Review all recommendations
-
-# 3. Fix all issues
-
-# 4. Run R CMD check
-
-# 5. Submit to CRAN
+# 4. Submit via https://cran.r-project.org/submit.html
+#    Paste cran-comments.md into the Comments field
 ```
 
 ---

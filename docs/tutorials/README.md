@@ -30,7 +30,7 @@ flowchart LR
     A["Getting started<br/>install + first analysis"] --> B["rforge in the<br/>R lifecycle<br/>what it is vs devtools"]
     B --> C["Understanding modes<br/>the --mode flag"]
     C --> D["Ecosystem orchestration<br/>impact / cascade / deps"]
-    D --> E["CRAN release prep<br/>thorough / r:check / release"]
+    D --> E["CRAN release prep<br/>r:cran-prep / thorough / release"]
 ```
 
 ## Available tutorials

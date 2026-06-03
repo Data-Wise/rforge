@@ -13,7 +13,7 @@
     - **How:** `brew install data-wise/tap/rforge`, then `/rforge:analyze "<what changed>"`.
     - **Next:** [Quick Start](QUICK-START.md) (3 min) → [Where to start](#where-to-start) below.
 
-Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. **No MCP server, no Node.js, no R subprocess** for the fast commands (only `/rforge:r:check` and `/rforge:thorough` shell out to R).
+Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. **No MCP server, no Node.js** at runtime. The fast ecosystem commands (analysis, deps, status) are pure Python; the `r:*` dev-cycle commands and `/rforge:thorough` shell out to R via `lib/rcmd.py`.
 
 ## What rforge is — and isn't
 
@@ -47,7 +47,10 @@ Most daily work runs through these. The other 30 commands are specialized — se
 # Balanced analysis with impact + recommendations (~30 seconds) — after changes
 /rforge:analyze "Update RMediation bootstrap algorithm"
 
-# Comprehensive validation incl. R CMD check (2-5 minutes) — before CRAN
+# Per-package CRAN gate (v2.2.0+) — document→check→revdep, writes cran-comments.md
+/rforge:r:cran-prep
+
+# Ecosystem rollup (2-5 minutes) — cross-package validation + submission order
 /rforge:thorough "Prepare for CRAN release"
 ```
 
