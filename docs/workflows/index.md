@@ -23,7 +23,29 @@ flowchart LR
 
 → [Getting started](../tutorials/getting-started.md) (~10 min)
 
-## 🔁 Daily development loop
+## 🔁 R package dev cycle
+
+The inner loop: every code change runs through these `r:` commands.
+
+```mermaid
+flowchart TD
+    A["edit code in R/*.R"] --> B["/rforge:r:cycle\ndocument → test → check"]
+    B --> C{"All stages\npassed?"}
+    C -- "yes ✅" --> D["commit / push"]
+    C -- "no ❌" --> E["fix the failing stage"]
+    E --> B
+
+    D --> F["pre-commit quality\n(optional but recommended)"]
+    F --> G["/rforge:r:lint\n/rforge:r:spell\n/rforge:r:urlcheck"]
+    G --> H{"Clean?"}
+    H -- "yes ✅" --> I["open PR"]
+    H -- "style issues" --> J["/rforge:r:style\n(auto-fix formatting)"]
+    J --> G
+```
+
+→ [R package dev cycle](../tutorials/r-dev-cycle.md) (~10 min)
+
+## 🔁 Ecosystem daily loop
 
 The habit: change code with R tools, check the ecosystem with rforge.
 
@@ -72,20 +94,43 @@ flowchart LR
 
 ## 📦 CRAN release pipeline
 
-Drift check → R CMD check → rollup → submission order.
+Per-package gate → ecosystem rollup → submission order.
 
 ```mermaid
 flowchart TD
-    A["/rforge:docs:check<br/>NEWS + doc drift"] --> B["/rforge:r:check<br/>R CMD check, parsed"]
-    B --> C["/rforge:thorough<br/>ecosystem rollup"]
-    C --> D{"All green?"}
-    D -- "no" --> E["fix blockers<br/>(loop back)"]
-    E --> A
-    D -- "yes" --> F["/rforge:release<br/>CRAN submission order"]
-    F --> G["submit via<br/>CRAN web form"]
+    A["/rforge:docs:check\nNEWS + doc drift"] --> B
+
+    subgraph gate["Per-package gate (v2.2.0+)"]
+        B["/rforge:r:cran-prep\ndocument→lint→spell→urlcheck\ntest→coverage→check(--as-cran)→revdep\nwrites cran-comments.md"]
+    end
+
+    B --> C{"ready / warn\n/ blocked?"}
+    C -- "blocked ❌" --> D["fix blockers\n(loop back)"]
+    D --> A
+    C -- "ready ✅ or warn 🟡" --> E["/rforge:thorough\necosystem rollup"]
+    E --> F["/rforge:release\nCRAN submission order"]
+    F --> G["submit via\nCRAN web form"]
 ```
 
-→ [CRAN release prep](../tutorials/cran-release-prep.md) (~15 min)
+→ [CRAN submission with rforge](../tutorials/cran-submission-with-rforge.md) (~15 min, per-package gate)
+→ [CRAN release prep](../tutorials/cran-release-prep.md) (~15 min, ecosystem pipeline)
+
+## 🌐 Multi-platform verification (optional)
+
+Async dispatch to win-builder and R-hub before CRAN submission.
+
+```mermaid
+flowchart LR
+    A["/rforge:r:cran-prep\n--multi-platform"] --> B["/rforge:r:winbuilder\nasync dispatch"]
+    A --> C["/rforge:r:rhub\nasync dispatch"]
+    B --> D["results emailed\nto DESCRIPTION maintainer"]
+    C --> E["results in repo's\nGitHub Actions tab"]
+    D --> F["review + address\nany Windows-specific issues"]
+    E --> F
+    F --> G["submit to CRAN"]
+```
+
+→ [CRAN submission — multi-platform section](../tutorials/cran-submission-with-rforge.md)
 
 ## How rforge fits with R's own tools
 

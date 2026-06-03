@@ -17,6 +17,7 @@ scenario and walks through the exact commands and expected output.
 | Wondering how rforge fits with `devtools`/`usethis` | [rforge in the R package lifecycle](rforge-in-the-r-lifecycle.md) | ~12 min |
 | Confused by the `--mode` flag | [Understanding modes](understanding-modes.md) | ~5 min |
 | Managing several inter-dependent packages | [Ecosystem orchestration](ecosystem-orchestration.md) | ~15 min |
+| Using the 12 `r:` dev-cycle commands daily | [R package dev cycle](r-dev-cycle.md) | ~10 min |
 | Preparing a CRAN submission — ecosystem ordering | [CRAN release prep](cran-release-prep.md) | ~15 min |
 | Running the full per-package CRAN gate | [CRAN submission with rforge](cran-submission-with-rforge.md) | ~15 min |
 | Coming from `rforge-mcp` (the deprecated MCP server) | [Migrating from rforge-mcp](migrate-from-mcp.md) | ~5 min |
@@ -30,7 +31,8 @@ flowchart LR
     A["Getting started<br/>install + first analysis"] --> B["rforge in the<br/>R lifecycle<br/>what it is vs devtools"]
     B --> C["Understanding modes<br/>the --mode flag"]
     C --> D["Ecosystem orchestration<br/>impact / cascade / deps"]
-    D --> E["CRAN release prep<br/>r:cran-prep / thorough / release"]
+    D --> E["R package dev cycle<br/>r:cycle / r:lint / r:coverage"]
+    E --> F["CRAN release prep<br/>r:cran-prep / thorough / release"]
 ```
 
 ## Available tutorials
@@ -48,8 +50,12 @@ flowchart LR
 - **[Ecosystem orchestration](ecosystem-orchestration.md)** — The
   multi-package commands with worked examples: `/rforge:deps` (map) →
   `/rforge:impact` (blast radius) → `/rforge:cascade` (plan). ~15 min.
-- **[CRAN release prep](cran-release-prep.md)** — End to end:
-  `/rforge:docs:check` → `/rforge:r:check` → `/rforge:thorough` →
+- **[R package dev cycle](r-dev-cycle.md)** — The 12 `r:` commands in daily
+  use: `r:load`, `r:document`, `r:test`, `r:check`, `r:cycle` (dev loop) +
+  `r:lint`, `r:spell`, `r:urlcheck`, `r:style`, `r:coverage`, `r:build`,
+  `r:install`, `r:site` (quality layer). ~10 min.
+- **[CRAN release prep](cran-release-prep.md)** — Ecosystem-level pipeline:
+  `/rforge:docs:check` → `/rforge:r:cran-prep` → `/rforge:thorough` →
   `/rforge:release`. ~15 min.
 - **[CRAN submission with rforge](cran-submission-with-rforge.md)** — Per-package
   CRAN gate: `/rforge:r:cran-prep` → fix blockers → re-run → `--multi-platform`
