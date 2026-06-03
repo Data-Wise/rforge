@@ -1,6 +1,7 @@
 ---
 name: rforge:health
 description: Check health across R package ecosystem
+argument-hint: "[package or focus area]"
 arguments:
   - name: context
     description: Optional focus area or package name

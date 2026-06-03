@@ -1,6 +1,7 @@
 ---
 name: rforge:r:cran-prep
-description: Per-package CRAN-readiness gate — runs the full pre-submission sequence
+description: Per-package CRAN gate — document→lint→spell→urlcheck→test→coverage→check→revdep, writes cran-comments.md
+argument-hint: "[package] [--goodpractice] [--multi-platform] [--no-revdep]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

@@ -1,6 +1,7 @@
 ---
 name: rforge:detect
 description: Auto-detect R package project structure (single package, ecosystem, or hybrid)
+argument-hint: "[path]"
 arguments:
   - name: path
     description: Path to scan (defaults to current directory)

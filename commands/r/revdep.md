@@ -1,6 +1,7 @@
 ---
 name: rforge:r:revdep
 description: Reverse-dependency check against CRAN downstream packages (revdepcheck)
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

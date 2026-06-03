@@ -1,7 +1,7 @@
 ---
 name: rforge:thorough
-description: Comprehensive R package analysis (status rollup plus user-run R checks)
-argument-hint: Optional context (e.g., "Prepare for CRAN release")
+description: Comprehensive ecosystem rollup — status, deps, cross-package health, and CRAN submission order
+argument-hint: "[\"context\"] [package]"
 arguments:
   - name: context
     description: What to focus the thorough analysis on (e.g., "CRAN prep")

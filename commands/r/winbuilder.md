@@ -1,6 +1,7 @@
 ---
 name: rforge:r:winbuilder
 description: Submit to win-builder (R-devel) via devtools::check_win_devel — async
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

@@ -1,6 +1,7 @@
 ---
 name: rforge:r:check
-description: Run R CMD check on package with smart output parsing
+description: Run R CMD check with smart parsing — NOTEs classified as spurious or real
+argument-hint: "[package] [--as-cran]"
 arguments:
   - name: package
     description: Package path to check (defaults to current directory)

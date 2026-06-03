@@ -1,6 +1,7 @@
 ---
 name: rforge:r:goodpractice
 description: Advisory best-practice bundle — goodpractice checks (opt-in, not part of r:cycle)
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

@@ -1,6 +1,7 @@
 ---
 name: rforge:r:rhub
 description: Multi-platform checks via R-hub v2 (rhub::rhub_check) — async, GitHub Actions
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

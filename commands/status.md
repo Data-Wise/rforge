@@ -1,6 +1,7 @@
 ---
 name: rforge:status
 description: Ecosystem-wide status dashboard (health, packages, .STATUS aggregation)
+argument-hint: "[package] [--format text|json]"
 arguments:
   - name: package
     description: Optional package to drill into (defaults to ecosystem-wide)
