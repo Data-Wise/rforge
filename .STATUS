@@ -1,8 +1,8 @@
 project: rforge
 updated: 2026-06-02
 status: Active
-version: 2.2.0 (dev, pending release)
-last_release: 2026-06-01 v2.1.0 (PR #12 dev → main merge d76a45a, release https://github.com/Data-Wise/rforge/releases/tag/v2.1.0, tap data-wise/tap synced to 2.1.0 + brew install/test green; r: dev-cycle + quality commands, 16→28)
+version: 2.2.0 (released)
+last_release: 2026-06-02 v2.2.0 (PR #15 dev → main merge 3b2bdda, release https://github.com/Data-Wise/rforge/releases/tag/v2.2.0, tap data-wise/tap synced to 2.2.0 + brew info green; CRAN-submission suite — r:cran-prep + r:revdep/r:goodpractice/r:winbuilder/r:rhub + NOTE classifier, 28→33 commands)
 
 worktrees: []
 
