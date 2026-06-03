@@ -1,6 +1,7 @@
 ---
 name: rforge:analyze
 description: Analyze R package ecosystem with mode-specific behavior depth
+argument-hint: "[context] [--mode debug|optimize|release]"
 arguments:
   - name: context
     description: What changed or what to focus on

@@ -56,24 +56,27 @@ After any method, confirm Claude Code sees the plugin:
 /help
 ```
 
-Expected: 16 commands prefixed `/rforge:` appear in the listing. If they
+Expected: 33 commands prefixed `/rforge:` appear in the listing. If they
 don't, restart Claude Code and try again.
 
 A quicker confirmation from the shell:
 
 ```zsh
-ls ~/.claude/plugins/rforge/commands/
+ls ~/.claude/plugins/rforge/commands/r/
 ```
 
-Expected: a list of 16 `.md` files (analyze, capture, cascade, complete,
-deps, detect, health, impact, init, next, quick, release, status,
-thorough, plus `docs/check.md` and `r/check.md` in sub-namespaces).
+Expected: a list of 17 `.md` files in `commands/r/` (check, load, document,
+test, coverage, build, install, site, cycle, lint, spell, urlcheck, style,
+revdep, goodpractice, winbuilder, cran-prep) plus `commands/rhub.md`, and
+the 15 top-level commands in `commands/` (analyze, capture, cascade,
+complete, deps, detect, health, impact, init, next, quick, release, status,
+thorough, plus `docs/check.md`).
 
 ## Requirements
 
 - **Claude Code CLI** installed and configured
 - **Python 3.10+** on `PATH` (for the `lib/` modules)
-- **R 4.0+** — only needed for `/rforge:r:check` and `/rforge:thorough`
+- **R 4.0+** — required for all `r:*` commands and `/rforge:thorough`
   workflows. The rest of the plugin runs without R.
 
 No MCP server or Node.js runtime is required at runtime as of v1.3.0.

@@ -5,15 +5,15 @@
 [![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
 [![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
-**R package ecosystem orchestrator for Claude Code — 28 commands, R-aware hooks, validation skills.**
+**R package ecosystem orchestrator for Claude Code — 33 commands, R-aware hooks, validation skills.**
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** R package *ecosystem* analysis from inside Claude Code. 28 slash commands.
+    - **What:** R package *ecosystem* analysis from inside Claude Code. 33 slash commands.
     - **Why:** Fast feedback on multi-package R repos — discovery, dependencies, change impact, CRAN cascade planning.
     - **How:** `brew install data-wise/tap/rforge`, then `/rforge:analyze "<what changed>"`.
     - **Next:** [Quick Start](QUICK-START.md) (3 min) → [Where to start](#where-to-start) below.
 
-Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. **No MCP server, no Node.js, no R subprocess** for the fast commands (only `/rforge:r:check` and `/rforge:thorough` shell out to R).
+Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. **No MCP server, no Node.js** at runtime. The fast ecosystem commands (analysis, deps, status) are pure Python; the `r:*` dev-cycle commands and `/rforge:thorough` shell out to R via `lib/rcmd.py`.
 
 ## What rforge is — and isn't
 
@@ -38,7 +38,7 @@ Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fu
 
 ## The 3 headline commands
 
-Most daily work runs through these. The other 25 commands are specialized — see the [Reference Card](REFCARD.md).
+Most daily work runs through these. The other 30 commands are specialized — see the [Reference Card](REFCARD.md).
 
 ```bash
 # Ultra-fast snapshot (< 10 seconds) — pre-commit
@@ -47,9 +47,18 @@ Most daily work runs through these. The other 25 commands are specialized — se
 # Balanced analysis with impact + recommendations (~30 seconds) — after changes
 /rforge:analyze "Update RMediation bootstrap algorithm"
 
-# Comprehensive validation incl. R CMD check (2-5 minutes) — before CRAN
+# Per-package CRAN gate (v2.2.0+) — document→check→revdep, writes cran-comments.md
+/rforge:r:cran-prep
+
+# Ecosystem rollup (2-5 minutes) — cross-package validation + submission order
 /rforge:thorough "Prepare for CRAN release"
 ```
+
+## What's new in v2.2.0
+
+- **5 new `r:` CRAN-submission commands**: `r:revdep`, `r:goodpractice`, `r:winbuilder`, `r:rhub`, `r:cran-prep` — full pre-submission gate that runs document→lint→spell→urlcheck→test→coverage→check(--as-cran)→revdep, generates `cran-comments.md`, and returns a `ready`/`warn`/`blocked` verdict.
+- **`r:check` NOTE classifier**: notes are now classified as `spurious` (expected on CRAN submission) or `real` (needs attention) using `notes_classified` in the envelope.
+- **Total: 28 → 33 commands.**
 
 ## What's new in v2.1.0
 
@@ -119,7 +128,7 @@ Restart Claude Code so the commands register, then verify with `/help` (look for
 
 ## More documentation
 
-- **[Reference Card](REFCARD.md)** — all 28 commands on one page
+- **[Reference Card](REFCARD.md)** — all 33 commands on one page
 - **[Commands](commands.md)** — full per-command reference
 - **[Architecture](architecture.md)** — how the `lib/` modules fit together
 - **[Hooks & Skills](hooks-and-skills.md)** — the R-aware `PreToolUse` hook

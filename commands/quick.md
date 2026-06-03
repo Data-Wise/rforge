@@ -1,6 +1,7 @@
 ---
 name: rforge:quick
 description: Ultra-fast ecosystem snapshot using only quick lib modules (< 10 seconds)
+argument-hint: "[context description]"
 arguments:
   - name: context
     description: Free-form context for the snapshot (used for narration only)

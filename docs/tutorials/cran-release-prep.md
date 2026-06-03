@@ -2,33 +2,40 @@
 
 !!! tip "TL;DR (30 seconds)"
     - **What:** Take one or more packages from "code complete" to "submitted to CRAN."
-    - **Why:** rforge sequences the submission and surfaces drift; R does the heavy `R CMD check`.
-    - **How:** `/rforge:docs:check` → `/rforge:r:check` → `/rforge:thorough` → `/rforge:release`.
+    - **Why:** rforge can now run the full per-package gate (`r:cran-prep`) **and** plan ecosystem submission order (`release`).
+    - **How (single package):** `/rforge:r:cran-prep` → fix blockers → repeat → `/rforge:release`.
+    - **How (ecosystem):** `/rforge:docs:check` → `/rforge:r:cran-prep` per package → `/rforge:thorough` → `/rforge:release`.
     - **Next:** Submit via CRAN's web form (rforge plans the order; it doesn't upload).
 
 > **For whom:** Maintainer preparing a CRAN submission (single package or
 > ecosystem).
 > **Estimated time:** 15 minutes to read; the actual checks take longer
-> because `R CMD check` is slow.
+> because `R CMD check --as-cran` and `revdepcheck` are slow.
 > **Prior knowledge:** You've built the package and want to ship it.
 
-!!! warning "Division of labor — read this first"
-    rforge does **not** run heavy R checks for you, and it does **not**
-    upload to CRAN. It **aggregates** lib-module health, **parses** the
-    `R CMD check` output you run, and **plans** the submission order. The
-    actual `R CMD check --as-cran` runs in *your* shell with *your* R
-    toolchain. This is by design — those checks need R and can take minutes.
+!!! note "What rforge runs vs. what you run (v2.2.0+)"
+    As of v2.2.0, `/rforge:r:cran-prep` **does** run the heavy checks
+    (document → lint → spell → urlcheck → test → coverage → `R CMD check
+    --as-cran` → revdepcheck) and writes `cran-comments.md`. It still does
+    **not** upload to CRAN — submission is via the CRAN web form.
+    For ecosystem-level planning (submission order, cross-package deps),
+    `/rforge:thorough` and `/rforge:release` remain orchestration-only.
 
 ## The release pipeline at a glance
 
 ```mermaid
 flowchart TD
-    A["/rforge:docs:check<br/>NEWS + doc drift"] --> B["/rforge:r:check<br/>R CMD check, parsed"]
-    B --> C["/rforge:thorough<br/>ecosystem rollup +<br/>R-check recommendations"]
-    C --> D{"All green?"}
-    D -- "no" --> E["Fix blockers<br/>(loop back)"]
-    E --> A
-    D -- "yes" --> F["/rforge:release<br/>CRAN submission order"]
+    A["/rforge:docs:check<br/>NEWS + doc drift"] --> B
+
+    subgraph "Per-package gate (v2.2.0+)"
+        B["/rforge:r:cran-prep<br/>document→lint→spell→urlcheck<br/>test→coverage→check(--as-cran)→revdep<br/>writes cran-comments.md"]
+    end
+
+    B --> C{"ready / warn / blocked?"}
+    C -- "blocked" --> D["Fix blockers<br/>(loop back)"]
+    D --> A
+    C -- "ready or warn" --> E["/rforge:thorough<br/>ecosystem rollup"]
+    E --> F["/rforge:release<br/>CRAN submission order"]
     F --> G["Submit via<br/>CRAN web form"]
 ```
 
@@ -65,48 +72,62 @@ Recommendations:
     `CHANGELOG.md` — the single most common pre-CRAN slip. It's pure shell,
     needs no R, and runs autonomously. See [Hooks & Skills](../hooks-and-skills.md).
 
-## Step 2: Run R CMD check with smart parsing
+## Step 2: Run the full CRAN-prep gate (v2.2.0+)
+
+For most submissions, use the orchestrating command:
+
+```text
+/rforge:r:cran-prep
+```
+
+This sequences document → lint → spell → urlcheck → test → coverage →
+`R CMD check --as-cran` → revdep and writes `cran-comments.md`. It returns
+one of three verdicts:
+
+| Verdict | Meaning |
+|---------|---------|
+| `ready` | All stages clean — proceed to submission |
+| `warn` | Passed but has real NOTEs or new revdep problems — review before submitting |
+| `blocked` | At least one stage errored — fix and re-run |
+
+```text
+✅ CRAN PREP — medfit v2.0.0
+
+document   ok    ✅
+lint       ok    ✅
+spell      ok    ✅
+urlcheck   ok    ✅
+test       ok    ✅  (187 passed)
+coverage   ok    ✅  (92%)
+check      ok    ✅  1 NOTE (classified spurious — "New submission")
+revdep     ok    ✅  no broken packages
+
+Verdict: ready
+cran-comments.md written → review before submitting
+```
+
+!!! tip "NOTEs are classified automatically"
+    `r:cran-prep` tags each NOTE as `spurious` (expected on first submission,
+    e.g. "New submission" or "checking CRAN incoming feasibility") or `real`
+    (needs attention). Spurious NOTEs do not block `ready`. Real NOTEs
+    downgrade the verdict to `warn`.
+
+**Optional flags:**
+
+```text
+/rforge:r:cran-prep --no-revdep         # skip revdep (first submission, no dependents)
+/rforge:r:cran-prep --goodpractice      # add advisory goodpractice checks
+/rforge:r:cran-prep --multi-platform    # dispatch win-builder + R-hub async
+```
+
+**For a single targeted check** (no orchestration), use:
 
 ```text
 /rforge:r:check --as-cran
 ```
 
-This invokes `R CMD check --as-cran` via Bash and parses the output into a
-scannable summary:
-
-```markdown
-## Package Check: medfit v2.0.0
-
-### Status: 🟡
-
-### R CMD Check
-- Errors: 0
-- Warnings: 0
-- Notes: 1
-  • checking CRAN incoming feasibility ... NOTE (new submission)
-
-### Tests
-- Passed: 187
-- Failed: 0
-
-### Documentation
-- [x] All exports documented
-- [x] Examples run
-- [x] README exists
-
-### Recommended Actions
-1. The single NOTE is the standard "new submission" note — expected, not a blocker.
-```
-
-!!! tip "NOTEs are not all equal"
-    A "new submission" NOTE is routine. A NOTE about non-standard files,
-    undefined globals, or large installed size needs fixing. rforge's parse
-    helps you tell them apart — but the judgment call is yours. Run this on
-    each package you're submitting.
-
-`/rforge:r:check` is single-package. For one quick check it's equivalent to
-`devtools::check()` — use whichever you prefer; rforge's value-add is the
-parsed, consistent summary.
+See [CRAN submission with rforge](cran-submission-with-rforge.md) for the
+full per-package walkthrough.
 
 ## Step 3: Roll up the whole ecosystem
 
@@ -133,12 +154,12 @@ Recommended R-side checks (run in your shell):
 Paste the results back and rforge combines them with the lib-status rollup
 into a release-readiness summary.
 
-!!! abstract "Why thorough doesn't just run everything"
-    Earlier (MCP-era) versions tried to orchestrate background R tasks.
-    v1.3.0 deliberately descoped that: R checks are slow, environment-
-    specific, and better run in your own terminal where you can see
-    progress and re-run individually. `/rforge:thorough` focuses on the fast
-    aggregation and points you at the right R commands.
+!!! abstract "Why thorough doesn't run R checks"
+    `/rforge:thorough` is an ecosystem rollup — it aggregates health across
+    all packages, not a single one. The per-package R execution lives in
+    `/rforge:r:cran-prep` (v2.2.0+). `thorough` focuses on fast cross-package
+    aggregation and surfaces drift; `cran-prep` does the heavy single-package
+    gate.
 
 ## Step 4: Plan the submission order
 
@@ -198,21 +219,28 @@ That's your signal to loop back to Steps 1–2 for that package.
 Most releases are one package, not a whole verse. The condensed flow:
 
 ```text
-/rforge:docs:check medfit        # 1. drift check
-/rforge:r:check --as-cran        # 2. R CMD check (in medfit/)
-/rforge:thorough "CRAN prep"     # 3. rollup + recommendations
-# ... fix anything flagged, re-run ...
-/rforge:release medfit           # 4. confirm it's ready
-# → submit via https://cran.r-project.org/submit.html
+/rforge:docs:check medfit        # 1. drift check (NEWS, examples)
+/rforge:r:cran-prep              # 2. full gate: runs all checks + writes cran-comments.md
+# ... fix anything flagged, re-run until "ready" ...
+/rforge:release medfit           # 3. confirm ecosystem readiness + submission order
+# → review cran-comments.md, submit via https://cran.r-project.org/submit.html
+```
+
+For multi-platform verification before submission:
+
+```text
+/rforge:r:cran-prep --multi-platform   # dispatches win-builder + R-hub (async)
+/rforge:r:winbuilder                   # or run individually
+/rforge:r:rhub
 ```
 
 ## Pre-submission checklist
 
 - [ ] `/rforge:docs:check` clean (NEWS.md current, examples run)
 - [ ] `description-sync` passes (DESCRIPTION version == NEWS top entry)
-- [ ] `/rforge:r:check --as-cran` → 0 errors, 0 warnings, only benign NOTEs
-- [ ] `devtools::test()` → all passing
-- [ ] `covr::package_coverage()` → acceptable for your project
+- [ ] `/rforge:r:cran-prep` → verdict `ready` (or `warn` with all NOTEs reviewed)
+- [ ] `cran-comments.md` reviewed and accurate — you'll paste this into the CRAN form
+- [ ] Multi-platform: win-builder and/or R-hub dispatched and results reviewed
 - [ ] `/rforge:release` → package shows ✅ Ready
 - [ ] For ecosystems: submit in the order `/rforge:release` gives, waiting
       for each approval before the next

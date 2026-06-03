@@ -1,6 +1,7 @@
 ---
 name: rforge:r:cycle
 description: Full dev cycle — document → test → check (stops at first error)
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

@@ -1,6 +1,7 @@
 ---
 name: rforge:docs:check
 description: Check for documentation drift and inconsistencies across packages
+argument-hint: "[package] [--detailed]"
 arguments:
   - name: package
     description: Specific package to check (defaults to ecosystem-wide)

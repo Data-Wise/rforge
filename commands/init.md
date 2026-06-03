@@ -1,6 +1,7 @@
 ---
 name: rforge:init
 description: Initialize rforge context for an R package directory (idempotent)
+argument-hint: "[path] [--quick]"
 arguments:
   - name: path
     description: Package or ecosystem root (defaults to current directory)

@@ -1,6 +1,7 @@
 ---
 name: rforge:r:coverage
 description: Test coverage (covr) — total, per-file, and untested lines
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

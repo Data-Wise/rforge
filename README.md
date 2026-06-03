@@ -5,9 +5,15 @@
 [![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
 [![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
-**R package ecosystem orchestrator for Claude Code — 28 commands, R-aware hooks, validation skills.**
+**R package ecosystem orchestrator for Claude Code — 33 commands, R-aware hooks, validation skills.**
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
+
+## What's new in v2.2.0
+
+- **5 new `r:` CRAN-submission commands**: `r:revdep`, `r:goodpractice`, `r:winbuilder`, `r:rhub`, `r:cran-prep` — full pre-submission gate that runs document→lint→spell→urlcheck→test→coverage→check(--as-cran)→revdep, generates `cran-comments.md`, and returns a `ready`/`warn`/`blocked` verdict.
+- **`r:check` NOTE classifier**: notes are now classified as `spurious` (expected on CRAN submission) or `real` (needs attention) using `notes_classified` in the envelope.
+- **Total: 28 → 33 commands.**
 
 ## What's new in v2.1.0
 
@@ -57,7 +63,10 @@ Full changelog: [`CHANGELOG.md`](CHANGELOG.md).
 # Ultra-fast (< 10 seconds)
 /rforge:quick
 
-# Comprehensive (2-5 minutes)
+# CRAN submission gate (per-package)
+/rforge:r:cran-prep
+
+# Ecosystem rollup (2-5 minutes)
 /rforge:thorough "Prepare for CRAN release"
 ```
 
@@ -68,7 +77,7 @@ Full changelog: [`CHANGELOG.md`](CHANGELOG.md).
 📊 **Live progress** - Real-time updates as tools complete
 🎯 **Smart synthesis** - Combines results into actionable summary
 🧠 **ADHD-friendly** - Fast feedback, clear structure, visual progress
-🐍 **Pure-Python `lib/`** - `lib/discovery.py`, `lib/deps.py`, `lib/status.py`, `lib/init.py`. No R subprocess, no MCP server, no Node.js. See [`docs/lib-modules.md`](docs/lib-modules.md).
+🐍 **Pure-Python `lib/`** - `lib/discovery.py`, `lib/deps.py`, `lib/status.py`, `lib/init.py` (pure Python, no R); `lib/rcmd.py` runs R engines for the `r:*` dev-cycle + CRAN commands. No MCP server, no Node.js. See [`docs/lib-modules.md`](docs/lib-modules.md).
 
 ## How It Works
 
@@ -417,7 +426,7 @@ Plugin settings in `plugin.json`:
 ```
 ~/.claude/plugins/rforge/
 ├── .claude-plugin/
-│   ├── plugin.json          # Plugin manifest (v2.1.0)
+│   ├── plugin.json          # Plugin manifest (v2.2.0)
 │   ├── marketplace.json     # Marketplace install metadata
 │   ├── config.json          # User-tunable options (CRAN mirror, etc.)
 │   ├── hooks/
@@ -425,7 +434,7 @@ Plugin settings in `plugin.json`:
 │   └── skills/
 │       └── validation/
 │           └── description-sync.md  # DESCRIPTION ↔ NEWS.md drift check
-├── commands/                # 28 slash commands (/rforge:*)
+├── commands/                # 33 slash commands (/rforge:*)
 ├── agents/
 │   └── orchestrator.md      # Pattern recognition + delegation
 ├── lib/                     # Pure-Python analysis modules
@@ -433,7 +442,7 @@ Plugin settings in `plugin.json`:
 │   ├── deps.py              # Dependency graph + impact
 │   ├── status.py            # DESCRIPTION + .STATUS health snapshot
 │   ├── init.py              # ~/.rforge/context.json initializer
-│   ├── rcmd.py              # R dev-cycle + quality engines (v2.1.0)
+│   ├── rcmd.py              # R dev-cycle + quality + CRAN-submission engines (v2.2.0)
 │   └── formatters.py        # Output formatting helpers
 └── docs/                    # User-facing docs
 ```
@@ -459,6 +468,6 @@ MIT
 
 ---
 
-**Version:** 2.1.0
+**Version:** 2.2.0
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+

@@ -219,3 +219,237 @@ def test_run_site_recovers_from_build_log(tmp_path, monkeypatch):
                                    '{"checked":true,"built":true,"problems":[""]}', 0))
     env = rcmd.run("site", str(tmp_path))
     assert env["site"]["built"] is True and env["status"] == "ok"
+
+
+# --- Task 1: dispatched status for async engines (winbuilder/rhub) ---
+
+def test_status_dispatched_for_winbuilder_on_success():
+    assert rcmd._status_for("winbuilder", {}, 0) == "dispatched"
+    assert rcmd._status_for("rhub", {}, 0) == "dispatched"
+
+
+def test_status_dispatched_engine_missing_is_error():
+    # engine_missing takes precedence (downgraded later in run())
+    assert rcmd._status_for("winbuilder", {"engine_missing": ["devtools"]}, 0) == "error"
+    assert rcmd._status_for("rhub", {"engine_missing": ["rhub"]}, 0) == "error"
+
+
+def test_main_dispatched_exits_zero(tmp_path, monkeypatch, capsys):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"run_url":"https://x"}', 0))
+    rc = rcmd.main(["--kind", "rhub", "--path", str(tmp_path)])
+    out = json.loads(capsys.readouterr().out)
+    assert out["status"] == "dispatched" and rc == 0
+
+
+def test_classify_notes_spurious_vs_real():
+    notes = ["New submission", "checking foo ... NOTE\n  undefined global bar"]
+    out = rcmd._classify_notes(notes)
+    assert out[0]["kind"] == "spurious" and out[0]["reason"]
+    assert out[1]["kind"] == "real" and out[1]["reason"] is None
+
+
+def test_normalize_check_includes_notes_classified():
+    raw = {"errors": [], "warnings": [], "notes": ["New submission"]}
+    env = rcmd.normalize("check", raw, 0, None)
+    assert env["check"]["notes_classified"][0]["kind"] == "spurious"
+
+
+# --- Task 3: r:revdep — reverse-dependency check (revdepcheck) ---
+
+def test_r_snippet_revdep_uses_revdepcheck():
+    src = rcmd.r_snippet("revdep", "/tmp/foo")
+    assert "revdepcheck" in src and "jsonlite::toJSON" in src
+    assert "devtools::" not in src
+
+def test_normalize_revdep_broken_is_error():
+    env = rcmd.normalize("revdep", {"broken": ["pkgA"], "new_problems": []}, 0, None)
+    assert env["status"] == "error" and env["revdep"]["broken"] == ["pkgA"]
+
+def test_normalize_revdep_clean_is_ok():
+    env = rcmd.normalize("revdep", {"broken": [], "new_problems": []}, 0, None)
+    assert env["status"] == "ok"
+
+def test_normalize_revdep_new_problems_is_warn():
+    env = rcmd.normalize("revdep", {"broken": [], "new_problems": ["pkgB"]}, 0, None)
+    assert env["status"] == "warn"
+
+
+# --- Task 4: r:goodpractice — advisory best-practice bundle (goodpractice) ---
+
+def test_r_snippet_goodpractice_uses_gp():
+    src = rcmd.r_snippet("goodpractice", "/tmp/foo")
+    assert "goodpractice::gp" in src and "jsonlite::toJSON" in src
+    assert "devtools::" not in src
+
+def test_normalize_goodpractice_warns_with_items():
+    env = rcmd.normalize("goodpractice", {"checks": ["avoid T/F"]}, 0, None)
+    assert env["status"] == "warn" and env["goodpractice"]["count"] == 1
+
+def test_normalize_goodpractice_clean_ok():
+    assert rcmd.normalize("goodpractice", {"checks": []}, 0, None)["status"] == "ok"
+
+
+# --- Task 5: r:winbuilder + r:rhub — multi-platform dispatch ---
+
+def test_r_snippet_winbuilder_guards_devtools():
+    src = rcmd.r_snippet("winbuilder", "/tmp/foo")
+    assert "devtools::check_win_devel" in src and 'requireNamespace("devtools"' in src
+
+def test_r_snippet_rhub_uses_rhub_check():
+    src = rcmd.r_snippet("rhub", "/tmp/foo")
+    assert "rhub::rhub_check" in src and 'requireNamespace("rhub"' in src
+
+def test_run_winbuilder_missing_devtools_warns(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"engine_missing":["devtools"]}', 0))
+    env = rcmd.run("winbuilder", str(tmp_path))
+    assert env["status"] == "warn"  # optional engine downgrade
+    assert any("devtools" in m for m in env["messages"])
+
+
+# --- Task 6: render_cran_comments — pure markdown generator ---
+
+def test_cran_comments_spurious_note_no_revdep():
+    """revdep_env=None → 'no downstream dependencies'; spurious note is tagged 'expected'."""
+    check_env = {"check": {"errors": [], "warnings": [], "notes": ["New submission"],
+                 "notes_classified": [{"text": "New submission", "kind": "spurious",
+                                       "reason": "expected on first submission"}]}}
+    text = rcmd.render_cran_comments("foo", "0.2.0", check_env, None)
+    assert "## R CMD check results" in text
+    assert "0 errors | 0 warnings | 1 note" in text
+    assert "New submission" in text and "expected on first submission" in text
+    assert "[expected]" in text
+    assert "## Reverse dependencies" in text
+    assert "no downstream dependencies" in text.lower()
+
+
+def test_cran_comments_spurious_note_clean_revdep():
+    """revdep_env provided with no broken packages → 'All reverse dependencies passed'."""
+    check_env = {"check": {"errors": [], "warnings": [], "notes": ["New submission"],
+                 "notes_classified": [{"text": "New submission", "kind": "spurious",
+                                       "reason": "expected on first submission"}]}}
+    revdep_env = {"revdep": {"broken": [], "new_problems": []}}
+    text = rcmd.render_cran_comments("foo", "0.2.0", check_env, revdep_env)
+    assert "## R CMD check results" in text
+    assert "0 errors | 0 warnings | 1 note" in text
+    assert "New submission" in text and "expected on first submission" in text
+    assert "## Reverse dependencies" in text
+    assert "all reverse dependencies passed" in text.lower()
+
+
+def test_cran_comments_flags_real_note_needs_review():
+    check_env = {"check": {"errors": [], "warnings": [],
+                 "notes_classified": [{"text": "undefined global foo", "kind": "real",
+                                       "reason": None}]}}
+    text = rcmd.render_cran_comments("foo", "1.0", check_env, None)
+    assert "NEEDS REVIEW" in text and "undefined global foo" in text
+
+
+def test_cran_comments_broken_revdep():
+    """Broken packages are listed; empty check_env is handled without crash."""
+    revdep_env = {"revdep": {"broken": ["pkgA", "pkgB"], "new_problems": []}}
+    text = rcmd.render_cran_comments("foo", "0.2.0", {}, revdep_env)
+    assert "Broke 2 package(s): pkgA, pkgB" in text
+    assert "maintainers notified" in text
+
+
+# --- Task 7: _run_cran_prep orchestrator ---
+
+def test_cran_prep_stops_at_hard_error(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    calls = []
+    def fake_run(kind, path, **kw):
+        calls.append(kind)
+        status = "error" if kind == "test" else "ok"
+        return {"kind": kind, "status": status, "engine_missing": [], "messages": [],
+                "check": {"errors": [], "warnings": [], "notes": [], "notes_classified": []}}
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cran_prep(str(tmp_path))
+    assert env["status"] == "blocked" and env["failed_stage"] == "test"
+    assert "check" not in calls  # stopped before the gate
+
+def test_cran_prep_ready_when_clean(tmp_path, monkeypatch):
+    _write_desc(tmp_path, "foo", "0.2.0")
+    def fake_run(kind, path, **kw):
+        base = {"kind": kind, "status": "ok", "engine_missing": [], "messages": []}
+        if kind == "check":
+            base["check"] = {"errors": [], "warnings": [], "notes": [], "notes_classified": []}
+        if kind == "revdep":
+            base["revdep"] = {"broken": [], "new_problems": []}
+        return base
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cran_prep(str(tmp_path), no_revdep=False)
+    assert env["status"] == "ready"
+    assert env["cran_comments_path"].endswith("cran-comments.md")
+
+def test_cran_prep_warn_on_real_note(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    def fake_run(kind, path, **kw):
+        base = {"kind": kind, "status": "ok" if kind != "check" else "warn",
+                "engine_missing": [], "messages": []}
+        if kind == "check":
+            base["check"] = {"errors": [], "warnings": [],
+                             "notes": ["undefined global"],
+                             "notes_classified": [{"text": "undefined global",
+                                                   "kind": "real", "reason": None}]}
+        if kind == "revdep":
+            base["revdep"] = {"broken": [], "new_problems": []}
+        return base
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cran_prep(str(tmp_path))
+    assert env["status"] == "warn"   # real NOTE → not "ready"
+    assert any("real NOTE" in b or "real note" in b.lower() for b in env["blockers"])
+
+
+def test_cran_prep_no_description_blocked(tmp_path):
+    env = rcmd._run_cran_prep(str(tmp_path))
+    assert env["status"] == "blocked" and "DESCRIPTION" in env["blockers"][0]
+    assert env["stages"] == []
+
+
+def test_cran_prep_check_error_blocked(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    def fake_run(kind, path, **kw):
+        status = "error" if kind == "check" else "ok"
+        base = {"kind": kind, "status": status, "engine_missing": [], "messages": []}
+        if kind == "check":
+            base["check"] = {"errors": ["E"], "warnings": [], "notes": [],
+                             "notes_classified": []}
+        return base
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cran_prep(str(tmp_path))
+    assert env["status"] == "blocked" and env["failed_stage"] == "check"
+
+
+def test_cran_prep_revdep_error_adds_blocker(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    def fake_run(kind, path, **kw):
+        status = "error" if kind == "revdep" else "ok"
+        base = {"kind": kind, "status": status, "engine_missing": [], "messages": []}
+        if kind == "check":
+            base["check"] = {"errors": [], "warnings": [], "notes": [],
+                             "notes_classified": []}
+        if kind == "revdep":
+            base["revdep"] = {"broken": ["pkgA"], "new_problems": []}
+        return base
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cran_prep(str(tmp_path))
+    assert any("reverse" in b for b in env["blockers"])
+
+
+def test_cran_prep_multi_platform_populates_dispatched(tmp_path, monkeypatch):
+    _write_desc(tmp_path, "foo", "0.2.0")
+    def fake_run(kind, path, **kw):
+        status = "dispatched" if kind in ("winbuilder", "rhub") else "ok"
+        base = {"kind": kind, "status": status, "engine_missing": [], "messages": []}
+        if kind == "check":
+            base["check"] = {"errors": [], "warnings": [], "notes": [],
+                             "notes_classified": []}
+        if kind == "revdep":
+            base["revdep"] = {"broken": [], "new_problems": []}
+        return base
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd._run_cran_prep(str(tmp_path), multi_platform=True)
+    assert env["dispatched"] == ["winbuilder", "rhub"]
+    assert env["status"] == "ready"

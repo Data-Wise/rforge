@@ -1,6 +1,7 @@
 ---
 name: rforge:r:check
-description: Run R CMD check on package with smart output parsing
+description: Run R CMD check with smart parsing — NOTEs classified as spurious or real
+argument-hint: "[package] [--as-cran]"
 arguments:
   - name: package
     description: Package path to check (defaults to current directory)
@@ -33,6 +34,10 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
 - Warnings: {len check.warnings}
 - Notes: {len check.notes}
 {list each message as a bullet, if any}
+{If check.notes_classified is non-empty:}
+### NOTE classification
+{For each check.notes_classified: "🟢 expected — {text}" (kind=spurious) or
+ "🔴 needs attention — {text}" (kind=real)}
 ### Recommended Actions
 {1-3 steps, or "None — package is clean ✅"}
 ```

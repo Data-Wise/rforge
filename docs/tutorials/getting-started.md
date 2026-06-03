@@ -171,14 +171,15 @@ Expected output (abbreviated):
 
 ## Three headline commands
 
-Use these for daily work; the rest of the plugin's 16 commands are
+Use these for daily work; the rest of the plugin's 33 commands are
 specialized.
 
 | Command | When | What |
 |---|---|---|
 | `/rforge:quick` | Pre-commit, fast check | <10s ecosystem snapshot |
 | `/rforge:analyze "description"` | After code changes | ~30s — impact + recommendations |
-| `/rforge:thorough "release prep"` | Before CRAN submission | 2-5 min — full validation |
+| `/rforge:r:cran-prep` | Before CRAN submission | per-package gate — document→check→revdep, writes `cran-comments.md` |
+| `/rforge:thorough "release prep"` | Ecosystem rollup before release | 2-5 min — cross-package validation + submission order |
 
 ## What's next
 
@@ -194,7 +195,7 @@ Now that the basics work, follow the learning path:
 
 Reference material:
 
-- **[REFCARD](../REFCARD.md)** — all 16 commands in one page
+- **[REFCARD](../REFCARD.md)** — all 33 commands in one page
 - **[Hooks & Skills](../hooks-and-skills.md)** — the `pretooluse` hook
   that flags R-aware mistakes on every Write/Edit
 - **[Architecture](../architecture.md)** — how the plugin's `lib/`

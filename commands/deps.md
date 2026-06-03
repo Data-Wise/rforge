@@ -1,6 +1,7 @@
 ---
 name: rforge:deps
 description: Build and visualize dependency graph across R package ecosystem
+argument-hint: "[package] [--format text|json]"
 arguments:
   - name: package
     description: Specific package to focus on (defaults to ecosystem-wide)
