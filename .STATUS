@@ -1,24 +1,16 @@
 project: rforge
 updated: 2026-06-02
 status: Active
-version: 2.2.0 (in-progress, feature/r-cran-prep branch)
+version: 2.2.0 (dev, pending release)
 last_release: 2026-06-01 v2.1.0 (PR #12 dev → main merge d76a45a, release https://github.com/Data-Wise/rforge/releases/tag/v2.1.0, tap data-wise/tap synced to 2.1.0 + brew install/test green; r: dev-cycle + quality commands, 16→28)
 
-worktrees:
-  - path: ~/.git-worktrees/rforge/feature-r-cran-prep
-    branch: feature/r-cran-prep
-    created: 2026-06-01
-    status: implementation complete — PR open
-    target: v2.2.0
-    scope: "CRAN-submission suite — r:cran-prep orchestrator + r:revdep/r:goodpractice/r:winbuilder/r:rhub + r:check NOTE classifier. 28 → 33 commands. Reuses lib/rcmd.py run()."
-    plan: ORCHESTRATE-r-cran-prep.md (10 TDD tasks — all complete)
-    spec: docs/specs/SPEC-r-cran-prep-2026-06-01.md (research: RESEARCH-cran-dev-2026-06-01.md)
+worktrees: []
 
 recent:
   - date: 2026-06-02
-    branch: feature/r-cran-prep
-    state: in-progress
-    title: "feat: r: CRAN-submission commands (v2.2.0)"
+    pr: 14
+    branch: dev
+    title: "feat: CRAN-submission suite — r:cran-prep + revdep/goodpractice/winbuilder/rhub (v2.2.0)"
     summary: |
       5 new r: CRAN-submission commands (r:revdep, r:goodpractice, r:winbuilder,
       r:rhub, r:cran-prep) + r:check NOTE classifier (notes_classified). 28→33
