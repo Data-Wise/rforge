@@ -6,7 +6,7 @@
 
 ## Current state (2026-06-10)
 
-**v2.3.0 + v2.4.0 + v2.5.0 merged to dev (unreleased; last release v2.2.0)** — 34 commands.
+**v2.6.0 — release in progress (dev → main)** — 35 commands. One release bundling four features accumulated on `dev` since v2.2.0 (each roadmapped as a separate minor, shipped together as v2.6.0):
 - **v2.3.0 CRAN-incoming hardening** (PR #18): `r:check --strict` runs both
   Suggests-withholding flavors (`check (noSuggests)` + `check (suggests-only)`) with
   `--run-donttest`; `--incoming` adds the CRAN-incoming `_R_CHECK_*` bundle; `r:cran-prep`
@@ -20,10 +20,13 @@
   `DESCRIPTION` vs `R/`/tests/vignettes usage (missing/misclassified/missing_suggests/unused)
   + suggested patch (`--write`). 33→34 commands. The misclassified finding is the *static*
   sibling of `r:check --strict`'s noSuggests pass. Spec: `SPEC-r-deps-sync-2026-06-10.md`.
+- **v2.6.0 `r:submit`** (PR #22): GitHub pre-release of the submitted tarball + CRAN submit
+  handoff (never auto-submits); `--promote` flips to a full release on acceptance. Backed by
+  pure-Python `lib/ghrelease.py` (`gh` soft-dep). 34→35 commands. Spec: `SPEC-r-submit-github-prerelease-2026-06-10.md`.
 
 **v2.2.0 (released 2026-06-02)** — 33 commands. v2.2.0 adds 5 `r:` CRAN-submission commands (`r:revdep`/`r:goodpractice`/`r:winbuilder`/`r:rhub`/`r:cran-prep`) plus `r:check` NOTE classifier (`notes_classified` field). v2.1.0 added 12 `r:` dev-cycle + quality commands (`load`/`document`/`test`/`coverage`/`build`/`install`/`site`/`cycle` + `lint`/`spell`/`urlcheck`/`style`) backed by `lib/rcmd.py`; `r:check` retrofitted onto it. v2.0.0 (2026-05-12) introduced sub-namespacing (`docs:check`, `r:check`, `health`); v1.3.0 absorbed `rforge-mcp` into pure-Python `lib/*` modules.
 
-**Roadmap** (`.STATUS`): v2.3.0 + v2.4.0 + v2.5.0 merged (above) → **v2.6.0 `r:submit`** (spec'd, GitHub pre-release + CRAN submit handoff, not built) → Phase 4 agents (post-v2.6.0, unspecced). Unscheduled candidates: diff-aware P0 (`--changed`), scaffolding theme (`r:use-test`/`r:use-package`/`r:use-vignette`, existing-only). Parked: Path B v1.4.0 (4-mode status). Plus issue #9 (rename-ergonomics watch).
+**Roadmap** (`.STATUS`): v2.6.0 release in progress (bundles the four features above) → Phase 4 agents (post-v2.6.0, unspecced). Unscheduled candidates: diff-aware P0 (`--changed`), scaffolding theme (`r:use-test`/`r:use-package`/`r:use-vignette`, existing-only). Parked: Path B v1.4.0 (4-mode status). Plus issue #9 (rename-ergonomics watch).
 
 ## Branch architecture
 

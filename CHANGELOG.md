@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [2.6.0] - 2026-06-10
+
+> Collapses four roadmapped minors into one release — cran-incoming hardening,
+> ecosystem-manifest discovery, `r:deps-sync`, and `r:submit` — that accumulated
+> on `dev` since v2.2.0.
 
 ### Added
 

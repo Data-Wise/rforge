@@ -1,16 +1,16 @@
 # 📚 RForge Plugin - Reference Card
 
-> **Version:** 2.3.0 | **Last Updated:** 2026-06-10
+> **Version:** 2.6.0 | **Last Updated:** 2026-06-10
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** All 33 commands in one page — categorized by use case.
+    - **What:** All 35 commands in one page — categorized by use case.
     - **Why:** Forget command syntax? Scan the ASCII box below.
     - **How:** Daily? `/rforge:status` `/rforge:quick`. After changes? `/rforge:analyze "what?"`. Per-package CRAN gate? `/rforge:r:cran-prep`. Ecosystem rollup? `/rforge:thorough`.
     - **Next:** [Commands reference](commands.md) for full per-command docs.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  RFORGE PLUGIN REFERENCE                                            v2.3.0  │
+│  RFORGE PLUGIN REFERENCE                                            v2.6.0  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  COMMANDS (33)                                                              │
@@ -227,7 +227,7 @@ No `~/.claude/settings.json` entries required since v1.3.0 — the plugin is ful
 
 ```text
 rforge/
-├── .claude-plugin/        # Plugin manifest + extras (v2.3.0)
+├── .claude-plugin/        # Plugin manifest + extras (v2.6.0)
 │   ├── plugin.json
 │   ├── marketplace.json
 │   ├── config.json
@@ -246,7 +246,7 @@ rforge/
 │   ├── deps.py
 │   ├── status.py
 │   ├── init.py
-│   ├── rcmd.py            # R dev-cycle + quality + CRAN-submission engines (v2.3.0)
+│   ├── rcmd.py            # R dev-cycle + quality + CRAN-submission engines (v2.6.0)
 │   ├── cranlint.py        # CRAN-incoming linter (DESCRIPTION + build-hygiene) (v2.3.0)
 │   └── formatters.py
 └── docs/                  # Documentation
