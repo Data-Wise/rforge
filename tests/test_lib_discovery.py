@@ -12,6 +12,7 @@ from lib.discovery import (
     ManifestEntry,
     detect_ecosystem,
     find_r_packages,
+    format_text,
     parse_description,
     parse_manifest,
     read_description,
@@ -334,6 +335,35 @@ def test_ecosystem_to_dict_is_json_serializable(tmp_path, make_pkg):
     parsed = json.loads(payload)
     assert parsed["kind"] == "ecosystem"
     assert {p["name"] for p in parsed["packages"]} == {"foo", "bar"}
+
+
+# ───────────────────────── format_text (detect output) ─────────────────────────
+
+
+def test_format_text_surfaces_manifest_role_and_drift(tmp_path, make_pkg):
+    make_pkg("medfit")
+    make_pkg("stray")  # on disk, not in manifest → disk_only drift
+    (tmp_path / "ECOSYSTEM-MANIFEST.yaml").write_text(
+        "packages:\n  - name: medfit\n    role: Foundation engine\n  - name: ghost\n",
+        encoding="utf-8",
+    )
+    (tmp_path / ".rforge.yaml").write_text(
+        "manifest: ECOSYSTEM-MANIFEST.yaml\n", encoding="utf-8"
+    )
+    out = format_text(detect_ecosystem(tmp_path))
+    assert "Foundation engine" in out  # role surfaced inline
+    assert "manifest:" in out.lower()  # manifest line in header
+    assert "drift" in out.lower()  # drift section present
+    assert "ghost" in out  # manifest_only entry listed
+
+
+def test_format_text_no_manifest_is_unchanged(tmp_path, make_pkg):
+    """Regression: without a manifest, no manifest/drift lines appear."""
+    make_pkg("a")
+    make_pkg("b")
+    out = format_text(detect_ecosystem(tmp_path))
+    assert "manifest:" not in out.lower()
+    assert "drift" not in out.lower()
 
 
 # ───────────────────────── Error paths ─────────────────────────

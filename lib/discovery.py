@@ -478,20 +478,42 @@ def detect_ecosystem(path: str | os.PathLike = ".") -> Ecosystem:
 # ───────────────────────── Formatters ─────────────────────────
 
 
+def _truncate(text: str, limit: int) -> str:
+    """Clip `text` to `limit` chars with an ellipsis when it overflows."""
+    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
+
+
 def format_text(eco: Ecosystem) -> str:
     """Terminal-friendly rendering of an Ecosystem."""
     lines: list[str] = []
     icon = {"single": "📦", "ecosystem": "🏗️ ", "hybrid": "🧩"}[eco.kind]
     lines.append(f"{icon} {eco.kind.capitalize()}: {eco.root}")
-    lines.append(f"   Packages: {len(eco.packages)} | mode: {eco.mode}"
-                 f" | config: {'found' if eco.config_found else 'not found'}")
+    header = (f"   Packages: {len(eco.packages)} | mode: {eco.mode}"
+              f" | config: {'found' if eco.config_found else 'not found'}")
+    if eco.manifest_path:
+        header += f" | manifest: {os.path.basename(eco.manifest_path)}"
+    lines.append(header)
     if eco.packages:
         lines.append("")
         for pkg in eco.packages[:10]:
             tag = f" [{pkg.category}]" if pkg.category != "active" else ""
-            lines.append(f"   ├─ {pkg.name} {pkg.version}{tag}")
+            role = ""
+            if pkg.manifest and pkg.manifest.role:
+                role = f" — {_truncate(pkg.manifest.role, 50)}"
+            lines.append(f"   ├─ {pkg.name} {pkg.version}{tag}{role}")
         if len(eco.packages) > 10:
             lines.append(f"   └─ ... and {len(eco.packages) - 10} more")
+    if eco.drift.manifest_only or eco.drift.disk_only:
+        lines.append("")
+        lines.append("⚠️  Manifest drift:")
+        if eco.drift.manifest_only:
+            lines.append(
+                f"   in manifest, not on disk: {', '.join(eco.drift.manifest_only)}"
+            )
+        if eco.drift.disk_only:
+            lines.append(
+                f"   on disk, not in manifest: {', '.join(eco.drift.disk_only)}"
+            )
     return "\n".join(lines)
 
 
