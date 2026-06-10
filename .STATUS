@@ -301,7 +301,7 @@ backlog:
     spec: docs/specs/SPEC-r-deps-sync-2026-06-10.md
     notes: "MERGED to dev (PR #21). lib/deps_sync.py + commands/r/deps-sync.md + 11 tests; 33→34 commands. Static sibling of the cran-incoming noSuggests catch. Unreleased."
   - title: "v2.6.0 — r:submit (GitHub pre-release + CRAN submit handoff)"
-    priority: medium
+    priority: IMPLEMENTED (feature/r-submit — PR-ready; gates green, pytest 199+2, test-all 31/31)
     spec: docs/specs/SPEC-r-submit-github-prerelease-2026-06-10.md
     notes: "Draft. gh pre-release of submitted tarball, promote on acceptance. No auto-submit."
   - title: "Phase 4 — discovery engine + agents (post-v2.6.0)"
