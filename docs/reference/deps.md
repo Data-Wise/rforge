@@ -51,7 +51,7 @@ Attributes:
 
 ### `class Edge`
 
-Edge(from_: 'str', to: 'str', type: 'EdgeType')
+A directed dependency edge: ``from_`` (importer) depends on ``to`` (imported).
 
 | Field | Type | Default |
 |---|---|---|
@@ -61,7 +61,7 @@ Edge(from_: 'str', to: 'str', type: 'EdgeType')
 
 ### `class Impact`
 
-Impact(package: 'str', change_type: 'ChangeType', direct_dependents: 'list[str]', indirect_dependents: 'list[str]', affected_tests: 'int', update_sequence: 'list[str]', estimated_work: 'str', risk_level: 'RiskLevel', recommendations: 'list[str]')
+Downstream impact of a change to one package — who is affected, in what order, at what risk.
 
 | Field | Type | Default |
 |---|---|---|
