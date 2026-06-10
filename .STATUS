@@ -1,10 +1,19 @@
 project: rforge
-updated: 2026-06-03
+updated: 2026-06-10
 status: Active
 version: 2.2.0 (released)
 last_release: 2026-06-02 v2.2.0 (PR #15 dev → main merge 3b2bdda, release https://github.com/Data-Wise/rforge/releases/tag/v2.2.0, tap data-wise/tap synced to 2.2.0 + brew info green; CRAN-submission suite — r:cran-prep + r:revdep/r:goodpractice/r:winbuilder/r:rhub + NOTE classifier, 28→33 commands)
 
-worktrees: []
+worktrees:
+  - path: ~/.git-worktrees/rforge/feature-cran-incoming
+    branch: feature/cran-incoming
+    base: dev
+    created: 2026-06-10
+    purpose: |
+      Implement SPEC-cran-incoming-hardening (v2.3.0). Code work (lib/rcmd.py
+      strict passes + new lib/cranlint.py + tests + help/hub doc sweep) — start
+      in a fresh session in the worktree. Open impl-time decisions: cranlint.py
+      module placement; docs:check reusable entry point for the 4c consistency check.
 
 recent:
   - date: 2026-06-02
