@@ -5,9 +5,27 @@
 [![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
 [![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
-**R package ecosystem orchestrator for Claude Code — 33 commands, R-aware hooks, validation skills.**
+**R package ecosystem orchestrator for Claude Code — 35 commands, R-aware hooks, validation skills.**
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
+
+## What's new in v2.6.0
+
+- 🚀 **`r:submit`** — new per-package command that wraps the *moment of CRAN submission*. Gates on `r:cran-prep` being `ready`, builds the tarball, and cuts a GitHub **pre-release** (not "Latest") of it with `cran-comments.md` attached, then prints the CRAN submit checklist — it **never auto-submits**. `r:submit --promote` flips the pre-release to a full release once CRAN accepts (`gh release edit --prerelease=false --latest`). Using a *pre-release* promoted in place sidesteps the r-pkgs anti-pattern of tagging a final release before acceptance (resubmissions bump the version). `gh` is a soft dependency with a printed manual-recipe fallback. Backed by pure-Python `lib/ghrelease.py`. Commands 34 → 35.
+
+## What's new in v2.5.0
+
+- 🔗 **`r:deps-sync`** — new pure-Python per-package command that reconciles `DESCRIPTION` against what the code actually uses. Scans `R/`/`tests/`/`vignettes/` + `NAMESPACE` for namespace usage and reports **missing** (used, undeclared → Imports), **misclassified** (in Suggests but used unconditionally in `R/` → Imports), **missing_suggests** (tests/vignettes-only), and **unused** dependencies, plus a suggested `DESCRIPTION` patch. Report-only by default; `--write` applies the unambiguous changes. The `misclassified` finding is the *static* sibling of `r:check --strict`'s noSuggests pass — it catches the medfit/MASS class **before** R runs. *Intra*-package, complementing `/rforge:deps` (the *inter*-package graph). Commands 33 → 34.
+
+## What's new in v2.4.0
+
+- 🧭 **Ecosystem-manifest discovery** (`/rforge:detect`, `/rforge:status`) — discovery can now read an optional **ecosystem manifest** (a curated YAML listing packages with `role`/`repo`/`cran`/`status_file`), located via a new `manifest:` key in the root `.rforge.yaml`. Discovered packages are **enriched** with that metadata (matched by name, case-insensitive), and any mismatch between the manifest and what's on disk surfaces as **drift** (`manifest_only` / `disk_only`). `/rforge:detect` shows a `manifest:` header + per-package `role`; `/rforge:status` adds a conditional `Role` column. Parsed by a vendored YAML-subset reader — `discovery.py` stays stdlib-only (no PyYAML). **Zero behavior change when no manifest is configured.** New public API: `Manifest`, `ManifestEntry`, `Drift`, `parse_manifest`, `read_manifest`.
+
+## What's new in v2.3.0
+
+- 🛡️ **CRAN-incoming hardening for `r:check` + `r:cran-prep`** (no new commands) — the gate now emulates CRAN's *incoming* and post-acceptance flavors. `r:check --strict` runs **both** Suggests-withholding passes as distinct rows (`check (noSuggests)` via `_R_CHECK_DEPENDS_ONLY_`, `check (suggests-only)` via `_R_CHECK_SUGGESTS_ONLY_`), each with `--run-donttest`; `--incoming` implies `--strict` and adds an opt-in `check (incoming)` env-var bundle. `r:cran-prep` runs the strict passes **by default**, and a strict ERROR **blocks** the `ready` verdict (plus a Tier 1b PDF-manual check that warns, never blocks).
+- 🐍 **`lib/cranlint.py`** — new pure-Python (stdlib-only, no R) module backing three **Tier 4 advisory** `cran-prep` stages that **never block `ready`**: `description` (DESCRIPTION incoming nits — non-`Authors@R`, weak `Title`, `Description` prose, stale `Date`), `build-hygiene` (planning/dev docs that would ship in the tarball, with the exact `.Rbuildignore` regex to add), `docs-consistency` (lightweight advisory). Public functions: `lint_description`, `check_build_hygiene`, `check_planning_consistency`, `run_all`; CLI `python3 -m lib.cranlint --path .`.
+- ⚠️ **Behavior change:** a package that is 🟢 `ready` today under `--as-cran` can turn 🔴 once the noSuggests pass catches a `Suggests` package used unconditionally (the medfit 0.2.1 class). Intended — CRAN would bounce it post-acceptance. Fix: move the dependency to `Imports`, or guard with `requireNamespace()` + `skip_if_not_installed()`.
 
 ## What's new in v2.2.0
 
@@ -77,7 +95,7 @@ Full changelog: [`CHANGELOG.md`](CHANGELOG.md).
 📊 **Live progress** - Real-time updates as tools complete
 🎯 **Smart synthesis** - Combines results into actionable summary
 🧠 **ADHD-friendly** - Fast feedback, clear structure, visual progress
-🐍 **Pure-Python `lib/`** - `lib/discovery.py`, `lib/deps.py`, `lib/status.py`, `lib/init.py` (pure Python, no R); `lib/rcmd.py` runs R engines for the `r:*` dev-cycle + CRAN commands. No MCP server, no Node.js. See [`docs/lib-modules.md`](docs/lib-modules.md).
+🐍 **Pure-Python `lib/`** - `lib/discovery.py`, `lib/deps.py`, `lib/status.py`, `lib/init.py`, `lib/cranlint.py` (pure Python, no R); `lib/rcmd.py` runs R engines for the `r:*` dev-cycle + CRAN commands. No MCP server, no Node.js. See [`docs/lib-modules.md`](docs/lib-modules.md).
 
 ## How It Works
 
@@ -426,7 +444,7 @@ Plugin settings in `plugin.json`:
 ```
 ~/.claude/plugins/rforge/
 ├── .claude-plugin/
-│   ├── plugin.json          # Plugin manifest (v2.2.0)
+│   ├── plugin.json          # Plugin manifest (v2.6.0)
 │   ├── marketplace.json     # Marketplace install metadata
 │   ├── config.json          # User-tunable options (CRAN mirror, etc.)
 │   ├── hooks/
@@ -442,7 +460,8 @@ Plugin settings in `plugin.json`:
 │   ├── deps.py              # Dependency graph + impact
 │   ├── status.py            # DESCRIPTION + .STATUS health snapshot
 │   ├── init.py              # ~/.rforge/context.json initializer
-│   ├── rcmd.py              # R dev-cycle + quality + CRAN-submission engines (v2.2.0)
+│   ├── rcmd.py              # R dev-cycle + quality + CRAN-submission engines (v2.6.0)
+│   ├── cranlint.py          # CRAN-incoming linter — DESCRIPTION + build-hygiene (v2.3.0)
 │   └── formatters.py        # Output formatting helpers
 └── docs/                    # User-facing docs
 ```
@@ -468,6 +487,6 @@ MIT
 
 ---
 
-**Version:** 2.2.0
+**Version:** 2.6.0
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+

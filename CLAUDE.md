@@ -4,11 +4,29 @@
 > Follows the global `~/.claude/CLAUDE.md`; this file only captures
 > rforge-specific patterns that don't apply to other dev-tools repos.
 
-## Current state (2026-06-02)
+## Current state (2026-06-10)
 
-**v2.2.0 in-progress (feature/r-cran-prep)** — 33 commands. v2.2.0 adds 5 `r:` CRAN-submission commands (`r:revdep`/`r:goodpractice`/`r:winbuilder`/`r:rhub`/`r:cran-prep`) plus `r:check` NOTE classifier (`notes_classified` field). v2.1.0 added 12 `r:` dev-cycle + quality commands (`load`/`document`/`test`/`coverage`/`build`/`install`/`site`/`cycle` + `lint`/`spell`/`urlcheck`/`style`) backed by `lib/rcmd.py`; `r:check` retrofitted onto it. v2.0.0 (2026-05-12) introduced sub-namespacing (`docs:check`, `r:check`, `health`); v1.3.0 absorbed `rforge-mcp` into pure-Python `lib/*` modules.
+**v2.6.0 — release in progress (dev → main)** — 35 commands. One release bundling four features accumulated on `dev` since v2.2.0 (each roadmapped as a separate minor, shipped together as v2.6.0):
+- **v2.3.0 CRAN-incoming hardening** (PR #18): `r:check --strict` runs both
+  Suggests-withholding flavors (`check (noSuggests)` + `check (suggests-only)`) with
+  `--run-donttest`; `--incoming` adds the CRAN-incoming `_R_CHECK_*` bundle; `r:cran-prep`
+  runs the strict passes **by default** and blocks `ready` on failure (behavior change).
+  New pure-stdlib `lib/cranlint.py` adds advisory `description`/`build-hygiene`/
+  `docs-consistency` stages. Spec: `SPEC-cran-incoming-hardening-2026-06-10.md`.
+- **v2.4.0 ecosystem-manifest discovery** (PR #16 spec + #17 impl): `lib/discovery.py`
+  optionally reads an ecosystem manifest (via `.rforge.yaml` `manifest:`) → enrich packages
+  with role/repo/cran metadata + report drift. Follow-ups: issues #19, #20.
+- **v2.5.0 `r:deps-sync`** (PR #21): new pure-stdlib `lib/deps_sync.py` — reconcile
+  `DESCRIPTION` vs `R/`/tests/vignettes usage (missing/misclassified/missing_suggests/unused)
+  + suggested patch (`--write`). 33→34 commands. The misclassified finding is the *static*
+  sibling of `r:check --strict`'s noSuggests pass. Spec: `SPEC-r-deps-sync-2026-06-10.md`.
+- **v2.6.0 `r:submit`** (PR #22): GitHub pre-release of the submitted tarball + CRAN submit
+  handoff (never auto-submits); `--promote` flips to a full release on acceptance. Backed by
+  pure-Python `lib/ghrelease.py` (`gh` soft-dep). 34→35 commands. Spec: `SPEC-r-submit-github-prerelease-2026-06-10.md`.
 
-**Open backlog** (`.STATUS`): Issue #9 (feedback watch) → Phase 4 (agents, v2.3.0) → deferred specs (see `BRAINSTORM-r-command-expansion-2026-05-31.md`): `r:deps-sync`, scaffolding theme (`r:create`/`r:use-test`/…) → Path B v1.4.0 (4-mode status, parked).
+**v2.2.0 (released 2026-06-02)** — 33 commands. v2.2.0 adds 5 `r:` CRAN-submission commands (`r:revdep`/`r:goodpractice`/`r:winbuilder`/`r:rhub`/`r:cran-prep`) plus `r:check` NOTE classifier (`notes_classified` field). v2.1.0 added 12 `r:` dev-cycle + quality commands (`load`/`document`/`test`/`coverage`/`build`/`install`/`site`/`cycle` + `lint`/`spell`/`urlcheck`/`style`) backed by `lib/rcmd.py`; `r:check` retrofitted onto it. v2.0.0 (2026-05-12) introduced sub-namespacing (`docs:check`, `r:check`, `health`); v1.3.0 absorbed `rforge-mcp` into pure-Python `lib/*` modules.
+
+**Roadmap** (`.STATUS`): v2.6.0 release in progress (bundles the four features above) → Phase 4 agents (post-v2.6.0, unspecced). Unscheduled candidates: diff-aware P0 (`--changed`), scaffolding theme (`r:use-test`/`r:use-package`/`r:use-vignette`, existing-only). Parked: Path B v1.4.0 (4-mode status). Plus issue #9 (rename-ergonomics watch).
 
 ## Branch architecture
 
@@ -36,10 +54,11 @@ The `lib/` directory is a Python package (has `__init__.py`). Modules use relati
 
 - **Run modules as a package**: `python3 -m lib.<module>` (e.g., `python3 -m lib.discovery`)
 - **Never**: `python3 lib/<module>.py` — breaks relative imports
-- **Public modules** (with `docs/reference/` pages): `discovery`, `deps`, `status`, `init`, `rcmd`
+- **Public modules** (with `docs/reference/` pages): `discovery`, `deps`, `status`, `init`, `rcmd`, `cranlint`
+- **CRAN-lint module** (`cranlint`, v2.3.0): pure-stdlib (no R), like the analysis modules. `lint_description`/`check_build_hygiene`/`check_planning_consistency`/`run_all` emit advisory envelopes wired into `r:cran-prep` as the `description`/`build-hygiene`/`docs-consistency` stages (never block `ready`).
 - **R-runner module** (`rcmd`, v2.2.0): unlike the analysis modules (pure-stdlib, no R), `rcmd` shells out to `Rscript` running lower-level R engines (`rcmdcheck`/`pkgbuild`/`roxygen2`/`testthat`/`pkgload`/`covr`/`pkgdown`/`lintr`/`spelling`/`urlchecker`/`styler`/`revdepcheck`/`goodpractice`/`rhub`) which emit JSON; it normalizes to one envelope. Backs the 17 `r:` commands. The `devtools` engine is used only by `r:winbuilder`.
 - **Internal module** (no reference page, subject to refactor): `formatters` — used from command prompts; if importing externally, copy don't reuse
-- **Auto-generated reference docs**: `docs/reference/{discovery,deps,status,init,rcmd}.md` are produced by `scripts/gen_lib_reference.py`
+- **Auto-generated reference docs**: `docs/reference/{discovery,deps,status,init,rcmd,cranlint}.md` are produced by `scripts/gen_lib_reference.py`
 - **CI gate**: `scripts/gen_lib_reference.py --check` compares regenerated output against committed files; any drift fails CI
 
 ## Command-file conventions (all 28 commands)

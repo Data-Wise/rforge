@@ -150,9 +150,13 @@ git commit
 
 ```bash
 # 1. Full per-package gate (document→lint→spell→urlcheck→test→coverage→check→revdep)
+#    Runs two strict flavor passes by default (check (noSuggests) / (suggests-only)) +
+#    advisory Tier 4 checks (description / build-hygiene / docs-consistency).
 /rforge:r:cran-prep
 
 # 2. Verdict: ready ✅ / warn 🟡 (review NOTEs) / blocked ❌ (fix and re-run)
+#    Note: a package green under --as-cran alone can turn red once a Suggests
+#    package used unconditionally is detected (intended behavior change).
 
 # 3. Ecosystem submission order
 /rforge:thorough "Prepare v2.0.0 for CRAN"

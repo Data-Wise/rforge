@@ -402,6 +402,22 @@ if 'status' not in d:
 " 2>&1
 }
 
+# lib.cranlint CLI smoke — pure-Python (no R). Runs the three Tier-4 advisory
+# checks against a real fixture package and asserts a well-formed envelope.
+lib_cranlint_smoke() {
+    local out
+    out=$(python3 -m lib.cranlint --path tests/fixtures/suggestbug.before 2>/dev/null)
+    printf '%s' "$out" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+assert d['kind'] == 'cranlint', f\"unexpected kind {d['kind']}\"
+assert d['status'] in ('ok', 'warn'), f\"advisory module must never error, got {d['status']}\"
+kinds = {s['kind'] for s in d['stages']}
+need = {'description', 'build-hygiene', 'docs-consistency'}
+assert need <= kinds, f'missing Tier-4 stages: {need - kinds}'
+"
+}
+
 echo "═══════════════════════════════════════════════════════════════"
 echo "  RForge plugin — full validation suite"
 echo "═══════════════════════════════════════════════════════════════"
@@ -448,6 +464,7 @@ run "Lib: pytest suite (discovery + deps + status + init)"   lib_pytest
 run "Lib: CLI smoke (discovery + deps + status + init)" lib_cli_smoke
 run "Lib: reference docs in sync with source" lib_reference_in_sync
 run "Lib: rcmd CLI smoke (R-free — accepts engine_missing envelope)" lib_rcmd_smoke
+run "Dogfood: lib.cranlint Tier-4 advisory CLI on a fixture package" lib_cranlint_smoke
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════"

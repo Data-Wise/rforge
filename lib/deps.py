@@ -42,6 +42,8 @@ RiskLevel = Literal["low", "medium", "high"]
 
 @dataclass(frozen=True)
 class Edge:
+    """A directed dependency edge: ``from_`` (importer) depends on ``to`` (imported)."""
+
     from_: str
     to: str
     type: EdgeType
@@ -79,6 +81,8 @@ class DepGraph:
 
 @dataclass
 class Impact:
+    """Downstream impact of a change to one package — who is affected, in what order, at what risk."""
+
     package: str
     change_type: ChangeType
     direct_dependents: list[str]

@@ -112,12 +112,32 @@ cran-comments.md written → review before submitting
     (needs attention). Spurious NOTEs do not block `ready`. Real NOTEs
     downgrade the verdict to `warn`.
 
+!!! note "Strict flavor passes run by default"
+    The gate now runs the `check` stage **plus two strict flavor passes** —
+    `check (noSuggests)` (`_R_CHECK_DEPENDS_ONLY_=true`) and
+    `check (suggests-only)` (`_R_CHECK_SUGGESTS_ONLY_=true`), each with
+    `--run-donttest`. These emulate CRAN's post-acceptance flavors and catch a
+    `Suggests` package used unconditionally (which plain `--as-cran` misses).
+    A strict-pass **ERROR blocks `ready`**. It also adds three pure-Python,
+    **advisory** Tier 4 stages — `description` (DESCRIPTION incoming nits),
+    `build-hygiene` (planning/dev docs that would ship in the tarball, with the
+    exact `.Rbuildignore` fix), and `docs-consistency`. Tier 4 stages surface as
+    `warn` and **never block** `ready`.
+
+!!! warning "Behavior change — a package green today can turn red"
+    Because the strict passes are on by default, a package that reports 🟢
+    `ready` under `--as-cran` alone can turn 🔴 once `check (noSuggests)`
+    detects a `Suggests` package used unconditionally. This is intended.
+    **Fix:** move the package to `Imports`, or guard with
+    `requireNamespace()` in code **and** `skip_if_not_installed()` in tests.
+
 **Optional flags:**
 
 ```text
 /rforge:r:cran-prep --no-revdep         # skip revdep (first submission, no dependents)
 /rforge:r:cran-prep --goodpractice      # add advisory goodpractice checks
 /rforge:r:cran-prep --multi-platform    # dispatch win-builder + R-hub async
+/rforge:r:cran-prep --incoming          # add the opt-in CRAN-incoming check pass
 ```
 
 **For a single targeted check** (no orchestration), use:

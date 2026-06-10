@@ -187,6 +187,41 @@ def test_format_text_handles_empty_ecosystem(tmp_path):
     assert "Health score: 100/100" in rendered
 
 
+def test_status_surfaces_manifest_role_and_drift(tmp_path, make_pkg):
+    make_pkg("medfit")
+    make_pkg("stray")  # on disk, not in manifest
+    (tmp_path / "ECOSYSTEM-MANIFEST.yaml").write_text(
+        "packages:\n  - name: medfit\n    role: Foundation\n  - name: ghost\n",
+        encoding="utf-8",
+    )
+    (tmp_path / ".rforge.yaml").write_text(
+        "manifest: ECOSYSTEM-MANIFEST.yaml\n", encoding="utf-8"
+    )
+    result = aggregate_status(tmp_path)
+    by_name = {p.name: p for p in result.packages}
+    assert by_name["medfit"].role == "Foundation"
+    assert result.drift is not None
+    assert result.drift.manifest_only == ["ghost"]
+    assert result.drift.disk_only == ["stray"]
+
+    rendered = format_text(result)
+    assert "Foundation" in rendered  # role surfaced
+    assert "Role" in rendered  # role column header
+    assert "drift" in rendered.lower()  # drift section
+    assert "ghost" in rendered
+
+
+def test_status_no_manifest_has_no_role_column_or_drift(tmp_path, make_pkg):
+    """Regression: without a manifest, output has no Role column or drift block."""
+    make_pkg("a")
+    make_pkg("b")
+    result = aggregate_status(tmp_path)
+    assert all(p.role is None for p in result.packages)
+    rendered = format_text(result)
+    assert "Role" not in rendered
+    assert "drift" not in rendered.lower()
+
+
 def test_format_json_round_trip(tmp_path, make_pkg):
     pkg = make_pkg("solo")
     (pkg / ".STATUS").write_text("🎯 CURRENT STATUS\nDoing stuff\n\n📊 50%\n")

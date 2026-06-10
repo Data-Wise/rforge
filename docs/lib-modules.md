@@ -1,7 +1,7 @@
 # 🐍 Lib Modules (`lib/`)
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** Pure-Python analysis modules (`discovery`, `deps`, `status`, `init`) — no R, no Node — plus `rcmd` (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the `r:` commands.
+    - **What:** Pure-Python analysis modules (`discovery`, `deps`, `status`, `init`, `cranlint`) — no R, no Node — plus `rcmd` (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the `r:` commands.
     - **Why:** No MCP server, no Node, no external deps — just `python3 -m lib.<module>`, fast and scriptable.
     - **How:** Each takes `--path` and `--format text|json`; importable as a Python API too.
     - **Next:** [Reference API docs](reference/discovery.md) for signatures, or [Architecture](architecture.md#path-b-lib-modules) for fit.
@@ -36,9 +36,28 @@ flowchart LR
 
 | Module | Public functions | CLI entry point |
 |---|---|---|
-| `lib/discovery.py` | `detect_ecosystem`, `find_r_packages`, `parse_description`, `read_description` | `python3 -m lib.discovery --path . --format text\|json` |
+| `lib/discovery.py` | `detect_ecosystem`, `find_r_packages`, `parse_description`, `read_description`, `parse_manifest`, `read_manifest` | `python3 -m lib.discovery --path . --format text\|json` |
 | `lib/deps.py` | `build_graph`, `analyze_impact`, `get_all_dependents`, `get_update_order`, `identify_blockers` | `python3 -m lib.deps [--path .] [--format text\|json] [graph\|impact ...]` |
-| `lib/rcmd.py` | `run`, `normalize`, `find_package`, `r_snippet`, `_run_cran_prep`, `_cran_prep_envelope`, `render_cran_comments` (v2.2.0 R-runner) | `python3 -m lib.rcmd --kind <kind> [--path .] [--as-cran] [--preview] [--strict] [--articles-only] [--devel] [--goodpractice] [--multi-platform] [--no-revdep]` |
+| `lib/rcmd.py` | `run`, `normalize`, `find_package`, `r_snippet`, `_run_cran_prep`, `_cran_prep_envelope`, `render_cran_comments` (v2.2.0 R-runner) | `python3 -m lib.rcmd --kind <kind> [--path .] [--as-cran] [--preview] [--strict] [--incoming] [--articles-only] [--devel] [--goodpractice] [--multi-platform] [--no-revdep]` |
+| `lib/cranlint.py` | `lint_description`, `check_build_hygiene`, `check_planning_consistency`, `run_all` (v2.3.0 CRAN-incoming linter) | `python3 -m lib.cranlint --path . [--format text\|json]` |
+| `lib/deps_sync.py` | `scan_usage`, `reconcile`, `deps_sync` (v2.5.0 — *intra*-package DESCRIPTION↔usage reconciliation; complements the *inter*-package `lib.deps`) | `python3 -m lib.deps_sync --path . [--write] [--format text\|json]` |
+| `lib/ghrelease.py` | `gh_available`, `submission_tag`, `prerelease_cmd`, `promote_cmd`, `manual_recipe` (v2.6.0 — `gh release` command builders for `r:submit`; pure-Python, shells to nothing itself) | used from `commands/r/submit.md` (constructs the `gh` argv it runs) |
+
+> **`cranlint` is a pure-stdlib analysis module** like `discovery`/`deps`/`status`/`init`
+> — it never touches R. It backs the Tier 4 advisory stages of `r:cran-prep` (v2.3.0):
+> `lint_description` (DESCRIPTION incoming nits — non-`Authors@R`, weak `Title`,
+> `Description` prose, stale `Date`), `check_build_hygiene` (planning/dev docs that would
+> ship in the tarball, each with the exact `.Rbuildignore` regex to add), and
+> `check_planning_consistency` (lightweight advisory). `run_all` bundles all three into one
+> envelope. These findings are advisory and never block the `ready` verdict on their own
+> (though build-hygiene issues still block indirectly via the matching real R CMD check
+> NOTE). See [reference/cranlint.md](reference/cranlint.md).
+
+For the rcmd CRAN-incoming flavor flags (`--strict`, `--incoming`): `--strict` makes the
+`check` kind run **both** Suggests-withholding flavor passes (`_R_CHECK_DEPENDS_ONLY_` and
+`_R_CHECK_SUGGESTS_ONLY_`), each with `--run-donttest`; `--incoming` implies `--strict` and
+adds the opt-in CRAN-incoming `_R_CHECK_*` bundle pass. In `cran-prep` the strict passes run
+by default and a strict ERROR blocks `ready`; `--incoming` is opt-in.
 
 > **`rcmd` differs from the analysis modules.** `discovery`/`deps`/`status`/`init`
 > are pure-stdlib and never touch R. `rcmd` (v2.2.0) shells out to `Rscript`
@@ -60,6 +79,13 @@ flowchart LR
 Walks a directory tree (depth ≤ 2 by default) for R `DESCRIPTION` files,
 parses each into a structured record, and classifies the layout as
 `single | ecosystem | hybrid`.
+
+**Ecosystem-manifest enrichment (v2.4.0).** If the root `.rforge.yaml` declares a
+`manifest:` path (relative to root), discovery reads that **ecosystem manifest** — a
+curated YAML of `role`/`repo`/`cran`/`status_file` per package — and attaches the metadata
+to matching packages (by name, case-insensitive). Mismatches surface as **drift**. Parsed by
+a vendored YAML-subset reader (`parse_manifest`/`read_manifest`), so the module stays
+stdlib-only (no PyYAML). Absent/unreadable manifest → zero behavior change.
 
 ### CLI
 
@@ -92,6 +118,17 @@ print([p.name for p in eco.packages])
 | `mode` | `"minimal" \| "standard" \| "full"` | Preserved from `rforge-mcp` for wire compatibility |
 | `config_found` | `bool` | `True` if `.rforge.yaml` exists at root |
 | `config_path` | `str \| None` | Absolute path to `.rforge.yaml` when present |
+| `manifest_path` | `str \| None` | Path to the ecosystem manifest, when configured + found (v2.4.0) |
+| `drift` | `Drift` | `manifest_only` / `disk_only` name lists; empty when no manifest (v2.4.0) |
+
+Each `Package` also gains an optional `manifest: ManifestEntry` (the matched curation metadata).
+
+### `.rforge.yaml` config fields
+
+| Field | Purpose |
+|---|---|
+| `kind: hybrid` | Force the `hybrid` classification (see heuristic below) |
+| `manifest: <relative-path>` | Point discovery at an ecosystem manifest to enrich/drift-check against (v2.4.0) |
 
 ### Classification heuristic (strict)
 
@@ -269,6 +306,7 @@ round-trip with idempotency, and the `rcmd` envelope/normalizer/snippets
 - [Reference: `deps` API](reference/deps.md) — auto-extracted signatures + docstrings
 - [Reference: `status` API](reference/status.md) — auto-extracted signatures + docstrings
 - [Reference: `init` API](reference/init.md) — auto-extracted signatures + docstrings
+- [Reference: `cranlint` API](reference/cranlint.md) — auto-extracted signatures + docstrings
 - [SPEC: Absorb rforge-mcp (Path B)](specs/SPEC-mcp-absorb-2026-05-10.md) — full migration plan
 - [Migration: rforge-mcp deprecation](migration/rforge-mcp-deprecation.md) — old MCP tool → new lib module table
 - [Architecture](architecture.md#path-b-lib-modules) — where lib/ fits in the plugin surface

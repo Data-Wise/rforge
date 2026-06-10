@@ -7,6 +7,71 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.6.0] - 2026-06-10
+
+> Collapses four roadmapped minors into one release — cran-incoming hardening,
+> ecosystem-manifest discovery, `r:deps-sync`, and `r:submit` — that accumulated
+> on `dev` since v2.2.0.
+
+### Added
+
+- **Ecosystem manifest discovery** (`lib/discovery.py`): `detect_ecosystem()` optionally reads an ecosystem manifest (e.g. `ECOSYSTEM-MANIFEST.yaml`) located via a new `manifest:` key in the root `.rforge.yaml`, and enriches discovered packages with curated metadata (`role`, `repo`, `cran`, `status_file`). Matching is by package name (case-insensitive). Mismatches surface as `Ecosystem.drift` (`manifest_only` / `disk_only`). New public API: `Manifest`, `ManifestEntry`, `Drift`, `parse_manifest()`, `read_manifest()`.
+- **Vendored YAML-subset parser** — `parse_manifest()` reads top-level scalars + a `packages:` list of flat maps with inline-comment stripping, keeping `discovery.py` stdlib-only (no PyYAML). See `docs/specs/SPEC-ecosystem-manifest-discovery-2026-06-10.md`.
+- **Manifest surfaced in output**: `/rforge:detect` text output shows a `manifest:` header field, an inline `role` per package, and a `⚠️  Manifest drift` block. `/rforge:status` adds a (conditional) `Role` column and the same drift block. Both render the extra detail only when a manifest is configured — zero-manifest output is byte-for-byte unchanged.
+- **`r:deps-sync`** (`lib/deps_sync.py`) — new pure-Python per-package command that reconciles `DESCRIPTION` against actual code usage. Scans `R/`/`tests/`/`vignettes/` + `NAMESPACE` for namespace usage (`pkg::`, `library()`, `@importFrom`, …) and reports **missing** (used, undeclared → Imports), **misclassified** (in Suggests but used unconditionally in `R/` → Imports — the static sibling of `r:check --strict`'s noSuggests pass), **missing_suggests** (tests/vignettes-only), and **unused** findings, plus a suggested patch. Report-only by default; `--write` applies the unambiguous changes. Commands 33 → 34.
+- **`r:submit`** (`lib/ghrelease.py`) — new per-package command wrapping the moment of CRAN submission: gate on `cran-prep` `ready` → build the tarball → cut a GitHub **pre-release** (not "Latest") of it + `cran-comments.md` → print the CRAN submit checklist (**never auto-submits**). `r:submit --promote` flips the pre-release to a full release on acceptance (`gh release edit --prerelease=false --latest`). Plain `v<version>` tags promoted in place; `gh` is a soft dependency with a printed manual-recipe fallback. Sidesteps the r-pkgs anti-pattern of tagging a final release pre-acceptance. Commands 34 → 35.
+
+### Changed
+
+- `Ecosystem` gains `manifest_path` and `drift` fields (both default to the empty/zero-manifest case); `Package` gains an optional `manifest` field. `Ecosystem.to_dict()` includes both. Zero behavior change when no manifest is configured.
+- `lib/status.py`: `PackageStatus` gains `role`; `EcosystemStatus` gains `drift`; both `to_dict()`s include the new fields. `aggregate_status()` passes manifest role + drift through from discovery.
+
+---
+
+## [2.3.0] - 2026-06-10
+
+> ⚠️ **Behavior change.** `r:cran-prep` now runs two strict Suggests-withholding
+> check passes **by default** and **blocks the `ready` verdict** when they fail.
+> A package that reports 🟢 `ready` today under `--as-cran` alone can turn 🔴 if
+> it uses a `Suggests` package unconditionally (the medfit 0.2.1 class). This is
+> intended — CRAN's post-acceptance noSuggests flavor would bounce it anyway —
+> but it is not patch-safe, hence the minor bump.
+
+### Added
+
+- **CRAN-incoming strict check passes** (`lib/rcmd.py`): `r:check --strict` runs
+  both Suggests-withholding flavors as distinct stage rows — `check (noSuggests)`
+  (`_R_CHECK_DEPENDS_ONLY_=true`) and `check (suggests-only)`
+  (`_R_CHECK_SUGGESTS_ONLY_=true`) — each with `--run-donttest` (runs
+  `\donttest{}` examples). `r:check --incoming` implies `--strict` and adds a
+  third `check (incoming)` row (`_R_CHECK_CRAN_INCOMING_*`, confirmed against R
+  Internals §8). Mechanism: `rcmdcheck(args=, env=)` — no `devtools`, no
+  subprocess-layer change.
+- **`lib/cranlint.py`** — new pure-stdlib (no R) analysis module with three
+  advisory checks wired into `r:cran-prep`: `lint_description` (DESCRIPTION
+  incoming nits — non-`Authors@R`/no `cph`, weak `Title`, `Description` prose,
+  stale `Date`), `check_build_hygiene` (planning/dev docs that would ship in the
+  tarball, each with the exact `.Rbuildignore` regex to add), and
+  `check_planning_consistency`. These surface as the `description`,
+  `build-hygiene`, and `docs-consistency` stages and **never block** `ready`.
+- **Tier 1b manual-build check** — `r:cran-prep` verifies the PDF reference
+  manual builds; emits a `warn` (never a blocker) when LaTeX is absent.
+- **Failure hint** on a strict-pass error: move the package to `Imports`, or
+  guard with `requireNamespace()` in code AND `skip_if_not_installed()` in tests.
+- **E2E regression proof** — `tests/fixtures/suggestbug.{before,after}` +
+  `tests/test_regression_suggests_e2e.py` (opt-in via `RFORGE_E2E`) prove the
+  noSuggests pass catches the medfit bug class with the real R toolchain.
+
+### Changed
+
+- `r:cran-prep` default sequence now includes `check (noSuggests)`,
+  `check (suggests-only)`, `description`, `build-hygiene`, and `docs-consistency`
+  (plus opt-in `check (incoming)` via `--incoming`).
+- `r_snippet`/`run("check", …)` gained internal `flavor`/`incoming` selectors;
+  `lib.rcmd` argparse gained `--incoming`.
+
+---
+
 ## [2.2.0] - 2026-06-02
 
 ### Added

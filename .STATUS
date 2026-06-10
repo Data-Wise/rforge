@@ -1,12 +1,40 @@
 project: rforge
-updated: 2026-06-02
+updated: 2026-06-10
 status: Active
-version: 2.2.0 (dev, pending release)
-last_release: 2026-06-01 v2.1.0 (PR #12 dev → main merge d76a45a, release https://github.com/Data-Wise/rforge/releases/tag/v2.1.0, tap data-wise/tap synced to 2.1.0 + brew install/test green; r: dev-cycle + quality commands, 16→28)
+version: 2.6.0 (RELEASE IN PROGRESS — dev → main). One release bundling cran-incoming (v2.3.0) + ecosystem-manifest (v2.4.0) + r:deps-sync (v2.5.0) + r:submit (v2.6.0); last release v2.2.0. 35 commands.
+last_release: 2026-06-02 v2.2.0 (PR #15 dev → main merge 3b2bdda, release https://github.com/Data-Wise/rforge/releases/tag/v2.2.0, tap data-wise/tap synced to 2.2.0 + brew info green; CRAN-submission suite — r:cran-prep + r:revdep/r:goodpractice/r:winbuilder/r:rhub + NOTE classifier, 28→33 commands)
 
-worktrees: []
+worktrees: []  # feature/r-deps-sync merged (PR #21) + worktree removed 2026-06-10
 
 recent:
+  - date: 2026-06-10
+    branch: feature/cran-incoming
+    title: "feat: CRAN-incoming hardening — strict check passes + cranlint Tier 4 (v2.3.0)"
+    spec: docs/specs/SPEC-cran-incoming-hardening-2026-06-10.md
+    state: implemented, PR-ready (gates green)
+    summary: |
+      r:check --strict runs both Suggests-withholding flavors (check (noSuggests)
+      + check (suggests-only)) with --run-donttest; --incoming adds the CRAN
+      incoming bundle. r:cran-prep runs the strict passes by default and BLOCKS
+      `ready` on failure (behavior change). New pure-stdlib lib/cranlint.py adds
+      advisory description/build-hygiene/docs-consistency stages (never block).
+      E2E proof: tests/fixtures/suggestbug.{before,after} — noSuggests pass
+      catches the medfit 0.2.1 unconditional-Suggests bug class with real R
+      (verified live). Gates: pytest 168 + 2 opt-in e2e, test-all.sh 31/31.
+      Merged dev (5b3fc17) in to stay current; dev's r:submit v2.5.0 spec carried along.
+
+  - date: 2026-06-10
+    branch: dev
+    title: "spec + convention: CRAN-incoming hardening (v2.3.0) groundwork"
+    state: SUPERSEDED by the implementation entry above
+    summary: |
+      On dev: established a reusable research+citation convention
+      (docs/specs/_TEMPLATE-{SPEC,RESEARCH}.md + README "Research & Citation
+      Standard" + 7-step workflow), and promoted the CRAN-incoming proposal to an
+      approved SPEC grounded in a cited RESEARCH companion. Research corrected a
+      real draft error: the medfit/MASS noSuggests catcher is
+      _R_CHECK_DEPENDS_ONLY_, not _R_CHECK_SUGGESTS_ONLY_ (per WRE). Also seeded
+      SPEC-r-submit-github-prerelease (v2.5.0) groundwork.
   - date: 2026-06-02
     pr: 14
     branch: dev
@@ -240,39 +268,55 @@ decisions:
 
 ## 🎯 Next Action
 
-Quick post-release loop on this machine:
+✅ **Done (PR-ready): CRAN-incoming hardening (v2.3.0)** — feature/cran-incoming worktree.
 
-A) 🟢 ⚡ **`brew upgrade rforge`** — local install is still at v1.3.0 (Cellar shows /opt/homebrew/Cellar/rforge/1.3.0). `brew info` confirms `1.3.0 → stable 2.0.0` available. ~30s task.
+All Phases 0–5 complete. Phase 0 decisions locked: new `lib/cranlint.py` module;
+Tier 4c done as a lightweight inline advisory (no `docs:check` extraction). Strict
+noSuggests/suggests-only passes + opt-in `--incoming` bundle (confirmed vs R Internals
+§8); Tier 4 metadata/hygiene advisory stages; E2E medfit regression proof verified live
+with real R; full help/hub doc sweep + v2.3.0 version sync. Gates: pytest 168 + 2 opt-in
+e2e, test-all.sh 31/31. `dev` merged in (5b3fc17). Next: open the PR to `dev`.
 
-B) 🟢 ⚡ **Phase 2.2 live-test (post-upgrade)** — now feasible from the production install. Fresh `claude` session, type each of the 3 old slash commands, paste outputs into issue #9. ~5 min. Validates the stub format end-to-end and serves as the first feedback data point.
+Background, no active task:
 
-C) 🟡 Watch issue #9 for ~2-4 weeks. No active task; just keep an eye out for rename-ergonomics signal that would inform Phase 4 / v2.1.0 scope.
-
-After A+B done: backlog is the medium-term roadmap below.
+- 🟡 Watch issue #9 (rename ergonomics) — feeds Phase 4 (agents) scope.
 
 ---
 
 backlog:
-  # Immediate (post-release housekeeping)
-  - title: "brew upgrade local rforge install to v2.0.0"
-    priority: high
-    effort: "< 1 min"
-    notes: "`brew upgrade data-wise/tap/rforge`. Local Cellar still at 1.3.0 (the previous version we used for the brew-outdated UX demo). Currently /opt/homebrew/opt/rforge points at 1.3.0 install. After upgrade, /rforge:* slash commands will see the v2.0.0 manifest including rename-error stubs."
-  - title: "Phase 2.2 live-test of rename-error stubs (post brew upgrade)"
-    priority: high
-    effort: "5 min"
-    notes: "Carried over from PR #6 review. Now executable from the production v2.0.0 install. Steps: fresh `claude` session → type /rforge:doc-check, /rforge:ecosystem-health, /rforge:rpkg-check → paste verbatim outputs into issue #9 as the first feedback data point. If a stub paraphrases instead of emitting verbatim, file as a v2.0.1 patch."
-
-  # Watch (no active task; passive monitoring)
-  - title: "Issue #9 — v2.0.0 rename feedback collection"
-    url: https://github.com/Data-Wise/rforge/issues/9
-    priority: low
-    notes: "Open-ended feedback thread for rename ergonomics + the deferred /rforge:quick + /rforge:thorough rename decision. Watch ~2-4 weeks; decisions inform v2.1.0 scope."
-
-  # Medium-term work (v2.3.0 horizon)
-  - title: "Phase 4 — discovery engine + agents (v2.3.0)"
+  # Roadmap (settled 2026-06-10) — minor cadence after v2.2.0
+  - title: "v2.3.0 — CRAN-incoming hardening"
+    priority: merged-to-dev
+    pr: 18
+    spec: docs/specs/SPEC-cran-incoming-hardening-2026-06-10.md
+    notes: "MERGED to dev (PR #18, merge 749800a). Strict check flavors + Tier-4 cranlint. Gates green (pytest 180+2, test-all 31/31, v2.3.0 synced). Unreleased — ships on next dev → main."
+  - title: "v2.4.0 — ecosystem-manifest discovery"
+    priority: merged-to-dev
+    pr: "16 (spec) + 17 (impl)"
+    spec: docs/specs/SPEC-ecosystem-manifest-discovery-2026-06-10.md
+    notes: "MERGED to dev. lib/discovery.py reads an ecosystem manifest; enrich + drift. Follow-ups open: #19 (path-escape guard), #20 (manifest_order). Unreleased."
+  - title: "v2.5.0 — r:deps-sync (flagship)"
+    priority: merged-to-dev
+    pr: 21
+    spec: docs/specs/SPEC-r-deps-sync-2026-06-10.md
+    notes: "MERGED to dev (PR #21). lib/deps_sync.py + commands/r/deps-sync.md + 11 tests; 33→34 commands. Static sibling of the cran-incoming noSuggests catch. Unreleased."
+  - title: "v2.6.0 — r:submit (GitHub pre-release + CRAN submit handoff)"
+    priority: IMPLEMENTED (feature/r-submit — PR-ready; gates green, pytest 199+2, test-all 31/31)
+    spec: docs/specs/SPEC-r-submit-github-prerelease-2026-06-10.md
+    notes: "Draft. gh pre-release of submitted tarball, promote on acceptance. No auto-submit."
+  - title: "Phase 4 — discovery engine + agents (post-v2.6.0)"
     priority: medium
-    notes: "Last craft-parity item. Adds agent definitions mirroring craft's discovery engine. (Bumped from v2.2.0 — that slot was taken by r: CRAN-submission commands.)"
+    notes: "Last craft-parity item. Bumped repeatedly (v2.2.0→…→post-v2.6.0). Still unspecced; feeds off issue #9 signal."
+
+  # Unscheduled candidates (have specs/brainstorms, no slot yet)
+  - title: "diff-aware checks P0 (--changed)"
+    priority: candidate
+    spec: docs/specs/SPEC-diff-aware-checks-and-coverage-2026-05-31.md
+    notes: "Refocused to P0 (2026-06-10); the unbuilt flagship. P1 shipped; P2/P3/P4 migrated to other specs."
+  - title: "Scaffolding theme (r:use-test/r:use-package/r:use-vignette)"
+    priority: candidate
+    spec: docs/specs/SPEC-r-scaffolding-2026-06-10.md
+    notes: "Now specced (2026-06-10). Mission resolved: EXISTING ecosystems only — r:create dropped. Hybrid engine (usethis infra + Python/AI content), dry-run default. Builds on r:deps-sync (shared DESCRIPTION-patch writer). Competes with Phase 4 for post-v2.6.0."
 
   # Parked (waits on external signal)
   - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"
@@ -281,6 +325,7 @@ backlog:
     notes: "lib/status.py shipped as a thin faithful port in v1.3.0. The 4-mode contract (default/debug/optimize/release with R subprocess) was descoped pending real-user input on what depth is wanted. Open a new SPEC when there's demand."
 
 shipped:
+  - "v2.2.0 — 2026-06-02 — CRAN-submission suite: r:cran-prep orchestrator + r:revdep/r:goodpractice/r:winbuilder/r:rhub + r:check NOTE classifier (spurious/real); 28→33 commands; argument-hint added to all 17 commands lacking it; new tutorials: r-dev-cycle + cran-submission-with-rforge; workflow flowcharts updated"
   - "v2.1.0 — 2026-05-31 — 12 new r: commands (r:load, r:document, r:test, r:coverage, r:build, r:install, r:site, r:cycle, r:lint, r:spell, r:urlcheck, r:style) + lib/rcmd.py; 16→28 commands; r:check retrofitted onto lib.rcmd envelope"
   - "v2.0.0 — 2026-05-12 — BREAKING: Phase 3 command namespacing — 3 of 16 commands renamed (doc-check → docs:check, ecosystem-health → health, rpkg-check → r:check); old names retained as rename-error stubs through v2.x; tests 29/29 (+6 new rename-specific); v1.3.0+ post-MCP doc cleanup bundled; tap formula + manifest synced; feedback thread at issue #9"
   - "v1.3.0 — 2026-05-11 — Path B complete (rforge-mcp absorbed into lib/ pure-Python modules); /rforge:init promoted to first-class command (16 total); rforge-mcp local prototype tombstoned (was never public on GitHub or npm — SPEC scope-corrected); tap formula + manifest + docs Pages all synced; brew outdated UX verified via Cellar-rename trick"

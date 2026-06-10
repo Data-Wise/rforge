@@ -10,7 +10,14 @@ Walks a directory tree looking for R `DESCRIPTION` files, parses them into
 structured `Package` records, and classifies the result as a single package,
 an ecosystem, or a hybrid layout.
 
-Pure Python — no R subprocess, no external deps beyond the stdlib. Ported
+Optionally enriches discovery from an *ecosystem manifest* (curation metadata:
+role/repo/CRAN state). The manifest is located via a `manifest:` path in the
+root `.rforge.yaml`, parsed by a vendored YAML-subset reader (`parse_manifest`),
+matched to discovered packages by name, and any mismatch is reported as `drift`.
+An absent/unreadable manifest leaves the zero-manifest behavior unchanged.
+
+Pure Python — no R subprocess, no external deps beyond the stdlib (the manifest
+reader is a hand-rolled YAML subset, not PyYAML). Ported
 from `rforge-mcp/dist/tools/discovery/detect.js` (Path B Phase B.1).
 
 Usage (CLI, from repo root):
@@ -41,6 +48,15 @@ Parsed contents of an R DESCRIPTION file.
 | `linking_to` | `list[str]` | `list()` |
 | `url` | `Optional[str]` | `None` |
 
+### `class Drift`
+
+Mismatch between a manifest and what's on disk.
+
+| Field | Type | Default |
+|---|---|---|
+| `manifest_only` | `list[str]` | `list()` |
+| `disk_only` | `list[str]` | `list()` |
+
 ### `class Ecosystem`
 
 Result of `detect_ecosystem()`.
@@ -53,6 +69,35 @@ Result of `detect_ecosystem()`.
 | `mode` | `Mode` | — |
 | `config_found` | `bool` | — |
 | `config_path` | `Optional[str]` | `None` |
+| `manifest_path` | `Optional[str]` | `None` |
+| `drift` | `Drift` | `Drift()` |
+
+### `class Manifest`
+
+Parsed ecosystem manifest (e.g. ECOSYSTEM-MANIFEST.yaml).
+
+Curation metadata maintained by hand in a hub — what packages the ecosystem
+*should* contain, their roles, repos, and CRAN state. Distinct from on-disk
+discovery (`find_r_packages`), which is the source of truth for versions/deps.
+
+| Field | Type | Default |
+|---|---|---|
+| `ecosystem` | `Optional[str]` | `None` |
+| `updated` | `Optional[str]` | `None` |
+| `packages` | `list[ManifestEntry]` | `list()` |
+
+### `class ManifestEntry`
+
+One package entry from an ecosystem manifest (curation metadata).
+
+| Field | Type | Default |
+|---|---|---|
+| `name` | `str` | — |
+| `path` | `Optional[str]` | `None` |
+| `role` | `Optional[str]` | `None` |
+| `repo` | `Optional[str]` | `None` |
+| `cran` | `Optional[str]` | `None` |
+| `status_file` | `Optional[str]` | `None` |
 
 ### `class Package`
 
@@ -65,6 +110,7 @@ An R package discovered on disk.
 | `path` | `str` | — |
 | `category` | `Literal['active', 'stable', 'archived']` | `'active'` |
 | `description` | `Optional[Description]` | `None` |
+| `manifest` | `Optional[ManifestEntry]` | `None` |
 
 ## Functions
 
@@ -123,6 +169,20 @@ Parse the content of a DESCRIPTION file.
 DESCRIPTION uses an RFC-822-ish format: `Field: value` lines, with
 indented continuation lines belonging to the previous field.
 
+### `parse_manifest()`
+
+```python
+def parse_manifest(content: 'str') -> 'Manifest'
+```
+
+Parse an ecosystem manifest from a strict YAML *subset*.
+
+Deliberately stdlib-only (no PyYAML). Supports exactly what the manifest
+schema uses: top-level scalars (`ecosystem`, `updated`, …) and a `packages:`
+list of flat maps. Blank lines and `#` comment lines are ignored. Anything
+fancier than this subset is silently skipped rather than raised — callers
+treat a sparse/empty Manifest as "no usable manifest".
+
 ### `read_description()`
 
 ```python
@@ -130,3 +190,11 @@ def read_description(path: 'str | os.PathLike') -> 'Optional[Description]'
 ```
 
 Read and parse a DESCRIPTION file. Returns None on any error.
+
+### `read_manifest()`
+
+```python
+def read_manifest(path: 'str | os.PathLike') -> 'Optional[Manifest]'
+```
+
+Read and parse an ecosystem manifest. Returns None on any read error.

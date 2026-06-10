@@ -36,7 +36,25 @@ This runs the full sequence in order:
 | `test` | `testthat::test_local()` | Tests pass with no failures |
 | `coverage` | `covr::package_coverage()` | Coverage baseline |
 | `check` | `rcmdcheck::rcmdcheck(--as-cran)` | R CMD check with CRAN flags + NOTE classifier |
+| `check (noSuggests)` | `rcmdcheck(env=_R_CHECK_DEPENDS_ONLY_)` | strict pass — `Suggests` package used unconditionally fails here |
+| `check (suggests-only)` | `rcmdcheck(env=_R_CHECK_SUGGESTS_ONLY_)` | strict pass — undeclared-package use |
+| `description` | `lib/cranlint.py` (pure-Python) | DESCRIPTION incoming nits — **advisory** |
+| `build-hygiene` | `lib/cranlint.py` (pure-Python) | planning/dev docs that would ship in the tarball — **advisory** |
+| `docs-consistency` | `lib/cranlint.py` (pure-Python) | staleness/dangling-ref check — **advisory** |
 | `revdep` | `revdepcheck::revdep_check()` | CRAN downstream packages not broken |
+
+!!! note "Strict passes run by default; Tier 4 is advisory"
+    The two `check (...)` strict flavor passes (each with `--run-donttest`) run **by
+    default** and a strict-pass **ERROR blocks `ready`** — they emulate CRAN's
+    post-acceptance flavors. The three pure-Python Tier 4 stages
+    (`description`, `build-hygiene`, `docs-consistency`) are **advisory** and never block
+    `ready`. Add `--incoming` for an extra opt-in CRAN-incoming `check (incoming)` pass.
+
+!!! warning "Behavior change — a package green today can turn red"
+    Because the strict passes are on by default, a package that was 🟢 `ready` under
+    `--as-cran` alone can turn 🔴 once `check (noSuggests)` detects a `Suggests` package
+    used unconditionally. This is intended. **Fix:** move it to `Imports`, or guard with
+    `requireNamespace()` in code **and** `skip_if_not_installed()` in tests.
 
 **Output — what to look for:**
 

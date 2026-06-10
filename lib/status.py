@@ -34,7 +34,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from .discovery import detect_ecosystem
+from .discovery import Drift, detect_ecosystem
 
 
 __all__ = [
@@ -85,6 +85,7 @@ class PackageStatus:
     test_status: str = "unknown"
     last_updated: Optional[datetime] = None
     status_file: Optional[StatusFileSummary] = None
+    role: Optional[str] = None  # from the ecosystem manifest, when matched
 
     def to_dict(self) -> dict:
         return {
@@ -95,6 +96,7 @@ class PackageStatus:
             "test_status": self.test_status,
             "last_updated": self.last_updated.isoformat() if self.last_updated else None,
             "status_file": self.status_file.to_dict() if self.status_file else None,
+            "role": self.role,
         }
 
 
@@ -113,6 +115,7 @@ class EcosystemStatus:
     health_score: int
     blocking_issues: Optional[list[str]]
     last_updated: datetime
+    drift: Optional[Drift] = None  # manifest vs. on-disk mismatch, when a manifest is configured
 
     def to_dict(self) -> dict:
         return {
@@ -121,6 +124,7 @@ class EcosystemStatus:
             "health_score": self.health_score,
             "blocking_issues": list(self.blocking_issues) if self.blocking_issues is not None else None,
             "last_updated": self.last_updated.isoformat() if isinstance(self.last_updated, datetime) else self.last_updated,
+            "drift": asdict(self.drift) if self.drift else None,
         }
 
 
@@ -279,6 +283,7 @@ def aggregate_status(ecosystem_path: str | os.PathLike = ".") -> EcosystemStatus
                 test_status="unknown",
                 last_updated=mtime,
                 status_file=summary,
+                role=pkg.manifest.role if pkg.manifest else None,
             )
         )
 
@@ -296,6 +301,7 @@ def aggregate_status(ecosystem_path: str | os.PathLike = ".") -> EcosystemStatus
         health_score=health_score,
         blocking_issues=blocking_issues,
         last_updated=datetime.now(),
+        drift=ecosystem.drift,
     )
 
 
@@ -319,30 +325,54 @@ def _health_verdict(score: int) -> str:
     return "✅ Ecosystem is healthy"
 
 
+def _truncate(text: str, limit: int) -> str:
+    """Clip `text` to `limit` chars with an ellipsis when it overflows."""
+    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
+
+
 def format_text(result: EcosystemStatus) -> str:
     """Terminal-friendly rendering of an `EcosystemStatus`."""
     lines: list[str] = []
     lines.append(f"📊 ECOSYSTEM STATUS: {result.ecosystem}")
     lines.append("")
+    has_roles = any(p.role for p in result.packages)
     if result.packages:
-        lines.append(
-            f"{'Package':<22} {'Version':<10} {'Check':<10} {'Test':<10} Progress"
+        header = (
+            f"{'Package':<22} {'Version':<10} {'Check':<10} {'Test':<10} {'Progress':<9}"
         )
-        lines.append("─" * 70)
+        if has_roles:
+            header += " Role"
+        lines.append(header)
+        lines.append("─" * (90 if has_roles else 70))
         for pkg in result.packages:
             progress = (
                 f"{pkg.status_file.progress}%"
                 if pkg.status_file and pkg.status_file.progress is not None
                 else "--"
             )
-            lines.append(
+            base = (
                 f"{pkg.name:<22} {pkg.version:<10} "
                 f"{_check_icon(pkg.check_status)} {pkg.check_status:<7} "
-                f"{_check_icon(pkg.test_status)} {pkg.test_status:<7} {progress}"
+                f"{_check_icon(pkg.test_status)} {pkg.test_status:<7} "
             )
+            if has_roles:
+                lines.append(f"{base}{progress:<9} {_truncate(pkg.role or '', 36)}".rstrip())
+            else:
+                lines.append(f"{base}{progress}")
     else:
         lines.append("(no packages discovered)")
     lines.append("")
+    if result.drift and (result.drift.manifest_only or result.drift.disk_only):
+        lines.append("⚠️  Manifest drift")
+        if result.drift.manifest_only:
+            lines.append(
+                f"  in manifest, not on disk: {', '.join(result.drift.manifest_only)}"
+            )
+        if result.drift.disk_only:
+            lines.append(
+                f"  on disk, not in manifest: {', '.join(result.drift.disk_only)}"
+            )
+        lines.append("")
     if result.blocking_issues:
         lines.append("🔴 BLOCKING ISSUES")
         for issue in result.blocking_issues:

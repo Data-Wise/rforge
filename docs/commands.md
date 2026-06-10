@@ -17,7 +17,7 @@ Complete reference for all **33** RForge commands. Commands are organized by cat
 - [Health Checks](#health-checks) (2 commands)
 - [R Development Cycle](#r-development-cycle) (9 commands)
 - [R Quality](#r-quality) (5 commands)
-- [CRAN Submission](#cran-submission) (5 commands)
+- [CRAN Submission](#cran-submission) (6 commands)
 
 ---
 
@@ -101,6 +101,9 @@ Quick ecosystem-wide status dashboard with mode-specific detail levels.
 - Dependencies status
 - Test results
 - Coverage metrics
+- **Role column + manifest drift (v2.4.0)** — when an ecosystem manifest is configured via
+  `.rforge.yaml` `manifest:`, the dashboard adds a conditional `Role` column (from the manifest)
+  and a drift block. Without a manifest, the dashboard is unchanged.
 
 **Time budget:** <10s (default), up to 300s (release mode)
 
@@ -233,6 +236,12 @@ Auto-detect project structure (single package, ecosystem, or hybrid).
 - Directory structure summary
 - Dependency relationships
 
+**Ecosystem manifest (v2.4.0):** if the root `.rforge.yaml` declares a `manifest:` path,
+`/rforge:detect` reads that ecosystem manifest, shows a `manifest:` header field and a per-package
+`role`, and reports **drift** (packages in the manifest but not on disk, and vice-versa). Add the
+field to `.rforge.yaml` as `manifest: <relative-path-to.yaml>`; with no manifest configured, output
+is unchanged.
+
 ---
 
 ### /rforge:cascade
@@ -347,6 +356,27 @@ Build and visualize dependency graph across R package ecosystem.
 - Import vs Suggest relationships
 - Circular dependency detection
 - External dependencies
+
+### /rforge:r:deps-sync
+
+Reconcile **one package's** `DESCRIPTION` against what its code actually uses (the *intra*-package
+counterpart to `/rforge:deps`, which maps the *inter*-package graph). Pure-Python — scans
+`R/`/`tests/`/`vignettes/` + `NAMESPACE`.
+
+**Usage:**
+```bash
+/rforge:r:deps-sync [package] [--write]
+```
+
+**Parameters:**
+- `package` (optional) — package path (defaults to current directory)
+- `--write` (optional) — apply the unambiguous `Imports`/`Suggests` changes to `DESCRIPTION` (default is report-only)
+
+**Findings:** `missing` (used, undeclared → Imports), `misclassified` (in Suggests but used
+unconditionally in `R/` → Imports — the static sibling of `r:check --strict`'s noSuggests pass),
+`missing_suggests` (tests/vignettes-only → Suggests), `unused` (declared, no usage — advisory).
+Emits a suggested patch; `--write` applies only the unambiguous parts (advisory removals are never
+auto-applied).
 
 ---
 
@@ -504,28 +534,41 @@ R CMD check integration with detailed error reporting.
 
 **Usage:**
 ```bash
-/rforge:r:check [package]
+/rforge:r:check [package] [--strict] [--incoming]
 ```
 
 **Parameters:**
 - `package` (optional) - Package to check (defaults to current)
+- `--strict` (optional) - Run both CRAN Suggests-withholding flavors (default: false)
+- `--incoming` (optional) - Emulate CRAN's incoming `_R_CHECK_*` bundle; implies `--strict` (default: false)
 
 **Examples:**
 ```bash
-# Check current package
+# Check current package (single --as-cran pass)
 /rforge:r:check
 
 # Check specific package
 /rforge:r:check mypackage
+
+# Strict CRAN-incoming check (both Suggests flavors)
+/rforge:r:check --strict
+
+# Add the opt-in incoming env-var bundle
+/rforge:r:check --incoming
 ```
 
 **Executes:**
-- R CMD check with standard flags
+- R CMD check with `--as-cran` flags
 - Parses output for errors/warnings/notes
-- Categorizes issues
+- Categorizes issues (NOTEs classified as `spurious` vs `real`)
 - Suggests fixes
 
-**Note:** This can take 1-5 minutes depending on package size.
+**Strict mode (v2.3.0):** `--strict` runs **two additional flavor passes** as distinct stage rows — `check (noSuggests)` (`_R_CHECK_DEPENDS_ONLY_=true`) and `check (suggests-only)` (`_R_CHECK_SUGGESTS_ONLY_=true`), each with `--run-donttest`. These catch the error classes CRAN's post-acceptance flavors detect but a plain `--as-cran` run misses. `--incoming` implies `--strict` and adds a third `check (incoming)` row.
+
+!!! warning "Behavior change in v2.3.0"
+    A package that passes the default `--as-cran` check today can fail `--strict` once the **noSuggests** pass catches a `Suggests` package used unconditionally (the medfit 0.2.1 class — `MASS::mvrnorm` in a default code path). This is intended: CRAN would bounce such a package post-acceptance. Move the dependency to `Imports`, or guard it with `requireNamespace()` in code and `skip_if_not_installed()` in tests.
+
+**Note:** This can take 1-5 minutes depending on package size. Strict mode runs the baseline plus two flavor passes (~3× check time; ~4× with `--incoming`).
 
 ---
 
@@ -1063,12 +1106,13 @@ Per-package CRAN-readiness gate — runs the full pre-submission sequence and ge
 **Usage:**
 
 ```bash
-/rforge:r:cran-prep [package] [--goodpractice] [--multi-platform] [--no-revdep]
+/rforge:r:cran-prep [package] [--incoming] [--goodpractice] [--multi-platform] [--no-revdep]
 ```
 
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
+- `--incoming` (optional) - Also run the opt-in CRAN-incoming `_R_CHECK_*` pass (default: false)
 - `--goodpractice` (optional) - Also run the advisory goodpractice bundle (default: false)
 - `--multi-platform` (optional) - Dispatch win-builder + R-hub async checks (default: false)
 - `--no-revdep` (optional) - Skip the reverse-dependency check (default: false)
@@ -1076,8 +1120,11 @@ Per-package CRAN-readiness gate — runs the full pre-submission sequence and ge
 **Examples:**
 
 ```bash
-# Full CRAN-prep gate for current package
+# Full CRAN-prep gate for current package (strict passes run by default)
 /rforge:r:cran-prep
+
+# Add the opt-in incoming env-var pass
+/rforge:r:cran-prep --incoming
 
 # Include goodpractice advisory and multi-platform checks
 /rforge:r:cran-prep --goodpractice --multi-platform
@@ -1088,12 +1135,53 @@ Per-package CRAN-readiness gate — runs the full pre-submission sequence and ge
 
 **Executes:**
 
-- Full sequence: `document` → `lint` → `spell` → `urlcheck` → `test` → `coverage` → `check (--as-cran)` → `revdep`
+- Full sequence: `document` → `lint` → `spell` → `urlcheck` → `test` → `coverage` → `check` → strict + Tier 4 stages → `revdep`
+- The `check` stage now expands into multiple rows: `check`, `check (noSuggests)`, `check (suggests-only)`, (with `--incoming`) `check (incoming)`, then the Tier 4 advisory stages `description`, `build-hygiene`, and `docs-consistency`
+- **Strict passes run by default** (v2.3.0): `check (noSuggests)` + `check (suggests-only)`, each with `--run-donttest`. A strict **ERROR blocks the `ready` verdict** (catches the medfit-class Suggests misuse). Plus a Tier 1b PDF-manual check (warns, never blocks if no LaTeX).
+- **Tier 4 (advisory, NEVER blocks `ready`)** — three stages backed by `lib/cranlint.py` (pure Python, no R): `description` (DESCRIPTION incoming nits — non-`Authors@R`, weak `Title`, `Description` prose, stale `Date`), `build-hygiene` (planning/dev docs that would ship in the tarball, with the exact `.Rbuildignore` regex to add), `docs-consistency` (lightweight advisory). Build-hygiene findings still block indirectly via the matching real R CMD check NOTE once R runs.
 - Generates `cran-comments.md` with a `ready` / `warn` / `blocked` verdict
 - Returns a stage-by-stage status table; lists blockers that must be fixed before submission
 - Composes with `/rforge:release` (this = single-package gate; release = cross-package submission ordering)
 
-**Related commands:** `/rforge:release` (ecosystem-level submission ordering), `/rforge:r:revdep`, `/rforge:r:check`, `/rforge:r:winbuilder`, `/rforge:r:rhub`, `/rforge:r:cycle`
+!!! warning "Behavior change in v2.3.0"
+    Because the strict passes run by default and block `ready`, a package that reports 🟢 `ready` today under `--as-cran` can turn 🔴 `blocked` once the noSuggests pass catches an unconditional `Suggests` use. Intended — CRAN would bounce it post-acceptance. The fix: move the package to `Imports`, or guard with `requireNamespace()` + `skip_if_not_installed()`.
+
+**Related commands:** `/rforge:release` (ecosystem-level submission ordering), `/rforge:r:revdep`, `/rforge:r:check`, `/rforge:r:winbuilder`, `/rforge:r:rhub`, `/rforge:r:cycle`, `/rforge:r:submit`
+
+---
+
+### /rforge:r:submit
+
+GitHub pre-release of the submitted tarball + CRAN submit **handoff** — fills the gap between
+`r:cran-prep` (reports `ready`) and CRAN going live. **Never auto-submits to CRAN.**
+
+**Usage:**
+
+```bash
+/rforge:r:submit [package] [--promote] [--dry-run] [--no-verify] [--force]
+```
+
+**Parameters:**
+
+- `package` (optional) — package path (defaults to current directory)
+- `--promote` (optional) — Phase 2: flip the pre-release to a full release after CRAN accepts
+- `--dry-run` (optional) — show the tag/assets/checklist without touching GitHub
+- `--no-verify` (optional) — with `--promote`, skip the `cran.r-project.org` version check
+- `--force` (optional) — cut the pre-release even if `cran-prep` is not `ready` (records the override)
+
+**Lifecycle:**
+
+- **Phase 1** (`r:submit`): gate on `cran-prep` = `ready` → build the tarball (reuse `r:build`) → cut a
+  GitHub **pre-release** (not "Latest") tagged `v<version>` with `cran-comments.md` + tarball attached →
+  print the CRAN submit checklist for you to run.
+- **Phase 2** (`r:submit --promote`): optionally verify the version is live on CRAN, then
+  `gh release edit v<version> --prerelease=false --latest`.
+
+Uses a *pre-release promoted in place* to avoid tagging a final release before acceptance (resubmissions
+bump the version — the r-pkgs anti-pattern). `gh` is a soft dependency: if absent/unauthed, the command
+prints the manual `gh` recipe instead of failing. Backed by `lib/ghrelease.py`.
+
+**Related commands:** `/rforge:r:cran-prep` (upstream gate), `/rforge:r:build` (the tarball), `/rforge:release`
 
 ---
 

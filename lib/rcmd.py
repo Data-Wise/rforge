@@ -21,6 +21,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from . import cranlint
+
 OPTIONAL_ENGINES = {"covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
                     "revdepcheck", "goodpractice", "devtools", "rhub"}
 INSTALL_HINT = {
@@ -226,14 +228,73 @@ def _guard(pkg_name: str, body: str) -> str:
     )
 
 
+# CRAN-incoming `_R_CHECK_*` env bundles for the strict check flavors.
+#
+# Each maps to a named-character `env=` vector passed straight into
+# rcmdcheck::rcmdcheck() (RESEARCH §A.4). The two flavor vars are the
+# Suggests-withholding flavors documented in Writing R Extensions (RESEARCH
+# §A.1); the incoming pair are the CRAN-incoming switches.
+#
+# `--incoming` bundle scope (confirmed against R Internals §8 "Tools", the
+# `R CMD check --as-cran` block — doc/manual/R-ints.texi): the manual states
+# the *entire* `_R_CHECK_CRAN_INCOMING_…/CODE_…/S3…` block is already "turned
+# on by R CMD check --as-cran". So there is no large incoming-only extra set to
+# add. We force the two INCOMING switches explicitly so the stage is
+# self-documenting and robust even if a future call path omits `--as-cran`.
+# EXCLUDED (with reason):
+#   _R_CHECK_S3_REGISTRATION_      — not a real var name; the real one is
+#                                    _R_CHECK_OVERWRITE_REGISTERED_S3_METHODS_,
+#                                    already in the --as-cran block.
+#   _R_CHECK_LENGTH_1_CONDITION_   — documented "No longer in use" (now an error).
+#   partial-match (_R_CHECK_*PARTIAL*) — already in the --as-cran block.
+#   _R_CHECK_RD_VALIDATE_RD2HTML_  — already on under --as-cran (RESEARCH §A.2).
+#   _R_CHECK_FORCE_SUGGESTS_=FALSE — the one true incoming-extra, but it RELAXES
+#                                    (tolerates unavailable Suggests) rather than
+#                                    tightening — deferred; it would undercut the
+#                                    noSuggests pass philosophy.
+_CHECK_ENV = {
+    "depends": {"_R_CHECK_DEPENDS_ONLY_": "true"},
+    "suggests": {"_R_CHECK_SUGGESTS_ONLY_": "true"},
+}
+_INCOMING_ENV = {"_R_CHECK_CRAN_INCOMING_": "true",
+                 "_R_CHECK_CRAN_INCOMING_REMOTE_": "true"}
+
+
+def _r_named_char(d: dict) -> str:
+    """Render a Python dict as an R named character vector literal: c("k"="v")."""
+    inner = ", ".join(f'"{k}"="{v}"' for k, v in d.items())
+    return f"c({inner})"
+
+
 def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = False,
               strict: bool = False, articles_only: bool = False,
-              devel: bool = False) -> str:
+              devel: bool = False, flavor: str | None = None,
+              incoming: bool = False) -> str:
+    """Build the R one-liner for engine ``kind``, emitting JSON on stdout.
+
+    For ``kind="check"``, ``flavor`` in {None, "depends", "suggests"} selects a
+    Suggests-withholding env flavor and ``incoming`` adds the CRAN-incoming
+    ``_R_CHECK_*`` bundle; a flavor / ``incoming`` / ``strict`` pass also runs
+    ``\\donttest{}`` examples. Each engine call is wrapped in ``_guard(...)``.
+    """
     p = json.dumps(path)  # safely quote path for R
     if kind == "check":
-        args = 'c("--as-cran")' if as_cran else "character()"
+        # Strict-grade passes (a flavor or the incoming bundle) always run
+        # \donttest{} examples (spec §Scope Tier 1a); --strict does too.
+        run_donttest = strict or flavor is not None or incoming
+        flags = ["--as-cran"] if as_cran else []
+        if run_donttest:
+            flags.append("--run-donttest")
+        args = f'c({", ".join(json.dumps(f) for f in flags)})' if flags else "character()"
+        env_vars: dict[str, str] = {}
+        if flavor is not None:
+            env_vars.update(_CHECK_ENV[flavor])
+        if incoming:
+            env_vars.update(_INCOMING_ENV)
+        env_arg = f", env={_r_named_char(env_vars)}" if env_vars else ""
         return _guard("rcmdcheck",
-            f'r <- rcmdcheck::rcmdcheck({p}, args={args}, quiet=TRUE, error_on = "never"); '
+            f'r <- rcmdcheck::rcmdcheck({p}, args={args}{env_arg}, '
+            f'quiet=TRUE, error_on = "never"); '
             f'cat(jsonlite::toJSON(list(errors=r$errors, warnings=r$warnings, '
             f'notes=r$notes), auto_unbox=TRUE, null="list"))')
     if kind == "build":
@@ -360,7 +421,13 @@ def _install_package(path: str) -> tuple[dict, int]:
 
 
 def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = False,
-        strict: bool = False, articles_only: bool = False, devel: bool = False) -> dict:
+        strict: bool = False, articles_only: bool = False, devel: bool = False,
+        flavor: str | None = None, incoming: bool = False) -> dict:
+    """Run one engine ``kind`` against ``path``; return the normalized envelope.
+
+    Threads the check ``flavor`` / ``incoming`` selectors through to ``r_snippet``;
+    returns an error envelope when no DESCRIPTION is found.
+    """
     pkg = find_package(path)
     if pkg is None:
         return {"kind": kind, "status": "error", "engine_missing": [],
@@ -372,7 +439,8 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
         if kind == "site" and articles_only:
             _install_package(path)  # standalone build_articles renders installed version
         snippet = r_snippet(kind, path, as_cran=as_cran, preview=preview,
-                            strict=strict, articles_only=articles_only, devel=devel)
+                            strict=strict, articles_only=articles_only, devel=devel,
+                            flavor=flavor, incoming=incoming)
         stdout, code = _invoke_r(snippet)
         raw = _parse_json(stdout)
         if raw is None:
@@ -437,19 +505,26 @@ def render_cran_comments(package: str, version: str,
     return "\n".join(lines) + "\n"
 
 
+# Surfaced when a strict (noSuggests / suggests-only / incoming) flavor errors.
+_STRICT_HINT = ("A Suggests package is used unconditionally. Move it to Imports, "
+                "or guard with `requireNamespace()` in code AND "
+                "`skip_if_not_installed()` in tests.")
+
+
 def _run_cran_prep(path: str = ".", *, no_revdep: bool = False,
-                   goodpractice: bool = False, multi_platform: bool = False) -> dict:
+                   goodpractice: bool = False, multi_platform: bool = False,
+                   strict: bool = True, incoming: bool = False) -> dict:
     pkg = find_package(path)
     if pkg is None:
         return {"kind": "cran-prep", "status": "blocked", "engine_missing": [],
                 "blockers": ["No DESCRIPTION — try /rforge:detect"], "stages": [],
                 "messages": []}
-    stages, blockers, dispatched = [], [], []
+    stages, blockers, dispatched, messages = [], [], [], []
     revdep_env = None  # may stay None when no_revdep=True
 
-    def stage(kind, **kw):
+    def stage(kind, *, label=None, **kw):
         env = run(kind, path, **kw)
-        stages.append({"kind": kind, "status": env["status"]})
+        stages.append({"kind": label or kind, "status": env["status"]})
         return env
 
     # 1-6: hard sequence (stop at first ERROR)
@@ -458,16 +533,57 @@ def _run_cran_prep(path: str = ".", *, no_revdep: bool = False,
         if env["status"] == "error":
             blockers.append(f"{kind} failed")
             return _cran_prep_envelope(pkg, "blocked", stages, blockers, dispatched,
-                                       failed_stage=kind)
+                                       failed_stage=kind, messages=messages)
     check_env = stage("check", as_cran=True)
     if check_env["status"] == "error":
         blockers.append("R CMD check --as-cran failed (errors/warnings)")
         return _cran_prep_envelope(pkg, "blocked", stages, blockers, dispatched,
-                                   failed_stage="check")
+                                   failed_stage="check", messages=messages)
     real_notes = [c for c in check_env.get("check", {}).get("notes_classified", [])
                   if c.get("kind") == "real"]
     if real_notes:
         blockers.append(f"{len(real_notes)} real NOTE(s) need attention")
+
+    # Tier 1b: PDF reference manual — warn (never block) if LaTeX is absent.
+    manual = check_env.get("check", {}).get("manual")
+    if isinstance(manual, dict) and not manual.get("built", True) \
+            and not manual.get("latex", True):
+        messages.append("PDF reference manual not built locally (no LaTeX) — "
+                        "rely on win-builder for the manual. (warning, not a blocker)")
+
+    # Tier 2a/2b: strict Suggests-withholding flavors (run by default in
+    # cran-prep). Each is its own --run-donttest pass with a restricted lib path.
+    if strict:
+        flavor_rows = [("depends", "check (noSuggests)"),
+                       ("suggests", "check (suggests-only)")]
+        for flavor, label in flavor_rows:
+            env = stage("check", label=label, as_cran=True, strict=True, flavor=flavor)
+            if env["status"] == "error":
+                blockers.append("noSuggests/donttest check failed "
+                                "(Suggests used unconditionally?)")
+                if _STRICT_HINT not in messages:
+                    messages.append(_STRICT_HINT)
+
+    # Tier 3: incoming-only `_R_CHECK_*` bundle (opt-in via --incoming).
+    if incoming:
+        env = stage("check", label="check (incoming)", as_cran=True,
+                    strict=True, incoming=True)
+        if env["status"] == "error":
+            blockers.append("CRAN incoming check failed")
+
+    # Tier 4: pure-Python metadata + structure checks (no R). All ADVISORY —
+    # they surface findings but never append a blocker, so they cannot flip the
+    # `ready` verdict on their own. (Build-hygiene issues still block indirectly
+    # via the real R CMD check NOTE once R runs.) Each degrades to `warn` on a
+    # missing/unparseable DESCRIPTION/.Rbuildignore rather than raising.
+    for tier4 in (cranlint.lint_description, cranlint.check_build_hygiene,
+                  cranlint.check_planning_consistency):
+        env = tier4(path)
+        stages.append({"kind": env["kind"], "status": env["status"]})
+        for finding in env.get("findings", []):
+            msg = finding.get("message")
+            if msg:
+                messages.append(f"[{env['kind']}] {msg}")
 
     # revdep (skip if opted out)
     if not no_revdep:
@@ -494,7 +610,7 @@ def _run_cran_prep(path: str = ".", *, no_revdep: bool = False,
 
     status = "ready" if not blockers else "warn"
     return _cran_prep_envelope(pkg, status, stages, blockers, dispatched,
-                               cran_comments_path=str(cc_path))
+                               cran_comments_path=str(cc_path), messages=messages)
 
 
 def _cran_prep_envelope(pkg, status, stages, blockers, dispatched, **extra):
@@ -526,16 +642,24 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--goodpractice", action="store_true")
     ap.add_argument("--multi-platform", action="store_true")
     ap.add_argument("--no-revdep", action="store_true")
+    ap.add_argument("--incoming", action="store_true",
+                    help="check: add the CRAN-incoming _R_CHECK_* bundle "
+                         "(implies --strict); cran-prep: add the check (incoming) row")
+    ap.add_argument("--flavor", choices=["depends", "suggests"], default=None,
+                    help="check: run a single Suggests-withholding flavor "
+                         "(internal selector; cran-prep loops over both by default)")
     ns = ap.parse_args(argv)
     if ns.kind == "cycle":
         env = _run_cycle(ns.path)
     elif ns.kind == "cran-prep":
         env = _run_cran_prep(ns.path, no_revdep=ns.no_revdep,
                              goodpractice=ns.goodpractice,
-                             multi_platform=ns.multi_platform)
+                             multi_platform=ns.multi_platform,
+                             incoming=ns.incoming)
     else:
         env = run(ns.kind, ns.path, as_cran=ns.as_cran, preview=ns.preview,
-                  strict=ns.strict, articles_only=ns.articles_only, devel=ns.devel)
+                  strict=ns.strict, articles_only=ns.articles_only, devel=ns.devel,
+                  flavor=ns.flavor, incoming=ns.incoming)
     print(json.dumps(env, indent=2))
     # "dispatched" (winbuilder/rhub) is non-error — exits 0 like "ok"/"warn"
     return 0 if env.get("status") not in ("error", "blocked") else 1

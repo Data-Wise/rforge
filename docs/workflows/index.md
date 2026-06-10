@@ -100,8 +100,8 @@ Per-package gate → ecosystem rollup → submission order.
 flowchart TD
     A["/rforge:docs:check\nNEWS + doc drift"] --> B
 
-    subgraph gate["Per-package gate (v2.2.0+)"]
-        B["/rforge:r:cran-prep\ndocument→lint→spell→urlcheck\ntest→coverage→check(--as-cran)→revdep\nwrites cran-comments.md"]
+    subgraph gate["Per-package gate (v2.2.0+, strict by default v2.3.0+)"]
+        B["/rforge:r:cran-prep\ndocument→lint→spell→urlcheck→test→coverage\ncheck → check (noSuggests) → check (suggests-only)\nTier 4: description, build-hygiene, docs-consistency\nrevdep · writes cran-comments.md"]
     end
 
     B --> C{"ready / warn\n/ blocked?"}
@@ -114,6 +114,9 @@ flowchart TD
 
 → [CRAN submission with rforge](../tutorials/cran-submission-with-rforge.md) (~15 min, per-package gate)
 → [CRAN release prep](../tutorials/cran-release-prep.md) (~15 min, ecosystem pipeline)
+
+!!! warning "Strict passes block `ready` (v2.3.0+)"
+    As of v2.3.0 the gate runs two Suggests-withholding flavor passes — `check (noSuggests)` and `check (suggests-only)` — **by default**, each with `--run-donttest`, and a strict ERROR blocks the `ready` verdict. A package that was 🟢 `ready` under `--as-cran` can now turn 🔴 once the noSuggests pass catches a `Suggests` package used unconditionally. The Tier 4 stages (`description`, `build-hygiene`, `docs-consistency`, backed by `lib/cranlint.py`) are advisory and never block on their own. Add `--incoming` for the opt-in CRAN-incoming `_R_CHECK_*` pass.
 
 ## 🌐 Multi-platform verification (optional)
 
