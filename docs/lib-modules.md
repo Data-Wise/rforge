@@ -41,6 +41,7 @@ flowchart LR
 | `lib/rcmd.py` | `run`, `normalize`, `find_package`, `r_snippet`, `_run_cran_prep`, `_cran_prep_envelope`, `render_cran_comments` (v2.2.0 R-runner) | `python3 -m lib.rcmd --kind <kind> [--path .] [--as-cran] [--preview] [--strict] [--incoming] [--articles-only] [--devel] [--goodpractice] [--multi-platform] [--no-revdep]` |
 | `lib/cranlint.py` | `lint_description`, `check_build_hygiene`, `check_planning_consistency`, `run_all` (v2.3.0 CRAN-incoming linter) | `python3 -m lib.cranlint --path . [--format text\|json]` |
 | `lib/deps_sync.py` | `scan_usage`, `reconcile`, `deps_sync` (v2.5.0 — *intra*-package DESCRIPTION↔usage reconciliation; complements the *inter*-package `lib.deps`) | `python3 -m lib.deps_sync --path . [--write] [--format text\|json]` |
+| `lib/ghrelease.py` | `gh_available`, `submission_tag`, `prerelease_cmd`, `promote_cmd`, `manual_recipe` (v2.6.0 — `gh release` command builders for `r:submit`; pure-Python, shells to nothing itself) | used from `commands/r/submit.md` (constructs the `gh` argv it runs) |
 
 > **`cranlint` is a pure-stdlib analysis module** like `discovery`/`deps`/`status`/`init`
 > — it never touches R. It backs the Tier 4 advisory stages of `r:cran-prep` (v2.3.0):

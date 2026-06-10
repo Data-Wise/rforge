@@ -17,7 +17,7 @@ Complete reference for all **33** RForge commands. Commands are organized by cat
 - [Health Checks](#health-checks) (2 commands)
 - [R Development Cycle](#r-development-cycle) (9 commands)
 - [R Quality](#r-quality) (5 commands)
-- [CRAN Submission](#cran-submission) (5 commands)
+- [CRAN Submission](#cran-submission) (6 commands)
 
 ---
 
@@ -1146,7 +1146,42 @@ Per-package CRAN-readiness gate — runs the full pre-submission sequence and ge
 !!! warning "Behavior change in v2.3.0"
     Because the strict passes run by default and block `ready`, a package that reports 🟢 `ready` today under `--as-cran` can turn 🔴 `blocked` once the noSuggests pass catches an unconditional `Suggests` use. Intended — CRAN would bounce it post-acceptance. The fix: move the package to `Imports`, or guard with `requireNamespace()` + `skip_if_not_installed()`.
 
-**Related commands:** `/rforge:release` (ecosystem-level submission ordering), `/rforge:r:revdep`, `/rforge:r:check`, `/rforge:r:winbuilder`, `/rforge:r:rhub`, `/rforge:r:cycle`
+**Related commands:** `/rforge:release` (ecosystem-level submission ordering), `/rforge:r:revdep`, `/rforge:r:check`, `/rforge:r:winbuilder`, `/rforge:r:rhub`, `/rforge:r:cycle`, `/rforge:r:submit`
+
+---
+
+### /rforge:r:submit
+
+GitHub pre-release of the submitted tarball + CRAN submit **handoff** — fills the gap between
+`r:cran-prep` (reports `ready`) and CRAN going live. **Never auto-submits to CRAN.**
+
+**Usage:**
+
+```bash
+/rforge:r:submit [package] [--promote] [--dry-run] [--no-verify] [--force]
+```
+
+**Parameters:**
+
+- `package` (optional) — package path (defaults to current directory)
+- `--promote` (optional) — Phase 2: flip the pre-release to a full release after CRAN accepts
+- `--dry-run` (optional) — show the tag/assets/checklist without touching GitHub
+- `--no-verify` (optional) — with `--promote`, skip the `cran.r-project.org` version check
+- `--force` (optional) — cut the pre-release even if `cran-prep` is not `ready` (records the override)
+
+**Lifecycle:**
+
+- **Phase 1** (`r:submit`): gate on `cran-prep` = `ready` → build the tarball (reuse `r:build`) → cut a
+  GitHub **pre-release** (not "Latest") tagged `v<version>` with `cran-comments.md` + tarball attached →
+  print the CRAN submit checklist for you to run.
+- **Phase 2** (`r:submit --promote`): optionally verify the version is live on CRAN, then
+  `gh release edit v<version> --prerelease=false --latest`.
+
+Uses a *pre-release promoted in place* to avoid tagging a final release before acceptance (resubmissions
+bump the version — the r-pkgs anti-pattern). `gh` is a soft dependency: if absent/unauthed, the command
+prints the manual `gh` recipe instead of failing. Backed by `lib/ghrelease.py`.
+
+**Related commands:** `/rforge:r:cran-prep` (upstream gate), `/rforge:r:build` (the tarball), `/rforge:release`
 
 ---
 

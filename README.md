@@ -9,6 +9,10 @@
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
+## What's new in v2.6.0
+
+- 🚀 **`r:submit`** — new per-package command that wraps the *moment of CRAN submission*. Gates on `r:cran-prep` being `ready`, builds the tarball, and cuts a GitHub **pre-release** (not "Latest") of it with `cran-comments.md` attached, then prints the CRAN submit checklist — it **never auto-submits**. `r:submit --promote` flips the pre-release to a full release once CRAN accepts (`gh release edit --prerelease=false --latest`). Using a *pre-release* promoted in place sidesteps the r-pkgs anti-pattern of tagging a final release before acceptance (resubmissions bump the version). `gh` is a soft dependency with a printed manual-recipe fallback. Backed by pure-Python `lib/ghrelease.py`. Commands 34 → 35.
+
 ## What's new in v2.5.0
 
 - 🔗 **`r:deps-sync`** — new pure-Python per-package command that reconciles `DESCRIPTION` against what the code actually uses. Scans `R/`/`tests/`/`vignettes/` + `NAMESPACE` for namespace usage and reports **missing** (used, undeclared → Imports), **misclassified** (in Suggests but used unconditionally in `R/` → Imports), **missing_suggests** (tests/vignettes-only), and **unused** dependencies, plus a suggested `DESCRIPTION` patch. Report-only by default; `--write` applies the unambiguous changes. The `misclassified` finding is the *static* sibling of `r:check --strict`'s noSuggests pass — it catches the medfit/MASS class **before** R runs. *Intra*-package, complementing `/rforge:deps` (the *inter*-package graph). Commands 33 → 34.
