@@ -36,7 +36,7 @@ flowchart LR
 
 | Module | Public functions | CLI entry point |
 |---|---|---|
-| `lib/discovery.py` | `detect_ecosystem`, `find_r_packages`, `parse_description`, `read_description` | `python3 -m lib.discovery --path . --format text\|json` |
+| `lib/discovery.py` | `detect_ecosystem`, `find_r_packages`, `parse_description`, `read_description`, `parse_manifest`, `read_manifest` | `python3 -m lib.discovery --path . --format text\|json` |
 | `lib/deps.py` | `build_graph`, `analyze_impact`, `get_all_dependents`, `get_update_order`, `identify_blockers` | `python3 -m lib.deps [--path .] [--format text\|json] [graph\|impact ...]` |
 | `lib/rcmd.py` | `run`, `normalize`, `find_package`, `r_snippet`, `_run_cran_prep`, `_cran_prep_envelope`, `render_cran_comments` (v2.2.0 R-runner) | `python3 -m lib.rcmd --kind <kind> [--path .] [--as-cran] [--preview] [--strict] [--incoming] [--articles-only] [--devel] [--goodpractice] [--multi-platform] [--no-revdep]` |
 | `lib/cranlint.py` | `lint_description`, `check_build_hygiene`, `check_planning_consistency`, `run_all` (v2.3.0 CRAN-incoming linter) | `python3 -m lib.cranlint --path . [--format text\|json]` |
@@ -78,6 +78,13 @@ Walks a directory tree (depth ≤ 2 by default) for R `DESCRIPTION` files,
 parses each into a structured record, and classifies the layout as
 `single | ecosystem | hybrid`.
 
+**Ecosystem-manifest enrichment (v2.4.0).** If the root `.rforge.yaml` declares a
+`manifest:` path (relative to root), discovery reads that **ecosystem manifest** — a
+curated YAML of `role`/`repo`/`cran`/`status_file` per package — and attaches the metadata
+to matching packages (by name, case-insensitive). Mismatches surface as **drift**. Parsed by
+a vendored YAML-subset reader (`parse_manifest`/`read_manifest`), so the module stays
+stdlib-only (no PyYAML). Absent/unreadable manifest → zero behavior change.
+
 ### CLI
 
 ```bash
@@ -109,6 +116,17 @@ print([p.name for p in eco.packages])
 | `mode` | `"minimal" \| "standard" \| "full"` | Preserved from `rforge-mcp` for wire compatibility |
 | `config_found` | `bool` | `True` if `.rforge.yaml` exists at root |
 | `config_path` | `str \| None` | Absolute path to `.rforge.yaml` when present |
+| `manifest_path` | `str \| None` | Path to the ecosystem manifest, when configured + found (v2.4.0) |
+| `drift` | `Drift` | `manifest_only` / `disk_only` name lists; empty when no manifest (v2.4.0) |
+
+Each `Package` also gains an optional `manifest: ManifestEntry` (the matched curation metadata).
+
+### `.rforge.yaml` config fields
+
+| Field | Purpose |
+|---|---|
+| `kind: hybrid` | Force the `hybrid` classification (see heuristic below) |
+| `manifest: <relative-path>` | Point discovery at an ecosystem manifest to enrich/drift-check against (v2.4.0) |
 
 ### Classification heuristic (strict)
 

@@ -9,6 +9,10 @@
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
+## What's new in v2.4.0
+
+- 🧭 **Ecosystem-manifest discovery** (`/rforge:detect`, `/rforge:status`) — discovery can now read an optional **ecosystem manifest** (a curated YAML listing packages with `role`/`repo`/`cran`/`status_file`), located via a new `manifest:` key in the root `.rforge.yaml`. Discovered packages are **enriched** with that metadata (matched by name, case-insensitive), and any mismatch between the manifest and what's on disk surfaces as **drift** (`manifest_only` / `disk_only`). `/rforge:detect` shows a `manifest:` header + per-package `role`; `/rforge:status` adds a conditional `Role` column. Parsed by a vendored YAML-subset reader — `discovery.py` stays stdlib-only (no PyYAML). **Zero behavior change when no manifest is configured.** New public API: `Manifest`, `ManifestEntry`, `Drift`, `parse_manifest`, `read_manifest`.
+
 ## What's new in v2.3.0
 
 - 🛡️ **CRAN-incoming hardening for `r:check` + `r:cran-prep`** (no new commands) — the gate now emulates CRAN's *incoming* and post-acceptance flavors. `r:check --strict` runs **both** Suggests-withholding passes as distinct rows (`check (noSuggests)` via `_R_CHECK_DEPENDS_ONLY_`, `check (suggests-only)` via `_R_CHECK_SUGGESTS_ONLY_`), each with `--run-donttest`; `--incoming` implies `--strict` and adds an opt-in `check (incoming)` env-var bundle. `r:cran-prep` runs the strict passes **by default**, and a strict ERROR **blocks** the `ready` verdict (plus a Tier 1b PDF-manual check that warns, never blocks).

@@ -101,6 +101,9 @@ Quick ecosystem-wide status dashboard with mode-specific detail levels.
 - Dependencies status
 - Test results
 - Coverage metrics
+- **Role column + manifest drift (v2.4.0)** — when an ecosystem manifest is configured via
+  `.rforge.yaml` `manifest:`, the dashboard adds a conditional `Role` column (from the manifest)
+  and a drift block. Without a manifest, the dashboard is unchanged.
 
 **Time budget:** <10s (default), up to 300s (release mode)
 
@@ -232,6 +235,12 @@ Auto-detect project structure (single package, ecosystem, or hybrid).
 - Package count and names
 - Directory structure summary
 - Dependency relationships
+
+**Ecosystem manifest (v2.4.0):** if the root `.rforge.yaml` declares a `manifest:` path,
+`/rforge:detect` reads that ecosystem manifest, shows a `manifest:` header field and a per-package
+`role`, and reports **drift** (packages in the manifest but not on disk, and vice-versa). Add the
+field to `.rforge.yaml` as `manifest: <relative-path-to.yaml>`; with no manifest configured, output
+is unchanged.
 
 ---
 
