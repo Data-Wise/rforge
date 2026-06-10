@@ -1220,10 +1220,43 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#class-drift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        class Drift
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#class-ecosystem" class="md-nav__link">
     <span class="md-ellipsis">
       
         class Ecosystem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#class-manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        class Manifest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#class-manifestentry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        class ManifestEntry
       
     </span>
   </a>
@@ -1314,10 +1347,32 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#parse_manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        parse_manifest()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#read_description" class="md-nav__link">
     <span class="md-ellipsis">
       
         read_description()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#read_manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_manifest()
       
     </span>
   </a>
@@ -1979,10 +2034,43 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#class-drift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        class Drift
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#class-ecosystem" class="md-nav__link">
     <span class="md-ellipsis">
       
         class Ecosystem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#class-manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        class Manifest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#class-manifestentry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        class ManifestEntry
       
     </span>
   </a>
@@ -2073,10 +2161,32 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#parse_manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        parse_manifest()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#read_description" class="md-nav__link">
     <span class="md-ellipsis">
       
         read_description()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#read_manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_manifest()
       
     </span>
   </a>
@@ -2122,7 +2232,13 @@
 <p>Walks a directory tree looking for R <code>DESCRIPTION</code> files, parses them into
 structured <code>Package</code> records, and classifies the result as a single package,
 an ecosystem, or a hybrid layout.</p>
-<p>Pure Python — no R subprocess, no external deps beyond the stdlib. Ported
+<p>Optionally enriches discovery from an <em>ecosystem manifest</em> (curation metadata:
+role/repo/CRAN state). The manifest is located via a <code>manifest:</code> path in the
+root <code>.rforge.yaml</code>, parsed by a vendored YAML-subset reader (<code>parse_manifest</code>),
+matched to discovered packages by name, and any mismatch is reported as <code>drift</code>.
+An absent/unreadable manifest leaves the zero-manifest behavior unchanged.</p>
+<p>Pure Python — no R subprocess, no external deps beyond the stdlib (the manifest
+reader is a hand-rolled YAML subset, not PyYAML). Ported
 from <code>rforge-mcp/dist/tools/discovery/detect.js</code> (Path B Phase B.1).</p>
 <p>Usage (CLI, from repo root):
     python3 -m lib.discovery --path . --format text
@@ -2195,6 +2311,29 @@ from <code>rforge-mcp/dist/tools/discovery/detect.js</code> (Path B Phase B.1).<
 </tr>
 </tbody>
 </table>
+<h3 id="class-drift"><code>class Drift</code><a class="headerlink" href="#class-drift" title="Permanent link">&para;</a></h3>
+<p>Mismatch between a manifest and what's on disk.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>manifest_only</code></td>
+<td><code>list[str]</code></td>
+<td><code>list()</code></td>
+</tr>
+<tr>
+<td><code>disk_only</code></td>
+<td><code>list[str]</code></td>
+<td><code>list()</code></td>
+</tr>
+</tbody>
+</table>
 <h3 id="class-ecosystem"><code>class Ecosystem</code><a class="headerlink" href="#class-ecosystem" title="Permanent link">&para;</a></h3>
 <p>Result of <code>detect_ecosystem()</code>.</p>
 <table>
@@ -2236,6 +2375,90 @@ from <code>rforge-mcp/dist/tools/discovery/detect.js</code> (Path B Phase B.1).<
 <td><code>Optional[str]</code></td>
 <td><code>None</code></td>
 </tr>
+<tr>
+<td><code>manifest_path</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>drift</code></td>
+<td><code>Drift</code></td>
+<td><code>Drift()</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="class-manifest"><code>class Manifest</code><a class="headerlink" href="#class-manifest" title="Permanent link">&para;</a></h3>
+<p>Parsed ecosystem manifest (e.g. ECOSYSTEM-MANIFEST.yaml).</p>
+<p>Curation metadata maintained by hand in a hub — what packages the ecosystem
+<em>should</em> contain, their roles, repos, and CRAN state. Distinct from on-disk
+discovery (<code>find_r_packages</code>), which is the source of truth for versions/deps.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ecosystem</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>updated</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>packages</code></td>
+<td><code>list[ManifestEntry]</code></td>
+<td><code>list()</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="class-manifestentry"><code>class ManifestEntry</code><a class="headerlink" href="#class-manifestentry" title="Permanent link">&para;</a></h3>
+<p>One package entry from an ecosystem manifest (curation metadata).</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>str</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>role</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>repo</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>cran</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>status_file</code></td>
+<td><code>Optional[str]</code></td>
+<td><code>None</code></td>
+</tr>
 </tbody>
 </table>
 <h3 id="class-package"><code>class Package</code><a class="headerlink" href="#class-package" title="Permanent link">&para;</a></h3>
@@ -2274,6 +2497,11 @@ from <code>rforge-mcp/dist/tools/discovery/detect.js</code> (Path B Phase B.1).<
 <td><code>Optional[Description]</code></td>
 <td><code>None</code></td>
 </tr>
+<tr>
+<td><code>manifest</code></td>
+<td><code>Optional[ManifestEntry]</code></td>
+<td><code>None</code></td>
+</tr>
 </tbody>
 </table>
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
@@ -2308,10 +2536,23 @@ it's recorded and we don't descend into it. Hidden directories (<code>.git</code
 <p>Parse the content of a DESCRIPTION file.</p>
 <p>DESCRIPTION uses an RFC-822-ish format: <code>Field: value</code> lines, with
 indented continuation lines belonging to the previous field.</p>
+<h3 id="parse_manifest"><code>parse_manifest()</code><a class="headerlink" href="#parse_manifest" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_manifest</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Manifest&#39;</span>
+</span></code></pre></div>
+<p>Parse an ecosystem manifest from a strict YAML <em>subset</em>.</p>
+<p>Deliberately stdlib-only (no PyYAML). Supports exactly what the manifest
+schema uses: top-level scalars (<code>ecosystem</code>, <code>updated</code>, …) and a <code>packages:</code>
+list of flat maps. Blank lines and <code>#</code> comment lines are ignored. Anything
+fancier than this subset is silently skipped rather than raised — callers
+treat a sparse/empty Manifest as "no usable manifest".</p>
 <h3 id="read_description"><code>read_description()</code><a class="headerlink" href="#read_description" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_description</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Description]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_description</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Description]&#39;</span>
 </span></code></pre></div>
 <p>Read and parse a DESCRIPTION file. Returns None on any error.</p>
+<h3 id="read_manifest"><code>read_manifest()</code><a class="headerlink" href="#read_manifest" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_manifest</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Manifest]&#39;</span>
+</span></code></pre></div>
+<p>Read and parse an ecosystem manifest. Returns None on any read error.</p>
 
 
 

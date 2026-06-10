@@ -2115,12 +2115,52 @@
 <td>R CMD check with CRAN flags + NOTE classifier</td>
 </tr>
 <tr>
+<td><code>check (noSuggests)</code></td>
+<td><code>rcmdcheck(env=_R_CHECK_DEPENDS_ONLY_)</code></td>
+<td>strict pass — <code>Suggests</code> package used unconditionally fails here</td>
+</tr>
+<tr>
+<td><code>check (suggests-only)</code></td>
+<td><code>rcmdcheck(env=_R_CHECK_SUGGESTS_ONLY_)</code></td>
+<td>strict pass — undeclared-package use</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td><code>lib/cranlint.py</code> (pure-Python)</td>
+<td>DESCRIPTION incoming nits — <strong>advisory</strong></td>
+</tr>
+<tr>
+<td><code>build-hygiene</code></td>
+<td><code>lib/cranlint.py</code> (pure-Python)</td>
+<td>planning/dev docs that would ship in the tarball — <strong>advisory</strong></td>
+</tr>
+<tr>
+<td><code>docs-consistency</code></td>
+<td><code>lib/cranlint.py</code> (pure-Python)</td>
+<td>staleness/dangling-ref check — <strong>advisory</strong></td>
+</tr>
+<tr>
 <td><code>revdep</code></td>
 <td><code>revdepcheck::revdep_check()</code></td>
 <td>CRAN downstream packages not broken</td>
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">Strict passes run by default; Tier 4 is advisory</p>
+<p>The two <code>check (...)</code> strict flavor passes (each with <code>--run-donttest</code>) run <strong>by
+default</strong> and a strict-pass <strong>ERROR blocks <code>ready</code></strong> — they emulate CRAN's
+post-acceptance flavors. The three pure-Python Tier 4 stages
+(<code>description</code>, <code>build-hygiene</code>, <code>docs-consistency</code>) are <strong>advisory</strong> and never block
+<code>ready</code>. Add <code>--incoming</code> for an extra opt-in CRAN-incoming <code>check (incoming)</code> pass.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Behavior change — a package green today can turn red</p>
+<p>Because the strict passes are on by default, a package that was 🟢 <code>ready</code> under
+<code>--as-cran</code> alone can turn 🔴 once <code>check (noSuggests)</code> detects a <code>Suggests</code> package
+used unconditionally. This is intended. <strong>Fix:</strong> move it to <code>Imports</code>, or guard with
+<code>requireNamespace()</code> in code <strong>and</strong> <code>skip_if_not_installed()</code> in tests.</p>
+</div>
 <p><strong>Output — what to look for:</strong></p>
 <div class="language-markdown highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gu">## CRAN-Prep: medfit v2.2.0</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="gu">### Status: 🔴 blocked</span>

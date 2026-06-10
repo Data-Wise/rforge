@@ -2091,8 +2091,8 @@ tutorial that walks it through in detail.</p>
 <pre class="mermaid"><code>flowchart TD
     A["/rforge:docs:check\nNEWS + doc drift"] --&gt; B
 
-    subgraph gate["Per-package gate (v2.2.0+)"]
-        B["/rforge:r:cran-prep\ndocument→lint→spell→urlcheck\ntest→coverage→check(--as-cran)→revdep\nwrites cran-comments.md"]
+    subgraph gate["Per-package gate (v2.2.0+, strict by default v2.3.0+)"]
+        B["/rforge:r:cran-prep\ndocument→lint→spell→urlcheck→test→coverage\ncheck → check (noSuggests) → check (suggests-only)\nTier 4: description, build-hygiene, docs-consistency\nrevdep · writes cran-comments.md"]
     end
 
     B --&gt; C{"ready / warn\n/ blocked?"}
@@ -2103,6 +2103,10 @@ tutorial that walks it through in detail.</p>
     F --&gt; G["submit via\nCRAN web form"]</code></pre>
 <p>→ <a href="../tutorials/cran-submission-with-rforge/">CRAN submission with rforge</a> (~15 min, per-package gate)
 → <a href="../tutorials/cran-release-prep/">CRAN release prep</a> (~15 min, ecosystem pipeline)</p>
+<div class="admonition warning">
+<p class="admonition-title">Strict passes block <code>ready</code> (v2.3.0+)</p>
+<p>As of v2.3.0 the gate runs two Suggests-withholding flavor passes — <code>check (noSuggests)</code> and <code>check (suggests-only)</code> — <strong>by default</strong>, each with <code>--run-donttest</code>, and a strict ERROR blocks the <code>ready</code> verdict. A package that was 🟢 <code>ready</code> under <code>--as-cran</code> can now turn 🔴 once the noSuggests pass catches a <code>Suggests</code> package used unconditionally. The Tier 4 stages (<code>description</code>, <code>build-hygiene</code>, <code>docs-consistency</code>, backed by <code>lib/cranlint.py</code>) are advisory and never block on their own. Add <code>--incoming</code> for the opt-in CRAN-incoming <code>_R_CHECK_*</code> pass.</p>
+</div>
 <h2 id="multi-platform-verification-optional">🌐 Multi-platform verification (optional)<a class="headerlink" href="#multi-platform-verification-optional" title="Permanent link">&para;</a></h2>
 <p>Async dispatch to win-builder and R-hub before CRAN submission.</p>
 <pre class="mermaid"><code>flowchart LR

@@ -1581,6 +1581,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#status-refocus-2026-06-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Status &amp; refocus (2026-06-10)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#summary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1900,6 +1911,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#status-refocus-2026-06-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Status &amp; refocus (2026-06-10)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#summary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2026,10 +2048,50 @@
 <h1 id="spec-feature-request-diff-aware-checks-coverage-and-ecosystem-note-classification">SPEC / Feature Request: Diff-Aware Checks, Coverage, and Ecosystem NOTE Classification<a class="headerlink" href="#spec-feature-request-diff-aware-checks-coverage-and-ecosystem-note-classification" title="Permanent link">&para;</a></h1>
 <p><strong>Date:</strong> 2026-05-31
 <strong>Author:</strong> Davood Tofighi (with Claude Code)
-<strong>Status:</strong> Proposed
+<strong>Status:</strong> Draft — <strong>refocused to P0</strong> (2026-06-10); P1–P5 migrated (see below)
 <strong>Origin:</strong> Friction encountered using rforge (<code>/rforge:r:check</code>, <code>/rforge:docs:check</code>) across a
 3-package ecosystem change (RMediation + medfit covariance work) under the workflow
 "address all issues and errors before merging."</p>
+<hr />
+<h2 id="status-refocus-2026-06-10">Status &amp; refocus (2026-06-10)<a class="headerlink" href="#status-refocus-2026-06-10" title="Permanent link">&para;</a></h2>
+<p>This started as a 6-item wishlist; events have since absorbed most of it. <strong>The live scope of
+this spec is now P0 only</strong> — <code>--changed</code> diff-aware checks, the one high-value item still
+unbuilt. The rest are migrated:</p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Disposition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P0</strong> <code>--changed</code> diff-aware check</td>
+<td><strong>LIVE — the focus of this spec.</strong> Still unbuilt. Candidate target: post-v2.6.0 (unscheduled).</td>
+</tr>
+<tr>
+<td>P1 <code>r:coverage</code> (package_coverage)</td>
+<td>✅ base <strong>shipped v2.1.0</strong>; the <code>--changed</code> slice folds into P0's diff-aware mode.</td>
+</tr>
+<tr>
+<td>P2 auto-handle missing <code>Suggests</code> (<code>_R_CHECK_FORCE_SUGGESTS_</code>)</td>
+<td>→ <strong><code>SPEC-cran-incoming-hardening</code></strong> (v2.3.0), which owns the <code>_R_CHECK_*</code> flavor surface.</td>
+</tr>
+<tr>
+<td>P3 ecosystem-aware NOTE classification</td>
+<td>partly done by the v2.2.0 NOTE classifier; the ecosystem-metadata half → <strong><code>SPEC-ecosystem-manifest-discovery</code></strong> (v2.4.0).</td>
+</tr>
+<tr>
+<td>P4 <code>r:test-gen</code> scaffold</td>
+<td>→ the deferred <strong>scaffolding theme</strong> (<code>r:use-test</code>), its own future spec.</td>
+</tr>
+<tr>
+<td>P5 worktree-collision guard</td>
+<td>minor; keep as a parked note under P0.</td>
+</tr>
+</tbody>
+</table>
+<p>Everything below P0 is retained for historical context only; act on <strong>P0</strong>.</p>
 <hr />
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
 <p>rforge's check/test/docs commands answer <em>"is this package healthy right now?"</em> well. But real PR

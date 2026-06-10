@@ -1156,6 +1156,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rforgeyaml-config-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .rforge.yaml config fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#classification-heuristic-strict" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2109,6 +2120,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rforgeyaml-config-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .rforge.yaml config fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#classification-heuristic-strict" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2291,7 +2313,7 @@
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
-<li><strong>What:</strong> Pure-Python analysis modules (<code>discovery</code>, <code>deps</code>, <code>status</code>, <code>init</code>) — no R, no Node — plus <code>rcmd</code> (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the <code>r:</code> commands.</li>
+<li><strong>What:</strong> Pure-Python analysis modules (<code>discovery</code>, <code>deps</code>, <code>status</code>, <code>init</code>, <code>cranlint</code>) — no R, no Node — plus <code>rcmd</code> (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the <code>r:</code> commands.</li>
 <li><strong>Why:</strong> No MCP server, no Node, no external deps — just <code>python3 -m lib.&lt;module&gt;</code>, fast and scriptable.</li>
 <li><strong>How:</strong> Each takes <code>--path</code> and <code>--format text|json</code>; importable as a Python API too.</li>
 <li><strong>Next:</strong> <a href="../reference/discovery/">Reference API docs</a> for signatures, or <a href="../architecture/#path-b-lib-modules">Architecture</a> for fit.</li>
@@ -2330,7 +2352,7 @@ ecosystem health, or initialize per-user state.</p>
 <tbody>
 <tr>
 <td><code>lib/discovery.py</code></td>
-<td><code>detect_ecosystem</code>, <code>find_r_packages</code>, <code>parse_description</code>, <code>read_description</code></td>
+<td><code>detect_ecosystem</code>, <code>find_r_packages</code>, <code>parse_description</code>, <code>read_description</code>, <code>parse_manifest</code>, <code>read_manifest</code></td>
 <td><code>python3 -m lib.discovery --path . --format text\|json</code></td>
 </tr>
 <tr>
@@ -2341,10 +2363,41 @@ ecosystem health, or initialize per-user state.</p>
 <tr>
 <td><code>lib/rcmd.py</code></td>
 <td><code>run</code>, <code>normalize</code>, <code>find_package</code>, <code>r_snippet</code>, <code>_run_cran_prep</code>, <code>_cran_prep_envelope</code>, <code>render_cran_comments</code> (v2.2.0 R-runner)</td>
-<td><code>python3 -m lib.rcmd --kind &lt;kind&gt; [--path .] [--as-cran] [--preview] [--strict] [--articles-only] [--devel] [--goodpractice] [--multi-platform] [--no-revdep]</code></td>
+<td><code>python3 -m lib.rcmd --kind &lt;kind&gt; [--path .] [--as-cran] [--preview] [--strict] [--incoming] [--articles-only] [--devel] [--goodpractice] [--multi-platform] [--no-revdep]</code></td>
+</tr>
+<tr>
+<td><code>lib/cranlint.py</code></td>
+<td><code>lint_description</code>, <code>check_build_hygiene</code>, <code>check_planning_consistency</code>, <code>run_all</code> (v2.3.0 CRAN-incoming linter)</td>
+<td><code>python3 -m lib.cranlint --path . [--format text\|json]</code></td>
+</tr>
+<tr>
+<td><code>lib/deps_sync.py</code></td>
+<td><code>scan_usage</code>, <code>reconcile</code>, <code>deps_sync</code> (v2.5.0 — <em>intra</em>-package DESCRIPTION↔usage reconciliation; complements the <em>inter</em>-package <code>lib.deps</code>)</td>
+<td><code>python3 -m lib.deps_sync --path . [--write] [--format text\|json]</code></td>
+</tr>
+<tr>
+<td><code>lib/ghrelease.py</code></td>
+<td><code>gh_available</code>, <code>submission_tag</code>, <code>prerelease_cmd</code>, <code>promote_cmd</code>, <code>manual_recipe</code> (v2.6.0 — <code>gh release</code> command builders for <code>r:submit</code>; pure-Python, shells to nothing itself)</td>
+<td>used from <code>commands/r/submit.md</code> (constructs the <code>gh</code> argv it runs)</td>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p><strong><code>cranlint</code> is a pure-stdlib analysis module</strong> like <code>discovery</code>/<code>deps</code>/<code>status</code>/<code>init</code>
+— it never touches R. It backs the Tier 4 advisory stages of <code>r:cran-prep</code> (v2.3.0):
+<code>lint_description</code> (DESCRIPTION incoming nits — non-<code>Authors@R</code>, weak <code>Title</code>,
+<code>Description</code> prose, stale <code>Date</code>), <code>check_build_hygiene</code> (planning/dev docs that would
+ship in the tarball, each with the exact <code>.Rbuildignore</code> regex to add), and
+<code>check_planning_consistency</code> (lightweight advisory). <code>run_all</code> bundles all three into one
+envelope. These findings are advisory and never block the <code>ready</code> verdict on their own
+(though build-hygiene issues still block indirectly via the matching real R CMD check
+NOTE). See <a href="../reference/cranlint/">reference/cranlint.md</a>.</p>
+</blockquote>
+<p>For the rcmd CRAN-incoming flavor flags (<code>--strict</code>, <code>--incoming</code>): <code>--strict</code> makes the
+<code>check</code> kind run <strong>both</strong> Suggests-withholding flavor passes (<code>_R_CHECK_DEPENDS_ONLY_</code> and
+<code>_R_CHECK_SUGGESTS_ONLY_</code>), each with <code>--run-donttest</code>; <code>--incoming</code> implies <code>--strict</code> and
+adds the opt-in CRAN-incoming <code>_R_CHECK_*</code> bundle pass. In <code>cran-prep</code> the strict passes run
+by default and a strict ERROR blocks <code>ready</code>; <code>--incoming</code> is opt-in.</p>
 <blockquote>
 <p><strong><code>rcmd</code> differs from the analysis modules.</strong> <code>discovery</code>/<code>deps</code>/<code>status</code>/<code>init</code>
 are pure-stdlib and never touch R. <code>rcmd</code> (v2.2.0) shells out to <code>Rscript</code>
@@ -2364,6 +2417,12 @@ is added alongside ok/warn/error for async kinds. See
 <p>Walks a directory tree (depth ≤ 2 by default) for R <code>DESCRIPTION</code> files,
 parses each into a structured record, and classifies the layout as
 <code>single | ecosystem | hybrid</code>.</p>
+<p><strong>Ecosystem-manifest enrichment (v2.4.0).</strong> If the root <code>.rforge.yaml</code> declares a
+<code>manifest:</code> path (relative to root), discovery reads that <strong>ecosystem manifest</strong> — a
+curated YAML of <code>role</code>/<code>repo</code>/<code>cran</code>/<code>status_file</code> per package — and attaches the metadata
+to matching packages (by name, case-insensitive). Mismatches surface as <strong>drift</strong>. Parsed by
+a vendored YAML-subset reader (<code>parse_manifest</code>/<code>read_manifest</code>), so the module stays
+stdlib-only (no PyYAML). Absent/unreadable manifest → zero behavior change.</p>
 <h3 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Text (human-readable, with emojis + tree layout)</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.discovery<span class="w"> </span>--path<span class="w"> </span>.<span class="w"> </span>--format<span class="w"> </span>text
@@ -2418,6 +2477,36 @@ parses each into a structured record, and classifies the layout as
 <td><code>config_path</code></td>
 <td><code>str \| None</code></td>
 <td>Absolute path to <code>.rforge.yaml</code> when present</td>
+</tr>
+<tr>
+<td><code>manifest_path</code></td>
+<td><code>str \| None</code></td>
+<td>Path to the ecosystem manifest, when configured + found (v2.4.0)</td>
+</tr>
+<tr>
+<td><code>drift</code></td>
+<td><code>Drift</code></td>
+<td><code>manifest_only</code> / <code>disk_only</code> name lists; empty when no manifest (v2.4.0)</td>
+</tr>
+</tbody>
+</table>
+<p>Each <code>Package</code> also gains an optional <code>manifest: ManifestEntry</code> (the matched curation metadata).</p>
+<h3 id="rforgeyaml-config-fields"><code>.rforge.yaml</code> config fields<a class="headerlink" href="#rforgeyaml-config-fields" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kind: hybrid</code></td>
+<td>Force the <code>hybrid</code> classification (see heuristic below)</td>
+</tr>
+<tr>
+<td><code>manifest: &lt;relative-path&gt;</code></td>
+<td>Point discovery at an ecosystem manifest to enrich/drift-check against (v2.4.0)</td>
 </tr>
 </tbody>
 </table>
@@ -2616,6 +2705,7 @@ round-trip with idempotency, and the <code>rcmd</code> envelope/normalizer/snipp
 <li><a href="../reference/deps/">Reference: <code>deps</code> API</a> — auto-extracted signatures + docstrings</li>
 <li><a href="../reference/status/">Reference: <code>status</code> API</a> — auto-extracted signatures + docstrings</li>
 <li><a href="../reference/init/">Reference: <code>init</code> API</a> — auto-extracted signatures + docstrings</li>
+<li><a href="../reference/cranlint/">Reference: <code>cranlint</code> API</a> — auto-extracted signatures + docstrings</li>
 <li><a href="../specs/SPEC-mcp-absorb-2026-05-10/">SPEC: Absorb rforge-mcp (Path B)</a> — full migration plan</li>
 <li><a href="../migration/rforge-mcp-deprecation/">Migration: rforge-mcp deprecation</a> — old MCP tool → new lib module table</li>
 <li><a href="../architecture/#path-b-lib-modules">Architecture</a> — where lib/ fits in the plugin surface</li>

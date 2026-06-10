@@ -10,13 +10,9 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/tutorials/cran-release-prep/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/RESEARCH-cran-incoming-checks-2026-06-10/">
       
       
-        <link rel="prev" href="../r-dev-cycle/">
-      
-      
-        <link rel="next" href="../cran-submission-with-rforge/">
       
       
         
@@ -27,7 +23,7 @@
     
     
       
-        <title>CRAN release prep - RForge Plugin</title>
+        <title>RESEARCH: CRAN incoming + ongoing checks (2026) vs rforge v2.2.0 check/cran-prep - RForge Plugin</title>
       
     
     
@@ -80,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cran-release-prep-thorough-rcheck-release" class="md-skip">
+        <a href="#research-cran-incoming-ongoing-checks-2026-vs-rforge-v220-checkcran-prep" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              CRAN release prep
+              RESEARCH: CRAN incoming + ongoing checks (2026) vs rforge v2.2.0 check/cran-prep
             
           </span>
         </div>
@@ -264,12 +260,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../../workflows/" class="md-tabs__link">
           
   
@@ -539,29 +533,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -579,7 +568,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -625,7 +614,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../../tutorials/" class="md-nav__link">
         
   
   
@@ -653,7 +642,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/" class="md-nav__link">
+      <a href="../../tutorials/getting-started/" class="md-nav__link">
         
   
   
@@ -681,7 +670,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../rforge-in-the-r-lifecycle/" class="md-nav__link">
+      <a href="../../tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
         
   
   
@@ -709,7 +698,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../understanding-modes/" class="md-nav__link">
+      <a href="../../tutorials/understanding-modes/" class="md-nav__link">
         
   
   
@@ -737,7 +726,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ecosystem-orchestration/" class="md-nav__link">
+      <a href="../../tutorials/ecosystem-orchestration/" class="md-nav__link">
         
   
   
@@ -765,7 +754,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../r-dev-cycle/" class="md-nav__link">
+      <a href="../../tutorials/r-dev-cycle/" class="md-nav__link">
         
   
   
@@ -790,37 +779,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CRAN release prep
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../tutorials/cran-release-prep/" class="md-nav__link">
         
   
   
@@ -836,114 +798,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-release-pipeline-at-a-glance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The release pipeline at a glance
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-1-catch-documentation-drift-early" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 1: Catch documentation drift early
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-2-run-the-full-cran-prep-gate-v220" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 2: Run the full CRAN-prep gate (v2.2.0+)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-3-roll-up-the-whole-ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 3: Roll up the whole ecosystem
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-4-plan-the-submission-order" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 4: Plan the submission order
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#a-realistic-single-package-release" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A realistic single-package release
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pre-submission-checklist" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pre-submission checklist
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's next
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -956,7 +810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cran-submission-with-rforge/" class="md-nav__link">
+      <a href="../../tutorials/cran-submission-with-rforge/" class="md-nav__link">
         
   
   
@@ -984,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migrate-from-mcp/" class="md-nav__link">
+      <a href="../../tutorials/migrate-from-mcp/" class="md-nav__link">
         
   
   
@@ -1570,7 +1424,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -1598,7 +1452,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
+      <a href="../SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
         
   
   
@@ -1626,7 +1480,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
+      <a href="../SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
         
   
   
@@ -1654,7 +1508,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
+      <a href="../SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
         
   
   
@@ -1682,7 +1536,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
+      <a href="../SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
         
   
   
@@ -1887,10 +1741,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-release-pipeline-at-a-glance" class="md-nav__link">
+  <a href="#the-triggering-case" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The release pipeline at a glance
+        The triggering case
       
     </span>
   </a>
@@ -1898,10 +1752,104 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-1-catch-documentation-drift-early" class="md-nav__link">
+  <a href="#part-a-current-2026-state-of-cran-check-flavors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 1: Catch documentation drift early
+        PART A — Current (2026) state of CRAN check flavors
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PART A — Current (2026) state of CRAN check flavors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a1-the-two-suggests-withholding-flavors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A.1 The two Suggests-withholding flavors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a2-the-_r_check_-incoming-env-bundle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A.2 The _R_CHECK_* "incoming" env bundle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a3-run-donttest-manual-and-vignettes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A.3 --run-donttest, manual, and vignettes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a4-implementation-mechanism-rcmdchecks-env-argument" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A.4 Implementation mechanism — rcmdcheck's env= argument
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a5-description-meta-information-incoming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A.5 DESCRIPTION meta-information (incoming)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a6-non-standard-top-level-files-rbuildignore-build-hygiene" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A.6 Non-standard top-level files &amp; .Rbuildignore (build hygiene)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a7-planning-doc-consistency-orthogonal-to-the-build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A.7 Planning-doc consistency (orthogonal to the build)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-b-gap-analysis-vs-rforge-v220" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PART B — Gap analysis vs rforge v2.2.0
       
     </span>
   </a>
@@ -1909,65 +1857,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-run-the-full-cran-prep-gate-v220" class="md-nav__link">
+  <a href="#part-c-prioritized-recommendations-feed-the-spec" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2: Run the full CRAN-prep gate (v2.2.0+)
+        PART C — Prioritized recommendations (feed the SPEC)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PART C — Prioritized recommendations (feed the SPEC)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quick-wins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick wins
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#step-3-roll-up-the-whole-ecosystem" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#medium" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 3: Roll up the whole ecosystem
+        Medium
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#step-4-plan-the-submission-order" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#long-term" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 4: Plan the submission order
+        Long-term
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#a-realistic-single-package-release" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A realistic single-package release
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#pre-submission-checklist" class="md-nav__link">
+  <a href="#sources" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pre-submission checklist
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's next
+        Sources
       
     </span>
   </a>
@@ -1991,7 +1934,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/tutorials/cran-release-prep.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/RESEARCH-cran-incoming-checks-2026-06-10.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1999,253 +1942,354 @@
   
 
 
-<h1 id="cran-release-prep-thorough-rcheck-release">📦 CRAN release prep: thorough, r:check, release<a class="headerlink" href="#cran-release-prep-thorough-rcheck-release" title="Permanent link">&para;</a></h1>
-<div class="admonition tip">
-<p class="admonition-title">TL;DR (30 seconds)</p>
-<ul>
-<li><strong>What:</strong> Take one or more packages from "code complete" to "submitted to CRAN."</li>
-<li><strong>Why:</strong> rforge can now run the full per-package gate (<code>r:cran-prep</code>) <strong>and</strong> plan ecosystem submission order (<code>release</code>).</li>
-<li><strong>How (single package):</strong> <code>/rforge:r:cran-prep</code> → fix blockers → repeat → <code>/rforge:release</code>.</li>
-<li><strong>How (ecosystem):</strong> <code>/rforge:docs:check</code> → <code>/rforge:r:cran-prep</code> per package → <code>/rforge:thorough</code> → <code>/rforge:release</code>.</li>
-<li><strong>Next:</strong> Submit via CRAN's web form (rforge plans the order; it doesn't upload).</li>
-</ul>
-</div>
+<h1 id="research-cran-incoming-ongoing-checks-2026-vs-rforge-v220-checkcran-prep">RESEARCH: CRAN incoming + ongoing checks (2026) vs rforge v2.2.0 <code>check</code>/<code>cran-prep</code><a class="headerlink" href="#research-cran-incoming-ongoing-checks-2026-vs-rforge-v220-checkcran-prep" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>For whom:</strong> Maintainer preparing a CRAN submission (single package or
-ecosystem).
-<strong>Estimated time:</strong> 15 minutes to read; the actual checks take longer
-because <code>R CMD check --as-cran</code> and <code>revdepcheck</code> are slow.
-<strong>Prior knowledge:</strong> You've built the package and want to ship it.</p>
+<p><strong>Type:</strong> Research + recommendations (no code, no spec). Feeds
+<a href="../SPEC-cran-incoming-hardening-2026-06-10/"><code>SPEC-cran-incoming-hardening-2026-06-10.md</code></a>;
+that spec references this doc instead of re-deriving the claims below.
+<strong>Date:</strong> 2026-06-10
+<strong>Scope:</strong> Why <code>R CMD check --as-cran</code> (what rforge's <code>check</code> stage runs today,
+<a href="../../lib/rcmd.py"><code>lib/rcmd.py:233</code></a>) does not catch the full set of errors CRAN's
+<em>incoming</em> and <em>ongoing</em> (post-acceptance) checks catch, and exactly which flags/env
+vars close the gap. Triggered by a <strong>medfit 0.2.1</strong> near-miss (below). The first
+worked example of the repo's <a href="../#research--citation-standard">Research &amp; Citation Standard</a>.</p>
 </blockquote>
-<div class="admonition note">
-<p class="admonition-title">What rforge runs vs. what you run (v2.2.0+)</p>
-<p>As of v2.2.0, <code>/rforge:r:cran-prep</code> <strong>does</strong> run the heavy checks
-(document → lint → spell → urlcheck → test → coverage → <code>R CMD check
---as-cran</code> → revdepcheck) and writes <code>cran-comments.md</code>. It still does
-<strong>not</strong> upload to CRAN — submission is via the CRAN web form.
-For ecosystem-level planning (submission order, cross-package deps),
-<code>/rforge:thorough</code> and <code>/rforge:release</code> remain orchestration-only.</p>
-</div>
-<h2 id="the-release-pipeline-at-a-glance">The release pipeline at a glance<a class="headerlink" href="#the-release-pipeline-at-a-glance" title="Permanent link">&para;</a></h2>
-<pre class="mermaid"><code>flowchart TD
-    A["/rforge:docs:check&lt;br/&gt;NEWS + doc drift"] --&gt; B
-
-    subgraph "Per-package gate (v2.2.0+)"
-        B["/rforge:r:cran-prep&lt;br/&gt;document→lint→spell→urlcheck&lt;br/&gt;test→coverage→check(--as-cran)→revdep&lt;br/&gt;writes cran-comments.md"]
-    end
-
-    B --&gt; C{"ready / warn / blocked?"}
-    C -- "blocked" --&gt; D["Fix blockers&lt;br/&gt;(loop back)"]
-    D --&gt; A
-    C -- "ready or warn" --&gt; E["/rforge:thorough&lt;br/&gt;ecosystem rollup"]
-    E --&gt; F["/rforge:release&lt;br/&gt;CRAN submission order"]
-    F --&gt; G["Submit via&lt;br/&gt;CRAN web form"]</code></pre>
-<h2 id="step-1-catch-documentation-drift-early">Step 1: Catch documentation drift early<a class="headerlink" href="#step-1-catch-documentation-drift-early" title="Permanent link">&para;</a></h2>
-<p>Documentation problems are the most common avoidable CRAN rejection. Check
-first, while fixes are cheap:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/rforge:docs:check
-</span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>⚠️ DOCUMENTATION CHECK
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>NEWS.md: ⚠️ Missing 3 recent changes
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  • extract_mediation refactor
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>  • New bootstrap method
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  • Bug fix #234
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>Examples: ⚠️ 2 outdated
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>  • README example uses old API
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>  • Vignette 2 has broken code
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>Recommendations:
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>  1. Update NEWS.md (5 min)
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>  2. Update examples (20 min)
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>  3. Regenerate vignettes (10 min)
-</span></code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">The description-sync skill backs this up automatically</p>
-<p>rforge ships a <code>description-sync</code> validation skill that checks your
-<code>DESCRIPTION</code> <code>Version:</code> matches the top entry in <code>NEWS.md</code> /
-<code>CHANGELOG.md</code> — the single most common pre-CRAN slip. It's pure shell,
-needs no R, and runs autonomously. See <a href="../../hooks-and-skills/">Hooks &amp; Skills</a>.</p>
-</div>
-<h2 id="step-2-run-the-full-cran-prep-gate-v220">Step 2: Run the full CRAN-prep gate (v2.2.0+)<a class="headerlink" href="#step-2-run-the-full-cran-prep-gate-v220" title="Permanent link">&para;</a></h2>
-<p>For most submissions, use the orchestrating command:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/rforge:r:cran-prep
-</span></code></pre></div>
-<p>This sequences document → lint → spell → urlcheck → test → coverage →
-<code>R CMD check --as-cran</code> → revdep and writes <code>cran-comments.md</code>. It returns
-one of three verdicts:</p>
+<hr />
+<h2 id="the-triggering-case">The triggering case<a class="headerlink" href="#the-triggering-case" title="Permanent link">&para;</a></h2>
+<p>While fixing CRAN round-2 feedback for <strong>medfit 0.2.1</strong>, a strict local check
+(<code>_R_CHECK_DEPENDS_ONLY_=true</code> + <code>--run-donttest</code>) caught a latent bug that
+<code>R CMD check --as-cran</code> did not: a <em>default</em> parametric-bootstrap path
+(<code>R/bootstrap.R:250</code>, <code>MASS::mvrnorm</code>) hard-requires <strong>MASS</strong>, which sits in
+<code>Suggests</code>. 13 tests error when MASS is absent. <code>--as-cran</code> installs Suggests, so
+the bug passes <code>--as-cran</code> and the win-builder pretest — but <strong>fails CRAN's
+post-acceptance "noSuggests" flavor</strong>, producing a "please fix" email weeks later.
+rforge's submission gate (<code>/rforge:r:cran-prep</code>) runs only <code>--as-cran</code>, so it shares
+the blind spot.</p>
+<blockquote>
+<p><strong>Citation correction (recorded per the standard):</strong> an earlier draft of the
+hardening proposal named <code>_R_CHECK_SUGGESTS_ONLY_=true</code> as the catcher. That is the
+wrong flavor — see A.1. The catcher is <code>_R_CHECK_DEPENDS_ONLY_=true</code>.</p>
+</blockquote>
+<hr />
+<h2 id="part-a-current-2026-state-of-cran-check-flavors">PART A — Current (2026) state of CRAN check flavors<a class="headerlink" href="#part-a-current-2026-state-of-cran-check-flavors" title="Permanent link">&para;</a></h2>
+<h3 id="a1-the-two-suggests-withholding-flavors">A.1 The two Suggests-withholding flavors<a class="headerlink" href="#a1-the-two-suggests-withholding-flavors" title="Permanent link">&para;</a></h3>
+<p><code>R CMD check</code> can be run with a restricted set of packages on the library path, via
+two distinct environment variables (<a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html">Writing R Extensions §"Checking packages"</a>):</p>
+<ul>
+<li><strong><code>_R_CHECK_DEPENDS_ONLY_=true</code></strong> — only packages in <code>Depends</code> and <code>Imports</code> (and
+  their recursive dependencies) are available. <strong><code>Suggests</code> is withheld.</strong> This is the
+  flavor that flags a <code>Suggests</code> package used <em>unconditionally</em> — i.e. the medfit/MASS
+  bug. It approximates CRAN's post-acceptance "noSuggests" flavor.</li>
+<li><strong><code>_R_CHECK_SUGGESTS_ONLY_=true</code></strong> — <code>Depends</code> + <code>Imports</code> + <code>Suggests</code> are available,
+  but <strong>not</strong> <code>Enhances</code>, and <strong>not</strong> packages absent from <code>DESCRIPTION</code>. This flavor
+  catches use of <em>undeclared</em> packages — a different bug class than DEPENDS_ONLY.</li>
+</ul>
+<p>WRE explicitly recommends: <em>"a package is checked with each of these set, as well as
+with neither."</em> So the rigorous gate runs <strong>both</strong> flavors plus the ordinary
+<code>--as-cran</code> pass — they are complementary, not redundant.</p>
 <table>
 <thead>
 <tr>
-<th>Verdict</th>
-<th>Meaning</th>
+<th>Flavor</th>
+<th>On the lib path</th>
+<th>Catches</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>ready</code></td>
-<td>All stages clean — proceed to submission</td>
+<td><code>--as-cran</code> (no env)</td>
+<td>Depends + Imports + Suggests + Enhances</td>
+<td>baseline CRAN checks</td>
 </tr>
 <tr>
-<td><code>warn</code></td>
-<td>Passed but has real NOTEs or new revdep problems — review before submitting</td>
+<td><code>_R_CHECK_DEPENDS_ONLY_=true</code></td>
+<td>Depends + Imports only</td>
+<td><strong>Suggests used unconditionally</strong> (medfit/MASS)</td>
 </tr>
 <tr>
-<td><code>blocked</code></td>
-<td>At least one stage errored — fix and re-run</td>
+<td><code>_R_CHECK_SUGGESTS_ONLY_=true</code></td>
+<td>Depends + Imports + Suggests</td>
+<td><strong>undeclared</strong> package use</td>
 </tr>
 </tbody>
 </table>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>✅ CRAN PREP — medfit v2.0.0
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>document   ok    ✅
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>lint       ok    ✅
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>spell      ok    ✅
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>urlcheck   ok    ✅
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>test       ok    ✅  (187 passed)
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>coverage   ok    ✅  (92%)
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>check      ok    ✅  1 NOTE (classified spurious — &quot;New submission&quot;)
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>revdep     ok    ✅  no broken packages
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>Verdict: ready
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>cran-comments.md written → review before submitting
-</span></code></pre></div>
-<div class="admonition tip">
-<p class="admonition-title">NOTEs are classified automatically</p>
-<p><code>r:cran-prep</code> tags each NOTE as <code>spurious</code> (expected on first submission,
-e.g. "New submission" or "checking CRAN incoming feasibility") or <code>real</code>
-(needs attention). Spurious NOTEs do not block <code>ready</code>. Real NOTEs
-downgrade the verdict to <code>warn</code>.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Strict flavor passes run by default</p>
-<p>The gate now runs the <code>check</code> stage <strong>plus two strict flavor passes</strong> —
-<code>check (noSuggests)</code> (<code>_R_CHECK_DEPENDS_ONLY_=true</code>) and
-<code>check (suggests-only)</code> (<code>_R_CHECK_SUGGESTS_ONLY_=true</code>), each with
-<code>--run-donttest</code>. These emulate CRAN's post-acceptance flavors and catch a
-<code>Suggests</code> package used unconditionally (which plain <code>--as-cran</code> misses).
-A strict-pass <strong>ERROR blocks <code>ready</code></strong>. It also adds three pure-Python,
-<strong>advisory</strong> Tier 4 stages — <code>description</code> (DESCRIPTION incoming nits),
-<code>build-hygiene</code> (planning/dev docs that would ship in the tarball, with the
-exact <code>.Rbuildignore</code> fix), and <code>docs-consistency</code>. Tier 4 stages surface as
-<code>warn</code> and <strong>never block</strong> <code>ready</code>.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Behavior change — a package green today can turn red</p>
-<p>Because the strict passes are on by default, a package that reports 🟢
-<code>ready</code> under <code>--as-cran</code> alone can turn 🔴 once <code>check (noSuggests)</code>
-detects a <code>Suggests</code> package used unconditionally. This is intended.
-<strong>Fix:</strong> move the package to <code>Imports</code>, or guard with
-<code>requireNamespace()</code> in code <strong>and</strong> <code>skip_if_not_installed()</code> in tests.</p>
-</div>
-<p><strong>Optional flags:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/rforge:r:cran-prep --no-revdep         # skip revdep (first submission, no dependents)
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>/rforge:r:cran-prep --goodpractice      # add advisory goodpractice checks
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>/rforge:r:cran-prep --multi-platform    # dispatch win-builder + R-hub async
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>/rforge:r:cran-prep --incoming          # add the opt-in CRAN-incoming check pass
-</span></code></pre></div>
-<p><strong>For a single targeted check</strong> (no orchestration), use:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>/rforge:r:check --as-cran
-</span></code></pre></div>
-<p>See <a href="../cran-submission-with-rforge/">CRAN submission with rforge</a> for the
-full per-package walkthrough.</p>
-<h2 id="step-3-roll-up-the-whole-ecosystem">Step 3: Roll up the whole ecosystem<a class="headerlink" href="#step-3-roll-up-the-whole-ecosystem" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:thorough &quot;Prepare mediationverse for CRAN&quot;
-</span></code></pre></div>
-<p><code>/rforge:thorough</code> runs the status rollup across all packages…</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.status<span class="w"> </span>--path<span class="w"> </span>.<span class="w"> </span>--format<span class="w"> </span>text
-</span></code></pre></div>
-<p>…and then <strong>recommends the R-side checks for you to run yourself</strong> (it does
-not run them — that's Step 2's territory, per package):</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Recommended R-side checks (run in your shell):
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>  R CMD check --as-cran .
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>  Rscript -e &#39;devtools::test()&#39;
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>  Rscript -e &#39;covr::package_coverage()&#39;
-</span></code></pre></div>
-<p>Paste the results back and rforge combines them with the lib-status rollup
-into a release-readiness summary.</p>
-<div class="admonition abstract">
-<p class="admonition-title">Why thorough doesn't run R checks</p>
-<p><code>/rforge:thorough</code> is an ecosystem rollup — it aggregates health across
-all packages, not a single one. The per-package R execution lives in
-<code>/rforge:r:cran-prep</code> (v2.2.0+). <code>thorough</code> focuses on fast cross-package
-aggregation and surfaces drift; <code>cran-prep</code> does the heavy single-package
-gate.</p>
-</div>
-<h2 id="step-4-plan-the-submission-order">Step 4: Plan the submission order<a class="headerlink" href="#step-4-plan-the-submission-order" title="Permanent link">&para;</a></h2>
-<p>For an ecosystem, you can't submit in arbitrary order — CRAN needs each
-dependency <em>approved and available</em> before its dependents pass incoming
-checks. <code>/rforge:release</code> computes the sequence:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/rforge:release
-</span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>🚀 CRAN RELEASE PLAN
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>Submission Order (by dependency):
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>1. medfit v2.0.0
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>   Status: ✅ Ready
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>   Submit: Now
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>2. probmed v1.5.0
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>   Status: ⏳ Waiting (needs medfit on CRAN)
-</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>   Submit: +2 weeks (after medfit approval)
-</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
-</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>3. medsim v1.3.0
-</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>   Status: ⏳ Waiting
-</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>   Submit: +2 weeks
-</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>
-</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>4. mediationverse v1.1.0
-</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>   Status: ⏳ Waiting (needs all deps)
-</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>   Submit: +4 weeks
-</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>
-</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>Timeline: 4-6 weeks total
-</span></code></pre></div>
-<p>Add <code>--detailed</code> for per-package readiness with reverse-dependency checks:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>/rforge:release --detailed
-</span></code></pre></div>
-<p>If a package isn't ready, the plan tells you exactly what's blocking it:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>1. medfit v2.0.0
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>   Status: ❌ NOT READY
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>   Blockers:
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>     • 3 failing tests
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>     • NEWS.md incomplete
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>     • R CMD check has 1 actionable NOTE
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>   Fix time: ~4 hours
-</span></code></pre></div>
-<p>That's your signal to loop back to Steps 1–2 for that package.</p>
-<h2 id="a-realistic-single-package-release">A realistic single-package release<a class="headerlink" href="#a-realistic-single-package-release" title="Permanent link">&para;</a></h2>
-<p>Most releases are one package, not a whole verse. The condensed flow:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>/rforge:docs:check medfit        # 1. drift check (NEWS, examples)
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>/rforge:r:cran-prep              # 2. full gate: runs all checks + writes cran-comments.md
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a># ... fix anything flagged, re-run until &quot;ready&quot; ...
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>/rforge:release medfit           # 3. confirm ecosystem readiness + submission order
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a># → review cran-comments.md, submit via https://cran.r-project.org/submit.html
-</span></code></pre></div>
-<p>For multi-platform verification before submission:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>/rforge:r:cran-prep --multi-platform   # dispatches win-builder + R-hub (async)
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>/rforge:r:winbuilder                   # or run individually
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>/rforge:r:rhub
-</span></code></pre></div>
-<h2 id="pre-submission-checklist">Pre-submission checklist<a class="headerlink" href="#pre-submission-checklist" title="Permanent link">&para;</a></h2>
+<h3 id="a2-the-_r_check_-incoming-env-bundle">A.2 The <code>_R_CHECK_*</code> "incoming" env bundle<a class="headerlink" href="#a2-the-_r_check_-incoming-env-bundle" title="Permanent link">&para;</a></h3>
+<p><code>R CMD check --as-cran</code> already turns on a large set of <code>_R_CHECK_*</code> variables; CRAN's
+incoming/r-devel machine turns on a few <em>more</em>. The authoritative per-variable reference
+is <a href="https://cran.r-project.org/doc/manuals/r-release/R-ints.html">R Internals §8 "Tools"</a>.
+Two confirmed examples that frame the split:</p>
 <ul>
-<li>[ ] <code>/rforge:docs:check</code> clean (NEWS.md current, examples run)</li>
-<li>[ ] <code>description-sync</code> passes (DESCRIPTION version == NEWS top entry)</li>
-<li>[ ] <code>/rforge:r:cran-prep</code> → verdict <code>ready</code> (or <code>warn</code> with all NOTEs reviewed)</li>
-<li>[ ] <code>cran-comments.md</code> reviewed and accurate — you'll paste this into the CRAN form</li>
-<li>[ ] Multi-platform: win-builder and/or R-hub dispatched and results reviewed</li>
-<li>[ ] <code>/rforge:release</code> → package shows ✅ Ready</li>
-<li>[ ] For ecosystems: submit in the order <code>/rforge:release</code> gives, waiting
-      for each approval before the next</li>
+<li><strong><code>_R_CHECK_RD_VALIDATE_RD2HTML_</code></strong> — HTML (Rd) validation. <strong>Already enabled by
+  <code>--as-cran</code></strong> (setting it false <em>overrides</em> <code>--as-cran</code> to turn validation off). So it
+  is <strong>not</strong> part of the incoming-only bundle.</li>
+<li><strong><code>_R_CHECK_S3_REGISTRATION_</code></strong> — reports already-registered S3 methods in
+  base/recommended packages overwritten on namespace load. Documented as "false by
+  default but true for CRAN submission checks."</li>
 </ul>
-<h2 id="whats-next">What's next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
+<p><strong>Consequence for the spec:</strong> the Tier 3 <code>--incoming</code> bundle must contain <strong>only the
+incoming-only extras not already implied by <code>--as-cran</code>.</strong> Blindly setting a list
+(e.g. the candidate set <code>_R_CHECK_S3_REGISTRATION_</code>, <code>_R_CHECK_LENGTH_1_CONDITION_</code>,
+partial-match warnings) risks (a) re-setting vars <code>--as-cran</code> already owns, or (b)
+asserting behavior not actually documented. Each candidate variable below is
+<strong>marked for per-variable confirmation against R Internals §8 during implementation</strong>
+(Deliverable D) — they are <em>not</em> yet verified individually in this pass.</p>
+<table>
+<thead>
+<tr>
+<th>Candidate var</th>
+<th>Purpose (claimed)</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>_R_CHECK_S3_REGISTRATION_</code></td>
+<td>overwritten base/recommended S3 methods</td>
+<td>⚠️ documented true-for-submission; confirm whether <code>--as-cran</code> already sets it</td>
+</tr>
+<tr>
+<td><code>_R_CHECK_LENGTH_1_CONDITION_</code></td>
+<td><code>if</code>/<code>while</code> given length &gt; 1 condition</td>
+<td>⚠️ confirm name + default vs <code>--as-cran</code></td>
+</tr>
+<tr>
+<td>partial-match warnings (<code>_R_CHECK_*PARTIAL*</code>)</td>
+<td><code>$</code>/<code>[[</code> partial matching, arg partial match</td>
+<td>⚠️ confirm exact var names</td>
+</tr>
+<tr>
+<td><code>_R_CHECK_RD_VALIDATE_RD2HTML_</code></td>
+<td>Rd→HTML validation</td>
+<td>✅ already on under <code>--as-cran</code> — <strong>exclude</strong> from bundle</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a3-run-donttest-manual-and-vignettes">A.3 <code>--run-donttest</code>, manual, and vignettes<a class="headerlink" href="#a3-run-donttest-manual-and-vignettes" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong><a href="../ecosystem-orchestration/">Ecosystem orchestration</a></strong> — if the
-  release surfaced a needed cross-package change, plan it with
-  <code>/rforge:cascade</code>.</li>
-<li><strong><a href="../../REFCARD/">REFCARD</a></strong> — <code>thorough</code>, <code>r:check</code>, <code>docs:check</code>,
-  <code>release</code> syntax.</li>
-<li><strong><a href="../../configuration/">Configuration</a></strong> — set your <code>cran_mirror</code> and
-  <code>vignette_engine</code> so checks use the right defaults.</li>
+<li><strong><code>\donttest{}</code> examples</strong> are <em>not run</em> by a plain <code>--as-cran</code> check; <code>--run-donttest</code>
+  forces them to execute, surfacing breakage CRAN catches on incoming
+  (<a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html">Writing R Extensions</a>).
+  This is a pure addition to the <code>args</code> vector.</li>
+<li><strong>PDF reference manual</strong> builds during check only when a LaTeX toolchain is present;
+  CRAN always builds it. Locally, absence of LaTeX should be a <em>warning</em> ("rely on
+  win-builder"), not a silent skip.</li>
+<li><strong>Vignettes</strong> are built by <code>--as-cran</code> unless <code>--no-build-vignettes</code> is passed; the gate
+  must not suppress them.</li>
+</ul>
+<h3 id="a4-implementation-mechanism-rcmdchecks-env-argument">A.4 Implementation mechanism — <code>rcmdcheck</code>'s <code>env=</code> argument<a class="headerlink" href="#a4-implementation-mechanism-rcmdchecks-env-argument" title="Permanent link">&para;</a></h3>
+<p><code>rcmdcheck::rcmdcheck()</code> accepts <strong><code>env</code></strong> — <em>"A named character vector, extra environment
+variables to set in the check process"</em> — alongside <code>args</code>, <code>build_args</code>, and <code>error_on</code>
+(<a href="https://rdrr.io/cran/rcmdcheck/man/rcmdcheck.html">rcmdcheck reference</a>). So the flavors
+are applied directly:</p>
+<div class="language-r highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">rcmdcheck</span><span class="o">::</span><span class="nf">rcmdcheck</span><span class="p">(</span><span class="n">path</span><span class="p">,</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="n">args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;--as-cran&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;--run-donttest&quot;</span><span class="p">),</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="n">env</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;_R_CHECK_DEPENDS_ONLY_&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;true&quot;</span><span class="p">),</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="n">quiet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">error_on</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;never&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<p><strong>No change to rforge's subprocess layer</strong> (<code>_invoke_r</code>, <a href="../../lib/rcmd.py"><code>lib/rcmd.py:343</code></a>,
+which calls <code>subprocess.run([rscript,"-e",snippet])</code> with no <code>env=</code>) is required — the env
+vars ride through <code>rcmdcheck</code>'s own argument into the child check process.</p>
+<h3 id="a5-description-meta-information-incoming">A.5 DESCRIPTION meta-information (incoming)<a class="headerlink" href="#a5-description-meta-information-incoming" title="Permanent link">&para;</a></h3>
+<p><code>R CMD check</code> runs "checking DESCRIPTION meta-information"; CRAN's incoming-feasibility pass
+applies stricter, human-adjacent scrutiny to the same file
+(<a href="https://cran.r-project.org/web/packages/policies.html">CRAN Repository Policy</a>,
+<a href="https://r-pkgs.org/release.html">r-pkgs §22 Releasing to CRAN</a>,
+<a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html">Writing R Extensions §"The DESCRIPTION file"</a>):</p>
+<ul>
+<li><strong><code>License</code></strong> must be in a <em>standard form</em> so <code>R CMD check</code> and CRAN can verify it
+  automatically; a license stub that is invalid DCF is flagged. (R CMD check catches the
+  hard cases; a non-canonical-but-parseable license can still draw an incoming NOTE.)</li>
+<li><strong><code>Authors@R</code></strong> is recommended over <code>Author</code>/<code>Maintainer</code>; its absence draws a CRAN
+  incoming-feasibility NOTE, and it should name a copyright holder (<code>cph</code> role) and exactly
+  one maintainer (<code>cre</code>) with an email.</li>
+<li><strong><code>Description</code></strong> must be one or more <em>complete sentences</em>; malformed/stub Descriptions
+  (and "This package…"/title-echo openings) are flagged.</li>
+<li><strong><code>Title</code></strong> — title case, concise, no trailing period, no redundant "A package to…".
+  Title + Description are the prime targets of CRAN's human review.</li>
+</ul>
+<p><strong>Split, like the env flavors:</strong> the hard failures (invalid <code>License</code>, missing mandatory
+fields, malformed <code>Description</code>) already surface through <code>rcmdcheck</code> → the existing <code>check</code>
+stage. The <em>style/incoming</em> nits (non-<code>Authors@R</code>, weak <code>Title</code>, missing trailing period,
+stale <code>Date</code>) are <strong>not</strong> reliably caught by a local <code>--as-cran</code> run — they are a good fit
+for a small <strong>pure-Python DCF linter</strong> on rforge's side (the DESCRIPTION file is DCF; no R
+needed), run as an <strong>advisory</strong> stage.</p>
+<h3 id="a6-non-standard-top-level-files-rbuildignore-build-hygiene">A.6 Non-standard top-level files &amp; <code>.Rbuildignore</code> (build hygiene)<a class="headerlink" href="#a6-non-standard-top-level-files-rbuildignore-build-hygiene" title="Permanent link">&para;</a></h3>
+<p>"Only specified files and directories are allowed at the top level of the package" (e.g.
+<code>DESCRIPTION</code>, <code>R/</code>, <code>man/</code>, <code>src/</code>, <code>tests/</code>, <code>vignettes/</code>). Anything else — planning/spec
+docs, <code>BRAINSTORM*</code>, <code>ROADMAP</code>, <code>TODO</code>, <code>.STATUS</code>, dev notes — triggers R CMD check's
+"checking top-level files" <strong>NOTE</strong> unless it is either listed in <code>.Rbuildignore</code> or moved
+to <code>inst/</code> (<a href="https://r-pkgs.org/structure.html">r-pkgs §3 Package structure</a>,
+<a href="https://r-pkgs.org/R-CMD-check.html">r-pkgs Appendix A — R CMD check</a>).</p>
+<ul>
+<li><code>.Rbuildignore</code> lines are <strong>case-insensitive Perl-compatible regexes</strong> matched against
+  each file path; matching paths are excluded from the built bundle (and so never reach
+  CRAN). The canonical helper is <code>usethis::use_build_ignore()</code>.</li>
+<li>rforge develops packages that <em>also</em> carry planning artifacts in-repo, so this is a live
+  risk for the ecosystem: a spec doc left un-ignored ships in the tarball and draws the NOTE.</li>
+</ul>
+<p><strong>rforge's leverage:</strong> the NOTE itself flows through the existing <code>check</code> stage (and the
+note classifier defaults unknown notes to <code>real</code>, so it already contributes to the
+real-NOTE blocker). The <em>additive</em> value is a <strong>proactive, pre-R, pure-Python scan</strong> —
+list top-level entries, match them against <code>.Rbuildignore</code>, and flag the planning docs that
+would ship, with the exact <code>.Rbuildignore</code> regex to add. Catch it before R does, with the fix attached.</p>
+<h3 id="a7-planning-doc-consistency-orthogonal-to-the-build">A.7 Planning-doc consistency (orthogonal to the build)<a class="headerlink" href="#a7-planning-doc-consistency-orthogonal-to-the-build" title="Permanent link">&para;</a></h3>
+<p>Separately from CRAN: planning/spec docs that are <em>not</em> part of the R build can still rot
+(stale status, dangling spec cross-references). rforge already has <code>docs:check</code>-style
+staleness/dangling-reference logic; running it as an <strong>advisory</strong> alongside the CRAN gate
+keeps the in-repo planning surface honest. This is rforge-internal hygiene, not a CRAN
+requirement — so it never blocks the <code>ready</code> verdict.</p>
+<hr />
+<h2 id="part-b-gap-analysis-vs-rforge-v220">PART B — Gap analysis vs rforge v2.2.0<a class="headerlink" href="#part-b-gap-analysis-vs-rforge-v220" title="Permanent link">&para;</a></h2>
+<p>Current <code>check</code> stage: <code>rcmdcheck(args=c("--as-cran"))</code>, no <code>env</code>, no <code>--run-donttest</code>
+(<a href="../../lib/rcmd.py"><code>lib/rcmd.py:233</code></a>). <code>cran-prep</code> runs that single check at
+<a href="../../lib/rcmd.py"><code>lib/rcmd.py:462</code></a>. ✅ covered · ⚠️ partial · ❌ missing.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>CRAN check behavior</th>
+<th>rforge today</th>
+<th>Status</th>
+<th>Closes the gap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>\donttest{}</code> examples run</td>
+<td><code>--as-cran</code> only</td>
+<td>❌</td>
+<td>add <code>--run-donttest</code> to <code>args</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>noSuggests flavor (Suggests withheld)</td>
+<td>never run</td>
+<td>❌</td>
+<td><code>env=c("_R_CHECK_DEPENDS_ONLY_"="true")</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>undeclared-package flavor</td>
+<td>never run</td>
+<td>❌</td>
+<td><code>env=c("_R_CHECK_SUGGESTS_ONLY_"="true")</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>incoming-only <code>_R_CHECK_*</code> bundle</td>
+<td>never set</td>
+<td>❌</td>
+<td><code>--incoming</code> env bundle (per-var, A.2)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>PDF manual builds</td>
+<td>only if local TeX, unverified</td>
+<td>⚠️</td>
+<td>force; warn if no LaTeX</td>
+</tr>
+<tr>
+<td>6</td>
+<td>vignettes build under check</td>
+<td>built by <code>--as-cran</code></td>
+<td>✅</td>
+<td>confirm not <code>--no-build-vignettes</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>R-devel cross-platform</td>
+<td>win-builder/R-hub dispatchable</td>
+<td>⚠️</td>
+<td>nudge harder pre-<code>ready</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>DESCRIPTION spelling, URL/DOI</td>
+<td><code>spell</code> + <code>urlcheck</code> stages</td>
+<td>✅</td>
+<td>already covered</td>
+</tr>
+<tr>
+<td>9</td>
+<td>reverse deps</td>
+<td><code>revdep</code> stage</td>
+<td>✅</td>
+<td>already covered</td>
+</tr>
+<tr>
+<td>10</td>
+<td>DESCRIPTION hard checks (License, mandatory fields)</td>
+<td>via <code>rcmdcheck</code></td>
+<td>⚠️</td>
+<td>surfaced but not classified/hinted</td>
+</tr>
+<tr>
+<td>11</td>
+<td>DESCRIPTION incoming nits (Authors@R, Title, Description prose, Date)</td>
+<td>not run locally</td>
+<td>❌</td>
+<td>pure-Python DCF linter (advisory)</td>
+</tr>
+<tr>
+<td>12</td>
+<td>non-standard top-level files</td>
+<td>NOTE via <code>rcmdcheck</code> (classified <code>real</code>)</td>
+<td>⚠️</td>
+<td>add proactive <code>.Rbuildignore</code> scan + fix hint</td>
+</tr>
+<tr>
+<td>13</td>
+<td>planning-doc consistency (staleness, dangling refs)</td>
+<td><code>docs:check</code> exists, not in gate</td>
+<td>❌</td>
+<td>run <code>docs:check</code> logic as advisory</td>
+</tr>
+</tbody>
+</table>
+<p>The two highest-value, lowest-cost wins are <strong>#1 (<code>--run-donttest</code>)</strong> and <strong>#2
+(DEPENDS_ONLY)</strong> — both pure additions, no new dependencies.</p>
+<hr />
+<h2 id="part-c-prioritized-recommendations-feed-the-spec">PART C — Prioritized recommendations (feed the SPEC)<a class="headerlink" href="#part-c-prioritized-recommendations-feed-the-spec" title="Permanent link">&para;</a></h2>
+<h3 id="quick-wins">Quick wins<a class="headerlink" href="#quick-wins" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Add <code>--run-donttest</code> to the check <code>args</code> when <code>as_cran</code> (gap #1).</li>
+<li>Add a <code>check (noSuggests)</code> stage via <code>env=c("_R_CHECK_DEPENDS_ONLY_"="true")</code> (gap #2)
+  — the single change that converts the medfit near-miss into a permanent guardrail.</li>
+</ul>
+<h3 id="medium">Medium<a class="headerlink" href="#medium" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Add a <code>check (suggests-only)</code> stage via <code>_R_CHECK_SUGGESTS_ONLY_=true</code> (gap #3), so the
+  gate matches the WRE "check with each" recommendation.</li>
+<li>Verify the PDF manual builds; warn (not skip) when LaTeX is absent (gap #5).</li>
+<li>On any strict failure, surface the targeted hint: <em>"A Suggests package is used
+  unconditionally. Move it to Imports, or guard with <code>requireNamespace()</code> in code AND
+  <code>skip_if_not_installed()</code> in tests."</em></li>
+<li><strong>Build-hygiene scan</strong> (gaps #12): pre-R, pure-Python — flag planning/dev docs at the
+  package top level that aren't <code>.Rbuildignore</code>d, with the exact regex to add (gap #12).</li>
+<li><strong>DESCRIPTION linter</strong> (gap #11): pure-Python DCF parse — advisory NOTEs for non-<code>Authors@R</code>,
+  weak <code>Title</code>, <code>Description</code> not ending in a complete sentence, stale <code>Date</code>; classify the
+  hard DESCRIPTION findings already surfaced by <code>rcmdcheck</code> (gap #10).</li>
+</ul>
+<h3 id="long-term">Long-term<a class="headerlink" href="#long-term" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>--incoming</code>: add the incoming-only <code>_R_CHECK_*</code> bundle (gap #4) — <strong>only after</strong>
+  confirming each variable per A.2 against R Internals §8.</li>
+<li>Refuse a 🟢 <code>ready</code> verdict in <code>cran-prep</code> until win-builder/R-hub have at least been
+  <em>dispatched</em> (gap #7).</li>
+<li><strong>Planning-doc consistency</strong> (gap #13): run <code>docs:check</code>-style staleness/dangling-ref
+  logic as an advisory stage (never blocks).</li>
+</ul>
+<hr />
+<h2 id="sources">Sources<a class="headerlink" href="#sources" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html">Writing R Extensions — CRAN</a> — the two Suggests-withholding flavors and the "check with each, and with neither" recommendation; <code>--run-donttest</code>; manual/vignette build behavior.</li>
+<li><a href="https://cran.r-project.org/doc/manuals/r-release/R-ints.html">R Internals §8 "Tools" — CRAN</a> — authoritative per-variable reference for <code>_R_CHECK_*</code>; <code>_R_CHECK_RD_VALIDATE_RD2HTML_</code> (on under <code>--as-cran</code>), <code>_R_CHECK_S3_REGISTRATION_</code> (true for submission checks).</li>
+<li><a href="https://rdrr.io/cran/rcmdcheck/man/rcmdcheck.html">rcmdcheck::rcmdcheck() reference</a> — the <code>env=</code> named-character-vector argument.</li>
+<li><a href="https://cran.r-project.org/web/packages/policies.html">CRAN Repository Policy</a> — <code>Authors@R</code>/<code>cph</code>, <code>License</code> standard form, DESCRIPTION expectations.</li>
+<li><a href="https://r-pkgs.org/structure.html">r-pkgs §3 Package structure</a> and <a href="https://r-pkgs.org/R-CMD-check.html">Appendix A — R CMD check</a> — top-level files allowed, <code>.Rbuildignore</code> regex semantics, <code>usethis::use_build_ignore()</code>.</li>
+<li><a href="https://r-pkgs.org/release.html">r-pkgs §22 Releasing to CRAN</a> — DESCRIPTION incoming nits (Title/Description hotspots, Authors@R).</li>
+<li>Existing rforge docs: <a href="../RESEARCH-cran-dev-2026-06-01/"><code>RESEARCH-cran-dev-2026-06-01.md</code></a>, <a href="../SPEC-r-cran-prep-2026-06-01/"><code>SPEC-r-cran-prep-2026-06-01.md</code></a>.</li>
 </ul>
 
 

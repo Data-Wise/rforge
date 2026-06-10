@@ -2200,7 +2200,7 @@ contain leaves first (deepest deps), which is the correct order to build in.</p>
 </tbody>
 </table>
 <h3 id="class-edge"><code>class Edge</code><a class="headerlink" href="#class-edge" title="Permanent link">&para;</a></h3>
-<p>Edge(from_: 'str', to: 'str', type: 'EdgeType')</p>
+<p>A directed dependency edge: <code>from_</code> (importer) depends on <code>to</code> (imported).</p>
 <table>
 <thead>
 <tr>
@@ -2228,7 +2228,7 @@ contain leaves first (deepest deps), which is the correct order to build in.</p>
 </tbody>
 </table>
 <h3 id="class-impact"><code>class Impact</code><a class="headerlink" href="#class-impact" title="Permanent link">&para;</a></h3>
-<p>Impact(package: 'str', change_type: 'ChangeType', direct_dependents: 'list[str]', indirect_dependents: 'list[str]', affected_tests: 'int', update_sequence: 'list[str]', estimated_work: 'str', risk_level: 'RiskLevel', recommendations: 'list[str]')</p>
+<p>Downstream impact of a change to one package — who is affected, in what order, at what risk.</p>
 <table>
 <thead>
 <tr>

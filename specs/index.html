@@ -1519,6 +1519,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Templates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#research-citation-standard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Research &amp; Citation Standard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#specs_1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1867,6 +1889,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Templates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#research-citation-standard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Research &amp; Citation Standard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#specs_1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1940,6 +1984,59 @@ single-PR features. The PR description is the right home for those.</p>
   more useful than goals — they prevent scope creep.</li>
 <li>Link from <code>CHANGELOG.md</code> and <code>.STATUS</code> so SPECs aren't orphaned.</li>
 </ul>
+<h2 id="templates">Templates<a class="headerlink" href="#templates" title="Permanent link">&para;</a></h2>
+<p>Start from a template rather than a blank file — they encode the section
+structure and the citation rules below:</p>
+<ul>
+<li><strong><a href="_TEMPLATE-SPEC/"><code>_TEMPLATE-SPEC.md</code></a></strong> — design + execution plan.</li>
+<li><strong><a href="_TEMPLATE-RESEARCH/"><code>_TEMPLATE-RESEARCH.md</code></a></strong> — findings + recommendations
+  (no code, no plan). A RESEARCH doc feeds a SPEC; the SPEC references it instead
+  of re-deriving claims (e.g. <code>RESEARCH-cran-dev</code> → <code>SPEC-r-cran-prep</code>).</li>
+</ul>
+<p>Naming prefixes: <code>RESEARCH-</code> (findings) → <code>PROPOSAL-</code> (early ideation, not yet
+approved) → <code>SPEC-</code> (approved design). Promote a PROPOSAL to a SPEC by <code>git mv</code>
+once the design is decided; the date in the filename stays the <em>creation</em> date.</p>
+<h2 id="research-citation-standard">Research &amp; Citation Standard<a class="headerlink" href="#research-citation-standard" title="Permanent link">&para;</a></h2>
+<p>rforge specs make claims about CRAN policy, R internals, and tool behavior that
+are easy to get <em>subtly</em> wrong. (A real example: an early draft of the
+CRAN-incoming-hardening proposal named <code>_R_CHECK_SUGGESTS_ONLY_</code> as the env var
+that catches a Suggests-package-used-unconditionally bug; the correct flavor is
+<code>_R_CHECK_DEPENDS_ONLY_</code>. The two have different semantics — only verification
+against the primary source caught it.) This standard exists to make that class of
+error visible before a spec leaves <code>Draft</code>.</p>
+<p><strong>The rules:</strong></p>
+<ul>
+<li><strong>Claim → source.</strong> Every non-obvious external or technical claim cites a source
+  <em>at the point of use</em>, not just in a bibliography.</li>
+<li><strong>Source hierarchy</strong> (prefer higher tiers; drop to a lower tier only when no
+  higher source covers the claim, and label it):</li>
+<li><strong>Primary</strong> — <a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html">Writing R Extensions</a>,
+     <a href="https://cran.r-project.org/doc/manuals/r-release/R-ints.html">R Internals</a>,
+     <a href="https://cran.r-project.org/web/packages/policies.html">CRAN Repository Policy</a>,
+     R <code>NEWS</code>/source, and a package's own reference docs.</li>
+<li><strong>Official tutorials</strong> — <a href="https://r-pkgs.org/">r-pkgs.org</a>, r-lib / tidyverse
+     reference sites.</li>
+<li><strong>Secondary</strong> — blog posts, mailing-list threads. Use only when no primary
+     source exists, and mark them as secondary.</li>
+<li><strong>Format.</strong> Inline markdown link where the claim is made, <strong>plus</strong> a closing
+  <code>## Sources</code> section collecting every link for one-pass verification.</li>
+<li><strong>Resolve contradictions in the open.</strong> When two sources disagree, state both,
+  pick one, and record the resolution. That sentence is usually the most valuable
+  line in the document.</li>
+</ul>
+<p><strong>The research workflow</strong> (how a RESEARCH doc or a spec's evidence base gets built):</p>
+<ol>
+<li><strong>Scope the question</strong> — write down exactly what must be true for the design to hold.</li>
+<li><strong>Fan-out search</strong> — the global <code>deep-research</code> skill, or <code>WebSearch</code> filtered to
+   primary domains (<code>cran.r-project.org</code>, <code>stat.ethz.ch</code>, package reference sites).</li>
+<li><strong>Fetch &amp; verify</strong> — <code>WebFetch</code> the primary source; confirm the claim in its own
+   words rather than trusting a summary.</li>
+<li><strong>Resolve contradictions</strong> — reconcile disagreeing sources; note the resolution.</li>
+<li><strong>Write claim + citation</strong> — link at point of use.</li>
+<li><strong>Compile <code>## Sources</code></strong> — collect all links.</li>
+<li><strong>Self-review</strong> — scan for any external claim without a citation before promoting
+   out of <code>Draft</code>.</li>
+</ol>
 <h2 id="specs_1">Specs<a class="headerlink" href="#specs_1" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong><a href="SPEC-mcp-absorb-2026-05-10/">MCP absorb (Path B)</a></strong> — Status:
@@ -1950,13 +2047,33 @@ single-PR features. The PR description is the right home for those.</p>
   Status: Shipped (v2.0.0). The command-rename / sub-namespacing plan
   (<code>docs:check</code>, <code>r:check</code>, <code>health</code>).</li>
 <li><strong><a href="SPEC-diff-aware-checks-and-coverage-2026-05-31/">Diff-aware checks &amp; coverage</a></strong> —
-  Status: Draft. Proposal for diff-scoped checks, coverage integration, and
-  ecosystem NOTE classification.</li>
+  Status: Draft, <strong>refocused to P0</strong> (<code>--changed</code> diff-aware checks — the unbuilt flagship).
+  P1 shipped (v2.1.0); P2→cran-incoming, P3→ecosystem-manifest, P4→scaffolding (2026-06-10).</li>
 <li><strong><a href="SPEC-r-dev-commands-2026-05-31/">r: dev-cycle + quality commands (v2.1.0)</a></strong> —
   Status: Shipped (v2.1.0). 12 new <code>r:</code> commands (build/test/document/install/
   coverage/site/cycle + lint/spell/urlcheck/style) backed by <code>lib/rcmd.py</code>.
   16 → 28 commands. Deferred follow-ups (deps-sync, scaffolding, cran-prep)
   noted in the appendix.</li>
+<li><strong><a href="SPEC-cran-incoming-hardening-2026-06-10/">CRAN-incoming hardening</a></strong> —
+  Status: Reviewed/approved (target v2.3.0). Make the <code>check</code>/<code>cran-prep</code> gate emulate CRAN incoming + ongoing
+  checks (noSuggests + suggests-only flavors, <code>--run-donttest</code>, opt-in <code>--incoming</code>
+  bundle), default-on as a <code>ready</code>-blocker, plus pure-Python DESCRIPTION-lint,
+  <code>.Rbuildignore</code> build-hygiene, and planning-doc consistency checks. Grounded in
+  <a href="RESEARCH-cran-incoming-checks-2026-06-10/">RESEARCH-cran-incoming-checks</a>.</li>
+<li><strong><a href="SPEC-r-deps-sync-2026-06-10/"><code>r:deps-sync</code> — reconcile DESCRIPTION vs code usage</a></strong> —
+  Status: Draft (target v2.5.0). New pure-Python per-package command: scan <code>R/</code>/tests/vignettes for
+  namespace usage, reconcile against <code>Imports</code>/<code>Suggests</code> (missing/unused/misclassified), suggest a
+  DESCRIPTION patch (<code>--write</code> to apply). Static sibling of the cran-incoming noSuggests catch.</li>
+<li><strong><a href="SPEC-r-submit-github-prerelease-2026-06-10/"><code>r:submit</code> — GitHub pre-release + CRAN submit handoff</a></strong> —
+  Status: Draft (target v2.6.0). New per-package command: build the submitted tarball, cut a
+  GitHub <strong>pre-release</strong> (+<code>cran-comments.md</code>), hand off the CRAN submit step, then promote to a
+  full release on acceptance (<code>gh release edit --prerelease=false</code>). Fills the submission-lifecycle
+  gap between <code>r:cran-prep</code> (ready) and CRAN going live.</li>
+<li><strong><a href="SPEC-r-scaffolding-2026-06-10/">Scaffolding theme — <code>r:use-test</code>/<code>r:use-package</code>/<code>r:use-vignette</code></a></strong> —
+  Status: Draft (unscheduled, post-v2.6.0). Authoring commands for <em>existing</em> packages (no
+  <code>r:create</code>): scaffold + AI-draft a testthat file, add a declared dependency, start a vignette.
+  Hybrid engine (usethis infra + Python/AI content), dry-run by default. Reuses deps-sync's
+  DESCRIPTION-patch writer.</li>
 </ul>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>

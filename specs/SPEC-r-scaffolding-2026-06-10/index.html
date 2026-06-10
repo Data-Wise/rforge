@@ -10,13 +10,9 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/tutorials/cran-release-prep/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-r-scaffolding-2026-06-10/">
       
       
-        <link rel="prev" href="../r-dev-cycle/">
-      
-      
-        <link rel="next" href="../cran-submission-with-rforge/">
       
       
         
@@ -27,7 +23,7 @@
     
     
       
-        <title>CRAN release prep - RForge Plugin</title>
+        <title>SPEC: Scaffolding theme — r:use-test / r:use-package / r:use-vignette - RForge Plugin</title>
       
     
     
@@ -80,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cran-release-prep-thorough-rcheck-release" class="md-skip">
+        <a href="#spec-scaffolding-theme-ruse-test-ruse-package-ruse-vignette" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              CRAN release prep
+              SPEC: Scaffolding theme — r:use-test / r:use-package / r:use-vignette
             
           </span>
         </div>
@@ -264,12 +260,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../../workflows/" class="md-tabs__link">
           
   
@@ -539,29 +533,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -579,7 +568,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -625,7 +614,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../../tutorials/" class="md-nav__link">
         
   
   
@@ -653,7 +642,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/" class="md-nav__link">
+      <a href="../../tutorials/getting-started/" class="md-nav__link">
         
   
   
@@ -681,7 +670,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../rforge-in-the-r-lifecycle/" class="md-nav__link">
+      <a href="../../tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
         
   
   
@@ -709,7 +698,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../understanding-modes/" class="md-nav__link">
+      <a href="../../tutorials/understanding-modes/" class="md-nav__link">
         
   
   
@@ -737,7 +726,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ecosystem-orchestration/" class="md-nav__link">
+      <a href="../../tutorials/ecosystem-orchestration/" class="md-nav__link">
         
   
   
@@ -765,7 +754,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../r-dev-cycle/" class="md-nav__link">
+      <a href="../../tutorials/r-dev-cycle/" class="md-nav__link">
         
   
   
@@ -790,37 +779,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CRAN release prep
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../tutorials/cran-release-prep/" class="md-nav__link">
         
   
   
@@ -836,114 +798,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-release-pipeline-at-a-glance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The release pipeline at a glance
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-1-catch-documentation-drift-early" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 1: Catch documentation drift early
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-2-run-the-full-cran-prep-gate-v220" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 2: Run the full CRAN-prep gate (v2.2.0+)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-3-roll-up-the-whole-ecosystem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 3: Roll up the whole ecosystem
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-4-plan-the-submission-order" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 4: Plan the submission order
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#a-realistic-single-package-release" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A realistic single-package release
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pre-submission-checklist" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pre-submission checklist
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's next
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -956,7 +810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cran-submission-with-rforge/" class="md-nav__link">
+      <a href="../../tutorials/cran-submission-with-rforge/" class="md-nav__link">
         
   
   
@@ -984,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migrate-from-mcp/" class="md-nav__link">
+      <a href="../../tutorials/migrate-from-mcp/" class="md-nav__link">
         
   
   
@@ -1570,7 +1424,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -1598,7 +1452,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
+      <a href="../SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
         
   
   
@@ -1626,7 +1480,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
+      <a href="../SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
         
   
   
@@ -1654,7 +1508,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
+      <a href="../SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
         
   
   
@@ -1682,7 +1536,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
+      <a href="../SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
         
   
   
@@ -1887,10 +1741,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-release-pipeline-at-a-glance" class="md-nav__link">
+  <a href="#summary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The release pipeline at a glance
+        Summary
       
     </span>
   </a>
@@ -1898,10 +1752,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-1-catch-documentation-drift-early" class="md-nav__link">
+  <a href="#motivation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 1: Catch documentation drift early
+        Motivation
       
     </span>
   </a>
@@ -1909,10 +1763,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-run-the-full-cran-prep-gate-v220" class="md-nav__link">
+  <a href="#goals" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2: Run the full CRAN-prep gate (v2.2.0+)
+        Goals
       
     </span>
   </a>
@@ -1920,10 +1774,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-roll-up-the-whole-ecosystem" class="md-nav__link">
+  <a href="#non-goals" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 3: Roll up the whole ecosystem
+        Non-goals
       
     </span>
   </a>
@@ -1931,10 +1785,49 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-4-plan-the-submission-order" class="md-nav__link">
+  <a href="#scope" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 4: Plan the submission order
+        Scope
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scope">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#in-scope-decided" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In scope (decided)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#out-of-scope-yagni-deferred" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Out of scope (YAGNI / deferred)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
       
     </span>
   </a>
@@ -1942,10 +1835,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-realistic-single-package-release" class="md-nav__link">
+  <a href="#dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A realistic single-package release
+        Dependencies
       
     </span>
   </a>
@@ -1953,10 +1846,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pre-submission-checklist" class="md-nav__link">
+  <a href="#error-handling" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pre-submission checklist
+        Error handling
       
     </span>
   </a>
@@ -1964,10 +1857,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-next" class="md-nav__link">
+  <a href="#testing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's next
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation impact
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation order
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions-risks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open questions / risks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources
       
     </span>
   </a>
@@ -1991,7 +1928,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/tutorials/cran-release-prep.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-r-scaffolding-2026-06-10.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1999,253 +1936,181 @@
   
 
 
-<h1 id="cran-release-prep-thorough-rcheck-release">📦 CRAN release prep: thorough, r:check, release<a class="headerlink" href="#cran-release-prep-thorough-rcheck-release" title="Permanent link">&para;</a></h1>
-<div class="admonition tip">
-<p class="admonition-title">TL;DR (30 seconds)</p>
+<h1 id="spec-scaffolding-theme-ruse-test-ruse-package-ruse-vignette">SPEC: Scaffolding theme — <code>r:use-test</code> / <code>r:use-package</code> / <code>r:use-vignette</code><a class="headerlink" href="#spec-scaffolding-theme-ruse-test-ruse-package-ruse-vignette" title="Permanent link">&para;</a></h1>
 <ul>
-<li><strong>What:</strong> Take one or more packages from "code complete" to "submitted to CRAN."</li>
-<li><strong>Why:</strong> rforge can now run the full per-package gate (<code>r:cran-prep</code>) <strong>and</strong> plan ecosystem submission order (<code>release</code>).</li>
-<li><strong>How (single package):</strong> <code>/rforge:r:cran-prep</code> → fix blockers → repeat → <code>/rforge:release</code>.</li>
-<li><strong>How (ecosystem):</strong> <code>/rforge:docs:check</code> → <code>/rforge:r:cran-prep</code> per package → <code>/rforge:thorough</code> → <code>/rforge:release</code>.</li>
-<li><strong>Next:</strong> Submit via CRAN's web form (rforge plans the order; it doesn't upload).</li>
+<li><strong>Status:</strong> Draft — awaiting user review</li>
+<li><strong>Target version:</strong> unscheduled candidate (post-v2.6.0; builds on <code>r:deps-sync</code> v2.5.0 — see Dependencies)</li>
+<li><strong>Date:</strong> 2026-06-10</li>
+<li><strong>Author:</strong> brainstormed with Claude, grounded in <code>BRAINSTORM-r-command-expansion-2026-05-31.md</code></li>
+<li><strong>Related:</strong> <a href="../SPEC-r-deps-sync-2026-06-10/">SPEC-r-deps-sync-2026-06-10.md</a>,
+  <a href="../SPEC-diff-aware-checks-and-coverage-2026-05-31/">SPEC-diff-aware-checks-and-coverage-2026-05-31.md</a> (P4 origin),
+  <code>lib/rcmd.py</code>, <code>lib/deps_sync.py</code> (planned)</li>
 </ul>
-</div>
-<blockquote>
-<p><strong>For whom:</strong> Maintainer preparing a CRAN submission (single package or
-ecosystem).
-<strong>Estimated time:</strong> 15 minutes to read; the actual checks take longer
-because <code>R CMD check --as-cran</code> and <code>revdepcheck</code> are slow.
-<strong>Prior knowledge:</strong> You've built the package and want to ship it.</p>
-</blockquote>
-<div class="admonition note">
-<p class="admonition-title">What rforge runs vs. what you run (v2.2.0+)</p>
-<p>As of v2.2.0, <code>/rforge:r:cran-prep</code> <strong>does</strong> run the heavy checks
-(document → lint → spell → urlcheck → test → coverage → <code>R CMD check
---as-cran</code> → revdepcheck) and writes <code>cran-comments.md</code>. It still does
-<strong>not</strong> upload to CRAN — submission is via the CRAN web form.
-For ecosystem-level planning (submission order, cross-package deps),
-<code>/rforge:thorough</code> and <code>/rforge:release</code> remain orchestration-only.</p>
-</div>
-<h2 id="the-release-pipeline-at-a-glance">The release pipeline at a glance<a class="headerlink" href="#the-release-pipeline-at-a-glance" title="Permanent link">&para;</a></h2>
-<pre class="mermaid"><code>flowchart TD
-    A["/rforge:docs:check&lt;br/&gt;NEWS + doc drift"] --&gt; B
-
-    subgraph "Per-package gate (v2.2.0+)"
-        B["/rforge:r:cran-prep&lt;br/&gt;document→lint→spell→urlcheck&lt;br/&gt;test→coverage→check(--as-cran)→revdep&lt;br/&gt;writes cran-comments.md"]
-    end
-
-    B --&gt; C{"ready / warn / blocked?"}
-    C -- "blocked" --&gt; D["Fix blockers&lt;br/&gt;(loop back)"]
-    D --&gt; A
-    C -- "ready or warn" --&gt; E["/rforge:thorough&lt;br/&gt;ecosystem rollup"]
-    E --&gt; F["/rforge:release&lt;br/&gt;CRAN submission order"]
-    F --&gt; G["Submit via&lt;br/&gt;CRAN web form"]</code></pre>
-<h2 id="step-1-catch-documentation-drift-early">Step 1: Catch documentation drift early<a class="headerlink" href="#step-1-catch-documentation-drift-early" title="Permanent link">&para;</a></h2>
-<p>Documentation problems are the most common avoidable CRAN rejection. Check
-first, while fixes are cheap:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/rforge:docs:check
-</span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>⚠️ DOCUMENTATION CHECK
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>NEWS.md: ⚠️ Missing 3 recent changes
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  • extract_mediation refactor
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>  • New bootstrap method
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  • Bug fix #234
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>Examples: ⚠️ 2 outdated
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>  • README example uses old API
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>  • Vignette 2 has broken code
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>Recommendations:
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>  1. Update NEWS.md (5 min)
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>  2. Update examples (20 min)
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>  3. Regenerate vignettes (10 min)
-</span></code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">The description-sync skill backs this up automatically</p>
-<p>rforge ships a <code>description-sync</code> validation skill that checks your
-<code>DESCRIPTION</code> <code>Version:</code> matches the top entry in <code>NEWS.md</code> /
-<code>CHANGELOG.md</code> — the single most common pre-CRAN slip. It's pure shell,
-needs no R, and runs autonomously. See <a href="../../hooks-and-skills/">Hooks &amp; Skills</a>.</p>
-</div>
-<h2 id="step-2-run-the-full-cran-prep-gate-v220">Step 2: Run the full CRAN-prep gate (v2.2.0+)<a class="headerlink" href="#step-2-run-the-full-cran-prep-gate-v220" title="Permanent link">&para;</a></h2>
-<p>For most submissions, use the orchestrating command:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/rforge:r:cran-prep
-</span></code></pre></div>
-<p>This sequences document → lint → spell → urlcheck → test → coverage →
-<code>R CMD check --as-cran</code> → revdep and writes <code>cran-comments.md</code>. It returns
-one of three verdicts:</p>
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>A coherent <strong>authoring</strong> theme: three commands that <em>scaffold + draft</em> package artifacts for an
+<strong>existing</strong> package — <code>r:use-test</code> (a <code>testthat</code> file + drafted cases), <code>r:use-package</code> (add a
+declared dependency + <code>@importFrom</code>), and <code>r:use-vignette</code> (a vignette skeleton + drafted prose).
+They share one shape distinct from the run-and-parse <code>r:</code> commands: they <strong>write files</strong>, so they
+are <strong>dry-run by default</strong> and apply only with <code>--write</code>. Engine is <strong>hybrid</strong> — <code>usethis::</code> for the
+infra it does correctly (testthat edition, vignette builder), pure-Python + AI for simple file
+creation and content drafting. Commands 33 → <strong>36</strong> (+3).</p>
+<h2 id="motivation">Motivation<a class="headerlink" href="#motivation" title="Permanent link">&para;</a></h2>
+<p>rforge runs and validates the dev cycle but can't <em>author</em> the artifacts that cycle checks. Per the
+2026-05-31 brainstorm (and the diff-aware spec's P4), after changing a function a maintainer
+hand-writes the test file and fixtures, hand-edits <code>DESCRIPTION</code> + roxygen to add a dep, and
+hand-starts vignettes — mechanical chores with real AI value in the <em>content</em> (drafting <code>testthat</code>
+cases from a signature, picking <code>Imports</code> vs <code>Suggests</code>, outlining vignette prose). <code>craft:test:gen</code>
+exists but is not R/<code>testthat</code>/S7-aware. These three commands fill that gap while staying within
+rforge's mission of serving <strong>existing</strong> ecosystems (no package <em>creation</em> — <code>r:create</code> is out, see
+Non-goals).</p>
+<h2 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>r:use-test &lt;fn&gt;</code> — ensure <code>testthat</code> infra, create <code>tests/testthat/test-&lt;fn&gt;.R</code>, and <strong>draft</strong>
+  <code>test_that()</code> blocks (happy path, each documented <code>stop()</code>, <code>@param</code>-constraint edge cases) from
+  the function's signature + roxygen + argument classes (S7/S4).</li>
+<li><code>r:use-package &lt;pkg&gt;</code> — add <code>&lt;pkg&gt;</code> to <code>DESCRIPTION</code> (AI picks <code>Imports</code> vs <code>Suggests</code>) and insert
+  the roxygen <code>@importFrom</code> in the right <code>R/</code> file.</li>
+<li><code>r:use-vignette &lt;name&gt;</code> — scaffold the vignette (<code>usethis</code> infra) and <strong>draft</strong> an outline/prose
+  from the package's purpose.</li>
+<li>All three: <strong>dry-run by default</strong>, apply with <code>--write</code>; never overwrite an existing file without
+  <code>--force</code>.</li>
+</ul>
+<h2 id="non-goals">Non-goals<a class="headerlink" href="#non-goals" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>No <code>r:create</code>.</strong> Creating <em>new</em> packages is out of scope — rforge serves existing ecosystems
+  (decided 2026-06-10). Revisit only if rforge's mission changes.</li>
+<li><strong>No oracle.</strong> <code>r:use-test</code> drafts <em>structure</em>, not expected values — assertions are emitted as
+  <code># TODO</code>. (A real bug: a test asserting the naive <code>a*b</code> for a delta-method estimate that is
+  actually <code>a*b + cov(a,b)</code> — generated assertions must not be trusted.)</li>
+<li><strong>No reconcile-everything.</strong> <code>r:use-package</code> adds <em>one named</em> dep; scanning + reconciling <em>all</em>
+  usage is <code>r:deps-sync</code>'s job. Complementary, not overlapping.</li>
+<li><strong>No auto-write by default</strong>, no interactive prompts (dry-run + <code>--write</code>, agent/TTY-safe).</li>
+</ul>
+<h2 id="scope">Scope<a class="headerlink" href="#scope" title="Permanent link">&para;</a></h2>
+<h3 id="in-scope-decided">In scope (decided)<a class="headerlink" href="#in-scope-decided" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Verdict</th>
-<th>Meaning</th>
+<th>Command</th>
+<th>usethis (infra)</th>
+<th>Python + AI (content)</th>
+<th>Writes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>ready</code></td>
-<td>All stages clean — proceed to submission</td>
+<td><code>r:use-test &lt;fn&gt;</code></td>
+<td><code>use_testthat(3)</code> if testthat absent</td>
+<td>draft <code>test_that()</code> blocks from signature/roxygen/arg-classes; assertions = <code># TODO</code></td>
+<td><code>tests/testthat/test-&lt;fn&gt;.R</code></td>
 </tr>
 <tr>
-<td><code>warn</code></td>
-<td>Passed but has real NOTEs or new revdep problems — review before submitting</td>
+<td><code>r:use-package &lt;pkg&gt;</code></td>
+<td>— (pure-Python via shared writer)</td>
+<td>pick <code>Imports</code>/<code>Suggests</code>; choose the <code>R/</code> file for <code>@importFrom</code></td>
+<td><code>DESCRIPTION</code> + one <code>R/*.R</code> roxygen block</td>
 </tr>
 <tr>
-<td><code>blocked</code></td>
-<td>At least one stage errored — fix and re-run</td>
+<td><code>r:use-vignette &lt;name&gt;</code></td>
+<td><code>use_vignette()</code>/<code>use_article()</code> (builder config, skeleton)</td>
+<td>draft outline/prose from package purpose</td>
+<td><code>vignettes/&lt;name&gt;.Rmd</code> + <code>DESCRIPTION</code> VignetteBuilder</td>
 </tr>
 </tbody>
 </table>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>✅ CRAN PREP — medfit v2.0.0
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>document   ok    ✅
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>lint       ok    ✅
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>spell      ok    ✅
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>urlcheck   ok    ✅
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>test       ok    ✅  (187 passed)
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>coverage   ok    ✅  (92%)
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>check      ok    ✅  1 NOTE (classified spurious — &quot;New submission&quot;)
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>revdep     ok    ✅  no broken packages
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>Verdict: ready
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>cran-comments.md written → review before submitting
-</span></code></pre></div>
-<div class="admonition tip">
-<p class="admonition-title">NOTEs are classified automatically</p>
-<p><code>r:cran-prep</code> tags each NOTE as <code>spurious</code> (expected on first submission,
-e.g. "New submission" or "checking CRAN incoming feasibility") or <code>real</code>
-(needs attention). Spurious NOTEs do not block <code>ready</code>. Real NOTEs
-downgrade the verdict to <code>warn</code>.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Strict flavor passes run by default</p>
-<p>The gate now runs the <code>check</code> stage <strong>plus two strict flavor passes</strong> —
-<code>check (noSuggests)</code> (<code>_R_CHECK_DEPENDS_ONLY_=true</code>) and
-<code>check (suggests-only)</code> (<code>_R_CHECK_SUGGESTS_ONLY_=true</code>), each with
-<code>--run-donttest</code>. These emulate CRAN's post-acceptance flavors and catch a
-<code>Suggests</code> package used unconditionally (which plain <code>--as-cran</code> misses).
-A strict-pass <strong>ERROR blocks <code>ready</code></strong>. It also adds three pure-Python,
-<strong>advisory</strong> Tier 4 stages — <code>description</code> (DESCRIPTION incoming nits),
-<code>build-hygiene</code> (planning/dev docs that would ship in the tarball, with the
-exact <code>.Rbuildignore</code> fix), and <code>docs-consistency</code>. Tier 4 stages surface as
-<code>warn</code> and <strong>never block</strong> <code>ready</code>.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Behavior change — a package green today can turn red</p>
-<p>Because the strict passes are on by default, a package that reports 🟢
-<code>ready</code> under <code>--as-cran</code> alone can turn 🔴 once <code>check (noSuggests)</code>
-detects a <code>Suggests</code> package used unconditionally. This is intended.
-<strong>Fix:</strong> move the package to <code>Imports</code>, or guard with
-<code>requireNamespace()</code> in code <strong>and</strong> <code>skip_if_not_installed()</code> in tests.</p>
-</div>
-<p><strong>Optional flags:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/rforge:r:cran-prep --no-revdep         # skip revdep (first submission, no dependents)
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>/rforge:r:cran-prep --goodpractice      # add advisory goodpractice checks
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>/rforge:r:cran-prep --multi-platform    # dispatch win-builder + R-hub async
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>/rforge:r:cran-prep --incoming          # add the opt-in CRAN-incoming check pass
-</span></code></pre></div>
-<p><strong>For a single targeted check</strong> (no orchestration), use:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>/rforge:r:check --as-cran
-</span></code></pre></div>
-<p>See <a href="../cran-submission-with-rforge/">CRAN submission with rforge</a> for the
-full per-package walkthrough.</p>
-<h2 id="step-3-roll-up-the-whole-ecosystem">Step 3: Roll up the whole ecosystem<a class="headerlink" href="#step-3-roll-up-the-whole-ecosystem" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:thorough &quot;Prepare mediationverse for CRAN&quot;
-</span></code></pre></div>
-<p><code>/rforge:thorough</code> runs the status rollup across all packages…</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.status<span class="w"> </span>--path<span class="w"> </span>.<span class="w"> </span>--format<span class="w"> </span>text
-</span></code></pre></div>
-<p>…and then <strong>recommends the R-side checks for you to run yourself</strong> (it does
-not run them — that's Step 2's territory, per package):</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Recommended R-side checks (run in your shell):
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>  R CMD check --as-cran .
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>  Rscript -e &#39;devtools::test()&#39;
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>  Rscript -e &#39;covr::package_coverage()&#39;
-</span></code></pre></div>
-<p>Paste the results back and rforge combines them with the lib-status rollup
-into a release-readiness summary.</p>
-<div class="admonition abstract">
-<p class="admonition-title">Why thorough doesn't run R checks</p>
-<p><code>/rforge:thorough</code> is an ecosystem rollup — it aggregates health across
-all packages, not a single one. The per-package R execution lives in
-<code>/rforge:r:cran-prep</code> (v2.2.0+). <code>thorough</code> focuses on fast cross-package
-aggregation and surfaces drift; <code>cran-prep</code> does the heavy single-package
-gate.</p>
-</div>
-<h2 id="step-4-plan-the-submission-order">Step 4: Plan the submission order<a class="headerlink" href="#step-4-plan-the-submission-order" title="Permanent link">&para;</a></h2>
-<p>For an ecosystem, you can't submit in arbitrary order — CRAN needs each
-dependency <em>approved and available</em> before its dependents pass incoming
-checks. <code>/rforge:release</code> computes the sequence:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/rforge:release
-</span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>🚀 CRAN RELEASE PLAN
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>Submission Order (by dependency):
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>1. medfit v2.0.0
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>   Status: ✅ Ready
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>   Submit: Now
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>2. probmed v1.5.0
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>   Status: ⏳ Waiting (needs medfit on CRAN)
-</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>   Submit: +2 weeks (after medfit approval)
-</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
-</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>3. medsim v1.3.0
-</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>   Status: ⏳ Waiting
-</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>   Submit: +2 weeks
-</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>
-</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>4. mediationverse v1.1.0
-</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>   Status: ⏳ Waiting (needs all deps)
-</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>   Submit: +4 weeks
-</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>
-</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>Timeline: 4-6 weeks total
-</span></code></pre></div>
-<p>Add <code>--detailed</code> for per-package readiness with reverse-dependency checks:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>/rforge:release --detailed
-</span></code></pre></div>
-<p>If a package isn't ready, the plan tells you exactly what's blocking it:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>1. medfit v2.0.0
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>   Status: ❌ NOT READY
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>   Blockers:
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>     • 3 failing tests
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>     • NEWS.md incomplete
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>     • R CMD check has 1 actionable NOTE
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>   Fix time: ~4 hours
-</span></code></pre></div>
-<p>That's your signal to loop back to Steps 1–2 for that package.</p>
-<h2 id="a-realistic-single-package-release">A realistic single-package release<a class="headerlink" href="#a-realistic-single-package-release" title="Permanent link">&para;</a></h2>
-<p>Most releases are one package, not a whole verse. The condensed flow:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>/rforge:docs:check medfit        # 1. drift check (NEWS, examples)
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>/rforge:r:cran-prep              # 2. full gate: runs all checks + writes cran-comments.md
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a># ... fix anything flagged, re-run until &quot;ready&quot; ...
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>/rforge:release medfit           # 3. confirm ecosystem readiness + submission order
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a># → review cran-comments.md, submit via https://cran.r-project.org/submit.html
-</span></code></pre></div>
-<p>For multi-platform verification before submission:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>/rforge:r:cran-prep --multi-platform   # dispatches win-builder + R-hub (async)
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>/rforge:r:winbuilder                   # or run individually
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>/rforge:r:rhub
-</span></code></pre></div>
-<h2 id="pre-submission-checklist">Pre-submission checklist<a class="headerlink" href="#pre-submission-checklist" title="Permanent link">&para;</a></h2>
+<p>All accept <code>--write</code> (apply; default dry-run) and <code>--force</code> (overwrite existing).</p>
+<h3 id="out-of-scope-yagni-deferred">Out of scope (YAGNI / deferred)<a class="headerlink" href="#out-of-scope-yagni-deferred" title="Permanent link">&para;</a></h3>
 <ul>
-<li>[ ] <code>/rforge:docs:check</code> clean (NEWS.md current, examples run)</li>
-<li>[ ] <code>description-sync</code> passes (DESCRIPTION version == NEWS top entry)</li>
-<li>[ ] <code>/rforge:r:cran-prep</code> → verdict <code>ready</code> (or <code>warn</code> with all NOTEs reviewed)</li>
-<li>[ ] <code>cran-comments.md</code> reviewed and accurate — you'll paste this into the CRAN form</li>
-<li>[ ] Multi-platform: win-builder and/or R-hub dispatched and results reviewed</li>
-<li>[ ] <code>/rforge:release</code> → package shows ✅ Ready</li>
-<li>[ ] For ecosystems: submit in the order <code>/rforge:release</code> gives, waiting
-      for each approval before the next</li>
+<li><code>r:create</code> / <code>r:use-data</code> / <code>r:use-r</code> (bare file creation with no AI value — a docs snippet beats a wrapper).</li>
+<li>Rewriting/regenerating <code>man/*.Rd</code> — that's <code>r:document</code>'s job (and the hook blocks hand-edits).</li>
+<li>Multi-function test generation in one call — one <code>&lt;fn&gt;</code> per <code>r:use-test</code>.</li>
 </ul>
-<h2 id="whats-next">What's next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
+<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
+<p>These are command prompts (like all rforge commands) orchestrating a <strong>hybrid</strong> backend:</p>
 <ul>
-<li><strong><a href="../ecosystem-orchestration/">Ecosystem orchestration</a></strong> — if the
-  release surfaced a needed cross-package change, plan it with
-  <code>/rforge:cascade</code>.</li>
-<li><strong><a href="../../REFCARD/">REFCARD</a></strong> — <code>thorough</code>, <code>r:check</code>, <code>docs:check</code>,
-  <code>release</code> syntax.</li>
-<li><strong><a href="../../configuration/">Configuration</a></strong> — set your <code>cran_mirror</code> and
-  <code>vignette_engine</code> so checks use the right defaults.</li>
+<li><strong>Infra via <code>usethis</code> (guarded R engine).</strong> Only the bits <code>usethis</code> does correctly: <code>use_testthat(3)</code>
+  (sets <code>Config/testthat/edition</code>), <code>use_vignette()</code>/<code>use_article()</code> (creates <code>vignettes/</code>, sets
+  <code>VignetteBuilder</code>, writes the skeleton). Shelled via a thin <code>lib/rcmd.py</code>-style snippet wrapped in
+  <code>_guard("usethis", …)</code>; if <code>usethis</code> is absent, degrade to a printed manual recipe (mirrors
+  <code>r:winbuilder</code>). <strong><code>usethis</code> is a scoped <em>authoring</em> engine, not a gate</strong> — the "no devtools/usethis
+  for gate commands" rule is unaffected.</li>
+<li><strong>Content via Python + AI.</strong> The command prompt reads <code>R/&lt;fn&gt;.R</code> (signature, roxygen <code>@examples</code>,
+  <code>@param</code>, and the S7/S4 classes of arguments) and drafts the test/vignette content. Simple file
+  creation (the test file, the roxygen insertion) is pure-Python.</li>
+<li><strong><code>r:use-package</code> reuses <code>lib/deps_sync.py</code>.</strong> The <code>DESCRIPTION</code>-patch writer built for <code>r:deps-sync</code>
+  (v2.5.0) does the <code>Imports</code>/<code>Suggests</code> edit here too — one DCF-editing implementation, two commands.
+  This is why scaffolding sequences <strong>after</strong> deps-sync.</li>
+<li><strong>Dry-run/<code>--write</code>.</strong> Default renders the planned files + diffs without touching disk; <code>--write</code>
+  applies; <code>--force</code> is required to overwrite an existing target.</li>
+</ul>
+<h2 id="dependencies">Dependencies<a class="headerlink" href="#dependencies" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><code>usethis</code></strong> — new <strong>optional, guarded</strong> R engine for infra (mainly <code>use-vignette</code>; <code>use_testthat</code>
+  setup). Manual-recipe fallback when absent. Scoped to authoring commands only.</li>
+<li><strong><code>lib/deps_sync.py</code></strong> (v2.5.0) — reused <code>DESCRIPTION</code>-patch writer for <code>r:use-package</code>. <strong>Hard
+  sequencing dependency:</strong> this theme builds on deps-sync.</li>
+<li>Otherwise pure-Python stdlib + AI drafting in the prompt. No <code>devtools</code>.</li>
+</ul>
+<h2 id="error-handling">Error handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Target file already exists → refuse without <code>--force</code>; <code>--write --force</code> overwrites (diff shown first).</li>
+<li><code>usethis</code> absent (for <code>use-vignette</code>) → print the manual <code>usethis::use_vignette()</code> recipe; do not fail.</li>
+<li><code>r:use-test</code> on a function with no resolvable signature/roxygen → scaffold a minimal stub + a note
+  that cases couldn't be drafted (never invent assertions).</li>
+<li><code>r:use-package</code> with an ambiguous <code>Imports</code>-vs-<code>Suggests</code> call → state the recommendation + reason,
+  apply on <code>--write</code>, but surface the judgement so the user can override.</li>
+</ul>
+<h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
+<p>Both gates must pass (<code>python3 -m pytest tests/</code> and <code>bash tests/test-all.sh</code>). Mock the <code>usethis</code>
+boundary; assert generated <em>text</em>, not R side effects:</p>
+<ul>
+<li><code>r:use-test</code> — fixture function with two <code>stop()</code> calls + an <code>@param</code> constraint → drafted file has
+  a <code>test_that()</code> per branch and <strong>all assertions are <code># TODO</code></strong> (no invented expected values).</li>
+<li><code>r:use-package</code> — <code>&lt;pkg&gt;</code> used in <code>R/</code> → recommends <code>Imports</code>; used only in a vignette → <code>Suggests</code>;
+  dry-run writes nothing, <code>--write</code> applies the DESCRIPTION diff + the <code>@importFrom</code>.</li>
+<li><code>r:use-vignette</code> — <code>usethis</code>-absent → manual recipe printed, non-fatal; present → skeleton + drafted
+  outline planned.</li>
+<li><strong>Dry-run safety</strong> — default mode performs zero disk writes for all three (asserted).</li>
+<li>New command frontmatter + name-uniqueness covered by <code>test-all.sh</code>.</li>
+</ul>
+<h2 id="documentation-impact">Documentation impact<a class="headerlink" href="#documentation-impact" title="Permanent link">&para;</a></h2>
+<p><strong>Frontmatter:</strong> <code>commands/r/use-test.md</code>, <code>commands/r/use-package.md</code>, <code>commands/r/use-vignette.md</code>
+(<code>arguments:</code> for <code>--write</code>/<code>--force</code>).</p>
+<p><strong>Help / hub:</strong> <code>docs/commands.md</code> (a new "Scaffolding / authoring" section), <code>docs/REFCARD.md</code>,
+<code>docs/index.md</code> + <code>docs/README.md</code> (counts 33→36, tree diagrams), root <code>README.md</code>,
+<code>docs/lib-modules.md</code> (note the <code>deps_sync</code> reuse + <code>usethis</code> engine), a scaffolding tutorial.</p>
+<p><strong>Trackers:</strong> <code>CHANGELOG.md</code> (<code>[Unreleased]</code>), <code>.STATUS</code>. Version sync at release.</p>
+<h2 id="implementation-order">Implementation order<a class="headerlink" href="#implementation-order" title="Permanent link">&para;</a></h2>
+<ol>
+<li><em>(docs — this spec, on <code>dev</code>)</em> — DONE on write.</li>
+<li><strong>Prereq:</strong> <code>r:deps-sync</code> (v2.5.0) landed — its <code>DESCRIPTION</code>-patch writer is reused by <code>use-package</code>.</li>
+<li><em>(code — feature worktree)</em> <code>r:use-package</code> (reuse deps_sync writer + <code>@importFrom</code> insertion).</li>
+<li><code>r:use-test</code> (Python file creation + AI case drafting; <code>use_testthat</code> infra via guarded usethis).</li>
+<li><code>r:use-vignette</code> (usethis infra + AI outline) — heaviest; can be a phase-2 if scope needs trimming.</li>
+<li>Tests (both gates) with the <code>usethis</code> boundary mocked.</li>
+<li>Full doc sweep (help/hub) + CHANGELOG/.STATUS + version sync.</li>
+</ol>
+<blockquote>
+<p><strong>Branch note:</strong> steps 3–7 are code → a <code>feature/r-scaffolding</code> worktree off <code>dev</code>, fresh session.</p>
+</blockquote>
+<h2 id="open-questions-risks">Open questions / risks<a class="headerlink" href="#open-questions-risks" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Version slot.</strong> Unscheduled; competes with Phase 4 for post-v2.6.0. <em>Resolution:</em> sequence on the
+  roadmap once v2.5.0/v2.6.0 are underway.</li>
+<li><strong><code>use-vignette</code> phase.</strong> Heaviest (usethis infra + largest AI prose surface; the brainstorm filed it
+  "long-term"). <em>Proposed:</em> ship <code>use-test</code> + <code>use-package</code> first, <code>use-vignette</code> as phase 2.</li>
+<li><strong>S7/S4 fixture drafting fidelity.</strong> Building a fixture from a class's required properties is the
+  hardest part of <code>use-test</code>; mis-built fixtures waste time. <em>Mitigation:</em> scaffold the fixture
+  skeleton with <code># TODO</code> slots rather than guessing property values.</li>
+<li><strong><code>@importFrom</code> placement.</strong> Which <code>R/</code> file gets the roxygen tag (the using file vs a central
+  <code>pkg-package.R</code>)? <em>Proposed:</em> the file where the symbol is used; fall back to a package-doc file.</li>
+</ul>
+<h2 id="sources">Sources<a class="headerlink" href="#sources" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://r-pkgs.org/testing-basics.html">r-pkgs §"Testing basics" / testthat</a> — <code>use_test()</code>, testthat 3e, file layout.</li>
+<li><a href="https://r-pkgs.org/dependencies-mindset-background.html">r-pkgs §"Dependencies"</a> — <code>use_package()</code>, Imports vs Suggests, <code>@importFrom</code>.</li>
+<li><a href="https://r-pkgs.org/vignettes.html">r-pkgs §"Vignettes"</a> and <a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html">Writing R Extensions §"Writing package vignettes"</a> — <code>use_vignette()</code>, <code>VignetteBuilder</code>.</li>
+<li>rforge: <code>BRAINSTORM-r-command-expansion-2026-05-31.md</code> (origin + AI-value lens), <code>SPEC-r-deps-sync-2026-06-10.md</code> (reused patch writer), <code>SPEC-diff-aware-checks-and-coverage-2026-05-31.md</code> (P4 <code>r:test-gen</code> origin + the no-oracle lesson).</li>
 </ul>
 
 

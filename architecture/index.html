@@ -2901,7 +2901,7 @@
 </div>
 <p>Deep dive into how RForge works internally: auto-delegation orchestration, pattern recognition, parallel execution, and result synthesis.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>RForge is a <strong>self-contained Claude Code plugin</strong> for R package ecosystems. Slash commands are markdown prompts that Claude reads; the plugin ships pure-Python <code>lib/</code> modules (discovery, deps, status, init) that Claude orchestrates via Bash to gather ecosystem data, then synthesizes results into actionable summaries.</p>
+<p>RForge is a <strong>self-contained Claude Code plugin</strong> for R package ecosystems. Slash commands are markdown prompts that Claude reads; the plugin ships pure-Python <code>lib/</code> modules — five stdlib analysis modules (discovery, deps, status, init, cranlint) plus <code>rcmd</code>, an R-runner that shells to <code>Rscript</code> for the <code>r:</code> commands — that Claude orchestrates via Bash to gather ecosystem data, then synthesizes results into actionable summaries.</p>
 <p><strong>Architecture in one line (v1.3.0+):</strong> <code>/rforge:&lt;command&gt;</code> → Claude reads <code>commands/&lt;name&gt;.md</code> → Claude orchestrates <code>python3 -m lib.&lt;module&gt;</code> calls + Bash tools → synthesized output.</p>
 <p><strong>Key innovation:</strong> Auto-delegation with parallel <code>lib/</code> invocations — multiple modules complete in the time it would take to run them sequentially.</p>
 <blockquote>
@@ -3027,19 +3027,23 @@ the plugin advertises to Claude Code.</p>
         IM[impact.md]
         ST[status.md]
         IN[init.md]
+        RC[r/*.md + cran-prep.md]
     end
 
-    subgraph Lib["lib/ modules (pure Python)"]
+    subgraph Lib["lib/ modules"]
         L1[lib/discovery.py]
         L2[lib/deps.py]
         L3[lib/status.py]
         L4[lib/init.py]
+        L6[lib/cranlint.py]
+        L5[lib/rcmd.py — R-runner]
     end
 
-    subgraph FS["Filesystem"]
+    subgraph FS["Filesystem + toolchain"]
         DESCR[R DESCRIPTION files]
         STATUS[.STATUS files]
         CTX[~/.rforge/context.json]
+        RSCRIPT[Rscript engines: rcmdcheck, pkgbuild, …]
     end
 
     UR --&gt; DT
@@ -3047,17 +3051,24 @@ the plugin advertises to Claude Code.</p>
     UR --&gt; IM
     UR --&gt; ST
     UR --&gt; IN
+    UR --&gt; RC
     DT --&gt;|bash python3 -m| L1
     DP --&gt;|bash python3 -m| L2
     IM --&gt;|bash python3 -m| L2
     ST --&gt;|bash python3 -m| L3
     IN --&gt;|bash python3 -m| L4
+    RC --&gt;|bash python3 -m| L5
+    RC --&gt;|bash python3 -m| L6
     L1 --&gt; DESCR
     L2 --&gt; DESCR
     L3 --&gt; DESCR
     L3 --&gt; STATUS
-    L4 --&gt; CTX</code></pre>
+    L4 --&gt; CTX
+    L5 --&gt;|Rscript| RSCRIPT
+    L6 --&gt; DESCR</code></pre>
 <h3 id="module-summary">Module summary<a class="headerlink" href="#module-summary" title="Permanent link">&para;</a></h3>
+<p>Two architectural categories have emerged since v1.3.0:</p>
+<p><strong>Pure-stdlib analysis modules</strong> (no R subprocess — read the filesystem/DESCRIPTION, emit JSON):</p>
 <table>
 <thead>
 <tr>
@@ -3069,17 +3080,17 @@ the plugin advertises to Claude Code.</p>
 <tbody>
 <tr>
 <td><code>lib.discovery</code></td>
-<td><code>/rforge:detect</code> — ecosystem + package detection (single/ecosystem/hybrid)</td>
+<td><code>/rforge:detect</code> — ecosystem + package detection; <strong>ecosystem-manifest enrichment + drift (v2.4.0)</strong> via <code>.rforge.yaml</code> <code>manifest:</code></td>
 <td>&lt;2s</td>
 </tr>
 <tr>
 <td><code>lib.deps</code></td>
-<td><code>/rforge:deps</code>, <code>/rforge:impact</code> — dependency graph + change impact</td>
+<td><code>/rforge:deps</code>, <code>/rforge:impact</code> — <em>inter</em>-package dependency graph + change impact</td>
 <td>~8s</td>
 </tr>
 <tr>
 <td><code>lib.status</code></td>
-<td><code>/rforge:status</code> — ecosystem health snapshot from DESCRIPTION + .STATUS</td>
+<td><code>/rforge:status</code> — ecosystem health snapshot from DESCRIPTION + .STATUS (+ manifest <code>role</code>/drift)</td>
 <td>&lt;5s</td>
 </tr>
 <tr>
@@ -3087,13 +3098,34 @@ the plugin advertises to Claude Code.</p>
 <td><code>/rforge:init</code> — initialize <code>~/.rforge/context.json</code></td>
 <td>&lt;5s</td>
 </tr>
+<tr>
+<td><code>lib.cranlint</code></td>
+<td><strong>(v2.3.0)</strong> advisory CRAN-incoming linter — DESCRIPTION nits, <code>.Rbuildignore</code> build-hygiene, docs-consistency; Tier-4 stages in <code>r:cran-prep</code></td>
+<td>&lt;2s</td>
+</tr>
 </tbody>
 </table>
-<p>For deep-R workflows (<code>/rforge:r:check</code>, <code>/rforge:thorough</code>) the command bodies invoke <code>R CMD check</code> / <code>Rscript</code> directly via Bash — there's no R-subprocess-wrapper module.</p>
-<p>See <a href="../lib-modules/"><code>docs/lib-modules.md</code></a> for the user-facing reference,
-and the auto-extracted <a href="../reference/discovery/"><code>reference/discovery.md</code></a> /
-<a href="../reference/deps/"><code>reference/deps.md</code></a> / <a href="../reference/status/"><code>reference/status.md</code></a> /
-<a href="../reference/init/"><code>reference/init.md</code></a> for full API listings.</p>
+<p><strong>R-runner module</strong> (shells out to <code>Rscript</code> engines — the one category that <em>does</em> invoke R):</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Powers</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lib.rcmd</code></td>
+<td><strong>(v2.1.0)</strong> the 17 <code>r:</code> commands — <code>load</code>/<code>document</code>/<code>test</code>/<code>check</code>/<code>coverage</code>/<code>build</code>/<code>install</code>/<code>site</code>/<code>cycle</code> + quality + CRAN-submission. v2.3.0 added strict CRAN-incoming check flavors</td>
+<td>wraps <code>rcmdcheck</code>/<code>pkgbuild</code>/<code>roxygen2</code>/<code>testthat</code>/<code>covr</code>/<code>pkgdown</code>/… → normalizes to one JSON envelope; <code>devtools</code> only for <code>r:winbuilder</code></td>
+</tr>
+</tbody>
+</table>
+<p>So the v1.3.0 "four analysis modules" picture is now <strong>five stdlib modules + one R-runner</strong>: deep-R workflows (<code>/rforge:r:*</code>) run through <code>lib.rcmd</code>, <em>not</em> ad-hoc Bash <code>R CMD check</code> calls.</p>
+<p>See <a href="../lib-modules/"><code>docs/lib-modules.md</code></a> for the user-facing reference, and the
+auto-extracted <a href="../reference/discovery/"><code>reference/</code></a> pages (<code>discovery</code>, <code>deps</code>, <code>status</code>,
+<code>init</code>, <code>rcmd</code>, <code>cranlint</code>) for full API listings.</p>
 <hr />
 <h2 id="architecture-layers">Architecture Layers<a class="headerlink" href="#architecture-layers" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────────────────────────────┐

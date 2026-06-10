@@ -465,6 +465,50 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#whats-new-in-v260" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.6.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-new-in-v250" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.5.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-new-in-v240" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.4.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-new-in-v230" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.3.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-new-in-v220" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1968,6 +2012,50 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#whats-new-in-v260" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.6.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-new-in-v250" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.5.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-new-in-v240" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.4.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-new-in-v230" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.3.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-new-in-v220" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2107,7 +2195,7 @@
 <a href="https://www.npmjs.com/package/@data-wise/rforge-plugin"><img alt="npm" src="https://img.shields.io/npm/v/@data-wise/rforge-plugin?label=npm&amp;color=red" /></a>
 <a href="https://github.com/Data-Wise/rforge/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/Data-Wise/rforge?color=green" /></a>
 <a href="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev" /></a></p>
-<p><strong>R package ecosystem orchestrator for Claude Code — 33 commands, R-aware hooks, validation skills.</strong></p>
+<p><strong>R package ecosystem orchestrator for Claude Code — 35 commands, R-aware hooks, validation skills.</strong></p>
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
@@ -2178,12 +2266,33 @@
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Balanced analysis with impact + recommendations (~30 seconds) — after changes</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;Update RMediation bootstrap algorithm&quot;</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Per-package CRAN gate (v2.2.0+) — document→check→revdep, writes cran-comments.md</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Per-package CRAN gate (v2.2.0+) — document→strict check→Tier 4→revdep, writes cran-comments.md</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>/rforge:r:cran-prep
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Ecosystem rollup (2-5 minutes) — cross-package validation + submission order</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Prepare for CRAN release&quot;</span>
 </span></code></pre></div>
+<h2 id="whats-new-in-v260">What's new in v2.6.0<a class="headerlink" href="#whats-new-in-v260" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><code>r:submit</code></strong> — wraps the moment of CRAN submission: gate on <code>r:cran-prep</code> <code>ready</code> → build the tarball → cut a GitHub <strong>pre-release</strong> (not "Latest") of it with <code>cran-comments.md</code> → print the CRAN submit checklist (<strong>never auto-submits</strong>). <code>r:submit --promote</code> flips the pre-release to a full release on acceptance. Using a pre-release promoted in place sidesteps tagging a final release before acceptance. Backed by pure-Python <code>lib/ghrelease.py</code>.</li>
+</ul>
+<h2 id="whats-new-in-v250">What's new in v2.5.0<a class="headerlink" href="#whats-new-in-v250" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><code>r:deps-sync</code></strong> — reconciles <code>DESCRIPTION</code> against actual code usage. Scans <code>R/</code>/tests/vignettes + <code>NAMESPACE</code> and reports <strong>missing</strong> (used, undeclared → Imports), <strong>misclassified</strong> (in Suggests but used unconditionally in <code>R/</code> → Imports — the static sibling of <code>r:check --strict</code>'s noSuggests pass), <strong>missing_suggests</strong>, and <strong>unused</strong> dependencies, plus a suggested patch. Report-only by default; <code>--write</code> applies the unambiguous changes. Pure-Python <code>lib/deps_sync.py</code>.</li>
+</ul>
+<h2 id="whats-new-in-v240">What's new in v2.4.0<a class="headerlink" href="#whats-new-in-v240" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Ecosystem-manifest discovery</strong> (<code>/rforge:detect</code>, <code>/rforge:status</code>) — discovery optionally reads a curated <strong>ecosystem manifest</strong> (via a <code>manifest:</code> key in <code>.rforge.yaml</code>) and enriches packages with <code>role</code>/<code>repo</code>/<code>cran</code> metadata, reporting <strong>drift</strong> between the manifest and what's on disk. Vendored YAML-subset parser keeps <code>discovery.py</code> stdlib-only. Zero behavior change when no manifest is configured.</li>
+</ul>
+<h2 id="whats-new-in-v230">What's new in v2.3.0<a class="headerlink" href="#whats-new-in-v230" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>CRAN-incoming hardening for <code>r:check</code> + <code>r:cran-prep</code></strong> — the submission gate now emulates CRAN's <em>incoming</em> and post-acceptance flavors. <code>r:check --strict</code> runs <strong>both</strong> Suggests-withholding passes (<code>check (noSuggests)</code> + <code>check (suggests-only)</code>, each with <code>--run-donttest</code>); <code>--incoming</code> adds the opt-in <code>check (incoming)</code> env-var bundle. <code>r:cran-prep</code> runs the strict passes <strong>by default</strong>, and a strict ERROR <strong>blocks</strong> the <code>ready</code> verdict.</li>
+<li><strong>Tier 4 advisory checks (new <code>lib/cranlint.py</code>, pure stdlib, no R)</strong> — three <code>cran-prep</code> stages that never block <code>ready</code>: <code>description</code> (DESCRIPTION incoming nits — non-<code>Authors@R</code>, weak <code>Title</code>, <code>Description</code> prose, stale <code>Date</code>), <code>build-hygiene</code> (planning/dev docs that would ship in the tarball, with the exact <code>.Rbuildignore</code> regex to add), and <code>docs-consistency</code>.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Behavior change in v2.3.0</p>
+<p>A package that reports 🟢 <code>ready</code> today under <code>--as-cran</code> can turn 🔴 once the noSuggests pass catches a <code>Suggests</code> package used unconditionally (the medfit 0.2.1 class). This is intended — CRAN would bounce such a package post-acceptance. Move the dependency to <code>Imports</code>, or guard it with <code>requireNamespace()</code> + <code>skip_if_not_installed()</code>.</p>
+</div>
 <h2 id="whats-new-in-v220">What's new in v2.2.0<a class="headerlink" href="#whats-new-in-v220" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>5 new <code>r:</code> CRAN-submission commands</strong>: <code>r:revdep</code>, <code>r:goodpractice</code>, <code>r:winbuilder</code>, <code>r:rhub</code>, <code>r:cran-prep</code> — full pre-submission gate that runs document→lint→spell→urlcheck→test→coverage→check(--as-cran)→revdep, generates <code>cran-comments.md</code>, and returns a <code>ready</code>/<code>warn</code>/<code>blocked</code> verdict.</li>
@@ -2266,7 +2375,7 @@
 </ol>
 <h2 id="more-documentation">More documentation<a class="headerlink" href="#more-documentation" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong><a href="REFCARD/">Reference Card</a></strong> — all 33 commands on one page</li>
+<li><strong><a href="REFCARD/">Reference Card</a></strong> — all 35 commands on one page</li>
 <li><strong><a href="commands/">Commands</a></strong> — full per-command reference</li>
 <li><strong><a href="architecture/">Architecture</a></strong> — how the <code>lib/</code> modules fit together</li>
 <li><strong><a href="hooks-and-skills/">Hooks &amp; Skills</a></strong> — the R-aware <code>PreToolUse</code> hook</li>
