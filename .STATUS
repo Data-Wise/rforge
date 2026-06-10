@@ -287,10 +287,37 @@ Background, no active task:
 ---
 
 backlog:
-  # Medium-term work (v2.3.0 horizon)
-  - title: "Phase 4 — discovery engine + agents (v2.4.0)"
+  # Roadmap (settled 2026-06-10) — minor cadence after v2.2.0
+  - title: "v2.3.0 — CRAN-incoming hardening"
+    priority: pr-open
+    pr: 18
+    spec: docs/specs/SPEC-cran-incoming-hardening-2026-06-10.md
+    notes: "DONE in feature/cran-incoming — strict check flavors + Tier-4 cranlint (lib/cranlint.py: DESCRIPTION/build-hygiene/consistency). Gates green (pytest 168+2, test-all 31/31, v2.3.0 synced). PR #18 → dev."
+  - title: "v2.4.0 — ecosystem-manifest discovery"
     priority: medium
-    notes: "Last craft-parity item. Adds agent definitions mirroring craft's discovery engine. (Bumped v2.2.0 → v2.3.0 → v2.4.0 — the v2.3.0 slot went to CRAN-incoming hardening.)"
+    spec: docs/specs/SPEC-ecosystem-manifest-discovery-2026-06-10.md
+    notes: "Draft (PR #16, branch docs/ecosystem-manifest-spec). Teach lib/discovery.py to read an ecosystem manifest."
+  - title: "v2.5.0 — r:deps-sync (flagship)"
+    priority: medium
+    spec: docs/specs/SPEC-r-deps-sync-2026-06-10.md
+    notes: "Draft. Pure-Python DESCRIPTION↔code reconciliation. Static sibling of the cran-incoming noSuggests catch."
+  - title: "v2.6.0 — r:submit (GitHub pre-release + CRAN submit handoff)"
+    priority: medium
+    spec: docs/specs/SPEC-r-submit-github-prerelease-2026-06-10.md
+    notes: "Draft. gh pre-release of submitted tarball, promote on acceptance. No auto-submit."
+  - title: "Phase 4 — discovery engine + agents (post-v2.6.0)"
+    priority: medium
+    notes: "Last craft-parity item. Bumped repeatedly (v2.2.0→…→post-v2.6.0). Still unspecced; feeds off issue #9 signal."
+
+  # Unscheduled candidates (have specs/brainstorms, no slot yet)
+  - title: "diff-aware checks P0 (--changed)"
+    priority: candidate
+    spec: docs/specs/SPEC-diff-aware-checks-and-coverage-2026-05-31.md
+    notes: "Refocused to P0 (2026-06-10); the unbuilt flagship. P1 shipped; P2/P3/P4 migrated to other specs."
+  - title: "Scaffolding theme (r:use-test/r:use-package/r:use-vignette)"
+    priority: candidate
+    spec: docs/specs/SPEC-r-scaffolding-2026-06-10.md
+    notes: "Now specced (2026-06-10). Mission resolved: EXISTING ecosystems only — r:create dropped. Hybrid engine (usethis infra + Python/AI content), dry-run default. Builds on r:deps-sync (shared DESCRIPTION-patch writer). Competes with Phase 4 for post-v2.6.0."
 
   # Parked (waits on external signal)
   - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"
