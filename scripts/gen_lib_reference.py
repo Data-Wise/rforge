@@ -35,7 +35,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 LIB_DIR = REPO_ROOT / "lib"  # kept for the doc-output destination
 OUT_DIR = REPO_ROOT / "docs" / "reference"
 
-MODULES = ["lib.discovery", "lib.deps", "lib.status", "lib.init", "lib.rcmd", "lib.cranlint", "lib.deps_sync"]
+MODULES = ["lib.discovery", "lib.deps", "lib.status", "lib.init", "lib.rcmd", "lib.cranlint", "lib.deps_sync", "lib.ghrelease"]
 
 
 def _public_members(module: ModuleType) -> tuple[list, list]:
