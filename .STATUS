@@ -2,7 +2,7 @@ project: rforge
 updated: 2026-06-10
 status: Active
 version: 2.6.0 (released 2026-06-10)
-last_release: 2026-06-10 v2.6.0 (PR #23 dev → main merge 90bbad7, release https://github.com/Data-Wise/rforge/releases/tag/v2.6.0; CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#114 OPEN — sha256 c7d89879…, generate.py --diff IDENTICAL, awaiting merge). One release bundling cran-incoming (v2.3.0) + ecosystem-manifest (v2.4.0) + r:deps-sync (v2.5.0) + r:submit (v2.6.0); 33→35 commands. Closed issue #19; #20 still open.
+last_release: 2026-06-10 v2.6.0 (PR #23 dev → main merge 90bbad7, release https://github.com/Data-Wise/rforge/releases/tag/v2.6.0; CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#114 MERGED — origin/main formula → v2.6.0, sha256 c7d89879…, --diff IDENTICAL, ruby -c OK; local brew still 2.2.0 → `brew upgrade rforge`). One release bundling cran-incoming (v2.3.0) + ecosystem-manifest (v2.4.0) + r:deps-sync (v2.5.0) + r:submit (v2.6.0); 33→35 commands. Closed issue #19; #20 still open.
 
 worktrees: []  # feature/r-deps-sync merged (PR #21) + worktree removed 2026-06-10
 
