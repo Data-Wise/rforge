@@ -6,7 +6,7 @@
 
 ## Current state (2026-06-10)
 
-**v2.6.0 — release in progress (dev → main)** — 35 commands. One release bundling four features accumulated on `dev` since v2.2.0 (each roadmapped as a separate minor, shipped together as v2.6.0):
+**v2.6.0 — released 2026-06-10** (PR #23; [release](https://github.com/Data-Wise/rforge/releases/tag/v2.6.0); CI green; tap PR #114 pending) — 35 commands. One release bundling four features accumulated on `dev` since v2.2.0 (each roadmapped as a separate minor, shipped together as v2.6.0):
 - **v2.3.0 CRAN-incoming hardening** (PR #18): `r:check --strict` runs both
   Suggests-withholding flavors (`check (noSuggests)` + `check (suggests-only)`) with
   `--run-donttest`; `--incoming` adds the CRAN-incoming `_R_CHECK_*` bundle; `r:cran-prep`

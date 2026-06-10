@@ -1,8 +1,8 @@
 project: rforge
 updated: 2026-06-10
 status: Active
-version: 2.6.0 (RELEASE IN PROGRESS — dev → main). One release bundling cran-incoming (v2.3.0) + ecosystem-manifest (v2.4.0) + r:deps-sync (v2.5.0) + r:submit (v2.6.0); last release v2.2.0. 35 commands.
-last_release: 2026-06-02 v2.2.0 (PR #15 dev → main merge 3b2bdda, release https://github.com/Data-Wise/rforge/releases/tag/v2.2.0, tap data-wise/tap synced to 2.2.0 + brew info green; CRAN-submission suite — r:cran-prep + r:revdep/r:goodpractice/r:winbuilder/r:rhub + NOTE classifier, 28→33 commands)
+version: 2.6.0 (released 2026-06-10)
+last_release: 2026-06-10 v2.6.0 (PR #23 dev → main merge 90bbad7, release https://github.com/Data-Wise/rforge/releases/tag/v2.6.0; CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#114 OPEN — sha256 c7d89879…, generate.py --diff IDENTICAL, awaiting merge). One release bundling cran-incoming (v2.3.0) + ecosystem-manifest (v2.4.0) + r:deps-sync (v2.5.0) + r:submit (v2.6.0); 33→35 commands. Closed issue #19; #20 still open.
 
 worktrees: []  # feature/r-deps-sync merged (PR #21) + worktree removed 2026-06-10
 
@@ -325,6 +325,7 @@ backlog:
     notes: "lib/status.py shipped as a thin faithful port in v1.3.0. The 4-mode contract (default/debug/optimize/release with R subprocess) was descoped pending real-user input on what depth is wanted. Open a new SPEC when there's demand."
 
 shipped:
+  - "v2.6.0 — 2026-06-10 — one release bundling four features accumulated since v2.2.0: cran-incoming hardening (r:check --strict/--incoming + cran-prep strict passes + lib/cranlint.py Tier 4), ecosystem-manifest discovery (lib/discovery.py manifest enrichment + drift, +path-escape guard #19), r:deps-sync (lib/deps_sync.py DESCRIPTION↔code reconciliation), r:submit (lib/ghrelease.py GitHub pre-release + CRAN submit handoff); 33→35 commands; PR #23; tap PR #114 pending"
   - "v2.2.0 — 2026-06-02 — CRAN-submission suite: r:cran-prep orchestrator + r:revdep/r:goodpractice/r:winbuilder/r:rhub + r:check NOTE classifier (spurious/real); 28→33 commands; argument-hint added to all 17 commands lacking it; new tutorials: r-dev-cycle + cran-submission-with-rforge; workflow flowcharts updated"
   - "v2.1.0 — 2026-05-31 — 12 new r: commands (r:load, r:document, r:test, r:coverage, r:build, r:install, r:site, r:cycle, r:lint, r:spell, r:urlcheck, r:style) + lib/rcmd.py; 16→28 commands; r:check retrofitted onto lib.rcmd envelope"
   - "v2.0.0 — 2026-05-12 — BREAKING: Phase 3 command namespacing — 3 of 16 commands renamed (doc-check → docs:check, ecosystem-health → health, rpkg-check → r:check); old names retained as rename-error stubs through v2.x; tests 29/29 (+6 new rename-specific); v1.3.0+ post-MCP doc cleanup bundled; tap formula + manifest synced; feedback thread at issue #9"
