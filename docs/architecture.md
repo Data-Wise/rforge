@@ -10,7 +10,7 @@ Deep dive into how RForge works internally: auto-delegation orchestration, patte
 
 ## Overview
 
-RForge is a **self-contained Claude Code plugin** for R package ecosystems. Slash commands are markdown prompts that Claude reads; the plugin ships pure-Python `lib/` modules (discovery, deps, status, init) that Claude orchestrates via Bash to gather ecosystem data, then synthesizes results into actionable summaries.
+RForge is a **self-contained Claude Code plugin** for R package ecosystems. Slash commands are markdown prompts that Claude reads; the plugin ships pure-Python `lib/` modules — five stdlib analysis modules (discovery, deps, status, init, cranlint) plus `rcmd`, an R-runner that shells to `Rscript` for the `r:` commands — that Claude orchestrates via Bash to gather ecosystem data, then synthesizes results into actionable summaries.
 
 **Architecture in one line (v1.3.0+):** `/rforge:<command>` → Claude reads `commands/<name>.md` → Claude orchestrates `python3 -m lib.<module>` calls + Bash tools → synthesized output.
 
@@ -108,19 +108,23 @@ graph TB
         IM[impact.md]
         ST[status.md]
         IN[init.md]
+        RC[r/*.md + cran-prep.md]
     end
 
-    subgraph Lib["lib/ modules (pure Python)"]
+    subgraph Lib["lib/ modules"]
         L1[lib/discovery.py]
         L2[lib/deps.py]
         L3[lib/status.py]
         L4[lib/init.py]
+        L6[lib/cranlint.py]
+        L5[lib/rcmd.py — R-runner]
     end
 
-    subgraph FS["Filesystem"]
+    subgraph FS["Filesystem + toolchain"]
         DESCR[R DESCRIPTION files]
         STATUS[.STATUS files]
         CTX[~/.rforge/context.json]
+        RSCRIPT[Rscript engines: rcmdcheck, pkgbuild, …]
     end
 
     UR --> DT
@@ -128,33 +132,48 @@ graph TB
     UR --> IM
     UR --> ST
     UR --> IN
+    UR --> RC
     DT -->|bash python3 -m| L1
     DP -->|bash python3 -m| L2
     IM -->|bash python3 -m| L2
     ST -->|bash python3 -m| L3
     IN -->|bash python3 -m| L4
+    RC -->|bash python3 -m| L5
+    RC -->|bash python3 -m| L6
     L1 --> DESCR
     L2 --> DESCR
     L3 --> DESCR
     L3 --> STATUS
     L4 --> CTX
+    L5 -->|Rscript| RSCRIPT
+    L6 --> DESCR
 ```
 
 ### Module summary
 
+Two architectural categories have emerged since v1.3.0:
+
+**Pure-stdlib analysis modules** (no R subprocess — read the filesystem/DESCRIPTION, emit JSON):
+
 | Module | Powers | Speed |
 |---|---|---|
-| `lib.discovery` | `/rforge:detect` — ecosystem + package detection (single/ecosystem/hybrid) | <2s |
-| `lib.deps` | `/rforge:deps`, `/rforge:impact` — dependency graph + change impact | ~8s |
-| `lib.status` | `/rforge:status` — ecosystem health snapshot from DESCRIPTION + .STATUS | <5s |
+| `lib.discovery` | `/rforge:detect` — ecosystem + package detection; **ecosystem-manifest enrichment + drift (v2.4.0)** via `.rforge.yaml` `manifest:` | <2s |
+| `lib.deps` | `/rforge:deps`, `/rforge:impact` — *inter*-package dependency graph + change impact | ~8s |
+| `lib.status` | `/rforge:status` — ecosystem health snapshot from DESCRIPTION + .STATUS (+ manifest `role`/drift) | <5s |
 | `lib.init` | `/rforge:init` — initialize `~/.rforge/context.json` | <5s |
+| `lib.cranlint` | **(v2.3.0)** advisory CRAN-incoming linter — DESCRIPTION nits, `.Rbuildignore` build-hygiene, docs-consistency; Tier-4 stages in `r:cran-prep` | <2s |
 
-For deep-R workflows (`/rforge:r:check`, `/rforge:thorough`) the command bodies invoke `R CMD check` / `Rscript` directly via Bash — there's no R-subprocess-wrapper module.
+**R-runner module** (shells out to `Rscript` engines — the one category that *does* invoke R):
 
-See [`docs/lib-modules.md`](lib-modules.md) for the user-facing reference,
-and the auto-extracted [`reference/discovery.md`](reference/discovery.md) /
-[`reference/deps.md`](reference/deps.md) / [`reference/status.md`](reference/status.md) /
-[`reference/init.md`](reference/init.md) for full API listings.
+| Module | Powers | Notes |
+|---|---|---|
+| `lib.rcmd` | **(v2.1.0)** the 17 `r:` commands — `load`/`document`/`test`/`check`/`coverage`/`build`/`install`/`site`/`cycle` + quality + CRAN-submission. v2.3.0 added strict CRAN-incoming check flavors | wraps `rcmdcheck`/`pkgbuild`/`roxygen2`/`testthat`/`covr`/`pkgdown`/… → normalizes to one JSON envelope; `devtools` only for `r:winbuilder` |
+
+So the v1.3.0 "four analysis modules" picture is now **five stdlib modules + one R-runner**: deep-R workflows (`/rforge:r:*`) run through `lib.rcmd`, *not* ad-hoc Bash `R CMD check` calls.
+
+See [`docs/lib-modules.md`](lib-modules.md) for the user-facing reference, and the
+auto-extracted [`reference/`](reference/discovery.md) pages (`discovery`, `deps`, `status`,
+`init`, `rcmd`, `cranlint`) for full API listings.
 
 ---
 

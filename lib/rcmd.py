@@ -270,6 +270,13 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
               strict: bool = False, articles_only: bool = False,
               devel: bool = False, flavor: str | None = None,
               incoming: bool = False) -> str:
+    """Build the R one-liner for engine ``kind``, emitting JSON on stdout.
+
+    For ``kind="check"``, ``flavor`` in {None, "depends", "suggests"} selects a
+    Suggests-withholding env flavor and ``incoming`` adds the CRAN-incoming
+    ``_R_CHECK_*`` bundle; a flavor / ``incoming`` / ``strict`` pass also runs
+    ``\\donttest{}`` examples. Each engine call is wrapped in ``_guard(...)``.
+    """
     p = json.dumps(path)  # safely quote path for R
     if kind == "check":
         # Strict-grade passes (a flavor or the incoming bundle) always run
@@ -416,6 +423,11 @@ def _install_package(path: str) -> tuple[dict, int]:
 def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = False,
         strict: bool = False, articles_only: bool = False, devel: bool = False,
         flavor: str | None = None, incoming: bool = False) -> dict:
+    """Run one engine ``kind`` against ``path``; return the normalized envelope.
+
+    Threads the check ``flavor`` / ``incoming`` selectors through to ``r_snippet``;
+    returns an error envelope when no DESCRIPTION is found.
+    """
     pkg = find_package(path)
     if pkg is None:
         return {"kind": kind, "status": "error", "engine_missing": [],

@@ -4,7 +4,14 @@ status: Active
 version: 2.3.0 (merged to dev 749800a — unreleased; last release v2.2.0). v2.4.0 ecosystem-manifest also merged to dev.
 last_release: 2026-06-02 v2.2.0 (PR #15 dev → main merge 3b2bdda, release https://github.com/Data-Wise/rforge/releases/tag/v2.2.0, tap data-wise/tap synced to 2.2.0 + brew info green; CRAN-submission suite — r:cran-prep + r:revdep/r:goodpractice/r:winbuilder/r:rhub + NOTE classifier, 28→33 commands)
 
-worktrees: []  # feature/cran-incoming merged (PR #18) + worktree removed 2026-06-10
+worktrees:
+  - path: ~/.git-worktrees/rforge/feature-r-deps-sync
+    branch: feature/r-deps-sync
+    base: dev
+    created: 2026-06-10
+    state: ready-for-impl (Phase 0 locked; implement in a fresh worktree session)
+    orchestrate: ORCHESTRATE-deps-sync.md (in tree, pushed)
+    purpose: "v2.5.0 r:deps-sync — pure-Python lib/deps_sync.py: scan R//tests/vignettes usage, reconcile vs DESCRIPTION (missing/unused/misclassified), suggested patch (--write). Remotes hint can now consult the merged ecosystem-manifest."
 
 recent:
   - date: 2026-06-10

@@ -59,7 +59,12 @@ Fold a raw engine result into the common envelope.
 def r_snippet(kind: 'str', path: 'str', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False, flavor: 'str | None' = None, incoming: 'bool' = False) -> 'str'
 ```
 
-_(no docstring)_
+Build the R one-liner for engine ``kind``, emitting JSON on stdout.
+
+For ``kind="check"``, ``flavor`` in {None, "depends", "suggests"} selects a
+Suggests-withholding env flavor and ``incoming`` adds the CRAN-incoming
+``_R_CHECK_*`` bundle; a flavor / ``incoming`` / ``strict`` pass also runs
+``\donttest{}`` examples. Each engine call is wrapped in ``_guard(...)``.
 
 ### `render_cran_comments()`
 
@@ -79,4 +84,7 @@ revdep_env=None when no revdep check was run (package has no dependents).
 def run(kind: 'str', path: 'str' = '.', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False, flavor: 'str | None' = None, incoming: 'bool' = False) -> 'dict'
 ```
 
-_(no docstring)_
+Run one engine ``kind`` against ``path``; return the normalized envelope.
+
+Threads the check ``flavor`` / ``incoming`` selectors through to ``r_snippet``;
+returns an error envelope when no DESCRIPTION is found.
