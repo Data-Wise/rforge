@@ -109,6 +109,11 @@ error visible before a spec leaves `Draft`.
   bundle), default-on as a `ready`-blocker, plus pure-Python DESCRIPTION-lint,
   `.Rbuildignore` build-hygiene, and planning-doc consistency checks. Grounded in
   [RESEARCH-cran-incoming-checks](RESEARCH-cran-incoming-checks-2026-06-10.md).
+- **[`r:submit` — GitHub pre-release + CRAN submit handoff](SPEC-r-submit-github-prerelease-2026-06-10.md)** —
+  Status: Draft (target v2.5.0). New per-package command: build the submitted tarball, cut a
+  GitHub **pre-release** (+`cran-comments.md`), hand off the CRAN submit step, then promote to a
+  full release on acceptance (`gh release edit --prerelease=false`). Fills the submission-lifecycle
+  gap between `r:cran-prep` (ready) and CRAN going live.
 
 ## See also
 
