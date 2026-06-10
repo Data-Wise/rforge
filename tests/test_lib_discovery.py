@@ -280,6 +280,23 @@ def test_detect_ecosystem_without_manifest_has_no_enrichment(tmp_path, make_pkg)
     assert eco.drift.disk_only == []
 
 
+def test_manifest_path_escape_is_ignored(tmp_path, make_pkg):
+    """Issue #19: a `manifest:` resolving outside the ecosystem root is ignored
+    (no path escape) — enrichment is skipped, never raises."""
+    make_pkg("medfit")
+    # a real manifest, but OUTSIDE the ecosystem root
+    outside = tmp_path.parent / "outside-ECOSYSTEM.yaml"
+    outside.write_text("ecosystem: x\npackages:\n  - name: medfit\n    role: Foundation\n",
+                       encoding="utf-8")
+    (tmp_path / ".rforge.yaml").write_text(
+        "manifest: ../outside-ECOSYSTEM.yaml\n", encoding="utf-8"
+    )
+    eco = detect_ecosystem(tmp_path)
+    assert eco.manifest_path is None  # rejected — not read
+    assert all(p.manifest is None for p in eco.packages)
+    outside.unlink()
+
+
 def test_detect_ecosystem_reports_manifest_drift(tmp_path, make_pkg):
     make_pkg("medfit")
     make_pkg("stray")  # on disk, absent from manifest

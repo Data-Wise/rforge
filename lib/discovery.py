@@ -457,7 +457,10 @@ def detect_ecosystem(path: str | os.PathLike = ".") -> Ecosystem:
         manifest_rel = _read_config_manifest_path(root)
         if manifest_rel:
             candidate = (root / manifest_rel).resolve()
-            if candidate.is_file():
+            # Path-escape guard (issue #19): a `manifest:` resolving outside the
+            # ecosystem root is ignored — never read arbitrary files off-tree.
+            within_root = candidate == root or candidate.is_relative_to(root)
+            if within_root and candidate.is_file():
                 parsed = read_manifest(candidate)
                 if parsed is not None:
                     manifest_path = str(candidate)
