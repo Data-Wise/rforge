@@ -56,7 +56,7 @@ Fold a raw engine result into the common envelope.
 ### `r_snippet()`
 
 ```python
-def r_snippet(kind: 'str', path: 'str', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False) -> 'str'
+def r_snippet(kind: 'str', path: 'str', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False, flavor: 'str | None' = None, incoming: 'bool' = False) -> 'str'
 ```
 
 _(no docstring)_
@@ -76,7 +76,7 @@ revdep_env=None when no revdep check was run (package has no dependents).
 ### `run()`
 
 ```python
-def run(kind: 'str', path: 'str' = '.', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False) -> 'dict'
+def run(kind: 'str', path: 'str' = '.', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False, flavor: 'str | None' = None, incoming: 'bool' = False) -> 'dict'
 ```
 
 _(no docstring)_
