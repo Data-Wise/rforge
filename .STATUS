@@ -1,17 +1,10 @@
 project: rforge
 updated: 2026-06-10
 status: Active
-version: 2.3.0 (merged to dev 749800a — unreleased; last release v2.2.0). v2.4.0 ecosystem-manifest also merged to dev.
+version: 2.3.0 (version sources; UNRELEASED — last release v2.2.0). dev now carries v2.3.0 cran-incoming + v2.4.0 ecosystem-manifest + v2.5.0 r:deps-sync, all stamped 2.3.0 → reconcile the real version in one release-prep step at next dev → main.
 last_release: 2026-06-02 v2.2.0 (PR #15 dev → main merge 3b2bdda, release https://github.com/Data-Wise/rforge/releases/tag/v2.2.0, tap data-wise/tap synced to 2.2.0 + brew info green; CRAN-submission suite — r:cran-prep + r:revdep/r:goodpractice/r:winbuilder/r:rhub + NOTE classifier, 28→33 commands)
 
-worktrees:
-  - path: ~/.git-worktrees/rforge/feature-r-deps-sync
-    branch: feature/r-deps-sync
-    base: dev
-    created: 2026-06-10
-    state: IMPLEMENTED — PR-ready (gates green; version NOT bumped — see note)
-    orchestrate: ORCHESTRATE-deps-sync.md (in tree)
-    purpose: "v2.5.0 r:deps-sync — lib/deps_sync.py (scan + reconcile + --write) + commands/r/deps-sync.md + 11 tests + docs/reference/deps_sync.md + doc sweep (CHANGELOG/commands/lib-modules/README). pytest 191+2, test-all 31/31. Version left at 2.3.0 (sources already lag the roadmap — ecosystem-manifest 'v2.4.0' is also unstamped; reconcile all unreleased work in one release-prep step at dev → main)."
+worktrees: []  # feature/r-deps-sync merged (PR #21) + worktree removed 2026-06-10
 
 recent:
   - date: 2026-06-10
@@ -303,9 +296,10 @@ backlog:
     spec: docs/specs/SPEC-ecosystem-manifest-discovery-2026-06-10.md
     notes: "MERGED to dev. lib/discovery.py reads an ecosystem manifest; enrich + drift. Follow-ups open: #19 (path-escape guard), #20 (manifest_order). Unreleased."
   - title: "v2.5.0 — r:deps-sync (flagship)"
-    priority: medium
+    priority: merged-to-dev
+    pr: 21
     spec: docs/specs/SPEC-r-deps-sync-2026-06-10.md
-    notes: "Draft. Pure-Python DESCRIPTION↔code reconciliation. Static sibling of the cran-incoming noSuggests catch."
+    notes: "MERGED to dev (PR #21). lib/deps_sync.py + commands/r/deps-sync.md + 11 tests; 33→34 commands. Static sibling of the cran-incoming noSuggests catch. Unreleased."
   - title: "v2.6.0 — r:submit (GitHub pre-release + CRAN submit handoff)"
     priority: medium
     spec: docs/specs/SPEC-r-submit-github-prerelease-2026-06-10.md
