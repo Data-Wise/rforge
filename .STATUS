@@ -9,6 +9,8 @@ worktrees:
     branch: feature/cran-incoming
     base: dev
     created: 2026-06-10
+    state: in-progress (Phase 0 — lock 2 decisions, then code in a fresh worktree session)
+    orchestrate: ORCHESTRATE-cran-incoming.md (in tree, pushed @ 9e06fd9)
     purpose: |
       Implement SPEC-cran-incoming-hardening (v2.3.0). Code work (lib/rcmd.py
       strict passes + new lib/cranlint.py + tests + help/hub doc sweep) — start
@@ -16,6 +18,29 @@ worktrees:
       module placement; docs:check reusable entry point for the 4c consistency check.
 
 recent:
+  - date: 2026-06-10
+    branch: dev + feature/cran-incoming
+    title: "spec + convention: CRAN-incoming hardening (v2.3.0), now in implementation"
+    state: IN PROGRESS
+    summary: |
+      On dev (b335340, pushed): established a reusable research+citation
+      convention (docs/specs/_TEMPLATE-{SPEC,RESEARCH}.md + README "Research &
+      Citation Standard" + 7-step workflow), and promoted the CRAN-incoming
+      proposal to an approved SPEC grounded in a cited RESEARCH companion.
+      Research corrected a real draft error: the medfit/MASS noSuggests catcher
+      is _R_CHECK_DEPENDS_ONLY_, not _R_CHECK_SUGGESTS_ONLY_ (per WRE).
+
+      Spec scope (default-on blocker in cran-prep, target v2.3.0): both
+      Suggests-withholding flavors + --run-donttest + opt-in --incoming bundle;
+      pure-Python DESCRIPTION linter, .Rbuildignore build-hygiene scan, and
+      advisory planning-doc consistency check; full help/hub doc sweep.
+
+      Worktree feature/cran-incoming created off dev; ORCHESTRATE-cran-incoming.md
+      written + committed in-tree (9e06fd9, pushed). Implementation (lib/rcmd.py
+      strict passes + new lib/cranlint.py + tests + docs) is the next step — a
+      fresh session in the worktree. Open Phase 0 decisions: cranlint.py module
+      placement; docs:check reusable entry point for the 4c consistency check.
+
   - date: 2026-06-02
     pr: 14
     branch: dev
@@ -249,15 +274,19 @@ decisions:
 
 ## 🎯 Next Action
 
-Quick post-release loop on this machine:
+🔨 **Active: implement CRAN-incoming hardening (v2.3.0)** — feature/cran-incoming worktree.
 
-A) 🟢 ⚡ **`brew upgrade rforge`** — local install is still at v1.3.0 (Cellar shows /opt/homebrew/Cellar/rforge/1.3.0). `brew info` confirms `1.3.0 → stable 2.0.0` available. ~30s task.
+→ Start a **fresh session in the worktree** and drive `ORCHESTRATE-cran-incoming.md`:
+   `cd ~/.git-worktrees/rforge/feature-cran-incoming && claude`
 
-B) 🟢 ⚡ **Phase 2.2 live-test (post-upgrade)** — now feasible from the production install. Fresh `claude` session, type each of the 3 old slash commands, paste outputs into issue #9. ~5 min. Validates the stub format end-to-end and serves as the first feedback data point.
+  1. 🔴 Phase 0 — lock the 2 decisions: `lib/cranlint.py` placement; `docs:check` reusable
+     entry point for the Tier 4c consistency check.
+  2. Then Phases 1–5 (strict check passes → --incoming bundle → Tier 4 metadata/hygiene →
+     both test gates incl. the medfit regression fixture → help/hub doc sweep + v2.3.0 version sync).
 
-C) 🟡 Watch issue #9 for ~2-4 weeks. No active task; just keep an eye out for rename-ergonomics signal that would inform Phase 4 / v2.1.0 scope.
+Background, no active task:
 
-After A+B done: backlog is the medium-term roadmap below.
+- 🟡 Watch issue #9 (rename ergonomics) — feeds Phase 4 (agents) scope.
 
 ---
 
