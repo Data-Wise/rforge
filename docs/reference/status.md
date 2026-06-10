@@ -44,6 +44,7 @@ distinct from `None` (not checked).
 | `health_score` | `int` | — |
 | `blocking_issues` | `Optional[list[str]]` | — |
 | `last_updated` | `datetime` | — |
+| `drift` | `Optional[Drift]` | `None` |
 
 ### `class PackageStatus`
 
@@ -58,6 +59,7 @@ Per-package status snapshot.
 | `test_status` | `str` | `'unknown'` |
 | `last_updated` | `Optional[datetime]` | `None` |
 | `status_file` | `Optional[StatusFileSummary]` | `None` |
+| `role` | `Optional[str]` | `None` |
 
 ### `class StatusFileSummary`
 

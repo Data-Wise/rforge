@@ -8,9 +8,13 @@ import pytest
 
 from lib.discovery import (
     Description,
+    Manifest,
+    ManifestEntry,
     detect_ecosystem,
     find_r_packages,
+    format_text,
     parse_description,
+    parse_manifest,
     read_description,
 )
 
@@ -69,6 +73,58 @@ def test_parse_description_missing_package_returns_none():
 
 def test_read_description_returns_none_for_missing_file(tmp_path):
     assert read_description(tmp_path / "nonexistent" / "DESCRIPTION") is None
+
+
+# ───────────────────────── Manifest parser ─────────────────────────
+
+
+def test_parse_manifest_basic():
+    content = """ecosystem: mediationverse
+updated: 2026-06-10
+packages:
+  - name: medfit
+    path: ../active/medfit
+    role: Foundation engine
+    repo: Data-Wise/medfit
+    cran: submitted
+    status_file: ../active/medfit/.STATUS
+"""
+    manifest = parse_manifest(content)
+    assert manifest is not None
+    assert manifest.ecosystem == "mediationverse"
+    assert manifest.updated == "2026-06-10"
+    assert len(manifest.packages) == 1
+    entry = manifest.packages[0]
+    assert entry.name == "medfit"
+    assert entry.path == "../active/medfit"
+    assert entry.role == "Foundation engine"
+    assert entry.repo == "Data-Wise/medfit"
+    assert entry.cran == "submitted"
+    assert entry.status_file == "../active/medfit/.STATUS"
+
+
+def test_parse_manifest_multiple_packages_and_inline_comments():
+    content = """ecosystem: mediationverse
+kind: ecosystem            # rforge classification, ignored here
+packages:
+  - name: medfit
+    cran: submitted          # none | submitted | on-cran
+  - name: probmed
+    role: P_med effect size
+"""
+    m = parse_manifest(content)
+    assert [e.name for e in m.packages] == ["medfit", "probmed"]
+    medfit, probmed = m.packages
+    assert medfit.cran == "submitted"  # inline comment stripped
+    assert medfit.role is None  # optional field absent → None
+    assert probmed.role == "P_med effect size"
+    assert probmed.cran is None
+
+
+def test_parse_manifest_empty_content_is_empty_manifest():
+    m = parse_manifest("")
+    assert m.ecosystem is None
+    assert m.packages == []
 
 
 # ───────────────────────── find_r_packages ─────────────────────────
@@ -182,6 +238,93 @@ def test_detect_ecosystem_config_other_kinds_are_ignored(tmp_path, make_pkg):
     assert eco.config_found is True
 
 
+def test_detect_ecosystem_enriches_packages_from_manifest(tmp_path, make_pkg):
+    make_pkg("medfit")
+    make_pkg("probmed")
+    (tmp_path / "hub").mkdir()
+    (tmp_path / "hub" / "ECOSYSTEM-MANIFEST.yaml").write_text(
+        "ecosystem: testverse\n"
+        "packages:\n"
+        "  - name: medfit\n"
+        "    role: Foundation\n"
+        "    cran: submitted\n"
+        "  - name: probmed\n"
+        "    role: P_med\n",
+        encoding="utf-8",
+    )
+    (tmp_path / ".rforge.yaml").write_text(
+        "manifest: hub/ECOSYSTEM-MANIFEST.yaml\n", encoding="utf-8"
+    )
+
+    eco = detect_ecosystem(tmp_path)
+    by_name = {p.name: p for p in eco.packages}
+    assert by_name["medfit"].manifest is not None
+    assert by_name["medfit"].manifest.role == "Foundation"
+    assert by_name["medfit"].manifest.cran == "submitted"
+    assert by_name["probmed"].manifest.role == "P_med"
+    assert eco.manifest_path is not None
+    assert eco.manifest_path.endswith("ECOSYSTEM-MANIFEST.yaml")
+    # full match → no drift
+    assert eco.drift.manifest_only == []
+    assert eco.drift.disk_only == []
+
+
+def test_detect_ecosystem_without_manifest_has_no_enrichment(tmp_path, make_pkg):
+    """Regression: zero-manifest behavior is unchanged."""
+    make_pkg("a")
+    make_pkg("b")
+    eco = detect_ecosystem(tmp_path)
+    assert eco.manifest_path is None
+    assert all(p.manifest is None for p in eco.packages)
+    assert eco.drift.manifest_only == []
+    assert eco.drift.disk_only == []
+
+
+def test_detect_ecosystem_reports_manifest_drift(tmp_path, make_pkg):
+    make_pkg("medfit")
+    make_pkg("stray")  # on disk, absent from manifest
+    (tmp_path / "ECOSYSTEM-MANIFEST.yaml").write_text(
+        "packages:\n  - name: medfit\n  - name: ghost\n",  # ghost: in manifest, not on disk
+        encoding="utf-8",
+    )
+    (tmp_path / ".rforge.yaml").write_text(
+        "manifest: ECOSYSTEM-MANIFEST.yaml\n", encoding="utf-8"
+    )
+    eco = detect_ecosystem(tmp_path)
+    assert eco.drift.manifest_only == ["ghost"]
+    assert eco.drift.disk_only == ["stray"]
+
+
+def test_detect_ecosystem_manifest_match_is_case_insensitive(tmp_path, make_pkg):
+    make_pkg("rmediation")  # dir/package lowercase
+    make_pkg("x")
+    make_pkg("y")
+    (tmp_path / "ECOSYSTEM-MANIFEST.yaml").write_text(
+        "packages:\n  - name: RMediation\n    role: CIs\n",  # manifest uses canonical case
+        encoding="utf-8",
+    )
+    (tmp_path / ".rforge.yaml").write_text(
+        "manifest: ECOSYSTEM-MANIFEST.yaml\n", encoding="utf-8"
+    )
+    eco = detect_ecosystem(tmp_path)
+    by_name = {p.name: p for p in eco.packages}
+    assert by_name["rmediation"].manifest is not None
+    assert by_name["rmediation"].manifest.role == "CIs"
+    assert eco.drift.manifest_only == []  # matched case-insensitively, not drift
+
+
+def test_detect_ecosystem_missing_manifest_file_degrades(tmp_path, make_pkg):
+    """Configured manifest path that doesn't exist → no enrichment, no raise."""
+    make_pkg("a")
+    make_pkg("b")
+    (tmp_path / ".rforge.yaml").write_text(
+        "manifest: nope/MISSING.yaml\n", encoding="utf-8"
+    )
+    eco = detect_ecosystem(tmp_path)
+    assert eco.manifest_path is None
+    assert all(p.manifest is None for p in eco.packages)
+
+
 def test_ecosystem_to_dict_is_json_serializable(tmp_path, make_pkg):
     import json
 
@@ -192,6 +335,35 @@ def test_ecosystem_to_dict_is_json_serializable(tmp_path, make_pkg):
     parsed = json.loads(payload)
     assert parsed["kind"] == "ecosystem"
     assert {p["name"] for p in parsed["packages"]} == {"foo", "bar"}
+
+
+# ───────────────────────── format_text (detect output) ─────────────────────────
+
+
+def test_format_text_surfaces_manifest_role_and_drift(tmp_path, make_pkg):
+    make_pkg("medfit")
+    make_pkg("stray")  # on disk, not in manifest → disk_only drift
+    (tmp_path / "ECOSYSTEM-MANIFEST.yaml").write_text(
+        "packages:\n  - name: medfit\n    role: Foundation engine\n  - name: ghost\n",
+        encoding="utf-8",
+    )
+    (tmp_path / ".rforge.yaml").write_text(
+        "manifest: ECOSYSTEM-MANIFEST.yaml\n", encoding="utf-8"
+    )
+    out = format_text(detect_ecosystem(tmp_path))
+    assert "Foundation engine" in out  # role surfaced inline
+    assert "manifest:" in out.lower()  # manifest line in header
+    assert "drift" in out.lower()  # drift section present
+    assert "ghost" in out  # manifest_only entry listed
+
+
+def test_format_text_no_manifest_is_unchanged(tmp_path, make_pkg):
+    """Regression: without a manifest, no manifest/drift lines appear."""
+    make_pkg("a")
+    make_pkg("b")
+    out = format_text(detect_ecosystem(tmp_path))
+    assert "manifest:" not in out.lower()
+    assert "drift" not in out.lower()
 
 
 # ───────────────────────── Error paths ─────────────────────────

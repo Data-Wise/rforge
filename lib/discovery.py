@@ -5,7 +5,14 @@ Walks a directory tree looking for R `DESCRIPTION` files, parses them into
 structured `Package` records, and classifies the result as a single package,
 an ecosystem, or a hybrid layout.
 
-Pure Python — no R subprocess, no external deps beyond the stdlib. Ported
+Optionally enriches discovery from an *ecosystem manifest* (curation metadata:
+role/repo/CRAN state). The manifest is located via a `manifest:` path in the
+root `.rforge.yaml`, parsed by a vendored YAML-subset reader (`parse_manifest`),
+matched to discovered packages by name, and any mismatch is reported as `drift`.
+An absent/unreadable manifest leaves the zero-manifest behavior unchanged.
+
+Pure Python — no R subprocess, no external deps beyond the stdlib (the manifest
+reader is a hand-rolled YAML subset, not PyYAML). Ported
 from `rforge-mcp/dist/tools/discovery/detect.js` (Path B Phase B.1).
 
 Usage (CLI, from repo root):
@@ -50,6 +57,32 @@ class Description:
 
 
 @dataclass
+class ManifestEntry:
+    """One package entry from an ecosystem manifest (curation metadata)."""
+
+    name: str
+    path: Optional[str] = None
+    role: Optional[str] = None
+    repo: Optional[str] = None
+    cran: Optional[str] = None
+    status_file: Optional[str] = None
+
+
+@dataclass
+class Manifest:
+    """Parsed ecosystem manifest (e.g. ECOSYSTEM-MANIFEST.yaml).
+
+    Curation metadata maintained by hand in a hub — what packages the ecosystem
+    *should* contain, their roles, repos, and CRAN state. Distinct from on-disk
+    discovery (`find_r_packages`), which is the source of truth for versions/deps.
+    """
+
+    ecosystem: Optional[str] = None
+    updated: Optional[str] = None
+    packages: list[ManifestEntry] = field(default_factory=list)
+
+
+@dataclass
 class Package:
     """An R package discovered on disk."""
 
@@ -58,10 +91,19 @@ class Package:
     path: str
     category: Literal["active", "stable", "archived"] = "active"
     description: Optional[Description] = None
+    manifest: Optional[ManifestEntry] = None  # curation metadata when a manifest matched
 
 
 Kind = Literal["single", "ecosystem", "hybrid"]
 Mode = Literal["minimal", "standard", "full"]
+
+
+@dataclass
+class Drift:
+    """Mismatch between a manifest and what's on disk."""
+
+    manifest_only: list[str] = field(default_factory=list)  # listed, not found on disk
+    disk_only: list[str] = field(default_factory=list)  # found on disk, not in manifest
 
 
 @dataclass
@@ -74,6 +116,8 @@ class Ecosystem:
     mode: Mode
     config_found: bool
     config_path: Optional[str] = None
+    manifest_path: Optional[str] = None
+    drift: Drift = field(default_factory=Drift)
 
     def to_dict(self) -> dict:
         return {
@@ -82,6 +126,8 @@ class Ecosystem:
             "mode": self.mode,
             "config_found": self.config_found,
             "config_path": self.config_path,
+            "manifest_path": self.manifest_path,
+            "drift": asdict(self.drift),
             "packages": [
                 {**asdict(p), "description": asdict(p.description) if p.description else None}
                 for p in self.packages
@@ -161,6 +207,115 @@ def read_description(path: str | os.PathLike) -> Optional[Description]:
             return parse_description(fh.read())
     except (OSError, UnicodeDecodeError):
         return None
+
+
+# ───────────────────────── Manifest parser ─────────────────────────
+
+# Keys recognized on a manifest package entry; anything else is ignored.
+_MANIFEST_ENTRY_KEYS = {"name", "path", "role", "repo", "cran", "status_file"}
+
+
+def _strip_inline_comment(value: str) -> str:
+    """Drop a trailing ` # comment` from a scalar value.
+
+    Splits on the first space-hash so a `#` that is part of the value (no
+    preceding space) is preserved. The manifest schema uses no quoted strings,
+    so this simple rule is sufficient.
+    """
+    idx = value.find(" #")
+    if idx != -1:
+        value = value[:idx]
+    return value.strip()
+
+
+def parse_manifest(content: str) -> Manifest:
+    """Parse an ecosystem manifest from a strict YAML *subset*.
+
+    Deliberately stdlib-only (no PyYAML). Supports exactly what the manifest
+    schema uses: top-level scalars (`ecosystem`, `updated`, …) and a `packages:`
+    list of flat maps. Blank lines and `#` comment lines are ignored. Anything
+    fancier than this subset is silently skipped rather than raised — callers
+    treat a sparse/empty Manifest as "no usable manifest".
+    """
+    manifest = Manifest()
+    in_packages = False
+    current: Optional[ManifestEntry] = None
+
+    for raw in content.splitlines():
+        stripped = raw.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+
+        is_item = stripped.startswith("- ")
+        body = stripped[2:].strip() if is_item else stripped
+        if ":" not in body:
+            continue
+        key, _, value = body.partition(":")
+        key = key.strip()
+        value = _strip_inline_comment(value)
+        indent = len(raw) - len(raw.lstrip())
+
+        if indent == 0 and not is_item:
+            if key == "packages":
+                in_packages = True
+                continue
+            in_packages = False
+            if key == "ecosystem":
+                manifest.ecosystem = value or None
+            elif key == "updated":
+                manifest.updated = value or None
+            continue
+
+        if in_packages:
+            if is_item:
+                current = ManifestEntry(name="")
+                manifest.packages.append(current)
+            if current is not None and key in _MANIFEST_ENTRY_KEYS:
+                setattr(current, key, value or None)
+
+    return manifest
+
+
+def read_manifest(path: str | os.PathLike) -> Optional[Manifest]:
+    """Read and parse an ecosystem manifest. Returns None on any read error."""
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as fh:
+            return parse_manifest(fh.read())
+    except (OSError, UnicodeDecodeError):
+        return None
+
+
+_CONFIG_MANIFEST_RE = re.compile(r"^manifest:\s*(.+)$", re.MULTILINE)
+
+
+def _read_config_manifest_path(root: Path) -> Optional[str]:
+    """Extract the optional `manifest:` path from `<root>/.rforge.yaml`."""
+    try:
+        text = (root / ".rforge.yaml").read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    match = _CONFIG_MANIFEST_RE.search(text)
+    if not match:
+        return None
+    return _strip_inline_comment(match.group(1)) or None
+
+
+def _enrich_packages(packages: list[Package], manifest: Manifest) -> Drift:
+    """Attach manifest metadata to matching packages (by name, case-insensitive)
+    and compute the drift between the manifest and what's on disk.
+    """
+    entries_by_name = {e.name.lower(): e for e in manifest.packages if e.name}
+    for pkg in packages:
+        entry = entries_by_name.get(pkg.name.lower())
+        if entry is not None:
+            pkg.manifest = entry
+    disk_names = {p.name.lower() for p in packages}
+    return Drift(
+        manifest_only=sorted(
+            e.name for e in manifest.packages if e.name and e.name.lower() not in disk_names
+        ),
+        disk_only=sorted(p.name for p in packages if p.name.lower() not in entries_by_name),
+    )
 
 
 # ───────────────────────── Filesystem scan ─────────────────────────
@@ -294,6 +449,20 @@ def detect_ecosystem(path: str | os.PathLike = ".") -> Ecosystem:
 
     kind = _classify_kind(root, packages)
 
+    # Optional manifest enrichment — keyed off `.rforge.yaml`'s `manifest:` path.
+    # Degrades silently to the zero-manifest case on any miss; never raises.
+    manifest_path: Optional[str] = None
+    drift = Drift()
+    if config_found:
+        manifest_rel = _read_config_manifest_path(root)
+        if manifest_rel:
+            candidate = (root / manifest_rel).resolve()
+            if candidate.is_file():
+                parsed = read_manifest(candidate)
+                if parsed is not None:
+                    manifest_path = str(candidate)
+                    drift = _enrich_packages(packages, parsed)
+
     return Ecosystem(
         root=str(root),
         packages=packages,
@@ -301,10 +470,17 @@ def detect_ecosystem(path: str | os.PathLike = ".") -> Ecosystem:
         mode=mode,
         config_found=config_found,
         config_path=str(config_path) if config_found else None,
+        manifest_path=manifest_path,
+        drift=drift,
     )
 
 
 # ───────────────────────── Formatters ─────────────────────────
+
+
+def _truncate(text: str, limit: int) -> str:
+    """Clip `text` to `limit` chars with an ellipsis when it overflows."""
+    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
 
 
 def format_text(eco: Ecosystem) -> str:
@@ -312,15 +488,32 @@ def format_text(eco: Ecosystem) -> str:
     lines: list[str] = []
     icon = {"single": "📦", "ecosystem": "🏗️ ", "hybrid": "🧩"}[eco.kind]
     lines.append(f"{icon} {eco.kind.capitalize()}: {eco.root}")
-    lines.append(f"   Packages: {len(eco.packages)} | mode: {eco.mode}"
-                 f" | config: {'found' if eco.config_found else 'not found'}")
+    header = (f"   Packages: {len(eco.packages)} | mode: {eco.mode}"
+              f" | config: {'found' if eco.config_found else 'not found'}")
+    if eco.manifest_path:
+        header += f" | manifest: {os.path.basename(eco.manifest_path)}"
+    lines.append(header)
     if eco.packages:
         lines.append("")
         for pkg in eco.packages[:10]:
             tag = f" [{pkg.category}]" if pkg.category != "active" else ""
-            lines.append(f"   ├─ {pkg.name} {pkg.version}{tag}")
+            role = ""
+            if pkg.manifest and pkg.manifest.role:
+                role = f" — {_truncate(pkg.manifest.role, 50)}"
+            lines.append(f"   ├─ {pkg.name} {pkg.version}{tag}{role}")
         if len(eco.packages) > 10:
             lines.append(f"   └─ ... and {len(eco.packages) - 10} more")
+    if eco.drift.manifest_only or eco.drift.disk_only:
+        lines.append("")
+        lines.append("⚠️  Manifest drift:")
+        if eco.drift.manifest_only:
+            lines.append(
+                f"   in manifest, not on disk: {', '.join(eco.drift.manifest_only)}"
+            )
+        if eco.drift.disk_only:
+            lines.append(
+                f"   on disk, not in manifest: {', '.join(eco.drift.disk_only)}"
+            )
     return "\n".join(lines)
 
 
