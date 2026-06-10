@@ -117,9 +117,14 @@ the stdlib", module docstring). YAML is not stdlib. The manifest's nested struct
 3. **Require the manifest be JSON** — stdlib `json` handles it, but the hub authored YAML
    for human-friendliness; would force a format change on the consumer. Rejected.
 
-Recommend **(1)** with a strict, documented subset; fall back to **(2)** only if real
-manifests outgrow the subset. Either way: **no manifest / unparseable manifest must
-degrade to today's behavior**, never raise.
+**Decided (2026-06-10): option (1)** — vendored minimal YAML-subset parser. Evidence:
+rforge currently has **no `import yaml` anywhere** and no `requirements.txt`/PyYAML
+declaration (verified 2026-06-10); `lib/discovery.py` is explicitly stdlib-only. Adding
+PyYAML would break that invariant for one optional feature. The manifest's structure is a
+fixed, simple subset (top-level scalars + a `packages:` list of flat maps), so a strict
+hand-rolled reader is sufficient. Fall back to **(2)** only if real manifests outgrow the
+subset. Either way: **no manifest / unparseable manifest must degrade to today's
+behavior**, never raise.
 
 ## Error handling
 
@@ -168,7 +173,9 @@ New cases:
 
 ## Open questions / risks
 
-- **YAML dependency (decide first):** vendored subset parser vs optional PyYAML. Resolution: ___
+- **YAML dependency (decide first):** vendored subset parser vs optional PyYAML.
+  **Resolved 2026-06-10 → vendored subset parser** (rforge has no PyYAML dep; keeps
+  `discovery.py` stdlib-only). See Dependencies above.
 - **Match key:** match on `name` only, or also reconcile `path`? If a manifest `path`
   disagrees with where the package was actually found, which wins? Proposed: disk location
   wins for `version`/deps; manifest supplies curation metadata + flags the path mismatch as drift.
