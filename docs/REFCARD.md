@@ -59,6 +59,7 @@
 │    /rforge:r:spell        Spell check (spelling)                            │
 │    /rforge:r:urlcheck     URL breakage check (urlchecker)                   │
 │    /rforge:r:style        Auto-format source (styler)                       │
+│    /rforge:r:deps-sync    Reconcile DESCRIPTION vs code usage (--write)     │
 │                                                                             │
 │  CRAN SUBMISSION (v2.2.0)                                                   │
 │    /rforge:r:revdep       Reverse-dep check vs CRAN downstream (revdepcheck)│
@@ -66,6 +67,7 @@
 │    /rforge:r:winbuilder   Dispatch to win-builder R-devel — async           │
 │    /rforge:r:rhub         Multi-platform checks via R-hub v2 — async        │
 │    /rforge:r:cran-prep    Full CRAN gate + strict passes + cran-comments.md │
+│    /rforge:r:submit       Pre-release of tarball + CRAN submit handoff      │
 │                                                                             │
 │  CRAN-INCOMING STRICT (v2.3.0)                                              │
 │    r:check --strict       Both Suggests-withholding flavor passes           │

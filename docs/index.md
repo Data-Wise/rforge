@@ -54,6 +54,18 @@ Most daily work runs through these. The other 30 commands are specialized — se
 /rforge:thorough "Prepare for CRAN release"
 ```
 
+## What's new in v2.6.0
+
+- **`r:submit`** — wraps the moment of CRAN submission: gate on `r:cran-prep` `ready` → build the tarball → cut a GitHub **pre-release** (not "Latest") of it with `cran-comments.md` → print the CRAN submit checklist (**never auto-submits**). `r:submit --promote` flips the pre-release to a full release on acceptance. Using a pre-release promoted in place sidesteps tagging a final release before acceptance. Backed by pure-Python `lib/ghrelease.py`.
+
+## What's new in v2.5.0
+
+- **`r:deps-sync`** — reconciles `DESCRIPTION` against actual code usage. Scans `R/`/tests/vignettes + `NAMESPACE` and reports **missing** (used, undeclared → Imports), **misclassified** (in Suggests but used unconditionally in `R/` → Imports — the static sibling of `r:check --strict`'s noSuggests pass), **missing_suggests**, and **unused** dependencies, plus a suggested patch. Report-only by default; `--write` applies the unambiguous changes. Pure-Python `lib/deps_sync.py`.
+
+## What's new in v2.4.0
+
+- **Ecosystem-manifest discovery** (`/rforge:detect`, `/rforge:status`) — discovery optionally reads a curated **ecosystem manifest** (via a `manifest:` key in `.rforge.yaml`) and enriches packages with `role`/`repo`/`cran` metadata, reporting **drift** between the manifest and what's on disk. Vendored YAML-subset parser keeps `discovery.py` stdlib-only. Zero behavior change when no manifest is configured.
+
 ## What's new in v2.3.0
 
 - **CRAN-incoming hardening for `r:check` + `r:cran-prep`** — the submission gate now emulates CRAN's *incoming* and post-acceptance flavors. `r:check --strict` runs **both** Suggests-withholding passes (`check (noSuggests)` + `check (suggests-only)`, each with `--run-donttest`); `--incoming` adds the opt-in `check (incoming)` env-var bundle. `r:cran-prep` runs the strict passes **by default**, and a strict ERROR **blocks** the `ready` verdict.
