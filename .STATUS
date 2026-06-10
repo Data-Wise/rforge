@@ -1,46 +1,43 @@
 project: rforge
 updated: 2026-06-10
 status: Active
-version: 2.2.0 (released)
+version: 2.3.0 (in development — feature/cran-incoming, PR-ready)
 last_release: 2026-06-02 v2.2.0 (PR #15 dev → main merge 3b2bdda, release https://github.com/Data-Wise/rforge/releases/tag/v2.2.0, tap data-wise/tap synced to 2.2.0 + brew info green; CRAN-submission suite — r:cran-prep + r:revdep/r:goodpractice/r:winbuilder/r:rhub + NOTE classifier, 28→33 commands)
 
 worktrees:
   - path: ~/.git-worktrees/rforge/feature-cran-incoming
     branch: feature/cran-incoming
-    base: dev
-    created: 2026-06-10
-    state: in-progress (Phase 0 — lock 2 decisions, then code in a fresh worktree session)
-    orchestrate: ORCHESTRATE-cran-incoming.md (in tree, pushed @ 9e06fd9)
-    purpose: |
-      Implement SPEC-cran-incoming-hardening (v2.3.0). Code work (lib/rcmd.py
-      strict passes + new lib/cranlint.py + tests + help/hub doc sweep) — start
-      in a fresh session in the worktree. Open impl-time decisions: cranlint.py
-      module placement; docs:check reusable entry point for the 4c consistency check.
+    purpose: "v2.3.0 CRAN-incoming hardening (strict noSuggests/suggests-only passes + lib/cranlint.py Tier 4)"
 
 recent:
   - date: 2026-06-10
-    branch: dev + feature/cran-incoming
-    title: "spec + convention: CRAN-incoming hardening (v2.3.0), now in implementation"
-    state: IN PROGRESS
+    branch: feature/cran-incoming
+    title: "feat: CRAN-incoming hardening — strict check passes + cranlint Tier 4 (v2.3.0)"
+    spec: docs/specs/SPEC-cran-incoming-hardening-2026-06-10.md
+    state: implemented, PR-ready (gates green)
     summary: |
-      On dev (b335340, pushed): established a reusable research+citation
-      convention (docs/specs/_TEMPLATE-{SPEC,RESEARCH}.md + README "Research &
-      Citation Standard" + 7-step workflow), and promoted the CRAN-incoming
-      proposal to an approved SPEC grounded in a cited RESEARCH companion.
-      Research corrected a real draft error: the medfit/MASS noSuggests catcher
-      is _R_CHECK_DEPENDS_ONLY_, not _R_CHECK_SUGGESTS_ONLY_ (per WRE).
+      r:check --strict runs both Suggests-withholding flavors (check (noSuggests)
+      + check (suggests-only)) with --run-donttest; --incoming adds the CRAN
+      incoming bundle. r:cran-prep runs the strict passes by default and BLOCKS
+      `ready` on failure (behavior change). New pure-stdlib lib/cranlint.py adds
+      advisory description/build-hygiene/docs-consistency stages (never block).
+      E2E proof: tests/fixtures/suggestbug.{before,after} — noSuggests pass
+      catches the medfit 0.2.1 unconditional-Suggests bug class with real R
+      (verified live). Gates: pytest 168 + 2 opt-in e2e, test-all.sh 31/31.
+      Merged dev (5b3fc17) in to stay current; dev's r:submit v2.5.0 spec carried along.
 
-      Spec scope (default-on blocker in cran-prep, target v2.3.0): both
-      Suggests-withholding flavors + --run-donttest + opt-in --incoming bundle;
-      pure-Python DESCRIPTION linter, .Rbuildignore build-hygiene scan, and
-      advisory planning-doc consistency check; full help/hub doc sweep.
-
-      Worktree feature/cran-incoming created off dev; ORCHESTRATE-cran-incoming.md
-      written + committed in-tree (9e06fd9, pushed). Implementation (lib/rcmd.py
-      strict passes + new lib/cranlint.py + tests + docs) is the next step — a
-      fresh session in the worktree. Open Phase 0 decisions: cranlint.py module
-      placement; docs:check reusable entry point for the 4c consistency check.
-
+  - date: 2026-06-10
+    branch: dev
+    title: "spec + convention: CRAN-incoming hardening (v2.3.0) groundwork"
+    state: SUPERSEDED by the implementation entry above
+    summary: |
+      On dev: established a reusable research+citation convention
+      (docs/specs/_TEMPLATE-{SPEC,RESEARCH}.md + README "Research & Citation
+      Standard" + 7-step workflow), and promoted the CRAN-incoming proposal to an
+      approved SPEC grounded in a cited RESEARCH companion. Research corrected a
+      real draft error: the medfit/MASS noSuggests catcher is
+      _R_CHECK_DEPENDS_ONLY_, not _R_CHECK_SUGGESTS_ONLY_ (per WRE). Also seeded
+      SPEC-r-submit-github-prerelease (v2.5.0) groundwork.
   - date: 2026-06-02
     pr: 14
     branch: dev
@@ -274,15 +271,14 @@ decisions:
 
 ## 🎯 Next Action
 
-🔨 **Active: implement CRAN-incoming hardening (v2.3.0)** — feature/cran-incoming worktree.
+✅ **Done (PR-ready): CRAN-incoming hardening (v2.3.0)** — feature/cran-incoming worktree.
 
-→ Start a **fresh session in the worktree** and drive `ORCHESTRATE-cran-incoming.md`:
-   `cd ~/.git-worktrees/rforge/feature-cran-incoming && claude`
-
-  1. 🔴 Phase 0 — lock the 2 decisions: `lib/cranlint.py` placement; `docs:check` reusable
-     entry point for the Tier 4c consistency check.
-  2. Then Phases 1–5 (strict check passes → --incoming bundle → Tier 4 metadata/hygiene →
-     both test gates incl. the medfit regression fixture → help/hub doc sweep + v2.3.0 version sync).
+All Phases 0–5 complete. Phase 0 decisions locked: new `lib/cranlint.py` module;
+Tier 4c done as a lightweight inline advisory (no `docs:check` extraction). Strict
+noSuggests/suggests-only passes + opt-in `--incoming` bundle (confirmed vs R Internals
+§8); Tier 4 metadata/hygiene advisory stages; E2E medfit regression proof verified live
+with real R; full help/hub doc sweep + v2.3.0 version sync. Gates: pytest 168 + 2 opt-in
+e2e, test-all.sh 31/31. `dev` merged in (5b3fc17). Next: open the PR to `dev`.
 
 Background, no active task:
 
@@ -293,9 +289,10 @@ Background, no active task:
 backlog:
   # Roadmap (settled 2026-06-10) — minor cadence after v2.2.0
   - title: "v2.3.0 — CRAN-incoming hardening"
-    priority: in-progress
+    priority: pr-open
+    pr: 18
     spec: docs/specs/SPEC-cran-incoming-hardening-2026-06-10.md
-    notes: "Approved; impl in feature/cran-incoming worktree. Strict check flavors + DESCRIPTION/build-hygiene/consistency."
+    notes: "DONE in feature/cran-incoming — strict check flavors + Tier-4 cranlint (lib/cranlint.py: DESCRIPTION/build-hygiene/consistency). Gates green (pytest 168+2, test-all 31/31, v2.3.0 synced). PR #18 → dev."
   - title: "v2.4.0 — ecosystem-manifest discovery"
     priority: medium
     spec: docs/specs/SPEC-ecosystem-manifest-discovery-2026-06-10.md

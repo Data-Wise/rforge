@@ -47,12 +47,20 @@ Most daily work runs through these. The other 30 commands are specialized — se
 # Balanced analysis with impact + recommendations (~30 seconds) — after changes
 /rforge:analyze "Update RMediation bootstrap algorithm"
 
-# Per-package CRAN gate (v2.2.0+) — document→check→revdep, writes cran-comments.md
+# Per-package CRAN gate (v2.2.0+) — document→strict check→Tier 4→revdep, writes cran-comments.md
 /rforge:r:cran-prep
 
 # Ecosystem rollup (2-5 minutes) — cross-package validation + submission order
 /rforge:thorough "Prepare for CRAN release"
 ```
+
+## What's new in v2.3.0
+
+- **CRAN-incoming hardening for `r:check` + `r:cran-prep`** — the submission gate now emulates CRAN's *incoming* and post-acceptance flavors. `r:check --strict` runs **both** Suggests-withholding passes (`check (noSuggests)` + `check (suggests-only)`, each with `--run-donttest`); `--incoming` adds the opt-in `check (incoming)` env-var bundle. `r:cran-prep` runs the strict passes **by default**, and a strict ERROR **blocks** the `ready` verdict.
+- **Tier 4 advisory checks (new `lib/cranlint.py`, pure stdlib, no R)** — three `cran-prep` stages that never block `ready`: `description` (DESCRIPTION incoming nits — non-`Authors@R`, weak `Title`, `Description` prose, stale `Date`), `build-hygiene` (planning/dev docs that would ship in the tarball, with the exact `.Rbuildignore` regex to add), and `docs-consistency`.
+
+!!! warning "Behavior change in v2.3.0"
+    A package that reports 🟢 `ready` today under `--as-cran` can turn 🔴 once the noSuggests pass catches a `Suggests` package used unconditionally (the medfit 0.2.1 class). This is intended — CRAN would bounce such a package post-acceptance. Move the dependency to `Imports`, or guard it with `requireNamespace()` + `skip_if_not_installed()`.
 
 ## What's new in v2.2.0
 

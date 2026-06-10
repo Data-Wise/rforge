@@ -1,6 +1,6 @@
 # RForge Plugin - Documentation
 
-> **Complete documentation for the RForge Plugin v2.2.0**
+> **Complete documentation for the RForge Plugin v2.3.0**
 
 ---
 
@@ -80,7 +80,7 @@ Perfect for:
 ```
 rforge/
 ├── .claude-plugin/            # Claude Code plugin manifest + extras
-│   ├── plugin.json            # Plugin manifest (v2.2.0)
+│   ├── plugin.json            # Plugin manifest (v2.3.0)
 │   ├── marketplace.json       # Marketplace install metadata
 │   ├── config.json            # User-tunable options
 │   ├── hooks/
@@ -165,6 +165,8 @@ See [REFCARD.md](REFCARD.md) for detailed pattern recognition guide.
 
 🎯 **Smart synthesis** - Combines results into actionable summary
 
+📦 **CRAN-incoming hardening (v2.3.0)** - `r:cran-prep` runs strict Suggests-withholding passes by default (blocking `ready`) plus Tier 4 advisory checks (`description`, `build-hygiene`, `docs-consistency`) via `lib/cranlint.py`
+
 🧠 **ADHD-friendly** - Fast feedback, clear structure, visual progress
 
 ---
@@ -233,8 +235,8 @@ from a previous version, remove it (see
 ## 📝 Document Maintenance
 
 **Last Updated:** 2026-06-02
-**Plugin Version:** 2.2.0
-**Documentation Version:** 2.2.0
+**Plugin Version:** 2.3.0
+**Documentation Version:** 2.3.0
 
 **Releases:** https://github.com/Data-Wise/rforge/releases
 

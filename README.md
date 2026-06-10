@@ -9,6 +9,12 @@
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
+## What's new in v2.3.0
+
+- 🛡️ **CRAN-incoming hardening for `r:check` + `r:cran-prep`** (no new commands) — the gate now emulates CRAN's *incoming* and post-acceptance flavors. `r:check --strict` runs **both** Suggests-withholding passes as distinct rows (`check (noSuggests)` via `_R_CHECK_DEPENDS_ONLY_`, `check (suggests-only)` via `_R_CHECK_SUGGESTS_ONLY_`), each with `--run-donttest`; `--incoming` implies `--strict` and adds an opt-in `check (incoming)` env-var bundle. `r:cran-prep` runs the strict passes **by default**, and a strict ERROR **blocks** the `ready` verdict (plus a Tier 1b PDF-manual check that warns, never blocks).
+- 🐍 **`lib/cranlint.py`** — new pure-Python (stdlib-only, no R) module backing three **Tier 4 advisory** `cran-prep` stages that **never block `ready`**: `description` (DESCRIPTION incoming nits — non-`Authors@R`, weak `Title`, `Description` prose, stale `Date`), `build-hygiene` (planning/dev docs that would ship in the tarball, with the exact `.Rbuildignore` regex to add), `docs-consistency` (lightweight advisory). Public functions: `lint_description`, `check_build_hygiene`, `check_planning_consistency`, `run_all`; CLI `python3 -m lib.cranlint --path .`.
+- ⚠️ **Behavior change:** a package that is 🟢 `ready` today under `--as-cran` can turn 🔴 once the noSuggests pass catches a `Suggests` package used unconditionally (the medfit 0.2.1 class). Intended — CRAN would bounce it post-acceptance. Fix: move the dependency to `Imports`, or guard with `requireNamespace()` + `skip_if_not_installed()`.
+
 ## What's new in v2.2.0
 
 - **5 new `r:` CRAN-submission commands**: `r:revdep`, `r:goodpractice`, `r:winbuilder`, `r:rhub`, `r:cran-prep` — full pre-submission gate that runs document→lint→spell→urlcheck→test→coverage→check(--as-cran)→revdep, generates `cran-comments.md`, and returns a `ready`/`warn`/`blocked` verdict.
@@ -77,7 +83,7 @@ Full changelog: [`CHANGELOG.md`](CHANGELOG.md).
 📊 **Live progress** - Real-time updates as tools complete
 🎯 **Smart synthesis** - Combines results into actionable summary
 🧠 **ADHD-friendly** - Fast feedback, clear structure, visual progress
-🐍 **Pure-Python `lib/`** - `lib/discovery.py`, `lib/deps.py`, `lib/status.py`, `lib/init.py` (pure Python, no R); `lib/rcmd.py` runs R engines for the `r:*` dev-cycle + CRAN commands. No MCP server, no Node.js. See [`docs/lib-modules.md`](docs/lib-modules.md).
+🐍 **Pure-Python `lib/`** - `lib/discovery.py`, `lib/deps.py`, `lib/status.py`, `lib/init.py`, `lib/cranlint.py` (pure Python, no R); `lib/rcmd.py` runs R engines for the `r:*` dev-cycle + CRAN commands. No MCP server, no Node.js. See [`docs/lib-modules.md`](docs/lib-modules.md).
 
 ## How It Works
 
@@ -426,7 +432,7 @@ Plugin settings in `plugin.json`:
 ```
 ~/.claude/plugins/rforge/
 ├── .claude-plugin/
-│   ├── plugin.json          # Plugin manifest (v2.2.0)
+│   ├── plugin.json          # Plugin manifest (v2.3.0)
 │   ├── marketplace.json     # Marketplace install metadata
 │   ├── config.json          # User-tunable options (CRAN mirror, etc.)
 │   ├── hooks/
@@ -442,7 +448,8 @@ Plugin settings in `plugin.json`:
 │   ├── deps.py              # Dependency graph + impact
 │   ├── status.py            # DESCRIPTION + .STATUS health snapshot
 │   ├── init.py              # ~/.rforge/context.json initializer
-│   ├── rcmd.py              # R dev-cycle + quality + CRAN-submission engines (v2.2.0)
+│   ├── rcmd.py              # R dev-cycle + quality + CRAN-submission engines (v2.3.0)
+│   ├── cranlint.py          # CRAN-incoming linter — DESCRIPTION + build-hygiene (v2.3.0)
 │   └── formatters.py        # Output formatting helpers
 └── docs/                    # User-facing docs
 ```
@@ -468,6 +475,6 @@ MIT
 
 ---
 
-**Version:** 2.2.0
+**Version:** 2.3.0
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+

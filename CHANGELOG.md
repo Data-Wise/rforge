@@ -22,6 +22,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.3.0] - 2026-06-10
+
+> ⚠️ **Behavior change.** `r:cran-prep` now runs two strict Suggests-withholding
+> check passes **by default** and **blocks the `ready` verdict** when they fail.
+> A package that reports 🟢 `ready` today under `--as-cran` alone can turn 🔴 if
+> it uses a `Suggests` package unconditionally (the medfit 0.2.1 class). This is
+> intended — CRAN's post-acceptance noSuggests flavor would bounce it anyway —
+> but it is not patch-safe, hence the minor bump.
+
+### Added
+
+- **CRAN-incoming strict check passes** (`lib/rcmd.py`): `r:check --strict` runs
+  both Suggests-withholding flavors as distinct stage rows — `check (noSuggests)`
+  (`_R_CHECK_DEPENDS_ONLY_=true`) and `check (suggests-only)`
+  (`_R_CHECK_SUGGESTS_ONLY_=true`) — each with `--run-donttest` (runs
+  `\donttest{}` examples). `r:check --incoming` implies `--strict` and adds a
+  third `check (incoming)` row (`_R_CHECK_CRAN_INCOMING_*`, confirmed against R
+  Internals §8). Mechanism: `rcmdcheck(args=, env=)` — no `devtools`, no
+  subprocess-layer change.
+- **`lib/cranlint.py`** — new pure-stdlib (no R) analysis module with three
+  advisory checks wired into `r:cran-prep`: `lint_description` (DESCRIPTION
+  incoming nits — non-`Authors@R`/no `cph`, weak `Title`, `Description` prose,
+  stale `Date`), `check_build_hygiene` (planning/dev docs that would ship in the
+  tarball, each with the exact `.Rbuildignore` regex to add), and
+  `check_planning_consistency`. These surface as the `description`,
+  `build-hygiene`, and `docs-consistency` stages and **never block** `ready`.
+- **Tier 1b manual-build check** — `r:cran-prep` verifies the PDF reference
+  manual builds; emits a `warn` (never a blocker) when LaTeX is absent.
+- **Failure hint** on a strict-pass error: move the package to `Imports`, or
+  guard with `requireNamespace()` in code AND `skip_if_not_installed()` in tests.
+- **E2E regression proof** — `tests/fixtures/suggestbug.{before,after}` +
+  `tests/test_regression_suggests_e2e.py` (opt-in via `RFORGE_E2E`) prove the
+  noSuggests pass catches the medfit bug class with the real R toolchain.
+
+### Changed
+
+- `r:cran-prep` default sequence now includes `check (noSuggests)`,
+  `check (suggests-only)`, `description`, `build-hygiene`, and `docs-consistency`
+  (plus opt-in `check (incoming)` via `--incoming`).
+- `r_snippet`/`run("check", …)` gained internal `flavor`/`incoming` selectors;
+  `lib.rcmd` argparse gained `--incoming`.
+
+---
+
 ## [2.2.0] - 2026-06-02
 
 ### Added

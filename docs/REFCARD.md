@@ -1,6 +1,6 @@
 # 📚 RForge Plugin - Reference Card
 
-> **Version:** 2.2.0 | **Last Updated:** 2026-06-02
+> **Version:** 2.3.0 | **Last Updated:** 2026-06-10
 
 !!! tip "TL;DR (30 seconds)"
     - **What:** All 33 commands in one page — categorized by use case.
@@ -10,7 +10,7 @@
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  RFORGE PLUGIN REFERENCE                                            v2.2.0  │
+│  RFORGE PLUGIN REFERENCE                                            v2.3.0  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  COMMANDS (33)                                                              │
@@ -65,7 +65,14 @@
 │    /rforge:r:goodpractice Advisory best-practice bundle (goodpractice)      │
 │    /rforge:r:winbuilder   Dispatch to win-builder R-devel — async           │
 │    /rforge:r:rhub         Multi-platform checks via R-hub v2 — async        │
-│    /rforge:r:cran-prep    Full CRAN-readiness gate + cran-comments.md       │
+│    /rforge:r:cran-prep    Full CRAN gate + strict passes + cran-comments.md │
+│                                                                             │
+│  CRAN-INCOMING STRICT (v2.3.0)                                              │
+│    r:check --strict       Both Suggests-withholding flavor passes           │
+│    r:check --incoming     + opt-in CRAN-incoming _R_CHECK_* bundle          │
+│    cran-prep stages:      check, check (noSuggests), check (suggests-only), │
+│                           [check (incoming)], description, build-hygiene,   │
+│                           docs-consistency  (strict ERROR blocks ready)     │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -135,6 +142,7 @@ As of v1.3.0 the plugin is self-contained — slash commands dispatch to pure-Py
 | `lib.status` | Ecosystem health snapshot | <5s |
 | `lib.init` | Initialize `~/.rforge/context.json` | <5s |
 | `lib.rcmd` | R dev-cycle + quality + CRAN-submission engines (v2.2.0) | R-bound |
+| `lib.cranlint` | CRAN-incoming linter — DESCRIPTION + build-hygiene (v2.3.0) | <2s |
 
 See [`docs/lib-modules.md`](lib-modules.md) and the [reference API docs](reference/discovery.md) for full call signatures.
 
@@ -219,7 +227,7 @@ No `~/.claude/settings.json` entries required since v1.3.0 — the plugin is ful
 
 ```text
 rforge/
-├── .claude-plugin/        # Plugin manifest + extras (v2.2.0)
+├── .claude-plugin/        # Plugin manifest + extras (v2.3.0)
 │   ├── plugin.json
 │   ├── marketplace.json
 │   ├── config.json
@@ -238,7 +246,8 @@ rforge/
 │   ├── deps.py
 │   ├── status.py
 │   ├── init.py
-│   ├── rcmd.py            # R dev-cycle + quality + CRAN-submission engines (v2.2.0)
+│   ├── rcmd.py            # R dev-cycle + quality + CRAN-submission engines (v2.3.0)
+│   ├── cranlint.py        # CRAN-incoming linter (DESCRIPTION + build-hygiene) (v2.3.0)
 │   └── formatters.py
 └── docs/                  # Documentation
     └── REFCARD.md (this file)
