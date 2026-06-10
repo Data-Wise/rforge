@@ -118,6 +118,11 @@ error visible before a spec leaves `Draft`.
   GitHub **pre-release** (+`cran-comments.md`), hand off the CRAN submit step, then promote to a
   full release on acceptance (`gh release edit --prerelease=false`). Fills the submission-lifecycle
   gap between `r:cran-prep` (ready) and CRAN going live.
+- **[Scaffolding theme — `r:use-test`/`r:use-package`/`r:use-vignette`](SPEC-r-scaffolding-2026-06-10.md)** —
+  Status: Draft (unscheduled, post-v2.6.0). Authoring commands for *existing* packages (no
+  `r:create`): scaffold + AI-draft a testthat file, add a declared dependency, start a vignette.
+  Hybrid engine (usethis infra + Python/AI content), dry-run by default. Reuses deps-sync's
+  DESCRIPTION-patch writer.
 
 ## See also
 

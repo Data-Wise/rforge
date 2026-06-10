@@ -317,9 +317,10 @@ backlog:
     priority: candidate
     spec: docs/specs/SPEC-diff-aware-checks-and-coverage-2026-05-31.md
     notes: "Refocused to P0 (2026-06-10); the unbuilt flagship. P1 shipped; P2/P3/P4 migrated to other specs."
-  - title: "Scaffolding theme (r:create/r:use-test/r:use-package/r:use-vignette)"
+  - title: "Scaffolding theme (r:use-test/r:use-package/r:use-vignette)"
     priority: candidate
-    notes: "BRAINSTORM-r-command-expansion. Different shape (writes files). Open Q: is creating NEW packages in rforge's mission?"
+    spec: docs/specs/SPEC-r-scaffolding-2026-06-10.md
+    notes: "Now specced (2026-06-10). Mission resolved: EXISTING ecosystems only — r:create dropped. Hybrid engine (usethis infra + Python/AI content), dry-run default. Builds on r:deps-sync (shared DESCRIPTION-patch writer). Competes with Phase 4 for post-v2.6.0."
 
   # Parked (waits on external signal)
   - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"
