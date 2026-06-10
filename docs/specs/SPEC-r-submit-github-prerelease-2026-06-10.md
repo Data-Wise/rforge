@@ -2,7 +2,7 @@
 
 - **Status:** Draft — awaiting user review
 - **Date:** 2026-06-10
-- **Target version:** v2.5.0 (proposed — after v2.3.0 cran-incoming, v2.4.0 ecosystem-manifest; see Open questions re Phase 4)
+- **Target version:** v2.6.0 (after v2.5.0 `r:deps-sync`; roadmap: v2.3.0 cran-incoming → v2.4.0 ecosystem-manifest → v2.5.0 deps-sync → v2.6.0 r:submit)
 - **Author:** brainstormed with Claude, grounded in r-pkgs + GitHub CLI docs
 - **Related:** [SPEC-cran-incoming-hardening-2026-06-10.md](SPEC-cran-incoming-hardening-2026-06-10.md),
   [SPEC-r-cran-prep-2026-06-01.md](SPEC-r-cran-prep-2026-06-01.md), `commands/release.md`
@@ -136,7 +136,7 @@ tree diagrams), root `README.md`, `docs/lib-modules.md` if any lib helper is add
 `docs/tutorials/cran-submission-with-rforge.md` (add the submit→pre-release→promote step),
 `commands/release.md` (note the handoff to `r:submit`).
 
-**Trackers:** `CHANGELOG.md` (`[Unreleased]`), `.STATUS`. Version sync → **v2.5.0** across the four
+**Trackers:** `CHANGELOG.md` (`[Unreleased]`), `.STATUS`. Version sync → **v2.6.0** across the four
 sources + live-version doc refs at release.
 
 ## Implementation order
@@ -146,17 +146,16 @@ sources + live-version doc refs at release.
 3. `gh` guard + manual-recipe fallback; `--dry-run`.
 4. Phase 2 `--promote` (`gh release edit --prerelease=false --latest`) + optional CRAN verify.
 5. Tests (both gates) with the `gh` boundary mocked.
-6. Full doc sweep (help/hub) + CHANGELOG/.STATUS + v2.5.0 version sync.
+6. Full doc sweep (help/hub) + CHANGELOG/.STATUS + v2.6.0 version sync.
 
 > **Branch note:** steps 2–6 are code/command work → a `feature/r-submit` worktree off `dev`, fresh session.
 
 ## Open questions / risks
 
-- **Command name.** `r:submit` (intuitive entry point for "I'm submitting") vs `r:gh-release`
-  (more honest — it doesn't auto-submit). *Proposed:* `r:submit`, since the submit handoff +
-  checklist is its center of gravity.
-- **Version slot vs Phase 4.** v2.5.0 is proposed, but Phase 4 (agents) also wants a near-term
-  minor. *Resolution needed:* order Phase 4 vs `r:submit` on the roadmap.
+- **Command name.** ✅ *Resolved:* **`r:submit`** — the submit handoff + checklist is its center
+  of gravity.
+- **Version slot.** ✅ *Resolved:* **v2.6.0**, after `r:deps-sync` (v2.5.0). Phase 4 (agents)
+  follows.
 - **CRAN-page verify (Phase 2).** Include the optional `cran.r-project.org/package=<pkg>` check in
   v1, or defer? *Proposed:* include it behind `--no-verify` (cheap, high-confidence guard).
 - **`gh` as a hard vs soft dep.** Soft (guarded + manual fallback) is chosen; revisit if real use

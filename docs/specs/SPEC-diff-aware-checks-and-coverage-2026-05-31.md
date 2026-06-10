@@ -2,10 +2,29 @@
 
 **Date:** 2026-05-31
 **Author:** Davood Tofighi (with Claude Code)
-**Status:** Proposed
+**Status:** Draft — **refocused to P0** (2026-06-10); P1–P5 migrated (see below)
 **Origin:** Friction encountered using rforge (`/rforge:r:check`, `/rforge:docs:check`) across a
 3-package ecosystem change (RMediation + medfit covariance work) under the workflow
 "address all issues and errors before merging."
+
+---
+
+## Status & refocus (2026-06-10)
+
+This started as a 6-item wishlist; events have since absorbed most of it. **The live scope of
+this spec is now P0 only** — `--changed` diff-aware checks, the one high-value item still
+unbuilt. The rest are migrated:
+
+| Item | Disposition |
+|---|---|
+| **P0** `--changed` diff-aware check | **LIVE — the focus of this spec.** Still unbuilt. Candidate target: post-v2.6.0 (unscheduled). |
+| P1 `r:coverage` (package_coverage) | ✅ base **shipped v2.1.0**; the `--changed` slice folds into P0's diff-aware mode. |
+| P2 auto-handle missing `Suggests` (`_R_CHECK_FORCE_SUGGESTS_`) | → **`SPEC-cran-incoming-hardening`** (v2.3.0), which owns the `_R_CHECK_*` flavor surface. |
+| P3 ecosystem-aware NOTE classification | partly done by the v2.2.0 NOTE classifier; the ecosystem-metadata half → **`SPEC-ecosystem-manifest-discovery`** (v2.4.0). |
+| P4 `r:test-gen` scaffold | → the deferred **scaffolding theme** (`r:use-test`), its own future spec. |
+| P5 worktree-collision guard | minor; keep as a parked note under P0. |
+
+Everything below P0 is retained for historical context only; act on **P0**.
 
 ---
 

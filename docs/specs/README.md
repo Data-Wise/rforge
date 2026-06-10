@@ -96,8 +96,8 @@ error visible before a spec leaves `Draft`.
   Status: Shipped (v2.0.0). The command-rename / sub-namespacing plan
   (`docs:check`, `r:check`, `health`).
 - **[Diff-aware checks & coverage](SPEC-diff-aware-checks-and-coverage-2026-05-31.md)** —
-  Status: Draft. Proposal for diff-scoped checks, coverage integration, and
-  ecosystem NOTE classification.
+  Status: Draft, **refocused to P0** (`--changed` diff-aware checks — the unbuilt flagship).
+  P1 shipped (v2.1.0); P2→cran-incoming, P3→ecosystem-manifest, P4→scaffolding (2026-06-10).
 - **[r: dev-cycle + quality commands (v2.1.0)](SPEC-r-dev-commands-2026-05-31.md)** —
   Status: Shipped (v2.1.0). 12 new `r:` commands (build/test/document/install/
   coverage/site/cycle + lint/spell/urlcheck/style) backed by `lib/rcmd.py`.
@@ -109,8 +109,12 @@ error visible before a spec leaves `Draft`.
   bundle), default-on as a `ready`-blocker, plus pure-Python DESCRIPTION-lint,
   `.Rbuildignore` build-hygiene, and planning-doc consistency checks. Grounded in
   [RESEARCH-cran-incoming-checks](RESEARCH-cran-incoming-checks-2026-06-10.md).
+- **[`r:deps-sync` — reconcile DESCRIPTION vs code usage](SPEC-r-deps-sync-2026-06-10.md)** —
+  Status: Draft (target v2.5.0). New pure-Python per-package command: scan `R/`/tests/vignettes for
+  namespace usage, reconcile against `Imports`/`Suggests` (missing/unused/misclassified), suggest a
+  DESCRIPTION patch (`--write` to apply). Static sibling of the cran-incoming noSuggests catch.
 - **[`r:submit` — GitHub pre-release + CRAN submit handoff](SPEC-r-submit-github-prerelease-2026-06-10.md)** —
-  Status: Draft (target v2.5.0). New per-package command: build the submitted tarball, cut a
+  Status: Draft (target v2.6.0). New per-package command: build the submitted tarball, cut a
   GitHub **pre-release** (+`cran-comments.md`), hand off the CRAN submit step, then promote to a
   full release on acceptance (`gh release edit --prerelease=false`). Fills the submission-lifecycle
   gap between `r:cran-prep` (ready) and CRAN going live.
