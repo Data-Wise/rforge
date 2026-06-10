@@ -271,15 +271,14 @@ decisions:
 
 ## 🎯 Next Action
 
-🔨 **Active: implement CRAN-incoming hardening (v2.3.0)** — feature/cran-incoming worktree.
+✅ **Done (PR-ready): CRAN-incoming hardening (v2.3.0)** — feature/cran-incoming worktree.
 
-→ Start a **fresh session in the worktree** and drive `ORCHESTRATE-cran-incoming.md`:
-   `cd ~/.git-worktrees/rforge/feature-cran-incoming && claude`
-
-  1. 🔴 Phase 0 — lock the 2 decisions: `lib/cranlint.py` placement; `docs:check` reusable
-     entry point for the Tier 4c consistency check.
-  2. Then Phases 1–5 (strict check passes → --incoming bundle → Tier 4 metadata/hygiene →
-     both test gates incl. the medfit regression fixture → help/hub doc sweep + v2.3.0 version sync).
+All Phases 0–5 complete. Phase 0 decisions locked: new `lib/cranlint.py` module;
+Tier 4c done as a lightweight inline advisory (no `docs:check` extraction). Strict
+noSuggests/suggests-only passes + opt-in `--incoming` bundle (confirmed vs R Internals
+§8); Tier 4 metadata/hygiene advisory stages; E2E medfit regression proof verified live
+with real R; full help/hub doc sweep + v2.3.0 version sync. Gates: pytest 168 + 2 opt-in
+e2e, test-all.sh 31/31. `dev` merged in (5b3fc17). Next: open the PR to `dev`.
 
 Background, no active task:
 
