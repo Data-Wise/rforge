@@ -1,0 +1,2 @@
+export(draw_sample)
+importFrom(MASS, mvrnorm)

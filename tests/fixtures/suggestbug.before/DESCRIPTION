@@ -1,0 +1,9 @@
+Package: suggestbug
+Title: Reproduces the Unconditional-Suggests Bug Class
+Version: 0.2.1
+Authors@R: person("A", "Dev", email = "a@example.com", role = c("aut", "cre"))
+Description: A minimal package whose default code path calls a Suggests
+    package unconditionally, the same error class as medfit 0.2.1.
+License: MIT + file LICENSE
+Suggests: MASS
+Encoding: UTF-8
