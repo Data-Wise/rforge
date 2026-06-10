@@ -1,13 +1,10 @@
 project: rforge
 updated: 2026-06-10
 status: Active
-version: 2.3.0 (in development — feature/cran-incoming, PR-ready)
+version: 2.3.0 (merged to dev 749800a — unreleased; last release v2.2.0). v2.4.0 ecosystem-manifest also merged to dev.
 last_release: 2026-06-02 v2.2.0 (PR #15 dev → main merge 3b2bdda, release https://github.com/Data-Wise/rforge/releases/tag/v2.2.0, tap data-wise/tap synced to 2.2.0 + brew info green; CRAN-submission suite — r:cran-prep + r:revdep/r:goodpractice/r:winbuilder/r:rhub + NOTE classifier, 28→33 commands)
 
-worktrees:
-  - path: ~/.git-worktrees/rforge/feature-cran-incoming
-    branch: feature/cran-incoming
-    purpose: "v2.3.0 CRAN-incoming hardening (strict noSuggests/suggests-only passes + lib/cranlint.py Tier 4)"
+worktrees: []  # feature/cran-incoming merged (PR #18) + worktree removed 2026-06-10
 
 recent:
   - date: 2026-06-10
@@ -289,14 +286,15 @@ Background, no active task:
 backlog:
   # Roadmap (settled 2026-06-10) — minor cadence after v2.2.0
   - title: "v2.3.0 — CRAN-incoming hardening"
-    priority: pr-open
+    priority: merged-to-dev
     pr: 18
     spec: docs/specs/SPEC-cran-incoming-hardening-2026-06-10.md
-    notes: "DONE in feature/cran-incoming — strict check flavors + Tier-4 cranlint (lib/cranlint.py: DESCRIPTION/build-hygiene/consistency). Gates green (pytest 168+2, test-all 31/31, v2.3.0 synced). PR #18 → dev."
+    notes: "MERGED to dev (PR #18, merge 749800a). Strict check flavors + Tier-4 cranlint. Gates green (pytest 180+2, test-all 31/31, v2.3.0 synced). Unreleased — ships on next dev → main."
   - title: "v2.4.0 — ecosystem-manifest discovery"
-    priority: medium
+    priority: merged-to-dev
+    pr: "16 (spec) + 17 (impl)"
     spec: docs/specs/SPEC-ecosystem-manifest-discovery-2026-06-10.md
-    notes: "Draft (PR #16, branch docs/ecosystem-manifest-spec). Teach lib/discovery.py to read an ecosystem manifest."
+    notes: "MERGED to dev. lib/discovery.py reads an ecosystem manifest; enrich + drift. Follow-ups open: #19 (path-escape guard), #20 (manifest_order). Unreleased."
   - title: "v2.5.0 — r:deps-sync (flagship)"
     priority: medium
     spec: docs/specs/SPEC-r-deps-sync-2026-06-10.md
