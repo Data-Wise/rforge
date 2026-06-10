@@ -1,12 +1,28 @@
 project: rforge
-updated: 2026-06-03
+updated: 2026-06-10
 status: Active
-version: 2.2.0 (released)
+version: 2.3.0 (in development — feature/cran-incoming, PR-ready)
 last_release: 2026-06-02 v2.2.0 (PR #15 dev → main merge 3b2bdda, release https://github.com/Data-Wise/rforge/releases/tag/v2.2.0, tap data-wise/tap synced to 2.2.0 + brew info green; CRAN-submission suite — r:cran-prep + r:revdep/r:goodpractice/r:winbuilder/r:rhub + NOTE classifier, 28→33 commands)
 
-worktrees: []
+worktrees:
+  - path: ~/.git-worktrees/rforge/feature-cran-incoming
+    branch: feature/cran-incoming
+    purpose: "v2.3.0 CRAN-incoming hardening (strict noSuggests/suggests-only passes + lib/cranlint.py Tier 4)"
 
 recent:
+  - date: 2026-06-10
+    branch: feature/cran-incoming
+    title: "feat: CRAN-incoming hardening — strict check passes + cranlint Tier 4 (v2.3.0)"
+    spec: docs/specs/SPEC-cran-incoming-hardening-2026-06-10.md
+    summary: |
+      r:check --strict runs both Suggests-withholding flavors (check (noSuggests)
+      + check (suggests-only)) with --run-donttest; --incoming adds the CRAN
+      incoming bundle. r:cran-prep runs the strict passes by default and BLOCKS
+      `ready` on failure (behavior change). New pure-stdlib lib/cranlint.py adds
+      advisory description/build-hygiene/docs-consistency stages (never block).
+      E2E proof: tests/fixtures/suggestbug.{before,after} — noSuggests pass
+      catches the medfit 0.2.1 unconditional-Suggests bug class with real R
+      (verified live). Gates: pytest 168 + 2 opt-in e2e, test-all.sh 31/31.
   - date: 2026-06-02
     pr: 14
     branch: dev
@@ -254,9 +270,9 @@ After A+B done: backlog is the medium-term roadmap below.
 
 backlog:
   # Medium-term work (v2.3.0 horizon)
-  - title: "Phase 4 — discovery engine + agents (v2.3.0)"
+  - title: "Phase 4 — discovery engine + agents (v2.4.0)"
     priority: medium
-    notes: "Last craft-parity item. Adds agent definitions mirroring craft's discovery engine. (Bumped from v2.2.0 — that slot was taken by r: CRAN-submission commands.)"
+    notes: "Last craft-parity item. Adds agent definitions mirroring craft's discovery engine. (Bumped v2.2.0 → v2.3.0 → v2.4.0 — the v2.3.0 slot went to CRAN-incoming hardening.)"
 
   # Parked (waits on external signal)
   - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"
