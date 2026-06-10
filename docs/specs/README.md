@@ -29,6 +29,63 @@ single-PR features. The PR description is the right home for those.
   more useful than goals — they prevent scope creep.
 - Link from `CHANGELOG.md` and `.STATUS` so SPECs aren't orphaned.
 
+## Templates
+
+Start from a template rather than a blank file — they encode the section
+structure and the citation rules below:
+
+- **[`_TEMPLATE-SPEC.md`](_TEMPLATE-SPEC.md)** — design + execution plan.
+- **[`_TEMPLATE-RESEARCH.md`](_TEMPLATE-RESEARCH.md)** — findings + recommendations
+  (no code, no plan). A RESEARCH doc feeds a SPEC; the SPEC references it instead
+  of re-deriving claims (e.g. `RESEARCH-cran-dev` → `SPEC-r-cran-prep`).
+
+Naming prefixes: `RESEARCH-` (findings) → `PROPOSAL-` (early ideation, not yet
+approved) → `SPEC-` (approved design). Promote a PROPOSAL to a SPEC by `git mv`
+once the design is decided; the date in the filename stays the *creation* date.
+
+## Research & Citation Standard
+
+rforge specs make claims about CRAN policy, R internals, and tool behavior that
+are easy to get *subtly* wrong. (A real example: an early draft of the
+CRAN-incoming-hardening proposal named `_R_CHECK_SUGGESTS_ONLY_` as the env var
+that catches a Suggests-package-used-unconditionally bug; the correct flavor is
+`_R_CHECK_DEPENDS_ONLY_`. The two have different semantics — only verification
+against the primary source caught it.) This standard exists to make that class of
+error visible before a spec leaves `Draft`.
+
+**The rules:**
+
+- **Claim → source.** Every non-obvious external or technical claim cites a source
+  *at the point of use*, not just in a bibliography.
+- **Source hierarchy** (prefer higher tiers; drop to a lower tier only when no
+  higher source covers the claim, and label it):
+  1. **Primary** — [Writing R Extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html),
+     [R Internals](https://cran.r-project.org/doc/manuals/r-release/R-ints.html),
+     [CRAN Repository Policy](https://cran.r-project.org/web/packages/policies.html),
+     R `NEWS`/source, and a package's own reference docs.
+  2. **Official tutorials** — [r-pkgs.org](https://r-pkgs.org/), r-lib / tidyverse
+     reference sites.
+  3. **Secondary** — blog posts, mailing-list threads. Use only when no primary
+     source exists, and mark them as secondary.
+- **Format.** Inline markdown link where the claim is made, **plus** a closing
+  `## Sources` section collecting every link for one-pass verification.
+- **Resolve contradictions in the open.** When two sources disagree, state both,
+  pick one, and record the resolution. That sentence is usually the most valuable
+  line in the document.
+
+**The research workflow** (how a RESEARCH doc or a spec's evidence base gets built):
+
+1. **Scope the question** — write down exactly what must be true for the design to hold.
+2. **Fan-out search** — the global `deep-research` skill, or `WebSearch` filtered to
+   primary domains (`cran.r-project.org`, `stat.ethz.ch`, package reference sites).
+3. **Fetch & verify** — `WebFetch` the primary source; confirm the claim in its own
+   words rather than trusting a summary.
+4. **Resolve contradictions** — reconcile disagreeing sources; note the resolution.
+5. **Write claim + citation** — link at point of use.
+6. **Compile `## Sources`** — collect all links.
+7. **Self-review** — scan for any external claim without a citation before promoting
+   out of `Draft`.
+
 ## Specs
 
 - **[MCP absorb (Path B)](SPEC-mcp-absorb-2026-05-10.md)** — Status:
@@ -46,6 +103,12 @@ single-PR features. The PR description is the right home for those.
   coverage/site/cycle + lint/spell/urlcheck/style) backed by `lib/rcmd.py`.
   16 → 28 commands. Deferred follow-ups (deps-sync, scaffolding, cran-prep)
   noted in the appendix.
+- **[CRAN-incoming hardening](SPEC-cran-incoming-hardening-2026-06-10.md)** —
+  Status: Reviewed/approved (target v2.3.0). Make the `check`/`cran-prep` gate emulate CRAN incoming + ongoing
+  checks (noSuggests + suggests-only flavors, `--run-donttest`, opt-in `--incoming`
+  bundle), default-on as a `ready`-blocker, plus pure-Python DESCRIPTION-lint,
+  `.Rbuildignore` build-hygiene, and planning-doc consistency checks. Grounded in
+  [RESEARCH-cran-incoming-checks](RESEARCH-cran-incoming-checks-2026-06-10.md).
 
 ## See also
 
