@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Ecosystem manifest discovery** (`lib/discovery.py`): `detect_ecosystem()` optionally reads an ecosystem manifest (e.g. `ECOSYSTEM-MANIFEST.yaml`) located via a new `manifest:` key in the root `.rforge.yaml`, and enriches discovered packages with curated metadata (`role`, `repo`, `cran`, `status_file`). Matching is by package name (case-insensitive). Mismatches surface as `Ecosystem.drift` (`manifest_only` / `disk_only`). New public API: `Manifest`, `ManifestEntry`, `Drift`, `parse_manifest()`, `read_manifest()`.
+- **Vendored YAML-subset parser** — `parse_manifest()` reads top-level scalars + a `packages:` list of flat maps with inline-comment stripping, keeping `discovery.py` stdlib-only (no PyYAML). See `docs/specs/SPEC-ecosystem-manifest-discovery-2026-06-10.md`.
+
+### Changed
+
+- `Ecosystem` gains `manifest_path` and `drift` fields (both default to the empty/zero-manifest case); `Package` gains an optional `manifest` field. `Ecosystem.to_dict()` includes both. Zero behavior change when no manifest is configured.
+
+---
+
 ## [2.2.0] - 2026-06-02
 
 ### Added
