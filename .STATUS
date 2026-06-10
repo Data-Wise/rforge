@@ -9,9 +9,9 @@ worktrees:
     branch: feature/r-deps-sync
     base: dev
     created: 2026-06-10
-    state: ready-for-impl (Phase 0 locked; implement in a fresh worktree session)
-    orchestrate: ORCHESTRATE-deps-sync.md (in tree, pushed)
-    purpose: "v2.5.0 r:deps-sync — pure-Python lib/deps_sync.py: scan R//tests/vignettes usage, reconcile vs DESCRIPTION (missing/unused/misclassified), suggested patch (--write). Remotes hint can now consult the merged ecosystem-manifest."
+    state: IMPLEMENTED — PR-ready (gates green; version NOT bumped — see note)
+    orchestrate: ORCHESTRATE-deps-sync.md (in tree)
+    purpose: "v2.5.0 r:deps-sync — lib/deps_sync.py (scan + reconcile + --write) + commands/r/deps-sync.md + 11 tests + docs/reference/deps_sync.md + doc sweep (CHANGELOG/commands/lib-modules/README). pytest 191+2, test-all 31/31. Version left at 2.3.0 (sources already lag the roadmap — ecosystem-manifest 'v2.4.0' is also unstamped; reconcile all unreleased work in one release-prep step at dev → main)."
 
 recent:
   - date: 2026-06-10

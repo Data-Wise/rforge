@@ -9,6 +9,10 @@
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
+## What's new in v2.5.0
+
+- 🔗 **`r:deps-sync`** — new pure-Python per-package command that reconciles `DESCRIPTION` against what the code actually uses. Scans `R/`/`tests/`/`vignettes/` + `NAMESPACE` for namespace usage and reports **missing** (used, undeclared → Imports), **misclassified** (in Suggests but used unconditionally in `R/` → Imports), **missing_suggests** (tests/vignettes-only), and **unused** dependencies, plus a suggested `DESCRIPTION` patch. Report-only by default; `--write` applies the unambiguous changes. The `misclassified` finding is the *static* sibling of `r:check --strict`'s noSuggests pass — it catches the medfit/MASS class **before** R runs. *Intra*-package, complementing `/rforge:deps` (the *inter*-package graph). Commands 33 → 34.
+
 ## What's new in v2.4.0
 
 - 🧭 **Ecosystem-manifest discovery** (`/rforge:detect`, `/rforge:status`) — discovery can now read an optional **ecosystem manifest** (a curated YAML listing packages with `role`/`repo`/`cran`/`status_file`), located via a new `manifest:` key in the root `.rforge.yaml`. Discovered packages are **enriched** with that metadata (matched by name, case-insensitive), and any mismatch between the manifest and what's on disk surfaces as **drift** (`manifest_only` / `disk_only`). `/rforge:detect` shows a `manifest:` header + per-package `role`; `/rforge:status` adds a conditional `Role` column. Parsed by a vendored YAML-subset reader — `discovery.py` stays stdlib-only (no PyYAML). **Zero behavior change when no manifest is configured.** New public API: `Manifest`, `ManifestEntry`, `Drift`, `parse_manifest`, `read_manifest`.

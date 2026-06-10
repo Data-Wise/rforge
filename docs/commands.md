@@ -357,6 +357,27 @@ Build and visualize dependency graph across R package ecosystem.
 - Circular dependency detection
 - External dependencies
 
+### /rforge:r:deps-sync
+
+Reconcile **one package's** `DESCRIPTION` against what its code actually uses (the *intra*-package
+counterpart to `/rforge:deps`, which maps the *inter*-package graph). Pure-Python — scans
+`R/`/`tests/`/`vignettes/` + `NAMESPACE`.
+
+**Usage:**
+```bash
+/rforge:r:deps-sync [package] [--write]
+```
+
+**Parameters:**
+- `package` (optional) — package path (defaults to current directory)
+- `--write` (optional) — apply the unambiguous `Imports`/`Suggests` changes to `DESCRIPTION` (default is report-only)
+
+**Findings:** `missing` (used, undeclared → Imports), `misclassified` (in Suggests but used
+unconditionally in `R/` → Imports — the static sibling of `r:check --strict`'s noSuggests pass),
+`missing_suggests` (tests/vignettes-only → Suggests), `unused` (declared, no usage — advisory).
+Emits a suggested patch; `--write` applies only the unambiguous parts (advisory removals are never
+auto-applied).
+
 ---
 
 ## Documentation & Tasks
