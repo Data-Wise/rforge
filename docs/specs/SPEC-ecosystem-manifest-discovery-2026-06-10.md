@@ -2,7 +2,7 @@
 
 - **Status:** Draft — awaiting user review
 - **Date:** 2026-06-10
-- **Target version:** vX.Y.Z (next minor)
+- **Target version:** v2.4.0 (minor after cran-incoming hardening's v2.3.0)
 - **Author:** brainstormed with Claude
 - **Related:** consumer is the mediationverse ecosystem hub
   (`~/projects/r-packages/mediation-planning/ECOSYSTEM-MANIFEST.yaml`)
