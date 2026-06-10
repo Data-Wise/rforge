@@ -155,8 +155,10 @@ Both gates must pass (`python3 -m pytest tests/` and `bash tests/test-all.sh`). 
 
 ## Open questions / risks
 
-- **Module placement.** New `lib/deps_sync.py` vs extending `lib/deps.py` (which is *inter*-package).
-  *Proposed:* new module — different concern (intra-package reconciliation). *Resolution at impl.*
+- **Module placement.** ✅ *Resolved:* **new `lib/deps_sync.py`**. `lib/deps.py` is the
+  *inter*-package ecosystem graph (operates on `Ecosystem`; build-order/impact/blockers; already
+  478 lines). `deps-sync` is *intra*-package — different input (one package dir), output (a
+  DESCRIPTION patch), and concern. Folding in would mix two unrelated models in one file.
 - **Guarded-usage detection fidelity.** Distinguishing `requireNamespace()`-guarded from
   unconditional `pkg::` use in `R/` is the crux of the misclassified finding; complex control flow
   may fool a regex scan. *Mitigation:* conservative — only flag clearly-unconditional top-level
