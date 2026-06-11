@@ -6,14 +6,14 @@
 
 ## Current state (2026-06-11)
 
-**v2.7.0 — in progress (feature/r-submit-runiverse)** — 35 commands (count unchanged; a flag, not a
+**v2.7.0 — released 2026-06-11** (PR #24 feature→dev, PR #25 dev→main; [release](https://github.com/Data-Wise/rforge/releases/tag/v2.7.0); CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#115 MERGED — formula+manifest → v2.7.0, sha256 6c31a316…, --diff IDENTICAL) — 35 commands (count unchanged; a flag, not a
 new command). Adds an **R-universe early-access tier** to `r:submit`: the new opt-in `--universe`
 flag verifies the package's R-universe build (CRAN-like binaries built from GitHub within minutes)
 so users can install the new version while CRAN's slower review runs in parallel. Backed by new
 public pure-stdlib `lib/runiverse.py` (`urllib`-only, no `gh`/R). **Read-only** — R-universe builds
 on `git push`, so it never uploads; R-universe status is **advisory** in the CRAN checklist and
-never blocks the (still manual, never-automatic) CRAN handoff. Spec:
-`SPEC-r-submit-runiverse-early-access-2026-06-11.md`.
+never blocks the (still manual, never-automatic) CRAN handoff. Live-verified against the new
+`data-wise.r-universe.dev` universe. Spec: `SPEC-r-submit-runiverse-early-access-2026-06-11.md`.
 
 **v2.6.0 — released 2026-06-10** (PR #23; [release](https://github.com/Data-Wise/rforge/releases/tag/v2.6.0); CI green; tap PR #114 pending) — 35 commands. One release bundling four features accumulated on `dev` since v2.2.0 (each roadmapped as a separate minor, shipped together as v2.6.0):
 - **v2.3.0 CRAN-incoming hardening** (PR #18): `r:check --strict` runs both

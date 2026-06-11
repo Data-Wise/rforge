@@ -1,10 +1,12 @@
 project: rforge
-updated: 2026-06-10
+updated: 2026-06-11
 status: Active
-version: 2.6.0 (released 2026-06-10)
-last_release: 2026-06-10 v2.6.0 (PR #23 dev → main merge 90bbad7, release https://github.com/Data-Wise/rforge/releases/tag/v2.6.0; CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#114 MERGED — origin/main formula → v2.6.0, sha256 c7d89879…, --diff IDENTICAL, ruby -c OK; local brew still 2.2.0 → `brew upgrade rforge`). One release bundling cran-incoming (v2.3.0) + ecosystem-manifest (v2.4.0) + r:deps-sync (v2.5.0) + r:submit (v2.6.0); 33→35 commands. Closed issue #19; #20 still open.
+version: 2.7.0 (released 2026-06-11)
+last_release: 2026-06-11 v2.7.0 (PR #24 feature→dev, PR #25 dev→main merge 748166682, release https://github.com/Data-Wise/rforge/releases/tag/v2.7.0; CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#115 MERGED — origin/main formula+manifest → v2.7.0, sha256 6c31a316…, --diff IDENTICAL, ruby -c OK; local brew → `brew upgrade rforge`). Adds r:submit --universe R-universe early-access tier (lib/runiverse.py, pure-stdlib); 35 commands (flag, not new command). Live-verified against data-wise.r-universe.dev (parser confirmed vs real API). Prior: v2.6.0 (2026-06-10) bundled v2.3–v2.6.
 
-worktrees: []  # feature/r-deps-sync merged (PR #21) + worktree removed 2026-06-10
+last_release_prior: 2026-06-10 v2.6.0 (tap PR #114). One release bundling cran-incoming (v2.3.0) + ecosystem-manifest (v2.4.0) + r:deps-sync (v2.5.0) + r:submit (v2.6.0); 33→35 commands. Closed issue #19; #20 still open.
+
+worktrees: []  # feature/r-submit-runiverse merged (PR #24) + worktree removed 2026-06-11
 
 recent:
   - date: 2026-06-10
