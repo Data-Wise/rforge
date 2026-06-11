@@ -109,11 +109,15 @@ flowchart TD
     D --> A
     C -- "ready ✅ or warn 🟡" --> E["/rforge:thorough\necosystem rollup"]
     E --> F["/rforge:release\nCRAN submission order"]
-    F --> G["submit via\nCRAN web form"]
+    F --> H["/rforge:r:submit\npre-release + handoff\n(opt: --universe early-access)"]
+    H --> G["submit via\nCRAN web form"]
 ```
 
 → [CRAN submission with rforge](../tutorials/cran-submission-with-rforge.md) (~15 min, per-package gate)
 → [CRAN release prep](../tutorials/cran-release-prep.md) (~15 min, ecosystem pipeline)
+
+!!! tip "R-universe early-access (v2.7.0+)"
+    CRAN review takes days; [R-universe](https://r-universe.dev) rebuilds your package from its GitHub repo within minutes and serves CRAN-like binaries. Run `/rforge:r:submit --universe` to verify your package's R-universe build is green — users can then `install.packages("<pkg>", repos = "https://<owner>.r-universe.dev")` **while** CRAN review runs in parallel. It's **read-only** (R-universe builds on `git push`) and **advisory** — it never blocks or triggers the still-manual CRAN submission.
 
 !!! warning "Strict passes block `ready` (v2.3.0+)"
     As of v2.3.0 the gate runs two Suggests-withholding flavor passes — `check (noSuggests)` and `check (suggests-only)` — **by default**, each with `--run-donttest`, and a strict ERROR blocks the `ready` verdict. A package that was 🟢 `ready` under `--as-cran` can now turn 🔴 once the noSuggests pass catches a `Suggests` package used unconditionally. The Tier 4 stages (`description`, `build-hygiene`, `docs-consistency`, backed by `lib/cranlint.py`) are advisory and never block on their own. Add `--incoming` for the opt-in CRAN-incoming `_R_CHECK_*` pass.
@@ -162,5 +166,5 @@ flowchart LR
 ## See also
 
 - **[Tutorials](../tutorials/README.md)** — step-by-step versions of every workflow above
-- **[REFCARD](../REFCARD.md)** — all 33 commands on one page
+- **[REFCARD](../REFCARD.md)** — all 35 commands on one page
 - **[Architecture](../architecture.md)** — how the plugin's internals fit together
