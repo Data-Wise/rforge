@@ -995,6 +995,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../tutorials/r-universe-early-access/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R-universe early-access
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../tutorials/migrate-from-mcp/" class="md-nav__link">
         
   
@@ -2100,9 +2128,14 @@ tutorial that walks it through in detail.</p>
     D --&gt; A
     C -- "ready ✅ or warn 🟡" --&gt; E["/rforge:thorough\necosystem rollup"]
     E --&gt; F["/rforge:release\nCRAN submission order"]
-    F --&gt; G["submit via\nCRAN web form"]</code></pre>
+    F --&gt; H["/rforge:r:submit\npre-release + handoff\n(opt: --universe early-access)"]
+    H --&gt; G["submit via\nCRAN web form"]</code></pre>
 <p>→ <a href="../tutorials/cran-submission-with-rforge/">CRAN submission with rforge</a> (~15 min, per-package gate)
 → <a href="../tutorials/cran-release-prep/">CRAN release prep</a> (~15 min, ecosystem pipeline)</p>
+<div class="admonition tip">
+<p class="admonition-title">R-universe early-access (v2.7.0+)</p>
+<p>CRAN review takes days; <a href="https://r-universe.dev">R-universe</a> rebuilds your package from its GitHub repo within minutes and serves CRAN-like binaries. Run <code>/rforge:r:submit --universe</code> to verify your package's R-universe build is green — users can then <code>install.packages("&lt;pkg&gt;", repos = "https://&lt;owner&gt;.r-universe.dev")</code> <strong>while</strong> CRAN review runs in parallel. It's <strong>read-only</strong> (R-universe builds on <code>git push</code>) and <strong>advisory</strong> — it never blocks or triggers the still-manual CRAN submission.</p>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Strict passes block <code>ready</code> (v2.3.0+)</p>
 <p>As of v2.3.0 the gate runs two Suggests-withholding flavor passes — <code>check (noSuggests)</code> and <code>check (suggests-only)</code> — <strong>by default</strong>, each with <code>--run-donttest</code>, and a strict ERROR blocks the <code>ready</code> verdict. A package that was 🟢 <code>ready</code> under <code>--as-cran</code> can now turn 🔴 once the noSuggests pass catches a <code>Suggests</code> package used unconditionally. The Tier 4 stages (<code>description</code>, <code>build-hygiene</code>, <code>docs-consistency</code>, backed by <code>lib/cranlint.py</code>) are advisory and never block on their own. Add <code>--incoming</code> for the opt-in CRAN-incoming <code>_R_CHECK_*</code> pass.</p>
@@ -2139,7 +2172,7 @@ the set.</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong><a href="../tutorials/">Tutorials</a></strong> — step-by-step versions of every workflow above</li>
-<li><strong><a href="../REFCARD/">REFCARD</a></strong> — all 33 commands on one page</li>
+<li><strong><a href="../REFCARD/">REFCARD</a></strong> — all 35 commands on one page</li>
 <li><strong><a href="../architecture/">Architecture</a></strong> — how the plugin's internals fit together</li>
 </ul>
 

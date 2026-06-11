@@ -10,13 +10,9 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/tutorials/getting-started/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/reference/runiverse/">
       
       
-        <link rel="prev" href="../">
-      
-      
-        <link rel="next" href="../rforge-in-the-r-lifecycle/">
       
       
         
@@ -27,7 +23,7 @@
     
     
       
-        <title>Getting started - RForge Plugin</title>
+        <title>lib/runiverse.py — API Reference - RForge Plugin</title>
       
     
     
@@ -80,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#getting-started-with-rforge" class="md-skip">
+        <a href="#libruniversepy-api-reference" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Getting started
+              lib/runiverse.py — API Reference
             
           </span>
         </div>
@@ -264,12 +260,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../../workflows/" class="md-tabs__link">
           
   
@@ -539,29 +533,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -579,7 +568,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -625,7 +614,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../../tutorials/" class="md-nav__link">
         
   
   
@@ -650,37 +639,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Getting started
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../tutorials/getting-started/" class="md-nav__link">
         
   
   
@@ -696,114 +658,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#step-1-install" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 1: Install
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-2-open-an-r-package-in-claude-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 2: Open an R package in Claude Code
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-3-detect-the-project-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 3: Detect the project structure
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-4-check-ecosystem-status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 4: Check ecosystem status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-5-initialize-the-active-package" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 5: Initialize the active package
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-6-run-a-deeper-analysis" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Step 6: Run a deeper analysis
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#three-headline-commands" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Three headline commands
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's next
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -816,7 +670,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../rforge-in-the-r-lifecycle/" class="md-nav__link">
+      <a href="../../tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
         
   
   
@@ -844,7 +698,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../understanding-modes/" class="md-nav__link">
+      <a href="../../tutorials/understanding-modes/" class="md-nav__link">
         
   
   
@@ -872,7 +726,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ecosystem-orchestration/" class="md-nav__link">
+      <a href="../../tutorials/ecosystem-orchestration/" class="md-nav__link">
         
   
   
@@ -900,7 +754,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../r-dev-cycle/" class="md-nav__link">
+      <a href="../../tutorials/r-dev-cycle/" class="md-nav__link">
         
   
   
@@ -928,7 +782,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cran-release-prep/" class="md-nav__link">
+      <a href="../../tutorials/cran-release-prep/" class="md-nav__link">
         
   
   
@@ -956,7 +810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cran-submission-with-rforge/" class="md-nav__link">
+      <a href="../../tutorials/cran-submission-with-rforge/" class="md-nav__link">
         
   
   
@@ -984,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../r-universe-early-access/" class="md-nav__link">
+      <a href="../../tutorials/r-universe-early-access/" class="md-nav__link">
         
   
   
@@ -1012,7 +866,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migrate-from-mcp/" class="md-nav__link">
+      <a href="../../tutorials/migrate-from-mcp/" class="md-nav__link">
         
   
   
@@ -1287,7 +1141,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/discovery/" class="md-nav__link">
+      <a href="../discovery/" class="md-nav__link">
         
   
   
@@ -1315,7 +1169,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/deps/" class="md-nav__link">
+      <a href="../deps/" class="md-nav__link">
         
   
   
@@ -1343,7 +1197,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/status/" class="md-nav__link">
+      <a href="../status/" class="md-nav__link">
         
   
   
@@ -1371,7 +1225,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/init/" class="md-nav__link">
+      <a href="../init/" class="md-nav__link">
         
   
   
@@ -1399,7 +1253,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/rcmd/" class="md-nav__link">
+      <a href="../rcmd/" class="md-nav__link">
         
   
   
@@ -1915,10 +1769,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#step-1-install" class="md-nav__link">
+  <a href="#module-overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 1: Install
+        Module overview
       
     </span>
   </a>
@@ -1926,79 +1780,107 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-open-an-r-package-in-claude-code" class="md-nav__link">
+  <a href="#functions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2: Open an R package in Claude Code
+        Functions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#api_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        api_url()
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#step-3-detect-the-project-structure" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#fetch_status" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 3: Detect the project structure
+        fetch_status()
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#step-4-check-ecosystem-status" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#format_text" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 4: Check ecosystem status
+        format_text()
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#step-5-initialize-the-active-package" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#install_snippet" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 5: Initialize the active package
+        install_snippet()
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#step-6-run-a-deeper-analysis" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#remote_owner" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 6: Run a deeper analysis
+        remote_owner()
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#three-headline-commands" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#resolve_universe" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Three headline commands
+        resolve_universe()
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-next" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#summarize" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's next
+        summarize()
       
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        verify()
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2019,7 +1901,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/tutorials/getting-started.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/reference/runiverse.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2027,189 +1909,93 @@
   
 
 
-<h1 id="getting-started-with-rforge">🚀 Getting started with rforge<a class="headerlink" href="#getting-started-with-rforge" title="Permanent link">&para;</a></h1>
+<h1 id="libruniversepy-api-reference"><code>lib/runiverse.py</code> — API Reference<a class="headerlink" href="#libruniversepy-api-reference" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>For whom:</strong> First-time rforge user. You have Claude Code installed
-and at least one R package directory you want to analyze.
-<strong>Estimated time:</strong> 10 minutes.
-<strong>Prior knowledge:</strong> Basic familiarity with R packages (you know what
-a <code>DESCRIPTION</code> file is). No prior rforge experience required.</p>
+<p>Auto-generated by <code>scripts/gen_lib_reference.py</code>. Do not edit by hand — re-run the generator to update.</p>
 </blockquote>
-<p>This tutorial walks through installing rforge, running your first
-analysis, and understanding what each command does. By the end you'll
-know the three headline commands (<code>/rforge:detect</code>, <code>/rforge:status</code>,
-<code>/rforge:analyze</code>) and where to look when something doesn't work.</p>
-<h2 id="step-1-install">Step 1: Install<a class="headerlink" href="#step-1-install" title="Permanent link">&para;</a></h2>
-<p>Pick one — they're equivalent for v1.3.0+:</p>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Claude Code marketplace (recommended — single command)</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>/plugin<span class="w"> </span>marketplace<span class="w"> </span>add<span class="w"> </span>Data-Wise/rforge
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Or via Homebrew</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>brew<span class="w"> </span>install<span class="w"> </span>data-wise/tap/rforge
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Or via npm</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>@data-wise/rforge-plugin
+<h2 id="module-overview">Module overview<a class="headerlink" href="#module-overview" title="Permanent link">&para;</a></h2>
+<p>R-universe early-access status (<code>r:submit --universe</code>).</p>
+<p>Confirms a package's R-universe is registered and reads its per-platform
+build/check status from the public R-universe API — the early-access channel
+that serves CRAN-like binaries built from GitHub within minutes, <em>before</em> CRAN's
+slower human review. <strong>Read-only:</strong> R-universe builds automatically on every git
+push, so this never uploads — it verifies and reports.</p>
+<p>Pure Python — stdlib only (<code>urllib</code>/<code>json</code>, <code>subprocess</code> for <code>git
+remote</code>); no R subprocess, no external deps. Reuses
+<code>lib.discovery.read_description</code> for the package name. Degrades to a <code>warn</code>
+envelope (never raises) when offline or unregistered, so it is safe in CI and
+hermetic smoke tests.</p>
+<p>The CRAN handoff stays explicit: this tier is passive/automatic (a git push),
+CRAN is active/manual (you run <code>submit_cran()</code>). They never share a trigger,
+so "CRAN explicit" is structurally guaranteed.</p>
+<p>API shape (<code>https://&lt;owner&gt;.r-universe.dev/api/packages/&lt;pkg&gt;</code>) — R-universe
+prefixes its internal metadata with <code>_</code>; the fields we read:</p>
+<p><code>_status</code>    overall build state ("success" / "failure" / …)
+  <code>_binaries</code>  list of per-platform builds, each with os/arch/r + status/check</p>
+<p>The parser is defensive (tolerates field-name variation) — the exact contract
+should be re-verified against a live response (the docs API page blocks
+automated fetch). A 404 means the package is not in that universe (unregistered),
+which is reported as guidance, distinct from a network failure.</p>
+<p>Usage (CLI, from repo root):
+    python3 -m lib.runiverse --path /path/to/pkg                  # auto-detect universe from git remote
+    python3 -m lib.runiverse --path /path/to/pkg --universe ropensci</p>
+<h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
+<h3 id="api_url"><code>api_url()</code><a class="headerlink" href="#api_url" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">api_url</span><span class="p">(</span><span class="n">owner</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">pkg</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
 </span></code></pre></div>
-<p>Verify the plugin loaded:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>/help
+<p>Per-package R-universe API endpoint (JSON). Owner lowercased (subdomain).</p>
+<h3 id="fetch_status"><code>fetch_status()</code><a class="headerlink" href="#fetch_status" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">fetch_status</span><span class="p">(</span><span class="n">owner</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">pkg</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;tuple[str, Optional[dict]]&#39;</span>
 </span></code></pre></div>
-<p>You should see commands prefixed <code>/rforge:</code> in the listing. If not,
-restart Claude Code and try again.</p>
-<h2 id="step-2-open-an-r-package-in-claude-code">Step 2: Open an R package in Claude Code<a class="headerlink" href="#step-2-open-an-r-package-in-claude-code" title="Permanent link">&para;</a></h2>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>~/your/r/package<span class="w">    </span><span class="c1"># any directory containing a DESCRIPTION file</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>claude
+<p>Read the package's R-universe status.</p>
+<p>Returns <code>(reason, data)</code> where reason is one of:
+  <code>"ok"</code>         — 200, parsed JSON in <code>data</code>
+  <code>"not_found"</code>  — 404, the package is not in this universe (unregistered)
+  <code>"network"</code>    — any other HTTP error, timeout, or unparseable body</p>
+<p>Never raises — degradation is the point.</p>
+<h3 id="format_text"><code>format_text()</code><a class="headerlink" href="#format_text" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_text</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
 </span></code></pre></div>
-<p>If you don't have an R package handy, the tutorial works on any folder
-that <em>contains</em> one or more package subdirectories (an "ecosystem"
-layout — see Step 3).</p>
-<h2 id="step-3-detect-the-project-structure">Step 3: Detect the project structure<a class="headerlink" href="#step-3-detect-the-project-structure" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/rforge:detect
+<p>Terminal-friendly rendering of a runiverse envelope.</p>
+<h3 id="install_snippet"><code>install_snippet()</code><a class="headerlink" href="#install_snippet" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">install_snippet</span><span class="p">(</span><span class="n">owner</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">pkg</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
 </span></code></pre></div>
-<p>Expected output (single package):</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>📦 Single: /Users/you/your/r/package
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>   Packages: 1 | mode: minimal | config: not found
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>   ├─ medfit 1.0.0
+<p>The early-access install line users run to get the R-universe build.</p>
+<p>Owner is lowercased (the canonical subdomain); the package name keeps its
+original case (R package names are case-sensitive).</p>
+<h3 id="remote_owner"><code>remote_owner()</code><a class="headerlink" href="#remote_owner" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">remote_owner</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[str]&#39;</span>
 </span></code></pre></div>
-<p>Or (ecosystem with multiple packages):</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>🏗️  Ecosystem: /Users/you/your/r/packages
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>   Packages: 4 | mode: standard | config: not found
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>   ├─ medfit 1.0.0
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>   ├─ medsim 0.3.2
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>   ├─ probmed 0.1.0
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>   └─ mediationverse 1.2.0
+<p>GitHub owner of the <code>origin</code> remote, or None.</p>
+<p>Handles both <code>https://github.com/&lt;owner&gt;/&lt;repo&gt;.git</code> and
+<code>git@github.com:&lt;owner&gt;/&lt;repo&gt;.git</code> forms. Never raises — returns None if
+git is absent, there is no remote, or the URL is not a GitHub URL.</p>
+<h3 id="resolve_universe"><code>resolve_universe()</code><a class="headerlink" href="#resolve_universe" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_universe</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">override</span><span class="p">:</span> <span class="s1">&#39;Optional[str]&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[str]&#39;</span>
 </span></code></pre></div>
-<p><strong>What just happened:</strong> rforge walked the filesystem looking for
-<code>DESCRIPTION</code> files. Each found file becomes a package entry. The
-"mode" reflects how thorough subsequent analysis will be — see
-<a href="../../reference/discovery/"><code>lib.discovery</code> reference</a> for details.</p>
-<h2 id="step-4-check-ecosystem-status">Step 4: Check ecosystem status<a class="headerlink" href="#step-4-check-ecosystem-status" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:status
+<p>The universe name: <code>override</code> if given, else the GitHub remote owner.</p>
+<p>Normalized to <strong>lowercase</strong> — R-universe subdomains and registry/monorepo
+names are canonically lowercase (the <code>Data-Wise</code> GitHub org maps to
+<code>data-wise.r-universe.dev</code>), even though DNS itself is case-insensitive.</p>
+<h3 id="summarize"><code>summarize()</code><a class="headerlink" href="#summarize" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">summarize</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
-<p>Expected output:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>📊 ECOSYSTEM STATUS: /Users/you/your/r/packages
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>Package                Version    Check      Test       Progress
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>──────────────────────────────────────────────────────────────────────
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>medfit                 1.0.0      ❔ unknown ❔ unknown --
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>medsim                 0.3.2      ❔ unknown ❔ unknown --
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>Health score: 70/100
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>🟡 Some issues to address
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>Generated: 2026-05-11T12:34:56
+<p>Reduce a raw API payload to <code>{green, known, top_status, platforms}</code>.</p>
+<p><code>green</code> means every platform <strong>built</strong> (its binary is installable) — the
+relevant bar for an early-access channel. Each platform row also carries the
+advisory R CMD <code>check</code> result (<code>OK</code>/<code>NOTE</code>/<code>WARNING</code>/<code>ERROR</code>), which
+is surfaced but does <strong>not</strong> flip <code>green</code> (a built binary installs even with
+a check NOTE). <code>known</code> is False when the payload has no recognizable build
+status (treated as "unknown", not "green").</p>
+<h3 id="verify"><code>verify()</code><a class="headerlink" href="#verify" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">verify</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">universe</span><span class="p">:</span> <span class="s1">&#39;Optional[str]&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
-<p><strong>Reading the output:</strong></p>
-<ul>
-<li><strong><code>Check</code>/<code>Test</code> columns</strong>: <code>unknown</code> means rforge hasn't yet run R
-  CMD check or test suites. In v1.3.0, these are stubs — to be wired up
-  in v1.4.0. Don't worry about it for now.</li>
-<li><strong><code>Progress</code></strong>: read from each package's <code>.STATUS</code> file (if present).
-  <code>--</code> means no <code>.STATUS</code> file exists. See
-  <a href="../../reference/status/">lib.status reference</a> for the <code>.STATUS</code>
-  format rforge can parse.</li>
-<li><strong><code>Health score</code></strong>: 0-100 composite. Each <code>unknown</code> deducts a bit;
-  staleness (&gt;14 days since last <code>.STATUS</code> update) deducts more.</li>
-</ul>
-<h2 id="step-5-initialize-the-active-package">Step 5: Initialize the active package<a class="headerlink" href="#step-5-initialize-the-active-package" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/rforge:init
-</span></code></pre></div>
-<p>Expected output:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>✓ rforge initialized
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>  Package: medfit (1.0.0)
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>  Path:    /Users/you/your/r/package
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>  State:   /Users/you/.rforge/context.json
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>  Mode:    full
-</span></code></pre></div>
-<p><strong>What this does:</strong> writes <code>~/.rforge/context.json</code> marking this
-package as the current active context. Other rforge tools (and future
-features) read this file to know what package you're working on. It's
-<strong>per-user, not per-package</strong> — only one active context at a time.</p>
-<p>To switch contexts later: <code>cd</code> to a different package directory and run
-<code>/rforge:init</code> again.</p>
-<h2 id="step-6-run-a-deeper-analysis">Step 6: Run a deeper analysis<a class="headerlink" href="#step-6-run-a-deeper-analysis" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>/rforge:analyze &quot;Updated bootstrap algorithm&quot;
-</span></code></pre></div>
-<p>This is the headline orchestration command. It:</p>
-<ol>
-<li>Detects the project structure (Step 3)</li>
-<li>Checks status (Step 4)</li>
-<li>Analyzes dependencies + impact of the described change</li>
-<li>Synthesizes recommendations</li>
-</ol>
-<p>Expected output (abbreviated):</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>📦 Pattern: CODE_CHANGE
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>🔍 Analyzing impact of &quot;Updated bootstrap algorithm&quot;...
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>   Direct dependents:   2 (medsim, mediationverse)
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>   Indirect dependents: 0
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>   Estimated work:      90 min
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>   Risk level:          medium
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>🔄 UPDATE SEQUENCE
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>   1. medfit
-</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>   2. medsim
-</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>   3. mediationverse
-</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>
-</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>💡 RECOMMENDATIONS
-</span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>   • Update 2 direct dependent package(s)
-</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>   • Run tests on dependents after change
-</span></code></pre></div>
-<h2 id="three-headline-commands">Three headline commands<a class="headerlink" href="#three-headline-commands" title="Permanent link">&para;</a></h2>
-<p>Use these for daily work; the rest of the plugin's 35 commands are
-specialized.</p>
-<table>
-<thead>
-<tr>
-<th>Command</th>
-<th>When</th>
-<th>What</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>/rforge:quick</code></td>
-<td>Pre-commit, fast check</td>
-<td>&lt;10s ecosystem snapshot</td>
-</tr>
-<tr>
-<td><code>/rforge:analyze "description"</code></td>
-<td>After code changes</td>
-<td>~30s — impact + recommendations</td>
-</tr>
-<tr>
-<td><code>/rforge:r:cran-prep</code></td>
-<td>Before CRAN submission</td>
-<td>per-package gate — document→check→revdep, writes <code>cran-comments.md</code></td>
-</tr>
-<tr>
-<td><code>/rforge:thorough "release prep"</code></td>
-<td>Ecosystem rollup before release</td>
-<td>2-5 min — cross-package validation + submission order</td>
-</tr>
-</tbody>
-</table>
-<h2 id="whats-next">What's next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
-<p>Now that the basics work, follow the learning path:</p>
-<ul>
-<li><strong><a href="../rforge-in-the-r-lifecycle/">rforge in the R package lifecycle</a></strong> —
-  where rforge fits alongside <code>devtools</code>/<code>usethis</code> (read this next)</li>
-<li><strong><a href="../understanding-modes/">Understanding modes</a></strong> — the <code>--mode</code> flag on
-  <code>/rforge:analyze</code>, explained simply</li>
-<li><strong><a href="../ecosystem-orchestration/">Ecosystem orchestration</a></strong> — managing
-  several inter-dependent packages</li>
-<li><strong><a href="../cran-release-prep/">CRAN release prep</a></strong> — taking a package to CRAN</li>
-</ul>
-<p>Reference material:</p>
-<ul>
-<li><strong><a href="../../REFCARD/">REFCARD</a></strong> — all 35 commands in one page</li>
-<li><strong><a href="../../hooks-and-skills/">Hooks &amp; Skills</a></strong> — the <code>pretooluse</code> hook
-  that flags R-aware mistakes on every Write/Edit</li>
-<li><strong><a href="../../architecture/">Architecture</a></strong> — how the plugin's <code>lib/</code>
-  modules fit together</li>
-<li><strong><a href="../../troubleshooting/">Troubleshooting</a></strong> — when commands don't
-  behave as expected</li>
-</ul>
+<p>Verify a package's R-universe early-access build status.</p>
+<p>Resolves the universe owner (git remote, or <code>universe</code> override) and the
+package name (DESCRIPTION), reads the R-universe API, and reports per-platform
+build status. Emits <code>ok</code> only when builds are confirmed green; every
+degradation (no DESCRIPTION, no remote, unregistered, offline, unknown) is a
+non-fatal <code>warn</code>. Never raises.</p>
 
 
 

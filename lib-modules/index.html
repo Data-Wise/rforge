@@ -844,6 +844,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../tutorials/r-universe-early-access/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R-universe early-access
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../tutorials/migrate-from-mcp/" class="md-nav__link">
         
   
@@ -2379,6 +2407,11 @@ ecosystem health, or initialize per-user state.</p>
 <td><code>lib/ghrelease.py</code></td>
 <td><code>gh_available</code>, <code>submission_tag</code>, <code>prerelease_cmd</code>, <code>promote_cmd</code>, <code>manual_recipe</code> (v2.6.0 — <code>gh release</code> command builders for <code>r:submit</code>; pure-Python, shells to nothing itself)</td>
 <td>used from <code>commands/r/submit.md</code> (constructs the <code>gh</code> argv it runs)</td>
+</tr>
+<tr>
+<td><code>lib/runiverse.py</code></td>
+<td><code>remote_owner</code>, <code>resolve_universe</code>, <code>api_url</code>, <code>install_snippet</code>, <code>fetch_status</code>, <code>summarize</code>, <code>verify</code> (v2.7.0 — R-universe early-access status for <code>r:submit --universe</code>; pure-stdlib, <code>urllib</code>-only, read-only — never uploads)</td>
+<td><code>python3 -m lib.runiverse --path . [--universe &lt;owner&gt;] [--format text\|json]</code></td>
 </tr>
 </tbody>
 </table>

@@ -844,6 +844,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../tutorials/r-universe-early-access/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R-universe early-access
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../tutorials/migrate-from-mcp/" class="md-nav__link">
         
   
@@ -3828,27 +3856,37 @@ auto-applied).</p>
 <p>GitHub pre-release of the submitted tarball + CRAN submit <strong>handoff</strong> — fills the gap between
 <code>r:cran-prep</code> (reports <code>ready</code>) and CRAN going live. <strong>Never auto-submits to CRAN.</strong></p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-67-1"><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>/rforge:r:submit<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--promote<span class="o">]</span><span class="w"> </span><span class="o">[</span>--dry-run<span class="o">]</span><span class="w"> </span><span class="o">[</span>--no-verify<span class="o">]</span><span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-67-1"><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>/rforge:r:submit<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--promote<span class="o">]</span><span class="w"> </span><span class="o">[</span>--universe<span class="o">]</span><span class="w"> </span><span class="o">[</span>--universe-name<span class="w"> </span>&lt;owner&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--dry-run<span class="o">]</span><span class="w"> </span><span class="o">[</span>--no-verify<span class="o">]</span><span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
 <li><code>package</code> (optional) — package path (defaults to current directory)</li>
 <li><code>--promote</code> (optional) — Phase 2: flip the pre-release to a full release after CRAN accepts</li>
+<li><code>--universe</code> (optional) — Phase 0: also verify the package's <strong>R-universe early-access</strong> build is green (read-only; never uploads). Advisory — never blocks the CRAN handoff.</li>
+<li><code>--universe-name &lt;owner&gt;</code> (optional) — override the auto-detected R-universe owner (defaults to the GitHub <code>origin</code> remote owner)</li>
 <li><code>--dry-run</code> (optional) — show the tag/assets/checklist without touching GitHub</li>
 <li><code>--no-verify</code> (optional) — with <code>--promote</code>, skip the <code>cran.r-project.org</code> version check</li>
 <li><code>--force</code> (optional) — cut the pre-release even if <code>cran-prep</code> is not <code>ready</code> (records the override)</li>
 </ul>
 <p><strong>Lifecycle:</strong></p>
 <ul>
+<li><strong>Phase 0</strong> (<code>r:submit --universe</code>, optional): verify the <strong>R-universe early-access</strong> build.
+  R-universe rebuilds the package from its GitHub repo within minutes and serves CRAN-like binaries,
+  so users can <code>install.packages("&lt;pkg&gt;", repos = "https://&lt;owner&gt;.r-universe.dev")</code> <strong>while</strong> CRAN
+  review runs. Auto-detects the universe from the git <code>origin</code> remote, reads the public R-universe
+  API, and reports per-platform build status. <strong>Read-only</strong> — R-universe builds on <code>git push</code>, so it
+  never uploads. Backed by pure-stdlib <code>lib/runiverse.py</code> (<code>urllib</code>-only; no <code>gh</code>/R); degrades to a
+  <code>warn</code> envelope offline/unregistered (with one-time setup guidance), never blocking the steps below.</li>
 <li><strong>Phase 1</strong> (<code>r:submit</code>): gate on <code>cran-prep</code> = <code>ready</code> → build the tarball (reuse <code>r:build</code>) → cut a
   GitHub <strong>pre-release</strong> (not "Latest") tagged <code>v&lt;version&gt;</code> with <code>cran-comments.md</code> + tarball attached →
-  print the CRAN submit checklist for you to run.</li>
+  print the CRAN submit checklist for you to run (with an <strong>advisory</strong> R-universe status line).</li>
 <li><strong>Phase 2</strong> (<code>r:submit --promote</code>): optionally verify the version is live on CRAN, then
   <code>gh release edit v&lt;version&gt; --prerelease=false --latest</code>.</li>
 </ul>
 <p>Uses a <em>pre-release promoted in place</em> to avoid tagging a final release before acceptance (resubmissions
 bump the version — the r-pkgs anti-pattern). <code>gh</code> is a soft dependency: if absent/unauthed, the command
-prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib/ghrelease.py</code>.</p>
+prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib/ghrelease.py</code> (release commands) and
+<code>lib/runiverse.py</code> (R-universe status).</p>
 <p><strong>Related commands:</strong> <code>/rforge:r:cran-prep</code> (upstream gate), <code>/rforge:r:build</code> (the tarball), <code>/rforge:release</code></p>
 <hr />
 <h2 id="command-categories-summary">Command Categories Summary<a class="headerlink" href="#command-categories-summary" title="Permanent link">&para;</a></h2>
