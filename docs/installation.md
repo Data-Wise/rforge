@@ -56,7 +56,7 @@ After any method, confirm Claude Code sees the plugin:
 /help
 ```
 
-Expected: 33 commands prefixed `/rforge:` appear in the listing. If they
+Expected: 35 commands prefixed `/rforge:` appear in the listing. If they
 don't, restart Claude Code and try again.
 
 A quicker confirmation from the shell:

@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.7.0] - 2026-06-11
+
+> Adds an **R-universe early-access tier** to `r:submit` — verify your package's
+> fast-channel build is green while CRAN's slower review runs. CRAN submission
+> stays explicit and never automatic.
+
+### Added
+
+- **`r:submit --universe`** (`lib/runiverse.py`) — new opt-in flag that verifies the package's
+  [R-universe](https://r-universe.dev) early-access build. R-universe rebuilds from your GitHub
+  repo within minutes and serves CRAN-like binaries, so users can install the new version
+  (`install.packages("<pkg>", repos = "https://<owner>.r-universe.dev")`) while CRAN review runs
+  in parallel. The flag auto-detects the universe from the git `origin` remote (override with
+  `--universe-name <owner>`), reads the public R-universe API, and reports per-platform build
+  status. **Read-only** — R-universe builds on `git push`, so it never uploads; and the R-universe
+  status appears as an **advisory** line in the CRAN checklist that never blocks the (still manual)
+  CRAN handoff. New public, pure-stdlib module `lib/runiverse.py` (`urllib`-only; no `gh`/R).
+  Degrades to a `warn` envelope when offline or unregistered (prints one-time setup guidance);
+  never raises. See `docs/specs/SPEC-r-submit-runiverse-early-access-2026-06-11.md`. Command count
+  unchanged at 35 (a flag, not a new command).
+
+---
+
 ## [2.6.0] - 2026-06-10
 
 > Collapses four roadmapped minors into one release — cran-incoming hardening,

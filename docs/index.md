@@ -54,6 +54,10 @@ Most daily work runs through these. The other 30 commands are specialized — se
 /rforge:thorough "Prepare for CRAN release"
 ```
 
+## What's new in v2.7.0
+
+- **`r:submit --universe`** — opt-in **R-universe early-access tier**. Verifies your package's R-universe build (CRAN-like binaries rebuilt from GitHub within minutes) so users can install the new version while CRAN review runs in parallel. Auto-detects the universe from the git `origin` remote (`--universe-name <owner>` to override), reports per-platform build status, and prints the `install.packages(..., repos=...)` snippet. **Read-only** (R-universe builds on `git push`); status is **advisory** in the CRAN checklist and never blocks the still-manual CRAN handoff. Backed by new pure-stdlib `lib/runiverse.py` (`urllib`-only); degrades to `warn` offline/unregistered.
+
 ## What's new in v2.6.0
 
 - **`r:submit`** — wraps the moment of CRAN submission: gate on `r:cran-prep` `ready` → build the tarball → cut a GitHub **pre-release** (not "Latest") of it with `cran-comments.md` → print the CRAN submit checklist (**never auto-submits**). `r:submit --promote` flips the pre-release to a full release on acceptance. Using a pre-release promoted in place sidesteps tagging a final release before acceptance. Backed by pure-Python `lib/ghrelease.py`.

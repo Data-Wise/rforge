@@ -9,6 +9,10 @@
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
+## What's new in v2.7.0
+
+- 🌌 **`r:submit --universe`** — new opt-in flag that adds an **R-universe early-access tier**. R-universe rebuilds your package from its GitHub repo within minutes and serves CRAN-like binaries, so users can install the new version (`install.packages("<pkg>", repos = "https://<owner>.r-universe.dev")`) **while** CRAN's slower human review runs in parallel. The flag auto-detects your universe from the git `origin` remote (`--universe-name <owner>` to override), reads the public R-universe API, and reports per-platform build status. It's **read-only** — R-universe builds on `git push`, so it never uploads — and the status is **advisory** in the CRAN checklist: it never blocks the (still manual, never-automatic) CRAN handoff. Backed by new pure-stdlib `lib/runiverse.py` (`urllib`-only; no `gh`/R); degrades to a `warn` envelope offline/unregistered with one-time setup guidance. Commands unchanged at 35 (a flag, not a new command).
+
 ## What's new in v2.6.0
 
 - 🚀 **`r:submit`** — new per-package command that wraps the *moment of CRAN submission*. Gates on `r:cran-prep` being `ready`, builds the tarball, and cuts a GitHub **pre-release** (not "Latest") of it with `cran-comments.md` attached, then prints the CRAN submit checklist — it **never auto-submits**. `r:submit --promote` flips the pre-release to a full release once CRAN accepts (`gh release edit --prerelease=false --latest`). Using a *pre-release* promoted in place sidesteps the r-pkgs anti-pattern of tagging a final release before acceptance (resubmissions bump the version). `gh` is a soft dependency with a printed manual-recipe fallback. Backed by pure-Python `lib/ghrelease.py`. Commands 34 → 35.
@@ -444,7 +448,7 @@ Plugin settings in `plugin.json`:
 ```
 ~/.claude/plugins/rforge/
 ├── .claude-plugin/
-│   ├── plugin.json          # Plugin manifest (v2.6.0)
+│   ├── plugin.json          # Plugin manifest (v2.7.0)
 │   ├── marketplace.json     # Marketplace install metadata
 │   ├── config.json          # User-tunable options (CRAN mirror, etc.)
 │   ├── hooks/
@@ -460,7 +464,7 @@ Plugin settings in `plugin.json`:
 │   ├── deps.py              # Dependency graph + impact
 │   ├── status.py            # DESCRIPTION + .STATUS health snapshot
 │   ├── init.py              # ~/.rforge/context.json initializer
-│   ├── rcmd.py              # R dev-cycle + quality + CRAN-submission engines (v2.6.0)
+│   ├── rcmd.py              # R dev-cycle + quality + CRAN-submission engines (v2.7.0)
 │   ├── cranlint.py          # CRAN-incoming linter — DESCRIPTION + build-hygiene (v2.3.0)
 │   └── formatters.py        # Output formatting helpers
 └── docs/                    # User-facing docs
@@ -487,6 +491,6 @@ MIT
 
 ---
 
-**Version:** 2.6.0
+**Version:** 2.7.0
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+
