@@ -4,9 +4,18 @@
 > Follows the global `~/.claude/CLAUDE.md`; this file only captures
 > rforge-specific patterns that don't apply to other dev-tools repos.
 
-## Current state (2026-06-10)
+## Current state (2026-06-11)
 
-**v2.6.0 — release in progress (dev → main)** — 35 commands. One release bundling four features accumulated on `dev` since v2.2.0 (each roadmapped as a separate minor, shipped together as v2.6.0):
+**v2.7.0 — in progress (feature/r-submit-runiverse)** — 35 commands (count unchanged; a flag, not a
+new command). Adds an **R-universe early-access tier** to `r:submit`: the new opt-in `--universe`
+flag verifies the package's R-universe build (CRAN-like binaries built from GitHub within minutes)
+so users can install the new version while CRAN's slower review runs in parallel. Backed by new
+public pure-stdlib `lib/runiverse.py` (`urllib`-only, no `gh`/R). **Read-only** — R-universe builds
+on `git push`, so it never uploads; R-universe status is **advisory** in the CRAN checklist and
+never blocks the (still manual, never-automatic) CRAN handoff. Spec:
+`SPEC-r-submit-runiverse-early-access-2026-06-11.md`.
+
+**v2.6.0 — released 2026-06-10** (PR #23; [release](https://github.com/Data-Wise/rforge/releases/tag/v2.6.0); CI green; tap PR #114 pending) — 35 commands. One release bundling four features accumulated on `dev` since v2.2.0 (each roadmapped as a separate minor, shipped together as v2.6.0):
 - **v2.3.0 CRAN-incoming hardening** (PR #18): `r:check --strict` runs both
   Suggests-withholding flavors (`check (noSuggests)` + `check (suggests-only)`) with
   `--run-donttest`; `--incoming` adds the CRAN-incoming `_R_CHECK_*` bundle; `r:cran-prep`
@@ -54,11 +63,12 @@ The `lib/` directory is a Python package (has `__init__.py`). Modules use relati
 
 - **Run modules as a package**: `python3 -m lib.<module>` (e.g., `python3 -m lib.discovery`)
 - **Never**: `python3 lib/<module>.py` — breaks relative imports
-- **Public modules** (with `docs/reference/` pages): `discovery`, `deps`, `status`, `init`, `rcmd`, `cranlint`
+- **Public modules** (with `docs/reference/` pages): `discovery`, `deps`, `status`, `init`, `rcmd`, `cranlint`, `deps_sync`, `ghrelease`, `runiverse`
+- **R-universe module** (`runiverse`, v2.7.0): pure-stdlib (`urllib`-only, no R, no `gh`), like the analysis modules. Backs `r:submit --universe` — `verify()` reads the R-universe API and reports per-platform early-access build status; **read-only** (never uploads) and degrades to a `warn` envelope offline/unregistered (never raises).
 - **CRAN-lint module** (`cranlint`, v2.3.0): pure-stdlib (no R), like the analysis modules. `lint_description`/`check_build_hygiene`/`check_planning_consistency`/`run_all` emit advisory envelopes wired into `r:cran-prep` as the `description`/`build-hygiene`/`docs-consistency` stages (never block `ready`).
 - **R-runner module** (`rcmd`, v2.2.0): unlike the analysis modules (pure-stdlib, no R), `rcmd` shells out to `Rscript` running lower-level R engines (`rcmdcheck`/`pkgbuild`/`roxygen2`/`testthat`/`pkgload`/`covr`/`pkgdown`/`lintr`/`spelling`/`urlchecker`/`styler`/`revdepcheck`/`goodpractice`/`rhub`) which emit JSON; it normalizes to one envelope. Backs the 17 `r:` commands. The `devtools` engine is used only by `r:winbuilder`.
 - **Internal module** (no reference page, subject to refactor): `formatters` — used from command prompts; if importing externally, copy don't reuse
-- **Auto-generated reference docs**: `docs/reference/{discovery,deps,status,init,rcmd,cranlint}.md` are produced by `scripts/gen_lib_reference.py`
+- **Auto-generated reference docs**: `docs/reference/{discovery,deps,status,init,rcmd,cranlint,deps_sync,ghrelease,runiverse}.md` are produced by `scripts/gen_lib_reference.py`
 - **CI gate**: `scripts/gen_lib_reference.py --check` compares regenerated output against committed files; any drift fails CI
 
 ## Command-file conventions (all 28 commands)
@@ -87,8 +97,8 @@ The `arguments:` array is the machine-readable spec; the `## Usage` body is the 
 
 Both must pass before any PR:
 
-- `bash tests/test-all.sh` — **30 checks** (versions, hook compile + behavior, manifests parse, skills valid, lib pytest, lib CLI smoke incl. `rcmd`, lib reference docs in sync, rename stubs/targets, command-name uniqueness, migration recipe E2E)
-- `python3 -m pytest tests/` — **136 lib/\* cases** (discovery, deps, status, init, rcmd)
+- `bash tests/test-all.sh` — **32 checks** (versions, hook compile + behavior, manifests parse, skills valid, lib pytest, lib CLI smoke incl. `rcmd`/`cranlint`/`runiverse`, lib reference docs in sync, rename stubs/targets, command-name uniqueness, migration recipe E2E)
+- `python3 -m pytest tests/` — **220 lib/\* cases** (discovery, deps, status, init, rcmd, cranlint, deps_sync, ghrelease, runiverse)
 
 ## Homebrew tap quirks (rforge-specific)
 

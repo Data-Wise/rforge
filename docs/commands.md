@@ -1158,28 +1158,38 @@ GitHub pre-release of the submitted tarball + CRAN submit **handoff** — fills 
 **Usage:**
 
 ```bash
-/rforge:r:submit [package] [--promote] [--dry-run] [--no-verify] [--force]
+/rforge:r:submit [package] [--promote] [--universe] [--universe-name <owner>] [--dry-run] [--no-verify] [--force]
 ```
 
 **Parameters:**
 
 - `package` (optional) — package path (defaults to current directory)
 - `--promote` (optional) — Phase 2: flip the pre-release to a full release after CRAN accepts
+- `--universe` (optional) — Phase 0: also verify the package's **R-universe early-access** build is green (read-only; never uploads). Advisory — never blocks the CRAN handoff.
+- `--universe-name <owner>` (optional) — override the auto-detected R-universe owner (defaults to the GitHub `origin` remote owner)
 - `--dry-run` (optional) — show the tag/assets/checklist without touching GitHub
 - `--no-verify` (optional) — with `--promote`, skip the `cran.r-project.org` version check
 - `--force` (optional) — cut the pre-release even if `cran-prep` is not `ready` (records the override)
 
 **Lifecycle:**
 
+- **Phase 0** (`r:submit --universe`, optional): verify the **R-universe early-access** build.
+  R-universe rebuilds the package from its GitHub repo within minutes and serves CRAN-like binaries,
+  so users can `install.packages("<pkg>", repos = "https://<owner>.r-universe.dev")` **while** CRAN
+  review runs. Auto-detects the universe from the git `origin` remote, reads the public R-universe
+  API, and reports per-platform build status. **Read-only** — R-universe builds on `git push`, so it
+  never uploads. Backed by pure-stdlib `lib/runiverse.py` (`urllib`-only; no `gh`/R); degrades to a
+  `warn` envelope offline/unregistered (with one-time setup guidance), never blocking the steps below.
 - **Phase 1** (`r:submit`): gate on `cran-prep` = `ready` → build the tarball (reuse `r:build`) → cut a
   GitHub **pre-release** (not "Latest") tagged `v<version>` with `cran-comments.md` + tarball attached →
-  print the CRAN submit checklist for you to run.
+  print the CRAN submit checklist for you to run (with an **advisory** R-universe status line).
 - **Phase 2** (`r:submit --promote`): optionally verify the version is live on CRAN, then
   `gh release edit v<version> --prerelease=false --latest`.
 
 Uses a *pre-release promoted in place* to avoid tagging a final release before acceptance (resubmissions
 bump the version — the r-pkgs anti-pattern). `gh` is a soft dependency: if absent/unauthed, the command
-prints the manual `gh` recipe instead of failing. Backed by `lib/ghrelease.py`.
+prints the manual `gh` recipe instead of failing. Backed by `lib/ghrelease.py` (release commands) and
+`lib/runiverse.py` (R-universe status).
 
 **Related commands:** `/rforge:r:cran-prep` (upstream gate), `/rforge:r:build` (the tarball), `/rforge:release`
 

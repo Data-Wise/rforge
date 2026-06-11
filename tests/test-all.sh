@@ -418,6 +418,23 @@ assert need <= kinds, f'missing Tier-4 stages: {need - kinds}'
 "
 }
 
+# lib.runiverse CLI smoke — pure-Python, network-free here (a tmpdir with no
+# DESCRIPTION bails before any HTTP call). Asserts the warn-degradation envelope
+# so the check is hermetic: offline/unregistered must never crash or error.
+lib_runiverse_smoke() {
+    local tmpdir out
+    tmpdir=$(mktemp -d)
+    out=$(python3 -m lib.runiverse --path "$tmpdir" --format json 2>/dev/null)
+    rm -rf "$tmpdir"
+    printf '%s' "$out" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+assert d['kind'] == 'runiverse', f\"unexpected kind {d['kind']}\"
+assert d['status'] in ('ok', 'warn'), f\"must degrade, not error; got {d['status']}\"
+assert d['engine_missing'] == [], 'pure-Python module: engine_missing must be []'
+"
+}
+
 echo "═══════════════════════════════════════════════════════════════"
 echo "  RForge plugin — full validation suite"
 echo "═══════════════════════════════════════════════════════════════"
@@ -465,6 +482,7 @@ run "Lib: CLI smoke (discovery + deps + status + init)" lib_cli_smoke
 run "Lib: reference docs in sync with source" lib_reference_in_sync
 run "Lib: rcmd CLI smoke (R-free — accepts engine_missing envelope)" lib_rcmd_smoke
 run "Dogfood: lib.cranlint Tier-4 advisory CLI on a fixture package" lib_cranlint_smoke
+run "Dogfood: lib.runiverse CLI smoke (offline → warn envelope)" lib_runiverse_smoke
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════"

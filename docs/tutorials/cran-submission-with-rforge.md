@@ -215,3 +215,4 @@ With a green gate and reviewed `cran-comments.md`, hand off to the ecosystem-lev
 - `/rforge:release` — ecosystem submission ordering
 - `/rforge:r:cycle` — quick dev loop (document → test → check); use before cran-prep
 - [CRAN release prep](cran-release-prep.md) — the broader ecosystem release workflow
+- [R-universe early-access](r-universe-early-access.md) — ship binaries to users *while* CRAN reviews (`r:submit --universe`)

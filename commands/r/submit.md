@@ -1,7 +1,7 @@
 ---
 name: rforge:r:submit
 description: GitHub pre-release of the submitted tarball + CRAN submit handoff; promote on acceptance
-argument-hint: "[package] [--promote] [--dry-run] [--no-verify] [--force]"
+argument-hint: "[package] [--promote] [--universe] [--dry-run] [--no-verify] [--force]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)
@@ -27,6 +27,15 @@ arguments:
     required: false
     type: boolean
     default: false
+  - name: universe
+    description: "Also verify the package's R-universe early-access build is green (read-only; never uploads)"
+    required: false
+    type: boolean
+    default: false
+  - name: universe-name
+    description: Override the auto-detected R-universe owner (your GitHub user/org name)
+    required: false
+    type: string
 ---
 
 # R Submit — GitHub pre-release + CRAN submit handoff
@@ -37,6 +46,25 @@ pre-release to a full release once CRAN accepts. **Never auto-submits to CRAN.**
 
 > Fills the gap between `/rforge:r:cran-prep` (reports `ready`) and CRAN going live. The actual
 > CRAN upload stays a manual step you run.
+
+Add `--universe` to also surface the package's **R-universe early-access** status — the
+fast channel (CRAN-like binaries built from your GitHub repo within minutes) that lets users
+install the new version *while* CRAN's slower human review runs. R-universe builds automatically
+on `git push`, so this step is **read-only**: it verifies and reports, never uploads. The CRAN
+handoff is untouched and stays explicit — the two channels never share a trigger.
+
+## Phase 0 — `r:submit --universe` (optional R-universe early-access check)
+
+```bash
+# Verify the early-access build is green (auto-detects the universe from the git remote;
+# override with --universe-name <owner>). Pure-Python, network-only, no gh/R needed.
+python3 -m lib.runiverse --path "<path>"                          # or: --universe <owner>
+# → per-platform build status + the early-access install snippet:
+#     install.packages("<pkg>", repos = "https://<owner>.r-universe.dev")
+```
+
+Degrades gracefully (never blocks): if the universe isn't registered it prints the one-time
+setup steps; if offline it reports "status unknown." None of these stop the CRAN handoff below.
 
 ## Phase 1 — `r:submit` (build + pre-release + handoff)
 
@@ -59,6 +87,7 @@ Then **print the CRAN submit checklist** (do not run it):
 
 ```markdown
 ## Ready to submit v{version} to CRAN
+- R-universe early-access: {green | red | unregistered}  ← advisory only (with --universe); never blocks
 - [ ] Pre-release cut: {tag} (pre-release, not "Latest") with cran-comments.md + tarball attached
 - [ ] Submit: `devtools::submit_cran()`  — or the web form at https://cran.r-project.org/submit.html
 - [ ] Confirm via the emailed link
@@ -80,6 +109,10 @@ python3 -c "from lib.ghrelease import promote_cmd; print(' '.join(promote_cmd('<
 - `--dry-run` — show the tag/assets/checklist; touch nothing on GitHub.
 - `--force` — cut the pre-release even if `cran-prep` is not `ready` (record the override + reasons).
 - `--no-verify` — with `--promote`, skip the CRAN-page version check.
+- `--universe` — also verify the R-universe early-access build (read-only); reports per-platform
+  status + the install snippet. Advisory — never blocks the CRAN handoff.
+- `--universe-name <owner>` — override the auto-detected universe owner (defaults to the GitHub
+  `origin` remote owner).
 
 ## Guards & degradation
 
@@ -87,6 +120,8 @@ python3 -c "from lib.ghrelease import promote_cmd; print(' '.join(promote_cmd('<
 - **`gh` absent/unauthed** (`gh_available()` false, or `gh auth status` fails) → print the manual
   `gh` recipe via `lib.ghrelease.manual_recipe`; never fail.
 - **`--promote` with no matching pre-release** → warn with guidance, never a destructive action.
+- **`--universe` offline / unregistered / no remote** → `lib.runiverse` emits a `warn` envelope
+  (setup guidance or "status unknown"); never raises and never blocks CRAN.
 
 ## Related Commands
 
