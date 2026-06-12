@@ -422,4 +422,4 @@ Install them as you need them; `r:cycle` (document/test/check) has no optional d
   `r:cycle` is green, run the full pre-submission gate with `r:cran-prep`
 - **[CRAN release prep](cran-release-prep.md)** — ecosystem-level submission
   order when you have multiple interdependent packages
-- **[REFCARD](../REFCARD.md)** — all 35 commands in one page
+- **[REFCARD](../REFCARD.md)** — all {{ rforge.command_count }} commands in one page

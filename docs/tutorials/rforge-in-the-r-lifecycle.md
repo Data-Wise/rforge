@@ -176,4 +176,4 @@ is."
   `/rforge:r:check`, `/rforge:release` end to end.
 - **[Getting started](getting-started.md)** — if you skipped the basic
   install + first-analysis walkthrough.
-- **[REFCARD](../REFCARD.md)** — all 35 commands on one page.
+- **[REFCARD](../REFCARD.md)** — all {{ rforge.command_count }} commands on one page.

@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+> Makes docs render the current version/command-count from a single source of
+> truth (`package.json`) so they stop drifting (the 33→35 staleness root-caused
+> in `5267825`). Two Python-native layers: a `mkdocs-macros` render layer and a
+> `version_sync.py --check` CI gate. No command-surface change — still 35 commands.
+
+### Added
+
+- **`scripts/version_sync.py`** — pure-stdlib sync tool (matches `gen_lib_reference.py`
+  style). Reads `version` from `package.json` and `command_count` from
+  `mkdocs.yml extra.rforge.command_count`, then syncs the derived surfaces
+  (`mkdocs.yml extra.rforge.version`, `.claude-plugin/plugin.json`, `package.json`
+  + `README.md` count strings, `CLAUDE.md` command-count heading). `--check` is a
+  CI drift gate (exit 1 on drift), `--dry-run` previews; wired into both
+  `tests/test-all.sh` and `.github/workflows/ci.yml`. New tests in
+  `tests/test_version_sync.py` (7 cases).
+- **mkdocs-macros render layer** — `mkdocs-macros-plugin` enabled in `mkdocs.yml`
+  with an `extra.rforge` namespace (`version`/`prev_version`/`release_date`/
+  `command_count`); installed in `docs.yml` CI. ~10 user-facing docs now render the
+  current version/count via `{{ rforge.version }}` / `{{ rforge.command_count }}`
+  macros (historical "introduced-in vX.Y.Z" refs left literal). See
+  `docs/specs/SPEC-mkdocs-version-macros-2026-06-12.md`.
+
+### Changed
+
+- Release runbook (`CLAUDE.md`): after bumping `package.json`, run
+  `python3 scripts/version_sync.py` to propagate version/count; mkdocs docs are no
+  longer hand-edited for the current version/count.
+
+---
+
 ## [2.7.0] - 2026-06-11
 
 > Adds an **R-universe early-access tier** to `r:submit` — verify your package's

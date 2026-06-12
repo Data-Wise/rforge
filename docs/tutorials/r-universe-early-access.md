@@ -142,4 +142,4 @@ It never blocks and never triggers the (still manual) CRAN submission — it's a
 - **[CRAN submission with rforge](cran-submission-with-rforge.md)** — the manual CRAN handoff this complements
 - **[r:submit command reference](../commands.md#rforgersubmit)** — all flags
 - **[`lib.runiverse` API reference](../reference/runiverse.md)** — the backing module
-- **[REFCARD](../REFCARD.md)** — all 35 commands on one page
+- **[REFCARD](../REFCARD.md)** — all {{ rforge.command_count }} commands on one page

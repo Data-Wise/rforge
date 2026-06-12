@@ -9,10 +9,19 @@ last_release_prior: 2026-06-10 v2.6.0 (tap PR #114). One release bundling cran-i
 worktrees:
   - branch: feature/mkdocs-version-macros
     path: ~/.git-worktrees/rforge/feature-mkdocs-version-macros
+    target: v2.8.0
     spec: docs/specs/SPEC-mkdocs-version-macros-2026-06-12.md
     orchestrate: ORCHESTRATE-mkdocs-version-macros.md
-    status: WIP
-    created: 2026-06-12  # mkdocs version/count macros (v2.8.0) — not yet started
+    state: implemented, PR-ready (gates green)  # PR #27 → dev
+    created: 2026-06-12
+    summary: |
+      Single-source-of-truth version/count for docs. mkdocs-macros render layer
+      (extra.rforge.{version,prev_version,release_date,command_count}) + pure-stdlib
+      scripts/version_sync.py (--check CI gate, wired into ci.yml + test-all.sh).
+      ~10 user-facing docs render via {{ rforge.* }}; historical refs left literal.
+      Caught pre-existing count drift (package.json 33→35, CLAUDE.md 28→35).
+      Gates: pytest 229 + 2 skipped, test-all.sh 33/33, mkdocs build --strict clean.
+# prior: feature/r-submit-runiverse merged (PR #24) + worktree removed 2026-06-11
 
 recent:
   - date: 2026-06-10
