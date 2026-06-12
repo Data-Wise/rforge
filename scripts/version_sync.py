@@ -98,9 +98,11 @@ def build_rules(version: str, count: int) -> list[Rule]:
     n = str(count)
     return [
         # --- mkdocs.yml extra.rforge.version (authoritative render source) ---
+        # Anchored on the `rforge:` parent so a future top-level/theme `version:`
+        # key elsewhere in mkdocs.yml can't be clobbered by a bare first-match.
         Rule(
             MKDOCS_YML,
-            r'(?P<pre>^\s*version:\s*")(?P<val>[^"]*)(?P<post>"\s*$)',
+            r'(?P<pre>^\s*rforge:[^\n]*\n\s*version:\s*")(?P<val>[^"]*)(?P<post>")',
             version,
             "mkdocs.yml extra.rforge.version",
         ),

@@ -8,7 +8,7 @@
 **R package ecosystem orchestrator for Claude Code — {{ rforge.command_count }} commands, R-aware hooks, validation skills.**
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** R package *ecosystem* analysis from inside Claude Code. 33 slash commands.
+    - **What:** R package *ecosystem* analysis from inside Claude Code. {{ rforge.command_count }} slash commands.
     - **Why:** Fast feedback on multi-package R repos — discovery, dependencies, change impact, CRAN cascade planning.
     - **How:** `brew install data-wise/tap/rforge`, then `/rforge:analyze "<what changed>"`.
     - **Next:** [Quick Start](QUICK-START.md) (3 min) → [Where to start](#where-to-start) below.
@@ -38,7 +38,7 @@ Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fu
 
 ## The 3 headline commands
 
-Most daily work runs through these. The other 30 commands are specialized — see the [Reference Card](REFCARD.md).
+Most daily work runs through these; the rest of the plugin's {{ rforge.command_count }} commands are specialized — see the [Reference Card](REFCARD.md).
 
 ```bash
 # Ultra-fast snapshot (< 10 seconds) — pre-commit

@@ -155,6 +155,32 @@ def test_write_path_syncs_command_count(synced_tree):
 
 
 def test_read_version_is_canonical_source(synced_tree):
-    mod, _ = synced_tree
-    # read_version pulls straight from package.json "version".
-    assert mod.read_version() == "2.7.0"
+    mod, tree = synced_tree
+    # read_version pulls straight from package.json "version" — assert against
+    # the file itself so this stays correct across version bumps.
+    expected = json.loads((tree / "package.json").read_text(encoding="utf-8"))["version"]
+    assert mod.read_version() == expected
+
+
+def test_version_rule_targets_rforge_not_a_decoy(synced_tree):
+    mod, tree = synced_tree
+    # A stray top-level `version:` (e.g. a future theme/mike key) must NOT be
+    # clobbered — only extra.rforge.version is the render source. Locks the
+    # `rforge:`-anchored pattern against a bare first-match regression.
+    mkdocs_path = tree / "mkdocs.yml"
+    mkdocs_path.write_text(
+        'version: "0.0.0-decoy"\n' + mkdocs_path.read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+
+    pkg = tree / "package.json"
+    data = json.loads(pkg.read_text(encoding="utf-8"))
+    data["version"] = "9.9.9"
+    pkg.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+    assert mod.main([]) == 0  # write
+
+    out = mkdocs_path.read_text(encoding="utf-8")
+    assert 'version: "0.0.0-decoy"' in out  # decoy untouched
+    assert 'version: "9.9.9"' in out  # rforge child synced
+    assert mod.main(["--check"]) == 0
