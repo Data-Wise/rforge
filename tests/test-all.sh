@@ -383,6 +383,14 @@ lib_reference_in_sync() {
     python3 scripts/gen_lib_reference.py --check
 }
 
+# Version/count strings across mkdocs.yml extra, plugin.json, README.md, and
+# CLAUDE.md must stay in sync with package.json (the authoritative source).
+# Drift means someone bumped the version without running version_sync.py.
+# Direct sibling of lib_reference_in_sync (same --check drift-gate pattern).
+version_sync_in_sync() {
+    python3 scripts/version_sync.py --check
+}
+
 # lib.rcmd CLI smoke — with R absent the module emits an engine_missing/error
 # envelope; with R present it runs for real. Either way we assert parseable JSON.
 lib_rcmd_smoke() {
@@ -480,6 +488,7 @@ run "Skill: frontmatter has required fields" skill_frontmatter_complete
 run "Lib: pytest suite (discovery + deps + status + init)"   lib_pytest
 run "Lib: CLI smoke (discovery + deps + status + init)" lib_cli_smoke
 run "Lib: reference docs in sync with source" lib_reference_in_sync
+run "Docs: version/count strings in sync with package.json" version_sync_in_sync
 run "Lib: rcmd CLI smoke (R-free — accepts engine_missing envelope)" lib_rcmd_smoke
 run "Dogfood: lib.cranlint Tier-4 advisory CLI on a fixture package" lib_cranlint_smoke
 run "Dogfood: lib.runiverse CLI smoke (offline → warn envelope)" lib_runiverse_smoke

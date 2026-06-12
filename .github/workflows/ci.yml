@@ -74,6 +74,10 @@ jobs:
           test -f agents/orchestrator.md || { echo "❌ Missing orchestrator agent"; exit 1; }
           echo "✅ All agent files present"
 
+      - name: Check version/count sync (docs drift gate)
+        run: |
+          python3 scripts/version_sync.py --check
+
       - name: Check for hardcoded paths
         run: |
           HARDCODED_PATHS=0
