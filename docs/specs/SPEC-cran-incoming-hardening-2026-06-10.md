@@ -13,7 +13,7 @@
 Make rforge's submission gate emulate CRAN's *incoming* and *ongoing* (post-acceptance)
 checks, so the error classes that "only CRAN submission detects" are caught locally.
 Today the `check` stage runs only `rcmdcheck(args=c("--as-cran"))`
-([`lib/rcmd.py:233`](../../lib/rcmd.py)); this spec adds, behind a `strict` flavor:
+([`lib/rcmd.py:233`](https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py)); this spec adds, behind a `strict` flavor:
 `--run-donttest`, a **noSuggests** pass (`_R_CHECK_DEPENDS_ONLY_=true`), a
 **suggests-only** pass (`_R_CHECK_SUGGESTS_ONLY_=true`), and an opt-in `--incoming`
 `_R_CHECK_*` bundle. The strict passes run **by default in `cran-prep` and block the
@@ -113,26 +113,26 @@ Stage rows surface as distinct entries: `check`, `check (noSuggests)`,
 
 ## Architecture
 
-All changes in [`lib/rcmd.py`](../../lib/rcmd.py); the `strict` kwarg already exists on
+All changes in [`lib/rcmd.py`](https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py); the `strict` kwarg already exists on
 `r_snippet`/`run` (used for `site`) and `--strict` is already an argparse flag.
 
-- **`r_snippet(kind="check", …)`** ([`lib/rcmd.py:233`](../../lib/rcmd.py)) — extend with a
+- **`r_snippet(kind="check", …)`** ([`lib/rcmd.py:233`](https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py)) — extend with a
   flavor selector (e.g. `flavor: str | None` ∈ `{None,"depends","suggests"}` and
   `incoming: bool`). Build `args` (`--as-cran` [+ `--run-donttest`] when strict) and an
   `env=` named vector for the flavor / incoming bundle, threaded into the existing
   `rcmdcheck(...)` call inside the `_guard("rcmdcheck", …)` wrapper. See RESEARCH §A.4 for
   the exact `rcmdcheck(args=, env=)` shape.
-- **`run("check", …)`** ([`lib/rcmd.py:362`](../../lib/rcmd.py)) — already threads kwargs to
+- **`run("check", …)`** ([`lib/rcmd.py:362`](https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py)) — already threads kwargs to
   `r_snippet`; pass the new flavor/incoming through. **No `_invoke_r` change.** `flavor` is an
   *internal* selector, not a user-facing flag: `--strict` drives a **loop over both flavors**
   (`"depends"` then `"suggests"`), each emitting its own stage row. The single combined path is
   rejected (it would conflate two distinct bug classes — see review).
-- **`_run_cran_prep()`** ([`lib/rcmd.py:440`](../../lib/rcmd.py)) — after the existing
-  `check` stage ([line 462](../../lib/rcmd.py)) and its real-NOTE blocker (467–470), run the
+- **`_run_cran_prep()`** ([`lib/rcmd.py:440`](https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py)) — after the existing
+  `check` stage ([line 462](https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py)) and its real-NOTE blocker (467–470), run the
   two strict flavors (`--run-donttest` + each env). On `error`, append a blocker:
   `"noSuggests/donttest check failed (Suggests used unconditionally?)"`. Accept an
   `incoming=` param and add the bundle stage when set. Thread `ns.strict`/`ns.incoming`
-  from argparse into `_run_cran_prep(...)` ([the missing link at lines 530–535](../../lib/rcmd.py)).
+  from argparse into `_run_cran_prep(...)` ([the missing link at lines 530–535](https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py)).
 - **Failure hint** — when a strict flavor errors, surface: *"A Suggests package is used
   unconditionally. Move it to Imports, or guard with `requireNamespace()` in code AND
   `skip_if_not_installed()` in tests."*
