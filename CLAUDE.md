@@ -57,6 +57,20 @@ After bumping, also update:
 
 `tests/test-all.sh` includes a "All 4 version sources agree" check — that gate must pass.
 
+**As of v2.8.0 — `scripts/version_sync.py` propagates version + command_count.**
+After bumping `package.json` `"version"` (the source of truth), run
+`python3 scripts/version_sync.py` to sync the derived surfaces:
+`mkdocs.yml` `extra.rforge.version`, `.claude-plugin/plugin.json` (`version` +
+`NN commands` in `description`), `package.json` description count, `README.md`
+footer + tagline, and the CLAUDE.md `## Command-file conventions (all NN commands)`
+heading. `command_count` lives in `mkdocs.yml extra.rforge.command_count`
+(hardcoded-for-v1, CI-validated). The mkdocs docs (REFCARD, index, installation,
+tutorials, workflows) now render current version/count via `{{ rforge.version }}` /
+`{{ rforge.command_count }}` macros — **do not hand-edit those**; bump the source
+and re-run the script. `marketplace.json` version stays a manual edit (above).
+`python3 scripts/version_sync.py --check` is wired into both `tests/test-all.sh`
+and `.github/workflows/ci.yml` — CI fails on drift.
+
 ## lib/ Python package convention
 
 The `lib/` directory is a Python package (has `__init__.py`). Modules use relative imports.
@@ -97,8 +111,8 @@ The `arguments:` array is the machine-readable spec; the `## Usage` body is the 
 
 Both must pass before any PR:
 
-- `bash tests/test-all.sh` — **32 checks** (versions, hook compile + behavior, manifests parse, skills valid, lib pytest, lib CLI smoke incl. `rcmd`/`cranlint`/`runiverse`, lib reference docs in sync, rename stubs/targets, command-name uniqueness, migration recipe E2E)
-- `python3 -m pytest tests/` — **220 lib/\* cases** (discovery, deps, status, init, rcmd, cranlint, deps_sync, ghrelease, runiverse)
+- `bash tests/test-all.sh` — **33 checks** (versions, hook compile + behavior, manifests parse, skills valid, lib pytest, lib CLI smoke incl. `rcmd`/`cranlint`/`runiverse`, lib reference docs in sync, **version/count sync (`version_sync.py --check`)**, rename stubs/targets, command-name uniqueness, migration recipe E2E)
+- `python3 -m pytest tests/` — **229 lib/\* cases** (discovery, deps, status, init, rcmd, cranlint, deps_sync, ghrelease, runiverse, **version_sync**)
 
 ## Homebrew tap quirks (rforge-specific)
 
