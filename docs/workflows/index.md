@@ -166,5 +166,5 @@ flowchart LR
 ## See also
 
 - **[Tutorials](../tutorials/README.md)** — step-by-step versions of every workflow above
-- **[REFCARD](../REFCARD.md)** — all 35 commands on one page
+- **[REFCARD](../REFCARD.md)** — all {{ rforge.command_count }} commands on one page
 - **[Architecture](../architecture.md)** — how the plugin's internals fit together

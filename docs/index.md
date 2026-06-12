@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
 [![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
-**R package ecosystem orchestrator for Claude Code — 35 commands, R-aware hooks, validation skills.**
+**R package ecosystem orchestrator for Claude Code — {{ rforge.command_count }} commands, R-aware hooks, validation skills.**
 
 !!! tip "TL;DR (30 seconds)"
     - **What:** R package *ecosystem* analysis from inside Claude Code. 33 slash commands.
@@ -152,7 +152,7 @@ Restart Claude Code so the commands register, then verify with `/help` (look for
 
 ## More documentation
 
-- **[Reference Card](REFCARD.md)** — all 35 commands on one page
+- **[Reference Card](REFCARD.md)** — all {{ rforge.command_count }} commands on one page
 - **[Commands](commands.md)** — full per-command reference
 - **[Architecture](architecture.md)** — how the `lib/` modules fit together
 - **[Hooks & Skills](hooks-and-skills.md)** — the R-aware `PreToolUse` hook

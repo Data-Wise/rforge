@@ -1,5 +1,7 @@
 # SPEC: mkdocs version/count macros + sync script
 
+{% raw %}
+
 - **Status:** Draft — awaiting user review
 - **Date:** 2026-06-12
 - **Target version:** v2.8.0
@@ -130,3 +132,5 @@ Both gates must pass:
 - [mkdocs-macros-plugin — official docs](https://mkdocs-macros-plugin.readthedocs.io/)
 - scholar's implementation (internal reference): `scholar/scripts/version-sync.js`,
   `scholar/mkdocs.yml` `extra.scholar.*`, `scholar/.github/workflows/docs.yml` (`pip install … mkdocs-macros-plugin`)
+
+{% endraw %}
