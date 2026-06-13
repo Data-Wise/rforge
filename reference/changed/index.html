@@ -1722,6 +1722,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#uncommitted_files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        uncommitted_files()
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2347,6 +2358,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#uncommitted_files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        uncommitted_files()
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2400,8 +2422,12 @@
                           temp tree under the SYSTEM temp dir, run an injected
                           runner there, and GUARANTEE worktree removal (finally).
   6. scope_check()      — orchestrate merge_base → baseline run → current run →
-                          tag_findings; returns None (caller falls back to
-                          scope-only) on any git failure.</p>
+                          tag_findings, then a file-level [uncommitted] refinement
+                          (v2.12.0); returns None (caller falls back to
+                          scope-only) on any git failure.
+  7. uncommitted_files()— working-tree-dirty paths (<code>git status --porcelain</code>),
+                          used to re-tag an [introduced] finding [uncommitted]
+                          when its file is not yet committed (v2.12.0).</p>
 <p>Advisory, never raises. git failures (not a repo, no merge-base, git missing)
 return None so callers can warn and fall back to a full run. "No changes" is the
 distinct empty-list case (a valid no-op, not a failure).</p>
@@ -2458,17 +2484,27 @@ the exception propagates (callers that want a fallback catch it upstream).</p>
 </span></code></pre></div>
 <p>Two-run introduced/pre-existing tagging over a REAL merge-base checkout.</p>
 <p>Orchestrates: merge_base(HEAD, base) → run_baseline (runner at the merge-base
-detached worktree) → runner against the live HEAD tree → tag_findings.</p>
+detached worktree) → runner against the live HEAD tree → tag_findings, then a
+file-level <code>[uncommitted]</code> refinement (v2.12.0).</p>
 <p><code>runner(treedir) -&gt; list[finding]</code> is injected so this module stays R-free and
 unit-testable; rcmd injects a closure that runs the chosen --kind engine in
 <code>treedir</code> and returns its flat finding list. The baseline run executes in a
 genuinely different working tree (the v2.10.0 bug was tagging HEAD vs HEAD —
 here the baseline tree is a real checkout of the merge-base SHA).</p>
+<p><code>[uncommitted]</code> refinement: after tagging, each <code>[introduced]</code> finding whose
+file is in <code>uncommitted_files(path)</code> is re-tagged <code>[uncommitted]</code> — "you
+caused this with edits you haven't committed yet" vs committed branch work.
+File-level, not finding-precise (a 3rd clean-HEAD run would be needed for
+finding-precision; not worth tripling check cost). String findings (no file)
+stay <code>[introduced]</code>; <code>[pre-existing]</code> is never re-tagged; a finding is never
+both. <code>[uncommitted]</code> is a subset of introduced — it IS folded into
+<code>introduced_count</code> (so <code>--fail-on introduced</code> still fails on your dirty edits).</p>
 <p>Returns None (caller falls back to scope-only) when the merge-base does not
 resolve or the baseline worktree add fails. Otherwise:
     {"base": <ref>, "merge_base": <sha>,
-     "findings": [{"text":..., "tag": "introduced"|"pre-existing"}, ...],
-     "introduced_count": <int>}</p>
+     "findings": [{"text":..., "tag":
+                   "introduced"|"uncommitted"|"pre-existing"}, ...],
+     "introduced_count": <int>}  # counts introduced + uncommitted</p>
 <h3 id="tag_findings"><code>tag_findings()</code><a class="headerlink" href="#tag_findings" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">tag_findings</span><span class="p">(</span><span class="n">head_findings</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">base_findings</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[dict]&#39;</span>
 </span></code></pre></div>
@@ -2481,6 +2517,22 @@ by string; dict findings (lint) compare by <code>(file, message, linter)</code> 
 EXCLUDING the raw <code>line</code>, so a line-shifted pre-existing lint stays
 <code>pre-existing</code> rather than flipping to <code>introduced</code>. The full finding is
 preserved in <code>text</code> for display.</p>
+<h3 id="uncommitted_files"><code>uncommitted_files()</code><a class="headerlink" href="#uncommitted_files" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">uncommitted_files</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;set[str]&#39;</span>
+</span></code></pre></div>
+<p>Repo-relative paths with UNCOMMITTED changes (<code>git status --porcelain</code>).</p>
+<p>Returns the set of modified / added / renamed / staged paths in the working
+tree — anything <code>git status --porcelain</code> reports as dirty. Used to refine an
+<code>[introduced]</code> finding to <code>[uncommitted]</code> when its file is still dirty.</p>
+<p>Advisory, never raises: not a git repo / git missing / any non-zero status →
+the empty set (no refinement, no error).</p>
+<p>Uses <code>git status --porcelain -z</code> (NUL-separated, NEVER quoted/escaped), so
+paths with spaces or non-ASCII bytes survive verbatim — plain <code>--porcelain</code>
+quotes those as <code>"a b.R"</code>, leaving literal quotes that never exact-match a
+finding path. The <code>-z</code> stream is: each entry <code>XY&lt;space&gt;PATH</code> terminated by a
+NUL; a rename/copy (R/C status) is <code>XY&lt;space&gt;NEW OLD </code> — TWO NUL fields,
+new path first — so after a rename status we consume (skip) the following
+field as the old path and keep the new one.</p>
 
 
 

@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-s7-method-missing-class-2026-06-13/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-commands-doc-sync-gate-2026-06-13/">
       
       
       
@@ -23,7 +23,7 @@
     
     
       
-        <title>SPEC: s7-review methods_on_missing_class — close the deferred runtime family - RForge Plugin</title>
+        <title>SPEC: docs/commands.md sync-gate - RForge Plugin</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#spec-s7-review-methods_on_missing_class-close-the-deferred-runtime-family" class="md-skip">
+        <a href="#spec-docscommandsmd-sync-gate" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              SPEC: s7-review methods_on_missing_class — close the deferred runtime family
+              SPEC: docs/commands.md sync-gate
             
           </span>
         </div>
@@ -2116,10 +2116,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#empirical-finding-refutes-the-deferral" class="md-nav__link">
+  <a href="#the-gate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Empirical finding (refutes the deferral)
+        The gate
       
     </span>
   </a>
@@ -2127,10 +2127,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-the-family-detects" class="md-nav__link">
+  <a href="#scope-decisions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What the family detects
+        Scope decisions
       
     </span>
   </a>
@@ -2138,32 +2138,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#algorithm-in-the-s7runtime-engine-librcmdpy" class="md-nav__link">
+  <a href="#expected-fallout" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Algorithm (in the s7runtime engine, lib/rcmd.py)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#false-positive-guards-the-adversarial-concerns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        False-positive guards (the adversarial concerns)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#out-of-scope" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Out of scope
+        Expected fallout
       
     </span>
   </a>
@@ -2198,7 +2176,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-s7-method-missing-class-2026-06-13.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-commands-doc-sync-gate-2026-06-13.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2206,88 +2184,55 @@
   
 
 
-<h1 id="spec-s7-review-methods_on_missing_class-close-the-deferred-runtime-family">SPEC: s7-review <code>methods_on_missing_class</code> — close the deferred runtime family<a class="headerlink" href="#spec-s7-review-methods_on_missing_class-close-the-deferred-runtime-family" title="Permanent link">&para;</a></h1>
+<h1 id="spec-docscommandsmd-sync-gate">SPEC: <code>docs/commands.md</code> sync-gate<a class="headerlink" href="#spec-docscommandsmd-sync-gate" title="Permanent link">&para;</a></h1>
 <p><strong>Date:</strong> 2026-06-13
 <strong>Author:</strong> Davood Tofighi (with Claude Code)
-<strong>Status:</strong> Approved (autonomous build, pre-approved)
-<strong>Parent:</strong> <code>SPEC-r-s7-review-eco-2026-06-13.md</code> (Deferred note)
-<strong>Target:</strong> post-v2.11.0 (single deferred family)</p>
+<strong>Status:</strong> Approved (bundle build)
+<strong>Target:</strong> v2.12.0 bundle (1 of 3)</p>
 <hr />
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
-<p><code>r:s7-review --runtime</code> (v2.11.0) ships two working runtime families (<code>dead_generic</code>,
-<code>validator_not_enforcing</code>) plus a <strong>third hardcoded-empty placeholder</strong>:
-<code>methods_on_missing_class</code>. The v2.11.0 spec deferred it claiming it was "not decidable
-from the S7 method registry alone." <strong>This spec refutes that empirically and implements it.</strong></p>
-<h2 id="empirical-finding-refutes-the-deferral">Empirical finding (refutes the deferral)<a class="headerlink" href="#empirical-finding-refutes-the-deferral" title="Permanent link">&para;</a></h2>
-<p>Investigated S7's real method-table structure (R + S7 present):</p>
-<ul>
-<li><code>attr(generic, "methods")</code> is an environment keyed by class <strong>name</strong> (nested for
-  multi-dispatch). Each value is an <code>S7_method</code> object.</li>
-<li>Each <code>S7_method</code> carries <strong><code>attr(method, "signature")</code></strong> — a <em>list of the actual
-  dispatch class objects</em> (S7_class objects for S7 classes; base-type specs otherwise).</li>
-<li>So for every registered method we can recover its dispatch class object(s) and check
-  <strong>resolvability by name against the loaded namespace</strong> — fully decidable.</li>
-</ul>
-<p>Confirmed detection: a method registered on an inline, unbound class
-(<code>method(gen, new_class("Ghost")) &lt;- fn</code>) yields a registry whose <code>Ghost</code> signature
-class is an <code>S7_class</code> whose name does <strong>not</strong> resolve in the namespace → a dead,
-unreachable method (nothing can ever construct a <code>Ghost</code> to dispatch on). Base-type
-methods (<code>method(gen, class_integer)</code>) have a signature element that is <strong>not</strong> an
-<code>S7_class</code> and are correctly excluded.</p>
-<h2 id="what-the-family-detects">What the family detects<a class="headerlink" href="#what-the-family-detects" title="Permanent link">&para;</a></h2>
-<p><strong><code>methods_on_missing_class</code></strong>: a registered method whose dispatch signature includes an
-<strong>S7 class that is not resolvable by name</strong> in the loaded package namespace (or a declared,
-loaded import). This is the runtime sibling of <code>dead_generic</code> — a method that can never be
-dispatched because its dispatch class has no reachable binding (typically an inline /
-unexported <code>new_class()</code> left in a <code>method()</code> call, or a method left dangling after a
-class was renamed/removed).</p>
-<h2 id="algorithm-in-the-s7runtime-engine-librcmdpy">Algorithm (in the <code>s7runtime</code> engine, <code>lib/rcmd.py</code>)<a class="headerlink" href="#algorithm-in-the-s7runtime-engine-librcmdpy" title="Permanent link">&para;</a></h2>
-<p>For each S7 generic in the namespace, walk its method registry; for each <code>S7_method</code>, for
-each element of <code>attr(method, "signature")</code>:</p>
+<p><code>docs/commands.md</code> is a hand-maintained reference mirror of the command files. It has
+<strong>no CI gate</strong>, so it drifts: stale command count (v2.10), a command section missing new
+flags (v2.11 <code>--eco</code>/<code>--runtime</code>), and a family table calling an implemented finding
+"deferred" (v2.11.1). The machine-checkable surfaces (<code>reference/*.md</code> via
+<code>gen_lib_reference --check</code>, version/count via <code>version_sync --check</code>, command frontmatter
+<code>arguments:</code>↔<code>Usage</code>) all stay current; this closes the last drift-prone surface.</p>
+<h2 id="the-gate">The gate<a class="headerlink" href="#the-gate" title="Permanent link">&para;</a></h2>
+<p>New pure-stdlib <code>tests/_check_commands_doc.py</code>, wired into <code>tests/test-all.sh</code> (33→ +1).
+Robust <strong>presence</strong> checks (not strict prose parsing — that would be brittle):</p>
 <ol>
-<li><strong>Skip non-S7 signature elements</strong> — base types (<code>class_integer</code>/<code>class_character</code>/…)
-   are not <code>S7_class</code> objects → never "missing".</li>
-<li><strong>Skip the universal types</strong> — <code>S7_object</code> / <code>class_any</code> (<code>ANY</code>) union dispatch.</li>
-<li>For an <code>S7_class</code> element with name <code>N</code> and package <code>P</code>:</li>
-<li><code>P</code> set and <code>P != this_package</code> → <strong>resolvable</strong> iff <code>exists(N, asNamespace(P))</code>
-     (imported class — the import is loaded, so it resolves). Not missing.</li>
-<li><code>P</code> unset or <code>P == this_package</code> → <strong>resolvable</strong> iff <code>N</code> is bound to an <code>S7_class</code>
-     in this package's namespace. If not bound → <strong>MISSING</strong> → flag
-     <code>"&lt;generic&gt; -&gt; &lt;N&gt;"</code>.</li>
+<li><strong>Command coverage</strong> — every non-stub command file (<code>commands/**/*.md</code>, excluding the
+   v2.0.0 rename stubs <code>doc-check</code>/<code>ecosystem-health</code>/<code>rpkg-check</code>) has a section in
+   <code>docs/commands.md</code>. Match on the command's slash-name (<code>/rforge:&lt;path&gt;</code>), which appears
+   in every section. Fail listing any command with no commands.md section, and any
+   commands.md <code>/rforge:</code> section with no backing command file.</li>
+<li><strong>Flag coverage</strong> — for each command, every flag declared in its frontmatter
+   <code>arguments:</code> whose <code>type</code> is <code>boolean</code>/<code>string</code> and that is a real CLI flag (name is a
+   <code>--flag</code>, i.e. excludes positional args like <code>package</code>) appears as <code>--&lt;name&gt;</code> somewhere
+   in that command's commands.md section. Fail listing <code>command: --flag documented? no</code>.</li>
 </ol>
-<p>Emit <code>methods_on_missing_class</code> as the list of <code>"&lt;generic&gt; -&gt; &lt;class&gt;"</code> strings (was
-<code>character()</code>). Normalization in <code>_status_for</code> / <code>normalize</code> already aggregates all three
-runtime lists — no change needed there.</p>
-<h2 id="false-positive-guards-the-adversarial-concerns">False-positive guards (the adversarial concerns)<a class="headerlink" href="#false-positive-guards-the-adversarial-concerns" title="Permanent link">&para;</a></h2>
+<p>Both directions are substring/identifier presence — resilient to wording changes, but
+catches the structural gaps that actually happened.</p>
+<h2 id="scope-decisions">Scope decisions<a class="headerlink" href="#scope-decisions" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Base types</strong> — excluded by the <code>inherits(sig, "S7_class")</code> gate (empirically verified:
-  <code>integer</code> key → <code>s7class=FALSE</code>).</li>
-<li><strong>Imported classes</strong> — resolved via the class's <code>package</code> attribute against that
-  package's loaded namespace; not flagged.</li>
-<li><strong><code>ANY</code> / <code>S7_object</code> union dispatch</strong> — explicitly skipped.</li>
-<li><strong>Parent classes</strong> — irrelevant; only the dispatch class itself is checked.</li>
-<li><strong>Multi-dispatch</strong> — every signature element checked independently; a method dispatching
-  on <code>list(Real, Ghost)</code> flags only <code>Ghost</code>.</li>
+<li><strong>Presence, not semantics.</strong> The gate cannot catch a <em>wrong</em> description (e.g. "deferred"
+  prose) — only missing coverage. That's an accepted limit; semantic honesty stays a
+  review concern. The gate retires the <em>structural</em> drift (missing command/flag), which is
+  the larger and more mechanical class.</li>
+<li><strong>Positional args excluded</strong> from flag coverage (they're not <code>--flags</code>; <code>package</code> etc.).</li>
+<li><strong>Stubs excluded</strong> from command coverage (they intentionally have no normal docs).</li>
 </ul>
-<h2 id="out-of-scope">Out of scope<a class="headerlink" href="#out-of-scope" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Cross-package <em>undeclared-dependency</em> dispatch (method on <code>otherpkg::Class</code> where
-  <code>otherpkg</code> ∉ DESCRIPTION) — a different, DESCRIPTION-aware check.
-  <strong>Implemented in v2.12.0</strong> as <code>method_undeclared_dependency</code>
-  (<code>SPEC-s7-undeclared-dependency-2026-06-13.md</code>).</li>
-<li>Static (non-runtime) detection — this is a <code>--runtime</code>-only family, like its siblings.</li>
-</ul>
+<h2 id="expected-fallout">Expected fallout<a class="headerlink" href="#expected-fallout" title="Permanent link">&para;</a></h2>
+<p>Building the gate will likely surface <strong>existing</strong> drift (flags in frontmatter not in
+commands.md). Part of this task is fixing that drift so the gate passes — that is the
+point.</p>
 <h2 id="tests-gates">Tests (gates)<a class="headerlink" href="#tests-gates" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Real-R e2e</strong> (R-gated <code>skipif</code>, like the existing s7runtime tests): a fixture package
-  with (a) a method on a real bound class (NOT flagged) and (b) a method on an inline
-  unbound class (flagged). Assert <code>methods_on_missing_class</code> contains exactly the dangling
-  one. Reuse/extend the <code>s7pkg.bad</code> fixture.</li>
-<li><strong>Base-type non-flag</strong>: a <code>method(gen, class_integer)</code> in the fixture must NOT appear.</li>
-<li><strong>Degradation</strong>: unchanged — R/S7 absent → <code>--runtime</code> still degrades to advisory <code>warn</code>.</li>
-<li><code>_check_agent_engines.py</code>, <code>version_sync --check</code>, <code>gen_lib_reference --check</code> stay green.</li>
-<li>Update <code>commands/r/s7-review.md</code> (move <code>method_on_missing_class</code> from Deferred into the
-  active family table) + this parent spec's Deferred note.</li>
+<li>The new check itself IS a gate (<code>_check_commands_doc.py</code>, run from <code>test-all.sh</code>).</li>
+<li>A self-test in <code>tests/</code> (pytest) feeding the checker a tiny fixture (one command file +
+  a commands.md missing a flag) asserting it reports the gap — so the gate is proven to
+  catch drift, not just pass vacuously.</li>
+<li><code>test-all.sh</code> count bumps; full suite green after fixing any surfaced drift.</li>
 </ul>
 
 

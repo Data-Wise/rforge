@@ -141,6 +141,10 @@
          <lastmod>2026-06-13</lastmod>
     </url>
     <url>
+         <loc>https://data-wise.github.io/rforge/specs/SPEC-commands-doc-sync-gate-2026-06-13/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
          <loc>https://data-wise.github.io/rforge/specs/SPEC-cran-incoming-hardening-2026-06-10/</loc>
          <lastmod>2026-06-13</lastmod>
     </url>
@@ -150,6 +154,10 @@
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/specs/SPEC-diff-aware-tagging-2026-06-13/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/specs/SPEC-diff-aware-uncommitted-tag-2026-06-13/</loc>
          <lastmod>2026-06-13</lastmod>
     </url>
     <url>
@@ -214,6 +222,10 @@
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/specs/SPEC-s7-method-missing-class-2026-06-13/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/specs/SPEC-s7-undeclared-dependency-2026-06-13/</loc>
          <lastmod>2026-06-13</lastmod>
     </url>
     <url>

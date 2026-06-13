@@ -3659,16 +3659,20 @@
 <h3 id="rforgequick">/rforge:quick<a class="headerlink" href="#rforgequick" title="Permanent link">&para;</a></h3>
 <p>Ultra-fast status check using only quick tools (&lt;10 seconds).</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:quick<span class="w"> </span><span class="o">[</span>description<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:quick<span class="w"> </span><span class="o">[</span>description<span class="o">]</span><span class="w"> </span><span class="o">[</span>--package<span class="w"> </span>PATH<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
-- <code>description</code> (optional) - Brief context for the check</p>
+- <code>description</code> (optional) - Brief context for the check (narration only)
+- <code>--package</code> (optional) - Path to a specific package (defaults to current directory)</p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Morning stand-up check</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>/rforge:quick
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Pre-commit validation</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>/rforge:quick<span class="w"> </span><span class="s2">&quot;Before committing changes&quot;</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1"># Snapshot a specific package</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>/rforge:quick<span class="w"> </span>--package<span class="w"> </span>/path/to/RMediation
 </span></code></pre></div></p>
 <p><strong>Provides:</strong>
 - Basic package info
@@ -3703,12 +3707,16 @@
 <h3 id="rforgedetect">/rforge:detect<a class="headerlink" href="#rforgedetect" title="Permanent link">&para;</a></h3>
 <p>Auto-detect project structure (single package, ecosystem, or hybrid).</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>/rforge:detect
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>/rforge:detect<span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>FORMAT<span class="o">]</span>
 </span></code></pre></div></p>
-<p><strong>No parameters</strong></p>
+<p><strong>Parameters:</strong>
+- <code>--format</code> (optional) - Output format: <code>text</code> (default) or <code>json</code></p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Detect current directory structure</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>/rforge:detect
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># Machine-readable output</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>/rforge:detect<span class="w"> </span>--format<span class="w"> </span>json
 </span></code></pre></div></p>
 <p><strong>Output:</strong>
 - Project type: single, ecosystem, or hybrid
@@ -3724,16 +3732,20 @@ is unchanged.</p>
 <h3 id="rforgecascade">/rforge:cascade<a class="headerlink" href="#rforgecascade" title="Permanent link">&para;</a></h3>
 <p>Plan coordinated updates across dependent packages.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>/rforge:cascade<span class="w"> </span><span class="o">[</span>description<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>/rforge:cascade<span class="w"> </span><span class="o">[</span>description<span class="o">]</span><span class="w"> </span><span class="o">[</span>--detailed<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
-- <code>description</code> (optional) - What's changing and why</p>
+- <code>description</code> (optional) - What's changing and why
+- <code>--detailed</code> (optional) - Show the full per-package task breakdown</p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Plan update cascade</span>
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>/rforge:cascade<span class="w"> </span><span class="s2">&quot;Update base package dependency from v1 to v2&quot;</span>
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># Version bump cascade</span>
 </span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>/rforge:cascade<span class="w"> </span><span class="s2">&quot;Major version bump in core package&quot;</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="c1"># Detailed cascade plan</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>/rforge:cascade<span class="w"> </span>--detailed
 </span></code></pre></div></p>
 <p><strong>Analyzes:</strong>
 - Dependency graph
@@ -3744,16 +3756,18 @@ is unchanged.</p>
 <h3 id="rforgeimpact">/rforge:impact<a class="headerlink" href="#rforgeimpact" title="Permanent link">&para;</a></h3>
 <p>Analyze change impact across ecosystem packages.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>/rforge:impact<span class="w"> </span><span class="o">[</span>description<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>/rforge:impact<span class="w"> </span>--package<span class="w"> </span>PKG<span class="w"> </span><span class="o">[</span>--change-type<span class="w"> </span>TYPE<span class="o">]</span><span class="w"> </span><span class="o">[</span>--affected-exports<span class="w"> </span><span class="s2">&quot;a b c&quot;</span><span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
-- <code>description</code> (optional) - What changed</p>
+- <code>--package</code> (required) - Package whose change is being analyzed
+- <code>--change-type</code> (optional) - Nature of change: <code>breaking</code>, <code>feature</code> (default), <code>fix</code>, <code>refactor</code>
+- <code>--affected-exports</code> (optional) - Space-separated list of changed exports</p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># API change impact</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>/rforge:impact<span class="w"> </span><span class="s2">&quot;Changed function signature in base package&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># API (breaking) change impact</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>/rforge:impact<span class="w"> </span>--package<span class="w"> </span>medfit<span class="w"> </span>--change-type<span class="w"> </span>breaking
 </span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># Dependency update impact</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>/rforge:impact<span class="w"> </span><span class="s2">&quot;Updated ggplot2 to v3.5.0&quot;</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># Feature change with specific affected exports</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>/rforge:impact<span class="w"> </span>--package<span class="w"> </span>medfit<span class="w"> </span>--change-type<span class="w"> </span>feature<span class="w"> </span>--affected-exports<span class="w"> </span><span class="s2">&quot;extract_mediation predict&quot;</span>
 </span></code></pre></div></p>
 <p><strong>Reports:</strong>
 - Affected packages
@@ -3764,12 +3778,17 @@ is unchanged.</p>
 <h3 id="rforgerelease">/rforge:release<a class="headerlink" href="#rforgerelease" title="Permanent link">&para;</a></h3>
 <p>Plan CRAN submission sequence based on dependencies.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>/rforge:release
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>/rforge:release<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--detailed<span class="o">]</span>
 </span></code></pre></div></p>
-<p><strong>No parameters</strong></p>
+<p><strong>Parameters:</strong>
+- <code>package</code> (optional) - Package to release (defaults to the ecosystem-wide CRAN sequence)
+- <code>--detailed</code> (optional) - Show the full submission sequence with internal dependency-order sequencing</p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Generate release plan</span>
 </span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>/rforge:release
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1"># Detailed release plan</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>/rforge:release<span class="w"> </span>--detailed
 </span></code></pre></div></p>
 <p><strong>Provides:</strong>
 - Submission order (base packages first)
@@ -3819,12 +3838,17 @@ auto-applied).</p>
 <h3 id="rforgedocscheck">/rforge:docs:check<a class="headerlink" href="#rforgedocscheck" title="Permanent link">&para;</a></h3>
 <p>Check for documentation drift and inconsistencies across packages.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>/rforge:docs:check
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>/rforge:docs:check<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--detailed<span class="o">]</span>
 </span></code></pre></div></p>
-<p><strong>No parameters</strong></p>
+<p><strong>Parameters:</strong>
+- <code>package</code> (optional) - Package to check (defaults to current directory / ecosystem)
+- <code>--detailed</code> (optional) - Show the full per-file documentation drift report</p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Check documentation status</span>
 </span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>/rforge:docs:check
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="c1"># Full drift report</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>/rforge:docs:check<span class="w"> </span>--detailed
 </span></code></pre></div></p>
 <p><strong>Validates:</strong>
 - Exported functions have documentation
@@ -3835,16 +3859,20 @@ auto-applied).</p>
 <h3 id="rforgecomplete">/rforge:complete<a class="headerlink" href="#rforgecomplete" title="Permanent link">&para;</a></h3>
 <p>Mark tasks complete with automatic documentation cascade.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>/rforge:complete<span class="w"> </span><span class="o">[</span>task_description<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>/rforge:complete<span class="w"> </span><span class="o">[</span>task_id<span class="o">]</span><span class="w"> </span><span class="o">[</span>--no-cascade<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
-- <code>task_description</code> (optional) - What was completed</p>
+- <code>task_id</code> (optional) - Task ID (e.g. <code>T-YYYY-MM-DD-NNN</code>) or short description
+- <code>--no-cascade</code> (optional) - Skip the documentation cascade detection</p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># Mark task complete</span>
 </span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>/rforge:complete<span class="w"> </span><span class="s2">&quot;Implemented bootstrap CI method&quot;</span>
 </span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>
 </span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="c1"># Trigger doc cascade</span>
 </span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>/rforge:complete<span class="w"> </span><span class="s2">&quot;Fixed critical bug in mediation function&quot;</span>
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="c1"># Complete without the doc cascade</span>
+</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>/rforge:complete<span class="w"> </span>T-2025-01-15-001<span class="w"> </span>--no-cascade
 </span></code></pre></div></p>
 <p><strong>Actions:</strong>
 - Updates task tracking
@@ -3874,12 +3902,17 @@ auto-applied).</p>
 <h3 id="rforgenext">/rforge:next<a class="headerlink" href="#rforgenext" title="Permanent link">&para;</a></h3>
 <p>Get ecosystem-aware next task recommendation.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>/rforge:next
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>/rforge:next<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--context<span class="w"> </span>TEXT<span class="o">]</span>
 </span></code></pre></div></p>
-<p><strong>No parameters</strong></p>
+<p><strong>Parameters:</strong>
+- <code>package</code> (optional) - Package to focus the recommendation on
+- <code>--context</code> (optional) - Free-form context (e.g. <code>"Before release"</code>, <code>"Daily check-in"</code>)</p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="c1"># Get next task suggestion</span>
 </span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>/rforge:next
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="c1"># Focused on a release context</span>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>/rforge:next<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;Before release&quot;</span>
 </span></code></pre></div></p>
 <p><strong>Considers:</strong>
 - Unfinished tasks
@@ -3924,7 +3957,7 @@ auto-applied).</p>
 - <code>package</code> (optional) - Package to check (defaults to current)
 - <code>--strict</code> (optional) - Run both CRAN Suggests-withholding flavors (default: false)
 - <code>--incoming</code> (optional) - Emulate CRAN's incoming <code>_R_CHECK_*</code> bundle; implies <code>--strict</code> (default: false)
-- <code>--changed</code> (optional, v2.10.0; tagging v2.11.0) - Scope the check to the package(s) changed on this branch and tag each finding <strong><code>[introduced]</code></strong> (new on your branch) vs <strong><code>[pre-existing]</code></strong> (already at the fork point), via a baseline run in a detached worktree at <code>merge-base(HEAD, --base)</code> (default: false)
+- <code>--changed</code> (optional, v2.10.0; tagging v2.11.0; <code>[uncommitted]</code> refinement v2.12.0) - Scope the check to the package(s) changed on this branch and tag each finding <strong><code>[introduced]</code></strong> (new on your branch) vs <strong><code>[pre-existing]</code></strong> (already at the fork point), via a baseline run in a detached worktree at <code>merge-base(HEAD, --base)</code>; an <code>[introduced]</code> finding whose file still has uncommitted changes is further refined to <strong><code>[uncommitted]</code></strong> (counts as introduced for <code>--fail-on</code>) (default: false)
 - <code>--base &lt;ref&gt;</code> (optional, v2.11.0) - Comparison ref for <code>--changed</code>; the baseline is run at <code>merge-base(HEAD, base)</code> (default: <code>dev</code>)
 - <code>--fail-on &lt;introduced|none&gt;</code> (optional, v2.11.0) - Exit non-zero only on findings tagged <code>[introduced]</code> (default: <code>introduced</code>); <code>none</code> is advisory
 - <code>--changed-strict</code> (optional, v2.10.0) - Documented no-op (default: false)</p>
@@ -3955,7 +3988,7 @@ auto-applied).</p>
 <p>A package that passes the default <code>--as-cran</code> check today can fail <code>--strict</code> once the <strong>noSuggests</strong> pass catches a <code>Suggests</code> package used unconditionally (the medfit 0.2.1 class — <code>MASS::mvrnorm</code> in a default code path). This is intended: CRAN would bounce such a package post-acceptance. Move the dependency to <code>Imports</code>, or guard it with <code>requireNamespace()</code> in code and <code>skip_if_not_installed()</code> in tests.</p>
 </div>
 <p><strong>Note:</strong> This can take 1-5 minutes depending on package size. Strict mode runs the baseline plus two flavor passes (~3× check time; ~4× with <code>--incoming</code>).</p>
-<p><strong>Diff-aware mode (v2.10.0; tagging v2.11.0):</strong> <code>--changed</code> scopes the check to the R package(s) touched on this branch and tags each finding <strong><code>[introduced]</code></strong> vs <strong><code>[pre-existing]</code></strong> — computed honestly by a second baseline run in a detached worktree checked out at <code>merge-base(HEAD, --base)</code> (default base <code>dev</code>). <code>--fail-on introduced</code> (the default) exits non-zero only on findings your branch introduced, so CI fails on regressions you caused — not pre-existing debt (<code>--fail-on none</code> is advisory). Identity is line-shift-immune (findings key on file + message, not raw line). Degrades gracefully: not a git repo / no merge-base / baseline-worktree failure → falls back to a real full check plus a warning (scope-only, no tagging — no regression of v2.10.0); no changes → a clean no-op. Out of scope: uncommitted-change tagging and cross-run baseline caching (each invocation pays one extra check). <code>--changed-strict</code> is a documented no-op.</p>
+<p><strong>Diff-aware mode (v2.10.0; tagging v2.11.0; <code>[uncommitted]</code> refinement v2.12.0):</strong> <code>--changed</code> scopes the check to the R package(s) touched on this branch and tags each finding <strong><code>[introduced]</code></strong> vs <strong><code>[pre-existing]</code></strong> — computed honestly by a second baseline run in a detached worktree checked out at <code>merge-base(HEAD, --base)</code> (default base <code>dev</code>). An <code>[introduced]</code> finding whose file still has <strong>uncommitted</strong> changes (per <code>git status --porcelain</code>) is further refined to <strong><code>[uncommitted]</code></strong> — "you caused this with edits you haven't committed yet" vs committed branch work. This is a file-level refinement (no third check run), so every introduced finding in a dirty file tags <code>[uncommitted]</code>; string findings (R CMD check messages with no file) stay <code>[introduced]</code>. <code>[uncommitted]</code> is a subset of introduced: <code>--fail-on introduced</code> still fails on it. <code>--fail-on introduced</code> (the default) exits non-zero only on findings your branch introduced (incl. <code>[uncommitted]</code>), so CI fails on regressions you caused — not pre-existing debt (<code>--fail-on none</code> is advisory). Identity is line-shift-immune (findings key on file + message, not raw line). Degrades gracefully: not a git repo / no merge-base / baseline-worktree failure → falls back to a real full check plus a warning (scope-only, no tagging — no regression of v2.10.0); no changes → a clean no-op. Out of scope: finding-precise uncommitted attribution (would need a third clean-HEAD run) and cross-run baseline caching (each invocation pays one extra check). <code>--changed-strict</code> is a documented no-op.</p>
 <hr />
 <h2 id="r-development-cycle">R Development Cycle<a class="headerlink" href="#r-development-cycle" title="Permanent link">&para;</a></h2>
 <h3 id="rforgerload">/rforge:r:load<a class="headerlink" href="#rforgerload" title="Permanent link">&para;</a></h3>
@@ -4009,7 +4042,7 @@ auto-applied).</p>
 <p><strong>Parameters:</strong></p>
 <ul>
 <li><code>package</code> (optional) - Package path (defaults to current directory)</li>
-<li><code>--changed</code> (optional, v2.10.0; tagging v2.11.0) - Scope tests to the package(s) changed on this branch and tag findings <code>[introduced]</code>/<code>[pre-existing]</code> via a merge-base baseline run (default: false)</li>
+<li><code>--changed</code> (optional, v2.10.0; tagging v2.11.0; <code>[uncommitted]</code> refinement v2.12.0) - Scope tests to the package(s) changed on this branch and tag findings <code>[introduced]</code>/<code>[pre-existing]</code> via a merge-base baseline run; an introduced failure in an uncommitted file is refined to <code>[uncommitted]</code> (default: false)</li>
 <li><code>--base &lt;ref&gt;</code> (optional, v2.11.0) - Comparison ref for <code>--changed</code> (default: <code>dev</code>)</li>
 <li><code>--fail-on &lt;introduced|none&gt;</code> (optional, v2.11.0) - Exit non-zero only on <code>[introduced]</code> findings (default: <code>introduced</code>)</li>
 </ul>
@@ -4156,7 +4189,7 @@ auto-applied).</p>
 <p><strong>Parameters:</strong></p>
 <ul>
 <li><code>package</code> (optional) - Package path (defaults to current directory)</li>
-<li><code>--changed</code> (optional, v2.10.0; tagging v2.11.0) - Scope lint to the package(s) changed on this branch and tag findings <code>[introduced]</code>/<code>[pre-existing]</code> via a merge-base baseline run; line-shift-immune identity (default: false)</li>
+<li><code>--changed</code> (optional, v2.10.0; tagging v2.11.0; <code>[uncommitted]</code> refinement v2.12.0) - Scope lint to the package(s) changed on this branch and tag findings <code>[introduced]</code>/<code>[pre-existing]</code> via a merge-base baseline run; line-shift-immune identity; an introduced lint in an uncommitted file is refined to <code>[uncommitted]</code> (default: false)</li>
 <li><code>--base &lt;ref&gt;</code> (optional, v2.11.0) - Comparison ref for <code>--changed</code> (default: <code>dev</code>)</li>
 <li><code>--fail-on &lt;introduced|none&gt;</code> (optional, v2.11.0) - Exit non-zero only on <code>[introduced]</code> findings (default: <code>introduced</code>)</li>
 </ul>
@@ -4242,7 +4275,7 @@ auto-applied).</p>
 </tr>
 <tr>
 <td>method-dispatch (<code>--runtime</code>)</td>
-<td><code>dead_generic</code>, <code>method_on_missing_class</code></td>
+<td><code>dead_generic</code>, <code>method_on_missing_class</code>, <code>method_undeclared_dependency</code></td>
 <td>runtime</td>
 </tr>
 <tr>
@@ -4252,7 +4285,7 @@ auto-applied).</p>
 </tr>
 </tbody>
 </table>
-<p>The <code>method-dispatch</code> runtime family reports <code>dead_generic</code> (an S7 generic with no registered method) and <code>method_on_missing_class</code> (a method whose dispatch signature references an S7 class with no resolvable namespace binding — e.g. an inline <code>new_class()</code> left in a <code>method()</code> call — making the method unreachable). Each <code>S7_method</code> carries its dispatch class objects (<code>attr(., "signature")</code>), so resolvability is decided by object identity against the package's classes; base types and imported classes are not flagged.</p>
+<p>The <code>method-dispatch</code> runtime family reports <code>dead_generic</code> (an S7 generic with no registered method), <code>method_on_missing_class</code> (a method whose dispatch signature references an S7 class with no resolvable namespace binding — e.g. an inline <code>new_class()</code> left in a <code>method()</code> call — making the method unreachable), and <code>method_undeclared_dependency</code> (a method dispatching on an S7 class that <em>does</em> resolve but whose providing package — <code>attr(class, "package")</code> — is not declared in <code>DESCRIPTION</code> <code>Imports</code>/<code>Depends</code>/<code>LinkingTo</code>, typically a <code>Suggests</code>-only class; where that package is absent the dispatch class never registers and the method never fires). Each <code>S7_method</code> carries its dispatch class objects (<code>attr(., "signature")</code>), so resolvability is decided by object identity against the package's classes; base types and the package's own classes are not flagged, and base/recommended packages (<code>base</code>, <code>methods</code>, <code>stats</code>, <code>utils</code>, <code>S7</code>, …) are always treated as declared.</p>
 <p><strong>Output:</strong> one <code>{kind: "s7review", status: "ok"|"warn", stages: [...]}</code> envelope. Each finding carries <code>source: "static"</code> and <code>severity: "advisory"</code>, worded "looks like / consider", never "must". Exit 0 always.</p>
 <p><strong>Related commands:</strong> <code>/rforge:r:cran-prep</code> (Tier-4 advisory siblings), <code>/rforge:r:document</code></p>
 <hr />

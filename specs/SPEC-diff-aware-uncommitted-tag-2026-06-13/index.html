@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-s7-method-missing-class-2026-06-13/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-diff-aware-uncommitted-tag-2026-06-13/">
       
       
       
@@ -23,7 +23,7 @@
     
     
       
-        <title>SPEC: s7-review methods_on_missing_class — close the deferred runtime family - RForge Plugin</title>
+        <title>SPEC: diff-aware [uncommitted] tag - RForge Plugin</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#spec-s7-review-methods_on_missing_class-close-the-deferred-runtime-family" class="md-skip">
+        <a href="#spec-diff-aware-uncommitted-tag" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              SPEC: s7-review methods_on_missing_class — close the deferred runtime family
+              SPEC: diff-aware [uncommitted] tag
             
           </span>
         </div>
@@ -2116,10 +2116,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#empirical-finding-refutes-the-deferral" class="md-nav__link">
+  <a href="#why-the-cheap-file-level-approach" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Empirical finding (refutes the deferral)
+        Why the cheap (file-level) approach
       
     </span>
   </a>
@@ -2127,10 +2127,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-the-family-detects" class="md-nav__link">
+  <a href="#design" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What the family detects
+        Design
       
     </span>
   </a>
@@ -2138,32 +2138,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#algorithm-in-the-s7runtime-engine-librcmdpy" class="md-nav__link">
+  <a href="#scope-decisions-caveats" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Algorithm (in the s7runtime engine, lib/rcmd.py)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#false-positive-guards-the-adversarial-concerns" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        False-positive guards (the adversarial concerns)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#out-of-scope" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Out of scope
+        Scope decisions / caveats
       
     </span>
   </a>
@@ -2198,7 +2176,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-s7-method-missing-class-2026-06-13.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-diff-aware-uncommitted-tag-2026-06-13.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2206,88 +2184,60 @@
   
 
 
-<h1 id="spec-s7-review-methods_on_missing_class-close-the-deferred-runtime-family">SPEC: s7-review <code>methods_on_missing_class</code> — close the deferred runtime family<a class="headerlink" href="#spec-s7-review-methods_on_missing_class-close-the-deferred-runtime-family" title="Permanent link">&para;</a></h1>
+<h1 id="spec-diff-aware-uncommitted-tag">SPEC: diff-aware <code>[uncommitted]</code> tag<a class="headerlink" href="#spec-diff-aware-uncommitted-tag" title="Permanent link">&para;</a></h1>
 <p><strong>Date:</strong> 2026-06-13
 <strong>Author:</strong> Davood Tofighi (with Claude Code)
-<strong>Status:</strong> Approved (autonomous build, pre-approved)
-<strong>Parent:</strong> <code>SPEC-r-s7-review-eco-2026-06-13.md</code> (Deferred note)
-<strong>Target:</strong> post-v2.11.0 (single deferred family)</p>
+<strong>Status:</strong> Approved (bundle build)
+<strong>Parent:</strong> <code>SPEC-diff-aware-tagging-2026-06-13.md</code> (Out of scope → now addressed)
+<strong>Target:</strong> v2.12.0 bundle (2 of 3)</p>
 <hr />
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
-<p><code>r:s7-review --runtime</code> (v2.11.0) ships two working runtime families (<code>dead_generic</code>,
-<code>validator_not_enforcing</code>) plus a <strong>third hardcoded-empty placeholder</strong>:
-<code>methods_on_missing_class</code>. The v2.11.0 spec deferred it claiming it was "not decidable
-from the S7 method registry alone." <strong>This spec refutes that empirically and implements it.</strong></p>
-<h2 id="empirical-finding-refutes-the-deferral">Empirical finding (refutes the deferral)<a class="headerlink" href="#empirical-finding-refutes-the-deferral" title="Permanent link">&para;</a></h2>
-<p>Investigated S7's real method-table structure (R + S7 present):</p>
+<p>v2.11.0 diff-aware <code>--changed</code> tags findings <code>[introduced]</code> (new on this branch vs the
+merge-base) and <code>[pre-existing]</code>. It explicitly deferred <em>uncommitted-change</em> tagging:
+"dirty working-tree findings count as HEAD's." This refines that — an <code>[introduced]</code>
+finding whose file has <strong>uncommitted changes</strong> is re-tagged <strong><code>[uncommitted]</code></strong>, so a user
+can tell "I caused this with edits I haven't committed yet" from "this is committed branch
+work."</p>
+<h2 id="why-the-cheap-file-level-approach">Why the cheap (file-level) approach<a class="headerlink" href="#why-the-cheap-file-level-approach" title="Permanent link">&para;</a></h2>
+<p>A <em>finding-precise</em> version would need a <strong>third</strong> check run (a clean worktree at committed
+HEAD) to set-diff working-tree findings from committed ones — tripling the check cost. The
+value (telling committed-branch from uncommitted) does not justify a 3rd full <code>R CMD check</code>.</p>
+<p>Instead: <strong>file-level refinement, no extra run.</strong> After tagging, an <code>[introduced]</code> finding
+whose <code>file</code> is in the set of uncommitted-changed paths (<code>git status --porcelain</code> →
+modified/added, staged or not) is re-tagged <code>[uncommitted]</code>. Zero extra check runs; reuses
+the runs <code>--changed</code> already does.</p>
+<h2 id="design">Design<a class="headerlink" href="#design" title="Permanent link">&para;</a></h2>
+<p>In <code>lib/changed.py</code>:</p>
 <ul>
-<li><code>attr(generic, "methods")</code> is an environment keyed by class <strong>name</strong> (nested for
-  multi-dispatch). Each value is an <code>S7_method</code> object.</li>
-<li>Each <code>S7_method</code> carries <strong><code>attr(method, "signature")</code></strong> — a <em>list of the actual
-  dispatch class objects</em> (S7_class objects for S7 classes; base-type specs otherwise).</li>
-<li>So for every registered method we can recover its dispatch class object(s) and check
-  <strong>resolvability by name against the loaded namespace</strong> — fully decidable.</li>
+<li>New <code>uncommitted_files(path) -&gt; set[str]</code> — <code>git status --porcelain</code>, returning the
+  modified/added/renamed paths (package-relative). Advisory: git failure → empty set
+  (no refinement, no error).</li>
+<li>In <code>scope_check</code> (after <code>tag_findings</code>): for each finding tagged <code>[introduced]</code> whose
+  finding-file ∈ <code>uncommitted_files</code>, change its tag to <code>[uncommitted]</code>. String findings
+  (no file) are never refined (stay <code>[introduced]</code>).</li>
+<li><code>[uncommitted]</code> is a <strong>subset of introduced</strong> for <code>--fail-on</code> purposes: <code>--fail-on
+  introduced</code> (default) still fails on <code>[uncommitted]</code> findings (they're yours). A finding
+  is never both.</li>
 </ul>
-<p>Confirmed detection: a method registered on an inline, unbound class
-(<code>method(gen, new_class("Ghost")) &lt;- fn</code>) yields a registry whose <code>Ghost</code> signature
-class is an <code>S7_class</code> whose name does <strong>not</strong> resolve in the namespace → a dead,
-unreachable method (nothing can ever construct a <code>Ghost</code> to dispatch on). Base-type
-methods (<code>method(gen, class_integer)</code>) have a signature element that is <strong>not</strong> an
-<code>S7_class</code> and are correctly excluded.</p>
-<h2 id="what-the-family-detects">What the family detects<a class="headerlink" href="#what-the-family-detects" title="Permanent link">&para;</a></h2>
-<p><strong><code>methods_on_missing_class</code></strong>: a registered method whose dispatch signature includes an
-<strong>S7 class that is not resolvable by name</strong> in the loaded package namespace (or a declared,
-loaded import). This is the runtime sibling of <code>dead_generic</code> — a method that can never be
-dispatched because its dispatch class has no reachable binding (typically an inline /
-unexported <code>new_class()</code> left in a <code>method()</code> call, or a method left dangling after a
-class was renamed/removed).</p>
-<h2 id="algorithm-in-the-s7runtime-engine-librcmdpy">Algorithm (in the <code>s7runtime</code> engine, <code>lib/rcmd.py</code>)<a class="headerlink" href="#algorithm-in-the-s7runtime-engine-librcmdpy" title="Permanent link">&para;</a></h2>
-<p>For each S7 generic in the namespace, walk its method registry; for each <code>S7_method</code>, for
-each element of <code>attr(method, "signature")</code>:</p>
-<ol>
-<li><strong>Skip non-S7 signature elements</strong> — base types (<code>class_integer</code>/<code>class_character</code>/…)
-   are not <code>S7_class</code> objects → never "missing".</li>
-<li><strong>Skip the universal types</strong> — <code>S7_object</code> / <code>class_any</code> (<code>ANY</code>) union dispatch.</li>
-<li>For an <code>S7_class</code> element with name <code>N</code> and package <code>P</code>:</li>
-<li><code>P</code> set and <code>P != this_package</code> → <strong>resolvable</strong> iff <code>exists(N, asNamespace(P))</code>
-     (imported class — the import is loaded, so it resolves). Not missing.</li>
-<li><code>P</code> unset or <code>P == this_package</code> → <strong>resolvable</strong> iff <code>N</code> is bound to an <code>S7_class</code>
-     in this package's namespace. If not bound → <strong>MISSING</strong> → flag
-     <code>"&lt;generic&gt; -&gt; &lt;N&gt;"</code>.</li>
-</ol>
-<p>Emit <code>methods_on_missing_class</code> as the list of <code>"&lt;generic&gt; -&gt; &lt;class&gt;"</code> strings (was
-<code>character()</code>). Normalization in <code>_status_for</code> / <code>normalize</code> already aggregates all three
-runtime lists — no change needed there.</p>
-<h2 id="false-positive-guards-the-adversarial-concerns">False-positive guards (the adversarial concerns)<a class="headerlink" href="#false-positive-guards-the-adversarial-concerns" title="Permanent link">&para;</a></h2>
+<h2 id="scope-decisions-caveats">Scope decisions / caveats<a class="headerlink" href="#scope-decisions-caveats" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Base types</strong> — excluded by the <code>inherits(sig, "S7_class")</code> gate (empirically verified:
-  <code>integer</code> key → <code>s7class=FALSE</code>).</li>
-<li><strong>Imported classes</strong> — resolved via the class's <code>package</code> attribute against that
-  package's loaded namespace; not flagged.</li>
-<li><strong><code>ANY</code> / <code>S7_object</code> union dispatch</strong> — explicitly skipped.</li>
-<li><strong>Parent classes</strong> — irrelevant; only the dispatch class itself is checked.</li>
-<li><strong>Multi-dispatch</strong> — every signature element checked independently; a method dispatching
-  on <code>list(Real, Ghost)</code> flags only <code>Ghost</code>.</li>
-</ul>
-<h2 id="out-of-scope">Out of scope<a class="headerlink" href="#out-of-scope" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Cross-package <em>undeclared-dependency</em> dispatch (method on <code>otherpkg::Class</code> where
-  <code>otherpkg</code> ∉ DESCRIPTION) — a different, DESCRIPTION-aware check.
-  <strong>Implemented in v2.12.0</strong> as <code>method_undeclared_dependency</code>
-  (<code>SPEC-s7-undeclared-dependency-2026-06-13.md</code>).</li>
-<li>Static (non-runtime) detection — this is a <code>--runtime</code>-only family, like its siblings.</li>
+<li><strong>File-level, not finding-level.</strong> If a file has <em>both</em> a committed-branch finding and an
+  uncommitted edit, all that file's introduced findings tag <code>[uncommitted]</code> (can't tell
+  which without the 3rd run). Documented in the command help + this spec.</li>
+<li><strong>String findings</strong> (whole-package <code>R CMD check</code> messages with no file) stay
+  <code>[introduced]</code> — no file to attribute.</li>
+<li>No new flag; the refinement is automatic when <code>--changed</code> runs in a dirty tree. Pre-existing
+  findings are never re-tagged.</li>
 </ul>
 <h2 id="tests-gates">Tests (gates)<a class="headerlink" href="#tests-gates" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Real-R e2e</strong> (R-gated <code>skipif</code>, like the existing s7runtime tests): a fixture package
-  with (a) a method on a real bound class (NOT flagged) and (b) a method on an inline
-  unbound class (flagged). Assert <code>methods_on_missing_class</code> contains exactly the dangling
-  one. Reuse/extend the <code>s7pkg.bad</code> fixture.</li>
-<li><strong>Base-type non-flag</strong>: a <code>method(gen, class_integer)</code> in the fixture must NOT appear.</li>
-<li><strong>Degradation</strong>: unchanged — R/S7 absent → <code>--runtime</code> still degrades to advisory <code>warn</code>.</li>
-<li><code>_check_agent_engines.py</code>, <code>version_sync --check</code>, <code>gen_lib_reference --check</code> stay green.</li>
-<li>Update <code>commands/r/s7-review.md</code> (move <code>method_on_missing_class</code> from Deferred into the
-  active family table) + this parent spec's Deferred note.</li>
+<li>Real-git e2e: branch with one <strong>committed</strong> introduced finding + one in an
+  <strong>uncommitted</strong> file → assert the former tags <code>[introduced]</code>, the latter <code>[uncommitted]</code>,
+  a pre-existing one stays <code>[pre-existing]</code>. No mocking of git.</li>
+<li><code>uncommitted_files</code> unit: returns modified+staged+added paths; empty on non-repo (no raise).</li>
+<li><code>--fail-on introduced</code> still exits non-zero when only <code>[uncommitted]</code> findings exist.</li>
+<li>Clean tree (no uncommitted changes) → no <code>[uncommitted]</code> tags (no regression of v2.11).</li>
+<li>Command frontmatter/<code>Usage</code> + <code>docs/commands.md</code> + <code>changed</code> reference updated; CHANGELOG.</li>
 </ul>
 
 

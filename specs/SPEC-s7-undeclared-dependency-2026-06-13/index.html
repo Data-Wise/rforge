@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-s7-method-missing-class-2026-06-13/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-s7-undeclared-dependency-2026-06-13/">
       
       
       
@@ -23,7 +23,7 @@
     
     
       
-        <title>SPEC: s7-review methods_on_missing_class — close the deferred runtime family - RForge Plugin</title>
+        <title>SPEC: s7-review method_undeclared_dependency (cross-package breadth) - RForge Plugin</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#spec-s7-review-methods_on_missing_class-close-the-deferred-runtime-family" class="md-skip">
+        <a href="#spec-s7-review-method_undeclared_dependency-cross-package-breadth" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              SPEC: s7-review methods_on_missing_class — close the deferred runtime family
+              SPEC: s7-review method_undeclared_dependency (cross-package breadth)
             
           </span>
         </div>
@@ -2116,10 +2116,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#empirical-finding-refutes-the-deferral" class="md-nav__link">
+  <a href="#decidability" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Empirical finding (refutes the deferral)
+        Decidability
       
     </span>
   </a>
@@ -2127,21 +2127,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-the-family-detects" class="md-nav__link">
+  <a href="#design-in-the-s7runtime-engine-librcmdpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What the family detects
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#algorithm-in-the-s7runtime-engine-librcmdpy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Algorithm (in the s7runtime engine, lib/rcmd.py)
+        Design (in the s7runtime engine, lib/rcmd.py)
       
     </span>
   </a>
@@ -2160,10 +2149,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#out-of-scope" class="md-nav__link">
+  <a href="#scope-decisions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Out of scope
+        Scope decisions
       
     </span>
   </a>
@@ -2198,7 +2187,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-s7-method-missing-class-2026-06-13.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-s7-undeclared-dependency-2026-06-13.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2206,88 +2195,72 @@
   
 
 
-<h1 id="spec-s7-review-methods_on_missing_class-close-the-deferred-runtime-family">SPEC: s7-review <code>methods_on_missing_class</code> — close the deferred runtime family<a class="headerlink" href="#spec-s7-review-methods_on_missing_class-close-the-deferred-runtime-family" title="Permanent link">&para;</a></h1>
+<h1 id="spec-s7-review-method_undeclared_dependency-cross-package-breadth">SPEC: s7-review <code>method_undeclared_dependency</code> (cross-package breadth)<a class="headerlink" href="#spec-s7-review-method_undeclared_dependency-cross-package-breadth" title="Permanent link">&para;</a></h1>
 <p><strong>Date:</strong> 2026-06-13
 <strong>Author:</strong> Davood Tofighi (with Claude Code)
-<strong>Status:</strong> Approved (autonomous build, pre-approved)
-<strong>Parent:</strong> <code>SPEC-r-s7-review-eco-2026-06-13.md</code> (Deferred note)
-<strong>Target:</strong> post-v2.11.0 (single deferred family)</p>
+<strong>Status:</strong> Approved (bundle build)
+<strong>Parent:</strong> <code>SPEC-r-s7-review-eco-2026-06-13.md</code> / <code>SPEC-s7-method-missing-class-2026-06-13.md</code>
+<strong>Target:</strong> v2.12.0 bundle (3 of 3)</p>
 <hr />
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
-<p><code>r:s7-review --runtime</code> (v2.11.0) ships two working runtime families (<code>dead_generic</code>,
-<code>validator_not_enforcing</code>) plus a <strong>third hardcoded-empty placeholder</strong>:
-<code>methods_on_missing_class</code>. The v2.11.0 spec deferred it claiming it was "not decidable
-from the S7 method registry alone." <strong>This spec refutes that empirically and implements it.</strong></p>
-<h2 id="empirical-finding-refutes-the-deferral">Empirical finding (refutes the deferral)<a class="headerlink" href="#empirical-finding-refutes-the-deferral" title="Permanent link">&para;</a></h2>
-<p>Investigated S7's real method-table structure (R + S7 present):</p>
-<ul>
-<li><code>attr(generic, "methods")</code> is an environment keyed by class <strong>name</strong> (nested for
-  multi-dispatch). Each value is an <code>S7_method</code> object.</li>
-<li>Each <code>S7_method</code> carries <strong><code>attr(method, "signature")</code></strong> — a <em>list of the actual
-  dispatch class objects</em> (S7_class objects for S7 classes; base-type specs otherwise).</li>
-<li>So for every registered method we can recover its dispatch class object(s) and check
-  <strong>resolvability by name against the loaded namespace</strong> — fully decidable.</li>
-</ul>
-<p>Confirmed detection: a method registered on an inline, unbound class
-(<code>method(gen, new_class("Ghost")) &lt;- fn</code>) yields a registry whose <code>Ghost</code> signature
-class is an <code>S7_class</code> whose name does <strong>not</strong> resolve in the namespace → a dead,
-unreachable method (nothing can ever construct a <code>Ghost</code> to dispatch on). Base-type
-methods (<code>method(gen, class_integer)</code>) have a signature element that is <strong>not</strong> an
-<code>S7_class</code> and are correctly excluded.</p>
-<h2 id="what-the-family-detects">What the family detects<a class="headerlink" href="#what-the-family-detects" title="Permanent link">&para;</a></h2>
-<p><strong><code>methods_on_missing_class</code></strong>: a registered method whose dispatch signature includes an
-<strong>S7 class that is not resolvable by name</strong> in the loaded package namespace (or a declared,
-loaded import). This is the runtime sibling of <code>dead_generic</code> — a method that can never be
-dispatched because its dispatch class has no reachable binding (typically an inline /
-unexported <code>new_class()</code> left in a <code>method()</code> call, or a method left dangling after a
-class was renamed/removed).</p>
-<h2 id="algorithm-in-the-s7runtime-engine-librcmdpy">Algorithm (in the <code>s7runtime</code> engine, <code>lib/rcmd.py</code>)<a class="headerlink" href="#algorithm-in-the-s7runtime-engine-librcmdpy" title="Permanent link">&para;</a></h2>
-<p>For each S7 generic in the namespace, walk its method registry; for each <code>S7_method</code>, for
-each element of <code>attr(method, "signature")</code>:</p>
+<p>The s7-review <code>--runtime</code> <code>method-dispatch</code> family flags <code>dead_generic</code> and
+<code>method_on_missing_class</code>. This adds the cross-package check named (and deferred) in the
+parent spec: <strong><code>method_undeclared_dependency</code></strong> — a method dispatching on an S7 class from
+a package that is <strong>not declared</strong> in <code>DESCRIPTION</code> (<code>Imports</code>/<code>Depends</code>/<code>LinkingTo</code>),
+typically a <code>Suggests</code>-only class. At a user's site without that package the dispatch class
+never registers → the method silently never fires. A real, decidable correctness/CRAN bug.</p>
+<h2 id="decidability">Decidability<a class="headerlink" href="#decidability" title="Permanent link">&para;</a></h2>
+<p><code>method_on_missing_class</code> (v2.11.1) established that each <code>S7_method</code> carries
+<code>attr(., "signature")</code> — the dispatch class objects — and an S7 class object exposes its
+originating package via <code>attr(class, "package")</code>. So for each dispatch class we know its
+package. Cross-checking that package against the loaded package's <code>DESCRIPTION</code> declared
+deps is decidable.</p>
+<h2 id="design-in-the-s7runtime-engine-librcmdpy">Design (in the <code>s7runtime</code> engine, <code>lib/rcmd.py</code>)<a class="headerlink" href="#design-in-the-s7runtime-engine-librcmdpy" title="Permanent link">&para;</a></h2>
+<p>Extend the existing per-signature loop (the one added for <code>method_on_missing_class</code>):</p>
 <ol>
-<li><strong>Skip non-S7 signature elements</strong> — base types (<code>class_integer</code>/<code>class_character</code>/…)
-   are not <code>S7_class</code> objects → never "missing".</li>
-<li><strong>Skip the universal types</strong> — <code>S7_object</code> / <code>class_any</code> (<code>ANY</code>) union dispatch.</li>
-<li>For an <code>S7_class</code> element with name <code>N</code> and package <code>P</code>:</li>
-<li><code>P</code> set and <code>P != this_package</code> → <strong>resolvable</strong> iff <code>exists(N, asNamespace(P))</code>
-     (imported class — the import is loaded, so it resolves). Not missing.</li>
-<li><code>P</code> unset or <code>P == this_package</code> → <strong>resolvable</strong> iff <code>N</code> is bound to an <code>S7_class</code>
-     in this package's namespace. If not bound → <strong>MISSING</strong> → flag
-     <code>"&lt;generic&gt; -&gt; &lt;N&gt;"</code>.</li>
+<li>Read the loaded package's declared deps once: parse <code>DESCRIPTION</code>
+   <code>Imports</code> + <code>Depends</code> + <code>LinkingTo</code> package names (R-side, from the loaded path; the
+   package name itself + <code>base</code>/<code>methods</code>/recommended-pkgs are always allowed).</li>
+<li>For a dispatch class that <strong>is</strong> resolvable (so not <code>method_on_missing_class</code>) and whose
+   <code>package</code> attribute <code>P</code> is set, <code>P != this_package</code>, and <code>P ∉ declared_deps</code> →
+   flag <code>methods_undeclared_dependency</code> as <code>"&lt;generic&gt; -&gt; &lt;P&gt;::&lt;class&gt;"</code> (structured
+   <code>{generic, class, package}</code>).</li>
+<li>The two checks are mutually exclusive per signature: unresolvable → <code>missing_class</code>;
+   resolvable-but-undeclared-package → <code>undeclared_dependency</code>; resolvable-and-declared →
+   clean.</li>
 </ol>
-<p>Emit <code>methods_on_missing_class</code> as the list of <code>"&lt;generic&gt; -&gt; &lt;class&gt;"</code> strings (was
-<code>character()</code>). Normalization in <code>_status_for</code> / <code>normalize</code> already aggregates all three
-runtime lists — no change needed there.</p>
+<p>Consumer (<code>lib/s7review.py</code> <code>_runtime_stages</code>): map the new engine list into
+<code>method_undeclared_dependency</code> findings in the <code>method-dispatch</code> family (advisory,
+<code>source: "runtime"</code>).</p>
 <h2 id="false-positive-guards-the-adversarial-concerns">False-positive guards (the adversarial concerns)<a class="headerlink" href="#false-positive-guards-the-adversarial-concerns" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Base types</strong> — excluded by the <code>inherits(sig, "S7_class")</code> gate (empirically verified:
-  <code>integer</code> key → <code>s7class=FALSE</code>).</li>
-<li><strong>Imported classes</strong> — resolved via the class's <code>package</code> attribute against that
-  package's loaded namespace; not flagged.</li>
-<li><strong><code>ANY</code> / <code>S7_object</code> union dispatch</strong> — explicitly skipped.</li>
-<li><strong>Parent classes</strong> — irrelevant; only the dispatch class itself is checked.</li>
-<li><strong>Multi-dispatch</strong> — every signature element checked independently; a method dispatching
-  on <code>list(Real, Ghost)</code> flags only <code>Ghost</code>.</li>
+<li><strong>Base types</strong> — not S7 classes; never considered (same gate as missing_class).</li>
+<li><strong>This package's own classes</strong> — <code>P</code> unset or <code>== this_package</code>; skipped.</li>
+<li><strong>Recommended/base packages</strong> (<code>methods</code>, <code>stats</code>, <code>utils</code>, …) — treated as always-allowed
+  (they need no <code>Imports</code> declaration); maintain an allowlist so a method on a base-S7 type
+  isn't flagged.</li>
+<li><strong><code>Depends</code> vs <code>Imports</code></strong> — both count as declared (a <code>Depends</code> package is attached).</li>
+<li><strong><code>ANY</code>/<code>S7_object</code>/unions</strong> — skipped (same as missing_class).</li>
 </ul>
-<h2 id="out-of-scope">Out of scope<a class="headerlink" href="#out-of-scope" title="Permanent link">&para;</a></h2>
+<h2 id="scope-decisions">Scope decisions<a class="headerlink" href="#scope-decisions" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Cross-package <em>undeclared-dependency</em> dispatch (method on <code>otherpkg::Class</code> where
-  <code>otherpkg</code> ∉ DESCRIPTION) — a different, DESCRIPTION-aware check.
-  <strong>Implemented in v2.12.0</strong> as <code>method_undeclared_dependency</code>
-  (<code>SPEC-s7-undeclared-dependency-2026-06-13.md</code>).</li>
-<li>Static (non-runtime) detection — this is a <code>--runtime</code>-only family, like its siblings.</li>
+<li>Reuses the v2.11.1 signature-walking machinery — no new traversal.</li>
+<li>DESCRIPTION parsing is R-side in the engine (the path is already loaded); the package's
+  own name is read via <code>pkgload::pkg_name</code> (already used).</li>
+<li>Out of scope: cross-package S7 <em>contract</em> checks (a class in pkg A consumed by pkg B's
+  generic) — that needs an ecosystem-wide S7 registry, a separate larger feature.</li>
 </ul>
 <h2 id="tests-gates">Tests (gates)<a class="headerlink" href="#tests-gates" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Real-R e2e</strong> (R-gated <code>skipif</code>, like the existing s7runtime tests): a fixture package
-  with (a) a method on a real bound class (NOT flagged) and (b) a method on an inline
-  unbound class (flagged). Assert <code>methods_on_missing_class</code> contains exactly the dangling
-  one. Reuse/extend the <code>s7pkg.bad</code> fixture.</li>
-<li><strong>Base-type non-flag</strong>: a <code>method(gen, class_integer)</code> in the fixture must NOT appear.</li>
-<li><strong>Degradation</strong>: unchanged — R/S7 absent → <code>--runtime</code> still degrades to advisory <code>warn</code>.</li>
-<li><code>_check_agent_engines.py</code>, <code>version_sync --check</code>, <code>gen_lib_reference --check</code> stay green.</li>
-<li>Update <code>commands/r/s7-review.md</code> (move <code>method_on_missing_class</code> from Deferred into the
-  active family table) + this parent spec's Deferred note.</li>
+<li>Real-R e2e (R-gated): a fixture package whose method dispatches on a class from a helper
+  package that is installed but <strong>not</strong> in the fixture's <code>DESCRIPTION</code> → assert
+  <code>methods_undeclared_dependency</code> fires; a method on a properly-<code>Imports</code>-declared class
+  does NOT fire; a base-type/<code>methods</code> class does NOT fire.</li>
+<li>Consumer mapping test (monkeypatched engine env) → <code>method_undeclared_dependency</code> finding
+  in <code>method-dispatch</code>.</li>
+<li><code>commands/r/s7-review.md</code> family table + <code>docs/commands.md</code> + parent spec + CHANGELOG
+  updated; <code>_check_agent_engines.py</code>, <code>version_sync --check</code>, <code>gen_lib_reference --check</code>,
+  and the new commands-doc sync-gate all green.</li>
 </ul>
 
 
