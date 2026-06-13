@@ -269,6 +269,41 @@ def test_detect_ecosystem_enriches_packages_from_manifest(tmp_path, make_pkg):
     assert eco.drift.disk_only == []
 
 
+def test_detect_ecosystem_manifest_order_preserves_declared_order(tmp_path, make_pkg):
+    """Issue #20: `manifest_order` is the manifest's declared package order
+    (not disk/alphabetical), exposed for curated `/rforge:status` rendering."""
+    make_pkg("medfit")
+    make_pkg("probmed")
+    (tmp_path / "hub").mkdir()
+    # Declared reverse-alphabetical so it can't accidentally match disk order.
+    (tmp_path / "hub" / "ECOSYSTEM-MANIFEST.yaml").write_text(
+        "ecosystem: testverse\n"
+        "packages:\n"
+        "  - name: probmed\n"
+        "    role: P_med\n"
+        "  - name: medfit\n"
+        "    role: Foundation\n",
+        encoding="utf-8",
+    )
+    (tmp_path / ".rforge.yaml").write_text(
+        "manifest: hub/ECOSYSTEM-MANIFEST.yaml\n", encoding="utf-8"
+    )
+
+    eco = detect_ecosystem(tmp_path)
+    assert eco.manifest_order == ["probmed", "medfit"]
+    # and it round-trips through to_dict() for consumers like /rforge:status
+    assert eco.to_dict()["manifest_order"] == ["probmed", "medfit"]
+
+
+def test_detect_ecosystem_without_manifest_has_empty_manifest_order(tmp_path, make_pkg):
+    """Issue #20: zero-manifest case → empty manifest_order (never None)."""
+    make_pkg("a")
+    make_pkg("b")
+    eco = detect_ecosystem(tmp_path)
+    assert eco.manifest_order == []
+    assert eco.to_dict()["manifest_order"] == []
+
+
 def test_detect_ecosystem_without_manifest_has_no_enrichment(tmp_path, make_pkg):
     """Regression: zero-manifest behavior is unchanged."""
     make_pkg("a")
