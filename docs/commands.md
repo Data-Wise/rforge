@@ -18,7 +18,7 @@ Complete reference for all **{{ rforge.command_count }}** RForge commands. Comma
 - [R Development Cycle](#r-development-cycle) (8 commands)
 - [R Quality](#r-quality) (5 commands)
 - [CRAN Submission](#cran-submission) (6 commands)
-- [R Authoring](#r-authoring) (3 commands)
+- [R Authoring](#r-authoring) (5 commands)
 
 ---
 
@@ -1368,13 +1368,76 @@ If `usethis` is absent, a manual `usethis::use_vignette()` recipe is printed (no
 
 ---
 
+### /rforge:r:use-data
+
+Document a package dataset for an existing package: appends a roxygen doc stub to `R/data.R` (`@title`, `@format` with a `\describe{}` skeleton, `@source`, and the trailing `"<name>"` documented-data idiom) and patches `DESCRIPTION` (`LazyData: true` / `Depends: R (>= 2.10)`). Never fabricates the `.rda` — emits a `usethis::use_data(<name>)` reminder. DESCRIPTION edits preserve existing version constraints.
+
+**Usage:**
+
+```bash
+/rforge:r:use-data <name> [--write]
+```
+
+**Parameters:**
+
+- `name` (required) - The dataset/object name to document
+- `--write` (optional) - Apply the plan: append to `R/data.R` (create if absent) + patch DESCRIPTION. Default is dry-run (default: false)
+
+**Examples:**
+
+```bash
+# Dry-run: print the planned roxygen block + DESCRIPTION delta
+/rforge:r:use-data mydata
+
+# Apply: append the doc + patch DESCRIPTION
+/rforge:r:use-data mydata --write
+```
+
+A collision guard skips appending if `R/data.R` already documents the same `\name` (warns, no duplicate).
+
+**Related commands:** `/rforge:r:document` (regenerate the Rd), `/rforge:r:check`
+
+---
+
+### /rforge:r:use-citation
+
+Scaffold `inst/CITATION` from `DESCRIPTION`: parses `Title`, `Authors@R` (or fallback `Author`), and `Version`, and renders a `bibentry(bibtype = "Manual", ...)` using the package's own `person()` calls. The year comes from `Date:` if present, else a `<YEAR>` TODO — never a wall-clock date (determinism). Unparseable authors degrade to a `# TODO` block + a warning.
+
+**Usage:**
+
+```bash
+/rforge:r:use-citation [--write] [--force]
+```
+
+**Parameters:**
+
+- `--write` (optional) - Apply the plan: write `inst/CITATION` (create `inst/` if absent). Default is dry-run (default: false)
+- `--force` (optional) - Overwrite an existing `inst/CITATION` (refused without this flag) (default: false)
+
+**Examples:**
+
+```bash
+# Dry-run: print the planned inst/CITATION
+/rforge:r:use-citation
+
+# Apply: write inst/CITATION
+/rforge:r:use-citation --write
+
+# Overwrite an existing inst/CITATION
+/rforge:r:use-citation --write --force
+```
+
+**Related commands:** `/rforge:r:check` (validates `inst/CITATION` parses)
+
+---
+
 ## Command Categories Summary
 
 ### By Time Budget
 
 | Time | Commands |
 |------|----------|
-| <10s | `status`, `quick`, `detect`, `deps` (visual), `next`, `r:s7-review`, `r:use-test`/`r:use-package`/`r:use-vignette` (dry-run) |
+| <10s | `status`, `quick`, `detect`, `deps` (visual), `next`, `r:s7-review`, `r:use-test`/`r:use-package`/`r:use-vignette`/`r:use-data`/`r:use-citation` (dry-run) |
 | <30s | `analyze` (default), `cascade`, `impact`, `docs:check` |
 | <1min | `r:load`, `r:document`, `r:lint`, `r:spell`, `r:urlcheck`, `r:style` |
 | <2min | `analyze` (debug/optimize), `r:test`, `r:coverage`, `r:build`, `r:install` |

@@ -66,6 +66,8 @@
 │    /rforge:r:use-test     Draft a testthat file (assertions left as TODO)   │
 │    /rforge:r:use-package  Declare a dep (Imports/Suggests) + @importFrom    │
 │    /rforge:r:use-vignette Scaffold a vignette/article skeleton + outline    │
+│    /rforge:r:use-data     Document a dataset (R/data.R + DESCRIPTION patch) │
+│    /rforge:r:use-citation Scaffold inst/CITATION from DESCRIPTION metadata  │
 │                                                                             │
 │  CRAN SUBMISSION (v2.2.0)                                                   │
 │    /rforge:r:revdep       Reverse-dep check vs CRAN downstream (revdepcheck)│
@@ -366,6 +368,8 @@ rforge/
 | Scaffold a test file | `/rforge:r:use-test` | Draft test_that() blocks (TODO assertions) |
 | Add a dependency | `/rforge:r:use-package` | Imports/Suggests + @importFrom |
 | Scaffold a vignette | `/rforge:r:use-vignette` | knitr skeleton + outline |
+| Document a dataset | `/rforge:r:use-data` | R/data.R roxygen + DESCRIPTION (LazyData/Depends) |
+| Scaffold a citation | `/rforge:r:use-citation` | inst/CITATION from DESCRIPTION (deterministic year) |
 
 ---
 

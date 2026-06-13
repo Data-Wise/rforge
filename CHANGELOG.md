@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`r:use-data` + `r:use-citation`** (scaffolding v2 — completes the `r:use-*`
+  family; **39 → 41 commands**). Same contract as the v2.10.0 scaffolders:
+  dry-run by default, `--write` applies, pure-stdlib (no R). **`r:use-data`**
+  documents a package dataset — appends a roxygen stub to `R/data.R` (`@title`,
+  `@format` with a `\describe{}` skeleton, `@source`, and the trailing
+  `"<name>"` documented-data idiom) and patches `DESCRIPTION`
+  (`LazyData: true` / `Depends: R (>= 2.10)`) through the shared
+  constraint-preserving DCF writer (`deps_sync._read_field_specs` /
+  `_rewrite_field` — existing version floors survive, regression-locking the
+  v2.10.0 fix on the new path). It **never fabricates the `.rda`** (the data is
+  the user's) — it emits the exact `usethis::use_data(<name>)` reminder — and a
+  collision guard skips duplicate `\name` docs. **`r:use-citation`** scaffolds
+  `inst/CITATION` from `DESCRIPTION` (`Title`/`Authors@R`→`person()`/`Version`)
+  as a `bibentry(bibtype = "Manual", ...)`; the year comes from `Date:` if
+  present, else a `<YEAR>` TODO — **never a wall-clock date** (determinism).
+  `--write` writes the file, `--force` to clobber; unparseable authors degrade
+  to a `# TODO` block + warn (never raises). Both land in `lib/scaffold.py`
+  (12 new tests). Spec: `SPEC-r-scaffolding-v2-2026-06-13.md`.
 - **`r:s7-review --eco` + `--runtime`** (v2 sibling of the v2.10.0 static checker) —
   two composable flags, no new command. **`--eco`** runs the 5 static families
   across **every package** in the ecosystem manifest and aggregates one
