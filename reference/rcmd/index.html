@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 39 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -2420,25 +2420,29 @@ revdep_env=None when no revdep check was run (package has no dependents).</p>
 <p>Threads the check <code>flavor</code> / <code>incoming</code> selectors through to <code>r_snippet</code>;
 returns an error envelope when no DESCRIPTION is found.</p>
 <h3 id="run_changed"><code>run_changed()</code><a class="headerlink" href="#run_changed" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_changed</span><span class="p">(</span><span class="n">kind</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">,</span> <span class="n">changed_strict</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">run_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_changed</span><span class="p">(</span><span class="n">kind</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;dev&#39;</span><span class="p">,</span> <span class="n">changed_strict</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">fail_on</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;introduced&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">run_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
-<p>Run <code>kind</code> scoped to the package(s) changed on this branch vs <code>base</code>.</p>
-<p>Behavior by kind (all kinds are currently SCOPE-ONLY):
-  - check / test / lint: scope the engine to the changed package(s) and report
-    the REAL full status for those packages. No finding is tagged
-    [introduced]/[pre-existing] and the exit status is NOT folded — a real
-    ERROR/WARNING/NOTE on a changed package surfaces and drives the status.</p>
-<p>introduced/pre-existing tagging is NOT YET WIRED: an honest two-run comparison
-requires checking out the merge-base into a detached worktree, which is not yet
-built. Until then <code>--changed</code> (and the now-vestigial <code>--changed-strict</code>) only
-scope; the command emits a clear "tagging deferred" message so the contract is
-not overstated. The <code>tag_findings</code>/<code>scope_check</code> helpers in lib.changed are kept
-as dormant building blocks for that future work but are NOT used to fold status.</p>
-<p>Degrades safely:
+<p>Run <code>kind</code> on the package(s) changed on this branch vs <code>base</code>, with diff-aware
+[introduced]/[pre-existing] tagging (SPEC P0 completion, v2.11.0).</p>
+<p>Two-run tagging applies UNIFORMLY to every taggable kind — <code>check</code>, <code>lint</code>,
+and <code>test</code> all get the same baseline-vs-HEAD tagging (there is no scope-only
+kind): when the merge-base resolves, <code>changed.scope_check</code> runs the SAME
+engine against a detached worktree at git merge-base(HEAD, base) (the
+baseline) and against the live HEAD tree, then tags each HEAD finding
+[introduced] (new on this branch) vs [pre-existing] (already on base).
+Lint findings (dicts) are compared by <code>(file, message, linter)</code> so a
+line-shifted pre-existing lint stays [pre-existing] (see changed.tag_findings).</p>
+<p><code>--fail-on</code> (default "introduced") controls the exit status: with the default,
+status is "error" iff ≥1 introduced finding (so CI fails only on regressions you
+caused, not pre-existing debt). <code>--fail-on none</code> reports findings but never
+folds status (advisory).</p>
+<p>Degrades safely (no regression of the v2.10.0 scope-only behavior):
   - not a git repo / git missing / no merge-base (changed_files None) → run a
     full <code>kind</code> against <code>root</code> and annotate <code>changed.fell_back=True</code>.
   - no changes (empty diff) → no-op <code>ok</code> envelope.
-  - multiple changed packages → run each; aggregate into stages.</p>
+  - merge-base / baseline worktree unavailable (scope_check None) → SCOPE-ONLY:
+    run the engine on the changed package(s), surface the REAL status, and warn
+    that tagging was unavailable (findings are NOT tagged, status NOT folded).</p>
 
 
 

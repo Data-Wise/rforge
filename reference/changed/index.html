@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 39 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -1623,6 +1623,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#merge_base" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        merge_base()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_baseline()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#scope_check" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2226,6 +2248,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#merge_base" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        merge_base()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_baseline()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#scope_check" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2294,10 +2338,14 @@
                           list, tagging each finding [introduced] vs
                           [pre-existing] (multiset semantics: duplicates count).</li>
 </ol>
-<p>Plus scope_check(): a DORMANT helper for future two-run introduced/pre-existing
-tagging. It is NOT wired into the live <code>r:check --changed</code> path (which is
-scope-only) because the merge-base checkout it needs is not yet built. See its
-docstring.</p>
+<p>Plus the two-run tagging machinery (v2.11.0):
+  4. merge_base()       — resolve the fork point git merge-base(HEAD, base).
+  5. run_baseline()     — <code>git worktree add --detach</code> the merge-base into a
+                          temp tree under the SYSTEM temp dir, run an injected
+                          runner there, and GUARANTEE worktree removal (finally).
+  6. scope_check()      — orchestrate merge_base → baseline run → current run →
+                          tag_findings; returns None (caller falls back to
+                          scope-only) on any git failure.</p>
 <p>Advisory, never raises. git failures (not a repo, no merge-base, git missing)
 return None so callers can warn and fall back to a full run. "No changes" is the
 distinct empty-list case (a valid no-op, not a failure).</p>
@@ -2328,34 +2376,55 @@ fork point — exactly the "what did this branch touch" question.</p>
 package set, then keeps packages with at least one changed file under them.
 Files owning no package (top-level README, docs/) are silently dropped.
 Result order follows discovery order; each package is returned at most once.</p>
-<h3 id="scope_check"><code>scope_check()</code><a class="headerlink" href="#scope_check" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">scope_check</span><span class="p">(</span><span class="n">run_check</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[dict]&#39;</span>
+<h3 id="merge_base"><code>merge_base()</code><a class="headerlink" href="#merge_base" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">merge_base</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;dev&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[str]&#39;</span>
 </span></code></pre></div>
-<p>DORMANT (NOT YET WIRED): two-run introduced/pre-existing tagging helper.</p>
-<p>This is a building block for a <em>future</em> honest comparison, and is NOT used by
-the live <code>r:check --changed</code> path. The blocker: an honest comparison needs
-<code>run_check(merge_base)</code> to actually check out the merge-base into a detached
-worktree and run R there. That checkout mechanism is not built yet — the
-command layer currently has no way to run R against anything but the live
-worktree, so wiring this in would compare the worktree against itself and tag
-every finding identically (a silent false-negative). Until the merge-base
-checkout lands, <code>r:check --changed</code> is scope-only (see lib.rcmd.run_changed)
-and this function is unreachable from the command path. It is kept (with its
-unit tests) so the future wiring has a tested core.</p>
-<p><code>run_check(checkout_ref) -&gt; envelope</code> is injected so this module stays R-free
-and unit-testable.</p>
-<p>Returns None when no merge-base resolves. Otherwise returns:
+<p>Resolve the fork point: git merge-base(HEAD, base).</p>
+<p>Returns the merge-base SHA, or None when there is no common ancestor, <code>base</code>
+is unknown, <code>path</code> is not a git repo, or git is missing. Advisory — never
+raises; callers warn and fall back to a full/scope-only run on None.</p>
+<h3 id="run_baseline"><code>run_baseline()</code><a class="headerlink" href="#run_baseline" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_baseline</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">base_sha</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">runner</span><span class="p">:</span> <span class="s1">&#39;Callable[[str], list]&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[list]&#39;</span>
+</span></code></pre></div>
+<p>Run <code>runner</code> against a detached worktree checked out at <code>base_sha</code>.</p>
+<p>Steps: create a temp dir under the SYSTEM temp root (NOT inside the repo, so
+<code>git status</code> stays clean and the PreToolUse "writes outside worktree" warning
+never fires); <code>git worktree add --detach &lt;tmp&gt; &lt;base_sha&gt;</code>; call
+<code>runner(&lt;tmp&gt;)</code> and return its finding list. The worktree is ALWAYS removed
+(<code>git worktree remove --force</code> + rmtree) in a <code>finally</code>, so a crash mid-run
+never leaks a worktree.</p>
+<p>Returns None only when the worktree add itself fails (bad SHA, git missing) —
+in that case nothing was created, so there is nothing to clean up and the
+caller falls back. If <code>runner</code> raises, the worktree is still cleaned up and
+the exception propagates (callers that want a fallback catch it upstream).</p>
+<h3 id="scope_check"><code>scope_check()</code><a class="headerlink" href="#scope_check" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">scope_check</span><span class="p">(</span><span class="n">runner</span><span class="p">:</span> <span class="s1">&#39;Callable[[str], list]&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;dev&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[dict]&#39;</span>
+</span></code></pre></div>
+<p>Two-run introduced/pre-existing tagging over a REAL merge-base checkout.</p>
+<p>Orchestrates: merge_base(HEAD, base) → run_baseline (runner at the merge-base
+detached worktree) → runner against the live HEAD tree → tag_findings.</p>
+<p><code>runner(treedir) -&gt; list[finding]</code> is injected so this module stays R-free and
+unit-testable; rcmd injects a closure that runs the chosen --kind engine in
+<code>treedir</code> and returns its flat finding list. The baseline run executes in a
+genuinely different working tree (the v2.10.0 bug was tagging HEAD vs HEAD —
+here the baseline tree is a real checkout of the merge-base SHA).</p>
+<p>Returns None (caller falls back to scope-only) when the merge-base does not
+resolve or the baseline worktree add fails. Otherwise:
     {"base": <ref>, "merge_base": <sha>,
-     "findings": [{"text":..., "level":"error|warning|note", "tag":...}, ...],
-     "introduced_counts": {"errors": n, "warnings": n, "notes": n}}</p>
+     "findings": [{"text":..., "tag": "introduced"|"pre-existing"}, ...],
+     "introduced_count": <int>}</p>
 <h3 id="tag_findings"><code>tag_findings()</code><a class="headerlink" href="#tag_findings" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">tag_findings</span><span class="p">(</span><span class="n">head_findings</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">base_findings</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[dict]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">tag_findings</span><span class="p">(</span><span class="n">head_findings</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">base_findings</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[dict]&#39;</span>
 </span></code></pre></div>
 <p>Tag each HEAD finding <code>[introduced]</code> vs <code>[pre-existing]</code> (multiset diff).</p>
 <p>A finding present on HEAD but absent from base is <code>introduced</code>. A finding on
 both is <code>pre-existing</code>. Multiset semantics: if HEAD has a finding twice and
-base once, one copy is introduced and one pre-existing. Findings are compared
-by their string form (R CMD check findings are plain strings).</p>
+base once, one copy is introduced and one pre-existing.</p>
+<p>Identity is <code>_finding_identity</code>: plain-string findings (R CMD check) compare
+by string; dict findings (lint) compare by <code>(file, message, linter)</code> —
+EXCLUDING the raw <code>line</code>, so a line-shifted pre-existing lint stays
+<code>pre-existing</code> rather than flipping to <code>introduced</code>. The full finding is
+preserved in <code>text</code> for display.</p>
 
 
 

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 39 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -1638,6 +1638,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#run_all_with_runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_all_with_runtime()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_eco" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_eco()
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2291,6 +2313,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#run_all_with_runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_all_with_runtime()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_eco" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_eco()
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2392,6 +2436,23 @@ declare a <code>validator=</code>; a validator returning <code>TRUE</code>/<code
 <p>Run all 5 convention checks; roll into one worst-of (ok&lt;warn) envelope.</p>
 <p>Returns <code>{kind: "s7review", status, stages, engine_missing: []}</code>. If no
 <code>R/</code> directory exists, returns a single <code>warn</code> envelope (advisory).</p>
+<h3 id="run_all_with_runtime"><code>run_all_with_runtime()</code><a class="headerlink" href="#run_all_with_runtime" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_all_with_runtime</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+</span></code></pre></div>
+<p><code>run_all</code> + the two R-backed runtime families, merged into one envelope.</p>
+<p>Never raises: the runtime pass degrades to advisory <code>warn</code> stages when R is
+unavailable, so the static result is always intact. Worst-of (ok&lt;warn) status.</p>
+<h3 id="run_eco"><code>run_eco()</code><a class="headerlink" href="#run_eco" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_eco</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+</span></code></pre></div>
+<p>Run the 5 static families across <strong>every package</strong> in the ecosystem.</p>
+<p>Resolves the package set via <code>discovery.detect_ecosystem</code> (the single source
+of truth + the curated <code>manifest_order</code>), runs <code>run_all</code> per package, and
+aggregates one envelope: a per-package breakdown plus an ecosystem roll-up
+(total findings by family, packages clean vs flagged). Ordered by
+<code>manifest_order</code> when present, else discovery order.</p>
+<p>Pure-stdlib (no R). A package that raises during its sweep is reported as a
+per-package <code>warn</code> rather than aborting the whole sweep — never raises.</p>
 
 
 

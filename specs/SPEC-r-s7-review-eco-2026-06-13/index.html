@@ -10,13 +10,9 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/migration/v2.0.0-rename/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-r-s7-review-eco-2026-06-13/">
       
       
-        <link rel="prev" href="../../specs/SPEC-r-dev-commands-2026-05-31/">
-      
-      
-        <link rel="next" href="../rforge-mcp-deprecation/">
       
       
         
@@ -27,7 +23,7 @@
     
     
       
-        <title>v2.0.0 command rename - RForge Plugin</title>
+        <title>SPEC: r:s7-review --eco + R-backed runtime checks (v2 sibling) - RForge Plugin</title>
       
     
     
@@ -80,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#migrating-to-rforge-v200" class="md-skip">
+        <a href="#spec-rs7-review-eco-r-backed-runtime-checks-v2-sibling" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              v2.0.0 command rename
+              SPEC: r:s7-review --eco + R-backed runtime checks (v2 sibling)
             
           </span>
         </div>
@@ -304,12 +300,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../../architecture/" class="md-tabs__link">
           
   
@@ -1579,29 +1573,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -1619,7 +1608,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1743,7 +1732,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -1771,7 +1760,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
+      <a href="../SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
         
   
   
@@ -1799,7 +1788,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
+      <a href="../SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
         
   
   
@@ -1827,7 +1816,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
+      <a href="../SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
         
   
   
@@ -1855,7 +1844,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
+      <a href="../SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
         
   
   
@@ -1888,8 +1877,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1900,11 +1887,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
         
           
           <label class="md-nav__link" for="__nav_5_4" id="__nav_5_4_label" tabindex="0">
@@ -1925,7 +1912,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1940,37 +1927,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    v2.0.0 command rename
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../migration/v2.0.0-rename/" class="md-nav__link">
         
   
   
@@ -1986,109 +1946,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#rename-mapping" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rename mapping
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#safety-net-typing-the-old-name-still-works-briefly" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Safety net: typing the old name still works (briefly)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-these-renames" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why these renames?
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-about-my-scripts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What about my scripts?
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="What about my scripts?">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-find-every-reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Find every reference
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-mass-update-in-place" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Mass-update in place
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#anything-else-changed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anything else changed?
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2101,7 +1958,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../rforge-mcp-deprecation/" class="md-nav__link">
+      <a href="../../migration/rforge-mcp-deprecation/" class="md-nav__link">
         
   
   
@@ -2129,7 +1986,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../v1.3.0-post-merge-checklist/" class="md-nav__link">
+      <a href="../../migration/v1.3.0-post-merge-checklist/" class="md-nav__link">
         
   
   
@@ -2192,10 +2049,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#rename-mapping" class="md-nav__link">
+  <a href="#summary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rename mapping
+        Summary
       
     </span>
   </a>
@@ -2203,10 +2060,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#safety-net-typing-the-old-name-still-works-briefly" class="md-nav__link">
+  <a href="#-eco-ecosystem-static-sweep-pure-stdlib" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Safety net: typing the old name still works (briefly)
+        --eco — ecosystem static sweep (pure-stdlib)
       
     </span>
   </a>
@@ -2214,33 +2071,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#why-these-renames" class="md-nav__link">
+  <a href="#-runtime-r-backed-runtime-checks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why these renames?
+        --runtime — R-backed runtime checks
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-about-my-scripts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What about my scripts?
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="What about my scripts?">
+    <nav class="md-nav" aria-label="--runtime — R-backed runtime checks">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-find-every-reference" class="md-nav__link">
+  <a href="#new-engine-s7runtime" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Find every reference
+        New engine: s7runtime
       
     </span>
   </a>
@@ -2248,10 +2094,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-mass-update-in-place" class="md-nav__link">
+  <a href="#two-new-runtime-families" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Mass-update in place
+        Two new runtime families
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#safety-classification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Safety classification
       
     </span>
   </a>
@@ -2264,10 +2121,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#anything-else-changed" class="md-nav__link">
+  <a href="#command-surface" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Anything else changed?
+        Command surface
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#out-of-scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Out of scope
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tests-gates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests (gates)
       
     </span>
   </a>
@@ -2291,7 +2170,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/migration/v2.0.0-rename.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-r-s7-review-eco-2026-06-13.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2299,113 +2178,110 @@
   
 
 
-<h1 id="migrating-to-rforge-v200">Migrating to rforge v2.0.0<a class="headerlink" href="#migrating-to-rforge-v200" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><strong>3 commands renamed.</strong> Update your habits or scripts using the table below.
-The other 13 commands are unchanged.</p>
-</blockquote>
-<h2 id="rename-mapping">Rename mapping<a class="headerlink" href="#rename-mapping" title="Permanent link">&para;</a></h2>
+<h1 id="spec-rs7-review-eco-r-backed-runtime-checks-v2-sibling">SPEC: <code>r:s7-review --eco</code> + R-backed runtime checks (v2 sibling)<a class="headerlink" href="#spec-rs7-review-eco-r-backed-runtime-checks-v2-sibling" title="Permanent link">&para;</a></h1>
+<p><strong>Date:</strong> 2026-06-13
+<strong>Author:</strong> Davood Tofighi (with Claude Code)
+<strong>Status:</strong> Approved
+<strong>Parent:</strong> <code>SPEC-r-s7-review-2026-06-12.md</code> (the shipped v1 static checker)
+<strong>Target:</strong> v2.11.0 bundle (feature 2 of 3)</p>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p><code>r:s7-review</code> v1 (shipped v2.10.0) is a <strong>pure-stdlib static</strong> S7 convention checker:
+5 advisory families (naming/validators/methods/legacy/docs) parsed from source, no R.
+This adds two <strong>composable flags</strong> that extend it without rewriting v1:</p>
 <table>
 <thead>
 <tr>
-<th>You used to type</th>
-<th>In v2.0.0+, type</th>
-<th>Why</th>
+<th>Flag</th>
+<th>What it adds</th>
+<th>Architecture impact</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>/rforge:doc-check</code></td>
-<td><code>/rforge:docs:check</code></td>
-<td>Aligns with craft's <code>docs:</code> namespace</td>
+<td><code>--eco</code></td>
+<td>Run the existing 5 static families across <strong>every package</strong> in the ecosystem manifest, aggregate into one report.</td>
+<td><strong>None — stays pure-stdlib.</strong></td>
 </tr>
 <tr>
-<td><code>/rforge:ecosystem-health</code></td>
-<td><code>/rforge:health</code></td>
-<td>Shorter, daily-use friendly</td>
-</tr>
-<tr>
-<td><code>/rforge:rpkg-check</code></td>
-<td><code>/rforge:r:check</code></td>
-<td>R-specific commands get an <code>r:</code> prefix</td>
+<td><code>--runtime</code></td>
+<td>An <strong>R subprocess pass</strong> that loads the package and introspects S7 at runtime; 2 new families.</td>
+<td>Adds R, routed through <code>lib.rcmd</code> (the only R-touching module).</td>
 </tr>
 </tbody>
 </table>
-<p>Unchanged: <code>analyze</code>, <code>capture</code>, <code>cascade</code>, <code>complete</code>, <code>deps</code>, <code>detect</code>,
-<code>impact</code>, <code>init</code>, <code>next</code>, <code>quick</code>, <code>release</code>, <code>status</code>, <code>thorough</code>.</p>
-<h2 id="safety-net-typing-the-old-name-still-works-briefly">Safety net: typing the old name still works (briefly)<a class="headerlink" href="#safety-net-typing-the-old-name-still-works-briefly" title="Permanent link">&para;</a></h2>
-<p>Each renamed command keeps a stub at its old name that responds with a
-rename-error pointing at the new name. So typing <code>/rforge:doc-check</code>
-in Claude Code produces:</p>
-<blockquote>
-<p>❌ <strong>Renamed:</strong> this command (<code>/rforge:doc-check</code>) was renamed in v2.0.0.</p>
-<p><strong>Use instead:</strong> <code>/rforge:docs:check</code></p>
-<p>See the migration tutorial: <a href="https://data-wise.github.io/rforge/migration/v2.0.0-rename/">https://data-wise.github.io/rforge/migration/v2.0.0-rename/</a></p>
-</blockquote>
-<p>You won't silently get nothing — you'll get a helpful pointer. The stubs
-are retained through the v2.x line and slated for removal in v3.0.0.</p>
-<h2 id="why-these-renames">Why these renames?<a class="headerlink" href="#why-these-renames" title="Permanent link">&para;</a></h2>
-<p>rforge's namespacing now mirrors craft's <strong>hybrid</strong> scheme:</p>
+<p>The flags compose: <code>r:s7-review --eco --runtime</code> sweeps the ecosystem statically <em>and</em>
+runs the runtime pass per package.</p>
+<h2 id="-eco-ecosystem-static-sweep-pure-stdlib"><code>--eco</code> — ecosystem static sweep (pure-stdlib)<a class="headerlink" href="#-eco-ecosystem-static-sweep-pure-stdlib" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>High-frequency daily commands stay flat</strong> (<code>/rforge:status</code>,
-  <code>/rforge:next</code>, <code>/rforge:analyze</code>). Typing a colon-namespace prefix for
-  a command you run 20× a day adds friction without payoff.</li>
-<li><strong>Sub-namespaces are used only where there's a real grouping.</strong> craft
-  has a <code>docs:</code> sub-namespace for documentation operations, so rforge's
-  documentation drift check moves to <code>docs:check</code> for cross-plugin
-  consistency. R-specific commands get their own <code>r:</code> prefix.</li>
-<li><strong>Single-command sub-namespaces are avoided.</strong> <code>ecosystem-health</code> was
-  a one-off — wrapping it in a <code>health:</code> sub-namespace would force you
-  to type more for no grouping benefit, so it becomes the shorter,
-  flat <code>health</code>.</li>
+<li>Resolve the package set via <strong><code>lib.discovery.find_r_packages</code></strong> (the single source of
+  truth for the on-disk package set; honors the ecosystem manifest + <code>manifest_order</code>).</li>
+<li>Run <code>s7review.run_all</code> (the existing static families) on each package.</li>
+<li>Aggregate: one envelope with a per-package breakdown + an ecosystem roll-up
+  (total findings by family, packages clean vs flagged). Ordered by <code>manifest_order</code>
+  when present, else discovery order.</li>
+<li>Degrades gracefully: a package that fails to parse is reported as a per-package warn,
+  never aborts the sweep.</li>
 </ul>
-<p>The net is a <strong>smaller</strong> breaking change than a full namespacing
-overhaul, hitting only the 3 commands where the old names felt either
-out of step with craft (<code>doc-check</code> vs craft's <code>docs:*</code>) or
-unnecessarily long (<code>ecosystem-health</code>, <code>rpkg-check</code>).</p>
-<p>For the longer rationale and rejected alternatives, see the SPEC at
-<a href="../../specs/SPEC-phase3-namespacing-2026-05-11/"><code>docs/specs/SPEC-phase3-namespacing-2026-05-11.md</code></a>.</p>
-<h2 id="what-about-my-scripts">What about my scripts?<a class="headerlink" href="#what-about-my-scripts" title="Permanent link">&para;</a></h2>
-<p>If you have shell scripts, aliases, or notes referencing the old names,
-update them in two steps.</p>
-<h3 id="1-find-every-reference">1. Find every reference<a class="headerlink" href="#1-find-every-reference" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>grep<span class="w"> </span>-rn<span class="w"> </span>-E<span class="w"> </span><span class="s1">&#39;/rforge:(doc-check|ecosystem-health|rpkg-check)&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span>~/your-project<span class="w"> </span>~/your-notes
-</span></code></pre></div>
-<h3 id="2-mass-update-in-place">2. Mass-update in place<a class="headerlink" href="#2-mass-update-in-place" title="Permanent link">&para;</a></h3>
-<p>POSIX <code>sed</code> (works on both macOS and Linux):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Preview the changes first (no -i)</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>find<span class="w"> </span>.<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.sh&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.md&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.txt&#39;</span><span class="w"> </span><span class="se">\)</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>-exec<span class="w"> </span>sed<span class="w"> </span>-E<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:doc-check|/rforge:docs:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:ecosystem-health|/rforge:health|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:rpkg-check|/rforge:r:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># Apply in place (after preview looks right)</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># macOS:</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>find<span class="w"> </span>.<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.sh&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.md&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.txt&#39;</span><span class="w"> </span><span class="se">\)</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span>-exec<span class="w"> </span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span>-E<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:doc-check|/rforge:docs:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:ecosystem-health|/rforge:health|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:rpkg-check|/rforge:r:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">    </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span>
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="c1"># Linux (GNU sed):</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>find<span class="w"> </span>.<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.sh&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.md&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.txt&#39;</span><span class="w"> </span><span class="se">\)</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">  </span>-exec<span class="w"> </span>sed<span class="w"> </span>-i<span class="w"> </span>-E<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:doc-check|/rforge:docs:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:ecosystem-health|/rforge:health|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:rpkg-check|/rforge:r:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">    </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span>
-</span></code></pre></div>
-<p>The <code>|</code> separator avoids quoting headaches with the <code>:</code> in the new names.</p>
-<h2 id="anything-else-changed">Anything else changed?<a class="headerlink" href="#anything-else-changed" title="Permanent link">&para;</a></h2>
-<p>No. v2.0.0's only behavioral break is the 3 renames. APIs, config
-options, hook contracts, lib/* modules, and state files are unchanged
-from v1.3.0.</p>
-<p>For the full release notes, see the <a href="https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md">v2.0.0 entry in
-CHANGELOG.md</a>.</p>
+<h2 id="-runtime-r-backed-runtime-checks"><code>--runtime</code> — R-backed runtime checks<a class="headerlink" href="#-runtime-r-backed-runtime-checks" title="Permanent link">&para;</a></h2>
+<p>The architecture invariant: <strong><code>lib.rcmd</code> is the only module that shells out to Rscript.</strong>
+So the runtime pass is a <strong>new <code>s7runtime</code> engine in <code>lib/rcmd.py</code></strong>, not a direct
+subprocess call from <code>s7review.py</code>.</p>
+<h3 id="new-engine-s7runtime">New engine: <code>s7runtime</code><a class="headerlink" href="#new-engine-s7runtime" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>lib.rcmd.run(kind="s7runtime", path=...)</code> shells to <code>Rscript</code> running an embedded R
+  program that: loads the package (<code>pkgload::load_all</code> / installed namespace), enumerates
+  S7 classes, generics, and methods, then emits <strong>JSON</strong> (via <code>jsonlite</code>, the existing
+  rcmd convention — auto_unbox guarded, stdout-contamination guarded per the v2.1.0
+  serialization lessons).</li>
+<li>Normalized into the standard rcmd envelope, then <strong>merged</strong> by <code>s7review</code> with the
+  static findings into one combined envelope.</li>
+</ul>
+<h3 id="two-new-runtime-families">Two new runtime families<a class="headerlink" href="#two-new-runtime-families" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong><code>method-dispatch</code></strong> — for each declared S7 generic, does dispatch actually resolve
+   to a method for its registered classes? Flags generics with no resolvable method
+   (<code>dead_generic</code>). <strong>Deferred:</strong> <code>method_on_missing_class</code> (methods registered to a
+   non-existent class) is <em>not implemented</em> — it can't be decided from the S7 method
+   registry alone; the R engine returns an empty placeholder list and the Python
+   consumer builds no findings for it. Future work.</li>
+<li><strong><code>validator-runtime</code></strong> — instantiate each S7 class with a deliberately invalid
+   property value; flag classes whose <code>validator</code> fails to reject it (validator present
+   in source but not actually enforcing — the runtime sibling of v1's static
+   <code>validators</code> family).</li>
+</ol>
+<h3 id="safety-classification">Safety classification<a class="headerlink" href="#safety-classification" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>s7runtime</code> <strong>loads and executes package code</strong> (like <code>load</code>/<code>test</code>), so it is <em>not</em>
+  inert — but it is <strong>read-only</strong> (no file writes, no network, no install). It is added
+  to <strong><code>SAFE_AUTORUN</code></strong> alongside <code>load</code>/<code>test</code>/<code>check</code>/<code>coverage</code>/<code>lint</code>/<code>spell</code>.</li>
+<li>The orchestrator agent's recipe validator (<code>tests/_check_agent_engines.py</code>) already
+  asserts auto-run kinds are real + safe; <code>s7runtime</code> must pass it.</li>
+<li>Requires R + the package's deps. When R is missing or load fails, <code>--runtime</code> degrades
+  to a <code>warn</code> envelope ("runtime pass skipped: <reason>") and the static result still
+  returns — never raises, mirroring <code>runiverse</code>'s offline degradation.</li>
+</ul>
+<h2 id="command-surface">Command surface<a class="headerlink" href="#command-surface" title="Permanent link">&para;</a></h2>
+<p><code>commands/r/s7-review.md</code> gains <code>--eco</code> and <code>--runtime</code> in the <code>arguments:</code> array +
+<code>## Usage</code> body. No new command (flags, not commands) → <strong>command count unchanged</strong>.</p>
+<h2 id="out-of-scope">Out of scope<a class="headerlink" href="#out-of-scope" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Fixing S7 issues (advisory only, like v1).</li>
+<li>Cross-package S7 <em>contract</em> checks (e.g. a class in pkg A used by pkg B) — future.</li>
+<li><code>--runtime</code> for non-S7 OOP (R6/S4) — S7 only.</li>
+</ul>
+<h2 id="tests-gates">Tests (gates)<a class="headerlink" href="#tests-gates" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>--eco</code> over a 2-package fixture ecosystem → asserts aggregation + <code>manifest_order</code>.</li>
+<li><code>s7runtime</code> rcmd engine: opt-in real-R e2e (like the existing rcmd e2e tests) against
+  a fixture package with (a) a dead generic and (b) a non-enforcing validator → asserts
+  both runtime families fire. Skipped when R absent.</li>
+<li>Degradation: <code>--runtime</code> with R unavailable → warn envelope, static result intact,
+  exit 0.</li>
+<li><code>_check_agent_engines.py</code> still green with <code>s7runtime</code> in SAFE_AUTORUN.</li>
+<li>pure-stdlib guard: <code>s7review.py</code> imports no R and shells out to nothing (greppable —
+  all R goes through <code>lib.rcmd</code>).</li>
+</ul>
 
 
 

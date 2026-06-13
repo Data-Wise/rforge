@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 39 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -1755,6 +1755,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#scaffold_citation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scaffold_citation()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scaffold_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scaffold_data()
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2413,6 +2435,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#scaffold_citation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scaffold_citation()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scaffold_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scaffold_data()
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2607,7 +2651,30 @@ to expand. Dry-run by default.</p>
 <h3 id="scaffold"><code>scaffold()</code><a class="headerlink" href="#scaffold" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">scaffold</span><span class="p">(</span><span class="n">mode</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fn</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">pkg</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">article</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">write</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
-<p>Dispatch to the three planners. Returns the envelope.</p>
+<p>Dispatch to the planners. Returns the envelope.</p>
+<h3 id="scaffold_citation"><code>scaffold_citation()</code><a class="headerlink" href="#scaffold_citation" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">scaffold_citation</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">write</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+</span></code></pre></div>
+<p>Plan (and, on <code>--write</code>, write) <code>inst/CITATION</code> from DESCRIPTION.</p>
+<p>Parses <code>Title</code>/<code>Authors@R</code> (or fallback <code>Author</code>)/<code>Version</code> and the
+year (from <code>Date</code> if present, else a <code>&lt;YEAR&gt;</code> TODO — <strong>never</strong> a
+wall-clock date, per the determinism rule). Renders a
+<code>bibentry(bibtype = "Manual", ...)</code> with the package's own <code>person()</code>
+calls. Refuses to clobber an existing <code>inst/CITATION</code> without <code>force</code>.
+Unparseable authors degrade to a <code># TODO</code> block + a warn (never raises).
+Dry-run by default.</p>
+<h3 id="scaffold_data"><code>scaffold_data()</code><a class="headerlink" href="#scaffold_data" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">scaffold_data</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">write</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+</span></code></pre></div>
+<p>Plan (and, on <code>--write</code>, apply) documentation for a package dataset.</p>
+<p>Appends a roxygen doc stub (<code>@title</code>/<code>@format \describe{}</code>/<code>@source</code> +
+the trailing <code>"&lt;name&gt;"</code> documented-data idiom) to <code>R/data.R</code> and patches
+<code>DESCRIPTION</code> (<code>LazyData: true</code> / <code>Depends: R (&gt;= 2.10)</code>). The
+DESCRIPTION edit goes through the shared constraint-preserving DCF writer
+(<code>deps_sync._read_field_specs</code> / <code>_rewrite_field</code>) — existing version
+floors survive. <strong>Never fabricates the <code>.rda</code></strong> (the data is the user's);
+emits the exact <code>usethis::use_data(&lt;name&gt;)</code> command instead. Dry-run by
+default.</p>
 
 
 

@@ -10,13 +10,9 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/migration/v2.0.0-rename/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-r-scaffolding-v2-2026-06-13/">
       
       
-        <link rel="prev" href="../../specs/SPEC-r-dev-commands-2026-05-31/">
-      
-      
-        <link rel="next" href="../rforge-mcp-deprecation/">
       
       
         
@@ -27,7 +23,7 @@
     
     
       
-        <title>v2.0.0 command rename - RForge Plugin</title>
+        <title>SPEC: r:use-data + r:use-citation (scaffolding v2) - RForge Plugin</title>
       
     
     
@@ -80,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#migrating-to-rforge-v200" class="md-skip">
+        <a href="#spec-ruse-data-ruse-citation-scaffolding-v2" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              v2.0.0 command rename
+              SPEC: r:use-data + r:use-citation (scaffolding v2)
             
           </span>
         </div>
@@ -304,12 +300,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../../architecture/" class="md-tabs__link">
           
   
@@ -1579,29 +1573,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -1619,7 +1608,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1743,7 +1732,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -1771,7 +1760,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
+      <a href="../SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
         
   
   
@@ -1799,7 +1788,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
+      <a href="../SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
         
   
   
@@ -1827,7 +1816,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
+      <a href="../SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
         
   
   
@@ -1855,7 +1844,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
+      <a href="../SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
         
   
   
@@ -1888,8 +1877,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1900,11 +1887,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
         
           
           <label class="md-nav__link" for="__nav_5_4" id="__nav_5_4_label" tabindex="0">
@@ -1925,7 +1912,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1940,37 +1927,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    v2.0.0 command rename
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../migration/v2.0.0-rename/" class="md-nav__link">
         
   
   
@@ -1986,109 +1946,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#rename-mapping" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rename mapping
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#safety-net-typing-the-old-name-still-works-briefly" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Safety net: typing the old name still works (briefly)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-these-renames" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why these renames?
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-about-my-scripts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What about my scripts?
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="What about my scripts?">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-find-every-reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Find every reference
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-mass-update-in-place" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Mass-update in place
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#anything-else-changed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Anything else changed?
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2101,7 +1958,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../rforge-mcp-deprecation/" class="md-nav__link">
+      <a href="../../migration/rforge-mcp-deprecation/" class="md-nav__link">
         
   
   
@@ -2129,7 +1986,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../v1.3.0-post-merge-checklist/" class="md-nav__link">
+      <a href="../../migration/v1.3.0-post-merge-checklist/" class="md-nav__link">
         
   
   
@@ -2192,10 +2049,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#rename-mapping" class="md-nav__link">
+  <a href="#summary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rename mapping
+        Summary
       
     </span>
   </a>
@@ -2203,10 +2060,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#safety-net-typing-the-old-name-still-works-briefly" class="md-nav__link">
+  <a href="#ruse-data" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Safety net: typing the old name still works (briefly)
+        r:use-data
       
     </span>
   </a>
@@ -2214,10 +2071,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#why-these-renames" class="md-nav__link">
+  <a href="#ruse-citation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why these renames?
+        r:use-citation
       
     </span>
   </a>
@@ -2225,49 +2082,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-about-my-scripts" class="md-nav__link">
+  <a href="#reuse-architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What about my scripts?
+        Reuse / architecture
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="What about my scripts?">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-find-every-reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Find every reference
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-mass-update-in-place" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Mass-update in place
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#anything-else-changed" class="md-nav__link">
+  <a href="#out-of-scope" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Anything else changed?
+        Out of scope
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tests-gates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tests (gates)
       
     </span>
   </a>
@@ -2291,7 +2131,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/migration/v2.0.0-rename.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-r-scaffolding-v2-2026-06-13.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2299,113 +2139,96 @@
   
 
 
-<h1 id="migrating-to-rforge-v200">Migrating to rforge v2.0.0<a class="headerlink" href="#migrating-to-rforge-v200" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><strong>3 commands renamed.</strong> Update your habits or scripts using the table below.
-The other 13 commands are unchanged.</p>
-</blockquote>
-<h2 id="rename-mapping">Rename mapping<a class="headerlink" href="#rename-mapping" title="Permanent link">&para;</a></h2>
+<h1 id="spec-ruse-data-ruse-citation-scaffolding-v2">SPEC: <code>r:use-data</code> + <code>r:use-citation</code> (scaffolding v2)<a class="headerlink" href="#spec-ruse-data-ruse-citation-scaffolding-v2" title="Permanent link">&para;</a></h1>
+<p><strong>Date:</strong> 2026-06-13
+<strong>Author:</strong> Davood Tofighi (with Claude Code)
+<strong>Status:</strong> Approved
+<strong>Parent:</strong> <code>SPEC-r-scaffolding-2026-06-10.md</code> (the shipped v1 <code>r:use-*</code> family)
+<strong>Target:</strong> v2.11.0 bundle (feature 3 of 3)</p>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>Two new scaffolders extend the v2.10.0 <code>r:use-*</code> family (<code>r:use-test</code>/<code>use-package</code>/
+<code>use-vignette</code>). Same contract as v1: <strong>dry-run by default</strong>, <code>--write</code> applies, hybrid
+engine (usethis-style infra in <code>lib/usethis_infra.py</code> + Python/AI content in
+<code>lib/scaffold.py</code>). Existing-package only (never <code>r:create</code>).</p>
 <table>
 <thead>
 <tr>
-<th>You used to type</th>
-<th>In v2.0.0+, type</th>
-<th>Why</th>
+<th>Command</th>
+<th>Scaffolds</th>
+<th>Source of truth</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>/rforge:doc-check</code></td>
-<td><code>/rforge:docs:check</code></td>
-<td>Aligns with craft's <code>docs:</code> namespace</td>
+<td><code>r:use-data</code></td>
+<td><code>data/&lt;name&gt;.rda</code> placeholder + <code>R/data.R</code> roxygen doc stub</td>
+<td>a named dataset (user supplies/object)</td>
 </tr>
 <tr>
-<td><code>/rforge:ecosystem-health</code></td>
-<td><code>/rforge:health</code></td>
-<td>Shorter, daily-use friendly</td>
-</tr>
-<tr>
-<td><code>/rforge:rpkg-check</code></td>
-<td><code>/rforge:r:check</code></td>
-<td>R-specific commands get an <code>r:</code> prefix</td>
+<td><code>r:use-citation</code></td>
+<td><code>inst/CITATION</code></td>
+<td>parsed from <code>DESCRIPTION</code> (<code>Authors@R</code>, <code>Title</code>, year)</td>
 </tr>
 </tbody>
 </table>
-<p>Unchanged: <code>analyze</code>, <code>capture</code>, <code>cascade</code>, <code>complete</code>, <code>deps</code>, <code>detect</code>,
-<code>impact</code>, <code>init</code>, <code>next</code>, <code>quick</code>, <code>release</code>, <code>status</code>, <code>thorough</code>.</p>
-<h2 id="safety-net-typing-the-old-name-still-works-briefly">Safety net: typing the old name still works (briefly)<a class="headerlink" href="#safety-net-typing-the-old-name-still-works-briefly" title="Permanent link">&para;</a></h2>
-<p>Each renamed command keeps a stub at its old name that responds with a
-rename-error pointing at the new name. So typing <code>/rforge:doc-check</code>
-in Claude Code produces:</p>
-<blockquote>
-<p>❌ <strong>Renamed:</strong> this command (<code>/rforge:doc-check</code>) was renamed in v2.0.0.</p>
-<p><strong>Use instead:</strong> <code>/rforge:docs:check</code></p>
-<p>See the migration tutorial: <a href="https://data-wise.github.io/rforge/migration/v2.0.0-rename/">https://data-wise.github.io/rforge/migration/v2.0.0-rename/</a></p>
-</blockquote>
-<p>You won't silently get nothing — you'll get a helpful pointer. The stubs
-are retained through the v2.x line and slated for removal in v3.0.0.</p>
-<h2 id="why-these-renames">Why these renames?<a class="headerlink" href="#why-these-renames" title="Permanent link">&para;</a></h2>
-<p>rforge's namespacing now mirrors craft's <strong>hybrid</strong> scheme:</p>
+<p><strong>Command count: 39 → 41.</strong></p>
+<h2 id="ruse-data"><code>r:use-data</code><a class="headerlink" href="#ruse-data" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>High-frequency daily commands stay flat</strong> (<code>/rforge:status</code>,
-  <code>/rforge:next</code>, <code>/rforge:analyze</code>). Typing a colon-namespace prefix for
-  a command you run 20× a day adds friction without payoff.</li>
-<li><strong>Sub-namespaces are used only where there's a real grouping.</strong> craft
-  has a <code>docs:</code> sub-namespace for documentation operations, so rforge's
-  documentation drift check moves to <code>docs:check</code> for cross-plugin
-  consistency. R-specific commands get their own <code>r:</code> prefix.</li>
-<li><strong>Single-command sub-namespaces are avoided.</strong> <code>ecosystem-health</code> was
-  a one-off — wrapping it in a <code>health:</code> sub-namespace would force you
-  to type more for no grouping benefit, so it becomes the shorter,
-  flat <code>health</code>.</li>
+<li><strong>Args:</strong> <code>&lt;name&gt;</code> (dataset/object name, required), <code>--write</code> (default dry-run).</li>
+<li><strong>Dry-run output:</strong> shows the <code>R/data.R</code> roxygen block it <em>would</em> write + notes the
+  <code>data/&lt;name&gt;.rda</code> it would expect, and whether <code>DESCRIPTION</code> needs <code>LazyData: true</code> /
+  <code>Depends: R (&gt;= 2.10)</code> (reported, applied on <code>--write</code> via the shared
+  <code>deps_sync._apply_patch</code> / <code>_read_field_specs</code> writer — which <strong>preserves version
+  constraints</strong>, the v2.10.0 fix).</li>
+<li><strong><code>--write</code>:</strong> appends the roxygen stub to <code>R/data.R</code> (creating it if absent; never
+  clobbers an existing doc for the same <code>\name</code>), and patches <code>DESCRIPTION</code> fields.
+  Does <strong>not</strong> fabricate the <code>.rda</code> (data is the user's); emits the exact
+  <code>usethis::use_data(&lt;name&gt;)</code> / <code>save()</code> command to produce it.</li>
+<li><strong>Roxygen stub:</strong> <code>@title</code>, <code>@format</code> (a <code>\describe{}</code> skeleton with TODO items),
+  <code>@source</code> TODO, and the <code>"&lt;name&gt;"</code> string at the end (the documented-data idiom).</li>
 </ul>
-<p>The net is a <strong>smaller</strong> breaking change than a full namespacing
-overhaul, hitting only the 3 commands where the old names felt either
-out of step with craft (<code>doc-check</code> vs craft's <code>docs:*</code>) or
-unnecessarily long (<code>ecosystem-health</code>, <code>rpkg-check</code>).</p>
-<p>For the longer rationale and rejected alternatives, see the SPEC at
-<a href="../../specs/SPEC-phase3-namespacing-2026-05-11/"><code>docs/specs/SPEC-phase3-namespacing-2026-05-11.md</code></a>.</p>
-<h2 id="what-about-my-scripts">What about my scripts?<a class="headerlink" href="#what-about-my-scripts" title="Permanent link">&para;</a></h2>
-<p>If you have shell scripts, aliases, or notes referencing the old names,
-update them in two steps.</p>
-<h3 id="1-find-every-reference">1. Find every reference<a class="headerlink" href="#1-find-every-reference" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>grep<span class="w"> </span>-rn<span class="w"> </span>-E<span class="w"> </span><span class="s1">&#39;/rforge:(doc-check|ecosystem-health|rpkg-check)&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span>~/your-project<span class="w"> </span>~/your-notes
-</span></code></pre></div>
-<h3 id="2-mass-update-in-place">2. Mass-update in place<a class="headerlink" href="#2-mass-update-in-place" title="Permanent link">&para;</a></h3>
-<p>POSIX <code>sed</code> (works on both macOS and Linux):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Preview the changes first (no -i)</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>find<span class="w"> </span>.<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.sh&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.md&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.txt&#39;</span><span class="w"> </span><span class="se">\)</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>-exec<span class="w"> </span>sed<span class="w"> </span>-E<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:doc-check|/rforge:docs:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:ecosystem-health|/rforge:health|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:rpkg-check|/rforge:r:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># Apply in place (after preview looks right)</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># macOS:</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>find<span class="w"> </span>.<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.sh&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.md&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.txt&#39;</span><span class="w"> </span><span class="se">\)</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span>-exec<span class="w"> </span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span>-E<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:doc-check|/rforge:docs:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:ecosystem-health|/rforge:health|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:rpkg-check|/rforge:r:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">    </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span>
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="c1"># Linux (GNU sed):</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>find<span class="w"> </span>.<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span><span class="se">\(</span><span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.sh&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.md&#39;</span><span class="w"> </span>-o<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.txt&#39;</span><span class="w"> </span><span class="se">\)</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">  </span>-exec<span class="w"> </span>sed<span class="w"> </span>-i<span class="w"> </span>-E<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:doc-check|/rforge:docs:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:ecosystem-health|/rforge:health|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">    </span>-e<span class="w"> </span><span class="s1">&#39;s|/rforge:rpkg-check|/rforge:r:check|g&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">    </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span>
-</span></code></pre></div>
-<p>The <code>|</code> separator avoids quoting headaches with the <code>:</code> in the new names.</p>
-<h2 id="anything-else-changed">Anything else changed?<a class="headerlink" href="#anything-else-changed" title="Permanent link">&para;</a></h2>
-<p>No. v2.0.0's only behavioral break is the 3 renames. APIs, config
-options, hook contracts, lib/* modules, and state files are unchanged
-from v1.3.0.</p>
-<p>For the full release notes, see the <a href="https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md">v2.0.0 entry in
-CHANGELOG.md</a>.</p>
+<h2 id="ruse-citation"><code>r:use-citation</code><a class="headerlink" href="#ruse-citation" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Args:</strong> <code>--write</code> (default dry-run). No positional arg — reads <code>DESCRIPTION</code>.</li>
+<li><strong>Parse</strong> <code>DESCRIPTION</code>: <code>Title</code>, <code>Authors@R</code> (or fallback <code>Author</code>), <code>Version</code>, and
+  the year (from <code>Date</code> if present, else a <code>&lt;YEAR&gt;</code> TODO — <strong>never</strong> a wall-clock date,
+  per the determinism rule).</li>
+<li><strong>Dry-run:</strong> prints the <code>inst/CITATION</code> it would write (a <code>bibentry(bibtype = "Manual",
+  ...)</code> for the package, with <code>Authors@R</code> mapped to <code>person()</code> entries).</li>
+<li><strong><code>--write</code>:</strong> writes <code>inst/CITATION</code> (refuses to overwrite an existing one without an
+  explicit confirmation flag <code>--force</code>); creates <code>inst/</code> if absent.</li>
+<li>Degrades: unparseable <code>Authors@R</code> → a <code># TODO</code> author block + a warn, never raises.</li>
+</ul>
+<h2 id="reuse-architecture">Reuse / architecture<a class="headerlink" href="#reuse-architecture" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Both land in <strong><code>lib/scaffold.py</code></strong> (the v1 module) + reuse <code>lib/usethis_infra.py</code>.</li>
+<li><code>DESCRIPTION</code> edits go through the <strong>shared constraint-preserving writer</strong>
+  (<code>deps_sync._read_field_specs</code> + <code>_apply_patch</code>) — the same path hardened in v2.10.0.
+  No new DESCRIPTION-writing code.</li>
+<li>Pure-stdlib (no R): like the rest of <code>scaffold</code>/<code>deps_sync</code>.</li>
+</ul>
+<h2 id="out-of-scope">Out of scope<a class="headerlink" href="#out-of-scope" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Generating dataset <em>contents</em> (<code>r:use-data</code> documents + wires; the user owns the data).</li>
+<li>Multi-dataset batch scaffolding.</li>
+<li>BibTeX import for <code>use-citation</code> (DESCRIPTION-derived only).</li>
+</ul>
+<h2 id="tests-gates">Tests (gates)<a class="headerlink" href="#tests-gates" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>r:use-data</code> dry-run: asserts roxygen stub + DESCRIPTION-delta report, <strong>no files
+  written</strong>.</li>
+<li><code>r:use-data --write</code>: asserts <code>R/data.R</code> appended, <code>"&lt;name&gt;"</code> string present,
+  <code>DESCRIPTION</code> <code>LazyData</code>/<code>Depends</code> patched <strong>with any existing version constraints
+  preserved</strong> (regression-locks the v2.10.0 fix on the new path).</li>
+<li><code>r:use-data --write</code> collision: existing <code>\name</code> doc for the same dataset → no
+  duplicate, warn.</li>
+<li><code>r:use-citation</code> dry-run: asserts <code>bibentry()</code> rendered from a fixture DESCRIPTION;
+  year is a TODO placeholder when <code>Date</code> absent (determinism check — no real date).</li>
+<li><code>r:use-citation --write</code> refuses to clobber an existing <code>inst/CITATION</code> without
+  <code>--force</code>.</li>
+<li>Both: pure-stdlib import guard (no R).</li>
+</ul>
 
 
 

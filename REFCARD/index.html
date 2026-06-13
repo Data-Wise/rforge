@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 39 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -2519,22 +2519,22 @@
 
 <h1 id="rforge-plugin-reference-card">📚 RForge Plugin - Reference Card<a class="headerlink" href="#rforge-plugin-reference-card" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>Version:</strong> 2.10.0 | <strong>Last Updated:</strong> 2026-06-13</p>
+<p><strong>Version:</strong> 2.11.0 | <strong>Last Updated:</strong> 2026-06-13</p>
 </blockquote>
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
-<li><strong>What:</strong> All 39 commands in one page — categorized by use case.</li>
+<li><strong>What:</strong> All 41 commands in one page — categorized by use case.</li>
 <li><strong>Why:</strong> Forget command syntax? Scan the ASCII box below.</li>
 <li><strong>How:</strong> Daily? <code>/rforge:status</code> <code>/rforge:quick</code>. After changes? <code>/rforge:analyze "what?"</code>. Per-package CRAN gate? <code>/rforge:r:cran-prep</code>. Ecosystem rollup? <code>/rforge:thorough</code>.</li>
 <li><strong>Next:</strong> <a href="../commands/">Commands reference</a> for full per-command docs.</li>
 </ul>
 </div>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────────────────────────────────────────────────┐
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  RFORGE PLUGIN REFERENCE                                            v2.10.0  │
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  RFORGE PLUGIN REFERENCE                                            v2.11.0  │
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├─────────────────────────────────────────────────────────────────────────────┤
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│                                                                             │
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  COMMANDS (39)                                                              │
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  COMMANDS (41)                                                              │
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│  ─────────                                                                  │
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│                                                                             │
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│  DAILY                                                                      │
@@ -2581,35 +2581,38 @@
 </span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>│    /rforge:r:urlcheck     URL breakage check (urlchecker)                   │
 </span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a>│    /rforge:r:style        Auto-format source (styler)                       │
 </span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>│    /rforge:r:deps-sync    Reconcile DESCRIPTION vs code usage (--write)     │
-</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>│    /rforge:r:s7-review    Static S7 convention checker (advisory, v2.10.0)  │
+</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>│    /rforge:r:s7-review    Static S7 convention checker (advisory, v2.11.0)  │
 </span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a>│                                                                             │
-</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a>│  R AUTHORING (v2.10.0, scaffold existing pkgs — dry-run; --write to apply)  │
+</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a>│  R AUTHORING (v2.11.0, scaffold existing pkgs — dry-run; --write to apply)  │
 </span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a>│    /rforge:r:use-test     Draft a testthat file (assertions left as TODO)   │
 </span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a>│    /rforge:r:use-package  Declare a dep (Imports/Suggests) + @importFrom    │
 </span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a>│    /rforge:r:use-vignette Scaffold a vignette/article skeleton + outline    │
-</span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58" href="#__codelineno-0-58"></a>│                                                                             │
-</span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59" href="#__codelineno-0-59"></a>│  CRAN SUBMISSION (v2.2.0)                                                   │
-</span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60" href="#__codelineno-0-60"></a>│    /rforge:r:revdep       Reverse-dep check vs CRAN downstream (revdepcheck)│
-</span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61" href="#__codelineno-0-61"></a>│    /rforge:r:goodpractice Advisory best-practice bundle (goodpractice)      │
-</span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62" href="#__codelineno-0-62"></a>│    /rforge:r:winbuilder   Dispatch to win-builder R-devel — async           │
-</span><span id="__span-0-63"><a id="__codelineno-0-63" name="__codelineno-0-63" href="#__codelineno-0-63"></a>│    /rforge:r:rhub         Multi-platform checks via R-hub v2 — async        │
-</span><span id="__span-0-64"><a id="__codelineno-0-64" name="__codelineno-0-64" href="#__codelineno-0-64"></a>│    /rforge:r:cran-prep    Full CRAN gate + strict passes + cran-comments.md │
-</span><span id="__span-0-65"><a id="__codelineno-0-65" name="__codelineno-0-65" href="#__codelineno-0-65"></a>│    /rforge:r:submit       Pre-release of tarball + CRAN submit handoff      │
-</span><span id="__span-0-66"><a id="__codelineno-0-66" name="__codelineno-0-66" href="#__codelineno-0-66"></a>│                                                                             │
-</span><span id="__span-0-67"><a id="__codelineno-0-67" name="__codelineno-0-67" href="#__codelineno-0-67"></a>│  CRAN-INCOMING STRICT (v2.3.0)                                              │
-</span><span id="__span-0-68"><a id="__codelineno-0-68" name="__codelineno-0-68" href="#__codelineno-0-68"></a>│    r:check --strict       Both Suggests-withholding flavor passes           │
-</span><span id="__span-0-69"><a id="__codelineno-0-69" name="__codelineno-0-69" href="#__codelineno-0-69"></a>│    r:check --incoming     + opt-in CRAN-incoming _R_CHECK_* bundle          │
-</span><span id="__span-0-70"><a id="__codelineno-0-70" name="__codelineno-0-70" href="#__codelineno-0-70"></a>│    cran-prep stages:      check, check (noSuggests), check (suggests-only), │
-</span><span id="__span-0-71"><a id="__codelineno-0-71" name="__codelineno-0-71" href="#__codelineno-0-71"></a>│                           [check (incoming)], description, build-hygiene,   │
-</span><span id="__span-0-72"><a id="__codelineno-0-72" name="__codelineno-0-72" href="#__codelineno-0-72"></a>│                           docs-consistency  (strict ERROR blocks ready)     │
-</span><span id="__span-0-73"><a id="__codelineno-0-73" name="__codelineno-0-73" href="#__codelineno-0-73"></a>│                                                                             │
-</span><span id="__span-0-74"><a id="__codelineno-0-74" name="__codelineno-0-74" href="#__codelineno-0-74"></a>│  DIFF-AWARE --changed (v2.10.0) on r:check / r:test / r:lint                │
-</span><span id="__span-0-75"><a id="__codelineno-0-75" name="__codelineno-0-75" href="#__codelineno-0-75"></a>│    --changed [--base &lt;ref&gt;] Scope to packages changed on this branch        │
-</span><span id="__span-0-76"><a id="__codelineno-0-76" name="__codelineno-0-76" href="#__codelineno-0-76"></a>│    r:check --changed        scope-only: real full status (introduced/pre-   │
-</span><span id="__span-0-77"><a id="__codelineno-0-77" name="__codelineno-0-77" href="#__codelineno-0-77"></a>│                             existing tagging NOT YET WIRED — needs merge-    │
-</span><span id="__span-0-78"><a id="__codelineno-0-78" name="__codelineno-0-78" href="#__codelineno-0-78"></a>│                             base checkout; --changed-strict is a no-op)      │
-</span><span id="__span-0-79"><a id="__codelineno-0-79" name="__codelineno-0-79" href="#__codelineno-0-79"></a>│                                                                             │
-</span><span id="__span-0-80"><a id="__codelineno-0-80" name="__codelineno-0-80" href="#__codelineno-0-80"></a>└─────────────────────────────────────────────────────────────────────────────┘
+</span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58" href="#__codelineno-0-58"></a>│    /rforge:r:use-data     Document a dataset (R/data.R + DESCRIPTION patch) │
+</span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59" href="#__codelineno-0-59"></a>│    /rforge:r:use-citation Scaffold inst/CITATION from DESCRIPTION metadata  │
+</span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60" href="#__codelineno-0-60"></a>│                                                                             │
+</span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61" href="#__codelineno-0-61"></a>│  CRAN SUBMISSION (v2.2.0)                                                   │
+</span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62" href="#__codelineno-0-62"></a>│    /rforge:r:revdep       Reverse-dep check vs CRAN downstream (revdepcheck)│
+</span><span id="__span-0-63"><a id="__codelineno-0-63" name="__codelineno-0-63" href="#__codelineno-0-63"></a>│    /rforge:r:goodpractice Advisory best-practice bundle (goodpractice)      │
+</span><span id="__span-0-64"><a id="__codelineno-0-64" name="__codelineno-0-64" href="#__codelineno-0-64"></a>│    /rforge:r:winbuilder   Dispatch to win-builder R-devel — async           │
+</span><span id="__span-0-65"><a id="__codelineno-0-65" name="__codelineno-0-65" href="#__codelineno-0-65"></a>│    /rforge:r:rhub         Multi-platform checks via R-hub v2 — async        │
+</span><span id="__span-0-66"><a id="__codelineno-0-66" name="__codelineno-0-66" href="#__codelineno-0-66"></a>│    /rforge:r:cran-prep    Full CRAN gate + strict passes + cran-comments.md │
+</span><span id="__span-0-67"><a id="__codelineno-0-67" name="__codelineno-0-67" href="#__codelineno-0-67"></a>│    /rforge:r:submit       Pre-release of tarball + CRAN submit handoff      │
+</span><span id="__span-0-68"><a id="__codelineno-0-68" name="__codelineno-0-68" href="#__codelineno-0-68"></a>│                                                                             │
+</span><span id="__span-0-69"><a id="__codelineno-0-69" name="__codelineno-0-69" href="#__codelineno-0-69"></a>│  CRAN-INCOMING STRICT (v2.3.0)                                              │
+</span><span id="__span-0-70"><a id="__codelineno-0-70" name="__codelineno-0-70" href="#__codelineno-0-70"></a>│    r:check --strict       Both Suggests-withholding flavor passes           │
+</span><span id="__span-0-71"><a id="__codelineno-0-71" name="__codelineno-0-71" href="#__codelineno-0-71"></a>│    r:check --incoming     + opt-in CRAN-incoming _R_CHECK_* bundle          │
+</span><span id="__span-0-72"><a id="__codelineno-0-72" name="__codelineno-0-72" href="#__codelineno-0-72"></a>│    cran-prep stages:      check, check (noSuggests), check (suggests-only), │
+</span><span id="__span-0-73"><a id="__codelineno-0-73" name="__codelineno-0-73" href="#__codelineno-0-73"></a>│                           [check (incoming)], description, build-hygiene,   │
+</span><span id="__span-0-74"><a id="__codelineno-0-74" name="__codelineno-0-74" href="#__codelineno-0-74"></a>│                           docs-consistency  (strict ERROR blocks ready)     │
+</span><span id="__span-0-75"><a id="__codelineno-0-75" name="__codelineno-0-75" href="#__codelineno-0-75"></a>│                                                                             │
+</span><span id="__span-0-76"><a id="__codelineno-0-76" name="__codelineno-0-76" href="#__codelineno-0-76"></a>│  DIFF-AWARE --changed (v2.11.0) on r:check / r:test / r:lint                │
+</span><span id="__span-0-77"><a id="__codelineno-0-77" name="__codelineno-0-77" href="#__codelineno-0-77"></a>│    --changed [--base &lt;ref&gt;] Scope to packages changed on this branch        │
+</span><span id="__span-0-78"><a id="__codelineno-0-78" name="__codelineno-0-78" href="#__codelineno-0-78"></a>│    r:check --changed        two-run tagging: same engine at merge-base      │
+</span><span id="__span-0-79"><a id="__codelineno-0-79" name="__codelineno-0-79" href="#__codelineno-0-79"></a>│                             baseline vs HEAD → [introduced]/[pre-existing]; │
+</span><span id="__span-0-80"><a id="__codelineno-0-80" name="__codelineno-0-80" href="#__codelineno-0-80"></a>│                             --fail-on introduced (default) errors on new    │
+</span><span id="__span-0-81"><a id="__codelineno-0-81" name="__codelineno-0-81" href="#__codelineno-0-81"></a>│                             findings only; --changed-strict is a no-op      │
+</span><span id="__span-0-82"><a id="__codelineno-0-82" name="__codelineno-0-82" href="#__codelineno-0-82"></a>│                                                                             │
+</span><span id="__span-0-83"><a id="__codelineno-0-83" name="__codelineno-0-83" href="#__codelineno-0-83"></a>└─────────────────────────────────────────────────────────────────────────────┘
 </span></code></pre></div>
 <hr />
 <h2 id="how-it-works-v130">How It Works (v1.3.0+)<a class="headerlink" href="#how-it-works-v130" title="Permanent link">&para;</a></h2>
@@ -2884,13 +2887,13 @@ install options.</p>
 <hr />
 <h2 id="file-structure">File Structure<a class="headerlink" href="#file-structure" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>rforge/
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>├── .claude-plugin/        # Plugin manifest + extras (v2.10.0)
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>├── .claude-plugin/        # Plugin manifest + extras (v2.11.0)
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>│   ├── plugin.json
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>│   ├── marketplace.json
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>│   ├── config.json
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>│   ├── hooks/pretooluse.py
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>│   └── skills/validation/description-sync.md
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>├── commands/              # 39 slash commands (/rforge:*)
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>├── commands/              # 41 slash commands (/rforge:*)
 </span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>│   ├── docs/check.md      # /rforge:docs:check (v2.0.0+)
 </span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>│   └── r/                 # /rforge:r:* (v2.0.0+, expanded v2.1.0, v2.2.0)
 </span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>├── agents/                # 1 orchestrator agent
@@ -3060,7 +3063,7 @@ install options.</p>
 <tr>
 <td>Check only changed packages</td>
 <td><code>/rforge:r:check --changed</code></td>
-<td>Scope-only; real full status (introduced/pre-existing tagging not yet wired)</td>
+<td>Scopes to packages changed vs <code>--base</code>; tags findings [introduced]/[pre-existing] via a merge-base baseline (<code>--fail-on introduced</code> by default); <code>--changed-strict</code> is a no-op</td>
 </tr>
 <tr>
 <td>Scaffold a test file</td>
@@ -3076,6 +3079,16 @@ install options.</p>
 <td>Scaffold a vignette</td>
 <td><code>/rforge:r:use-vignette</code></td>
 <td>knitr skeleton + outline</td>
+</tr>
+<tr>
+<td>Document a dataset</td>
+<td><code>/rforge:r:use-data</code></td>
+<td>R/data.R roxygen + DESCRIPTION (LazyData/Depends)</td>
+</tr>
+<tr>
+<td>Scaffold a citation</td>
+<td><code>/rforge:r:use-citation</code></td>
+<td>inst/CITATION from DESCRIPTION (deterministic year)</td>
 </tr>
 </tbody>
 </table>
