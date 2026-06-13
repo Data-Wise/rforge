@@ -1,0 +1,7 @@
+Package: s7clean
+Title: Idiomatic S7 Fixture
+Version: 0.0.1
+Description: A fixture package that follows S7 conventions.
+Authors@R: person("Test", "User", email = "t@example.com", role = c("aut", "cre", "cph"))
+License: MIT
+Encoding: UTF-8

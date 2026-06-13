@@ -453,3 +453,175 @@ def test_cran_prep_multi_platform_populates_dispatched(tmp_path, monkeypatch):
     env = rcmd._run_cran_prep(str(tmp_path), multi_platform=True)
     assert env["dispatched"] == ["winbuilder", "rhub"]
     assert env["status"] == "ready"
+
+
+# ───────── --changed (diff-aware) wiring ─────────
+
+from unittest import mock
+
+from lib import changed as changed_mod
+
+
+def test_check_changed_scopes_to_changed_package(monkeypatch, tmp_path):
+    """--changed restricts a multi-package run to the single changed package."""
+    # One changed package, name 'pkgA' at tmp path.
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+    seen_paths = []
+
+    def fake_run(kind, path=".", **kw):
+        seen_paths.append(path)
+        return {"kind": "check", "status": "ok",
+                "check": {"errors": [], "warnings": [], "notes": []}}
+
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    assert env["changed"]["packages"] == ["pkgA"]
+    assert str(tmp_path / "pkgA") in seen_paths
+
+
+def test_check_changed_surfaces_real_status_no_false_ok(monkeypatch, tmp_path):
+    """Honest scope-only: a REAL check finding on the changed package must NOT be
+    folded to ok. This is the regression guard for the v2.10.0 false-negative —
+    the old code fabricated introduced_counts={0,0,0} from two identical runs and
+    silently downgraded status to ok. Here the changed package reports a real
+    WARNING; the result must stay 'warn' and carry the tagging-deferred message.
+    """
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+
+    def fake_run(kind, path=".", **kw):
+        # changed package has a real, branch-introduced warning
+        return {"kind": "check", "status": "warn",
+                "check": {"errors": [], "warnings": ["W: introduced by branch"],
+                          "notes": []}}
+
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    # status is the REAL full status — not falsely folded to ok
+    assert env["status"] == "warn"
+    # the real finding is surfaced
+    assert env["check"]["warnings"] == ["W: introduced by branch"]
+    # no fabricated tagging block
+    assert "findings" not in env["changed"]
+    assert "introduced_counts" not in env["changed"]
+    # honest deferral message present
+    assert any("tagging deferred" in m for m in env.get("messages", []))
+
+
+def test_check_changed_strict_is_noop_still_scope_only(monkeypatch, tmp_path):
+    """--changed-strict is a documented no-op: still scope-only, real status."""
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+    monkeypatch.setattr(rcmd, "run", lambda kind, path=".", **kw: {
+        "kind": "check", "status": "error",
+        "check": {"errors": ["E: boom"], "warnings": [], "notes": []}})
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev",
+                           changed_strict=True)
+    assert env["status"] == "error"
+    assert "introduced_counts" not in env["changed"]
+
+
+def test_check_changed_real_git_repo_scope_only_e2e(monkeypatch, tmp_path):
+    """END-TO-END through the REAL git + discovery path (only R `run` is faked).
+
+    This drives `run_changed("check", ...)` against a throwaway git repo with one
+    R package whose source was modified on a feature branch. Nothing about findings
+    is monkeypatched — `changed_files`, `changed_packages`, and `scope_check` all
+    run for real. The faked R engine reports a real ERROR for the changed package.
+
+    This is the test that would have caught the v2.10.0 false-negative: the old
+    code ran `scope_check` (which checked the live worktree twice), tagged the real
+    ERROR as [pre-existing], computed introduced_counts={0,0,0}, and folded status
+    to 'ok'. The honest scope-only path keeps status 'error'.
+    """
+    import subprocess
+
+    def git(*args):
+        subprocess.run(["git", *args], cwd=str(tmp_path), check=True,
+                       capture_output=True, text=True)
+
+    git("init", "-q")
+    git("config", "user.email", "t@t.t")
+    git("config", "user.name", "t")
+    git("checkout", "-q", "-b", "main")
+    pkg_dir = tmp_path / "mypkg"
+    (pkg_dir / "R").mkdir(parents=True)
+    _write_desc(pkg_dir, "mypkg", "0.1.0")
+    (pkg_dir / "R" / "f.R").write_text("f <- function() 1\n")
+    git("add", "-A")
+    git("commit", "-qm", "init")
+    # feature branch with a real change to the package
+    git("checkout", "-q", "-b", "feature/x")
+    (pkg_dir / "R" / "f.R").write_text("f <- function() 2\n")
+    git("add", "-A")
+    git("commit", "-qm", "change f")
+
+    # Only the R engine is faked — it reports a REAL error for the changed pkg.
+    def fake_run(kind, path=".", **kw):
+        return {"kind": "check", "status": "error",
+                "check": {"errors": ["E: real check failure"], "warnings": [],
+                          "notes": []}}
+
+    monkeypatch.setattr(rcmd, "run", fake_run)
+
+    env = rcmd.run_changed("check", root=str(tmp_path), base="main")
+    # (a) scoped to the changed package
+    assert env["changed"]["packages"] == ["mypkg"]
+    # (b) real finding surfaced, status NOT falsely folded to ok
+    assert env["status"] == "error"
+    assert env["check"]["errors"] == ["E: real check failure"]
+    # (c) honest tagging-deferred message present
+    assert any("tagging deferred" in m for m in env.get("messages", []))
+
+
+def test_changed_no_git_falls_back_to_full(monkeypatch, tmp_path):
+    """Not a git repo (changed_files None) → full run + warn message, status preserved."""
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: None)
+    monkeypatch.setattr(rcmd, "run", lambda kind, path=".", **kw: {
+        "kind": "check", "status": "ok",
+        "check": {"errors": [], "warnings": [], "notes": []}})
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    assert env["changed"]["fell_back"] is True
+    assert any("git" in m.lower() for m in env.get("messages", []))
+
+
+def test_changed_no_changes_is_noop_ok(monkeypatch, tmp_path):
+    """Empty diff → nothing to check; status ok, packages empty."""
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: [])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [])
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    assert env["status"] == "ok"
+    assert env["changed"]["packages"] == []
+    assert any("no changes" in m.lower() for m in env.get("messages", []))
+
+
+def test_test_kind_changed_is_scope_only(monkeypatch, tmp_path):
+    """r:test --changed scopes to the changed package but does NOT tag findings."""
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+    seen = []
+    monkeypatch.setattr(rcmd, "run", lambda kind, path=".", **kw: seen.append((kind, path)) or {
+        "kind": "test", "status": "ok", "tests": {"passed": 1, "failed": 0}})
+    env = rcmd.run_changed("test", root=str(tmp_path), base="dev")
+    assert ("test", str(tmp_path / "pkgA")) in seen
+    assert "findings" not in env["changed"]   # scope-only: no tagging block

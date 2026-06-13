@@ -244,21 +244,45 @@ def reconcile(path: str | os.PathLike = ".") -> dict:
     return _envelope(status, findings, patch, msgs)
 
 
+def _read_field_specs(text: str, field_name: str) -> list[str]:
+    """Extract the VERBATIM dependency specifiers from a DCF field's raw text.
+
+    Unlike discovery's name-only parse, this preserves version constraints, e.g.
+    ``"dplyr (>= 1.1.0)"`` stays intact. Returns the full spec strings in source
+    order. Used so ``_apply_patch`` never drops constraints on untouched deps.
+    """
+    pat = re.compile(rf"^{re.escape(field_name)}:(.*?)(?=^\S|\Z)", re.MULTILINE | re.DOTALL)
+    m = pat.search(text)
+    if not m:
+        return []
+    specs: list[str] = []
+    for part in m.group(1).split(","):
+        spec = part.strip()
+        if spec:
+            specs.append(spec)
+    return specs
+
+
 def _apply_patch(desc_path: Path, patch: dict) -> list[str]:
     """Apply the *unambiguous* parts of a patch to DESCRIPTION's Imports/Suggests.
 
     Adds missing imports/suggests and moves misclassified packages to Imports.
     `remove_candidates` are advisory and never auto-removed. Returns a log of
     what changed. Best-effort DCF rewrite — normalizes the two fields it touches.
+
+    Deps the patch does not modify keep their VERBATIM specifier (name +
+    constraint) — the rewrite is built from the original field text, not from
+    discovery's name-only parse, so ``(>= x.y.z)`` floors survive.
     """
-    from .discovery import parse_description
     text = desc_path.read_text(encoding="utf-8", errors="replace")
-    desc = parse_description(text)
-    if desc is None:
+    if not (re.search(r"^Imports:", text, re.MULTILINE) or
+            re.search(r"^Suggests:", text, re.MULTILINE) or
+            re.search(r"^Package:", text, re.MULTILINE)):
         return ["could not parse DESCRIPTION — no changes written"]
 
-    imports = [d.strip() for d in getattr(desc, "imports", []) if d.strip()]
-    suggests = [d.strip() for d in getattr(desc, "suggests", []) if d.strip()]
+    # full spec strings (verbatim, with constraints) keyed by normalized name
+    imports = _read_field_specs(text, "Imports")
+    suggests = _read_field_specs(text, "Suggests")
     imp_keys = {_norm(_DEP_NAME_RE.match(d).group(1)) for d in imports if _DEP_NAME_RE.match(d)}
     sug_keys = {_norm(_DEP_NAME_RE.match(d).group(1)) for d in suggests if _DEP_NAME_RE.match(d)}
     log: list[str] = []
@@ -267,7 +291,8 @@ def _apply_patch(desc_path: Path, patch: dict) -> list[str]:
         if _norm(name) not in imp_keys:
             imports.append(name); imp_keys.add(_norm(name)); log.append(f"+Imports: {name}")
     for name in patch.get("move_to_imports", []):
-        suggests = [d for d in suggests if _norm(_DEP_NAME_RE.match(d).group(1)) != _norm(name)]
+        suggests = [d for d in suggests
+                    if not _DEP_NAME_RE.match(d) or _norm(_DEP_NAME_RE.match(d).group(1)) != _norm(name)]
         sug_keys.discard(_norm(name))
         if _norm(name) not in imp_keys:
             imports.append(name); imp_keys.add(_norm(name)); log.append(f"Suggests→Imports: {name}")

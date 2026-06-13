@@ -166,6 +166,35 @@ def test_write_applies_unambiguous_only(tmp_path):
     assert "neverused" in body
 
 
+def test_write_preserves_version_constraints(tmp_path):
+    """--write must NOT silently drop (>= x.y.z) floors on untouched deps.
+
+    Regression for the data-corruption bug: adding one dep rewrote the whole
+    Imports/Suggests block from discovery's name-only parse, stripping every
+    version constraint — including in fields the patch never targeted.
+    """
+    desc = """\
+Package: demo
+Title: A Demo Package
+Version: 0.1.0
+Imports:
+    stats,
+    dplyr (>= 1.1.0)
+Suggests:
+    testthat (>= 3.0.0)
+"""
+    # add one unrelated Imports dep (tibble) via usage scan
+    pkg = _mkpkg(tmp_path, desc=desc,
+                 r={"f.R": "f <- function(x) dplyr::filter(x) + tibble::tibble()\n"})
+    deps_sync.deps_sync(pkg, write=True)
+    body = (tmp_path / "DESCRIPTION").read_text()
+    # the new dep landed
+    assert "tibble" in body
+    # both pre-existing constraints SURVIVE verbatim
+    assert "dplyr (>= 1.1.0)" in body, body
+    assert "testthat (>= 3.0.0)" in body, body
+
+
 def test_dry_run_writes_nothing(tmp_path):
     desc = _DESC_BASE
     pkg = _mkpkg(tmp_path, desc=desc, r={"f.R": "f <- function() glue::glue('a')\n"})

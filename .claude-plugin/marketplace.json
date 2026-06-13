@@ -5,8 +5,8 @@
     "email": "dt@stat-wise.com"
   },
   "metadata": {
-    "description": "RForge toolkit for Claude Code: 35 commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration",
-    "version": "2.9.0"
+    "description": "RForge toolkit for Claude Code: 39 commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration",
+    "version": "2.10.0"
   },
   "plugins": [
     {
@@ -15,8 +15,8 @@
         "source": "github",
         "repo": "Data-Wise/rforge"
       },
-      "description": "RForge toolkit for Claude Code: 35 commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration",
-      "version": "2.9.0",
+      "description": "RForge toolkit for Claude Code: 39 commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration",
+      "version": "2.10.0",
       "author": {
         "name": "Data-Wise",
         "email": "dt@stat-wise.com"

@@ -1,7 +1,7 @@
 ---
 name: rforge:r:check
 description: Run R CMD check with smart parsing — NOTEs classified as spurious or real
-argument-hint: "[package] [--as-cran] [--strict] [--incoming]"
+argument-hint: "[package] [--as-cran] [--strict] [--incoming] [--changed] [--base <ref>] [--changed-strict]"
 arguments:
   - name: package
     description: Package path to check (defaults to current directory)
@@ -22,6 +22,21 @@ arguments:
     required: false
     type: boolean
     default: false
+  - name: changed
+    description: Scope the check to packages changed on this branch (vs --base); reports their full status. [introduced]/[pre-existing] tagging is not yet wired — scope-only for now.
+    required: false
+    type: boolean
+    default: false
+  - name: base
+    description: Comparison ref for --changed; the diff is taken against merge-base(HEAD, base). Default HEAD = uncommitted working-tree changes
+    required: false
+    type: string
+    default: HEAD
+  - name: changed-strict
+    description: With --changed, keep the full-check exit status (pre-existing findings count too) instead of exiting clean on introduced-only
+    required: false
+    type: boolean
+    default: false
 ---
 
 # R Package Check
@@ -34,6 +49,15 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
 2. `python3 -m lib.rcmd --kind check --path "<path>"` (add `--as-cran`, `--strict`,
    and/or `--incoming` if requested).
 3. Render the JSON envelope below. Do not re-run R yourself.
+4. If `--changed` is set: run `python3 -m lib.rcmd --kind check --changed
+   --base "<ref>" --path "<path>"`. The envelope gains a `changed` block with
+   `packages` (the changed package(s) the check was scoped to) plus a
+   `tagging deferred` message. **`introduced`/`pre-existing` tagging is NOT YET
+   WIRED** — an honest comparison needs a merge-base checkout (running R against
+   the fork point in a detached worktree), which is not built yet. Until then
+   `--changed` is **scope-only**: it runs the full check on the changed
+   package(s) and reports the REAL full status. Render the full check result as
+   usual.
 
 ## Usage
 
@@ -42,7 +66,18 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
 /rforge:r:check --as-cran          # explicit --as-cran pass
 /rforge:r:check --strict           # two extra flavor passes (see below)
 /rforge:r:check --incoming         # --strict + a third CRAN-incoming pass
+/rforge:r:check --changed --base dev   # scope the check to the changed package(s) — scope-only
 ```
+
+- **`--changed`** — scopes the check to the R package(s) touched on this branch
+  (diff vs `merge-base(HEAD, --base)`; `--base` defaults to `HEAD` = uncommitted
+  working-tree changes) and reports their REAL full check status. The exit status
+  reflects the actual findings on those packages, so a real ERROR/WARNING/NOTE
+  surfaces. **`introduced`/`pre-existing` tagging is NOT YET WIRED** (it needs a
+  merge-base checkout that isn't built), so `--changed` is currently scope-only —
+  it does NOT yet answer "did *my* change cause this?". `--changed-strict` is a
+  documented no-op reserved for when tagging lands. Degrades gracefully: not a git
+  repo / no merge-base → a full check + a warning; no changes → a clean no-op.
 
 - **Plain `r:check` (no flag)** — unchanged: one `--as-cran` pass, one `check` stage row.
 - **`--strict`** — runs **both** Suggests-withholding flavor passes as two distinct

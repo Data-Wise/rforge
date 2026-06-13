@@ -16,8 +16,9 @@ Complete reference for all **{{ rforge.command_count }}** RForge commands. Comma
 - [Documentation & Tasks](#documentation-tasks) (4 commands)
 - [Health Checks](#health-checks) (2 commands)
 - [R Development Cycle](#r-development-cycle) (8 commands)
-- [R Quality](#r-quality) (4 commands)
+- [R Quality](#r-quality) (5 commands)
 - [CRAN Submission](#cran-submission) (6 commands)
+- [R Authoring](#r-authoring) (3 commands)
 
 ---
 
@@ -534,13 +535,16 @@ R CMD check integration with detailed error reporting.
 
 **Usage:**
 ```bash
-/rforge:r:check [package] [--strict] [--incoming]
+/rforge:r:check [package] [--strict] [--incoming] [--changed] [--base <ref>] [--changed-strict]
 ```
 
 **Parameters:**
 - `package` (optional) - Package to check (defaults to current)
 - `--strict` (optional) - Run both CRAN Suggests-withholding flavors (default: false)
 - `--incoming` (optional) - Emulate CRAN's incoming `_R_CHECK_*` bundle; implies `--strict` (default: false)
+- `--changed` (optional, v2.10.0) - Scope the check to the package(s) changed on this branch (diff vs `merge-base(HEAD, --base)`) and report their REAL full check status. **`[introduced]`/`[pre-existing]` tagging is NOT YET WIRED** (needs a merge-base checkout) — `--changed` is currently scope-only (default: false)
+- `--base <ref>` (optional, v2.10.0) - Comparison ref for `--changed`; diff is taken against `merge-base(HEAD, base)` (default: `HEAD` = uncommitted working-tree changes)
+- `--changed-strict` (optional, v2.10.0) - Documented no-op reserved for when tagging lands; `--changed` is always scope-only for now (default: false)
 
 **Examples:**
 ```bash
@@ -555,6 +559,9 @@ R CMD check integration with detailed error reporting.
 
 # Add the opt-in incoming env-var bundle
 /rforge:r:check --incoming
+
+# Scope the check to the package(s) changed on this branch (scope-only)
+/rforge:r:check --changed --base dev
 ```
 
 **Executes:**
@@ -569,6 +576,8 @@ R CMD check integration with detailed error reporting.
     A package that passes the default `--as-cran` check today can fail `--strict` once the **noSuggests** pass catches a `Suggests` package used unconditionally (the medfit 0.2.1 class — `MASS::mvrnorm` in a default code path). This is intended: CRAN would bounce such a package post-acceptance. Move the dependency to `Imports`, or guard it with `requireNamespace()` in code and `skip_if_not_installed()` in tests.
 
 **Note:** This can take 1-5 minutes depending on package size. Strict mode runs the baseline plus two flavor passes (~3× check time; ~4× with `--incoming`).
+
+**Diff-aware mode (v2.10.0):** `--changed` scopes the check to the R package(s) touched on this branch and reports their REAL full check status, so a real ERROR/WARNING/NOTE on a changed package surfaces and drives the exit status. **`[introduced]`/`[pre-existing]` tagging is NOT YET WIRED** — an honest comparison needs a merge-base checkout (running R against the fork point in a detached worktree), which is not built yet. Until then `--changed` is **scope-only** and does not yet answer "did *my* change cause this?"; `--changed-strict` is a documented no-op reserved for when tagging lands. Degrades gracefully: not a git repo / no merge-base → a full check plus a warning; no changes → a clean no-op.
 
 ---
 
@@ -644,18 +653,23 @@ Run package tests via `testthat` and report pass/fail/skip counts.
 **Usage:**
 
 ```bash
-/rforge:r:test [package]
+/rforge:r:test [package] [--changed] [--base <ref>]
 ```
 
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
+- `--changed` (optional, v2.10.0) - Scope tests to the package(s) changed on this branch (diff vs `merge-base(HEAD, --base)`; scope-only, results reported as-is — no finding tagging) (default: false)
+- `--base <ref>` (optional, v2.10.0) - Comparison ref for `--changed` (default: `HEAD`)
 
 **Examples:**
 
 ```bash
 # Test current package
 /rforge:r:test
+
+# Test only packages changed on this branch
+/rforge:r:test --changed --base dev
 ```
 
 **Executes:**
@@ -846,18 +860,23 @@ Static analysis of the package via `lintr` — grouped report of style and code-
 **Usage:**
 
 ```bash
-/rforge:r:lint [package]
+/rforge:r:lint [package] [--changed] [--base <ref>]
 ```
 
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
+- `--changed` (optional, v2.10.0) - Scope lint to the package(s) changed on this branch (diff vs `merge-base(HEAD, --base)`; scope-only, lints reported as-is — no finding tagging) (default: false)
+- `--base <ref>` (optional, v2.10.0) - Comparison ref for `--changed` (default: `HEAD`)
 
 **Examples:**
 
 ```bash
 # Lint current package
 /rforge:r:lint
+
+# Lint only packages changed on this branch
+/rforge:r:lint --changed --base dev
 ```
 
 **Executes:**
@@ -867,6 +886,53 @@ Static analysis of the package via `lintr` — grouped report of style and code-
 - If `lintr` is missing, reports 🟡 with install hint
 
 **Related commands:** `/rforge:r:style` (auto-format fixes many style lints)
+
+---
+
+### /rforge:r:s7-review
+
+Static **S7 OOP convention checker** — scans `R/*.R` + `NAMESPACE` and reports advisory convention findings across five families. **Advisory only, never blocks** (mirrors `r:cran-prep`'s Tier-4 tone). Pure Python — no R, no Rscript.
+
+**Usage:**
+
+```bash
+/rforge:r:s7-review [package] [--kind all|naming|validators|methods|legacy|docs] [--format json|text]
+```
+
+**Parameters:**
+
+- `package` (optional, positional) - Package directory to review (defaults to current directory)
+- `--kind` (optional) - Limit to one convention family: `all` (default), `naming`, `validators`, `methods`, `legacy`, or `docs`
+- `--format` (optional) - Output format: `json` (default) or `text`
+
+There is **no** `--write`/`--fix` — S7 fixes need human judgement.
+
+**Examples:**
+
+```bash
+# Review all S7 conventions in the current package
+/rforge:r:s7-review
+
+# Only the naming family, as text
+/rforge:r:s7-review --kind naming --format text
+
+# Review a specific package
+/rforge:r:s7-review ~/projects/mypackage
+```
+
+**Convention families:**
+
+| Family | Example codes |
+|---|---|
+| naming | `class_name_case`, `class_name_mismatch`, `generic_name_case`, `prop_name_case` |
+| validators | `missing_validator`, `validator_return_shape` |
+| methods | `dangling_method`, `missing_methods_register` |
+| legacy | `legacy_s4_in_s7`, `legacy_r5_in_s7`, `legacy_s3_generic` |
+| docs | `undocumented_export`, `prop_type_unresolvable` |
+
+**Output:** one `{kind: "s7review", status: "ok"|"warn", stages: [...]}` envelope. Each finding carries `source: "static"` and `severity: "advisory"`, worded "looks like / consider", never "must". Exit 0 always.
+
+**Related commands:** `/rforge:r:cran-prep` (Tier-4 advisory siblings), `/rforge:r:document`
 
 ---
 
@@ -1195,13 +1261,120 @@ prints the manual `gh` recipe instead of failing. Backed by `lib/ghrelease.py` (
 
 ---
 
+## R Authoring
+
+Scaffolding commands for **existing** packages. All three are **dry-run by default** — they print the plan and write nothing; pass `--write` to apply and `--force` to overwrite. They never invent expected values or docs prose; generated bodies are left as `# TODO` for you to fill.
+
+### /rforge:r:use-test
+
+Scaffold `tests/testthat/test-<function>.R` for an existing function and draft a `test_that()` block per branch — happy path, one per `stop()`, one per constrained `@param`. **No oracle:** assertions are emitted as `# TODO` (the engine never invents expected values).
+
+**Usage:**
+
+```bash
+/rforge:r:use-test <function> [--write] [--force]
+```
+
+**Parameters:**
+
+- `function` (required) - The exported function to scaffold tests for (one per call)
+- `--write` (optional) - Apply the plan: create the file (sets up testthat 3e infra if absent). Default is dry-run (default: false)
+- `--force` (optional) - Overwrite an existing test file, diff shown first (default: false)
+
+**Examples:**
+
+```bash
+# Dry-run: print the planned file, write nothing
+/rforge:r:use-test my_function
+
+# Apply: create the test file
+/rforge:r:use-test my_function --write
+
+# Overwrite an existing file
+/rforge:r:use-test my_function --write --force
+```
+
+After `--write`, fill each `# TODO` with a real expected value verified against documented behavior, then run `/rforge:r:test`.
+
+**Related commands:** `/rforge:r:test`, `/rforge:r:coverage`, `/rforge:r:document`
+
+---
+
+### /rforge:r:use-package
+
+Declare a single dependency for an existing package. The `Imports`-vs-`Suggests` decision reuses `lib/deps_sync.py`'s usage scan (unconditional `R/` use → **Imports**; tests/vignettes or guarded only → **Suggests**); the `DESCRIPTION` edit reuses the same DCF writer as `/rforge:r:deps-sync`. For an Imports dep, an `#' @importFrom <pkg> <symbol>` is inserted.
+
+**Usage:**
+
+```bash
+/rforge:r:use-package <package> [--write] [--force]
+```
+
+**Parameters:**
+
+- `package` (required) - The dependency to declare (one per call)
+- `--write` (optional) - Apply the change to `DESCRIPTION` + the `@importFrom`. Default is dry-run (default: false)
+- `--force` (optional) - Reserved for symmetry with the other `use-*` commands (default: false)
+
+**Examples:**
+
+```bash
+# Dry-run: show the field decision + planned DESCRIPTION/@importFrom edits
+/rforge:r:use-package rlang
+
+# Apply: write DESCRIPTION + insert @importFrom
+/rforge:r:use-package rlang --write
+```
+
+The recommendation + reason is always surfaced so you can override it. After `--write` on an Imports dep, run `/rforge:r:document` to regenerate `NAMESPACE`.
+
+**Related commands:** `/rforge:r:deps-sync` (reconcile all deps at once), `/rforge:r:document`, `/rforge:r:check --strict`
+
+---
+
+### /rforge:r:use-vignette
+
+Scaffold `vignettes/<name>.Rmd` for an existing package: a knitr skeleton (YAML index entry + engine) plus a drafted outline seeded from the package Title/Description. Section bodies are `# TODO`.
+
+**Usage:**
+
+```bash
+/rforge:r:use-vignette <name> [--article] [--write] [--force]
+```
+
+**Parameters:**
+
+- `name` (required) - The vignette file name (becomes `vignettes/<name>.Rmd`)
+- `--article` (optional) - Create a pkgdown-only article (not built/installed) instead of a vignette (default: false)
+- `--write` (optional) - Apply the plan: write the `.Rmd` and register the `VignetteBuilder` via guarded `usethis`. Default is dry-run (default: false)
+- `--force` (optional) - Overwrite an existing vignette file, diff shown first (default: false)
+
+**Examples:**
+
+```bash
+# Dry-run: print the planned .Rmd, write nothing
+/rforge:r:use-vignette intro
+
+# Apply: write the .Rmd, then register the builder
+/rforge:r:use-vignette intro --write
+
+# Create a pkgdown-only article instead
+/rforge:r:use-vignette advanced --article --write
+```
+
+If `usethis` is absent, a manual `usethis::use_vignette()` recipe is printed (non-fatal — the `.Rmd` is still written).
+
+**Related commands:** `/rforge:r:site` (build vignettes → articles), `/rforge:r:check`
+
+---
+
 ## Command Categories Summary
 
 ### By Time Budget
 
 | Time | Commands |
 |------|----------|
-| <10s | `status`, `quick`, `detect`, `deps` (visual), `next` |
+| <10s | `status`, `quick`, `detect`, `deps` (visual), `next`, `r:s7-review`, `r:use-test`/`r:use-package`/`r:use-vignette` (dry-run) |
 | <30s | `analyze` (default), `cascade`, `impact`, `docs:check` |
 | <1min | `r:load`, `r:document`, `r:lint`, `r:spell`, `r:urlcheck`, `r:style` |
 | <2min | `analyze` (debug/optimize), `r:test`, `r:coverage`, `r:build`, `r:install` |
