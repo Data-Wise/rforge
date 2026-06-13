@@ -61,6 +61,10 @@
          <lastmod>2026-06-13</lastmod>
     </url>
     <url>
+         <loc>https://data-wise.github.io/rforge/reference/changed/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
          <loc>https://data-wise.github.io/rforge/reference/cranlint/</loc>
          <lastmod>2026-06-13</lastmod>
     </url>
@@ -93,6 +97,14 @@
          <lastmod>2026-06-13</lastmod>
     </url>
     <url>
+         <loc>https://data-wise.github.io/rforge/reference/s7review/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/reference/scaffold/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
          <loc>https://data-wise.github.io/rforge/reference/status/</loc>
          <lastmod>2026-06-13</lastmod>
     </url>
@@ -101,7 +113,19 @@
          <lastmod>2026-06-13</lastmod>
     </url>
     <url>
+         <loc>https://data-wise.github.io/rforge/specs/PLAN-diff-aware-changed-2026-06-12/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
          <loc>https://data-wise.github.io/rforge/specs/PLAN-phase4-orchestrator-rewrite-2026-06-12/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/specs/PLAN-r-s7-review-2026-06-12/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/specs/PLAN-r-scaffolding-2026-06-12/</loc>
          <lastmod>2026-06-13</lastmod>
     </url>
     <url>
@@ -202,6 +226,10 @@
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/tutorials/rforge-in-the-r-lifecycle/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/tutorials/scaffolding-existing-packages/</loc>
          <lastmod>2026-06-13</lastmod>
     </url>
     <url>

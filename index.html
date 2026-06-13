@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 35 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 39 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -458,6 +458,17 @@
     <span class="md-ellipsis">
       
         The 3 headline commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-new-in-v2100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.10.0
       
     </span>
   </a>
@@ -1061,6 +1072,34 @@
     
   
     R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/scaffolding-existing-packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaffolding existing packages
   
 
     
@@ -1713,6 +1752,90 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reference/s7review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    s7review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reference/changed/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    changed
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reference/scaffold/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    scaffold
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2241,6 +2364,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#whats-new-in-v2100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.10.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-new-in-v290" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2457,11 +2591,11 @@
 <a href="https://www.npmjs.com/package/@data-wise/rforge-plugin"><img alt="npm" src="https://img.shields.io/npm/v/@data-wise/rforge-plugin?label=npm&amp;color=red" /></a>
 <a href="https://github.com/Data-Wise/rforge/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/Data-Wise/rforge?color=green" /></a>
 <a href="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev" /></a></p>
-<p><strong>R package ecosystem orchestrator for Claude Code — 35 commands, R-aware hooks, validation skills.</strong></p>
+<p><strong>R package ecosystem orchestrator for Claude Code — 39 commands, R-aware hooks, validation skills.</strong></p>
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
-<li><strong>What:</strong> R package <em>ecosystem</em> analysis from inside Claude Code. 35 slash commands.</li>
+<li><strong>What:</strong> R package <em>ecosystem</em> analysis from inside Claude Code. 39 slash commands.</li>
 <li><strong>Why:</strong> Fast feedback on multi-package R repos — discovery, dependencies, change impact, CRAN cascade planning.</li>
 <li><strong>How:</strong> <code>brew install data-wise/tap/rforge</code>, then <code>/rforge:analyze "&lt;what changed&gt;"</code>.</li>
 <li><strong>Next:</strong> <a href="QUICK-START/">Quick Start</a> (3 min) → <a href="#where-to-start">Where to start</a> below.</li>
@@ -2521,7 +2655,7 @@
 </tbody>
 </table>
 <h2 id="the-3-headline-commands">The 3 headline commands<a class="headerlink" href="#the-3-headline-commands" title="Permanent link">&para;</a></h2>
-<p>Most daily work runs through these; the rest of the plugin's 35 commands are specialized — see the <a href="REFCARD/">Reference Card</a>.</p>
+<p>Most daily work runs through these; the rest of the plugin's 39 commands are specialized — see the <a href="REFCARD/">Reference Card</a>.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Ultra-fast snapshot (&lt; 10 seconds) — pre-commit</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>/rforge:quick
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
@@ -2534,6 +2668,13 @@
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Ecosystem rollup (2-5 minutes) — cross-package validation + submission order</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Prepare for CRAN release&quot;</span>
 </span></code></pre></div>
+<h2 id="whats-new-in-v2100">What's new in v2.10.0<a class="headerlink" href="#whats-new-in-v2100" title="Permanent link">&para;</a></h2>
+<p>Three additive features — now 39 commands.</p>
+<ul>
+<li><strong><code>/rforge:r:s7-review</code></strong> — a static <strong>S7 OOP convention checker</strong>. Scans <code>R/*.R</code> + <code>NAMESPACE</code> across five families — naming, validators, methods, legacy (S4/R5/S3 leftovers), and docs — and reports advisory "looks like / consider" findings. <strong>Advisory only, never blocks</strong>, mirroring <code>r:cran-prep</code>'s Tier-4 tone. Pure Python (no R, no Rscript), no <code>--write</code>. See the <a href="reference/s7review/"><code>s7review</code> reference</a>.</li>
+<li><strong>Scaffolding for existing packages</strong> — <code>/rforge:r:use-test</code>, <code>/rforge:r:use-package</code>, <code>/rforge:r:use-vignette</code>. Draft a testthat file (one <code>test_that()</code> per branch, assertions left as <code># TODO</code>), declare a dependency (Imports-vs-Suggests auto-picked via <code>deps_sync</code>, with an <code>@importFrom</code> tag), or scaffold a vignette/article skeleton. <strong>Dry-run by default</strong>; <code>--write</code> applies, <code>--force</code> overwrites. See the <a href="reference/scaffold/"><code>scaffold</code> reference</a> and the <a href="tutorials/scaffolding-existing-packages/">scaffolding tutorial</a>.</li>
+<li><strong>diff-aware <code>--changed</code></strong> — a new flag on <code>/rforge:r:check</code>, <code>/rforge:r:test</code>, and <code>/rforge:r:lint</code> that scopes the run to the package(s) changed on this branch (diff vs <code>merge-base(HEAD, --base)</code>) and reports their REAL full status. <strong><code>[introduced]</code>/<code>[pre-existing]</code> finding tagging is NOT YET WIRED</strong> (it needs a merge-base checkout that isn't built), so <code>--changed</code> ships as <strong>scope-only</strong> for now — it does not yet answer "did <em>my</em> change cause this?". <code>--changed-strict</code> is a documented no-op reserved for when tagging lands. See the <a href="reference/changed/"><code>changed</code> reference</a>.</li>
+</ul>
 <h2 id="whats-new-in-v290">What's new in v2.9.0<a class="headerlink" href="#whats-new-in-v290" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>The <a href="orchestrator/">orchestrator agent</a>, reborn</strong> — ask a <em>goal</em> ("is this CRAN-ready?", "what's the impact of this change?") instead of picking commands, and the orchestrator recognizes the intent and runs the right read-only analyses, then synthesizes one summary. It now delegates through the pure-Python <code>lib/*</code> modules (the old MCP-tool delegation, dead since v1.3.0, is gone), recognizes <strong>7 intents</strong>, and enforces a <strong>read-only / recommend-only safety boundary</strong> — anything that writes files or hits the network is recommended, never auto-run. See the <a href="tutorials/orchestrator-cookbook/">orchestrator cookbook</a> for worked examples.</li>
@@ -2541,7 +2682,7 @@
 </ul>
 <h2 id="whats-new-in-v280">What's new in v2.8.0<a class="headerlink" href="#whats-new-in-v280" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Single-source version/count for docs</strong> — the docs now render the current version and command count from one source of truth, so they stop drifting. A <strong>mkdocs-macros</strong> layer renders <code>2.9.0</code> / <code>35</code> at build time, and pure-stdlib <strong><code>scripts/version_sync.py</code></strong> stamps the surfaces macros can't reach (<code>README.md</code>, <code>plugin.json</code>, <code>CLAUDE.md</code>, …); its <code>--check</code> is a CI drift gate wired into <code>ci.yml</code> + <code>test-all.sh</code>. No command-surface change — still 35 commands.</li>
+<li><strong>Single-source version/count for docs</strong> — the docs now render the current version and command count from one source of truth, so they stop drifting. A <strong>mkdocs-macros</strong> layer renders <code>2.10.0</code> / <code>39</code> at build time, and pure-stdlib <strong><code>scripts/version_sync.py</code></strong> stamps the surfaces macros can't reach (<code>README.md</code>, <code>plugin.json</code>, <code>CLAUDE.md</code>, …); its <code>--check</code> is a CI drift gate wired into <code>ci.yml</code> + <code>test-all.sh</code>. No command-surface change — still 39 commands.</li>
 </ul>
 <h2 id="whats-new-in-v270">What's new in v2.7.0<a class="headerlink" href="#whats-new-in-v270" title="Permanent link">&para;</a></h2>
 <ul>
@@ -2650,7 +2791,7 @@
 </ol>
 <h2 id="more-documentation">More documentation<a class="headerlink" href="#more-documentation" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong><a href="REFCARD/">Reference Card</a></strong> — all 35 commands on one page</li>
+<li><strong><a href="REFCARD/">Reference Card</a></strong> — all 39 commands on one page</li>
 <li><strong><a href="commands/">Commands</a></strong> — full per-command reference</li>
 <li><strong><a href="architecture/">Architecture</a></strong> — how the <code>lib/</code> modules fit together</li>
 <li><strong><a href="hooks-and-skills/">Hooks &amp; Skills</a></strong> — the R-aware <code>PreToolUse</code> hook</li>

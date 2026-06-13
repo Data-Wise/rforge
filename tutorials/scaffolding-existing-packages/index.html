@@ -10,31 +10,31 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/tutorials/scaffolding-existing-packages/">
       
       
-        <link rel="prev" href="../hooks-and-skills/">
+        <link rel="prev" href="../r-dev-cycle/">
       
       
-        <link rel="next" href="SPEC-mcp-absorb-2026-05-10/">
+        <link rel="next" href="../cran-release-prep/">
       
       
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Overview - RForge Plugin</title>
+        <title>Scaffolding existing packages - RForge Plugin</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,9 +53,9 @@
       
     
     
-      <link rel="stylesheet" href="../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#specs" class="md-skip">
+        <a href="#scaffolding-for-existing-packages" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +94,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="RForge Plugin" class="md-header__button md-logo" aria-label="RForge Plugin" data-md-component="logo">
+    <a href="../.." title="RForge Plugin" class="md-header__button md-logo" aria-label="RForge Plugin" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Overview
+              Scaffolding existing packages
             
           </span>
         </div>
@@ -227,7 +227,7 @@
   
   
     <li class="md-tabs__item">
-      <a href=".." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -248,7 +248,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../installation/" class="md-tabs__link">
+        <a href="../../installation/" class="md-tabs__link">
           
   
   
@@ -264,11 +264,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../workflows/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../workflows/" class="md-tabs__link">
           
   
   
@@ -288,7 +290,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../REFCARD/" class="md-tabs__link">
+        <a href="../../REFCARD/" class="md-tabs__link">
           
   
   
@@ -304,13 +306,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../architecture/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../architecture/" class="md-tabs__link">
           
   
   
@@ -344,7 +344,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="RForge Plugin" class="md-nav__button md-logo" aria-label="RForge Plugin" data-md-component="logo">
+    <a href="../.." title="RForge Plugin" class="md-nav__button md-logo" aria-label="RForge Plugin" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -374,7 +374,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -451,7 +451,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../installation/" class="md-nav__link">
+      <a href="../../installation/" class="md-nav__link">
         
   
   
@@ -479,7 +479,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../QUICK-START/" class="md-nav__link">
+      <a href="../../QUICK-START/" class="md-nav__link">
         
   
   
@@ -507,7 +507,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../quickstart/" class="md-nav__link">
+      <a href="../../quickstart/" class="md-nav__link">
         
   
   
@@ -539,24 +539,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -574,7 +579,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -592,7 +597,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflows/" class="md-nav__link">
+      <a href="../../workflows/" class="md-nav__link">
         
   
   
@@ -620,7 +625,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -648,7 +653,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/getting-started/" class="md-nav__link">
+      <a href="../getting-started/" class="md-nav__link">
         
   
   
@@ -676,7 +681,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
+      <a href="../rforge-in-the-r-lifecycle/" class="md-nav__link">
         
   
   
@@ -704,7 +709,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/understanding-modes/" class="md-nav__link">
+      <a href="../understanding-modes/" class="md-nav__link">
         
   
   
@@ -732,7 +737,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/ecosystem-orchestration/" class="md-nav__link">
+      <a href="../ecosystem-orchestration/" class="md-nav__link">
         
   
   
@@ -760,7 +765,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/orchestrator-cookbook/" class="md-nav__link">
+      <a href="../orchestrator-cookbook/" class="md-nav__link">
         
   
   
@@ -788,7 +793,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/r-dev-cycle/" class="md-nav__link">
+      <a href="../r-dev-cycle/" class="md-nav__link">
         
   
   
@@ -813,10 +818,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../tutorials/scaffolding-existing-packages/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaffolding existing packages
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -832,6 +864,92 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-shared-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The shared contract
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-1-author-a-test-ruse-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 1: Author a test — r:use-test
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-2-add-a-dependency-ruse-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 2: Add a dependency — r:use-package
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-3-author-a-vignette-ruse-vignette" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 3: Author a vignette — r:use-vignette
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#putting-it-together" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Putting it together
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -844,7 +962,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/cran-release-prep/" class="md-nav__link">
+      <a href="../cran-release-prep/" class="md-nav__link">
         
   
   
@@ -872,7 +990,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/cran-submission-with-rforge/" class="md-nav__link">
+      <a href="../cran-submission-with-rforge/" class="md-nav__link">
         
   
   
@@ -900,7 +1018,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/r-universe-early-access/" class="md-nav__link">
+      <a href="../r-universe-early-access/" class="md-nav__link">
         
   
   
@@ -928,7 +1046,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/migrate-from-mcp/" class="md-nav__link">
+      <a href="../migrate-from-mcp/" class="md-nav__link">
         
   
   
@@ -1013,7 +1131,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../REFCARD/" class="md-nav__link">
+      <a href="../../REFCARD/" class="md-nav__link">
         
   
   
@@ -1041,7 +1159,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commands/" class="md-nav__link">
+      <a href="../../commands/" class="md-nav__link">
         
   
   
@@ -1069,7 +1187,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../orchestrator/" class="md-nav__link">
+      <a href="../../orchestrator/" class="md-nav__link">
         
   
   
@@ -1097,7 +1215,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
+      <a href="../../configuration/" class="md-nav__link">
         
   
   
@@ -1125,7 +1243,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../lib-modules/" class="md-nav__link">
+      <a href="../../lib-modules/" class="md-nav__link">
         
   
   
@@ -1153,7 +1271,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../troubleshooting/" class="md-nav__link">
+      <a href="../../troubleshooting/" class="md-nav__link">
         
   
   
@@ -1231,7 +1349,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/discovery/" class="md-nav__link">
+      <a href="../../reference/discovery/" class="md-nav__link">
         
   
   
@@ -1259,7 +1377,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/deps/" class="md-nav__link">
+      <a href="../../reference/deps/" class="md-nav__link">
         
   
   
@@ -1287,7 +1405,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/deps_sync/" class="md-nav__link">
+      <a href="../../reference/deps_sync/" class="md-nav__link">
         
   
   
@@ -1315,7 +1433,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/status/" class="md-nav__link">
+      <a href="../../reference/status/" class="md-nav__link">
         
   
   
@@ -1343,7 +1461,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/init/" class="md-nav__link">
+      <a href="../../reference/init/" class="md-nav__link">
         
   
   
@@ -1371,7 +1489,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/rcmd/" class="md-nav__link">
+      <a href="../../reference/rcmd/" class="md-nav__link">
         
   
   
@@ -1399,7 +1517,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/cranlint/" class="md-nav__link">
+      <a href="../../reference/cranlint/" class="md-nav__link">
         
   
   
@@ -1427,7 +1545,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/ghrelease/" class="md-nav__link">
+      <a href="../../reference/ghrelease/" class="md-nav__link">
         
   
   
@@ -1455,7 +1573,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/runiverse/" class="md-nav__link">
+      <a href="../../reference/runiverse/" class="md-nav__link">
         
   
   
@@ -1483,7 +1601,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/s7review/" class="md-nav__link">
+      <a href="../../reference/s7review/" class="md-nav__link">
         
   
   
@@ -1511,7 +1629,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/changed/" class="md-nav__link">
+      <a href="../../reference/changed/" class="md-nav__link">
         
   
   
@@ -1539,7 +1657,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/scaffold/" class="md-nav__link">
+      <a href="../../reference/scaffold/" class="md-nav__link">
         
   
   
@@ -1579,29 +1697,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -1619,7 +1732,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1637,7 +1750,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
+      <a href="../../architecture/" class="md-nav__link">
         
   
   
@@ -1665,7 +1778,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../hooks-and-skills/" class="md-nav__link">
+      <a href="../../hooks-and-skills/" class="md-nav__link">
         
   
   
@@ -1690,8 +1803,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1702,11 +1813,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
         
           
           <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
@@ -1727,7 +1838,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1742,37 +1853,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../specs/" class="md-nav__link">
         
   
   
@@ -1788,92 +1872,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#when-to-write-a-spec" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        When to write a SPEC
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#conventions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Conventions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#templates" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Templates
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#research-citation-standard" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Research &amp; Citation Standard
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#specs_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Specs
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1886,7 +1884,7 @@
   
   
     <li class="md-nav__item">
-      <a href="SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
+      <a href="../../specs/SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
         
   
   
@@ -1914,7 +1912,7 @@
   
   
     <li class="md-nav__item">
-      <a href="SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
+      <a href="../../specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
         
   
   
@@ -1942,7 +1940,7 @@
   
   
     <li class="md-nav__item">
-      <a href="SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
+      <a href="../../specs/SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
         
   
   
@@ -1970,7 +1968,7 @@
   
   
     <li class="md-nav__item">
-      <a href="SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
+      <a href="../../specs/SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
         
   
   
@@ -2056,7 +2054,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/v2.0.0-rename/" class="md-nav__link">
+      <a href="../../migration/v2.0.0-rename/" class="md-nav__link">
         
   
   
@@ -2084,7 +2082,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/rforge-mcp-deprecation/" class="md-nav__link">
+      <a href="../../migration/rforge-mcp-deprecation/" class="md-nav__link">
         
   
   
@@ -2112,7 +2110,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/v1.3.0-post-merge-checklist/" class="md-nav__link">
+      <a href="../../migration/v1.3.0-post-merge-checklist/" class="md-nav__link">
         
   
   
@@ -2175,10 +2173,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#when-to-write-a-spec" class="md-nav__link">
+  <a href="#the-shared-contract" class="md-nav__link">
     <span class="md-ellipsis">
       
-        When to write a SPEC
+        The shared contract
       
     </span>
   </a>
@@ -2186,10 +2184,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#conventions" class="md-nav__link">
+  <a href="#part-1-author-a-test-ruse-test" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Conventions
+        Part 1: Author a test — r:use-test
       
     </span>
   </a>
@@ -2197,10 +2195,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#templates" class="md-nav__link">
+  <a href="#part-2-add-a-dependency-ruse-package" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Templates
+        Part 2: Add a dependency — r:use-package
       
     </span>
   </a>
@@ -2208,10 +2206,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#research-citation-standard" class="md-nav__link">
+  <a href="#part-3-author-a-vignette-ruse-vignette" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Research &amp; Citation Standard
+        Part 3: Author a vignette — r:use-vignette
       
     </span>
   </a>
@@ -2219,10 +2217,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#specs_1" class="md-nav__link">
+  <a href="#putting-it-together" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Specs
+        Putting it together
       
     </span>
   </a>
@@ -2257,7 +2255,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/README.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/tutorials/scaffolding-existing-packages.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2265,128 +2263,152 @@
   
 
 
-<h1 id="specs">Specs<a class="headerlink" href="#specs" title="Permanent link">&para;</a></h1>
-<p>Design documents for non-trivial work in rforge. Each SPEC captures a
-decision, plan, or migration that's larger than a single PR — the <em>why</em>
-and the <em>how-to-execute</em>, separate from the implementation that
-eventually delivers it.</p>
-<h2 id="when-to-write-a-spec">When to write a SPEC<a class="headerlink" href="#when-to-write-a-spec" title="Permanent link">&para;</a></h2>
-<p>Write a new SPEC when the work is:</p>
+<h1 id="scaffolding-for-existing-packages">🏗️ Scaffolding for existing packages<a class="headerlink" href="#scaffolding-for-existing-packages" title="Permanent link">&para;</a></h1>
+<div class="admonition tip">
+<p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
-<li><strong>Multi-session</strong> — won't land in one focused effort</li>
-<li><strong>Architectural</strong> — changes how subsystems relate, not just what they
-  do</li>
-<li><strong>Breaking</strong> or <strong>migration</strong> — needs a sequenced execution path
-  rather than a one-shot edit</li>
-<li><strong>Carrying decisions worth preserving</strong> — <em>why</em> this approach beat
-  alternatives, captured before the alternatives are forgotten</li>
+<li><strong>What:</strong> Three <code>r:use-*</code> commands that scaffold a test file, a dependency, and a vignette into an <strong>existing</strong> package.</li>
+<li><strong>Why:</strong> Less boilerplate, fewer forgotten steps (NAMESPACE, VignetteBuilder, testthat infra) — and rforge picks <code>Imports</code> vs <code>Suggests</code> for you.</li>
+<li><strong>How:</strong> Everything is <strong>dry-run by default</strong>. Read the plan, then re-run with <code>--write</code>.</li>
+<li><strong>Safety:</strong> No oracle — generated assertions and prose are <code># TODO</code>. The engine never invents expected values.</li>
+<li><strong>Next:</strong> <a href="../r-dev-cycle/">R package dev cycle</a> to run what you scaffolded.</li>
 </ul>
-<p>Don't write a SPEC for routine refactors, focused bug fixes, or
-single-PR features. The PR description is the right home for those.</p>
-<h2 id="conventions">Conventions<a class="headerlink" href="#conventions" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Filename: <code>SPEC-&lt;short-name&gt;-YYYY-MM-DD.md</code>. Date is the <em>creation</em>
-  date, not the ship date.</li>
-<li>Status header: <code>Draft</code> → <code>In Progress</code> → <code>Shipped</code> (or <code>Abandoned</code>).</li>
-<li>Every SPEC has a <code>Goals</code> and <code>Non-goals</code> section. Non-goals are often
-  more useful than goals — they prevent scope creep.</li>
-<li>Link from <code>CHANGELOG.md</code> and <code>.STATUS</code> so SPECs aren't orphaned.</li>
-</ul>
-<h2 id="templates">Templates<a class="headerlink" href="#templates" title="Permanent link">&para;</a></h2>
-<p>Start from a template rather than a blank file — they encode the section
-structure and the citation rules below:</p>
-<ul>
-<li><strong><a href="_TEMPLATE-SPEC/"><code>_TEMPLATE-SPEC.md</code></a></strong> — design + execution plan.</li>
-<li><strong><a href="_TEMPLATE-RESEARCH/"><code>_TEMPLATE-RESEARCH.md</code></a></strong> — findings + recommendations
-  (no code, no plan). A RESEARCH doc feeds a SPEC; the SPEC references it instead
-  of re-deriving claims (e.g. <code>RESEARCH-cran-dev</code> → <code>SPEC-r-cran-prep</code>).</li>
-</ul>
-<p>Naming prefixes: <code>RESEARCH-</code> (findings) → <code>PROPOSAL-</code> (early ideation, not yet
-approved) → <code>SPEC-</code> (approved design). Promote a PROPOSAL to a SPEC by <code>git mv</code>
-once the design is decided; the date in the filename stays the <em>creation</em> date.</p>
-<h2 id="research-citation-standard">Research &amp; Citation Standard<a class="headerlink" href="#research-citation-standard" title="Permanent link">&para;</a></h2>
-<p>rforge specs make claims about CRAN policy, R internals, and tool behavior that
-are easy to get <em>subtly</em> wrong. (A real example: an early draft of the
-CRAN-incoming-hardening proposal named <code>_R_CHECK_SUGGESTS_ONLY_</code> as the env var
-that catches a Suggests-package-used-unconditionally bug; the correct flavor is
-<code>_R_CHECK_DEPENDS_ONLY_</code>. The two have different semantics — only verification
-against the primary source caught it.) This standard exists to make that class of
-error visible before a spec leaves <code>Draft</code>.</p>
-<p><strong>The rules:</strong></p>
-<ul>
-<li><strong>Claim → source.</strong> Every non-obvious external or technical claim cites a source
-  <em>at the point of use</em>, not just in a bibliography.</li>
-<li><strong>Source hierarchy</strong> (prefer higher tiers; drop to a lower tier only when no
-  higher source covers the claim, and label it):</li>
-<li><strong>Primary</strong> — <a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html">Writing R Extensions</a>,
-     <a href="https://cran.r-project.org/doc/manuals/r-release/R-ints.html">R Internals</a>,
-     <a href="https://cran.r-project.org/web/packages/policies.html">CRAN Repository Policy</a>,
-     R <code>NEWS</code>/source, and a package's own reference docs.</li>
-<li><strong>Official tutorials</strong> — <a href="https://r-pkgs.org/">r-pkgs.org</a>, r-lib / tidyverse
-     reference sites.</li>
-<li><strong>Secondary</strong> — blog posts, mailing-list threads. Use only when no primary
-     source exists, and mark them as secondary.</li>
-<li><strong>Format.</strong> Inline markdown link where the claim is made, <strong>plus</strong> a closing
-  <code>## Sources</code> section collecting every link for one-pass verification.</li>
-<li><strong>Resolve contradictions in the open.</strong> When two sources disagree, state both,
-  pick one, and record the resolution. That sentence is usually the most valuable
-  line in the document.</li>
-</ul>
-<p><strong>The research workflow</strong> (how a RESEARCH doc or a spec's evidence base gets built):</p>
-<ol>
-<li><strong>Scope the question</strong> — write down exactly what must be true for the design to hold.</li>
-<li><strong>Fan-out search</strong> — the global <code>deep-research</code> skill, or <code>WebSearch</code> filtered to
-   primary domains (<code>cran.r-project.org</code>, <code>stat.ethz.ch</code>, package reference sites).</li>
-<li><strong>Fetch &amp; verify</strong> — <code>WebFetch</code> the primary source; confirm the claim in its own
-   words rather than trusting a summary.</li>
-<li><strong>Resolve contradictions</strong> — reconcile disagreeing sources; note the resolution.</li>
-<li><strong>Write claim + citation</strong> — link at point of use.</li>
-<li><strong>Compile <code>## Sources</code></strong> — collect all links.</li>
-<li><strong>Self-review</strong> — scan for any external claim without a citation before promoting
-   out of <code>Draft</code>.</li>
-</ol>
-<h2 id="specs_1">Specs<a class="headerlink" href="#specs_1" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong><a href="SPEC-mcp-absorb-2026-05-10/">MCP absorb (Path B)</a></strong> — Status:
-  Shipped (v1.3.0). Migration plan that absorbed <code>rforge-mcp</code>'s implemented
-  tools into the plugin's <code>lib/</code>. Path A (decoupling at the npm peer-dep
-  level) shipped in v1.2.0; Path B delivered full self-sufficiency.</li>
-<li><strong><a href="SPEC-phase3-namespacing-2026-05-11/">Phase 3 namespacing (v2.0.0)</a></strong> —
-  Status: Shipped (v2.0.0). The command-rename / sub-namespacing plan
-  (<code>docs:check</code>, <code>r:check</code>, <code>health</code>).</li>
-<li><strong><a href="SPEC-diff-aware-checks-and-coverage-2026-05-31/">Diff-aware checks &amp; coverage</a></strong> —
-  Status: Draft, <strong>refocused to P0</strong> (<code>--changed</code> diff-aware checks — the unbuilt flagship).
-  P1 shipped (v2.1.0); P2→cran-incoming, P3→ecosystem-manifest, P4→scaffolding (2026-06-10).</li>
-<li><strong><a href="SPEC-r-dev-commands-2026-05-31/">r: dev-cycle + quality commands (v2.1.0)</a></strong> —
-  Status: Shipped (v2.1.0). 12 new <code>r:</code> commands (build/test/document/install/
-  coverage/site/cycle + lint/spell/urlcheck/style) backed by <code>lib/rcmd.py</code>.
-  16 → 28 commands. Deferred follow-ups (deps-sync, scaffolding, cran-prep)
-  noted in the appendix.</li>
-<li><strong><a href="SPEC-cran-incoming-hardening-2026-06-10/">CRAN-incoming hardening</a></strong> —
-  Status: Reviewed/approved (target v2.3.0). Make the <code>check</code>/<code>cran-prep</code> gate emulate CRAN incoming + ongoing
-  checks (noSuggests + suggests-only flavors, <code>--run-donttest</code>, opt-in <code>--incoming</code>
-  bundle), default-on as a <code>ready</code>-blocker, plus pure-Python DESCRIPTION-lint,
-  <code>.Rbuildignore</code> build-hygiene, and planning-doc consistency checks. Grounded in
-  <a href="RESEARCH-cran-incoming-checks-2026-06-10/">RESEARCH-cran-incoming-checks</a>.</li>
-<li><strong><a href="SPEC-r-deps-sync-2026-06-10/"><code>r:deps-sync</code> — reconcile DESCRIPTION vs code usage</a></strong> —
-  Status: Draft (target v2.5.0). New pure-Python per-package command: scan <code>R/</code>/tests/vignettes for
-  namespace usage, reconcile against <code>Imports</code>/<code>Suggests</code> (missing/unused/misclassified), suggest a
-  DESCRIPTION patch (<code>--write</code> to apply). Static sibling of the cran-incoming noSuggests catch.</li>
-<li><strong><a href="SPEC-r-submit-github-prerelease-2026-06-10/"><code>r:submit</code> — GitHub pre-release + CRAN submit handoff</a></strong> —
-  Status: Draft (target v2.6.0). New per-package command: build the submitted tarball, cut a
-  GitHub <strong>pre-release</strong> (+<code>cran-comments.md</code>), hand off the CRAN submit step, then promote to a
-  full release on acceptance (<code>gh release edit --prerelease=false</code>). Fills the submission-lifecycle
-  gap between <code>r:cran-prep</code> (ready) and CRAN going live.</li>
-<li><strong><a href="SPEC-r-scaffolding-2026-06-10/">Scaffolding theme — <code>r:use-test</code>/<code>r:use-package</code>/<code>r:use-vignette</code></a></strong> —
-  Status: Draft (unscheduled, post-v2.6.0). Authoring commands for <em>existing</em> packages (no
-  <code>r:create</code>): scaffold + AI-draft a testthat file, add a declared dependency, start a vignette.
-  Hybrid engine (usethis infra + Python/AI content), dry-run by default. Reuses deps-sync's
-  DESCRIPTION-patch writer.</li>
-</ul>
+</div>
+<blockquote>
+<p><strong>For whom:</strong> R package developer adding a test, a dependency, or a vignette to a
+package that already exists.
+<strong>Estimated time:</strong> 10 minutes.
+<strong>Prior knowledge:</strong> You have an R package (a directory with a <code>DESCRIPTION</code> file)
+registered with <code>/rforge:init</code>. These commands <strong>do not create packages</strong> — they
+add into one you already have.</p>
+</blockquote>
+<h2 id="the-shared-contract">The shared contract<a class="headerlink" href="#the-shared-contract" title="Permanent link">&para;</a></h2>
+<p>All three commands behave the same way:</p>
+<table>
+<thead>
+<tr>
+<th>Behavior</th>
+<th>Default</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Print the plan, write nothing</td>
+<td>✅ dry-run</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Apply the change</td>
+<td>—</td>
+<td><code>--write</code></td>
+</tr>
+<tr>
+<td>Overwrite an existing target</td>
+<td>—</td>
+<td><code>--force</code> (diff shown first)</td>
+</tr>
+</tbody>
+</table>
+<p>So the loop is always: <strong>run → read the plan → run again with <code>--write</code></strong>.</p>
+<hr />
+<h2 id="part-1-author-a-test-ruse-test">Part 1: Author a test — <code>r:use-test</code><a class="headerlink" href="#part-1-author-a-test-ruse-test" title="Permanent link">&para;</a></h2>
+<p>Scaffold <code>tests/testthat/test-&lt;function&gt;.R</code> for an existing exported function. rforge
+drafts a <code>test_that()</code> block per branch: the happy path, one per <code>stop()</code>, and one per
+constrained <code>@param</code>.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Dry-run: see the planned file</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>/rforge:r:use-test<span class="w"> </span>estimate_effect
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Apply: create the file (sets up testthat 3e infra if absent)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>/rforge:r:use-test<span class="w"> </span>estimate_effect<span class="w"> </span>--write
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">No oracle</p>
+<p>Assertions are emitted as <code># TODO</code> comments. The engine never invents expected
+values — a delta-method estimate may be <code>a*b + cov(a,b)</code>, not <code>a*b</code>. After
+<code>--write</code>, open <code>R/estimate_effect.R</code>, then fill each <code># TODO</code> with a real expected
+value verified against the documented behavior.</p>
+</div>
+<p>Then run the tests you just wrote:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>/rforge:r:test
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>/rforge:r:coverage<span class="w">   </span><span class="c1"># confirm the new file lifts coverage</span>
+</span></code></pre></div>
+<hr />
+<h2 id="part-2-add-a-dependency-ruse-package">Part 2: Add a dependency — <code>r:use-package</code><a class="headerlink" href="#part-2-add-a-dependency-ruse-package" title="Permanent link">&para;</a></h2>
+<p>Declare a single dependency. rforge reuses <code>r:deps-sync</code>'s usage scan to pick the field:
+unconditional use in <code>R/</code> → <strong>Imports</strong>; tests/vignettes-only or <code>requireNamespace()</code>-guarded
+→ <strong>Suggests</strong>. For an <code>Imports</code> dep it also inserts an <code>#' @importFrom &lt;pkg&gt; &lt;symbol&gt;</code>.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Dry-run: see the field decision + reason, plus the planned edits</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>/rforge:r:use-package<span class="w"> </span>rlang
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Apply: write DESCRIPTION (deps_sync writer) + insert @importFrom</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>/rforge:r:use-package<span class="w"> </span>rlang<span class="w"> </span>--write
+</span></code></pre></div>
+<p>The recommendation <strong>and its reason</strong> are always surfaced, so you can override it (e.g.
+re-run intending <code>Suggests</code> if the package is test-only). After <code>--write</code> on an <code>Imports</code>
+dep, regenerate <code>NAMESPACE</code>:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/rforge:r:document
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Imports vs Suggests, at a glance</p>
+<table>
+<thead>
+<tr>
+<th>Usage detected</th>
+<th>Field</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pkg::</code> / <code>library()</code> / <code>@importFrom</code> in <code>R/</code></td>
+<td><strong>Imports</strong></td>
+</tr>
+<tr>
+<td>only in <code>tests/</code> or <code>vignettes/</code>, or <code>requireNamespace()</code>-guarded</td>
+<td><strong>Suggests</strong></td>
+</tr>
+<tr>
+<td>not used yet</td>
+<td><strong>Imports</strong> (default)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>To reconcile <strong>all</strong> dependencies at once instead of adding one named dep, use
+<a href="../../commands/#rforgerdeps-sync"><code>/rforge:r:deps-sync</code></a>.</p>
+<hr />
+<h2 id="part-3-author-a-vignette-ruse-vignette">Part 3: Author a vignette — <code>r:use-vignette</code><a class="headerlink" href="#part-3-author-a-vignette-ruse-vignette" title="Permanent link">&para;</a></h2>
+<p>Scaffold <code>vignettes/&lt;name&gt;.Rmd</code>: a knitr skeleton (YAML index entry + engine) plus an
+outline seeded from the package Title/Description. Section bodies are <code># TODO</code>.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Dry-run: see the planned .Rmd</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>/rforge:r:use-vignette<span class="w"> </span>intro
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Apply: write the .Rmd + register the VignetteBuilder (usethis)</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>/rforge:r:use-vignette<span class="w"> </span>intro<span class="w"> </span>--write
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Or create a pkgdown-only article (not built/installed)</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>/rforge:r:use-vignette<span class="w"> </span>advanced<span class="w"> </span>--article<span class="w"> </span>--write
+</span></code></pre></div>
+<p>If <code>usethis</code> is absent, a manual <code>usethis::use_vignette()</code> recipe is printed — non-fatal;
+the <code>.Rmd</code> is still written. Once you've filled the outline, build the site:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>/rforge:r:site
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>/rforge:r:check<span class="w">   </span><span class="c1"># confirm the vignette builds under R CMD check</span>
+</span></code></pre></div>
+<hr />
+<h2 id="putting-it-together">Putting it together<a class="headerlink" href="#putting-it-together" title="Permanent link">&para;</a></h2>
+<p>A realistic "add a feature, document it" pass:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:r:use-package<span class="w"> </span>rlang<span class="w"> </span>--write<span class="w">     </span><span class="c1"># 1. declare the dep</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>/rforge:r:document<span class="w">                      </span><span class="c1"># 2. regenerate NAMESPACE</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>/rforge:r:use-test<span class="w"> </span>my_new_function<span class="w"> </span>--write<span class="w">   </span><span class="c1"># 3. scaffold tests, then fill the TODOs</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>/rforge:r:test<span class="w">                          </span><span class="c1"># 4. run them</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>/rforge:r:use-vignette<span class="w"> </span>intro<span class="w"> </span>--write<span class="w">    </span><span class="c1"># 5. scaffold a vignette, then expand it</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>/rforge:r:site<span class="w">                          </span><span class="c1"># 6. build the site</span>
+</span></code></pre></div>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md"><code>CHANGELOG.md</code></a> — release-level decisions</li>
-<li><code>.STATUS</code> — current session log + active backlog</li>
+<li><a href="../../reference/scaffold/"><code>scaffold</code> reference</a> — the <code>lib.scaffold</code> engine behind these commands</li>
+<li><a href="../r-dev-cycle/">R package dev cycle</a> — run document/test/check after scaffolding</li>
+<li><a href="../../commands/#rforgerdeps-sync"><code>/rforge:r:deps-sync</code></a> — reconcile all deps at once</li>
 </ul>
 
 
@@ -2443,10 +2465,10 @@ error visible before a spec leaves <code>Draft</code>.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
