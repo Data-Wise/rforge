@@ -29,6 +29,6 @@ Validated <- new_class("Validated",
   }
 )
 
-# method() on a generic not defined/imported here + no methods_register() anywhere
+# method() on a generic not defined/imported here + no register call anywhere
 # -> dangling_method AND missing_methods_register
 method(external_generic, mediator_model) <- function(x, ...) x
