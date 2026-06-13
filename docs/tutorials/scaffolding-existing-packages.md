@@ -1,8 +1,8 @@
 # 🏗️ Scaffolding for existing packages
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** Three `r:use-*` commands that scaffold a test file, a dependency, and a vignette into an **existing** package.
-    - **Why:** Less boilerplate, fewer forgotten steps (NAMESPACE, VignetteBuilder, testthat infra) — and rforge picks `Imports` vs `Suggests` for you.
+    - **What:** Five `r:use-*` commands that scaffold a test file, a dependency, a vignette, a documented dataset, and a citation into an **existing** package.
+    - **Why:** Less boilerplate, fewer forgotten steps (NAMESPACE, VignetteBuilder, testthat infra, `LazyData`, `inst/CITATION`) — and rforge picks `Imports` vs `Suggests` for you.
     - **How:** Everything is **dry-run by default**. Read the plan, then re-run with `--write`.
     - **Safety:** No oracle — generated assertions and prose are `# TODO`. The engine never invents expected values.
     - **Next:** [R package dev cycle](r-dev-cycle.md) to run what you scaffolded.
@@ -117,17 +117,65 @@ the `.Rmd` is still written. Once you've filled the outline, build the site:
 
 ---
 
-## Putting it together
+## Part 4: Document a dataset — `r:use-data`
 
-A realistic "add a feature, document it" pass:
+Document a package dataset: append a roxygen stub to `R/data.R` (`@title`, a `@format
+\describe{}` skeleton, `@source`, and the trailing `"<name>"` documented-data idiom) and
+patch `DESCRIPTION` (`LazyData: true` / `Depends: R (>= 2.10)`).
 
 ```bash
-/rforge:r:use-package rlang --write     # 1. declare the dep
-/rforge:r:document                      # 2. regenerate NAMESPACE
+# Dry-run: see the roxygen stub + the DESCRIPTION delta it would apply
+/rforge:r:use-data starwars
+
+# Apply: append to R/data.R (creates it if absent) + patch DESCRIPTION
+/rforge:r:use-data starwars --write
+```
+
+!!! warning "It documents — it never fabricates the data"
+    `r:use-data` does **not** create the `data/<name>.rda`. The dataset is yours; the
+    command prints the exact `usethis::use_data(<name>)` reminder to produce it. A
+    collision guard skips a duplicate `\name` block if the dataset is already documented.
+
+!!! note "Constraints are preserved"
+    The `DESCRIPTION` patch goes through the same constraint-preserving writer as
+    `r:use-package` / `r:deps-sync` — existing version floors like `foo (>= 1.2.0)` survive.
+
+---
+
+## Part 5: Add a citation — `r:use-citation`
+
+Scaffold `inst/CITATION` from `DESCRIPTION` (`Title` / `Authors@R` → `person()` / `Version`)
+as a `bibentry(bibtype = "Manual", ...)`.
+
+```bash
+# Dry-run: see the rendered bibentry
+/rforge:r:use-citation
+
+# Apply: write inst/CITATION (refuses to clobber an existing one without --force)
+/rforge:r:use-citation --write
+/rforge:r:use-citation --write --force   # overwrite an existing CITATION
+```
+
+!!! note "Deterministic — no wall-clock date"
+    The year comes from the `DESCRIPTION` `Date:` field if present, else a `<YEAR>` TODO
+    placeholder — the output never embeds the current date, so re-running is reproducible.
+    Unparseable `Authors@R` degrades to a `# TODO` author block plus a warning (never fails).
+
+---
+
+## Putting it together
+
+A realistic "add a feature, document it, ship the data + citation" pass:
+
+```bash
+/rforge:r:use-package rlang --write          # 1. declare the dep
+/rforge:r:document                           # 2. regenerate NAMESPACE
 /rforge:r:use-test my_new_function --write   # 3. scaffold tests, then fill the TODOs
-/rforge:r:test                          # 4. run them
-/rforge:r:use-vignette intro --write    # 5. scaffold a vignette, then expand it
-/rforge:r:site                          # 6. build the site
+/rforge:r:test                               # 4. run them
+/rforge:r:use-vignette intro --write         # 5. scaffold a vignette, then expand it
+/rforge:r:use-data demo_data --write         # 6. document a bundled dataset
+/rforge:r:use-citation --write               # 7. scaffold inst/CITATION
+/rforge:r:site                               # 8. build the site
 ```
 
 ## See also
