@@ -284,11 +284,11 @@ decisions:
 
 ## 🎯 Next Action
 
-✅ **v2.12.0 RELEASED (2026-06-13) — no active task.** dev ≡ main @ v2.12.0; no open PRs; no worktrees. Shipped the 3 recommendations (commands.md sync-gate, diff-aware [uncommitted] tag, s7 method_undeclared_dependency). 41 commands. pytest 379, test-all 42/42.
+🔨 **ACTIVE: candidate A — diff-aware baseline caching.** Worktree `~/.git-worktrees/rforge/feature-baseline-caching` (branch `feature/diff-aware-baseline-caching`, off dev @ fd6e4e9, created 2026-06-13). Spec/TDD next. Baseline: v2.12.0 RELEASED; dev ≡ main @ v2.12.0; 41 commands; pytest 379, test-all 42/42.
 
-Open candidates (all optional, net-new work → own session/worktree):
+Open candidates (B/C optional; A in progress):
 
-A) 🟢 **diff-aware cross-run baseline caching** — the remaining v2.11.0 follow-up (uncommitted tagging shipped v2.12.0). Each `--changed` run still pays one extra baseline check; cache by merge-base SHA.
+A) 🔨 **diff-aware cross-run baseline caching** — IN PROGRESS (worktree above). The remaining v2.11.0 follow-up (uncommitted tagging shipped v2.12.0). Each `--changed` run still pays one extra baseline check; cache by merge-base SHA.
 B) 🟢 **s7-review breadth** — two open sub-items, both need specs. (1) **cross-package S7 *contract* checks** (class in pkg A consumed by pkg B's generic — needs an ecosystem-wide S7 registry; `--eco` runs s7review *per package* but does no cross-package contract analysis). (2) **full R6/S4 *convention* checking** — NOT "S7-only": `check_legacy_oop` (v2.10.0, in `_CHECKS`/`run_all`) already flags S4/R5/R6/S3 *co-residing with S7* (`legacy_s4_in_s7`/`legacy_r5_in_s7`/`legacy_s3_generic`), but only as mid-migration leftovers and only when the pkg also uses `new_class`; a pure-R6/pure-S4 package gets nothing. Open = treating R6/S4 as first-class OOP systems. (`method_undeclared_dependency` shipped v2.12.0.)
 C) ✅ **Index redesign (A+)** — SHIPPED (PR #42 dev→main, docs-only, live-verified): grid cards + "Where rforge fits" mermaid lifecycle + collapsed the 13 "What's new" sections to one `{{ rforge.version }}`-macro'd section. `PROPOSAL-index-redesign-2026-06-13.md` (kept for provenance).
 
