@@ -15,118 +15,111 @@
 
 Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. **No MCP server, no Node.js** at runtime. The fast ecosystem commands (analysis, deps, status) are pure Python; the `r:*` dev-cycle commands and `/rforge:thorough` shell out to R via `lib/rcmd.py`.
 
-## What rforge is — and isn't
+## Where rforge fits
+
+```mermaid
+flowchart LR
+    A["usethis<br/>scaffold"] --> B["devtools<br/>document · test · build"]
+    B --> C["rforge<br/>discover · deps · impact · cascade"]
+    C --> D["CRAN<br/>ordered submission"]
+    style C fill:#5e35b1,color:#fff
+```
 
 !!! abstract "rforge orchestrates an ecosystem; it does not build packages"
-    rforge sits **alongside** the standard R toolchain, it doesn't replace it.
+    **They build one package. rforge runs the ecosystem.** rforge sits *alongside* the
+    standard R toolchain, it doesn't replace it.
 
     - **`usethis` / `devtools`** scaffold, document, test, and build a *single* package.
     - **rforge** answers cross-cutting questions: *Which packages exist here? What depends on what? If I change `medfit`, what breaks downstream? In what order do I submit to CRAN?*
 
-    If you're looking for `create_package()` or `document()`, that's `usethis`/`devtools`. rforge picks up where they leave off — see **[rforge in the R package lifecycle](tutorials/rforge-in-the-r-lifecycle.md)** for exactly where each tool plugs in.
+    Looking for `create_package()` or `document()`? That's `usethis`/`devtools`. rforge picks
+    up where they leave off — see **[rforge in the R package lifecycle](tutorials/rforge-in-the-r-lifecycle.md)**.
 
 ## Where to start
 
-| If you're… | Go to | Time |
-|---|---|---|
-| Brand new — just want it working | [Quick Start](QUICK-START.md) | 3 min |
-| New to rforge, have an R package to try | [Getting started tutorial](tutorials/getting-started.md) | 10 min |
-| Wondering how rforge fits with devtools/usethis | [rforge in the R package lifecycle](tutorials/rforge-in-the-r-lifecycle.md) | 12 min |
-| Managing several inter-dependent packages | [Ecosystem orchestration](tutorials/ecosystem-orchestration.md) | 15 min |
-| Preparing a CRAN submission | [CRAN release prep](tutorials/cran-release-prep.md) | 15 min |
-| Looking up a command's syntax | [Reference Card](REFCARD.md) | <1 min |
+<div class="grid cards" markdown>
 
-## The 3 headline commands
+-   :material-rocket-launch: **Just want it working**
 
-Most daily work runs through these; the rest of the plugin's {{ rforge.command_count }} commands are specialized — see the [Reference Card](REFCARD.md).
+    ---
+    3-minute install + first command.
 
-```bash
-# Ultra-fast snapshot (< 10 seconds) — pre-commit
-/rforge:quick
+    [:octicons-arrow-right-24: Quick Start](QUICK-START.md)
 
-# Balanced analysis with impact + recommendations (~30 seconds) — after changes
-/rforge:analyze "Update RMediation bootstrap algorithm"
+-   :material-school: **New, have a package to try**
 
-# Per-package CRAN gate (v2.2.0+) — document→strict check→Tier 4→revdep, writes cran-comments.md
-/rforge:r:cran-prep
+    ---
+    Guided 10-minute walkthrough.
 
-# Ecosystem rollup (2-5 minutes) — cross-package validation + submission order
-/rforge:thorough "Prepare for CRAN release"
-```
+    [:octicons-arrow-right-24: Getting started](tutorials/getting-started.md)
 
-## What's new in v2.11.0
+-   :material-puzzle: **How it fits with devtools/usethis**
 
-Three follow-up features — now {{ rforge.command_count }} commands.
+    ---
+    Where rforge plugs into the lifecycle.
 
-- **diff-aware `--changed` tagging** — `/rforge:r:check`/`r:test`/`r:lint` now tag each finding **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already at the fork point), via a second baseline run in a detached worktree at `merge-base(HEAD, --base)` (default base `dev`). New **`--fail-on introduced`** (the default) fails CI only on regressions you caused. Finding identity is line-shift-immune. Falls back to the v2.10.0 scope-only behavior when no merge-base is available. See the [`changed` reference](reference/changed.md).
-- **`/rforge:r:s7-review --eco` + `--runtime`** — `--eco` runs the static families across **every package** in the ecosystem manifest (pure-stdlib); `--runtime` adds an R-backed pass (via a new `s7runtime` engine) with two runtime families — **`dead_generic`** (an S7 generic with no methods) and **`validator_not_enforcing`** (a no-op validator). Degrades to advisory when R/S7 is absent. See the [`s7review` reference](reference/s7review.md).
-- **`/rforge:r:use-data` + `/rforge:r:use-citation`** — complete the `r:use-*` family. `use-data` documents a dataset (`R/data.R` roxygen + `DESCRIPTION` patch through the constraint-preserving writer); `use-citation` scaffolds `inst/CITATION` from `DESCRIPTION` (deterministic — no wall-clock date). **Dry-run by default**, `--write` applies. See the [`scaffold` reference](reference/scaffold.md).
+    [:octicons-arrow-right-24: The R lifecycle](tutorials/rforge-in-the-r-lifecycle.md)
 
-## What's new in v2.10.0
+-   :material-graph: **Managing several packages**
 
-Three additive features.
+    ---
+    Cross-package orchestration.
 
-- **`/rforge:r:s7-review`** — a static **S7 OOP convention checker**. Scans `R/*.R` + `NAMESPACE` across five families — naming, validators, methods, legacy (S4/R5/S3 leftovers), and docs — and reports advisory "looks like / consider" findings. **Advisory only, never blocks**, mirroring `r:cran-prep`'s Tier-4 tone. Pure Python (no R, no Rscript), no `--write`. See the [`s7review` reference](reference/s7review.md).
-- **Scaffolding for existing packages** — `/rforge:r:use-test`, `/rforge:r:use-package`, `/rforge:r:use-vignette`. Draft a testthat file (one `test_that()` per branch, assertions left as `# TODO`), declare a dependency (Imports-vs-Suggests auto-picked via `deps_sync`, with an `@importFrom` tag), or scaffold a vignette/article skeleton. **Dry-run by default**; `--write` applies, `--force` overwrites. See the [`scaffold` reference](reference/scaffold.md) and the [scaffolding tutorial](tutorials/scaffolding-existing-packages.md).
-- **diff-aware `--changed`** — a new flag on `/rforge:r:check`, `/rforge:r:test`, and `/rforge:r:lint` that scopes the run to the package(s) changed on this branch and reports their REAL full status. (Shipped scope-only in v2.10.0; **`[introduced]`/`[pre-existing]` tagging landed in v2.11.0** — see above.) See the [`changed` reference](reference/changed.md).
+    [:octicons-arrow-right-24: Ecosystem](tutorials/ecosystem-orchestration.md)
 
-## What's new in v2.9.0
+-   :material-package-up: **Preparing a CRAN submission**
 
-- **The [orchestrator agent](orchestrator.md), reborn** — ask a *goal* ("is this CRAN-ready?", "what's the impact of this change?") instead of picking commands, and the orchestrator recognizes the intent and runs the right read-only analyses, then synthesizes one summary. It now delegates through the pure-Python `lib/*` modules (the old MCP-tool delegation, dead since v1.3.0, is gone), recognizes **7 intents**, and enforces a **read-only / recommend-only safety boundary** — anything that writes files or hits the network is recommended, never auto-run. See the [orchestrator cookbook](tutorials/orchestrator-cookbook.md) for worked examples.
-- **`Ecosystem.manifest_order`** (#20) — discovery now exposes the manifest's *declared* package order, so `/rforge:status` can render in a curated order rather than alphabetical.
+    ---
+    The full submission gate.
 
-## What's new in v2.8.0
+    [:octicons-arrow-right-24: CRAN prep](tutorials/cran-release-prep.md)
 
-- **Single-source version/count for docs** — the docs now render the current version and command count from one source of truth, so they stop drifting. A **mkdocs-macros** layer renders `{{ rforge.version }}` / `{{ rforge.command_count }}` at build time, and pure-stdlib **`scripts/version_sync.py`** stamps the surfaces macros can't reach (`README.md`, `plugin.json`, `CLAUDE.md`, …); its `--check` is a CI drift gate wired into `ci.yml` + `test-all.sh`. No command-surface change — still {{ rforge.command_count }} commands.
+-   :material-card-text: **Looking up command syntax**
 
-## What's new in v2.7.0
+    ---
+    All {{ rforge.command_count }} commands, one page.
 
-- **`r:submit --universe`** — opt-in **R-universe early-access tier**. Verifies your package's R-universe build (CRAN-like binaries rebuilt from GitHub within minutes) so users can install the new version while CRAN review runs in parallel. Auto-detects the universe from the git `origin` remote (`--universe-name <owner>` to override), reports per-platform build status, and prints the `install.packages(..., repos=...)` snippet. **Read-only** (R-universe builds on `git push`); status is **advisory** in the CRAN checklist and never blocks the still-manual CRAN handoff. Backed by new pure-stdlib `lib/runiverse.py` (`urllib`-only); degrades to `warn` offline/unregistered.
+    [:octicons-arrow-right-24: Reference Card](REFCARD.md)
 
-## What's new in v2.6.0
+</div>
 
-- **`r:submit`** — wraps the moment of CRAN submission: gate on `r:cran-prep` `ready` → build the tarball → cut a GitHub **pre-release** (not "Latest") of it with `cran-comments.md` → print the CRAN submit checklist (**never auto-submits**). `r:submit --promote` flips the pre-release to a full release on acceptance. Using a pre-release promoted in place sidesteps tagging a final release before acceptance. Backed by pure-Python `lib/ghrelease.py`.
+## What you'll run daily
 
-## What's new in v2.5.0
+Most work runs through these four; the rest of the {{ rforge.command_count }} commands are specialized — see the [Reference Card](REFCARD.md).
 
-- **`r:deps-sync`** — reconciles `DESCRIPTION` against actual code usage. Scans `R/`/tests/vignettes + `NAMESPACE` and reports **missing** (used, undeclared → Imports), **misclassified** (in Suggests but used unconditionally in `R/` → Imports — the static sibling of `r:check --strict`'s noSuggests pass), **missing_suggests**, and **unused** dependencies, plus a suggested patch. Report-only by default; `--write` applies the unambiguous changes. Pure-Python `lib/deps_sync.py`.
+<div class="grid cards" markdown>
 
-## What's new in v2.4.0
+-   :material-flash: **`/rforge:quick`** · <10s
 
-- **Ecosystem-manifest discovery** (`/rforge:detect`, `/rforge:status`) — discovery optionally reads a curated **ecosystem manifest** (via a `manifest:` key in `.rforge.yaml`) and enriches packages with `role`/`repo`/`cran` metadata, reporting **drift** between the manifest and what's on disk. Vendored YAML-subset parser keeps `discovery.py` stdlib-only. Zero behavior change when no manifest is configured.
+    ---
+    Ultra-fast snapshot. Run before every commit.
 
-## What's new in v2.3.0
+-   :material-magnify-scan: **`/rforge:analyze "<change>"`** · ~30s
 
-- **CRAN-incoming hardening for `r:check` + `r:cran-prep`** — the submission gate now emulates CRAN's *incoming* and post-acceptance flavors. `r:check --strict` runs **both** Suggests-withholding passes (`check (noSuggests)` + `check (suggests-only)`, each with `--run-donttest`); `--incoming` adds the opt-in `check (incoming)` env-var bundle. `r:cran-prep` runs the strict passes **by default**, and a strict ERROR **blocks** the `ready` verdict.
-- **Tier 4 advisory checks (new `lib/cranlint.py`, pure stdlib, no R)** — three `cran-prep` stages that never block `ready`: `description` (DESCRIPTION incoming nits — non-`Authors@R`, weak `Title`, `Description` prose, stale `Date`), `build-hygiene` (planning/dev docs that would ship in the tarball, with the exact `.Rbuildignore` regex to add), and `docs-consistency`.
+    ---
+    Balanced analysis with impact + recommendations after a change.
 
-!!! warning "Behavior change in v2.3.0"
-    A package that reports 🟢 `ready` today under `--as-cran` can turn 🔴 once the noSuggests pass catches a `Suggests` package used unconditionally (the medfit 0.2.1 class). This is intended — CRAN would bounce such a package post-acceptance. Move the dependency to `Imports`, or guard it with `requireNamespace()` + `skip_if_not_installed()`.
+-   :material-clipboard-check: **`/rforge:r:cran-prep`** · per-pkg
 
-## What's new in v2.2.0
+    ---
+    The full CRAN gate; document → strict check → Tier 4 → revdep; writes `cran-comments.md`.
 
-- **5 new `r:` CRAN-submission commands**: `r:revdep`, `r:goodpractice`, `r:winbuilder`, `r:rhub`, `r:cran-prep` — full pre-submission gate that runs document→lint→spell→urlcheck→test→coverage→check(--as-cran)→revdep, generates `cran-comments.md`, and returns a `ready`/`warn`/`blocked` verdict.
-- **`r:check` NOTE classifier**: notes are now classified as `spurious` (expected on CRAN submission) or `real` (needs attention) using `notes_classified` in the envelope.
-- **Total: 28 → 33 commands.**
+-   :material-layers-triple: **`/rforge:thorough`** · 2-5 min
 
-## What's new in v2.1.0
+    ---
+    Cross-package ecosystem rollup + submission order.
 
-- 🔬 **12 new `r:` commands** (`r:load`, `r:document`, `r:test`, `r:coverage`, `r:build`, `r:install`, `r:site`, `r:cycle`, `r:lint`, `r:spell`, `r:urlcheck`, `r:style`) — full R package dev cycle + quality layer.
-- 🐍 **`lib/rcmd.py`** — new module running lower-level R engines (`rcmdcheck`, `pkgbuild`, `roxygen2`, `testthat`, `pkgload`, `covr`, `pkgdown`, `lintr`, `spelling`, `urlchecker`, `styler`); structured JSON output; optional engines degrade gracefully.
-- **Total: 16 → 28 commands.**
+</div>
 
-## What's new in v2.0.0 (BREAKING)
+## What's new in {{ rforge.version }}
 
-- 🔀 **3 commands renamed** for cleaner namespacing — `/rforge:doc-check` → `/rforge:docs:check`, `/rforge:ecosystem-health` → `/rforge:health`, `/rforge:rpkg-check` → `/rforge:r:check`. The other 13 commands are unchanged. Typing an old name produces a helpful rename-error pointing at the new name — no silent failures. See the [v2.0.0 migration tutorial](migration/v2.0.0-rename.md) for the full mapping table and a `sed` recipe to mass-update local scripts.
+Three recommendations from a documentation gap analysis — **{{ rforge.command_count }} commands** (no surface change).
 
-## What's new in v1.3.0
+- **`docs/commands.md` sync-gate** — a new test gate (`tests/_check_commands_doc.py`) cross-checks every command + flag against the reference page; it immediately surfaced and fixed 10 undocumented flags. Closes the last drift-prone documentation surface.
+- **diff-aware `[uncommitted]` tag** — `/rforge:r:check`/`r:test`/`r:lint --changed` now re-tags an `[introduced]` finding in a file with uncommitted changes as **`[uncommitted]`**, so you can tell "edits I haven't committed yet" from committed branch work. See the [diff-aware checks tutorial](tutorials/diff-aware-checks.md).
+- **`/rforge:r:s7-review method_undeclared_dependency`** — the `--runtime` pass now flags a method dispatching on an S7 class whose providing package isn't declared in `DESCRIPTION` (typically a `Suggests`-only class that silently never dispatches at a user's site). See the [S7 convention checking tutorial](tutorials/s7-convention-checking.md).
 
-- 🎯 **MCP absorption complete** — the prior `rforge-mcp` prototype was absorbed into the plugin. All capabilities now ship as pure-Python `lib/` modules. See the [migration guide](migration/rforge-mcp-deprecation.md).
-- 🐍 **`lib/status.py`** — ecosystem health snapshot (`DESCRIPTION` + `.STATUS` parsing): `python3 -m lib.status`.
-- 🌱 **`lib/init.py`** — `~/.rforge/context.json` initializer behind the new `/rforge:init` command.
-- 📦 **No runtime dependencies beyond Python 3.10+**.
-
-Full release notes: [CHANGELOG.md](https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md).
+Full release history: [CHANGELOG.md](https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md).
 
 ## How it works
 
