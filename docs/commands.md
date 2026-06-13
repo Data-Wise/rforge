@@ -542,9 +542,10 @@ R CMD check integration with detailed error reporting.
 - `package` (optional) - Package to check (defaults to current)
 - `--strict` (optional) - Run both CRAN Suggests-withholding flavors (default: false)
 - `--incoming` (optional) - Emulate CRAN's incoming `_R_CHECK_*` bundle; implies `--strict` (default: false)
-- `--changed` (optional, v2.10.0) - Scope the check to the package(s) changed on this branch (diff vs `merge-base(HEAD, --base)`) and report their REAL full check status. **`[introduced]`/`[pre-existing]` tagging is NOT YET WIRED** (needs a merge-base checkout) — `--changed` is currently scope-only (default: false)
-- `--base <ref>` (optional, v2.10.0) - Comparison ref for `--changed`; diff is taken against `merge-base(HEAD, base)` (default: `HEAD` = uncommitted working-tree changes)
-- `--changed-strict` (optional, v2.10.0) - Documented no-op reserved for when tagging lands; `--changed` is always scope-only for now (default: false)
+- `--changed` (optional, v2.10.0; tagging v2.11.0) - Scope the check to the package(s) changed on this branch and tag each finding **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already at the fork point), via a baseline run in a detached worktree at `merge-base(HEAD, --base)` (default: false)
+- `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed`; the baseline is run at `merge-base(HEAD, base)` (default: `dev`)
+- `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on findings tagged `[introduced]` (default: `introduced`); `none` is advisory
+- `--changed-strict` (optional, v2.10.0) - Documented no-op (default: false)
 
 **Examples:**
 ```bash
@@ -560,7 +561,7 @@ R CMD check integration with detailed error reporting.
 # Add the opt-in incoming env-var bundle
 /rforge:r:check --incoming
 
-# Scope the check to the package(s) changed on this branch (scope-only)
+# Tag findings [introduced]/[pre-existing] vs the fork point; fail only on introduced
 /rforge:r:check --changed --base dev
 ```
 
@@ -577,7 +578,7 @@ R CMD check integration with detailed error reporting.
 
 **Note:** This can take 1-5 minutes depending on package size. Strict mode runs the baseline plus two flavor passes (~3× check time; ~4× with `--incoming`).
 
-**Diff-aware mode (v2.10.0):** `--changed` scopes the check to the R package(s) touched on this branch and reports their REAL full check status, so a real ERROR/WARNING/NOTE on a changed package surfaces and drives the exit status. **`[introduced]`/`[pre-existing]` tagging is NOT YET WIRED** — an honest comparison needs a merge-base checkout (running R against the fork point in a detached worktree), which is not built yet. Until then `--changed` is **scope-only** and does not yet answer "did *my* change cause this?"; `--changed-strict` is a documented no-op reserved for when tagging lands. Degrades gracefully: not a git repo / no merge-base → a full check plus a warning; no changes → a clean no-op.
+**Diff-aware mode (v2.10.0; tagging v2.11.0):** `--changed` scopes the check to the R package(s) touched on this branch and tags each finding **`[introduced]`** vs **`[pre-existing]`** — computed honestly by a second baseline run in a detached worktree checked out at `merge-base(HEAD, --base)` (default base `dev`). `--fail-on introduced` (the default) exits non-zero only on findings your branch introduced, so CI fails on regressions you caused — not pre-existing debt (`--fail-on none` is advisory). Identity is line-shift-immune (findings key on file + message, not raw line). Degrades gracefully: not a git repo / no merge-base / baseline-worktree failure → falls back to a real full check plus a warning (scope-only, no tagging — no regression of v2.10.0); no changes → a clean no-op. Out of scope: uncommitted-change tagging and cross-run baseline caching (each invocation pays one extra check). `--changed-strict` is a documented no-op.
 
 ---
 
@@ -659,8 +660,9 @@ Run package tests via `testthat` and report pass/fail/skip counts.
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
-- `--changed` (optional, v2.10.0) - Scope tests to the package(s) changed on this branch (diff vs `merge-base(HEAD, --base)`; scope-only, results reported as-is — no finding tagging) (default: false)
-- `--base <ref>` (optional, v2.10.0) - Comparison ref for `--changed` (default: `HEAD`)
+- `--changed` (optional, v2.10.0; tagging v2.11.0) - Scope tests to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run (default: false)
+- `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed` (default: `dev`)
+- `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on `[introduced]` findings (default: `introduced`)
 
 **Examples:**
 
@@ -866,8 +868,9 @@ Static analysis of the package via `lintr` — grouped report of style and code-
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
-- `--changed` (optional, v2.10.0) - Scope lint to the package(s) changed on this branch (diff vs `merge-base(HEAD, --base)`; scope-only, lints reported as-is — no finding tagging) (default: false)
-- `--base <ref>` (optional, v2.10.0) - Comparison ref for `--changed` (default: `HEAD`)
+- `--changed` (optional, v2.10.0; tagging v2.11.0) - Scope lint to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; line-shift-immune identity (default: false)
+- `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed` (default: `dev`)
+- `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on `[introduced]` findings (default: `introduced`)
 
 **Examples:**
 

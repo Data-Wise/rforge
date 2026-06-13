@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [2.11.0] - 2026-06-13
+
+> Bundles three follow-up features — diff-aware `[introduced]`/`[pre-existing]`
+> tagging (P0 completion), `r:s7-review --eco`/`--runtime`, and the
+> `r:use-data`/`r:use-citation` scaffolders — each built TDD-first from an
+> approved spec, then hardened by a pre-release adversarial review.
+> **39 → 41 commands.**
 
 ### Added
 
@@ -64,6 +70,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--changed` baseline now runs in a real merge-base detached worktree instead of
   the scope-only fallback. The fallback (real status, no tagging) is preserved
   when no merge-base / baseline worktree is available — no regression of v2.10.0.
+
+### Fixed (pre-release adversarial review)
+
+A multi-agent adversarial review caught three bug-classes the green gates missed:
+
+- **`r:use-citation` emitted invalid R** for the standard `Authors@R` idioms —
+  a flat regex truncated `person(role = c("aut", "cre"))` (fired on the repo's
+  own fixture), and interpolated `Title`/`Version` weren't escaped (a `"` in the
+  title broke the literal). Now the `Authors@R` value is re-emitted verbatim and
+  every interpolated value routes through `_r_string()`. New tests assert the
+  generated CITATION actually parses under `Rscript`.
+- **diff-aware tagging mis-tagged shifted lint findings** — `tag_findings` keyed
+  on the raw line number, so inserting a blank line above a pre-existing lint
+  tagged it `[introduced]` (a false positive). Dict findings now key on
+  `(file, message, linter)`, line-shift-immune.
+- **`r:s7-review` advertised a non-working family** — `method_on_missing_class`
+  was a hardcoded-empty placeholder listed as a runtime finding. Removed the dead
+  code path and marked it deferred in the command help + spec.
+- Plus: dead `_CHANGED_SCOPE_ONLY` constant removed, s7 test fixtures fixed to
+  actually load under S7 (real-R runtime path now has a regression test), and
+  `use-data`'s collision guard now matches indented doc lines.
 
 ---
 
