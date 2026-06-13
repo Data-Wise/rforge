@@ -54,6 +54,10 @@ Most daily work runs through these; the rest of the plugin's {{ rforge.command_c
 /rforge:thorough "Prepare for CRAN release"
 ```
 
+## What's new in v2.8.0
+
+- **Single-source version/count for docs** — the docs now render the current version and command count from one source of truth, so they stop drifting. A **mkdocs-macros** layer renders `{{ rforge.version }}` / `{{ rforge.command_count }}` at build time, and pure-stdlib **`scripts/version_sync.py`** stamps the surfaces macros can't reach (`README.md`, `plugin.json`, `CLAUDE.md`, …); its `--check` is a CI drift gate wired into `ci.yml` + `test-all.sh`. No command-surface change — still {{ rforge.command_count }} commands.
+
 ## What's new in v2.7.0
 
 - **`r:submit --universe`** — opt-in **R-universe early-access tier**. Verifies your package's R-universe build (CRAN-like binaries rebuilt from GitHub within minutes) so users can install the new version while CRAN review runs in parallel. Auto-detects the universe from the git `origin` remote (`--universe-name <owner>` to override), reports per-platform build status, and prints the `install.packages(..., repos=...)` snippet. **Read-only** (R-universe builds on `git push`); status is **advisory** in the CRAN checklist and never blocks the still-manual CRAN handoff. Backed by new pure-stdlib `lib/runiverse.py` (`urllib`-only); degrades to `warn` offline/unregistered.
