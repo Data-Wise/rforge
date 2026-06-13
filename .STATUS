@@ -1,10 +1,10 @@
 project: rforge
 updated: 2026-06-12
 status: Active
-version: 2.7.0 (released 2026-06-11)
-last_release: 2026-06-11 v2.7.0 (PR #24 feature→dev, PR #25 dev→main merge 748166682, release https://github.com/Data-Wise/rforge/releases/tag/v2.7.0; CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#115 MERGED — origin/main formula+manifest → v2.7.0, sha256 6c31a316…, --diff IDENTICAL, ruby -c OK; local brew → `brew upgrade rforge`). Adds r:submit --universe R-universe early-access tier (lib/runiverse.py, pure-stdlib); 35 commands (flag, not new command). Live-verified against data-wise.r-universe.dev (parser confirmed vs real API). Prior: v2.6.0 (2026-06-10) bundled v2.3–v2.6.
+version: 2.8.0 (released 2026-06-12)
+last_release: 2026-06-12 v2.8.0 (PR #27 feature→dev, PR #28 dev→main merge 0a70e97, release https://github.com/Data-Wise/rforge/releases/tag/v2.8.0; CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#119 MERGED — origin/main formula+manifest → v2.8.0, sha256 9dc3c5d2…, ruby -c OK; --diff shows only pre-existing bin.mkpath drift, no new version/sha drift). Single-source docs version/count: mkdocs-macros render layer + pure-stdlib scripts/version_sync.py (--check CI gate). 35 commands (no surface change). Live-verified REFCARD renders 2.8.0, no literal braces. 230 pytest + test-all 33/33.
 
-last_release_prior: 2026-06-10 v2.6.0 (tap PR #114). One release bundling cran-incoming (v2.3.0) + ecosystem-manifest (v2.4.0) + r:deps-sync (v2.5.0) + r:submit (v2.6.0); 33→35 commands. Closed issue #19; #20 still open.
+last_release_prior: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --universe R-universe early-access tier (lib/runiverse.py, pure-stdlib); 35 commands (flag, not new command). Prior: v2.6.0 (2026-06-10, tap #114) bundled v2.3–v2.6.
 
 worktrees: []  # none active
 # prior: feature/mkdocs-version-macros merged (PR #27 → dev 2026-06-12) + worktree removed;

@@ -4,7 +4,9 @@
 > Follows the global `~/.claude/CLAUDE.md`; this file only captures
 > rforge-specific patterns that don't apply to other dev-tools repos.
 
-## Current state (2026-06-11)
+## Current state (2026-06-12)
+
+**v2.8.0 — released 2026-06-12** (PR #27 feature→dev, PR #28 dev→main; [release](https://github.com/Data-Wise/rforge/releases/tag/v2.8.0); CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#119 MERGED — formula+manifest → v2.8.0, sha256 9dc3c5d2…, `--diff` shows only pre-existing `bin.mkpath` drift) — **35 commands** (no surface change). **Single-source-of-truth version/count for docs**, killing the drift that produced the 33→35 staleness: a **mkdocs-macros render layer** (`extra.rforge.{version,prev_version,release_date,command_count}`; ~10 user-facing docs render `{{ rforge.version }}`/`{{ rforge.command_count }}`) plus pure-stdlib **`scripts/version_sync.py`** that stamps the macro-unreachable surfaces (`plugin.json`/`package.json`/`README.md`/`CLAUDE.md`/`mkdocs.yml extra`); `--check` is a CI drift gate wired into `ci.yml` + `test-all.sh`. Bump `package.json` version → run `version_sync.py` (see Version sync section). Spec: `SPEC-mkdocs-version-macros-2026-06-12.md`.
 
 **v2.7.0 — released 2026-06-11** (PR #24 feature→dev, PR #25 dev→main; [release](https://github.com/Data-Wise/rforge/releases/tag/v2.7.0); CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#115 MERGED — formula+manifest → v2.7.0, sha256 6c31a316…, --diff IDENTICAL) — 35 commands (count unchanged; a flag, not a
 new command). Adds an **R-universe early-access tier** to `r:submit`: the new opt-in `--universe`
