@@ -104,6 +104,25 @@ Results synthesized into actionable summary
 No MCP server. No Node.js. No R subprocess for status/discovery/deps —
 only `r:*` commands and `thorough` shell out to R (via `lib.rcmd`).
 
+## Orchestrator agent (v2.9.0)
+
+Ask a *goal* instead of picking commands — the [orchestrator](orchestrator.md)
+recognizes the intent and runs the read-only analyses, then synthesizes one summary.
+
+| Intent | Trigger | Auto-runs (read-only) |
+|--------|---------|------------------------|
+| CODE_CHANGE | "refactor / impact of" | discovery · deps impact · rcmd test |
+| NEW_FUNCTION | "add a function" | discovery · rcmd check |
+| BUG_FIX | "fix / failing" | rcmd test · deps |
+| DEPS_AUDIT | "dependencies / imports" | deps_sync · deps |
+| QUALITY | "coverage / lint / spelling" | rcmd coverage · lint · spell |
+| CRAN_READINESS | "is this CRAN-ready" | rcmd check · cranlint · runiverse |
+| ECOSYSTEM_HEALTH | "status / overview" | status · discovery · deps |
+
+🔒 **Safety:** writes/network are **recommend-only** — `document`, `style`, `build`,
+`cran-prep`, `submit`, `winbuilder`, `rhub`, `urlcheck`, `revdep`, `deps-sync --write`
+are named and handed back to you, never auto-run.
+
 ---
 
 ## Common Workflows

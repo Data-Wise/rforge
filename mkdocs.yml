@@ -98,6 +98,7 @@ nav:
     - "rforge in the R package lifecycle": tutorials/rforge-in-the-r-lifecycle.md
     - "Understanding modes": tutorials/understanding-modes.md
     - "Ecosystem orchestration": tutorials/ecosystem-orchestration.md
+    - "Orchestrator cookbook": tutorials/orchestrator-cookbook.md
     - "R package dev cycle": tutorials/r-dev-cycle.md
     - "CRAN release prep": tutorials/cran-release-prep.md
     - "CRAN submission with rforge": tutorials/cran-submission-with-rforge.md
@@ -106,6 +107,7 @@ nav:
   - Reference:
     - 📚 Reference Card: REFCARD.md
     - Commands: commands.md
+    - 🤖 Orchestrator Agent: orchestrator.md
     - Configuration: configuration.md
     - Lib Modules: lib-modules.md
     - Troubleshooting: troubleshooting.md

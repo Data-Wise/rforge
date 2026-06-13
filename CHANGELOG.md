@@ -45,9 +45,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   render in a curated order rather than disk/alphabetical. Closes the PR #17
   follow-up gap where manifest order was discarded after enrichment.
 
----
+### Documentation
 
-## [2.8.0] - 2026-06-12
+- **Orchestrator agent docs** — new [`orchestrator.md`](docs/orchestrator.md) guide
+  (4-step flow, 7-intent table, safety boundary, synthesis) + a worked-examples
+  [cookbook tutorial](docs/tutorials/orchestrator-cookbook.md), a REFCARD section,
+  an architecture.md refresh (pre-v2.9.0 "pattern recognition" → intent
+  recognition), and mkdocs nav entries.
 
 > Makes docs render the current version/command-count from a single source of
 > truth (`package.json`) so they stop drifting (the 33→35 staleness root-caused
