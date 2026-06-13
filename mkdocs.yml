@@ -1,5 +1,5 @@
 site_name: RForge Plugin
-site_description: R package ecosystem orchestrator - 33 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)
+site_description: R package ecosystem orchestrator - 35 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)
 site_url: https://data-wise.github.io/rforge/
 
 repo_name: Data-Wise/rforge
@@ -11,6 +11,8 @@ edit_uri: edit/main/docs/
 # tutorials/README.md and specs/README.md remain real nav pages.
 exclude_docs: |
   /README.md
+  specs/_TEMPLATE-*.md
+  specs/RESEARCH-*.md
 
 theme:
   name: material
@@ -44,8 +46,19 @@ theme:
 extra_css:
   - stylesheets/extra.css
 
+# Single source of truth for version/count strings rendered via mkdocs-macros
+# (e.g. {{ rforge.version }}). Kept in sync from package.json by
+# scripts/version_sync.py — do not hand-edit version/prev_version/release_date.
+extra:
+  rforge:
+    version: "2.8.0"
+    prev_version: "2.7.0"
+    release_date: "2026-06-12"
+    command_count: 35
+
 plugins:
   - search
+  - macros
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -99,9 +112,13 @@ nav:
     - API:
       - "discovery": reference/discovery.md
       - "deps": reference/deps.md
+      - "deps_sync": reference/deps_sync.md
       - "status": reference/status.md
       - "init": reference/init.md
       - "rcmd": reference/rcmd.md
+      - "cranlint": reference/cranlint.md
+      - "ghrelease": reference/ghrelease.md
+      - "runiverse": reference/runiverse.md
   - Project:
     - Architecture: architecture.md
     - Hooks & Skills: hooks-and-skills.md

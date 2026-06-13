@@ -1,19 +1,19 @@
 # 📚 RForge Plugin - Reference Card
 
-> **Version:** 2.7.0 | **Last Updated:** 2026-06-11
+> **Version:** {{ rforge.version }} | **Last Updated:** {{ rforge.release_date }}
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** All 35 commands in one page — categorized by use case.
+    - **What:** All {{ rforge.command_count }} commands in one page — categorized by use case.
     - **Why:** Forget command syntax? Scan the ASCII box below.
     - **How:** Daily? `/rforge:status` `/rforge:quick`. After changes? `/rforge:analyze "what?"`. Per-package CRAN gate? `/rforge:r:cran-prep`. Ecosystem rollup? `/rforge:thorough`.
     - **Next:** [Commands reference](commands.md) for full per-command docs.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  RFORGE PLUGIN REFERENCE                                            v2.7.0  │
+│  RFORGE PLUGIN REFERENCE                                            v{{ rforge.version }}  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│  COMMANDS (35)                                                              │
+│  COMMANDS ({{ rforge.command_count }})                                                              │
 │  ─────────                                                                  │
 │                                                                             │
 │  DAILY                                                                      │
@@ -229,13 +229,13 @@ No `~/.claude/settings.json` entries required since v1.3.0 — the plugin is ful
 
 ```text
 rforge/
-├── .claude-plugin/        # Plugin manifest + extras (v2.7.0)
+├── .claude-plugin/        # Plugin manifest + extras (v{{ rforge.version }})
 │   ├── plugin.json
 │   ├── marketplace.json
 │   ├── config.json
 │   ├── hooks/pretooluse.py
 │   └── skills/validation/description-sync.md
-├── commands/              # 33 slash commands (/rforge:*)
+├── commands/              # {{ rforge.command_count }} slash commands (/rforge:*)
 │   ├── docs/check.md      # /rforge:docs:check (v2.0.0+)
 │   └── r/                 # /rforge:r:* (v2.0.0+, expanded v2.1.0, v2.2.0)
 ├── agents/                # 1 orchestrator agent
