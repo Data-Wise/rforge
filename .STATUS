@@ -7,7 +7,11 @@ last_release_prior: 2026-06-12 v2.8.0 (PR #27 feature→dev, PR #28 dev→main m
 
 last_release_prior_2: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --universe R-universe early-access tier (lib/runiverse.py, pure-stdlib); 35 commands (flag, not new command). Prior: v2.6.0 (2026-06-10, tap #114) bundled v2.3–v2.6.
 
-worktrees: []  # none active
+worktrees:
+  - path: ~/.git-worktrees/rforge/feature-v2.10.0-bundle
+    branch: feature/v2.10.0-bundle
+    base: dev
+    purpose: "v2.10.0 bundle — #26 r:s7-review + scaffolding (r:use-*) + diff-aware --changed; 35→39 commands; plans in docs/specs/PLAN-*"
 # prior: feature/phase4-orchestrator merged (PR #29 → dev 2026-06-12, merge d6803ca) + worktree removed;
 # prior: feature/mkdocs-version-macros merged (PR #27 → dev 2026-06-12) + worktree removed;
 #        review follow-ups (index.md stale counts, mkdocs version anchor, decoy test) + ORCHESTRATE dropped pre-merge.
