@@ -75,7 +75,9 @@ runtime lists — no change needed there.
 ## Out of scope
 
 - Cross-package *undeclared-dependency* dispatch (method on `otherpkg::Class` where
-  `otherpkg` ∉ DESCRIPTION) — a different, DESCRIPTION-aware check; future.
+  `otherpkg` ∉ DESCRIPTION) — a different, DESCRIPTION-aware check.
+  **Implemented in v2.12.0** as `method_undeclared_dependency`
+  (`SPEC-s7-undeclared-dependency-2026-06-13.md`).
 - Static (non-runtime) detection — this is a `--runtime`-only family, like its siblings.
 
 ## Tests (gates)

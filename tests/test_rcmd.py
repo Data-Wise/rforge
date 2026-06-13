@@ -1,4 +1,6 @@
 import json
+import os
+import subprocess
 import textwrap
 from pathlib import Path
 import pytest
@@ -804,6 +806,19 @@ def test_normalize_s7runtime_warn_when_issues():
     assert env["s7runtime"]["nonenforcing_validators"] == ["Lax"]
 
 
+def test_normalize_s7runtime_warn_on_undeclared_dependency():
+    """A non-empty methods_undeclared_dependency list alone flips status to warn
+    and is surfaced in the normalized block."""
+    raw = {"dead_generics": [], "methods_on_missing_class": [],
+           "methods_undeclared_dependency": [
+               {"generic": "speak", "class": "Widget", "package": "otherpkg"}],
+           "nonenforcing_validators": []}
+    env = rcmd.normalize("s7runtime", raw, 0, None)
+    assert env["status"] == "warn"
+    assert env["s7runtime"]["methods_undeclared_dependency"] == [
+        {"generic": "speak", "class": "Widget", "package": "otherpkg"}]
+
+
 def test_normalize_s7runtime_ok_when_clean():
     raw = {"dead_generics": [], "methods_on_missing_class": [],
            "nonenforcing_validators": []}
@@ -951,3 +966,84 @@ def test_s7runtime_e2e_detects_method_on_missing_class(tmp_path):
     # binding-name != @name must NOT false-positive (identity, not @name, resolution)
     assert "DifferentName" not in classes, env
     assert "integer" not in classes, env       # base type NOT flagged
+
+
+@pytest.mark.skipif(not _have_r_with_s7(),
+                    reason="R + S7 + pkgload + jsonlite not installed")
+def test_s7runtime_e2e_detects_undeclared_dependency(tmp_path, monkeypatch):
+    """Real-R e2e (v2.12.0): a method dispatching on an S7 class from a HELPER
+    package that is installed-and-resolvable but NOT in the fixture's DESCRIPTION
+    fires `methods_undeclared_dependency`; a method on a properly-`Imports`-declared
+    class does NOT fire; a base-type (`methods`/`S7`) class does NOT fire.
+
+    Construction approach: build two tiny installable helper packages — `s7udep`
+    (provides `Widget`, left UNdeclared) and `s7dep` (provides `Gadget`, declared in
+    Imports) — `R CMD INSTALL` both into a temp library, then a fixture package whose
+    generic dispatches on both helper classes plus a base S7 type. The temp lib is
+    put on R's path via `R_LIBS` so `load_all` + `asNamespace()` resolve the helpers
+    while the fixture's DESCRIPTION deliberately omits `s7udep`.
+    """
+    libdir = tmp_path / "lib"
+    libdir.mkdir()
+
+    def _mk_helper(name, cls):
+        src = tmp_path / name
+        (src / "R").mkdir(parents=True)
+        (src / "DESCRIPTION").write_text(textwrap.dedent(f"""\
+            Package: {name}
+            Version: 0.0.1
+            Title: S7 helper
+            Imports: S7
+            Encoding: UTF-8
+        """))
+        (src / "NAMESPACE").write_text(f"import(S7)\nexport({cls})\n")
+        (src / "R" / "cls.R").write_text(
+            f'{cls} <- S7::new_class("{cls}", package = "{name}")\n')
+        rc = subprocess.run(["R", "CMD", "INSTALL", f"--library={libdir}", str(src)],
+                            capture_output=True, text=True)
+        assert rc.returncode == 0, rc.stderr
+
+    _mk_helper("s7udep", "Widget")   # left UNdeclared in the fixture
+    _mk_helper("s7dep", "Gadget")    # declared in the fixture's Imports
+
+    pkg = tmp_path / "s7main"
+    (pkg / "R").mkdir(parents=True)
+    (pkg / "DESCRIPTION").write_text(textwrap.dedent("""\
+        Package: s7main
+        Version: 0.0.1
+        Title: S7 undeclared-dep fixture
+        Imports: S7, s7dep
+        Encoding: UTF-8
+    """))
+    (pkg / "NAMESPACE").write_text("import(S7)\n")
+    (pkg / "R" / "methods.R").write_text(textwrap.dedent("""\
+        speak <- S7::new_generic("speak", "x")
+        # (BAD) dispatch on a class from an UNdeclared package -> flagged
+        S7::method(speak, s7udep::Widget) <- function(x, ...) "widget"
+        # (ok) dispatch on a class from a DECLARED (Imports) package -> not flagged
+        S7::method(speak, s7dep::Gadget) <- function(x, ...) "gadget"
+        # (ok) dispatch on a base S7 type -> not flagged
+        S7::method(speak, S7::class_integer) <- function(x, ...) "int"
+    """))
+
+    # put the temp lib on R's search path so the engine resolves the helpers
+    existing = os.environ.get("R_LIBS", "")
+    monkeypatch.setenv("R_LIBS", f"{libdir}{os.pathsep}{existing}" if existing
+                       else str(libdir))
+
+    env = rcmd.run("s7runtime", str(pkg))
+    assert env["kind"] == "s7runtime", env
+    msgs = env.get("messages", [])
+    msg_text = msgs if isinstance(msgs, str) else " ".join(msgs)
+    assert "failed" not in msg_text.lower(), f"fixture did not load: {env}"
+    rt = env.get("s7runtime", {})
+    undecl = rt.get("methods_undeclared_dependency", [])
+    by_class = {e.get("class"): e for e in undecl if isinstance(e, dict)}
+    assert "Widget" in by_class, env               # undeclared dep flagged
+    assert by_class["Widget"]["package"] == "s7udep", env
+    assert "Gadget" not in by_class, env           # declared (Imports) NOT flagged
+    assert "integer" not in by_class, env          # base type NOT flagged
+    # and the undeclared class is NOT mis-reported as a missing class
+    miss_classes = [m.get("class") if isinstance(m, dict) else str(m)
+                    for m in rt.get("methods_on_missing_class", [])]
+    assert "Widget" not in miss_classes, env

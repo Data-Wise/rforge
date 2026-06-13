@@ -40,6 +40,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   catches missing flags/sections/orphans (not vacuous). Spec:
   `SPEC-commands-doc-sync-gate-2026-06-13.md`.
 
+- **`r:s7-review` `method_undeclared_dependency`** runtime finding (closes the
+  cross-package check deferred in v2.11.1; no new flag). The `--runtime`
+  `method-dispatch` family now flags a method dispatching on an S7 class that *does*
+  resolve but whose providing package (`attr(class, "package")`) is set, differs from
+  this package, and is **not** in `DESCRIPTION` `Imports`/`Depends`/`LinkingTo` —
+  typically a `Suggests`-only class. At a site without that package the dispatch class
+  never registers, so the method silently never fires (a real correctness/CRAN bug).
+  Extends the v2.11.1 per-signature loop in the `s7runtime` engine (`lib/rcmd.py`):
+  declared deps are parsed R-side once from the loaded DESCRIPTION, with an always-allow
+  set (the package itself + `base`/`methods`/`stats`/`utils`/`graphics`/`grDevices`/
+  `datasets`/`tools`/`S7`); the three per-signature outcomes are mutually exclusive
+  (unresolvable → `method_on_missing_class`; resolvable + undeclared package →
+  `method_undeclared_dependency`; resolvable + declared → clean). Engine emits
+  structured `{generic, class, package}`; consumer (`lib/s7review.py`) maps them into
+  advisory `source: "runtime"` findings. +3 pytest cases (real-R e2e with two installed
+  helper packages — one declared, one not — plus consumer-mapping + normalize units).
+  Spec: `SPEC-s7-undeclared-dependency-2026-06-13.md`.
+
 ### Fixed
 
 - **`docs/commands.md` flag drift surfaced + fixed by the new gate** — 10 undocumented

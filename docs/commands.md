@@ -973,10 +973,10 @@ There is **no** `--write`/`--fix` — S7 fixes need human judgement.
 | methods | `dangling_method`, `missing_methods_register` | static |
 | legacy | `legacy_s4_in_s7`, `legacy_r5_in_s7`, `legacy_s3_generic` | static |
 | docs | `undocumented_export`, `prop_type_unresolvable` | static |
-| method-dispatch (`--runtime`) | `dead_generic`, `method_on_missing_class` | runtime |
+| method-dispatch (`--runtime`) | `dead_generic`, `method_on_missing_class`, `method_undeclared_dependency` | runtime |
 | validator-runtime (`--runtime`) | `validator_not_enforcing` | runtime |
 
-The `method-dispatch` runtime family reports `dead_generic` (an S7 generic with no registered method) and `method_on_missing_class` (a method whose dispatch signature references an S7 class with no resolvable namespace binding — e.g. an inline `new_class()` left in a `method()` call — making the method unreachable). Each `S7_method` carries its dispatch class objects (`attr(., "signature")`), so resolvability is decided by object identity against the package's classes; base types and imported classes are not flagged.
+The `method-dispatch` runtime family reports `dead_generic` (an S7 generic with no registered method), `method_on_missing_class` (a method whose dispatch signature references an S7 class with no resolvable namespace binding — e.g. an inline `new_class()` left in a `method()` call — making the method unreachable), and `method_undeclared_dependency` (a method dispatching on an S7 class that *does* resolve but whose providing package — `attr(class, "package")` — is not declared in `DESCRIPTION` `Imports`/`Depends`/`LinkingTo`, typically a `Suggests`-only class; where that package is absent the dispatch class never registers and the method never fires). Each `S7_method` carries its dispatch class objects (`attr(., "signature")`), so resolvability is decided by object identity against the package's classes; base types and the package's own classes are not flagged, and base/recommended packages (`base`, `methods`, `stats`, `utils`, `S7`, …) are always treated as declared.
 
 **Output:** one `{kind: "s7review", status: "ok"|"warn", stages: [...]}` envelope. Each finding carries `source: "static"` and `severity: "advisory"`, worded "looks like / consider", never "must". Exit 0 always.
 

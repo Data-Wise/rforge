@@ -294,13 +294,15 @@ def test_run_eco_broken_package_warns_without_aborting(tmp_path, monkeypatch):
 
 
 # ── --runtime orchestration + merge ──────────────────────────────────────
-def _fake_runtime_env(*, dead=("dead_gen",), nonenforcing=("Lax",), missing=()):
+def _fake_runtime_env(*, dead=("dead_gen",), nonenforcing=("Lax",), missing=(),
+                      undeclared=()):
     """Build a fake normalized rcmd s7runtime envelope (as rcmd.run would return)."""
     return {
         "kind": "s7runtime", "status": "warn", "engine_missing": [], "messages": [],
         "s7runtime": {
             "dead_generics": list(dead),
             "methods_on_missing_class": list(missing),
+            "methods_undeclared_dependency": list(undeclared),
             "nonenforcing_validators": list(nonenforcing),
         },
     }
@@ -345,6 +347,28 @@ def test_runtime_maps_method_on_missing_class(tmp_path, monkeypatch):
     assert miss[0]["symbol"] == "Ghost"
     assert "speak" in miss[0]["message"] and "Ghost" in miss[0]["message"]
     assert miss[0]["source"] == "runtime"
+    assert md["status"] == "warn"
+
+
+def test_runtime_maps_method_undeclared_dependency(tmp_path, monkeypatch):
+    """methods_undeclared_dependency engine entries ({generic, class, package})
+    become method_undeclared_dependency findings in the method-dispatch family."""
+    pkg = _mk_pkg(tmp_path, "alpha", 'Foo <- new_class("Foo")\n')
+    monkeypatch.setattr(
+        s7review.rcmd, "run",
+        lambda kind, path=".", **kw: _fake_runtime_env(
+            dead=(), nonenforcing=(), missing=(),
+            undeclared=({"generic": "speak", "class": "Widget",
+                         "package": "otherpkg"},)))
+    env = s7review.run_all_with_runtime(str(pkg))
+    md = next(s for s in env["stages"] if s["kind"] == "method-dispatch")
+    undecl = [f for f in md["findings"]
+              if f["code"] == "method_undeclared_dependency"]
+    assert len(undecl) == 1, md
+    assert undecl[0]["symbol"] == "Widget"
+    assert "speak" in undecl[0]["message"]
+    assert "otherpkg" in undecl[0]["message"]
+    assert undecl[0]["source"] == "runtime"
     assert md["status"] == "warn"
 
 
