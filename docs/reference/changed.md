@@ -23,8 +23,12 @@ Plus the two-run tagging machinery (v2.11.0):
                           temp tree under the SYSTEM temp dir, run an injected
                           runner there, and GUARANTEE worktree removal (finally).
   6. scope_check()      — orchestrate merge_base → baseline run → current run →
-                          tag_findings; returns None (caller falls back to
+                          tag_findings, then a file-level [uncommitted] refinement
+                          (v2.12.0); returns None (caller falls back to
                           scope-only) on any git failure.
+  7. uncommitted_files()— working-tree-dirty paths (`git status --porcelain`),
+                          used to re-tag an [introduced] finding [uncommitted]
+                          when its file is not yet committed (v2.12.0).
 
 Advisory, never raises. git failures (not a repo, no merge-base, git missing)
 return None so callers can warn and fall back to a full run. "No changes" is the
@@ -112,7 +116,8 @@ def scope_check(runner: 'Callable[[str], list]', path: 'str', base: 'str' = 'dev
 Two-run introduced/pre-existing tagging over a REAL merge-base checkout.
 
 Orchestrates: merge_base(HEAD, base) → run_baseline (runner at the merge-base
-detached worktree) → runner against the live HEAD tree → tag_findings.
+detached worktree) → runner against the live HEAD tree → tag_findings, then a
+file-level `[uncommitted]` refinement (v2.12.0).
 
 `runner(treedir) -> list[finding]` is injected so this module stays R-free and
 unit-testable; rcmd injects a closure that runs the chosen --kind engine in
@@ -120,11 +125,21 @@ unit-testable; rcmd injects a closure that runs the chosen --kind engine in
 genuinely different working tree (the v2.10.0 bug was tagging HEAD vs HEAD —
 here the baseline tree is a real checkout of the merge-base SHA).
 
+`[uncommitted]` refinement: after tagging, each `[introduced]` finding whose
+file is in `uncommitted_files(path)` is re-tagged `[uncommitted]` — "you
+caused this with edits you haven't committed yet" vs committed branch work.
+File-level, not finding-precise (a 3rd clean-HEAD run would be needed for
+finding-precision; not worth tripling check cost). String findings (no file)
+stay `[introduced]`; `[pre-existing]` is never re-tagged; a finding is never
+both. `[uncommitted]` is a subset of introduced — it IS folded into
+`introduced_count` (so `--fail-on introduced` still fails on your dirty edits).
+
 Returns None (caller falls back to scope-only) when the merge-base does not
 resolve or the baseline worktree add fails. Otherwise:
     {"base": <ref>, "merge_base": <sha>,
-     "findings": [{"text":..., "tag": "introduced"|"pre-existing"}, ...],
-     "introduced_count": <int>}
+     "findings": [{"text":..., "tag":
+                   "introduced"|"uncommitted"|"pre-existing"}, ...],
+     "introduced_count": <int>}  # counts introduced + uncommitted
 
 ### `tag_findings()`
 
@@ -143,3 +158,22 @@ by string; dict findings (lint) compare by `(file, message, linter)` —
 EXCLUDING the raw `line`, so a line-shifted pre-existing lint stays
 `pre-existing` rather than flipping to `introduced`. The full finding is
 preserved in `text` for display.
+
+### `uncommitted_files()`
+
+```python
+def uncommitted_files(path: 'str' = '.') -> 'set[str]'
+```
+
+Repo-relative paths with UNCOMMITTED changes (`git status --porcelain`).
+
+Returns the set of modified / added / renamed / staged paths in the working
+tree — anything `git status --porcelain` reports as dirty. Used to refine an
+`[introduced]` finding to `[uncommitted]` when its file is still dirty.
+
+Advisory, never raises: not a git repo / git missing / any non-zero status →
+the empty set (no refinement, no error). The porcelain v1 format is
+`XY<space>PATH` (PATH possibly `old -> new` for renames); we take the path
+column, and for a rename we keep the NEW (post-arrow) path (that's the one a
+finding will reference). Quoted paths (non-ASCII) keep their git-quoting; that
+is acceptable for the suffix/basename match in `scope_check`.

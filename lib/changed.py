@@ -17,8 +17,12 @@ Plus the two-run tagging machinery (v2.11.0):
                           temp tree under the SYSTEM temp dir, run an injected
                           runner there, and GUARANTEE worktree removal (finally).
   6. scope_check()      — orchestrate merge_base → baseline run → current run →
-                          tag_findings; returns None (caller falls back to
+                          tag_findings, then a file-level [uncommitted] refinement
+                          (v2.12.0); returns None (caller falls back to
                           scope-only) on any git failure.
+  7. uncommitted_files()— working-tree-dirty paths (`git status --porcelain`),
+                          used to re-tag an [introduced] finding [uncommitted]
+                          when its file is not yet committed (v2.12.0).
 
 Advisory, never raises. git failures (not a repo, no merge-base, git missing)
 return None so callers can warn and fall back to a full run. "No changes" is the
@@ -103,6 +107,38 @@ def changed_files(path: str = ".", base: str = "HEAD") -> Optional[list[str]]:
     if diff_proc is None or diff_proc.returncode != 0:
         return None
     return [ln.strip() for ln in diff_proc.stdout.splitlines() if ln.strip()]
+
+
+def uncommitted_files(path: str = ".") -> set[str]:
+    """Repo-relative paths with UNCOMMITTED changes (`git status --porcelain`).
+
+    Returns the set of modified / added / renamed / staged paths in the working
+    tree — anything `git status --porcelain` reports as dirty. Used to refine an
+    `[introduced]` finding to `[uncommitted]` when its file is still dirty.
+
+    Advisory, never raises: not a git repo / git missing / any non-zero status →
+    the empty set (no refinement, no error). The porcelain v1 format is
+    `XY<space>PATH` (PATH possibly `old -> new` for renames); we take the path
+    column, and for a rename we keep the NEW (post-arrow) path (that's the one a
+    finding will reference). Quoted paths (non-ASCII) keep their git-quoting; that
+    is acceptable for the suffix/basename match in `scope_check`.
+    """
+    proc = _git(["status", "--porcelain"], cwd=path)
+    if proc is None or proc.returncode != 0:
+        return set()
+    out: set[str] = set()
+    for line in proc.stdout.splitlines():
+        if not line.strip():
+            continue
+        # Porcelain v1: two status chars + a space, then the path.
+        rest = line[3:] if len(line) > 3 else line.strip()
+        # Renames/copies render "old -> new"; keep the new path.
+        if " -> " in rest:
+            rest = rest.split(" -> ", 1)[1]
+        rest = rest.strip()
+        if rest:
+            out.add(rest)
+    return out
 
 
 # ───────────────────────── file → package ─────────────────────────
@@ -231,6 +267,38 @@ def run_baseline(
 # ───────────────────────── two-run orchestration ─────────────────────────
 
 
+def _finding_file(f) -> Optional[str]:
+    """The file a finding is attributed to, or None for a string finding.
+
+    Dict findings (lint) carry `file`; plain-string findings (R CMD check) have
+    no file, so they can never be refined to `[uncommitted]`.
+    """
+    if isinstance(f, dict):
+        file = f.get("file")
+        return file if isinstance(file, str) and file else None
+    return None
+
+
+def _is_uncommitted_file(finding_file: str, uncommitted: set[str]) -> bool:
+    """True iff `finding_file` corresponds to an uncommitted-changed path.
+
+    Coordinate-system tolerant: finding files are package-relative (e.g.
+    `R/a.R`) while `git status --porcelain` paths are repo-relative (e.g.
+    `pkgA/R/a.R`). Match on exact membership, on a path-suffix (a porcelain path
+    ending in `/<finding_file>`), or on equal basenames — enough to attribute a
+    finding to a dirty file without a fragile path-rebasing step.
+    """
+    if finding_file in uncommitted:
+        return True
+    ff_base = finding_file.rsplit("/", 1)[-1]
+    for u in uncommitted:
+        if u == finding_file or u.endswith("/" + finding_file):
+            return True
+        if u.rsplit("/", 1)[-1] == ff_base:
+            return True
+    return False
+
+
 def scope_check(
     runner: Callable[[str], list],
     path: str,
@@ -239,7 +307,8 @@ def scope_check(
     """Two-run introduced/pre-existing tagging over a REAL merge-base checkout.
 
     Orchestrates: merge_base(HEAD, base) → run_baseline (runner at the merge-base
-    detached worktree) → runner against the live HEAD tree → tag_findings.
+    detached worktree) → runner against the live HEAD tree → tag_findings, then a
+    file-level `[uncommitted]` refinement (v2.12.0).
 
     `runner(treedir) -> list[finding]` is injected so this module stays R-free and
     unit-testable; rcmd injects a closure that runs the chosen --kind engine in
@@ -247,11 +316,21 @@ def scope_check(
     genuinely different working tree (the v2.10.0 bug was tagging HEAD vs HEAD —
     here the baseline tree is a real checkout of the merge-base SHA).
 
+    `[uncommitted]` refinement: after tagging, each `[introduced]` finding whose
+    file is in `uncommitted_files(path)` is re-tagged `[uncommitted]` — "you
+    caused this with edits you haven't committed yet" vs committed branch work.
+    File-level, not finding-precise (a 3rd clean-HEAD run would be needed for
+    finding-precision; not worth tripling check cost). String findings (no file)
+    stay `[introduced]`; `[pre-existing]` is never re-tagged; a finding is never
+    both. `[uncommitted]` is a subset of introduced — it IS folded into
+    `introduced_count` (so `--fail-on introduced` still fails on your dirty edits).
+
     Returns None (caller falls back to scope-only) when the merge-base does not
     resolve or the baseline worktree add fails. Otherwise:
         {"base": <ref>, "merge_base": <sha>,
-         "findings": [{"text":..., "tag": "introduced"|"pre-existing"}, ...],
-         "introduced_count": <int>}
+         "findings": [{"text":..., "tag":
+                       "introduced"|"uncommitted"|"pre-existing"}, ...],
+         "introduced_count": <int>}  # counts introduced + uncommitted
     """
     base_sha = merge_base(path=path, base=base)
     if base_sha is None:
@@ -263,7 +342,20 @@ def scope_check(
 
     head_findings = runner(path)
     tagged = tag_findings(head_findings, base_findings)
-    introduced = sum(1 for t in tagged if t["tag"] == "introduced")
+
+    # File-level [uncommitted] refinement: re-tag introduced findings whose file
+    # is still dirty. Advisory — a git failure yields an empty set (no refinement).
+    dirty = uncommitted_files(path=path)
+    if dirty:
+        for t in tagged:
+            if t["tag"] != "introduced":
+                continue
+            ff = _finding_file(t["text"])
+            if ff is not None and _is_uncommitted_file(ff, dirty):
+                t["tag"] = "uncommitted"
+
+    # [uncommitted] is a subset of "introduced" for --fail-on purposes.
+    introduced = sum(1 for t in tagged if t["tag"] in ("introduced", "uncommitted"))
     return {
         "base": base,
         "merge_base": base_sha,

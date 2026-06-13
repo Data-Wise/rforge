@@ -686,6 +686,28 @@ def test_changed_no_introduced_findings_is_ok(monkeypatch, tmp_path):
     assert env["changed"]["introduced_count"] == 0
 
 
+def test_changed_fail_on_introduced_fails_on_only_uncommitted(monkeypatch, tmp_path):
+    """[uncommitted] is a subset of introduced: --fail-on introduced (default) must
+    STILL exit non-zero when the only findings are [uncommitted] (they're yours).
+    scope_check folds [uncommitted] into introduced_count, so status=error."""
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+    monkeypatch.setattr(rcmd.changed, "scope_check",
+                        lambda runner, path, base: {
+                            "base": base, "merge_base": "abc",
+                            "findings": [{"text": {"file": "R/x.R",
+                                                   "message": "m"},
+                                          "tag": "uncommitted"}],
+                            "introduced_count": 1})
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    assert env["status"] == "error"
+    assert env["changed"]["introduced_count"] == 1
+
+
 def test_changed_fail_on_none_never_errors_on_introduced(monkeypatch, tmp_path):
     """--fail-on none: introduced findings are reported but do not drive a nonzero
     status (advisory mode)."""

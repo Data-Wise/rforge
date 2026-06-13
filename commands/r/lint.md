@@ -37,8 +37,12 @@ python3 -m lib.rcmd --kind lint --path "<path>"
 If `--changed`: `python3 -m lib.rcmd --kind lint --changed --base "<ref>"
 [--fail-on introduced|none]` — lints the package(s) changed on this branch and tags
 each lint `[introduced]` (new on your branch) vs `[pre-existing]` (already present at
-`merge-base(HEAD, base)`) via a second baseline run in a detached worktree.
-`--fail-on introduced` (default) exits non-zero iff ≥1 introduced lint. Degrades to
+`merge-base(HEAD, base)`) via a second baseline run in a detached worktree. An
+`[introduced]` lint whose file still has **uncommitted** changes is further refined to
+`[uncommitted]` (you caused it with edits you haven't committed yet) — a file-level
+refinement (no third run), so all introduced lints in a dirty file tag `[uncommitted]`.
+`[uncommitted]` counts as introduced for `--fail-on`. `--fail-on introduced` (default)
+exits non-zero iff ≥1 introduced lint (incl. `[uncommitted]`). Degrades to
 scope-only (no tagging) when no merge-base / baseline worktree is available. Costs
 one extra lint run (the baseline).
 

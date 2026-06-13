@@ -575,7 +575,7 @@ R CMD check integration with detailed error reporting.
 - `package` (optional) - Package to check (defaults to current)
 - `--strict` (optional) - Run both CRAN Suggests-withholding flavors (default: false)
 - `--incoming` (optional) - Emulate CRAN's incoming `_R_CHECK_*` bundle; implies `--strict` (default: false)
-- `--changed` (optional, v2.10.0; tagging v2.11.0) - Scope the check to the package(s) changed on this branch and tag each finding **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already at the fork point), via a baseline run in a detached worktree at `merge-base(HEAD, --base)` (default: false)
+- `--changed` (optional, v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0) - Scope the check to the package(s) changed on this branch and tag each finding **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already at the fork point), via a baseline run in a detached worktree at `merge-base(HEAD, --base)`; an `[introduced]` finding whose file still has uncommitted changes is further refined to **`[uncommitted]`** (counts as introduced for `--fail-on`) (default: false)
 - `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed`; the baseline is run at `merge-base(HEAD, base)` (default: `dev`)
 - `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on findings tagged `[introduced]` (default: `introduced`); `none` is advisory
 - `--changed-strict` (optional, v2.10.0) - Documented no-op (default: false)
@@ -611,7 +611,7 @@ R CMD check integration with detailed error reporting.
 
 **Note:** This can take 1-5 minutes depending on package size. Strict mode runs the baseline plus two flavor passes (~3× check time; ~4× with `--incoming`).
 
-**Diff-aware mode (v2.10.0; tagging v2.11.0):** `--changed` scopes the check to the R package(s) touched on this branch and tags each finding **`[introduced]`** vs **`[pre-existing]`** — computed honestly by a second baseline run in a detached worktree checked out at `merge-base(HEAD, --base)` (default base `dev`). `--fail-on introduced` (the default) exits non-zero only on findings your branch introduced, so CI fails on regressions you caused — not pre-existing debt (`--fail-on none` is advisory). Identity is line-shift-immune (findings key on file + message, not raw line). Degrades gracefully: not a git repo / no merge-base / baseline-worktree failure → falls back to a real full check plus a warning (scope-only, no tagging — no regression of v2.10.0); no changes → a clean no-op. Out of scope: uncommitted-change tagging and cross-run baseline caching (each invocation pays one extra check). `--changed-strict` is a documented no-op.
+**Diff-aware mode (v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0):** `--changed` scopes the check to the R package(s) touched on this branch and tags each finding **`[introduced]`** vs **`[pre-existing]`** — computed honestly by a second baseline run in a detached worktree checked out at `merge-base(HEAD, --base)` (default base `dev`). An `[introduced]` finding whose file still has **uncommitted** changes (per `git status --porcelain`) is further refined to **`[uncommitted]`** — "you caused this with edits you haven't committed yet" vs committed branch work. This is a file-level refinement (no third check run), so every introduced finding in a dirty file tags `[uncommitted]`; string findings (R CMD check messages with no file) stay `[introduced]`. `[uncommitted]` is a subset of introduced: `--fail-on introduced` still fails on it. `--fail-on introduced` (the default) exits non-zero only on findings your branch introduced (incl. `[uncommitted]`), so CI fails on regressions you caused — not pre-existing debt (`--fail-on none` is advisory). Identity is line-shift-immune (findings key on file + message, not raw line). Degrades gracefully: not a git repo / no merge-base / baseline-worktree failure → falls back to a real full check plus a warning (scope-only, no tagging — no regression of v2.10.0); no changes → a clean no-op. Out of scope: finding-precise uncommitted attribution (would need a third clean-HEAD run) and cross-run baseline caching (each invocation pays one extra check). `--changed-strict` is a documented no-op.
 
 ---
 
@@ -693,7 +693,7 @@ Run package tests via `testthat` and report pass/fail/skip counts.
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
-- `--changed` (optional, v2.10.0; tagging v2.11.0) - Scope tests to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run (default: false)
+- `--changed` (optional, v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0) - Scope tests to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; an introduced failure in an uncommitted file is refined to `[uncommitted]` (default: false)
 - `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed` (default: `dev`)
 - `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on `[introduced]` findings (default: `introduced`)
 
@@ -901,7 +901,7 @@ Static analysis of the package via `lintr` — grouped report of style and code-
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
-- `--changed` (optional, v2.10.0; tagging v2.11.0) - Scope lint to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; line-shift-immune identity (default: false)
+- `--changed` (optional, v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0) - Scope lint to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; line-shift-immune identity; an introduced lint in an uncommitted file is refined to `[uncommitted]` (default: false)
 - `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed` (default: `dev`)
 - `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on `[introduced]` findings (default: `introduced`)
 

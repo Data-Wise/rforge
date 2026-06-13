@@ -340,3 +340,124 @@ def test_scope_check_line_shifted_lint_tagged_pre_existing(tmp_path):
     assert result is not None
     assert [t["tag"] for t in result["findings"]] == ["pre-existing"]
     assert result["introduced_count"] == 0
+
+
+# ───────── uncommitted_files (v2.12.0): git status --porcelain ─────────
+
+
+def test_uncommitted_files_reports_modified_staged_and_added(tmp_path):
+    """Returns the working-tree-dirty paths: modified, staged, and new/added."""
+    repo, _ = _init_repo(tmp_path)
+    # tracked file modified but NOT committed
+    (repo / "f.txt").write_text("dirty\n", encoding="utf-8")
+    # a brand-new untracked file
+    (repo / "new.R").write_text("x <- 1\n", encoding="utf-8")
+    # a staged-but-uncommitted file
+    (repo / "staged.R").write_text("y <- 2\n", encoding="utf-8")
+    _git(["add", "staged.R"], cwd=repo)
+
+    files = changed.uncommitted_files(path=str(repo))
+    assert "f.txt" in files          # modified, unstaged
+    assert "new.R" in files          # untracked/added
+    assert "staged.R" in files       # staged
+
+
+def test_uncommitted_files_empty_on_clean_tree(tmp_path):
+    repo, _ = _init_repo(tmp_path)
+    assert changed.uncommitted_files(path=str(repo)) == set()
+
+
+def test_uncommitted_files_empty_on_non_repo_no_raise(tmp_path):
+    """Advisory: a non-repo path → empty set, never an exception."""
+    assert changed.uncommitted_files(path=str(tmp_path)) == set()
+
+
+def test_uncommitted_files_empty_when_git_missing(tmp_path):
+    with mock.patch.object(changed.subprocess, "run",
+                           side_effect=FileNotFoundError("git")):
+        assert changed.uncommitted_files(path=str(tmp_path)) == set()
+
+
+# ───────── scope_check [uncommitted] refinement (v2.12.0, REAL git) ─────────
+
+
+def test_scope_check_retags_introduced_in_uncommitted_file(tmp_path):
+    """KEY e2e: an introduced finding in a COMMITTED file stays [introduced];
+    an introduced finding in an UNCOMMITTED (dirty, not committed) file is
+    re-tagged [uncommitted]; a pre-existing finding stays [pre-existing].
+    No mocking of git — real repo + real `git status --porcelain`."""
+    repo, _ = _init_repo(tmp_path)
+    # On the branch: commit a finding-file (R/committed.R), then dirty another
+    # file (R/dirty.R) WITHOUT committing it.
+    (repo / "R").mkdir()
+    (repo / "R" / "committed.R").write_text("a <- 1\n", encoding="utf-8")
+    _git(["add", "R/committed.R"], cwd=repo)
+    _git(["commit", "-q", "-m", "add committed finding file"], cwd=repo)
+    # dirty file: present in the working tree, uncommitted
+    (repo / "R" / "dirty.R").write_text("b <- 2\n", encoding="utf-8")
+
+    def run_engine(treedir):
+        with open(os.path.join(treedir, "f.txt"), encoding="utf-8") as fh:
+            txt = fh.read().strip()
+        if txt == "branch":  # HEAD tree
+            return [
+                {"file": "R/committed.R", "line": 1, "linter": "L",
+                 "message": "introduced-committed"},
+                {"file": "R/dirty.R", "line": 1, "linter": "L",
+                 "message": "introduced-uncommitted"},
+                {"file": "R/old.R", "line": 1, "linter": "L",
+                 "message": "preexisting"},
+            ]
+        # baseline tree: only the pre-existing finding
+        return [{"file": "R/old.R", "line": 1, "linter": "L",
+                 "message": "preexisting"}]
+
+    result = changed.scope_check(run_engine, path=str(repo), base="dev")
+    assert result is not None
+    tags = {t["text"]["message"]: t["tag"] for t in result["findings"]}
+    assert tags == {
+        "introduced-committed": "introduced",
+        "introduced-uncommitted": "uncommitted",
+        "preexisting": "pre-existing",
+    }
+    # [uncommitted] counts as introduced for the introduced_count.
+    assert result["introduced_count"] == 2
+
+
+def test_scope_check_string_finding_never_uncommitted(tmp_path):
+    """String findings (R CMD check, no file attribute) stay [introduced] even
+    when the tree is dirty — no file to attribute to an uncommitted path."""
+    repo, _ = _init_repo(tmp_path)
+    (repo / "R").mkdir()
+    (repo / "R" / "dirty.R").write_text("z <- 1\n", encoding="utf-8")  # dirty tree
+
+    def run_check(treedir):
+        with open(os.path.join(treedir, "f.txt"), encoding="utf-8") as fh:
+            txt = fh.read().strip()
+        if txt == "branch":
+            return ["NOTE: new string finding"]
+        return []
+
+    result = changed.scope_check(run_check, path=str(repo), base="dev")
+    assert result is not None
+    assert [t["tag"] for t in result["findings"]] == ["introduced"]
+
+
+def test_scope_check_clean_tree_no_uncommitted_tags(tmp_path):
+    """No v2.11 regression: a clean working tree yields zero [uncommitted] tags;
+    an introduced finding stays [introduced]."""
+    repo, _ = _init_repo(tmp_path)
+
+    def run_engine(treedir):
+        with open(os.path.join(treedir, "f.txt"), encoding="utf-8") as fh:
+            txt = fh.read().strip()
+        if txt == "branch":
+            return [{"file": "R/a.R", "line": 1, "linter": "L",
+                     "message": "new"}]
+        return []
+
+    result = changed.scope_check(run_engine, path=str(repo), base="dev")
+    assert result is not None
+    tags = [t["tag"] for t in result["findings"]]
+    assert "uncommitted" not in tags
+    assert tags == ["introduced"]

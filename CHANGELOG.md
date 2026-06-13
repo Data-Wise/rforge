@@ -11,6 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Diff-aware `[uncommitted]` tag** (`lib/changed.py`; refines `r:check`/`r:test`/`r:lint`
+  `--changed`, no new flag). v2.11.0's two-run `--changed` tags findings `[introduced]`
+  (new on this branch vs the merge-base) vs `[pre-existing]`; it deferred
+  uncommitted-change tagging. This refines it: an `[introduced]` finding whose file has
+  **uncommitted** changes (per new `uncommitted_files()` → `git status --porcelain`) is
+  re-tagged **`[uncommitted]`**, so you can tell "I caused this with edits I haven't
+  committed yet" from committed branch work. File-level, **no third check run** (a
+  finding-precise version would need a clean-HEAD run, tripling cost): all introduced
+  findings in a dirty file tag `[uncommitted]`. String findings (R CMD check messages
+  with no file) stay `[introduced]`; `[pre-existing]` is never re-tagged; a finding is
+  never both. `[uncommitted]` is a **subset of introduced** — `--fail-on introduced`
+  (default) still fails on it (it's your work). Advisory: a git failure yields no
+  refinement (never raises). +8 pytest cases (real-git e2e + `uncommitted_files` units +
+  `--fail-on` on uncommitted-only). Spec: `SPEC-diff-aware-uncommitted-tag-2026-06-13.md`.
+
 - **`docs/commands.md` sync-gate** (`tests/_check_commands_doc.py`, wired into
   `tests/test-all.sh`; 41→42 checks). A pure-stdlib presence check closing the last
   drift-prone documentation surface: (1) **command coverage** — every non-stub command
