@@ -54,6 +54,11 @@ Most daily work runs through these; the rest of the plugin's {{ rforge.command_c
 /rforge:thorough "Prepare for CRAN release"
 ```
 
+## What's new in v2.9.0
+
+- **The [orchestrator agent](orchestrator.md), reborn** — ask a *goal* ("is this CRAN-ready?", "what's the impact of this change?") instead of picking commands, and the orchestrator recognizes the intent and runs the right read-only analyses, then synthesizes one summary. It now delegates through the pure-Python `lib/*` modules (the old MCP-tool delegation, dead since v1.3.0, is gone), recognizes **7 intents**, and enforces a **read-only / recommend-only safety boundary** — anything that writes files or hits the network is recommended, never auto-run. See the [orchestrator cookbook](tutorials/orchestrator-cookbook.md) for worked examples.
+- **`Ecosystem.manifest_order`** (#20) — discovery now exposes the manifest's *declared* package order, so `/rforge:status` can render in a curated order rather than alphabetical.
+
 ## What's new in v2.8.0
 
 - **Single-source version/count for docs** — the docs now render the current version and command count from one source of truth, so they stop drifting. A **mkdocs-macros** layer renders `{{ rforge.version }}` / `{{ rforge.command_count }}` at build time, and pure-stdlib **`scripts/version_sync.py`** stamps the surfaces macros can't reach (`README.md`, `plugin.json`, `CLAUDE.md`, …); its `--check` is a CI drift gate wired into `ci.yml` + `test-all.sh`. No command-surface change — still {{ rforge.command_count }} commands.
