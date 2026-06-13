@@ -158,6 +158,26 @@ def test_plan_package_write_uses_deps_sync_writer(pkg: Path):
     assert "@importFrom tibble as_tibble" in used or "@importFrom tibble" in used
 
 
+def test_plan_package_write_preserves_version_constraints(pkg: Path):
+    """r:use-package --write must NOT drop (>= x.y.z) floors on untouched deps.
+
+    Regression for the data-corruption bug: adding tibble to Imports rewrote
+    the whole block from discovery's name-only parse, stripping the existing
+    `testthat (>= 3.0.0)` Suggests constraint (and any Imports constraint).
+    """
+    desc_path = pkg / "DESCRIPTION"
+    # add a constrained Imports dep so we cover both fields
+    desc_path.write_text(
+        desc_path.read_text(encoding="utf-8").replace(
+            "Imports:\n    stats\n", "Imports:\n    stats,\n    dplyr (>= 1.1.0)\n"),
+        encoding="utf-8")
+    scaffold.plan_package(pkg, "tibble", write=True)
+    desc = desc_path.read_text(encoding="utf-8")
+    assert "tibble" in desc
+    assert "dplyr (>= 1.1.0)" in desc, desc
+    assert "testthat (>= 3.0.0)" in desc, desc
+
+
 def test_plan_package_already_declared_is_warn_noop(pkg: Path):
     env = scaffold.plan_package(pkg, "stats")            # already in Imports
     assert env["status"] == "warn"
