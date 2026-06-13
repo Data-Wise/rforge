@@ -123,6 +123,7 @@ nav:
       - "runiverse": reference/runiverse.md
       - "s7review": reference/s7review.md
       - "changed": reference/changed.md
+      - "scaffold": reference/scaffold.md
   - Project:
     - Architecture: architecture.md
     - Hooks & Skills: hooks-and-skills.md

@@ -475,6 +475,25 @@ assert 'changed_files' in d and 'changed_packages' in d, d
 "
 }
 
+# Scaffolding: the three use-* commands must carry name+description frontmatter.
+scaffold_cmds_frontmatter() {
+    for f in commands/r/use-test.md commands/r/use-package.md commands/r/use-vignette.md; do
+        grep -q "^name: rforge:r:use-" "$f" || { echo "missing name in $f"; return 1; }
+        grep -q "^description:" "$f" || { echo "missing description in $f"; return 1; }
+    done
+}
+
+# Scaffolding: lib.scaffold + lib.usethis_infra import + run --help cleanly.
+scaffold_lib_smoke() {
+    python3 -m lib.scaffold --help >/dev/null 2>&1 \
+        && python3 -m lib.usethis_infra --help >/dev/null 2>&1
+}
+
+# Scaffolding: every `--flag` in each use-* `arguments:` block appears in `## Usage`.
+scaffold_args_usage_sync() {
+    python3 tests/_check_scaffold_args.py
+}
+
 # Phase 4: no removed rforge-mcp tool references may survive in any agent file.
 # (rforge-mcp was absorbed into lib/ in v1.3.0; the tools no longer exist.)
 # Matches both the legacy `rforge_*` underscore form and the `mcp__rforge*`
@@ -559,6 +578,9 @@ run "Dogfood: lib.cranlint Tier-4 advisory CLI on a fixture package" lib_cranlin
 run "Dogfood: lib.runiverse CLI smoke (offline → warn envelope)" lib_runiverse_smoke
 run "Dogfood: lib.s7review CLI smoke (advisory S7 convention envelope)" lib_s7review_smoke
 run "Dogfood: lib.changed CLI smoke (JSON envelope, never raises)" lib_changed_smoke
+run "Scaffolding: use-* commands have frontmatter" scaffold_cmds_frontmatter
+run "Scaffolding: lib.scaffold + usethis_infra smoke" scaffold_lib_smoke
+run "Scaffolding: use-* arguments match Usage" scaffold_args_usage_sync
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
