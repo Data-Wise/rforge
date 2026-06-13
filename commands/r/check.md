@@ -100,13 +100,15 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
   changes → a clean no-op.
 
 !!! note "Cost — `--changed` runs the check twice (baseline is cached)"
-    Tagging pays one extra check run (the merge-base baseline). That
-    baseline is **cached** under `~/.rforge/baseline-cache/`, keyed by
-    `(repo, merge-base SHA, kind, changed-package set, engine flags)`, so a repeat
-    `--changed` run with an unchanged merge-base reuses it and skips the second
-    pass. The cache is **self-invalidating**: new commits on `--base` move the
-    merge-base SHA → new key → automatic miss. Pass **`--no-cache`** to force a
-    fresh baseline (and skip writing one) — useful after upgrading an R engine that
+    Tagging pays one extra check run (the merge-base baseline). That baseline is
+    **cached per package** under `~/.rforge/baseline-cache/`, keyed by
+    `(repo, merge-base SHA, kind, package, engine flags)`, so a repeat `--changed`
+    run with an unchanged merge-base reuses each already-baselined package and
+    re-runs only the uncached ones — when the whole changed set is cached, the
+    second pass is skipped entirely. The cache is **self-invalidating**: new
+    commits on `--base` move the merge-base SHA → new key → automatic miss. Pass
+    **`--no-cache`** to force a fresh baseline (and skip writing one) — useful after
+    upgrading an R engine that
     could change the immutable-tree baseline. Clear it with
     `python3 -m lib.changed --clear-cache`. For a quick scoped run without any
     baseline pass, omit `--changed` and pass the package path directly.

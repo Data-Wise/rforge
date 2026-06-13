@@ -44,6 +44,34 @@ Usage (Python API):
 
 ## Functions
 
+### `cached_baseline()`
+
+```python
+def cached_baseline(path: 'str', base_sha: 'str', items: 'list', run_item: 'Callable[[str, object], list]', key_item: 'Callable[[object], str]', *, use_cache: 'bool' = True) -> 'Optional[list]'
+```
+
+Per-item baseline finding list, each item cached independently.
+
+The whole-baseline cache hits only when the EXACT item set recurs; this hits
+any item already baselined and re-runs ONLY the uncached ones. That matters
+for ecosystem cascade work where the changed-package set grows run-over-run,
+and where the per-item engine run (e.g. ``R CMD check`` per package) — not the
+worktree — is the real cost. For a single item it is behaviour-identical to a
+whole-baseline cache.
+
+For each item: serve ``read_baseline_cache(path, base_sha, key_item(item))`` if
+present; else mark it for a fresh run. If ANY item is uncached, create ONE
+detached merge-base worktree (as ``run_baseline`` does), call
+``run_item(tree_root, item)`` for each uncached item, cache it, and ALWAYS
+remove the worktree (``finally``). Returns the flat combined finding list in
+``items`` order. When every item is a cache hit, NO worktree is created.
+
+Stays R-free: ``items`` are opaque, ``run_item``/``key_item`` are injected.
+Returns None iff a worktree was needed but ``git worktree add`` failed — same
+contract as ``run_baseline`` (caller falls back to scope-only). If
+``run_item`` raises, the worktree is still cleaned up and the exception
+propagates (matches ``run_baseline``).
+
 ### `changed_files()`
 
 ```python
@@ -132,20 +160,28 @@ the exception propagates (callers that want a fallback catch it upstream).
 ### `scope_check()`
 
 ```python
-def scope_check(runner: 'Callable[[str], list]', path: 'str', base: 'str' = 'dev', *, cache_key: 'Optional[str]' = None, use_cache: 'bool' = True) -> 'Optional[dict]'
+def scope_check(runner: 'Callable[[str], list]', path: 'str', base: 'str' = 'dev', *, baseline: 'Optional[Callable[[str, str], Optional[list]]]' = None) -> 'Optional[dict]'
 ```
 
 Two-run introduced/pre-existing tagging over a REAL merge-base checkout.
 
-Orchestrates: merge_base(HEAD, base) → run_baseline (runner at the merge-base
-detached worktree) → runner against the live HEAD tree → tag_findings, then a
-file-level `[uncommitted]` refinement (v2.12.0).
+Orchestrates: merge_base(HEAD, base) → acquire baseline findings → runner
+against the live HEAD tree → tag_findings, then a file-level `[uncommitted]`
+refinement (v2.12.0).
 
 `runner(treedir) -> list[finding]` is injected so this module stays R-free and
 unit-testable; rcmd injects a closure that runs the chosen --kind engine in
-`treedir` and returns its flat finding list. The baseline run executes in a
-genuinely different working tree (the v2.10.0 bug was tagging HEAD vs HEAD —
-here the baseline tree is a real checkout of the merge-base SHA).
+`treedir` and returns its flat finding list. The baseline tree is a genuinely
+different working tree (the v2.10.0 bug was tagging HEAD vs HEAD — here the
+baseline is a real checkout of the merge-base SHA).
+
+**Baseline acquisition is pluggable.** By default scope_check runs `runner`
+once against the merge-base detached worktree (uncached). A caller can inject
+`baseline(path, base_sha) -> Optional[list]` to supply the baseline findings
+its own way — rcmd injects a PER-PACKAGE cached baseline (`cached_baseline`)
+so a repeat --changed run reuses each package's baseline. `baseline` returning
+None means "fall back" (treated like a failed worktree add). The HEAD run
+always uses `runner` directly, so HEAD is never cached.
 
 `[uncommitted]` refinement: after tagging, each `[introduced]` finding whose
 file is in `uncommitted_files(path)` is re-tagged `[uncommitted]` — "you

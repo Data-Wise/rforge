@@ -624,12 +624,107 @@ def test_repo_id_stable_and_distinct(tmp_path):
     assert changed._repo_id(str(a)) != changed._repo_id(str(b))
 
 
-def _counting_runner():
-    """A runner that records every tree it is asked to evaluate.
+def test_cached_baseline_partial_hit_runs_only_uncached(tmp_path, cache_root):
+    """Per-package granularity (candidate-A step 2): caching pkgA's baseline, then
+    requesting [pkgA, pkgB], reuses pkgA from cache and runs ONLY pkgB — the
+    growing changed-set case that ecosystem cascade work hits."""
+    repo, base_sha = _init_repo(tmp_path)
+    ran = []
 
-    Distinguishes baseline ('base' content) from HEAD ('branch' content) by
-    reading f.txt, so we can assert the baseline run was skipped on a cache hit.
-    """
+    def run_item(tree_root, rel):
+        ran.append(rel)
+        return [f"NOTE: {rel}"]
+
+    def key_item(rel):
+        return f"check|{rel}|{{}}"
+
+    out1 = changed.cached_baseline(str(repo), base_sha, ["pkgA"], run_item, key_item)
+    assert out1 == ["NOTE: pkgA"]
+    assert ran == ["pkgA"]
+
+    ran.clear()
+    out2 = changed.cached_baseline(str(repo), base_sha, ["pkgA", "pkgB"],
+                                   run_item, key_item)
+    assert out2 == ["NOTE: pkgA", "NOTE: pkgB"]  # combined, in item order
+    assert ran == ["pkgB"]  # pkgA reused from cache, NOT re-run
+
+
+def test_cached_baseline_all_hits_skip_run(tmp_path, cache_root):
+    """When every item is cached, run_item is never called (no worktree)."""
+    repo, base_sha = _init_repo(tmp_path)
+    ran = []
+
+    def run_item(tree_root, rel):
+        ran.append(rel)
+        return [rel]
+
+    key_item = lambda rel: f"k|{rel}"
+    changed.cached_baseline(str(repo), base_sha, ["a", "b"], run_item, key_item)
+    ran.clear()
+    out = changed.cached_baseline(str(repo), base_sha, ["a", "b"], run_item, key_item)
+    assert out == ["a", "b"]
+    assert ran == []  # all cache hits → no run, no worktree
+
+
+def test_cached_baseline_use_cache_false_never_caches(tmp_path, cache_root):
+    repo, base_sha = _init_repo(tmp_path)
+    ran = []
+
+    def run_item(tree_root, rel):
+        ran.append(rel)
+        return [rel]
+
+    key_item = lambda rel: f"k|{rel}"
+    changed.cached_baseline(str(repo), base_sha, ["a"], run_item, key_item,
+                            use_cache=False)
+    changed.cached_baseline(str(repo), base_sha, ["a"], run_item, key_item,
+                            use_cache=False)
+    assert ran == ["a", "a"]  # ran both times, never cached
+    assert changed.read_baseline_cache(str(repo), base_sha, "k|a") is None
+
+
+def test_cached_baseline_none_when_worktree_add_fails(tmp_path, cache_root):
+    """Not a git repo → worktree add fails → None (caller falls back), and
+    run_item is never invoked."""
+    ran = []
+
+    def run_item(tree_root, rel):
+        ran.append(rel)
+        return [rel]
+
+    out = changed.cached_baseline(str(tmp_path), "deadbeef", ["a"],
+                                  run_item, lambda r: f"k|{r}")
+    assert out is None
+    assert ran == []
+
+
+def test_scope_check_uses_injected_baseline(tmp_path, cache_root):
+    """scope_check delegates baseline acquisition to the injected callable and
+    tags the always-fresh HEAD run against whatever it returns."""
+    repo, _ = _init_repo(tmp_path)
+    res = changed.scope_check(
+        lambda treedir: ["NOTE: old", "NOTE: new"],   # HEAD findings
+        path=str(repo), base="dev",
+        baseline=lambda p, sha: ["NOTE: old"],         # injected baseline
+    )
+    assert res is not None
+    tags = {t["text"]: t["tag"] for t in res["findings"]}
+    assert tags == {"NOTE: old": "pre-existing", "NOTE: new": "introduced"}
+
+
+def test_scope_check_baseline_none_falls_back(tmp_path, cache_root):
+    """A baseline callable returning None → scope_check returns None (caller falls
+    back to scope-only), same as a failed worktree add."""
+    repo, _ = _init_repo(tmp_path)
+    res = changed.scope_check(lambda d: ["x"], path=str(repo), base="dev",
+                              baseline=lambda p, sha: None)
+    assert res is None
+
+
+def test_scope_check_default_baseline_is_uncached(tmp_path, cache_root):
+    """No baseline callable → scope_check uses run_baseline directly (uncached):
+    the baseline runs on every call (no caching without an injected baseline)."""
+    repo, _ = _init_repo(tmp_path)
     seen = []
 
     def runner(treedir):
@@ -638,45 +733,9 @@ def _counting_runner():
         seen.append(txt)
         return ["NOTE: old"] if txt == "base" else ["NOTE: old", "NOTE: new"]
 
-    return runner, seen
-
-
-def test_scope_check_caches_baseline_then_hits(tmp_path, cache_root):
-    repo, _ = _init_repo(tmp_path)
-    runner1, seen1 = _counting_runner()
-    r1 = changed.scope_check(runner1, path=str(repo), base="dev",
-                             cache_key="check|.|{}")
-    assert r1 is not None
-    assert sorted(seen1) == ["base", "branch"]  # MISS: baseline + HEAD ran
-
-    runner2, seen2 = _counting_runner()
-    r2 = changed.scope_check(runner2, path=str(repo), base="dev",
-                             cache_key="check|.|{}")
-    assert r2 is not None
-    assert seen2 == ["branch"]  # HIT: baseline served from cache, only HEAD ran
-    # Tagging is identical whether or not the baseline came from cache.
-    assert {t["text"]: t["tag"] for t in r1["findings"]} == \
-           {t["text"]: t["tag"] for t in r2["findings"]}
-
-
-def test_scope_check_no_cache_bypasses(tmp_path, cache_root):
-    repo, _ = _init_repo(tmp_path)
-    runner, seen = _counting_runner()
-    changed.scope_check(runner, path=str(repo), base="dev",
-                        cache_key="check|.|{}", use_cache=False)
-    # Nothing written, so a use_cache=False run leaves no cache file behind.
-    assert changed.read_baseline_cache(str(repo), "x", "check|.|{}") is None
-    assert sorted(seen) == ["base", "branch"]
-
-
-def test_scope_check_without_cache_key_does_not_cache(tmp_path, cache_root):
-    repo, _ = _init_repo(tmp_path)
-    runner, seen = _counting_runner()
-    # cache_key omitted (default None) → exactly the pre-A behavior, no caching.
     changed.scope_check(runner, path=str(repo), base="dev")
-    runner2, seen2 = _counting_runner()
-    changed.scope_check(runner2, path=str(repo), base="dev")
-    assert sorted(seen2) == ["base", "branch"]  # second run still ran baseline
+    changed.scope_check(runner, path=str(repo), base="dev")
+    assert seen.count("base") == 2  # baseline re-ran (uncached) both times
 
 
 def test_changed_cli_clear_cache(tmp_path, cache_root, capsys):
@@ -688,29 +747,30 @@ def test_changed_cli_clear_cache(tmp_path, cache_root, capsys):
 
 
 def test_scope_check_dict_findings_hit_equals_miss(tmp_path, cache_root):
-    """A cache HIT must yield byte-for-byte the same tagging as a fresh MISS,
-    including for dict (lint) findings that round-trip through JSON. Guards the
-    hit/miss equivalence invariant against future _finding_identity changes
-    (the existing hit test uses only string findings)."""
+    """A per-package cache HIT must yield byte-for-byte the same tagging as a
+    fresh MISS, including dict (lint) findings that round-trip through JSON.
+    Guards hit/miss equivalence against future _finding_identity changes (the
+    string-finding path is covered by the cached_baseline tests above)."""
     repo, _ = _init_repo(tmp_path)
     base = {"file": "R/a.R", "line": 5, "linter": "L",
             "message": "pre-existing", "pkg_dir": "."}
 
-    def runner(treedir):
-        with open(os.path.join(treedir, "f.txt"), encoding="utf-8") as fh:
-            txt = fh.read().strip()
-        if txt == "base":
-            return [base]
-        # HEAD: the pre-existing lint line-shifted to 7 (line is EXCLUDED from
-        # identity → must stay pre-existing) + a genuinely new finding.
+    def run_item(tree_root, rel):                  # baseline: one package "."
+        return [base]
+
+    def runner(treedir):                           # HEAD: shifted + new
         return [{**base, "line": 7},
                 {"file": "R/a.R", "line": 9, "linter": "L",
                  "message": "introduced", "pkg_dir": "."}]
 
+    def mk_baseline():
+        return lambda p, sha: changed.cached_baseline(
+            p, sha, ["."], run_item, lambda rel: "lint|.|{}")
+
     miss = changed.scope_check(runner, path=str(repo), base="dev",
-                               cache_key="lint|.|{}")  # writes the baseline
+                               baseline=mk_baseline())   # writes the baseline
     hit = changed.scope_check(runner, path=str(repo), base="dev",
-                              cache_key="lint|.|{}")   # reads it back via JSON
+                              baseline=mk_baseline())     # reads it back via JSON
     assert miss == hit  # JSON round-trip of the cached baseline is transparent
     tags = {t["text"]["message"]: t["tag"] for t in hit["findings"]}
     assert tags == {"pre-existing": "pre-existing", "introduced": "introduced"}

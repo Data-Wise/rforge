@@ -413,6 +413,68 @@ def clear_baseline_cache(path: Optional[str] = None) -> int:
         return 0
 
 
+def cached_baseline(
+    path: str,
+    base_sha: str,
+    items: list,
+    run_item: Callable[[str, object], list],
+    key_item: Callable[[object], str],
+    *,
+    use_cache: bool = True,
+) -> Optional[list]:
+    """Per-item baseline finding list, each item cached independently.
+
+    The whole-baseline cache hits only when the EXACT item set recurs; this hits
+    any item already baselined and re-runs ONLY the uncached ones. That matters
+    for ecosystem cascade work where the changed-package set grows run-over-run,
+    and where the per-item engine run (e.g. ``R CMD check`` per package) — not the
+    worktree — is the real cost. For a single item it is behaviour-identical to a
+    whole-baseline cache.
+
+    For each item: serve ``read_baseline_cache(path, base_sha, key_item(item))`` if
+    present; else mark it for a fresh run. If ANY item is uncached, create ONE
+    detached merge-base worktree (as ``run_baseline`` does), call
+    ``run_item(tree_root, item)`` for each uncached item, cache it, and ALWAYS
+    remove the worktree (``finally``). Returns the flat combined finding list in
+    ``items`` order. When every item is a cache hit, NO worktree is created.
+
+    Stays R-free: ``items`` are opaque, ``run_item``/``key_item`` are injected.
+    Returns None iff a worktree was needed but ``git worktree add`` failed — same
+    contract as ``run_baseline`` (caller falls back to scope-only). If
+    ``run_item`` raises, the worktree is still cleaned up and the exception
+    propagates (matches ``run_baseline``).
+    """
+    results: list = [None] * len(items)
+    uncached: list = []
+    for i, it in enumerate(items):
+        hit = read_baseline_cache(path, base_sha, key_item(it)) if use_cache else None
+        if hit is not None:
+            results[i] = hit
+        else:
+            uncached.append(i)
+
+    if uncached:
+        tmp = tempfile.mkdtemp(prefix="rforge-baseline-")
+        add = _git(["worktree", "add", "--detach", tmp, base_sha], cwd=path)
+        if add is None or add.returncode != 0:
+            shutil.rmtree(tmp, ignore_errors=True)
+            return None
+        try:
+            for i in uncached:
+                findings = run_item(tmp, items[i])
+                results[i] = findings
+                if use_cache:
+                    write_baseline_cache(path, base_sha, key_item(items[i]), findings)
+        finally:
+            _git(["worktree", "remove", "--force", tmp], cwd=path)
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    combined: list = []
+    for r in results:
+        combined.extend(r or [])
+    return combined
+
+
 # ───────────────────────── two-run orchestration ─────────────────────────
 
 
@@ -470,20 +532,27 @@ def scope_check(
     path: str,
     base: str = "dev",
     *,
-    cache_key: Optional[str] = None,
-    use_cache: bool = True,
+    baseline: Optional[Callable[[str, str], Optional[list]]] = None,
 ) -> Optional[dict]:
     """Two-run introduced/pre-existing tagging over a REAL merge-base checkout.
 
-    Orchestrates: merge_base(HEAD, base) → run_baseline (runner at the merge-base
-    detached worktree) → runner against the live HEAD tree → tag_findings, then a
-    file-level `[uncommitted]` refinement (v2.12.0).
+    Orchestrates: merge_base(HEAD, base) → acquire baseline findings → runner
+    against the live HEAD tree → tag_findings, then a file-level `[uncommitted]`
+    refinement (v2.12.0).
 
     `runner(treedir) -> list[finding]` is injected so this module stays R-free and
     unit-testable; rcmd injects a closure that runs the chosen --kind engine in
-    `treedir` and returns its flat finding list. The baseline run executes in a
-    genuinely different working tree (the v2.10.0 bug was tagging HEAD vs HEAD —
-    here the baseline tree is a real checkout of the merge-base SHA).
+    `treedir` and returns its flat finding list. The baseline tree is a genuinely
+    different working tree (the v2.10.0 bug was tagging HEAD vs HEAD — here the
+    baseline is a real checkout of the merge-base SHA).
+
+    **Baseline acquisition is pluggable.** By default scope_check runs `runner`
+    once against the merge-base detached worktree (uncached). A caller can inject
+    `baseline(path, base_sha) -> Optional[list]` to supply the baseline findings
+    its own way — rcmd injects a PER-PACKAGE cached baseline (`cached_baseline`)
+    so a repeat --changed run reuses each package's baseline. `baseline` returning
+    None means "fall back" (treated like a failed worktree add). The HEAD run
+    always uses `runner` directly, so HEAD is never cached.
 
     `[uncommitted]` refinement: after tagging, each `[introduced]` finding whose
     file is in `uncommitted_files(path)` is re-tagged `[uncommitted]` — "you
@@ -505,19 +574,15 @@ def scope_check(
     if base_sha is None:
         return None
 
-    # Baseline cache (candidate A): when a cache_key is supplied and caching is
-    # enabled, reuse a prior baseline for this (repo, merge-base, key) instead of
-    # re-running the worktree+engine. A miss runs the baseline and writes it.
-    cached = (read_baseline_cache(path, base_sha, cache_key)
-              if use_cache and cache_key is not None else None)
-    if cached is not None:
-        base_findings = cached
+    # Acquire the baseline findings: an injected `baseline` (rcmd's per-package
+    # cached_baseline) or, by default, a single uncached run_baseline. Either may
+    # return None to signal "fall back to scope-only" (no merge-base checkout).
+    if baseline is not None:
+        base_findings = baseline(path, base_sha)
     else:
         base_findings = run_baseline(path=path, base_sha=base_sha, runner=runner)
-        if base_findings is None:
-            return None
-        if use_cache and cache_key is not None:
-            write_baseline_cache(path, base_sha, cache_key, base_findings)
+    if base_findings is None:
+        return None
 
     head_findings = runner(path)
     tagged = tag_findings(head_findings, base_findings)

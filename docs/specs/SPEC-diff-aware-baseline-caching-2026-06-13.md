@@ -30,13 +30,19 @@ Cache the baseline finding list so a repeat `--changed` run with an unchanged
 merge-base reuses it instead of re-running the worktree+engine. Self-invalidating:
 new `base` commits → new merge-base SHA → new key → cache miss → re-run.
 
+> **Update (same branch):** the original design cached the *whole* baseline run
+> keyed by the package set (see the first Non-goal below). After the pre-merge
+> adversarial review, the cache was **generalized to per-package granularity** —
+> strictly better hit rate and miss cost — so the per-package item is no longer a
+> non-goal. Sections below describe the shipped per-package design.
+
 ## Non-goals
 
 - Caching the **HEAD** run (changes on every edit; never cacheable).
-- Per-package cache granularity (a run with a *different* package set is a full
-  miss and re-baselines all its packages). Noted as a future enhancement; v1
-  caches the whole baseline run keyed by the package set. Branches usually touch
-  a stable package set, so practical hit rate is high.
+- ~~Per-package cache granularity~~ — **IMPLEMENTED** (this branch). The baseline
+  is cached per package, not per package-set: a run whose changed-package set
+  *grows* reuses every already-baselined package and re-runs only the uncached
+  ones. (Original v1 plan cached the whole set; superseded.)
 - Cross-engine-version staleness detection. The one staleness vector (user
   upgrades e.g. `lintr` so the immutable tree now lints differently) is handled
   by the `--no-cache` escape hatch, not by stamping engine versions into the key.
@@ -53,20 +59,21 @@ new `base` commits → new merge-base SHA → new key → cache miss → re-run.
   mtime, on every write) + a `--no-cache` flag (bypass read AND write) +
   `--clear-cache` (remove the cache, exit).
 
-### Cache key
+### Cache key (per package)
 
-`changed.py` stays **R-free**: it receives an **opaque `cache_key` string** from
-the caller and owns only the repo-id, SHA, file IO, and prune.
+`changed.py` stays **R-free**: it receives an **opaque `cache_key` string** per
+item from the caller and owns only the repo-id, SHA, file IO, and prune.
 
 - `<repo-id>` = `sha1(git rev-parse --show-toplevel)[:16]` (falls back to
   `sha1(abspath(path))` when not a git repo — defensive; `scope_check` only
   reaches caching after a merge-base resolved, so it is always a repo in
   practice).
 - filename = `<base_sha>-<sha1(cache_key)[:16]>.json`.
-- `rcmd.run_changed` builds the opaque key as
-  `f"{kind}|{','.join(sorted(rel_pkgs))}|{_kwargs_token(run_kwargs)}"` where
-  `_kwargs_token` is a stable serialization of the engine kwargs that affect
-  output (sorted JSON of the kwargs dict).
+- `rcmd.run_changed` builds **one key per changed package**:
+  `f"{kind}|{rel}|{kwargs_token}"` (a single package `rel`, not the joined set),
+  where `kwargs_token` is `json.dumps(run_kwargs, sort_keys=True, default=str)`.
+  Per-package keys are what let a *growing* changed-package set reuse the packages
+  already baselined.
 
 ### File format
 
@@ -74,56 +81,67 @@ the caller and owns only the repo-id, SHA, file IO, and prune.
 {
   "schema": 1,
   "base_sha": "<full merge-base sha>",
-  "cache_key": "<opaque key, stored for debuggability>",
-  "findings": [ /* the flat finding list run_baseline returned */ ]
+  "cache_key": "<opaque per-package key, stored for debuggability>",
+  "findings": [ /* one package's flat baseline finding list */ ]
 }
 ```
 
 Findings are already JSON-serializable (dicts for lint, strings for R CMD check)
 because they round-trip through the envelope today.
 
-### Read/write flow (in `scope_check`)
+### Flow: `cached_baseline` (per item) + pluggable `scope_check`
+
+`scope_check` is **caching-agnostic** — it takes a `baseline(path, base_sha) ->
+Optional[list]` provider (or, by default, runs one uncached `run_baseline`). rcmd
+injects a per-package provider backed by `cached_baseline`:
 
 ```text
-base_sha = merge_base(HEAD, base)            # unchanged
-if base_sha is None: return None             # unchanged fallback
+# scope_check
+base_sha = merge_base(HEAD, base)
+if base_sha is None: return None
+base_findings = baseline(path, base_sha) if baseline else run_baseline(...)
+if base_findings is None: return None          # provider says "fall back"
+# ... unchanged: head_findings = runner(path), tag_findings, [uncommitted] ...
 
-if use_cache and cache_key is not None:
-    cached = read_baseline_cache(path, base_sha, cache_key)
-    if cached is not None:
-        base_findings = cached               # HIT — no worktree, no engine
-    else:
-        base_findings = run_baseline(...)    # MISS
-        if base_findings is None: return None
-        write_baseline_cache(path, base_sha, cache_key, base_findings)
-else:
-    base_findings = run_baseline(...)        # bypass (use_cache=False)
-    if base_findings is None: return None
-
-# ... unchanged: head_findings, tag_findings, [uncommitted] refinement ...
+# cached_baseline(path, base_sha, items, run_item, key_item, *, use_cache)
+for item in items:
+    hit = read_baseline_cache(path, base_sha, key_item(item))   # per item
+    if hit is not None: results[item] = hit
+    else: uncached.append(item)
+if uncached:                                    # ONE worktree, only if needed
+    git worktree add --detach <tmp> <base_sha>
+    for item in uncached:
+        f = run_item(<tmp>, item); cache it; results[item] = f
+    remove worktree (finally)
+return flat(results in items order)             # None iff worktree add failed
 ```
 
-A corrupt/unreadable cache file is treated as a **miss** (never raises).
+When every item hits, **no worktree is created**. A corrupt/unreadable cache file
+is a **miss** (never raises).
 
 ### New functions in `lib/changed.py`
 
 | Function | Responsibility |
 |---|---|
-| `_cache_root() -> Path` | `Path.home()/".rforge"/"baseline-cache"` |
+| `_cache_root() -> Path` | `~/.rforge/baseline-cache` — resolved the raise-proof `expanduser` way (NOT `Path.home()`, which raises on unresolvable HOME), temp-dir fallback |
 | `_repo_id(path) -> str` | `sha1(toplevel)[:16]`, abspath fallback |
 | `_cache_file(path, base_sha, cache_key) -> Path` | resolve the JSON path |
 | `read_baseline_cache(path, base_sha, cache_key) -> Optional[list]` | hit → findings; miss/corrupt → None |
-| `write_baseline_cache(path, base_sha, cache_key, findings, *, keep=20)` | atomic write (tmp+replace) then `_prune` |
+| `write_baseline_cache(path, base_sha, cache_key, findings, *, keep=20)` | atomic write (tmp+replace, tmp removed in `finally`) then `_prune` |
 | `_prune(repo_dir, keep)` | keep `keep` newest `*.json` by mtime; rm rest |
-| `clear_baseline_cache(path=None) -> int` | rm a repo's cache dir (or whole root if `path` None); return files removed |
+| `clear_baseline_cache(path=None) -> int` | rm a repo's cache dir (or whole root if `path` None); return files removed (counts all files) |
+| `cached_baseline(path, base_sha, items, run_item, key_item, *, use_cache=True) -> Optional[list]` | per-item baseline: serve cached items, run only uncached ones in one worktree, combine |
 
 ### Signature changes
 
-- `scope_check(runner, path=".", base="dev", *, cache_key=None, use_cache=True)`
-  — additive, keyword-only; existing callers/tests unaffected (default off-key =
-  no caching, so an omitted `cache_key` runs exactly as today).
-- `rcmd.run_changed(..., use_cache: bool = True)` — builds `cache_key`, passes
-  both through to `scope_check`.
+- `scope_check(runner, path=".", base="dev", *, baseline=None)` — `baseline` is an
+  optional `(path, base_sha) -> Optional[list]` provider. Omitted = one uncached
+  `run_baseline` (the pre-cache behavior, so existing keyless callers/tests are
+  unaffected).
+- `rcmd.run_changed(..., use_cache: bool = True)` — factors a `_pkg_findings(tree,
+  rel)` unit used by both the HEAD `runner` and the baseline; builds a per-package
+  `_pkg_key(rel)`; injects `baseline = cached_baseline(..., _pkg_findings,
+  _pkg_key, use_cache=use_cache)`.
 
 ### CLI
 

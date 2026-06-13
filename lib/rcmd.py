@@ -668,38 +668,49 @@ def run_changed(
                 if Path(p.path).resolve() != Path(root).resolve() else "."
                 for p in pkgs]
 
+    def _pkg_findings(tree_root: str, rel: str) -> list:
+        """Findings for ONE package `rel` under `tree_root`, pkg_dir-annotated.
+
+        The unit of both the HEAD run (via `runner`) and the per-package baseline
+        cache, so HEAD and baseline findings have an identical shape and tag
+        cleanly. The pkg_dir annotation lets scope_check rebase a package-relative
+        finding `file` (R/a.R) to repo-relative (pkgA/R/a.R) and EXACT-match it
+        against `git status` — no cross-package basename collision.
+        """
+        pkg_path = str(Path(tree_root) / rel) if rel != "." else tree_root
+        out: list = []
+        for f in _extract_findings(run(kind, pkg_path, **run_kwargs), kind):
+            if isinstance(f, dict):
+                f = {**f, "pkg_dir": rel}
+            out.append(f)
+        return out
+
     def runner(tree_root: str) -> list:
         findings: list = []
         for rel in rel_pkgs:
-            pkg_path = str(Path(tree_root) / rel) if rel != "." else tree_root
-            for f in _extract_findings(run(kind, pkg_path, **run_kwargs), kind):
-                # Annotate dict findings with their owning package's repo-relative
-                # dir so scope_check can rebase a package-relative finding `file`
-                # (e.g. R/a.R) to repo-relative (pkgA/R/a.R) and EXACT-match it
-                # against `git status` — no cross-package basename collision.
-                if isinstance(f, dict):
-                    f = {**f, "pkg_dir": rel}
-                findings.append(f)
+            findings.extend(_pkg_findings(tree_root, rel))
         return findings
 
-    # Opaque baseline-cache key (candidate A): the baseline finding list is a
-    # pure function of (merge-base sha, kind, package-set, engine-kwargs). sha is
-    # added by changed.scope_check; we encode the rest here. MUST include every
-    # input that changes the baseline output — an under-keyed cache would serve an
-    # under-covering baseline and mis-tag pre-existing findings as [introduced].
-    # `default=str` guarantees key construction never raises on an exotic kwarg
-    # value (the --changed path must not abort on a serialization error). Its only
-    # downside is benign: a non-deterministic str() would vary the key across runs
-    # → cache MISSES (a perf loss), never a wrong-baseline reuse, since distinct
-    # keys can only miss, never collide. All current --changed kwargs are
-    # JSON-native bools, so default=str never even fires today.
-    cache_key = "|".join((
-        kind,
-        ",".join(sorted(rel_pkgs)),
-        json.dumps(run_kwargs, sort_keys=True, default=str),
-    ))
-    result = changed.scope_check(runner, path=root, base=base,
-                                 cache_key=cache_key, use_cache=use_cache)
+    # Per-PACKAGE baseline cache key: kind + the single package rel + engine
+    # kwargs (the merge-base sha is added by cached_baseline). Per-package, not
+    # per-set, so a growing changed-package set reuses already-baselined packages.
+    # MUST include every input that changes a package's baseline findings — an
+    # under-keyed cache would serve an under-covering baseline and mis-tag
+    # pre-existing findings as [introduced]. `default=str` guarantees key
+    # construction never raises on an exotic kwarg value; its only downside is
+    # benign — a non-deterministic str() would vary the key (cache MISSES, a perf
+    # loss), never collide (a wrong-baseline reuse). All current --changed kwargs
+    # are JSON-native bools, so default=str never even fires today.
+    kwargs_token = json.dumps(run_kwargs, sort_keys=True, default=str)
+
+    def _pkg_key(rel: str) -> str:
+        return f"{kind}|{rel}|{kwargs_token}"
+
+    def baseline(p: str, sha: str):
+        return changed.cached_baseline(p, sha, rel_pkgs, _pkg_findings, _pkg_key,
+                                       use_cache=use_cache)
+
+    result = changed.scope_check(runner, path=root, base=base, baseline=baseline)
     if result is not None:
         introduced = result["introduced_count"]
         # --fail-on: default "introduced" → error iff ≥1 introduced; "none" → never.
