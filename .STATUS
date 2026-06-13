@@ -289,7 +289,7 @@ decisions:
 Open candidates (all optional, net-new work → own session/worktree):
 
 A) 🟢 **diff-aware cross-run baseline caching** — the remaining v2.11.0 follow-up (uncommitted tagging shipped v2.12.0). Each `--changed` run still pays one extra baseline check; cache by merge-base SHA.
-B) 🟢 **s7-review breadth** — cross-package S7 *contract* checks (class in pkg A consumed by pkg B's generic — needs an ecosystem-wide S7 registry) + R6/S4 OOP (currently S7-only). Both need specs. (`method_undeclared_dependency` shipped v2.12.0.)
+B) 🟢 **s7-review breadth** — two open sub-items, both need specs. (1) **cross-package S7 *contract* checks** (class in pkg A consumed by pkg B's generic — needs an ecosystem-wide S7 registry; `--eco` runs s7review *per package* but does no cross-package contract analysis). (2) **full R6/S4 *convention* checking** — NOT "S7-only": `check_legacy_oop` (v2.10.0, in `_CHECKS`/`run_all`) already flags S4/R5/R6/S3 *co-residing with S7* (`legacy_s4_in_s7`/`legacy_r5_in_s7`/`legacy_s3_generic`), but only as mid-migration leftovers and only when the pkg also uses `new_class`; a pure-R6/pure-S4 package gets nothing. Open = treating R6/S4 as first-class OOP systems. (`method_undeclared_dependency` shipped v2.12.0.)
 C) ✅ **Index redesign (A+)** — SHIPPED (PR #42 dev→main, docs-only, live-verified): grid cards + "Where rforge fits" mermaid lifecycle + collapsed the 13 "What's new" sections to one `{{ rforge.version }}`-macro'd section. `PROPOSAL-index-redesign-2026-06-13.md` (kept for provenance).
 
 Background, no active task:
