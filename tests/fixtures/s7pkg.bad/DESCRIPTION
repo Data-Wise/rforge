@@ -4,4 +4,6 @@ Version: 0.0.1
 Description: A fixture package that violates S7 conventions on purpose.
 Authors@R: person("Test", "User", email = "t@example.com", role = c("aut", "cre", "cph"))
 License: MIT
+Imports:
+    S7
 Encoding: UTF-8

@@ -1,5 +1,5 @@
 site_name: RForge Plugin
-site_description: R package ecosystem orchestrator - 39 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)
+site_description: R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)
 site_url: https://data-wise.github.io/rforge/
 
 repo_name: Data-Wise/rforge
@@ -51,10 +51,10 @@ extra_css:
 # scripts/version_sync.py — do not hand-edit version/prev_version/release_date.
 extra:
   rforge:
-    version: "2.10.0"
-    prev_version: "2.9.0"
+    version: "2.11.0"
+    prev_version: "2.10.0"
     release_date: "2026-06-13"
-    command_count: 39
+    command_count: 41
 
 plugins:
   - search

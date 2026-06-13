@@ -133,4 +133,37 @@ to expand. Dry-run by default.
 def scaffold(mode: 'str', path: 'str' = '.', *, fn: 'str' = '', pkg: 'str' = '', name: 'str' = '', article: 'bool' = False, write: 'bool' = False, force: 'bool' = False) -> 'dict'
 ```
 
-Dispatch to the three planners. Returns the envelope.
+Dispatch to the planners. Returns the envelope.
+
+### `scaffold_citation()`
+
+```python
+def scaffold_citation(path: 'str | os.PathLike' = '.', *, write: 'bool' = False, force: 'bool' = False) -> 'dict'
+```
+
+Plan (and, on ``--write``, write) ``inst/CITATION`` from DESCRIPTION.
+
+Parses ``Title``/``Authors@R`` (or fallback ``Author``)/``Version`` and the
+year (from ``Date`` if present, else a ``<YEAR>`` TODO — **never** a
+wall-clock date, per the determinism rule). Renders a
+``bibentry(bibtype = "Manual", ...)`` with the package's own ``person()``
+calls. Refuses to clobber an existing ``inst/CITATION`` without ``force``.
+Unparseable authors degrade to a ``# TODO`` block + a warn (never raises).
+Dry-run by default.
+
+### `scaffold_data()`
+
+```python
+def scaffold_data(name: 'str', path: 'str | os.PathLike' = '.', *, write: 'bool' = False) -> 'dict'
+```
+
+Plan (and, on ``--write``, apply) documentation for a package dataset.
+
+Appends a roxygen doc stub (``@title``/``@format \describe{}``/``@source`` +
+the trailing ``"<name>"`` documented-data idiom) to ``R/data.R`` and patches
+``DESCRIPTION`` (``LazyData: true`` / ``Depends: R (>= 2.10)``). The
+DESCRIPTION edit goes through the shared constraint-preserving DCF writer
+(``deps_sync._read_field_specs`` / ``_rewrite_field``) — existing version
+floors survive. **Never fabricates the ``.rda``** (the data is the user's);
+emits the exact ``usethis::use_data(<name>)`` command instead. Dry-run by
+default.

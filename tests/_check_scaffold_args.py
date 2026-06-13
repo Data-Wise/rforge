@@ -4,7 +4,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CMDS = ["use-test.md", "use-package.md", "use-vignette.md"]
+CMDS = ["use-test.md", "use-package.md", "use-vignette.md",
+        "use-data.md", "use-citation.md"]
 
 
 def check(path: Path) -> list[str]:

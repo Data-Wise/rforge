@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
 [![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
-**R package ecosystem orchestrator for Claude Code — 39 commands, R-aware hooks, validation skills.**
+**R package ecosystem orchestrator for Claude Code — 41 commands, R-aware hooks, validation skills.**
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
@@ -491,6 +491,6 @@ MIT
 
 ---
 
-**Version:** 2.10.0
+**Version:** 2.11.0
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+

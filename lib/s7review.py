@@ -32,6 +32,9 @@ import sys
 from pathlib import Path
 from typing import Optional
 
+from . import discovery
+from . import rcmd
+
 # ─────────────────────────── S7 API vocabulary ───────────────────────────
 # One edit point as the S7 API churns. Targeted constructor/generic/method
 # call names + the class_* type-helper prefix S7 ships.
@@ -674,6 +677,134 @@ def run_all(path: str | os.PathLike = ".") -> dict:
             "engine_missing": []}
 
 
+# ─────────────────────────── --eco ecosystem sweep ───────────────────────────
+def run_eco(root: str | os.PathLike = ".") -> dict:
+    """Run the 5 static families across **every package** in the ecosystem.
+
+    Resolves the package set via ``discovery.detect_ecosystem`` (the single source
+    of truth + the curated ``manifest_order``), runs ``run_all`` per package, and
+    aggregates one envelope: a per-package breakdown plus an ecosystem roll-up
+    (total findings by family, packages clean vs flagged). Ordered by
+    ``manifest_order`` when present, else discovery order.
+
+    Pure-stdlib (no R). A package that raises during its sweep is reported as a
+    per-package ``warn`` rather than aborting the whole sweep — never raises.
+    """
+    eco = discovery.detect_ecosystem(root)
+    pkgs = list(eco.packages)
+    # Order by the curated manifest order when present; unknown packages keep
+    # discovery order, appended after the curated ones.
+    if eco.manifest_order:
+        rank = {name: i for i, name in enumerate(eco.manifest_order)}
+        pkgs.sort(key=lambda p: (rank.get(p.name, len(rank)), p.name))
+
+    per_package: list[dict] = []
+    by_family: dict[str, int] = {}
+    for pkg in pkgs:
+        try:
+            env = run_all(pkg.path)
+            findings = [f for s in env.get("stages", []) for f in s.get("findings", [])]
+            for s in env.get("stages", []):
+                if s.get("findings"):
+                    by_family[s["kind"]] = by_family.get(s["kind"], 0) + len(s["findings"])
+            per_package.append({
+                "package": pkg.name, "path": pkg.path,
+                "status": env["status"], "stages": env.get("stages", []),
+                "finding_count": len(findings),
+                "messages": env.get("messages", []),
+            })
+        except Exception as exc:  # noqa: BLE001 — advisory sweep must never abort
+            per_package.append({
+                "package": pkg.name, "path": pkg.path, "status": "warn",
+                "stages": [], "finding_count": 0,
+                "messages": [f"s7review skipped for '{pkg.name}': {exc}"],
+            })
+
+    flagged = sum(1 for p in per_package if p["status"] == "warn")
+    status = "warn" if flagged else "ok"
+    return {
+        "kind": "s7review-eco", "status": status,
+        "packages": per_package,
+        "rollup": {
+            "by_family": by_family,
+            "packages_total": len(per_package),
+            "packages_flagged": flagged,
+            "packages_clean": len(per_package) - flagged,
+        },
+        "engine_missing": [],
+    }
+
+
+# ─────────────────────────── --runtime (R-backed) ───────────────────────────
+def _runtime_stages(path: str | os.PathLike) -> list[dict]:
+    """Run the R-backed ``s7runtime`` engine and map its JSON to the two runtime
+    families ``method-dispatch`` + ``validator-runtime``.
+
+    All R goes through ``lib.rcmd`` (this module shells out to nothing). Degrades
+    to two ``warn`` stages ("runtime pass skipped: <reason>") when R / S7 is
+    unavailable, the engine errors, or ``rcmd.run`` raises — never propagates.
+    """
+    try:
+        env = rcmd.run(kind="s7runtime", path=str(path))
+    except Exception as exc:  # noqa: BLE001 — runtime is advisory; never abort
+        return _runtime_skipped(f"runtime pass skipped: {exc}")
+
+    if env.get("engine_missing") or env.get("status") == "error":
+        reason = "; ".join(env.get("messages", [])) or "R / S7 unavailable"
+        return _runtime_skipped(f"runtime pass skipped: {reason}")
+
+    rt = env.get("s7runtime", {})
+    md_findings: list[dict] = []
+    for gen in rt.get("dead_generics", []):
+        md_findings.append({
+            "code": "dead_generic", "severity": "advisory",
+            "file": "", "line": 0, "symbol": gen, "source": "runtime",
+            "message": (f"S7 generic '{gen}' has no registered method at runtime "
+                        "— dispatch can never resolve (dead generic)."),
+        })
+    # NOTE: `method_on_missing_class` is DEFERRED — the registry can't decide it
+    # from introspection alone (the R engine returns an empty placeholder list),
+    # so we do not build findings for it. Only `dead_generic` is wired here.
+    vr_findings: list[dict] = []
+    for cls in rt.get("nonenforcing_validators", []):
+        vr_findings.append({
+            "code": "validator_not_enforcing", "severity": "advisory",
+            "file": "", "line": 0, "symbol": cls, "source": "runtime",
+            "message": (f"S7 class '{cls}' has a validator but accepted a "
+                        "deliberately-invalid property value at runtime — the "
+                        "validator is present but not actually enforcing."),
+        })
+
+    md = _envelope("method-dispatch",
+                   "warn" if md_findings else "ok", md_findings,
+                   [] if md_findings else ["S7 generics all resolve at runtime."])
+    vr = _envelope("validator-runtime",
+                   "warn" if vr_findings else "ok", vr_findings,
+                   [] if vr_findings else ["S7 validators enforce at runtime."])
+    return [md, vr]
+
+
+def _runtime_skipped(reason: str) -> list[dict]:
+    """Two degraded runtime stages carrying the skip reason (status ok, advisory)."""
+    return [
+        _envelope("method-dispatch", "ok", [], [reason]),
+        _envelope("validator-runtime", "ok", [], [reason]),
+    ]
+
+
+def run_all_with_runtime(path: str | os.PathLike = ".") -> dict:
+    """``run_all`` + the two R-backed runtime families, merged into one envelope.
+
+    Never raises: the runtime pass degrades to advisory ``warn`` stages when R is
+    unavailable, so the static result is always intact. Worst-of (ok<warn) status.
+    """
+    static = run_all(path)
+    stages = list(static.get("stages", [])) + _runtime_stages(path)
+    status = "warn" if any(s["status"] == "warn" for s in stages) else "ok"
+    return {"kind": "s7review", "status": status, "stages": stages,
+            "engine_missing": []}
+
+
 def _main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(
         prog="python3 -m lib.s7review",
@@ -685,12 +816,45 @@ def _main(argv: Optional[list[str]] = None) -> int:
         choices=("all", "naming", "validators", "methods", "legacy", "docs"),
         default="all", help="Which family to run (default: all).")
     parser.add_argument("--format", choices=("json", "text"), default="json")
+    parser.add_argument(
+        "--eco", action="store_true",
+        help="run the static families across every package in the ecosystem "
+             "manifest, aggregated (pure-stdlib; composes with --runtime).")
+    parser.add_argument(
+        "--runtime", action="store_true",
+        help="add an R-backed runtime pass (method-dispatch + validator-runtime) "
+             "via lib.rcmd; degrades to advisory warn when R/S7 is unavailable.")
     args = parser.parse_args(argv)
 
-    env = run_all(args.path) if args.kind == "all" else _CHECKS[args.kind](args.path)
+    def _one(path: str) -> dict:
+        if args.kind != "all":
+            return _CHECKS[args.kind](path)
+        return run_all_with_runtime(path) if args.runtime else run_all(path)
+
+    if args.eco:
+        if args.runtime:
+            # ecosystem sweep + per-package runtime pass.
+            eco = run_eco(args.path)
+            for pkg in eco["packages"]:
+                pkg["stages"] = list(pkg.get("stages", [])) + _runtime_stages(pkg["path"])
+                pkg["status"] = ("warn"
+                                 if any(s["status"] == "warn" for s in pkg["stages"])
+                                 else pkg["status"])
+            eco["status"] = ("warn" if any(p["status"] == "warn"
+                                           for p in eco["packages"]) else "ok")
+            env = eco
+        else:
+            env = run_eco(args.path)
+    else:
+        env = _one(args.path)
 
     if args.format == "text":
         print(f"{env['kind']}: {env['status']}")
+        if env.get("kind") == "s7review-eco":
+            for pkg in env.get("packages", []):
+                print(f"  {pkg['status']:>4}  {pkg['package']} "
+                      f"({pkg.get('finding_count', 0)} findings)")
+            return 0
         stages = env.get("stages", [env])
         for s in stages:
             for f in s.get("findings", []):

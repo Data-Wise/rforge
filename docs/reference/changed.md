@@ -17,10 +17,14 @@ Pure-stdlib (subprocess + pathlib only — no R, no third-party). Three jobs:
                           list, tagging each finding [introduced] vs
                           [pre-existing] (multiset semantics: duplicates count).
 
-Plus scope_check(): a DORMANT helper for future two-run introduced/pre-existing
-tagging. It is NOT wired into the live `r:check --changed` path (which is
-scope-only) because the merge-base checkout it needs is not yet built. See its
-docstring.
+Plus the two-run tagging machinery (v2.11.0):
+  4. merge_base()       — resolve the fork point git merge-base(HEAD, base).
+  5. run_baseline()     — `git worktree add --detach` the merge-base into a
+                          temp tree under the SYSTEM temp dir, run an injected
+                          runner there, and GUARANTEE worktree removal (finally).
+  6. scope_check()      — orchestrate merge_base → baseline run → current run →
+                          tag_findings; returns None (caller falls back to
+                          scope-only) on any git failure.
 
 Advisory, never raises. git failures (not a repo, no merge-base, git missing)
 return None so callers can warn and fall back to a full run. "No changes" is the
@@ -67,32 +71,60 @@ package set, then keeps packages with at least one changed file under them.
 Files owning no package (top-level README, docs/) are silently dropped.
 Result order follows discovery order; each package is returned at most once.
 
+### `merge_base()`
+
+```python
+def merge_base(path: 'str' = '.', base: 'str' = 'dev') -> 'Optional[str]'
+```
+
+Resolve the fork point: git merge-base(HEAD, base).
+
+Returns the merge-base SHA, or None when there is no common ancestor, `base`
+is unknown, `path` is not a git repo, or git is missing. Advisory — never
+raises; callers warn and fall back to a full/scope-only run on None.
+
+### `run_baseline()`
+
+```python
+def run_baseline(path: 'str', base_sha: 'str', runner: 'Callable[[str], list]') -> 'Optional[list]'
+```
+
+Run `runner` against a detached worktree checked out at `base_sha`.
+
+Steps: create a temp dir under the SYSTEM temp root (NOT inside the repo, so
+`git status` stays clean and the PreToolUse "writes outside worktree" warning
+never fires); `git worktree add --detach <tmp> <base_sha>`; call
+`runner(<tmp>)` and return its finding list. The worktree is ALWAYS removed
+(`git worktree remove --force` + rmtree) in a `finally`, so a crash mid-run
+never leaks a worktree.
+
+Returns None only when the worktree add itself fails (bad SHA, git missing) —
+in that case nothing was created, so there is nothing to clean up and the
+caller falls back. If `runner` raises, the worktree is still cleaned up and
+the exception propagates (callers that want a fallback catch it upstream).
+
 ### `scope_check()`
 
 ```python
-def scope_check(run_check, path: 'str', base: 'str') -> 'Optional[dict]'
+def scope_check(runner: 'Callable[[str], list]', path: 'str', base: 'str' = 'dev') -> 'Optional[dict]'
 ```
 
-DORMANT (NOT YET WIRED): two-run introduced/pre-existing tagging helper.
+Two-run introduced/pre-existing tagging over a REAL merge-base checkout.
 
-This is a building block for a *future* honest comparison, and is NOT used by
-the live `r:check --changed` path. The blocker: an honest comparison needs
-`run_check(merge_base)` to actually check out the merge-base into a detached
-worktree and run R there. That checkout mechanism is not built yet — the
-command layer currently has no way to run R against anything but the live
-worktree, so wiring this in would compare the worktree against itself and tag
-every finding identically (a silent false-negative). Until the merge-base
-checkout lands, `r:check --changed` is scope-only (see lib.rcmd.run_changed)
-and this function is unreachable from the command path. It is kept (with its
-unit tests) so the future wiring has a tested core.
+Orchestrates: merge_base(HEAD, base) → run_baseline (runner at the merge-base
+detached worktree) → runner against the live HEAD tree → tag_findings.
 
-`run_check(checkout_ref) -> envelope` is injected so this module stays R-free
-and unit-testable.
+`runner(treedir) -> list[finding]` is injected so this module stays R-free and
+unit-testable; rcmd injects a closure that runs the chosen --kind engine in
+`treedir` and returns its flat finding list. The baseline run executes in a
+genuinely different working tree (the v2.10.0 bug was tagging HEAD vs HEAD —
+here the baseline tree is a real checkout of the merge-base SHA).
 
-Returns None when no merge-base resolves. Otherwise returns:
+Returns None (caller falls back to scope-only) when the merge-base does not
+resolve or the baseline worktree add fails. Otherwise:
     {"base": <ref>, "merge_base": <sha>,
-     "findings": [{"text":..., "level":"error|warning|note", "tag":...}, ...],
-     "introduced_counts": {"errors": n, "warnings": n, "notes": n}}
+     "findings": [{"text":..., "tag": "introduced"|"pre-existing"}, ...],
+     "introduced_count": <int>}
 
 ### `tag_findings()`
 
@@ -104,5 +136,10 @@ Tag each HEAD finding `[introduced]` vs `[pre-existing]` (multiset diff).
 
 A finding present on HEAD but absent from base is `introduced`. A finding on
 both is `pre-existing`. Multiset semantics: if HEAD has a finding twice and
-base once, one copy is introduced and one pre-existing. Findings are compared
-by their string form (R CMD check findings are plain strings).
+base once, one copy is introduced and one pre-existing.
+
+Identity is `_finding_identity`: plain-string findings (R CMD check) compare
+by string; dict findings (lint) compare by `(file, message, linter)` —
+EXCLUDING the raw `line`, so a line-shifted pre-existing lint stays
+`pre-existing` rather than flipping to `introduced`. The full finding is
+preserved in `text` for display.

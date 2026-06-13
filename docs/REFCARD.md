@@ -60,12 +60,14 @@
 │    /rforge:r:urlcheck     URL breakage check (urlchecker)                   │
 │    /rforge:r:style        Auto-format source (styler)                       │
 │    /rforge:r:deps-sync    Reconcile DESCRIPTION vs code usage (--write)     │
-│    /rforge:r:s7-review    Static S7 convention checker (advisory, v2.10.0)  │
+│    /rforge:r:s7-review    Static S7 convention checker (advisory, v2.11.0)  │
 │                                                                             │
-│  R AUTHORING (v2.10.0, scaffold existing pkgs — dry-run; --write to apply)  │
+│  R AUTHORING (v2.11.0, scaffold existing pkgs — dry-run; --write to apply)  │
 │    /rforge:r:use-test     Draft a testthat file (assertions left as TODO)   │
 │    /rforge:r:use-package  Declare a dep (Imports/Suggests) + @importFrom    │
 │    /rforge:r:use-vignette Scaffold a vignette/article skeleton + outline    │
+│    /rforge:r:use-data     Document a dataset (R/data.R + DESCRIPTION patch) │
+│    /rforge:r:use-citation Scaffold inst/CITATION from DESCRIPTION metadata  │
 │                                                                             │
 │  CRAN SUBMISSION (v2.2.0)                                                   │
 │    /rforge:r:revdep       Reverse-dep check vs CRAN downstream (revdepcheck)│
@@ -82,11 +84,12 @@
 │                           [check (incoming)], description, build-hygiene,   │
 │                           docs-consistency  (strict ERROR blocks ready)     │
 │                                                                             │
-│  DIFF-AWARE --changed (v2.10.0) on r:check / r:test / r:lint                │
+│  DIFF-AWARE --changed (v2.11.0) on r:check / r:test / r:lint                │
 │    --changed [--base <ref>] Scope to packages changed on this branch        │
-│    r:check --changed        scope-only: real full status (introduced/pre-   │
-│                             existing tagging NOT YET WIRED — needs merge-    │
-│                             base checkout; --changed-strict is a no-op)      │
+│    r:check --changed        two-run tagging: same engine at merge-base      │
+│                             baseline vs HEAD → [introduced]/[pre-existing]; │
+│                             --fail-on introduced (default) errors on new    │
+│                             findings only; --changed-strict is a no-op      │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -362,10 +365,12 @@ rforge/
 | Reverse-dep check | `/rforge:r:revdep` | CRAN downstream obligation |
 | Advisory best practices | `/rforge:r:goodpractice` | Pre-submission advisory pass |
 | Check S7 conventions | `/rforge:r:s7-review` | Static, advisory — naming/validators/methods/legacy/docs |
-| Check only changed packages | `/rforge:r:check --changed` | Scope-only; real full status (introduced/pre-existing tagging not yet wired) |
+| Check only changed packages | `/rforge:r:check --changed` | Scopes to packages changed vs `--base`; tags findings [introduced]/[pre-existing] via a merge-base baseline (`--fail-on introduced` by default); `--changed-strict` is a no-op |
 | Scaffold a test file | `/rforge:r:use-test` | Draft test_that() blocks (TODO assertions) |
 | Add a dependency | `/rforge:r:use-package` | Imports/Suggests + @importFrom |
 | Scaffold a vignette | `/rforge:r:use-vignette` | knitr skeleton + outline |
+| Document a dataset | `/rforge:r:use-data` | R/data.R roxygen + DESCRIPTION (LazyData/Depends) |
+| Scaffold a citation | `/rforge:r:use-citation` | inst/CITATION from DESCRIPTION (deterministic year) |
 
 ---
 

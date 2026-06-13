@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import re
 import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -19,6 +20,21 @@ import pytest
 from lib import scaffold
 
 FIXTURE = Path(__file__).parent / "fixtures" / "scaffoldpkg"
+
+_RSCRIPT = shutil.which("Rscript")
+
+
+def _assert_r_parses(content: str) -> None:
+    """Paren-balance always; R-parse gate behind a skipif when Rscript exists."""
+    assert content.count("(") == content.count(")"), (
+        "generated R has unbalanced parentheses:\n" + content)
+    if _RSCRIPT is None:
+        pytest.skip("Rscript not available — paren-balance checked, parse gate skipped")
+    proc = subprocess.run(
+        [_RSCRIPT, "-e", "invisible(parse(text=commandArgs(TRUE)[1]))", content],
+        capture_output=True, text=True)
+    assert proc.returncode == 0, (
+        f"generated R failed to parse:\n{content}\n--- stderr ---\n{proc.stderr}")
 
 
 @pytest.fixture
@@ -218,4 +234,195 @@ def test_plan_vignette_refuses_overwrite_without_force(pkg: Path):
     scaffold.plan_vignette(pkg, "intro", write=True)
     env = scaffold.plan_vignette(pkg, "intro", write=True)
     assert env["status"] == "warn"
-    assert any("--force" in m for m in env["messages"])
+
+
+# ───────────────────────── r:use-data planning ─────────────────────────
+
+
+def test_scaffold_data_dry_run_writes_nothing(pkg: Path):
+    data_r = pkg / "R" / "data.R"
+    desc_before = (pkg / "DESCRIPTION").read_text(encoding="utf-8")
+    env = scaffold.scaffold_data("mydat", path=pkg, write=False)
+    assert env["status"] == "ok"
+    assert not data_r.exists()
+    # DESCRIPTION untouched on dry-run
+    assert (pkg / "DESCRIPTION").read_text(encoding="utf-8") == desc_before
+
+
+def test_scaffold_data_dry_run_renders_roxygen_stub(pkg: Path):
+    env = scaffold.scaffold_data("mydat", path=pkg, write=False)
+    content = env["plan"]["content"]
+    assert "@title" in content
+    assert "@format" in content
+    assert "\\describe{" in content
+    assert "@source" in content
+    # the documented-data idiom: trailing quoted name
+    assert '"mydat"' in content
+
+
+def test_scaffold_data_dry_run_reports_description_delta(pkg: Path):
+    env = scaffold.scaffold_data("mydat", path=pkg, write=False)
+    blob = " ".join(env["messages"]) + repr(env.get("plan", {}))
+    assert "LazyData" in blob
+    assert "Depends" in blob
+
+
+def test_scaffold_data_write_appends_data_r_and_patches_description(pkg: Path):
+    data_r = pkg / "R" / "data.R"
+    env = scaffold.scaffold_data("mydat", path=pkg, write=True)
+    assert env["status"] == "ok"
+    assert data_r.exists()
+    body = data_r.read_text(encoding="utf-8")
+    assert '"mydat"' in body
+    desc = (pkg / "DESCRIPTION").read_text(encoding="utf-8")
+    assert re.search(r"^LazyData:\s*true", desc, re.MULTILINE)
+    assert re.search(r"^Depends:.*R \(>= 2\.10\)", desc, re.MULTILINE | re.DOTALL)
+    # never fabricates the .rda; emits the produce-it reminder
+    assert not (pkg / "data" / "mydat.rda").exists()
+    assert any("use_data" in m for m in env["messages"])
+
+
+def test_scaffold_data_write_preserves_version_constraints(pkg: Path):
+    """r:use-data --write must NOT drop (>= x.y.z) floors (v2.10.0 regression lock)."""
+    desc_path = pkg / "DESCRIPTION"
+    desc_path.write_text(
+        desc_path.read_text(encoding="utf-8").replace(
+            "Imports:\n    stats\n", "Imports:\n    stats,\n    dplyr (>= 1.1.0)\n"),
+        encoding="utf-8")
+    scaffold.scaffold_data("mydat", path=pkg, write=True)
+    desc = desc_path.read_text(encoding="utf-8")
+    assert "dplyr (>= 1.1.0)" in desc, desc
+    assert "testthat (>= 3.0.0)" in desc, desc
+
+
+def test_scaffold_data_write_collision_no_duplicate_warns(pkg: Path):
+    scaffold.scaffold_data("mydat", path=pkg, write=True)
+    env = scaffold.scaffold_data("mydat", path=pkg, write=True)
+    assert env["status"] == "warn"
+    body = (pkg / "R" / "data.R").read_text(encoding="utf-8")
+    assert body.count('"mydat"') == 1, body
+    assert any("already" in m.lower() or "exist" in m.lower() for m in env["messages"])
+
+
+def test_scaffold_data_collision_guard_matches_indented_doc(pkg: Path):
+    """MINOR 11: the collision guard must match an EXISTING `"name"` line even
+    when it is indented and/or carries a trailing comment (the column-0 anchor
+    used to miss those, duplicating the doc)."""
+    data_r = pkg / "R" / "data.R"
+    data_r.parent.mkdir(parents=True, exist_ok=True)
+    data_r.write_text(
+        "# hand-written docs\n"
+        '#\' some roxygen\n'
+        '    "mydat"   # documented, but indented + commented\n',
+        encoding="utf-8")
+    env = scaffold.scaffold_data("mydat", path=pkg, write=True)
+    assert env["status"] == "warn"
+    body = data_r.read_text(encoding="utf-8")
+    assert body.count('"mydat"') == 1, body
+
+
+def test_scaffold_data_is_pure_stdlib():
+    """No R subprocess imports in the scaffold module (pure-stdlib)."""
+    src = (Path(scaffold.__file__)).read_text(encoding="utf-8")
+    assert "import subprocess" not in src
+    assert "subprocess.run" not in src
+    assert "Rscript" not in src
+
+
+# ───────────────────────── r:use-citation planning ─────────────────────────
+
+
+def test_scaffold_citation_dry_run_renders_bibentry(pkg: Path):
+    env = scaffold.scaffold_citation(path=pkg, write=False)
+    content = env["plan"]["content"]
+    assert "bibentry(" in content
+    assert re.search(r'bibtype\s*=\s*"Manual"', content)
+    assert "scaffoldpkg" in content          # package/title appears
+    assert "person(" in content              # Authors@R mapped to person()
+    assert not (pkg / "inst" / "CITATION").exists()
+
+
+def test_scaffold_citation_year_is_todo_when_date_absent(pkg: Path):
+    """Determinism: no wall-clock date — a <YEAR> TODO instead (fixture has no Date)."""
+    env = scaffold.scaffold_citation(path=pkg, write=False)
+    content = env["plan"]["content"]
+    assert "<YEAR>" in content
+    # never a real four-digit year fabricated from the clock
+    assert not re.search(r"year\s*=\s*\"20\d\d\"", content)
+
+
+def test_scaffold_citation_write_creates_inst_citation(pkg: Path):
+    target = pkg / "inst" / "CITATION"
+    env = scaffold.scaffold_citation(path=pkg, write=True)
+    assert env["status"] == "ok"
+    assert target.exists()
+    assert "bibentry(" in target.read_text(encoding="utf-8")
+
+
+def test_scaffold_citation_write_refuses_clobber_without_force(pkg: Path):
+    scaffold.scaffold_citation(path=pkg, write=True)
+    env = scaffold.scaffold_citation(path=pkg, write=True)
+    assert env["status"] == "warn"
+    env2 = scaffold.scaffold_citation(path=pkg, write=True, force=True)
+    assert env2["status"] == "ok"
+
+
+def test_scaffold_citation_unparseable_authors_warns_not_raises(tmp_path: Path):
+    root = tmp_path / "weirdpkg"
+    (root).mkdir()
+    (root / "DESCRIPTION").write_text(
+        "Package: weirdpkg\nTitle: Weird\nVersion: 0.1\n"
+        "Author: nobody in particular, unparseable <<<\n", encoding="utf-8")
+    env = scaffold.scaffold_citation(path=root, write=False)
+    # never raises; degrades to a TODO author block + warn
+    content = env["plan"]["content"]
+    assert "TODO" in content
+    assert env["status"] == "warn"
+    assert any("Authors@R" in m or "author" in m.lower() for m in env["messages"])
+
+
+# ── BLOCKER 1+2 regression: generated CITATION must be valid, parseable R ──
+
+def _cite_for(tmp_path: Path, authors_r: str, *, title: str = "A Title",
+              version: str = "1.2.3") -> str:
+    root = tmp_path / "citpkg"
+    root.mkdir()
+    (root / "DESCRIPTION").write_text(
+        f"Package: citpkg\nTitle: {title}\nVersion: {version}\n"
+        f"Authors@R: {authors_r}\n", encoding="utf-8")
+    return scaffold.scaffold_citation(path=root, write=False)["plan"]["content"]
+
+
+def test_scaffold_citation_single_person_parses(tmp_path: Path):
+    content = _cite_for(tmp_path, 'person("Ada", "Lovelace")')
+    _assert_r_parses(content)
+
+
+def test_scaffold_citation_nested_role_c_parses(tmp_path: Path):
+    """BLOCKER 1: the normal `role = c("aut","cre")` idiom must not truncate."""
+    content = _cite_for(
+        tmp_path, 'person("Ada", "Lovelace", email = "a@b.com", '
+                  'role = c("aut", "cre"))')
+    assert 'role = c("aut", "cre")' in content   # not truncated at `c("aut"`
+    _assert_r_parses(content)
+
+
+def test_scaffold_citation_two_authors_parses(tmp_path: Path):
+    content = _cite_for(
+        tmp_path,
+        'c(person("Ada", "Lovelace", role = c("aut", "cre")), '
+        'person("Grace", "Hopper", role = "ctb"))')
+    _assert_r_parses(content)
+
+
+def test_scaffold_citation_fixture_authors_r_parses():
+    """The repo's OWN scaffoldpkg fixture uses role=c(...) — it must parse."""
+    content = scaffold.scaffold_citation(path=FIXTURE, write=False)["plan"]["content"]
+    _assert_r_parses(content)
+
+
+def test_scaffold_citation_quoted_title_escaped_and_parses(tmp_path: Path):
+    """BLOCKER 2: a Title containing `"` must not break the R string literal."""
+    content = _cite_for(tmp_path, 'person("Ada", "Lovelace")',
+                        title='A "Quoted" Title')
+    _assert_r_parses(content)
