@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.9.0] - 2026-06-12
+
+> Rewrites the single agent (`agents/orchestrator.md`), which had been stale
+> since v1.3.0: it delegated to 13 `rforge_*` MCP tools (43 references) removed
+> when rforge-mcp was absorbed into pure-Python `lib/` modules. The rewrite
+> delegates via `python3 -m lib.*` envelopes instead. Last craft-parity item
+> (Phase 4). No command-surface change — still 35 commands, still 1 agent.
+
+### Changed
+
+- **Orchestrator agent rewritten** — `agents/orchestrator.md` now delegates via
+  `python3 -m lib.*` envelopes (run through Bash) instead of the removed
+  `rforge_*` MCP tools. Adds `name`/`description` frontmatter, an intent→lib
+  mapping (CODE_CHANGE / NEW_FUNCTION / BUG_FIX / DEPS_AUDIT / CRAN_READINESS /
+  ECOSYSTEM_HEALTH), a read-only/recommend-only safety boundary (mirrors the
+  "never auto-submit" principle — `r:submit`/`winbuilder`/`rhub`/`--write`/
+  `revdep` are recommended, never auto-run), and envelope synthesis.
+
+### Added
+
+- Three `tests/test-all.sh` guards (**33 → 36 checks**): no `rforge_` MCP refs in
+  any agent file (regression lock for the bug this release fixes), orchestrator
+  carries `name`+`description` frontmatter, and every `--kind` it names is a real
+  `lib.rcmd` engine (`tests/_check_agent_engines.py`).
+
+---
+
 ## [2.8.0] - 2026-06-12
 
 > Makes docs render the current version/command-count from a single source of
