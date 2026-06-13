@@ -23,7 +23,9 @@ AGENT = ROOT / "agents" / "orchestrator.md"
 # Read-only rcmd engines safe to auto-run: no source writes, no network.
 # Excluded (mutating or network — recommend-only): document, build, install,
 # site, style, cran-prep, winbuilder, rhub, revdep, goodpractice, urlcheck.
-SAFE_AUTORUN = {"load", "test", "check", "coverage", "lint", "spell"}
+# s7runtime (v2.11.0) loads + executes package code (like load/test) but is
+# read-only — no file writes, no network, no install — so it is safe-to-auto-run.
+SAFE_AUTORUN = {"load", "test", "check", "coverage", "lint", "spell", "s7runtime"}
 
 
 def rcmd_kinds() -> set[str]:

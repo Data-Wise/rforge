@@ -744,3 +744,118 @@ def test_changed_runner_extracts_findings_per_kind(monkeypatch, tmp_path):
     monkeypatch.setattr(rcmd.changed, "scope_check", capture)
     rcmd.run_changed("check", root=str(tmp_path), base="dev")
     assert captured["findings"] == ["E1", "W1", "N1"]
+
+
+# ───────────────────────── s7runtime engine (v2.11.0) ─────────────────────────
+def test_r_snippet_s7runtime_loads_and_guards():
+    """s7runtime: loads via pkgload, guards S7+jsonlite, emits JSON, never devtools."""
+    src = rcmd.r_snippet("s7runtime", "/tmp/foo")
+    assert "pkgload::load_all" in src
+    assert "jsonlite::toJSON" in src
+    assert "auto_unbox" in src
+    assert "devtools::" not in src
+    # the guard must check for the S7 engine package
+    assert "S7" in src
+
+
+def test_s7runtime_in_safe_autorun_taxonomy():
+    """s7runtime must be classified read-only/safe-to-auto-run."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "_check_agent_engines",
+        str(Path(__file__).parent / "_check_agent_engines.py"))
+    cae = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(cae)
+    assert "s7runtime" in cae.SAFE_AUTORUN
+
+
+def test_normalize_s7runtime_warn_when_issues():
+    raw = {"dead_generics": ["dead_gen"], "methods_on_missing_class": [],
+           "nonenforcing_validators": ["Lax"]}
+    env = rcmd.normalize("s7runtime", raw, 0, {"package": "foo", "version": "1.0"})
+    assert env["status"] == "warn"
+    assert env["s7runtime"]["dead_generics"] == ["dead_gen"]
+    assert env["s7runtime"]["nonenforcing_validators"] == ["Lax"]
+
+
+def test_normalize_s7runtime_ok_when_clean():
+    raw = {"dead_generics": [], "methods_on_missing_class": [],
+           "nonenforcing_validators": []}
+    env = rcmd.normalize("s7runtime", raw, 0, None)
+    assert env["status"] == "ok"
+
+
+def test_run_s7runtime_engine_missing_downgrades_to_warn(tmp_path, monkeypatch):
+    _write_desc(tmp_path, "foo", "0.1.0")
+    monkeypatch.setattr(rcmd, "_invoke_r",
+                        lambda s: ('{"engine_missing":["S7"]}', 0))
+    env = rcmd.run("s7runtime", str(tmp_path))
+    # S7 is an optional engine → downgrade error→warn, never hard error
+    assert env["status"] == "warn"
+    assert "S7" in env["engine_missing"]
+
+
+def test_main_accepts_s7runtime_kind(tmp_path, monkeypatch, capsys):
+    _write_desc(tmp_path, "foo", "0.1.0")
+    monkeypatch.setattr(rcmd, "_invoke_r",
+                        lambda s: ('{"dead_generics":[],"methods_on_missing_class":[],'
+                                   '"nonenforcing_validators":[]}', 0))
+    rc = rcmd.main(["--kind", "s7runtime", "--path", str(tmp_path)])
+    assert rc == 0
+    assert json.loads(capsys.readouterr().out)["kind"] == "s7runtime"
+
+
+# ── opt-in real-R e2e ──
+def _have_r_with_s7():
+    import shutil
+    import subprocess
+    if shutil.which("Rscript") is None:
+        return False
+    try:
+        out = subprocess.run(
+            ["Rscript", "-e",
+             'cat(requireNamespace("S7", quietly=TRUE) && '
+             'requireNamespace("pkgload", quietly=TRUE) && '
+             'requireNamespace("jsonlite", quietly=TRUE))'],
+            capture_output=True, text=True, timeout=60)
+        return out.stdout.strip() == "TRUE"
+    except Exception:
+        return False
+
+
+@pytest.mark.skipif(not _have_r_with_s7(),
+                    reason="R + S7 + pkgload + jsonlite not installed")
+def test_s7runtime_e2e_detects_dead_generic_and_lax_validator(tmp_path):
+    """Real-R e2e: a fixture package with (a) a generic that has NO method (dead)
+    and (b) a class whose validator does not reject bad input → both fire."""
+    pkg = tmp_path / "s7rt"
+    (pkg / "R").mkdir(parents=True)
+    (pkg / "DESCRIPTION").write_text(textwrap.dedent("""\
+        Package: s7rt
+        Version: 0.0.1
+        Title: S7 runtime fixture
+        Imports: S7
+        Encoding: UTF-8
+    """))
+    (pkg / "NAMESPACE").write_text("import(S7)\n")
+    (pkg / "R" / "classes.R").write_text(textwrap.dedent("""\
+        # A generic with NO registered method anywhere -> dead generic
+        dead_gen <- S7::new_generic("dead_gen", "x")
+
+        # A class whose validator NEVER rejects (always passes) -> non-enforcing
+        Lax <- S7::new_class("Lax",
+          properties = list(x = S7::class_numeric),
+          validator = function(self) NULL
+        )
+
+        # A well-behaved generic + method (must NOT be flagged dead)
+        live_gen <- S7::new_generic("live_gen", "x")
+        S7::method(live_gen, Lax) <- function(x, ...) x@x
+    """))
+    env = rcmd.run("s7runtime", str(pkg))
+    assert env["kind"] == "s7runtime", env
+    rt = env.get("s7runtime", {})
+    assert "dead_gen" in rt.get("dead_generics", []), env
+    assert "Lax" in rt.get("nonenforcing_validators", []), env
+    # the well-behaved generic must not be flagged dead
+    assert "live_gen" not in rt.get("dead_generics", []), env

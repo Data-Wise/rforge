@@ -25,12 +25,12 @@ from . import changed
 from . import cranlint
 
 OPTIONAL_ENGINES = {"covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
-                    "revdepcheck", "goodpractice", "devtools", "rhub"}
+                    "revdepcheck", "goodpractice", "devtools", "rhub", "S7"}
 INSTALL_HINT = {
     p: f'install.packages("{p}")'
     for p in ("rcmdcheck", "pkgbuild", "roxygen2", "testthat", "pkgload",
               "covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
-              "revdepcheck", "goodpractice", "devtools", "rhub", "jsonlite")
+              "revdepcheck", "goodpractice", "devtools", "rhub", "S7", "jsonlite")
 }
 
 
@@ -133,6 +133,10 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
         return "warn" if raw.get("new_problems") else "ok"
     if kind == "goodpractice":
         return "warn" if raw.get("checks") else "ok"
+    if kind == "s7runtime":
+        any_issue = (raw.get("dead_generics") or raw.get("methods_on_missing_class")
+                     or raw.get("nonenforcing_validators"))
+        return "warn" if any_issue else "ok"
     # load, document, install, build, style: success == exit 0
     return "ok" if exit_code == 0 else "error"
 
@@ -196,6 +200,12 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
     elif kind == "goodpractice":
         checks = _as_list(raw.get("checks"))
         env["goodpractice"] = {"count": len(checks), "checks": checks}
+    elif kind == "s7runtime":
+        env["s7runtime"] = {
+            "dead_generics": _as_list(raw.get("dead_generics")),
+            "methods_on_missing_class": _as_list(raw.get("methods_on_missing_class")),
+            "nonenforcing_validators": _as_list(raw.get("nonenforcing_validators")),
+        }
     # load: no extra block — status carries the result
     return env
 
@@ -399,6 +409,62 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             f'rhub::rhub_setup({p}); '              # idempotent; writes workflow
             f'rhub::rhub_check({p}); '
             f'cat(jsonlite::toJSON(list(run_url=NA), auto_unbox=TRUE))')
+    if kind == "s7runtime":
+        # Load the package, introspect S7 at runtime, emit 3 issue lists as JSON.
+        #
+        # Serialization discipline (v2.1.0 lessons): the ENTIRE body runs inside a
+        # tryCatch so any R error still emits a valid one-line JSON object on
+        # stdout (never a bare traceback that would break _parse_json); load_all
+        # is quiet + suppressMessages to keep package startup chatter off stdout;
+        # toJSON uses auto_unbox=TRUE (scalars) + null="list" so empty result
+        # vectors serialize as `[]`, never `null`. _guard prepends the
+        # S7+jsonlite presence check (pkgload presence is asserted here too).
+        return _guard("S7",
+            'if (!requireNamespace("pkgload", quietly=TRUE)) {'
+            'cat(\'{"engine_missing":["pkgload"]}\'); quit(status=0)}; '
+            'res <- tryCatch({'
+            f'suppressMessages(pkgload::load_all({p}, quiet=TRUE, '
+            'helpers=FALSE, export_all=FALSE)); '
+            # gather exported + internal S7 objects from the loaded namespace
+            f'nm <- pkgload::pkg_name({p}); ns <- asNamespace(nm); '
+            'objs <- mget(ls(ns, all.names=TRUE), envir=ns, '
+            'ifnotfound=list(NULL)); '
+            'is_gen <- function(o) inherits(o, "S7_generic"); '
+            'is_cls <- function(o) inherits(o, "S7_class"); '
+            'gens <- Filter(is_gen, objs); clss <- Filter(is_cls, objs); '
+            # (1) dead generics: an S7 generic with zero registered methods. The
+            # registered methods live in the generic's `methods` attribute (an
+            # environment, possibly nested by dispatch arg); recurse + count.
+            'count_methods <- function(env) { if (!is.environment(env)) return(0L); '
+            'n <- 0L; for (k in ls(env, all.names=TRUE)) { v <- get(k, envir=env); '
+            'n <- n + if (is.environment(v)) count_methods(v) else 1L }; n }; '
+            'dead <- character(); '
+            'for (gn in names(gens)) { g <- gens[[gn]]; '
+            'mtab <- attr(g, "methods"); '
+            'if (count_methods(mtab) == 0L) dead <- c(dead, gn) }; '
+            # (2) non-enforcing validators: a validator whose body is a constant
+            # NULL/TRUE never inspects `self`, so it can never reject any input —
+            # it is present (passes the static family) but provably not enforcing.
+            'is_noop <- function(v) { if (!is.function(v)) return(FALSE); '
+            'b <- body(v); '
+            'if (is.null(b) || identical(b, quote(NULL)) || isTRUE(b) || '
+            'identical(b, quote(TRUE))) return(TRUE); '
+            'if (is.call(b) && identical(b[[1]], as.name("{")) && length(b) == 2L) '
+            '{ inner <- b[[2]]; return(is.null(inner) || identical(inner, quote(NULL)) '
+            '|| isTRUE(inner) || identical(inner, quote(TRUE))) }; FALSE }; '
+            'lax <- character(); '
+            'for (cn in names(clss)) { cl <- clss[[cn]]; '
+            'val <- attr(cl, "validator"); '
+            'if (is.null(val)) next; '
+            'if (is_noop(val)) lax <- c(lax, cn) }; '
+            # (3) methods registered on a non-existent class: not decidable from
+            # the registry alone; reported empty (placeholder for future work).
+            'list(dead_generics=dead, methods_on_missing_class=character(), '
+            'nonenforcing_validators=lax)}, '
+            'error=function(e) list(engine_missing=character(), '
+            'messages=paste("s7runtime load/introspection failed:", '
+            'conditionMessage(e)))); '
+            'cat(jsonlite::toJSON(res, auto_unbox=TRUE, null="list"))')
     raise ValueError(f"unknown kind: {kind}")
 
 
@@ -765,7 +831,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--kind", required=True,
                     choices=["load", "document", "test", "check", "coverage", "build",
                              "install", "site", "cycle", "lint", "spell", "urlcheck", "style",
-                             "winbuilder", "rhub", "revdep", "goodpractice", "cran-prep"])
+                             "winbuilder", "rhub", "revdep", "goodpractice", "cran-prep",
+                             "s7runtime"])
     ap.add_argument("--path", default=".")
     ap.add_argument("--as-cran", action="store_true")
     ap.add_argument("--preview", action="store_true")
