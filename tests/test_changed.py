@@ -340,3 +340,206 @@ def test_scope_check_line_shifted_lint_tagged_pre_existing(tmp_path):
     assert result is not None
     assert [t["tag"] for t in result["findings"]] == ["pre-existing"]
     assert result["introduced_count"] == 0
+
+
+# ───────── uncommitted_files (v2.12.0): git status --porcelain ─────────
+
+
+def test_uncommitted_files_reports_modified_staged_and_added(tmp_path):
+    """Returns the working-tree-dirty paths: modified, staged, and new/added."""
+    repo, _ = _init_repo(tmp_path)
+    # tracked file modified but NOT committed
+    (repo / "f.txt").write_text("dirty\n", encoding="utf-8")
+    # a brand-new untracked file
+    (repo / "new.R").write_text("x <- 1\n", encoding="utf-8")
+    # a staged-but-uncommitted file
+    (repo / "staged.R").write_text("y <- 2\n", encoding="utf-8")
+    _git(["add", "staged.R"], cwd=repo)
+
+    files = changed.uncommitted_files(path=str(repo))
+    assert "f.txt" in files          # modified, unstaged
+    assert "new.R" in files          # untracked/added
+    assert "staged.R" in files       # staged
+
+
+def test_uncommitted_files_handles_spaced_and_nonascii_paths(tmp_path):
+    """MINOR (feature 2): `git status --porcelain` quotes paths with spaces /
+    non-ASCII, leaving literal quotes that never exact-match. With `-z` the path
+    is NUL-separated and never quoted, so it survives verbatim."""
+    repo, _ = _init_repo(tmp_path)
+    # Commit a file in R/ first so R/ is a tracked dir → git reports new files
+    # under it individually (not as a single collapsed `R/` untracked entry).
+    (repo / "R").mkdir()
+    (repo / "R" / "keep.R").write_text("k <- 0\n", encoding="utf-8")
+    _git(["add", "R/keep.R"], cwd=repo)
+    _git(["commit", "-q", "-m", "seed R dir"], cwd=repo)
+    spaced = repo / "R" / "my util.R"
+    spaced.write_text("x <- 1\n", encoding="utf-8")
+    nonascii = repo / "R" / "café.R"
+    nonascii.write_text("y <- 2\n", encoding="utf-8")
+
+    files = changed.uncommitted_files(path=str(repo))
+    # Exact, unquoted, repo-relative — would be '"R/my util.R"' without -z.
+    assert "R/my util.R" in files
+    assert "R/café.R" in files
+
+
+def test_uncommitted_files_empty_on_clean_tree(tmp_path):
+    repo, _ = _init_repo(tmp_path)
+    assert changed.uncommitted_files(path=str(repo)) == set()
+
+
+def test_uncommitted_files_empty_on_non_repo_no_raise(tmp_path):
+    """Advisory: a non-repo path → empty set, never an exception."""
+    assert changed.uncommitted_files(path=str(tmp_path)) == set()
+
+
+def test_uncommitted_files_empty_when_git_missing(tmp_path):
+    with mock.patch.object(changed.subprocess, "run",
+                           side_effect=FileNotFoundError("git")):
+        assert changed.uncommitted_files(path=str(tmp_path)) == set()
+
+
+# ───────── scope_check [uncommitted] refinement (v2.12.0, REAL git) ─────────
+
+
+def test_scope_check_retags_introduced_in_uncommitted_file(tmp_path):
+    """KEY e2e: an introduced finding in a COMMITTED file stays [introduced];
+    an introduced finding in an UNCOMMITTED (dirty, not committed) file is
+    re-tagged [uncommitted]; a pre-existing finding stays [pre-existing].
+    No mocking of git — real repo + real `git status --porcelain`."""
+    repo, _ = _init_repo(tmp_path)
+    # On the branch: commit a finding-file (R/committed.R), then dirty another
+    # file (R/dirty.R) WITHOUT committing it.
+    (repo / "R").mkdir()
+    (repo / "R" / "committed.R").write_text("a <- 1\n", encoding="utf-8")
+    _git(["add", "R/committed.R"], cwd=repo)
+    _git(["commit", "-q", "-m", "add committed finding file"], cwd=repo)
+    # dirty file: present in the working tree, uncommitted
+    (repo / "R" / "dirty.R").write_text("b <- 2\n", encoding="utf-8")
+
+    def run_engine(treedir):
+        with open(os.path.join(treedir, "f.txt"), encoding="utf-8") as fh:
+            txt = fh.read().strip()
+        if txt == "branch":  # HEAD tree
+            return [
+                {"file": "R/committed.R", "line": 1, "linter": "L",
+                 "message": "introduced-committed"},
+                {"file": "R/dirty.R", "line": 1, "linter": "L",
+                 "message": "introduced-uncommitted"},
+                {"file": "R/old.R", "line": 1, "linter": "L",
+                 "message": "preexisting"},
+            ]
+        # baseline tree: only the pre-existing finding
+        return [{"file": "R/old.R", "line": 1, "linter": "L",
+                 "message": "preexisting"}]
+
+    result = changed.scope_check(run_engine, path=str(repo), base="dev")
+    assert result is not None
+    tags = {t["text"]["message"]: t["tag"] for t in result["findings"]}
+    assert tags == {
+        "introduced-committed": "introduced",
+        "introduced-uncommitted": "uncommitted",
+        "preexisting": "pre-existing",
+    }
+    # [uncommitted] counts as introduced for the introduced_count.
+    assert result["introduced_count"] == 2
+
+
+def test_scope_check_string_finding_never_uncommitted(tmp_path):
+    """String findings (R CMD check, no file attribute) stay [introduced] even
+    when the tree is dirty — no file to attribute to an uncommitted path."""
+    repo, _ = _init_repo(tmp_path)
+    (repo / "R").mkdir()
+    (repo / "R" / "dirty.R").write_text("z <- 1\n", encoding="utf-8")  # dirty tree
+
+    def run_check(treedir):
+        with open(os.path.join(treedir, "f.txt"), encoding="utf-8") as fh:
+            txt = fh.read().strip()
+        if txt == "branch":
+            return ["NOTE: new string finding"]
+        return []
+
+    result = changed.scope_check(run_check, path=str(repo), base="dev")
+    assert result is not None
+    assert [t["tag"] for t in result["findings"]] == ["introduced"]
+
+
+def test_scope_check_clean_tree_no_uncommitted_tags(tmp_path):
+    """No v2.11 regression: a clean working tree yields zero [uncommitted] tags;
+    an introduced finding stays [introduced]."""
+    repo, _ = _init_repo(tmp_path)
+
+    def run_engine(treedir):
+        with open(os.path.join(treedir, "f.txt"), encoding="utf-8") as fh:
+            txt = fh.read().strip()
+        if txt == "branch":
+            return [{"file": "R/a.R", "line": 1, "linter": "L",
+                     "message": "new"}]
+        return []
+
+    result = changed.scope_check(run_engine, path=str(repo), base="dev")
+    assert result is not None
+    tags = [t["tag"] for t in result["findings"]]
+    assert "uncommitted" not in tags
+    assert tags == ["introduced"]
+
+
+# ───────── BLOCKER: cross-package basename collision (v2.12.0 fix) ─────────
+
+
+def _write_pkg(root, name):
+    """Minimal R package skeleton under root/<name> with R/ dir."""
+    pkg = root / name
+    (pkg / "R").mkdir(parents=True)
+    (pkg / "DESCRIPTION").write_text(
+        f"Package: {name}\nVersion: 0.0.1\n", encoding="utf-8")
+    return pkg
+
+
+def test_scope_check_no_cross_package_basename_collision(tmp_path):
+    """REGRESSION (BLOCKER): two packages share a basename. pkgA/R/util.dat is
+    dirty+uncommitted; pkgB/R/util.dat is committed clean. A pkgB finding must
+    stay [introduced]; a pkgA finding must become [uncommitted]. The old
+    basename/suffix match wrongly re-tagged the pkgB finding [uncommitted]
+    because both files end in `util.dat` (same basename)."""
+    repo, _ = _init_repo(tmp_path)
+    # Two sibling packages, both with an R/util.dat.
+    _write_pkg(repo, "pkgA")
+    _write_pkg(repo, "pkgB")
+    (repo / "pkgA" / "R" / "util.dat").write_text("a\n", encoding="utf-8")
+    (repo / "pkgB" / "R" / "util.dat").write_text("b\n", encoding="utf-8")
+    # Commit BOTH packages clean on the branch.
+    _git(["add", "-A"], cwd=repo)
+    _git(["commit", "-q", "-m", "add two packages"], cwd=repo)
+    # Now dirty ONLY pkgA/R/util.dat (uncommitted). pkgB stays committed clean.
+    (repo / "pkgA" / "R" / "util.dat").write_text("a-dirty\n", encoding="utf-8")
+
+    # rel package dirs as rcmd computes them, in discovery order.
+    pkgs = changed.changed_packages(
+        changed.changed_files(path=str(repo), base="dev") or [], root=str(repo))
+    rel_pkgs = {p.name: str(p.path) for p in pkgs}
+
+    def runner(tree_root):
+        with open(os.path.join(tree_root, "f.txt"), encoding="utf-8") as fh:
+            txt = fh.read().strip()
+        if txt != "branch":
+            return []  # baseline: nothing → both findings are introduced
+        # HEAD: one finding per package, BOTH named R/util.dat (package-relative).
+        # Annotate the owning package's repo-relative dir so scope_check can
+        # rebase to repo-relative coordinates and exact-match.
+        return [
+            {"file": "R/util.dat", "line": 1, "linter": "L",
+             "message": "finding-in-pkgA", "pkg_dir": "pkgA"},
+            {"file": "R/util.dat", "line": 1, "linter": "L",
+             "message": "finding-in-pkgB", "pkg_dir": "pkgB"},
+        ]
+
+    result = changed.scope_check(runner, path=str(repo), base="dev")
+    assert result is not None
+    tags = {t["text"]["message"]: t["tag"] for t in result["findings"]}
+    # pkgA's file is dirty → uncommitted. pkgB's identical-basename file is
+    # committed clean → must NOT collide; stays introduced.
+    assert tags["finding-in-pkgA"] == "uncommitted"
+    assert tags["finding-in-pkgB"] == "introduced", (
+        "cross-package basename collision: pkgB finding wrongly re-tagged")

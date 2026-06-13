@@ -12,6 +12,7 @@ last_release_prior_2: 2026-06-12 v2.8.0 (PR #27 feature→dev, PR #28 dev→main
 last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --universe R-universe early-access tier (lib/runiverse.py, pure-stdlib); 35 commands (flag, not new command). Prior: v2.6.0 (2026-06-10, tap #114) bundled v2.3–v2.6.
 
 worktrees: []  # none active
+# prior: feature/v2.12.0-bundle merged (PR #40 → dev 2026-06-13, merge e1c2612) + worktree removed;
 # prior: feature/s7-method-missing-class merged (PR #37 → dev 2026-06-13, merge 144324e) + worktree removed;
 # prior: feature/v2.11.0-bundle merged (PR #35 → dev 2026-06-13, merge 0f3f548) + worktree removed;
 # prior: feature/v2.10.0-bundle merged (PR #32 → dev 2026-06-12, merge 85881e8) + worktree removed;

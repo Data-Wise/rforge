@@ -135,6 +135,7 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
         return "warn" if raw.get("checks") else "ok"
     if kind == "s7runtime":
         any_issue = (raw.get("dead_generics") or raw.get("methods_on_missing_class")
+                     or raw.get("methods_undeclared_dependency")
                      or raw.get("nonenforcing_validators"))
         return "warn" if any_issue else "ok"
     # load, document, install, build, style: success == exit 0
@@ -204,6 +205,8 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
         env["s7runtime"] = {
             "dead_generics": _as_list(raw.get("dead_generics")),
             "methods_on_missing_class": _as_list(raw.get("methods_on_missing_class")),
+            "methods_undeclared_dependency": _as_list(
+                raw.get("methods_undeclared_dependency")),
             "nonenforcing_validators": _as_list(raw.get("nonenforcing_validators")),
         }
     # load: no extra block — status carries the result
@@ -457,20 +460,50 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             'val <- attr(cl, "validator"); '
             'if (is.null(val)) next; '
             'if (is_noop(val)) lax <- c(lax, cn) }; '
+            # Declared deps (read ONCE): the loaded package's DESCRIPTION
+            # Imports+Depends+LinkingTo package names, plus an always-allowed set
+            # (the package itself + base/recommended pkgs that need no Imports).
+            # Used by check (4) below — a dispatch class from an undeclared package.
+            # Always-allowed = the real base package set (priority="base", which
+            # includes grid/parallel/splines/stats4/compiler/tcltk that a hardcoded
+            # list kept omitting), plus the package itself and S7 — none of these
+            # need a DESCRIPTION Imports entry, so a dispatch class from them is
+            # never an "undeclared dependency".
+            'base_pkgs <- tryCatch(rownames(installed.packages(priority="base")), '
+            'error=function(e) c("base","methods","stats","utils","graphics",'
+            '"grDevices","datasets","tools")); '
+            'allow <- union(c(nm, "S7"), base_pkgs); '
+            'declared <- tryCatch({ '
+            f'd <- read.dcf(file.path(pkgload::pkg_path({p}), "DESCRIPTION")); '
+            'fields <- intersect(c("Imports", "Depends", "LinkingTo"), colnames(d)); '
+            'raw <- paste(d[1, fields], collapse=","); '
+            'parts <- unlist(strsplit(raw, ",")); '
+            # strip version ranges "pkg (>= 1.0)" without a regex escape (R parsers
+            # reject "\\(" in a string literal): split on the literal "(" and keep [1]
+            'parts <- trimws(vapply(strsplit(parts, "(", fixed=TRUE), '
+            '`[`, character(1), 1)); '
+            'parts[nzchar(parts) & parts != "NA"] }, '
+            'error=function(e) character()); '
+            'declared <- union(declared, allow); '
             # (3) methods on a missing class: a method whose dispatch signature
             # references an S7 class with no resolvable namespace binding (e.g. an
             # inline `new_class()` left in a method() call) is unreachable — nothing
             # can ever construct that class to dispatch on. Each S7_method carries
             # attr(.,"signature") = the list of dispatch class OBJECTS, so this is
             # decidable. Guards: base-type signature elements are not S7_class (skip);
-            # ANY/S7_object union dispatch skipped; imported classes (package attr set
-            # and != this package) are trusted to resolve (not flagged).
+            # ANY/S7_object union dispatch skipped.
+            # (4) methods on an UNDECLARED dependency: a dispatch class that DOES
+            # resolve but whose `package` attr P is set, != this package, and is not
+            # in `declared` — typically a Suggests-only class. At a site without P
+            # the class never registers and the method silently never fires.
+            # The two are mutually exclusive per signature: unresolvable -> (3);
+            # resolvable-but-undeclared-package -> (4); resolvable+declared -> clean.
             'collect_methods <- function(env, acc) { '
             'if (!is.environment(env)) return(acc); '
             'for (k in ls(env, all.names=TRUE)) { v <- get(k, envir=env); '
             'if (is.environment(v)) acc <- collect_methods(v, acc) '
             'else acc <- c(acc, list(v)) }; acc }; '
-            'missing <- list(); '
+            'missing <- list(); undeclared <- list(); '
             'for (gn in names(gens)) { g <- gens[[gn]]; '
             'ms <- collect_methods(attr(g, "methods"), list()); '
             'for (md in ms) { sigs <- attr(md, "signature"); '
@@ -487,10 +520,13 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             'tryCatch(exists(cnm, envir=asNamespace(cpkg), inherits=FALSE), '
             'error=function(e) TRUE) } else { '
             'any(vapply(clss, function(o) identical(o, s), logical(1))) }; '
-            'if (!resolves) missing <- c(missing, '
-            'list(list(generic=gn, class=cnm))) } } }; '
-            'missing <- unique(missing); '
+            'if (!resolves) { missing <- c(missing, '
+            'list(list(generic=gn, class=cnm))); next }; '
+            'if (ext && !(cpkg %in% declared)) undeclared <- c(undeclared, '
+            'list(list(generic=gn, class=cnm, package=cpkg))) } } }; '
+            'missing <- unique(missing); undeclared <- unique(undeclared); '
             'list(dead_generics=dead, methods_on_missing_class=missing, '
+            'methods_undeclared_dependency=undeclared, '
             'nonenforcing_validators=lax)}, '
             'error=function(e) list(engine_missing=character(), '
             'messages=paste("s7runtime load/introspection failed:", '
@@ -635,8 +671,14 @@ def run_changed(
         findings: list = []
         for rel in rel_pkgs:
             pkg_path = str(Path(tree_root) / rel) if rel != "." else tree_root
-            findings.extend(_extract_findings(run(kind, pkg_path, **run_kwargs),
-                                              kind))
+            for f in _extract_findings(run(kind, pkg_path, **run_kwargs), kind):
+                # Annotate dict findings with their owning package's repo-relative
+                # dir so scope_check can rebase a package-relative finding `file`
+                # (e.g. R/a.R) to repo-relative (pkgA/R/a.R) and EXACT-match it
+                # against `git status` — no cross-package basename collision.
+                if isinstance(f, dict):
+                    f = {**f, "pkg_dir": rel}
+                findings.append(f)
         return findings
 
     result = changed.scope_check(runner, path=root, base=base)
