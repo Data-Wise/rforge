@@ -88,3 +88,25 @@ Run one engine ``kind`` against ``path``; return the normalized envelope.
 
 Threads the check ``flavor`` / ``incoming`` selectors through to ``r_snippet``;
 returns an error envelope when no DESCRIPTION is found.
+
+### `run_changed()`
+
+```python
+def run_changed(kind: 'str', root: 'str' = '.', *, base: 'str' = 'HEAD', changed_strict: 'bool' = False, **run_kwargs) -> 'dict'
+```
+
+Run `kind` scoped to the package(s) changed on this branch vs `base`.
+
+Behavior by kind:
+  - check: scope to changed package(s); when a merge-base resolves, tag each
+    finding [introduced] vs [pre-existing] (two R runs via changed.scope_check)
+    and, by default, fold the status to reflect *introduced* findings only.
+    `changed_strict=True` keeps the full-check status (pre-existing counts too).
+  - test / lint: scope only — run the engine against the changed package(s);
+    no finding tagging.
+
+Degrades safely:
+  - not a git repo / git missing / no merge-base (changed_files None) → run a
+    full `kind` against `root` and annotate `changed.fell_back=True`.
+  - no changes (empty diff) → no-op `ok` envelope.
+  - multiple changed packages → run each; aggregate into stages.
