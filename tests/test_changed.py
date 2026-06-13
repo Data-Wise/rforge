@@ -545,13 +545,15 @@ def test_scope_check_no_cross_package_basename_collision(tmp_path):
         "cross-package basename collision: pkgB finding wrongly re-tagged")
 
 
-# ───────── baseline caching (candidate A, v2.13.0) ─────────
+# ───────── baseline caching (candidate A) ─────────
 #
-# The baseline run is a pure function of (merge_base_sha, kind, package-set,
-# kwargs). `scope_check` accepts an opaque `cache_key` (rcmd builds it from
-# kind+pkgset+kwargs) and caches the baseline finding list under
-# ~/.rforge/baseline-cache/<repo-id>/<sha>-<keyhash>.json. The tests below
-# monkeypatch `_cache_root` so they never touch the real ~/.rforge.
+# A package's baseline run is a pure function of (merge_base_sha, kind, package,
+# kwargs). `cached_baseline(items, run_item, key_item)` caches each item's
+# findings under an opaque per-item key (rcmd builds `kind|rel|kwargs`) at
+# ~/.rforge/baseline-cache/<repo-id>/<sha>-<keyhash>.json, running only the
+# uncached items; `scope_check` is caching-agnostic (takes a pluggable `baseline`
+# provider). The tests below monkeypatch `_cache_root` so they never touch the
+# real ~/.rforge.
 
 
 @pytest.fixture()
