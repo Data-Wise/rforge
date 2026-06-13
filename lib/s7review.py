@@ -124,7 +124,7 @@ def _find_s7_constructs(text: str) -> list[dict]:
 _UPPER_CAMEL_RE = re.compile(r"^[A-Z][A-Za-z0-9]*$")
 _SNAKE_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 _NAME_ARG_RE = re.compile(r'^\s*["\']([^"\']+)["\']')          # first string arg
-_PROPS_RE = re.compile(r"properties\s*=\s*list\((.*)\)", re.DOTALL)
+_PROPS_OPEN_RE = re.compile(r"properties\s*=\s*list\(")
 _PROP_NAME_RE = re.compile(r"(\w+)\s*=")
 _VALIDATOR_RE = re.compile(r"validator\s*=\s*function")
 
@@ -135,12 +135,28 @@ def _name_arg(args: str) -> str:
     return m.group(1) if m else ""
 
 
+def _props_block(args: str) -> str:
+    """Return the *balanced* inside of a ``properties = list(...)`` block, or ''.
+
+    Uses paren-matching (not a greedy regex) so a sibling ``validator =
+    function(...)`` argument is **not** swallowed into the properties block.
+    """
+    m = _PROPS_OPEN_RE.search(args)
+    if not m:
+        return ""
+    open_idx = m.end() - 1  # index of the '(' after list
+    close_idx = _match_balanced(args, open_idx)
+    if close_idx is None:
+        return ""
+    return args[open_idx + 1:close_idx]
+
+
 def _prop_names(args: str) -> list[str]:
     """Property names from a ``properties = list(a = ..., b = ...)`` block."""
-    pm = _PROPS_RE.search(args)
-    if not pm:
+    block = _props_block(args)
+    if not block:
         return []
-    return _PROP_NAME_RE.findall(pm.group(1))
+    return _PROP_NAME_RE.findall(block)
 
 
 def check_naming(path: str | os.PathLike = ".") -> dict:
@@ -193,7 +209,6 @@ def check_naming(path: str | os.PathLike = ".") -> dict:
     return _envelope("naming", status, findings, messages)
 
 
-# ── temporary stubs (each replaced in its own task) ──
 _RETURN_BOOL_RE = re.compile(r"return\s*\(\s*(TRUE|FALSE)\s*\)")
 
 
@@ -234,7 +249,6 @@ def check_validators(path: str | os.PathLike = ".") -> dict:
     return _envelope("validators", status, findings, messages)
 
 
-# ── temporary stubs (each replaced in its own task) ──
 # first identifier argument to method(generic, Class)
 _METHOD_GENERIC_RE = re.compile(r"^\s*([A-Za-z.][\w.]*)")
 # imported symbols: importFrom(pkg, sym) / @importFrom pkg sym
@@ -326,7 +340,6 @@ def check_methods(path: str | os.PathLike = ".") -> dict:
     return _envelope("methods", status, findings, messages)
 
 
-# ── temporary stubs (each replaced in its own task) ──
 _S4_PATTERNS = [
     (re.compile(r"\bsetClass\s*\("), "setClass"),
     (re.compile(r"\bsetGeneric\s*\("), "setGeneric"),
@@ -406,9 +419,105 @@ def check_legacy_oop(path: str | os.PathLike = ".") -> dict:
     return _envelope("legacy", status, findings, messages)
 
 
-# ── temporary stubs (each replaced in its own task) ──
-def check_class_docs(path):  # Task 7
-    return _envelope("docs", "ok", [], ["(stub)"])
+# NEW export parser (mirrors deps_sync's importFrom regex style; deps_sync has
+# no export parser to reuse).
+_NS_EXPORT_RE = re.compile(r"^\s*export\(\s*([\w.]+)\s*\)")
+_ROX_EXPORT_RE = re.compile(r"^#'\s*@export\b")
+_PROP_TYPE_RE = re.compile(r"\w+\s*=\s*([A-Za-z.][\w.:]*)")  # name = TypeExpr
+
+
+def _exported_names(pkg_path: Path) -> set[str]:
+    """Symbols exported via NAMESPACE export(...). (roxygen @export handled inline)"""
+    syms: set[str] = set()
+    ns = pkg_path / "NAMESPACE"
+    if ns.is_file():
+        try:
+            for line in ns.read_text(encoding="utf-8", errors="replace").splitlines():
+                m = _NS_EXPORT_RE.match(line)
+                if m:
+                    syms.add(m.group(1))
+        except OSError:
+            pass
+    return syms
+
+
+def check_class_docs(path: str | os.PathLike = ".") -> dict:
+    """Doc + type-resolution. An exported S7 class (NAMESPACE ``export()`` or a
+    preceding roxygen ``@export``) should have a ``#'`` block immediately above
+    its ``new_class`` (``undocumented_export``); a property's declared class
+    should resolve to a ``class_*`` builtin or a class defined in scanned source
+    (``prop_type_unresolvable``). Never raises.
+    """
+    p = Path(path)
+    pkg = p if (p / "R").is_dir() or p.name != "R" else p.parent
+    exported = _exported_names(pkg)
+
+    files = list(_scan_r_files(path))
+    defined: set[str] = set()
+    for _f, text in files:
+        for c in _find_s7_constructs(text):
+            if c["call"] == "new_class":
+                nm = _name_arg(c["args"]) or c["bound"]
+                if nm:
+                    defined.add(nm)
+                if c["bound"]:
+                    defined.add(c["bound"])
+
+    findings: list[dict] = []
+    for f, text in files:
+        rel = f.name
+        lines = text.splitlines()
+        for c in _find_s7_constructs(text):
+            if c["call"] != "new_class":
+                continue
+            name = _name_arg(c["args"]) or c["bound"] or "<class>"
+            bound = c["bound"]
+            # roxygen block immediately above the construct's line?
+            li = c["line"] - 1  # 0-based index of the call line
+            j = li - 1
+            has_doc = False
+            has_rox_export = False
+            while j >= 0 and (lines[j].lstrip().startswith("#'") or not lines[j].strip()):
+                if lines[j].lstrip().startswith("#'"):
+                    has_doc = True
+                    if _ROX_EXPORT_RE.match(lines[j].strip()):
+                        has_rox_export = True
+                j -= 1
+            is_exported = bound in exported or name in exported or has_rox_export
+            if is_exported and not has_doc:
+                findings.append({
+                    "code": "undocumented_export", "severity": "advisory",
+                    "file": rel, "line": c["line"], "symbol": name,
+                    "source": "static",
+                    "message": (f"exported S7 class '{name}' has no #' doc block — "
+                                "consider documenting it (roxygen @export needs a "
+                                "title)."),
+                })
+            # property type resolution
+            block = _props_block(c["args"])
+            if block:
+                for tm in _PROP_TYPE_RE.finditer(block):
+                    typ = tm.group(1)
+                    base = typ.split("::")[-1]
+                    if base.startswith(_S7_VOCAB["class_prefix"]):
+                        continue            # class_numeric etc. — builtin
+                    if "::" in typ:
+                        continue            # external pkg::Class — assume resolvable
+                    if base in defined:
+                        continue
+                    if base in ("list", "TRUE", "FALSE", "NULL", "NA"):
+                        continue
+                    findings.append({
+                        "code": "prop_type_unresolvable", "severity": "advisory",
+                        "file": rel, "line": c["line"], "symbol": typ,
+                        "source": "static",
+                        "message": (f"property type '{typ}' in '{name}' does not "
+                                    "resolve to a class_* builtin or a class "
+                                    "defined here — check the type is in scope."),
+                    })
+    status = "warn" if findings else "ok"
+    messages = [] if findings else ["Exported S7 classes documented; prop types resolve."]
+    return _envelope("docs", status, findings, messages)
 
 
 _CHECKS = {

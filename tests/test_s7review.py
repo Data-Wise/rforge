@@ -135,3 +135,17 @@ def test_legacy_flag_bad_fixture():
 def test_legacy_clean_fixture_ok():
     env = s7review.check_legacy_oop(str(CLEAN))
     assert env["status"] == "ok"
+
+
+# ── docs ────────────────────────────────────────────────────────────────
+def test_docs_flag_bad_fixture():
+    env = s7review.check_class_docs(str(BAD))
+    c = _codes(env)
+    assert env["status"] == "warn"
+    assert "undocumented_export" in c     # export(undocumented_class), no #' block
+    assert "prop_type_unresolvable" in c  # ref = NoSuchClass
+
+
+def test_docs_clean_fixture_ok():
+    env = s7review.check_class_docs(str(CLEAN))
+    assert env["status"] == "ok"
