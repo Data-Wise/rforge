@@ -52,6 +52,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [cookbook tutorial](docs/tutorials/orchestrator-cookbook.md), a REFCARD section,
   an architecture.md refresh (pre-v2.9.0 "pattern recognition" → intent
   recognition), and mkdocs nav entries.
+- **`commands.md` count drift fixed** — the header now renders
+  `{{ rforge.command_count }}` (was a stale literal "33"; drift-proof like the
+  other v2.8.0-macro'd surfaces), and three category subtotals were corrected to
+  match the actual entries (Ecosystem 5→6, R Dev Cycle 9→8, R Quality 5→4; now
+  sum to 35).
 
 > Makes docs render the current version/command-count from a single source of
 > truth (`package.json`) so they stop drifting (the 33→35 staleness root-caused
