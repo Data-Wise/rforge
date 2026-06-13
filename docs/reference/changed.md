@@ -136,5 +136,10 @@ Tag each HEAD finding `[introduced]` vs `[pre-existing]` (multiset diff).
 
 A finding present on HEAD but absent from base is `introduced`. A finding on
 both is `pre-existing`. Multiset semantics: if HEAD has a finding twice and
-base once, one copy is introduced and one pre-existing. Findings are compared
-by their string form (R CMD check findings are plain strings).
+base once, one copy is introduced and one pre-existing.
+
+Identity is `_finding_identity`: plain-string findings (R CMD check) compare
+by string; dict findings (lint) compare by `(file, message, linter)` —
+EXCLUDING the raw `line`, so a line-shifted pre-existing lint stays
+`pre-existing` rather than flipping to `introduced`. The full finding is
+preserved in `text` for display.

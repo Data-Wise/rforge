@@ -891,18 +891,20 @@ Static analysis of the package via `lintr` — grouped report of style and code-
 
 ### /rforge:r:s7-review
 
-Static **S7 OOP convention checker** — scans `R/*.R` + `NAMESPACE` and reports advisory convention findings across five families. **Advisory only, never blocks** (mirrors `r:cran-prep`'s Tier-4 tone). Pure Python — no R, no Rscript.
+Static **S7 OOP convention checker** — scans `R/*.R` + `NAMESPACE` and reports advisory convention findings across five static families. **Advisory only, never blocks** (mirrors `r:cran-prep`'s Tier-4 tone). The static pass is pure Python — no R, no Rscript. An opt-in `--runtime` pass adds two R-backed families (loads the package and introspects S7 at runtime), and `--eco` sweeps the static families across the whole ecosystem manifest.
 
 **Usage:**
 
 ```bash
-/rforge:r:s7-review [package] [--kind all|naming|validators|methods|legacy|docs] [--format json|text]
+/rforge:r:s7-review [package] [--kind all|naming|validators|methods|legacy|docs] [--eco] [--runtime] [--format json|text]
 ```
 
 **Parameters:**
 
 - `package` (optional, positional) - Package directory to review (defaults to current directory)
 - `--kind` (optional) - Limit to one convention family: `all` (default), `naming`, `validators`, `methods`, `legacy`, or `docs`
+- `--eco` (optional) - Sweep the static families across **every package** in the ecosystem manifest, aggregated (pure-stdlib; composes with `--runtime`)
+- `--runtime` (optional) - Add an R-backed runtime pass (`method-dispatch` + `validator-runtime`) via `lib.rcmd`; degrades to an advisory `warn` when R/S7 is unavailable
 - `--format` (optional) - Output format: `json` (default) or `text`
 
 There is **no** `--write`/`--fix` — S7 fixes need human judgement.
@@ -918,17 +920,27 @@ There is **no** `--write`/`--fix` — S7 fixes need human judgement.
 
 # Review a specific package
 /rforge:r:s7-review ~/projects/mypackage
+
+# Sweep the whole ecosystem (static families)
+/rforge:r:s7-review --eco
+
+# Add the R-backed runtime pass (dead generics + non-enforcing validators)
+/rforge:r:s7-review --runtime
 ```
 
 **Convention families:**
 
-| Family | Example codes |
-|---|---|
-| naming | `class_name_case`, `class_name_mismatch`, `generic_name_case`, `prop_name_case` |
-| validators | `missing_validator`, `validator_return_shape` |
-| methods | `dangling_method`, `missing_methods_register` |
-| legacy | `legacy_s4_in_s7`, `legacy_r5_in_s7`, `legacy_s3_generic` |
-| docs | `undocumented_export`, `prop_type_unresolvable` |
+| Family | Example codes | Source |
+|---|---|---|
+| naming | `class_name_case`, `class_name_mismatch`, `generic_name_case`, `prop_name_case` | static |
+| validators | `missing_validator`, `validator_return_shape` | static |
+| methods | `dangling_method`, `missing_methods_register` | static |
+| legacy | `legacy_s4_in_s7`, `legacy_r5_in_s7`, `legacy_s3_generic` | static |
+| docs | `undocumented_export`, `prop_type_unresolvable` | static |
+| method-dispatch (`--runtime`) | `dead_generic` | runtime |
+| validator-runtime (`--runtime`) | `validator_not_enforcing` | runtime |
+
+The `method-dispatch` runtime family currently reports only `dead_generic`; `method_on_missing_class` is **deferred** (it can't be decided from the S7 registry alone — future work).
 
 **Output:** one `{kind: "s7review", status: "ok"|"warn", stages: [...]}` envelope. Each finding carries `source: "static"` and `severity: "advisory"`, worded "looks like / consider", never "must". Exit 0 always.
 
