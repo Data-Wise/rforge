@@ -11,10 +11,14 @@ Pure-stdlib (subprocess + pathlib only — no R, no third-party). Three jobs:
                           list, tagging each finding [introduced] vs
                           [pre-existing] (multiset semantics: duplicates count).
 
-Plus scope_check(): a DORMANT helper for future two-run introduced/pre-existing
-tagging. It is NOT wired into the live `r:check --changed` path (which is
-scope-only) because the merge-base checkout it needs is not yet built. See its
-docstring.
+Plus the two-run tagging machinery (v2.11.0):
+  4. merge_base()       — resolve the fork point git merge-base(HEAD, base).
+  5. run_baseline()     — `git worktree add --detach` the merge-base into a
+                          temp tree under the SYSTEM temp dir, run an injected
+                          runner there, and GUARANTEE worktree removal (finally).
+  6. scope_check()      — orchestrate merge_base → baseline run → current run →
+                          tag_findings; returns None (caller falls back to
+                          scope-only) on any git failure.
 
 Advisory, never raises. git failures (not a repo, no merge-base, git missing)
 return None so callers can warn and fall back to a full run. "No changes" is the
@@ -32,11 +36,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 import sys
+import tempfile
 from collections import Counter
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 from .discovery import Package, find_r_packages
 
@@ -152,62 +158,96 @@ def tag_findings(
     return tagged
 
 
+# ───────────────────────── merge-base + baseline run ─────────────────────────
+
+
+def merge_base(path: str = ".", base: str = "dev") -> Optional[str]:
+    """Resolve the fork point: git merge-base(HEAD, base).
+
+    Returns the merge-base SHA, or None when there is no common ancestor, `base`
+    is unknown, `path` is not a git repo, or git is missing. Advisory — never
+    raises; callers warn and fall back to a full/scope-only run on None.
+    """
+    mb = _git(["merge-base", "HEAD", base], cwd=path)
+    if mb is None or mb.returncode != 0:
+        return None
+    sha = mb.stdout.strip()
+    return sha or None
+
+
+def run_baseline(
+    path: str,
+    base_sha: str,
+    runner: Callable[[str], list],
+) -> Optional[list]:
+    """Run `runner` against a detached worktree checked out at `base_sha`.
+
+    Steps: create a temp dir under the SYSTEM temp root (NOT inside the repo, so
+    `git status` stays clean and the PreToolUse "writes outside worktree" warning
+    never fires); `git worktree add --detach <tmp> <base_sha>`; call
+    `runner(<tmp>)` and return its finding list. The worktree is ALWAYS removed
+    (`git worktree remove --force` + rmtree) in a `finally`, so a crash mid-run
+    never leaks a worktree.
+
+    Returns None only when the worktree add itself fails (bad SHA, git missing) —
+    in that case nothing was created, so there is nothing to clean up and the
+    caller falls back. If `runner` raises, the worktree is still cleaned up and
+    the exception propagates (callers that want a fallback catch it upstream).
+    """
+    tmp = tempfile.mkdtemp(prefix="rforge-baseline-")
+    add = _git(["worktree", "add", "--detach", tmp, base_sha], cwd=path)
+    if add is None or add.returncode != 0:
+        # Nothing was registered; just drop the empty temp dir.
+        shutil.rmtree(tmp, ignore_errors=True)
+        return None
+    try:
+        return runner(tmp)
+    finally:
+        _git(["worktree", "remove", "--force", tmp], cwd=path)
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 # ───────────────────────── two-run orchestration ─────────────────────────
 
 
 def scope_check(
-    run_check,
+    runner: Callable[[str], list],
     path: str,
-    base: str,
+    base: str = "dev",
 ) -> Optional[dict]:
-    """DORMANT (NOT YET WIRED): two-run introduced/pre-existing tagging helper.
+    """Two-run introduced/pre-existing tagging over a REAL merge-base checkout.
 
-    This is a building block for a *future* honest comparison, and is NOT used by
-    the live `r:check --changed` path. The blocker: an honest comparison needs
-    `run_check(merge_base)` to actually check out the merge-base into a detached
-    worktree and run R there. That checkout mechanism is not built yet — the
-    command layer currently has no way to run R against anything but the live
-    worktree, so wiring this in would compare the worktree against itself and tag
-    every finding identically (a silent false-negative). Until the merge-base
-    checkout lands, `r:check --changed` is scope-only (see lib.rcmd.run_changed)
-    and this function is unreachable from the command path. It is kept (with its
-    unit tests) so the future wiring has a tested core.
+    Orchestrates: merge_base(HEAD, base) → run_baseline (runner at the merge-base
+    detached worktree) → runner against the live HEAD tree → tag_findings.
 
-    `run_check(checkout_ref) -> envelope` is injected so this module stays R-free
-    and unit-testable.
+    `runner(treedir) -> list[finding]` is injected so this module stays R-free and
+    unit-testable; rcmd injects a closure that runs the chosen --kind engine in
+    `treedir` and returns its flat finding list. The baseline run executes in a
+    genuinely different working tree (the v2.10.0 bug was tagging HEAD vs HEAD —
+    here the baseline tree is a real checkout of the merge-base SHA).
 
-    Returns None when no merge-base resolves. Otherwise returns:
+    Returns None (caller falls back to scope-only) when the merge-base does not
+    resolve or the baseline worktree add fails. Otherwise:
         {"base": <ref>, "merge_base": <sha>,
-         "findings": [{"text":..., "level":"error|warning|note", "tag":...}, ...],
-         "introduced_counts": {"errors": n, "warnings": n, "notes": n}}
+         "findings": [{"text":..., "tag": "introduced"|"pre-existing"}, ...],
+         "introduced_count": <int>}
     """
-    root_proc = _git(["rev-parse", "--show-toplevel"], cwd=path)
-    if root_proc is None or root_proc.returncode != 0:
+    base_sha = merge_base(path=path, base=base)
+    if base_sha is None:
         return None
-    mb_proc = _git(["merge-base", "HEAD", base], cwd=path)
-    if mb_proc is None or mb_proc.returncode != 0 or not mb_proc.stdout.strip():
+
+    base_findings = run_baseline(path=path, base_sha=base_sha, runner=runner)
+    if base_findings is None:
         return None
-    merge_base = mb_proc.stdout.strip()
 
-    head_env = run_check("HEAD")
-    base_env = run_check(merge_base)
-
-    findings: list[dict] = []
-    counts = {"errors": 0, "warnings": 0, "notes": 0}
-    for level, plural in (("error", "errors"), ("warning", "warnings"),
-                          ("note", "notes")):
-        head_list = (head_env.get("check") or {}).get(plural, [])
-        base_list = (base_env.get("check") or {}).get(plural, [])
-        for t in tag_findings(head_list, base_list):
-            findings.append({"text": t["text"], "level": level, "tag": t["tag"]})
-            if t["tag"] == "introduced":
-                counts[plural] += 1
-
+    head_findings = runner(path)
+    tagged = tag_findings(head_findings, base_findings)
+    introduced = sum(1 for t in tagged if t["tag"] == "introduced")
     return {
         "base": base,
-        "merge_base": merge_base,
-        "findings": findings,
-        "introduced_counts": counts,
+        "merge_base": base_sha,
+        "findings": tagged,
+        "introduced_count": introduced,
     }
 
 

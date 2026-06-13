@@ -2,9 +2,15 @@
 
 git is mocked via subprocess so tests are hermetic (no real repo needed),
 except the file→package mapping test, which builds a tmp fixture ecosystem.
+
+The merge_base / run_baseline / scope_check tests deliberately use a REAL
+temporary git repo (commits made with subprocess git) — NOT mocked git. A
+mocked baseline run is exactly what hid the v2.10.0 false-negative (compared
+HEAD against HEAD), so these tests exercise genuine worktrees/checkouts.
 """
 from __future__ import annotations
 
+import os
 import subprocess
 from unittest import mock
 
@@ -162,3 +168,125 @@ def test_tag_findings_preserves_duplicates_by_count():
 
 def test_tag_findings_empty_head_returns_empty():
     assert changed.tag_findings(head_findings=[], base_findings=["NOTE: x"]) == []
+
+
+# ───────── REAL-GIT fixtures for merge_base / run_baseline / scope_check ─────────
+
+
+def _git(args, cwd):
+    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True,
+                          check=True)
+
+
+def _init_repo(root):
+    """A real git repo with a `dev` base commit and a `feature/x` branch commit.
+
+    Returns (repo_path, base_sha). The repo contains one tracked file `f.txt`
+    that differs between the base (on `dev`) and the branch tip (checked out).
+    """
+    _git(["init", "-q"], cwd=root)
+    _git(["config", "user.email", "t@t.t"], cwd=root)
+    _git(["config", "user.name", "T"], cwd=root)
+    _git(["checkout", "-q", "-b", "dev"], cwd=root)
+    (root / "f.txt").write_text("base\n", encoding="utf-8")
+    _git(["add", "f.txt"], cwd=root)
+    _git(["commit", "-q", "-m", "base"], cwd=root)
+    base_sha = _git(["rev-parse", "HEAD"], cwd=root).stdout.strip()
+    _git(["checkout", "-q", "-b", "feature/x"], cwd=root)
+    (root / "f.txt").write_text("branch\n", encoding="utf-8")
+    _git(["add", "f.txt"], cwd=root)
+    _git(["commit", "-q", "-m", "branch"], cwd=root)
+    return root, base_sha
+
+
+# ───────── merge_base ─────────
+
+
+def test_merge_base_resolves_fork_point(tmp_path):
+    repo, base_sha = _init_repo(tmp_path)
+    assert changed.merge_base(path=str(repo), base="dev") == base_sha
+
+
+def test_merge_base_none_when_not_a_repo(tmp_path):
+    assert changed.merge_base(path=str(tmp_path), base="dev") is None
+
+
+def test_merge_base_none_for_unknown_base(tmp_path):
+    repo, _ = _init_repo(tmp_path)
+    assert changed.merge_base(path=str(repo), base="no-such-branch") is None
+
+
+# ───────── run_baseline: detached worktree, guaranteed cleanup ─────────
+
+
+def _wt_count(repo):
+    out = _git(["worktree", "list"], cwd=repo).stdout
+    return len([ln for ln in out.splitlines() if ln.strip()])
+
+
+def test_run_baseline_runs_runner_at_base_sha_and_cleans_up(tmp_path):
+    """Runner is invoked in a tree whose f.txt holds the BASE content, and no
+    worktree is leaked afterward."""
+    repo, base_sha = _init_repo(tmp_path)
+    before = _wt_count(repo)
+    seen = {}
+
+    def runner(treedir):
+        # Prove the baseline tree is genuinely the base commit, not HEAD.
+        seen["content"] = (os.path.join(treedir, "f.txt"))
+        with open(seen["content"], encoding="utf-8") as fh:
+            seen["text"] = fh.read()
+        return ["finding-from-base"]
+
+    out = changed.run_baseline(path=str(repo), base_sha=base_sha, runner=runner)
+    assert out == ["finding-from-base"]
+    assert seen["text"] == "base\n"            # NOT "branch\n" — real checkout
+    assert _wt_count(repo) == before           # no leaked worktree
+
+
+def test_run_baseline_cleans_up_even_when_runner_raises(tmp_path):
+    repo, base_sha = _init_repo(tmp_path)
+    before = _wt_count(repo)
+
+    def boom(treedir):
+        raise RuntimeError("inner run failed")
+
+    with pytest.raises(RuntimeError):
+        changed.run_baseline(path=str(repo), base_sha=base_sha, runner=boom)
+    assert _wt_count(repo) == before           # finally cleaned up despite raise
+
+
+def test_run_baseline_none_when_worktree_add_fails(tmp_path):
+    repo, _ = _init_repo(tmp_path)
+    out = changed.run_baseline(path=str(repo), base_sha="deadbeef" * 5,
+                               runner=lambda d: ["x"])
+    assert out is None
+
+
+# ───────── scope_check: full two-run tagging over a real repo ─────────
+
+
+def test_scope_check_tags_introduced_and_pre_existing(tmp_path):
+    """HEAD has two findings; base has one of them → one introduced, one pre-existing."""
+    repo, _ = _init_repo(tmp_path)
+
+    def run_check(treedir):
+        with open(os.path.join(treedir, "f.txt"), encoding="utf-8") as fh:
+            txt = fh.read().strip()
+        if txt == "branch":
+            return ["NOTE: old", "NOTE: new"]   # HEAD findings
+        return ["NOTE: old"]                    # base findings
+
+    result = changed.scope_check(run_check, path=str(repo), base="dev")
+    assert result is not None
+    tags = {t["text"]: t["tag"] for t in result["findings"]}
+    assert tags == {"NOTE: old": "pre-existing", "NOTE: new": "introduced"}
+    assert result["introduced_count"] == 1
+    assert result["merge_base"]
+
+
+def test_scope_check_none_when_no_merge_base(tmp_path):
+    """Falls back (None) when base does not resolve — caller goes scope-only."""
+    repo, _ = _init_repo(tmp_path)
+    assert changed.scope_check(lambda d: [], path=str(repo),
+                               base="no-such-branch") is None
