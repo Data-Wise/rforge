@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.10.0] - 2026-06-12
+## [2.10.0] - 2026-06-13
 
 > Bundles three roadmap features — an S7 convention checker, diff-aware checks,
 > and a scaffolding theme — each built TDD-first from an approved spec.
