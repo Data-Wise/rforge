@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 33 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 35 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -1197,6 +1197,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/deps_sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    deps_sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/status/" class="md-nav__link">
         
   
@@ -1261,6 +1289,90 @@
     
   
     rcmd
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/cranlint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    cranlint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/ghrelease/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ghrelease
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/runiverse/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    runiverse
   
 
     
@@ -1978,7 +2090,7 @@
 <p>Make rforge's submission gate emulate CRAN's <em>incoming</em> and <em>ongoing</em> (post-acceptance)
 checks, so the error classes that "only CRAN submission detects" are caught locally.
 Today the <code>check</code> stage runs only <code>rcmdcheck(args=c("--as-cran"))</code>
-(<a href="../../lib/rcmd.py"><code>lib/rcmd.py:233</code></a>); this spec adds, behind a <code>strict</code> flavor:
+(<a href="https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py"><code>lib/rcmd.py:233</code></a>); this spec adds, behind a <code>strict</code> flavor:
 <code>--run-donttest</code>, a <strong>noSuggests</strong> pass (<code>_R_CHECK_DEPENDS_ONLY_=true</code>), a
 <strong>suggests-only</strong> pass (<code>_R_CHECK_SUGGESTS_ONLY_=true</code>), and an opt-in <code>--incoming</code>
 <code>_R_CHECK_*</code> bundle. The strict passes run <strong>by default in <code>cran-prep</code> and block the
@@ -2120,26 +2232,26 @@ that would ship. See RESEARCH §A.6.</p>
   deferred; tracked as a follow-up so this spec stays a single focused change.</li>
 </ul>
 <h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
-<p>All changes in <a href="../../lib/rcmd.py"><code>lib/rcmd.py</code></a>; the <code>strict</code> kwarg already exists on
+<p>All changes in <a href="https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py"><code>lib/rcmd.py</code></a>; the <code>strict</code> kwarg already exists on
 <code>r_snippet</code>/<code>run</code> (used for <code>site</code>) and <code>--strict</code> is already an argparse flag.</p>
 <ul>
-<li><strong><code>r_snippet(kind="check", …)</code></strong> (<a href="../../lib/rcmd.py"><code>lib/rcmd.py:233</code></a>) — extend with a
+<li><strong><code>r_snippet(kind="check", …)</code></strong> (<a href="https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py"><code>lib/rcmd.py:233</code></a>) — extend with a
   flavor selector (e.g. <code>flavor: str | None</code> ∈ <code>{None,"depends","suggests"}</code> and
   <code>incoming: bool</code>). Build <code>args</code> (<code>--as-cran</code> [+ <code>--run-donttest</code>] when strict) and an
   <code>env=</code> named vector for the flavor / incoming bundle, threaded into the existing
   <code>rcmdcheck(...)</code> call inside the <code>_guard("rcmdcheck", …)</code> wrapper. See RESEARCH §A.4 for
   the exact <code>rcmdcheck(args=, env=)</code> shape.</li>
-<li><strong><code>run("check", …)</code></strong> (<a href="../../lib/rcmd.py"><code>lib/rcmd.py:362</code></a>) — already threads kwargs to
+<li><strong><code>run("check", …)</code></strong> (<a href="https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py"><code>lib/rcmd.py:362</code></a>) — already threads kwargs to
   <code>r_snippet</code>; pass the new flavor/incoming through. <strong>No <code>_invoke_r</code> change.</strong> <code>flavor</code> is an
   <em>internal</em> selector, not a user-facing flag: <code>--strict</code> drives a <strong>loop over both flavors</strong>
   (<code>"depends"</code> then <code>"suggests"</code>), each emitting its own stage row. The single combined path is
   rejected (it would conflate two distinct bug classes — see review).</li>
-<li><strong><code>_run_cran_prep()</code></strong> (<a href="../../lib/rcmd.py"><code>lib/rcmd.py:440</code></a>) — after the existing
-  <code>check</code> stage (<a href="../../lib/rcmd.py">line 462</a>) and its real-NOTE blocker (467–470), run the
+<li><strong><code>_run_cran_prep()</code></strong> (<a href="https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py"><code>lib/rcmd.py:440</code></a>) — after the existing
+  <code>check</code> stage (<a href="https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py">line 462</a>) and its real-NOTE blocker (467–470), run the
   two strict flavors (<code>--run-donttest</code> + each env). On <code>error</code>, append a blocker:
   <code>"noSuggests/donttest check failed (Suggests used unconditionally?)"</code>. Accept an
   <code>incoming=</code> param and add the bundle stage when set. Thread <code>ns.strict</code>/<code>ns.incoming</code>
-  from argparse into <code>_run_cran_prep(...)</code> (<a href="../../lib/rcmd.py">the missing link at lines 530–535</a>).</li>
+  from argparse into <code>_run_cran_prep(...)</code> (<a href="https://github.com/Data-Wise/rforge/blob/main/lib/rcmd.py">the missing link at lines 530–535</a>).</li>
 <li><strong>Failure hint</strong> — when a strict flavor errors, surface: <em>"A Suggests package is used
   unconditionally. Move it to Imports, or guard with <code>requireNamespace()</code> in code AND
   <code>skip_if_not_installed()</code> in tests."</em></li>

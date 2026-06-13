@@ -6,11 +6,11 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 33 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 35 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/_TEMPLATE-SPEC/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-mkdocs-version-macros-2026-06-12/">
       
       
       
@@ -23,7 +23,7 @@
     
     
       
-        <title>TEMPLATE SPEC - RForge Plugin</title>
+        <title>SPEC: mkdocs version/count macros + sync script - RForge Plugin</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#spec" class="md-skip">
+        <a href="#spec-mkdocs-versioncount-macros-sync-script" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-               TEMPLATE SPEC
+              SPEC: mkdocs version/count macros + sync script
             
           </span>
         </div>
@@ -1197,6 +1197,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/deps_sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    deps_sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/status/" class="md-nav__link">
         
   
@@ -1261,6 +1289,90 @@
     
   
     rcmd
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/cranlint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    cranlint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/ghrelease/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ghrelease
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/runiverse/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    runiverse
   
 
     
@@ -1956,7 +2068,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/_TEMPLATE-SPEC.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-mkdocs-version-macros-2026-06-12.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1964,93 +2076,164 @@
   
 
 
-<!--
-TEMPLATE — copy to SPEC-<short-name>-YYYY-MM-DD.md (date = creation date) and fill in.
-Delete this comment and every `> guidance:` line before committing the real spec.
-See README.md → "Research & Citation Standard" for the citation rules this template assumes.
--->
-
-<h1 id="spec">SPEC: <one-line title><a class="headerlink" href="#spec" title="Permanent link">&para;</a></h1>
+<h1 id="spec-mkdocs-versioncount-macros-sync-script">SPEC: mkdocs version/count macros + sync script<a class="headerlink" href="#spec-mkdocs-versioncount-macros-sync-script" title="Permanent link">&para;</a></h1>
 <ul>
-<li><strong>Status:</strong> Draft — awaiting user review  <!-- Draft → In Progress → Shipped (vX.Y.Z) | Abandoned --></li>
-<li><strong>Date:</strong> YYYY-MM-DD  <!-- creation date, not ship date --></li>
-<li><strong>Target version:</strong> vX.Y.Z</li>
-<li><strong>Author:</strong> brainstormed with Claude, grounded in <code>RESEARCH-&lt;topic&gt;-YYYY-MM-DD.md</code></li>
-<li><strong>Related:</strong> <a href="RESEARCH-….md">RESEARCH-…</a>, <a href="SPEC-….md">SPEC-…</a></li>
+<li><strong>Status:</strong> Draft — awaiting user review</li>
+<li><strong>Date:</strong> 2026-06-12</li>
+<li><strong>Target version:</strong> v2.8.0</li>
+<li><strong>Author:</strong> brainstormed with Claude, grounded in the 2026-06-12 site audit (<code>/craft:site:update</code> on rforge)</li>
+<li><strong>Related:</strong> <a href="../SPEC-phase3-namespacing-2026-05-11/">SPEC-phase3-namespacing-2026-05-11</a></li>
 </ul>
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>guidance: 2–4 sentences. What this changes and the one-line why. Name the
-command/module surface touched and any count deltas (e.g. "33 → 34 commands").</p>
-</blockquote>
+<p>Stop version/command-count strings in the docs from drifting by introducing a single source of
+truth (<code>package.json</code>) rendered through <strong>mkdocs-macros</strong> (<code>{{ rforge.version }}</code>,
+<code>{{ rforge.command_count }}</code>) plus a Python <code>scripts/version_sync.py</code> for files that can't use
+macros (read raw on GitHub). Models scholar's proven two-layer system, re-implemented in Python to
+match rforge's existing tooling. No command-surface change (still 35 commands).</p>
 <h2 id="motivation">Motivation<a class="headerlink" href="#motivation" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>guidance: Why now. Cite the driving evidence — a bug, a CRAN bounce, a gap row
-in the companion RESEARCH doc. Every external/technical claim carries a source
-at point of use (see README citation standard).</p>
-</blockquote>
+<p>The 2026-06-12 audit found <code>mkdocs.yml</code> advertising <strong>33 commands</strong> while the code shipped <strong>35</strong>
+(fixed manually in <code>5267825</code>). Root cause: counts and versions are hardcoded across ~12 user-facing
+doc files plus <code>mkdocs.yml</code>, <code>README.md</code>, and <code>CLAUDE.md</code>, so every release silently strands stale
+numbers. rforge already proved the "generate-from-source, <code>--check</code> in CI" pattern works for API
+reference pages (<code>scripts/gen_lib_reference.py</code>); this applies the same discipline to versions/counts.</p>
 <h2 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>guidance: Bullet list. What success looks like.</p>
-</blockquote>
+<ul>
+<li>One authoritative source: <code>package.json</code> version → everything else derives from it.</li>
+<li>Live docs render the current version/count at build time — zero manual edits per release.</li>
+<li>A <code>--check</code> mode that fails CI when any tracked file drifts (mirrors <code>gen_lib_reference.py --check</code>).</li>
+<li>Released as v2.8.0 with the live site reflecting macros on first <code>dev→main</code> ship.</li>
+</ul>
 <h2 id="non-goals">Non-goals<a class="headerlink" href="#non-goals" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>guidance: Bullet list. Often more useful than Goals — they prevent scope creep.
-State what this deliberately does NOT do, and where deferred work is parked.</p>
-</blockquote>
+<ul>
+<li><strong>Not</strong> templating historical references — "What's New", CHANGELOG entries, <code>SPEC-*</code>/<code>RESEARCH-*</code>
+  docs, and "NEW in vX.Y.Z" prose keep their literal versions (same rule scholar follows).</li>
+<li><strong>Not</strong> auto-deriving <code>command_count</code> from the filesystem in v1 — keep it an explicit field in
+  <code>mkdocs.yml extra</code> (manually bumped, but CI-validated), matching scholar. Auto-derivation is deferred.</li>
+<li>No change to <code>gen_lib_reference.py</code> or the command surface.</li>
+</ul>
 <h2 id="scope">Scope<a class="headerlink" href="#scope" title="Permanent link">&para;</a></h2>
 <h3 id="in-scope-decided">In scope (decided)<a class="headerlink" href="#in-scope-decided" title="Permanent link">&para;</a></h3>
-<blockquote>
-<p>guidance: A table is good here. Columns like Kind | Command/Module | Engine | Tier.</p>
-</blockquote>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Target</th>
+<th>Engine</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Config</td>
+<td><code>mkdocs.yml</code> → add <code>plugins: - macros</code> and <code>extra.rforge.{version, prev_version, release_date, command_count}</code></td>
+<td>mkdocs-macros</td>
+<td><code>command_count: 35</code></td>
+</tr>
+<tr>
+<td>Docs</td>
+<td>~12 user-facing files (QUICK-START, index, REFCARD, installation, lib-modules, workflows/index, getting-started + 4 tutorials)</td>
+<td><code>{{ rforge.* }}</code></td>
+<td>current-version + count refs only</td>
+</tr>
+<tr>
+<td>Script</td>
+<td>new <code>scripts/version_sync.py</code> (+ <code>--check</code>, <code>--dry-run</code>, <code>--version</code>)</td>
+<td>Python (stdlib)</td>
+<td>syncs <code>mkdocs.yml extra</code>, <code>README.md</code>, <code>CLAUDE.md</code>, <code>plugin.json</code> from <code>package.json</code></td>
+</tr>
+<tr>
+<td>CI</td>
+<td><code>.github/workflows/docs.yml</code> → <code>pip install mkdocs-material mkdocs-macros-plugin</code></td>
+<td>—</td>
+<td>else build crashes on unknown plugin</td>
+</tr>
+<tr>
+<td>CI</td>
+<td>main test workflow → run <code>version_sync.py --check</code></td>
+<td>Python</td>
+<td>drift gate</td>
+</tr>
+</tbody>
+</table>
 <h3 id="out-of-scope-yagni-deferred">Out of scope (YAGNI / deferred)<a class="headerlink" href="#out-of-scope-yagni-deferred" title="Permanent link">&para;</a></h3>
-<blockquote>
-<p>guidance: Bullet list with the reason each item is deferred and where it lives next.</p>
-</blockquote>
+<ul>
+<li>Filesystem-derived command count — deferred until counts churn often enough to justify it.</li>
+<li>A <code>render_macros: false</code> per-file front-matter system — only add it to specific files <strong>if</strong> a
+  Jinja conflict surfaces (audit shows none today: no <code>{{ }}</code>/<code>{# #}</code>/<code>{% %}</code> in <code>docs/</code>).</li>
+<li>Test-count / suite-count macros (scholar has these; rforge's docs don't advertise test counts).</li>
+</ul>
 <h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>guidance: How it fits the existing code. Name files and functions with <code>path:line</code>
-anchors (e.g. <code>lib/rcmd.py:462</code>). Reuse existing helpers — say which. A Mermaid
-diagram is welcome if the data flow is non-trivial; mark "N/A" if a sentence suffices.</p>
-</blockquote>
+<p>Two layers, mirroring scholar but Python-native:</p>
+<ol>
+<li><strong>Render layer</strong> — <code>mkdocs-macros-plugin</code> exposes <code>extra.rforge.*</code> as <code>{{ rforge.version }}</code> etc.
+   at build time. Source of the <code>extra</code> block is <code>mkdocs.yml</code> itself.</li>
+<li><strong>Sync layer</strong> — <code>scripts/version_sync.py</code> reads <code>package.json</code> <code>version</code> (authoritative) and
+   writes it into <code>mkdocs.yml extra.rforge.version</code>, <code>.claude-plugin/plugin.json</code>, and the raw-on-GitHub
+   files (<code>README.md</code>, <code>CLAUDE.md</code>) that mkdocs never renders. Same shape as <code>scripts/gen_lib_reference.py</code>
+   (<code>main()</code> + <code>--check</code> returning exit 1 on drift); reuse its argparse/IO conventions.</li>
+</ol>
+<p>Flow: <code>package.json</code> → <code>version_sync.py</code> → <code>mkdocs.yml extra.rforge.*</code> → mkdocs-macros → rendered docs.
+Jinja-conflict risk is low (grep of <code>docs/</code> finds no existing <code>{{ }}</code>/<code>{% %}</code>); fenced code blocks that
+literally contain <code>{{</code> would need <code>{% raw %}</code> guards — audit during implementation.</p>
 <h2 id="dependencies">Dependencies<a class="headerlink" href="#dependencies" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>guidance: Confirmed-installed vs new optional engines. For R engines, state the
-guard (<code>_guard("&lt;pkg&gt;", …)</code>) and the degrade behavior when absent.</p>
-</blockquote>
+<ul>
+<li><strong>New (build/CI only):</strong> <code>mkdocs-macros-plugin</code> (Python, pip). Not a runtime dep of the plugin
+  itself. Degrade: if absent, <code>mkdocs build</code> errors loudly on the unknown plugin — caught in CI, not
+  silently. No R engines involved.</li>
+</ul>
 <h2 id="error-handling">Error handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>guidance: New failure modes and how the envelope/verdict represents them
-(status vocab, blockers, hints surfaced to the user).</p>
-</blockquote>
+<ul>
+<li><code>version_sync.py --check</code> exits 1 listing each drifted file (same vocabulary as
+  <code>gen_lib_reference.py --check</code>: "X is stale. Run: python3 scripts/version_sync.py").</li>
+<li>Unknown-plugin / unrendered-macro failures surface as a hard <code>mkdocs build</code> error in <code>docs.yml</code>,
+  before <code>gh-deploy</code> — never a half-stamped live site.</li>
+</ul>
 <h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>guidance: Both gates must pass — <code>python3 -m pytest tests/</code> and <code>bash tests/test-all.sh</code>.
-List the new cases and any regression fixture that proves the change.</p>
-</blockquote>
+<p>Both gates must pass:</p>
+<ul>
+<li><code>python3 -m pytest tests/</code> — add <code>tests/test_version_sync.py</code>: round-trips a temp <code>package.json</code>,
+  asserts <code>mkdocs.yml extra.rforge.version</code> updates, asserts <code>--check</code> returns non-zero on injected drift.</li>
+<li><code>bash tests/test-all.sh</code> — unchanged.</li>
+<li>Manual: <code>mkdocs build --strict</code> renders <code>{{ rforge.version }}</code> → <code>2.7.0</code> with no unrendered braces.</li>
+</ul>
 <h2 id="documentation-impact">Documentation impact<a class="headerlink" href="#documentation-impact" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>guidance: Every doc surface to update — command frontmatter, CHANGELOG, .STATUS,
-auto-gen reference (<code>scripts/gen_lib_reference.py</code>), tutorials, REFCARD.</p>
-</blockquote>
+<ul>
+<li>Convert the ~12 user-facing docs (see Scope table) to macros.</li>
+<li><code>CHANGELOG</code> + <code>.STATUS</code> + <code>CLAUDE.md</code>: note the new sync step in the release runbook
+  ("bump <code>package.json</code> → <code>python3 scripts/version_sync.py</code> → commit").</li>
+<li>Leave <code>scripts/gen_lib_reference.py</code> docs as-is (separate concern).</li>
+<li>REFCARD ASCII version box (if any) — verify it's macro-rendered or sync-script-stamped.</li>
+</ul>
 <h2 id="implementation-order">Implementation order<a class="headerlink" href="#implementation-order" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>(worktree)</strong> Add <code>mkdocs-macros-plugin</code> to <code>docs.yml</code>; add <code>plugins: - macros</code> + <code>extra.rforge.*</code>
+   to <code>mkdocs.yml</code>. Verify <code>mkdocs build</code> still green.</li>
+<li><strong>(worktree)</strong> Write <code>scripts/version_sync.py</code> + <code>tests/test_version_sync.py</code>; run <code>--check</code>.</li>
+<li><strong>(worktree)</strong> Convert the ~12 docs to <code>{{ rforge.* }}</code>; <code>mkdocs build --strict</code> to catch
+   unrendered braces / Jinja conflicts; add <code>{% raw %}</code> where code blocks contain <code>{{</code>.</li>
+<li><strong>(docs-only, dev)</strong> Update release runbook (<code>CLAUDE.md</code>/<code>.STATUS</code>/CHANGELOG) with the sync step.</li>
+<li><strong>(worktree)</strong> Wire <code>version_sync.py --check</code> into the main CI workflow.</li>
+<li>Merge <code>feature/mkdocs-version-macros</code> → <code>dev</code> → release v2.8.0.</li>
+</ol>
 <blockquote>
-<p>guidance: Numbered, sequenced steps. Note which steps need a feature worktree
-(code) vs which are docs-only (allowed on <code>dev</code>).</p>
+<p>Steps 1–3, 5 touch code/config and <strong>require a feature worktree</strong> off <code>dev</code>
+(<code>git worktree add ~/.git-worktrees/rforge-version-macros -b feature/mkdocs-version-macros dev</code>).
+Step 4 is docs-only and may land on <code>dev</code> directly.</p>
 </blockquote>
 <h2 id="open-questions-risks">Open questions / risks<a class="headerlink" href="#open-questions-risks" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>guidance: Unresolved items, with a resolution line once decided. Call out any
-behavior change that could surprise existing users.</p>
-</blockquote>
-<h2 id="sources">Sources<a class="headerlink" href="#sources" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>guidance: Every primary source cited above, collected for verification. Primary
-sources first (Writing R Extensions, R Internals, CRAN Repository Policy, package
-reference docs), then official tutorials, then blogs/mailing lists (labeled).</p>
-</blockquote>
 <ul>
-<li><a href="url"><source title></a></li>
+<li><strong><code>command_count</code> authority:</strong> hardcoded in <code>mkdocs.yml extra</code> (manual bump, CI-checked) vs derived
+  from <code>commands/</code> minus deprecated stubs. → <em>Resolved:</em> hardcode for v1, validate via <code>--check</code>; defer
+  derivation.</li>
+<li><strong>Jinja in code blocks:</strong> any fenced block containing <code>{{ … }}</code> (e.g. GitHub Actions snippets) will be
+  interpreted by macros → wrap in <code>{% raw %}</code>. Audit during Step 3.</li>
+<li><strong>Behavior change:</strong> none user-facing; purely a docs-build/release-process change.</li>
+</ul>
+<h2 id="sources">Sources<a class="headerlink" href="#sources" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://mkdocs-macros-plugin.readthedocs.io/">mkdocs-macros-plugin — official docs</a></li>
+<li>scholar's implementation (internal reference): <code>scholar/scripts/version-sync.js</code>,
+  <code>scholar/mkdocs.yml</code> <code>extra.scholar.*</code>, <code>scholar/.github/workflows/docs.yml</code> (<code>pip install … mkdocs-macros-plugin</code>)</li>
 </ul>
 
 
