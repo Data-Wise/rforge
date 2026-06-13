@@ -1,5 +1,5 @@
 project: rforge
-updated: 2026-06-12
+updated: 2026-06-13
 status: Active
 version: 2.10.0 (RELEASED 2026-06-13)
 last_release: 2026-06-13 v2.10.0 (PR #32 bundle + #33 review fixes feature→dev, PR #34 dev→main merge e478fca; release https://github.com/Data-Wise/rforge/releases/tag/v2.10.0; CI green on main RForge CI + Deploy Documentation; docs live-verified v2.10.0 + /reference/{s7review,scaffold,changed}/ + /tutorials/scaffolding-existing-packages/ all HTTP 200; tap PR Data-Wise/homebrew-tap#121 MERGED — formula+manifest → v2.10.0, sha256 96ef1108…, desc 35→39, ruby -c OK, --diff only pre-existing bin.mkpath drift). Three-feature bundle (35→39 commands): #26 r:s7-review + scaffolding r:use-* + diff-aware --changed (scope-only). Hardened by a pre-release adversarial review that caught + fixed 3 bug-classes the gates missed (diff-aware false-negative, deps_sync constraint-drop, s7review FPs). pytest 298, test-all 41/41.
@@ -278,13 +278,13 @@ decisions:
 
 ## 🎯 Next Action
 
-🔨 **v2.9.0 IN PROGRESS — Phase 4 orchestrator rewrite** (feature/phase4-orchestrator). Code complete + gates green (test-all 36/36, pytest 230); version bumped to 2.9.0; CHANGELOG/.STATUS/CLAUDE.md synced. **Next: PR feature→dev**, then dev→main release + tap sync. Spec+plan in docs/specs/.
+✅ **v2.10.0 RELEASED (2026-06-13) — no active task.** dev ≡ main @ v2.10.0; no open PRs; no worktrees. Issues #26 (r:s7-review) and #20 (manifest_order) both shipped — close them on GitHub.
 
-After v2.9.0 ships (all optional):
+Open candidates (all optional, net-new work → own session/worktree):
 
-B) 🟢 **Issue #20** — `manifest_order` for curated package ordering (small ecosystem-manifest follow-up; ~10 min).
-C) 🟢 **Issue #26** — `r:s7-review` S7 convention checker for mediationverse (filed 2026-06-12; unspecced).
-D) 🟢 **Scaffolding theme** — already specced (`SPEC-r-scaffolding-2026-06-10.md`), unscheduled: `r:use-test`/`r:use-package`/`r:use-vignette` (existing-package only).
+A) 🟢 **diff-aware `[introduced]`/`[pre-existing]` tagging** — the deferred P0 follow-up. Needs merge-base detached-worktree checkout in `lib/changed.py` (current `--changed` is honest scope-only). Spec: `SPEC-diff-aware-checks-and-coverage-2026-05-31.md`.
+B) 🟢 **`r:s7-review --eco`** + R-backed runtime checks — the v2 sibling deferred from #26. Needs a fresh spec.
+C) 🟢 **Scaffolding follow-ups** — `r:use-*` shipped (v2.10.0); any gaps surfaced by real use.
 
 Background, no active task:
 
