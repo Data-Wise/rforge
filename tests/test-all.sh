@@ -443,6 +443,21 @@ assert d['engine_missing'] == [], 'pure-Python module: engine_missing must be []
 "
 }
 
+# lib.s7review CLI smoke — pure-Python (no R). Runs the static S7 convention
+# checker over the deliberately-bad fixture and asserts the advisory envelope:
+# a worst-of warn, kind s7review, engine_missing always [].
+lib_s7review_smoke() {
+    local out
+    out=$(python3 -m lib.s7review --path tests/fixtures/s7pkg.bad --format json 2>/dev/null)
+    printf '%s' "$out" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+assert d['kind'] == 's7review', f\"unexpected kind {d['kind']}\"
+assert d['status'] in ('ok', 'warn'), f\"advisory: must be ok/warn; got {d['status']}\"
+assert d['engine_missing'] == [], 'pure-Python module: engine_missing must be []'
+"
+}
+
 # Phase 4: no removed rforge-mcp tool references may survive in any agent file.
 # (rforge-mcp was absorbed into lib/ in v1.3.0; the tools no longer exist.)
 # Matches both the legacy `rforge_*` underscore form and the `mcp__rforge*`
@@ -525,6 +540,7 @@ run "Docs: version/count strings in sync with package.json" version_sync_in_sync
 run "Lib: rcmd CLI smoke (R-free — accepts engine_missing envelope)" lib_rcmd_smoke
 run "Dogfood: lib.cranlint Tier-4 advisory CLI on a fixture package" lib_cranlint_smoke
 run "Dogfood: lib.runiverse CLI smoke (offline → warn envelope)" lib_runiverse_smoke
+run "Dogfood: lib.s7review CLI smoke (advisory S7 convention envelope)" lib_s7review_smoke
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════"

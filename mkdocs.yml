@@ -121,6 +121,7 @@ nav:
       - "cranlint": reference/cranlint.md
       - "ghrelease": reference/ghrelease.md
       - "runiverse": reference/runiverse.md
+      - "s7review": reference/s7review.md
   - Project:
     - Architecture: architecture.md
     - Hooks & Skills: hooks-and-skills.md
