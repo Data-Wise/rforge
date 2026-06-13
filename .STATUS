@@ -1,12 +1,17 @@
 project: rforge
 updated: 2026-06-12
 status: Active
-version: 2.8.0 (released 2026-06-12)
+version: 2.9.0 (in progress — feature/phase4-orchestrator → dev)
+in_progress: 2026-06-12 v2.9.0 — Phase 4 orchestrator rewrite (last craft-parity item). Stale agents/orchestrator.md (13 removed rforge_* MCP tools, 43 refs) rewritten to delegate via python3 -m lib.* envelopes; intent→lib mapping + read-only/recommend-only safety gate (never-auto-submit) + synthesis. +3 test-all guards (33→36) incl. rforge_-ref regression lock; tests/_check_agent_engines.py. Gates green: test-all 36/36, pytest 230. Spec+plan: docs/specs/SPEC-phase4-orchestrator-rewrite-2026-06-12.md (+PLAN). PR feature→dev pending.
 last_release: 2026-06-12 v2.8.0 (PR #27 feature→dev, PR #28 dev→main merge 0a70e97, release https://github.com/Data-Wise/rforge/releases/tag/v2.8.0; CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#119 MERGED — origin/main formula+manifest → v2.8.0, sha256 9dc3c5d2…, ruby -c OK; --diff shows only pre-existing bin.mkpath drift, no new version/sha drift). Single-source docs version/count: mkdocs-macros render layer + pure-stdlib scripts/version_sync.py (--check CI gate). 35 commands (no surface change). Live-verified REFCARD renders 2.8.0, no literal braces. 230 pytest + test-all 33/33.
 
 last_release_prior: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --universe R-universe early-access tier (lib/runiverse.py, pure-stdlib); 35 commands (flag, not new command). Prior: v2.6.0 (2026-06-10, tap #114) bundled v2.3–v2.6.
 
-worktrees: []  # none active
+worktrees:
+  - path: ~/.git-worktrees/rforge/feature-phase4-orchestrator
+    branch: feature/phase4-orchestrator
+    base: dev
+    purpose: "v2.9.0 Phase 4 orchestrator rewrite — gates green, PR feature→dev pending"
 # prior: feature/mkdocs-version-macros merged (PR #27 → dev 2026-06-12) + worktree removed;
 #        review follow-ups (index.md stale counts, mkdocs version anchor, decoy test) + ORCHESTRATE dropped pre-merge.
 #        feature/r-submit-runiverse merged (PR #24) + worktree removed 2026-06-11
@@ -273,13 +278,13 @@ decisions:
 
 ## 🎯 Next Action
 
-🎉 **v2.6.0 SHIPPED (2026-06-10)** — released to GitHub + Homebrew (local brew upgraded to 2.6.0, smoke-tested); CI green on main, docs deployed, tap PR #114 merged. No active task — clean stopping point.
+🔨 **v2.9.0 IN PROGRESS — Phase 4 orchestrator rewrite** (feature/phase4-orchestrator). Code complete + gates green (test-all 36/36, pytest 230); version bumped to 2.9.0; CHANGELOG/.STATUS/CLAUDE.md synced. **Next: PR feature→dev**, then dev→main release + tap sync. Spec+plan in docs/specs/.
 
-Next when you return (all optional):
+After v2.9.0 ships (all optional):
 
-A) 🟢 **Spec Phase 4 — discovery engine + agents** — the last unspecced craft-parity roadmap item. Start with `/workflow:brainstorm`.
 B) 🟢 **Issue #20** — `manifest_order` for curated package ordering (small ecosystem-manifest follow-up; ~10 min).
-C) 🟢 **Scaffolding theme** — already specced (`SPEC-r-scaffolding-2026-06-10.md`), unscheduled: `r:use-test`/`r:use-package`/`r:use-vignette` (existing-package only).
+C) 🟢 **Issue #26** — `r:s7-review` S7 convention checker for mediationverse (filed 2026-06-12; unspecced).
+D) 🟢 **Scaffolding theme** — already specced (`SPEC-r-scaffolding-2026-06-10.md`), unscheduled: `r:use-test`/`r:use-package`/`r:use-vignette` (existing-package only).
 
 Background, no active task:
 

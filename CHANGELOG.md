@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.9.0] - 2026-06-12
+
+> Rewrites the single agent (`agents/orchestrator.md`), which had been stale
+> since v1.3.0: it delegated to 13 `rforge_*` MCP tools (43 references) removed
+> when rforge-mcp was absorbed into pure-Python `lib/` modules. The rewrite
+> delegates via `python3 -m lib.*` envelopes instead. Last craft-parity item
+> (Phase 4). No command-surface change — still 35 commands, still 1 agent.
+
+### Changed
+
+- **Orchestrator agent rewritten** — `agents/orchestrator.md` now delegates via
+  `python3 -m lib.*` envelopes (run through Bash) instead of the removed
+  `rforge_*` MCP tools. Adds `name`/`description` frontmatter, an intent→lib
+  mapping over **7 intents** (CODE_CHANGE incl. `lib.deps impact` / NEW_FUNCTION /
+  BUG_FIX / DEPS_AUDIT / QUALITY / CRAN_READINESS / ECOSYSTEM_HEALTH), a strict
+  read-only/recommend-only safety boundary (mirrors "never auto-submit": every
+  file-writing or network command — `document`/`cran-prep`/`style`/`build`/
+  `submit`/`winbuilder`/`rhub`/`urlcheck`/`revdep`/`--write` — is recommended,
+  never auto-run), correct `--format json` flags, and per-module envelope
+  synthesis (modules don't share one schema).
+
+### Added
+
+- Three `tests/test-all.sh` guards (**33 → 36 checks**): no removed rforge-mcp
+  refs in any agent file (`rforge_`/`mcp__rforge`; regression lock for the bug
+  this release fixes), orchestrator carries `name`+`description` frontmatter, and
+  a recipe validator (`tests/_check_agent_engines.py`) asserting every `--kind`
+  is a **real** `lib.rcmd` engine, is **safe to auto-run** (read-only — the gate
+  rejects mutating kinds like `document`/`cran-prep` in auto-run recipes, in both
+  `--kind x` and `--kind=x` forms), every `lib.<module>` it names exists, and
+  every recipe command **actually parses** (no argparse usage error — catches
+  wrong flag ordering / missing required args that token checks miss).
+
+---
+
 ## [2.8.0] - 2026-06-12
 
 > Makes docs render the current version/command-count from a single source of
