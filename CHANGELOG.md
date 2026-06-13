@@ -11,6 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`r:s7-review --eco` + `--runtime`** (v2 sibling of the v2.10.0 static checker) —
+  two composable flags, no new command. **`--eco`** runs the 5 static families
+  across **every package** in the ecosystem manifest and aggregates one
+  `s7review-eco` envelope (per-package breakdown + roll-up by family, ordered by
+  the manifest's `manifest_order`); pure-stdlib, a parse-failure package degrades
+  to a per-package `warn` without aborting the sweep. **`--runtime`** adds an
+  R-backed pass — a new **`s7runtime` engine in `lib/rcmd.py`** (`pkgload::load_all`
+  + S7 runtime introspection) contributing two new families: **`method-dispatch`**
+  (`dead_generic` — an S7 generic with zero registered methods) and
+  **`validator-runtime`** (`validator_not_enforcing` — a validator whose body is a
+  constant no-op that can never reject input). The runtime families carry
+  `source: "runtime"`; static findings keep `source: "static"`. All R routes
+  through `lib.rcmd` (the only R-touching module); `s7runtime` is read-only and
+  added to `SAFE_AUTORUN`. The flags compose (`--eco --runtime`). `--runtime`
+  degrades to advisory `warn` stages ("runtime pass skipped: …") when R / S7 is
+  unavailable — the static result is always intact, exit 0 always (mirrors
+  `runiverse` offline degradation). Spec: `SPEC-r-s7-review-eco-2026-06-13.md`.
 - **diff-aware `--changed` tagging** (P0 completion) — completes the v2.10.0
   scope-only `--changed` flag on `r:check`/`r:test`/`r:lint`. Each finding is now
   tagged **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already
