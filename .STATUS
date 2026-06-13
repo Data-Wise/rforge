@@ -10,12 +10,8 @@ last_release_prior_2: 2026-06-12 v2.8.0 (PR #27 feature→dev, PR #28 dev→main
 
 last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --universe R-universe early-access tier (lib/runiverse.py, pure-stdlib); 35 commands (flag, not new command). Prior: v2.6.0 (2026-06-10, tap #114) bundled v2.3–v2.6.
 
-worktrees:
-  - path: ~/.git-worktrees/rforge/feature-s7-method-missing-class
-    branch: feature/s7-method-missing-class
-    base: dev
-    created: 2026-06-13
-    purpose: "s7-review methods_on_missing_class — close the deferred runtime family (signature-resolvability check in s7runtime engine). Spec SPEC-s7-method-missing-class-2026-06-13.md on dev @ 0badd53. Autonomous build."
+worktrees: []  # none active
+# prior: feature/s7-method-missing-class merged (PR #37 → dev 2026-06-13, merge 144324e) + worktree removed;
 # prior: feature/v2.11.0-bundle merged (PR #35 → dev 2026-06-13, merge 0f3f548) + worktree removed;
 # prior: feature/v2.10.0-bundle merged (PR #32 → dev 2026-06-12, merge 85881e8) + worktree removed;
 # prior: feature/phase4-orchestrator merged (PR #29 → dev 2026-06-12, merge d6803ca) + worktree removed;
