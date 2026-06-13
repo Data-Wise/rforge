@@ -685,3 +685,51 @@ def test_changed_cli_clear_cache(tmp_path, cache_root, capsys):
     rc = changed._main(["--path", str(repo), "--clear-cache"])
     assert rc == 0
     assert changed.read_baseline_cache(str(repo), "sha1", "k") is None
+
+
+def test_scope_check_dict_findings_hit_equals_miss(tmp_path, cache_root):
+    """A cache HIT must yield byte-for-byte the same tagging as a fresh MISS,
+    including for dict (lint) findings that round-trip through JSON. Guards the
+    hit/miss equivalence invariant against future _finding_identity changes
+    (the existing hit test uses only string findings)."""
+    repo, _ = _init_repo(tmp_path)
+    base = {"file": "R/a.R", "line": 5, "linter": "L",
+            "message": "pre-existing", "pkg_dir": "."}
+
+    def runner(treedir):
+        with open(os.path.join(treedir, "f.txt"), encoding="utf-8") as fh:
+            txt = fh.read().strip()
+        if txt == "base":
+            return [base]
+        # HEAD: the pre-existing lint line-shifted to 7 (line is EXCLUDED from
+        # identity → must stay pre-existing) + a genuinely new finding.
+        return [{**base, "line": 7},
+                {"file": "R/a.R", "line": 9, "linter": "L",
+                 "message": "introduced", "pkg_dir": "."}]
+
+    miss = changed.scope_check(runner, path=str(repo), base="dev",
+                               cache_key="lint|.|{}")  # writes the baseline
+    hit = changed.scope_check(runner, path=str(repo), base="dev",
+                              cache_key="lint|.|{}")   # reads it back via JSON
+    assert miss == hit  # JSON round-trip of the cached baseline is transparent
+    tags = {t["text"]["message"]: t["tag"] for t in hit["findings"]}
+    assert tags == {"pre-existing": "pre-existing", "introduced": "introduced"}
+    assert hit["introduced_count"] == 1
+
+
+def test_cache_never_raises_on_unresolvable_home(tmp_path, monkeypatch):
+    """BLOCKER regression: Path.home() raises RuntimeError (a non-OSError) when
+    HOME is unset AND the uid has no passwd entry (containers / scratch CI users).
+    _cache_root must fall back to the temp dir, and no public cache op may raise —
+    the advisory 'never raises' contract has to hold through the weird-HOME path
+    (previously this aborted r:check --changed with a traceback)."""
+    monkeypatch.delenv("HOME", raising=False)
+    monkeypatch.setattr(os.path, "expanduser", lambda p: p)  # unresolvable → "~"
+    monkeypatch.setattr(changed.tempfile, "gettempdir",
+                        lambda: str(tmp_path / "fallback"))
+    root = changed._cache_root()
+    assert root == tmp_path / "fallback" / ".rforge" / "baseline-cache"
+    # The three public ops must complete without raising (the regression).
+    changed.write_baseline_cache(str(tmp_path), "sha", "k", ["x"])
+    assert changed.read_baseline_cache(str(tmp_path), "sha", "k") == ["x"]
+    assert changed.clear_baseline_cache(str(tmp_path)) >= 0

@@ -29,9 +29,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   changes the immutable-tree baseline) and `python3 -m lib.changed --clear-cache`.
   `lib/changed.py` stays R-free: it takes an opaque `cache_key` string (rcmd builds
   it) and owns only repo-id + SHA + file IO + prune. Advisory throughout — a cache
-  failure degrades to a normal uncached baseline; nothing here raises. +12 pytest
-  cases (roundtrip, sha/key miss, corrupt-is-miss, prune, clear, repo-id, scope_check
-  hit/bypass/no-key, CLI). Spec: `SPEC-diff-aware-baseline-caching-2026-06-13.md`.
+  failure degrades to a normal uncached baseline; nothing here raises (incl. an
+  unresolvable HOME — `_cache_root` resolves home the raise-proof `expanduser`
+  way, falling back to the temp dir, NOT `Path.home()` which raises in
+  container/scratch-CI uids). +14 pytest cases (roundtrip, sha/key miss,
+  corrupt-is-miss, prune, clear, repo-id, scope_check hit/bypass/no-key, CLI,
+  dict-finding hit==miss equivalence, never-raises-on-unresolvable-HOME). Hardened
+  by a 4-lens pre-merge adversarial review (1 BLOCKER unresolvable-HOME crash +
+  2 IMPORTANT tmp-leak/premature-version-label + 2 MINOR, all fixed + re-verified).
+  Spec: `SPEC-diff-aware-baseline-caching-2026-06-13.md`.
 
 ---
 

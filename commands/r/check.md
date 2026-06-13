@@ -99,8 +99,8 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
   scope-only (real status on the changed package(s), no tagging) + a warning; no
   changes → a clean no-op.
 
-!!! note "Cost — `--changed` runs the check twice (baseline is cached, v2.13.0)"
-    Tagging pays one extra check run (the merge-base baseline). Since v2.13.0 that
+!!! note "Cost — `--changed` runs the check twice (baseline is cached)"
+    Tagging pays one extra check run (the merge-base baseline). That
     baseline is **cached** under `~/.rforge/baseline-cache/`, keyed by
     `(repo, merge-base SHA, kind, changed-package set, engine flags)`, so a repeat
     `--changed` run with an unchanged merge-base reuses it and skips the second

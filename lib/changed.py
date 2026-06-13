@@ -292,10 +292,19 @@ _CACHE_KEEP = 20  # LRU: max entries retained per repo-id dir (pruned on write)
 def _cache_root() -> Path:
     """Root of the on-disk baseline cache: ``~/.rforge/baseline-cache``.
 
-    Matches the existing ``~/.rforge/context.json`` convention (lib.init).
+    Resolves home the **raise-proof** way ``lib.init`` does — ``$HOME`` then
+    ``os.path.expanduser`` — NOT ``Path.home()``, which raises ``RuntimeError``
+    (a non-``OSError``) when home is unresolvable: HOME unset AND no passwd entry
+    for the uid (containers, ``nobody``, scratch CI users — the "weird HOME" case
+    this cache must degrade through, not crash on). If home still can't resolve
+    (``expanduser`` returns a literal ``~``), fall back to the system temp dir so
+    caching becomes ephemeral rather than aborting the caller's ``--changed`` run.
     Monkeypatched in tests so they never touch the real home directory.
     """
-    return Path.home() / ".rforge" / "baseline-cache"
+    home = os.environ.get("HOME") or os.path.expanduser("~")
+    if not home or home.startswith("~"):
+        home = tempfile.gettempdir()
+    return Path(home) / ".rforge" / "baseline-cache"
 
 
 def _repo_id(path: str) -> str:
@@ -326,8 +335,8 @@ def read_baseline_cache(
     A corrupt or unreadable file is treated as a miss (never raises), so a bad
     cache entry can only ever cost one extra baseline run — never a crash.
     """
-    f = _cache_file(path, base_sha, cache_key)
     try:
+        f = _cache_file(path, base_sha, cache_key)
         data = json.loads(f.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return None
@@ -347,17 +356,28 @@ def write_baseline_cache(
     write. After writing, prune the repo-id dir to the ``keep`` newest entries
     by mtime. Advisory — any IO error is swallowed (caching is best-effort).
     """
-    f = _cache_file(path, base_sha, cache_key)
+    tmp = None
     try:
+        f = _cache_file(path, base_sha, cache_key)
+        tmp = f.with_suffix(f".{os.getpid()}.tmp")
         f.parent.mkdir(parents=True, exist_ok=True)
         payload = {"schema": _CACHE_SCHEMA, "base_sha": base_sha,
                    "cache_key": cache_key, "findings": findings}
-        tmp = f.with_suffix(f".{os.getpid()}.tmp")
         tmp.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
         os.replace(tmp, f)
         _prune(f.parent, keep)
     except OSError:
-        return
+        pass
+    finally:
+        # Never leak an orphan `.tmp`: on success os.replace already consumed it
+        # (missing_ok makes the unlink a no-op); on a write/replace failure this
+        # removes the partial file so it can't accumulate (it's a `.tmp`, which
+        # neither _prune nor the clear-count globs would ever sweep).
+        if tmp is not None:
+            try:
+                tmp.unlink(missing_ok=True)
+            except OSError:
+                pass
 
 
 def _prune(repo_dir: Path, keep: int) -> None:
@@ -380,12 +400,17 @@ def clear_baseline_cache(path: Optional[str] = None) -> int:
     With ``path``: clear only that repo's cache dir. With ``path=None``: clear
     the entire cache root. Only ever deletes inside ``_cache_root()``.
     """
-    target = _cache_root() / _repo_id(path) if path is not None else _cache_root()
-    if not target.exists():
+    try:
+        target = (_cache_root() / _repo_id(path)) if path is not None else _cache_root()
+        if not target.exists():
+            return 0
+        # Count every file actually removed (not just *.json), so the reported
+        # number matches what rmtree deletes — including any stray .tmp.
+        count = sum(1 for p in target.rglob("*") if p.is_file())
+        shutil.rmtree(target, ignore_errors=True)
+        return count
+    except OSError:
         return 0
-    count = sum(1 for _ in target.rglob("*.json"))
-    shutil.rmtree(target, ignore_errors=True)
-    return count
 
 
 # ───────────────────────── two-run orchestration ─────────────────────────

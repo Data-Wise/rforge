@@ -49,7 +49,7 @@ refinement (no third run), so all introduced lints in a dirty file tag `[uncommi
 `[uncommitted]` counts as introduced for `--fail-on`. `--fail-on introduced` (default)
 exits non-zero iff ≥1 introduced lint (incl. `[uncommitted]`). Degrades to
 scope-only (no tagging) when no merge-base / baseline worktree is available. Costs
-one extra lint run (the baseline) — but since v2.13.0 that baseline is **cached**
+one extra lint run (the baseline) — but that baseline is **cached**
 under `~/.rforge/baseline-cache/` (keyed by repo + merge-base SHA + kind +
 changed-package set + flags) and self-invalidates when `--base` advances, so a
 repeat `--changed` run reuses it. Pass `--no-cache` to force a fresh baseline; clear

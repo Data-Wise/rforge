@@ -687,6 +687,12 @@ def run_changed(
     # added by changed.scope_check; we encode the rest here. MUST include every
     # input that changes the baseline output — an under-keyed cache would serve an
     # under-covering baseline and mis-tag pre-existing findings as [introduced].
+    # `default=str` guarantees key construction never raises on an exotic kwarg
+    # value (the --changed path must not abort on a serialization error). Its only
+    # downside is benign: a non-deterministic str() would vary the key across runs
+    # → cache MISSES (a perf loss), never a wrong-baseline reuse, since distinct
+    # keys can only miss, never collide. All current --changed kwargs are
+    # JSON-native bools, so default=str never even fires today.
     cache_key = "|".join((
         kind,
         ",".join(sorted(rel_pkgs)),
