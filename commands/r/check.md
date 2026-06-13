@@ -50,12 +50,14 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
    and/or `--incoming` if requested).
 3. Render the JSON envelope below. Do not re-run R yourself.
 4. If `--changed` is set: run `python3 -m lib.rcmd --kind check --changed
-   --base "<ref>" --path "<path>"` (add `--changed-strict` to count pre-existing
-   findings toward exit). The envelope gains a `changed` block: `packages`,
-   `findings` (each tagged `introduced`/`pre-existing`), and `introduced_counts`.
-   Render introduced findings first; show pre-existing dimmed. **Note:** until the
-   merge-base checkout mechanism lands, `pre-existing` tagging compares against the
-   merge-base ref's recorded findings; treat it as advisory.
+   --base "<ref>" --path "<path>"`. The envelope gains a `changed` block with
+   `packages` (the changed package(s) the check was scoped to) plus a
+   `tagging deferred` message. **`introduced`/`pre-existing` tagging is NOT YET
+   WIRED** — an honest comparison needs a merge-base checkout (running R against
+   the fork point in a detached worktree), which is not built yet. Until then
+   `--changed` is **scope-only**: it runs the full check on the changed
+   package(s) and reports the REAL full status. Render the full check result as
+   usual.
 
 ## Usage
 
@@ -64,17 +66,18 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
 /rforge:r:check --as-cran          # explicit --as-cran pass
 /rforge:r:check --strict           # two extra flavor passes (see below)
 /rforge:r:check --incoming         # --strict + a third CRAN-incoming pass
-/rforge:r:check --changed --base dev   # scope to changed pkg; tag findings introduced vs pre-existing
-/rforge:r:check --changed --changed-strict --base dev  # pre-existing findings count toward exit too
+/rforge:r:check --changed --base dev   # scope the check to the changed package(s) — scope-only
 ```
 
 - **`--changed`** — scopes the check to the R package(s) touched on this branch
   (diff vs `merge-base(HEAD, --base)`; `--base` defaults to `HEAD` = uncommitted
-  working-tree changes) and tags every finding `[introduced]` vs `[pre-existing]`.
-  By default the exit status reflects **introduced** findings only — a clean answer
-  to "did *my* change cause this?". `--changed-strict` keeps the full-check status.
-  Degrades gracefully: not a git repo / no merge-base → a full check + a warning;
-  no changes → a clean no-op.
+  working-tree changes) and reports their REAL full check status. The exit status
+  reflects the actual findings on those packages, so a real ERROR/WARNING/NOTE
+  surfaces. **`introduced`/`pre-existing` tagging is NOT YET WIRED** (it needs a
+  merge-base checkout that isn't built), so `--changed` is currently scope-only —
+  it does NOT yet answer "did *my* change cause this?". `--changed-strict` is a
+  documented no-op reserved for when tagging lands. Degrades gracefully: not a git
+  repo / no merge-base → a full check + a warning; no changes → a clean no-op.
 
 - **Plain `r:check` (no flag)** — unchanged: one `--as-cran` pass, one `check` stage row.
 - **`--strict`** — runs **both** Suggests-withholding flavor passes as two distinct
