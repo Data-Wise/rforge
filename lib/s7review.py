@@ -762,9 +762,23 @@ def _runtime_stages(path: str | os.PathLike) -> list[dict]:
             "message": (f"S7 generic '{gen}' has no registered method at runtime "
                         "— dispatch can never resolve (dead generic)."),
         })
-    # NOTE: `method_on_missing_class` is DEFERRED — the registry can't decide it
-    # from introspection alone (the R engine returns an empty placeholder list),
-    # so we do not build findings for it. Only `dead_generic` is wired here.
+    # `method_on_missing_class`: a method whose dispatch signature references an S7
+    # class with no resolvable namespace binding (e.g. an inline `new_class()` left
+    # in a method() call) — the method is unreachable. The engine reports these as
+    # structured {"generic", "class"} objects (a delimiter-joined string would be
+    # ambiguous for names containing the separator); tolerate legacy strings too.
+    for entry in rt.get("methods_on_missing_class", []):
+        if isinstance(entry, dict):
+            gen, cls = entry.get("generic", ""), entry.get("class", "")
+        else:  # legacy "<generic> -> <class>" string form
+            gen, _, cls = str(entry).partition(" -> ")
+        md_findings.append({
+            "code": "method_on_missing_class", "severity": "advisory",
+            "file": "", "line": 0, "symbol": cls or str(entry), "source": "runtime",
+            "message": (f"S7 method on generic '{gen}' dispatches on class "
+                        f"'{cls}', which has no resolvable namespace binding — the "
+                        "method is unreachable (nothing can construct that class)."),
+        })
     vr_findings: list[dict] = []
     for cls in rt.get("nonenforcing_validators", []):
         vr_findings.append({

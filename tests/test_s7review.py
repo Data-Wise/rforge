@@ -329,6 +329,25 @@ def test_runtime_merges_two_families_into_static(tmp_path, monkeypatch):
     assert env["status"] == "warn"
 
 
+def test_runtime_maps_method_on_missing_class(tmp_path, monkeypatch):
+    """methods_on_missing_class engine strings ('<gen> -> <cls>') become
+    method_on_missing_class findings in the method-dispatch family."""
+    pkg = _mk_pkg(tmp_path, "alpha", 'Foo <- new_class("Foo")\n')
+    monkeypatch.setattr(
+        s7review.rcmd, "run",
+        lambda kind, path=".", **kw: _fake_runtime_env(
+            dead=(), nonenforcing=(),
+            missing=({"generic": "speak", "class": "Ghost"},)))
+    env = s7review.run_all_with_runtime(str(pkg))
+    md = next(s for s in env["stages"] if s["kind"] == "method-dispatch")
+    miss = [f for f in md["findings"] if f["code"] == "method_on_missing_class"]
+    assert len(miss) == 1, md
+    assert miss[0]["symbol"] == "Ghost"
+    assert "speak" in miss[0]["message"] and "Ghost" in miss[0]["message"]
+    assert miss[0]["source"] == "runtime"
+    assert md["status"] == "warn"
+
+
 def test_runtime_degrades_when_r_unavailable(tmp_path, monkeypatch):
     """R missing → engine_missing envelope → warn, static intact, never raises."""
     pkg = _mk_pkg(tmp_path, "alpha",
