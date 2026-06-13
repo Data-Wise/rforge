@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [2.12.0] - 2026-06-13
+
+> Three recommendations from a doc gap analysis, built TDD-first and hardened by a
+> 3-dimension pre-release adversarial review. **41 commands** (no surface change).
 
 ### Added
 
@@ -66,6 +69,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `/rforge:impact --package`/`--change-type`/`--affected-exports`,
   `/rforge:release --detailed`, `/rforge:docs:check --detailed`,
   `/rforge:complete --no-cascade`, `/rforge:next --context`.
+
+### Fixed (pre-release adversarial review)
+
+A 3-dimension adversarial review caught issues the green gates missed:
+
+- **BLOCKER — diff-aware `[uncommitted]` cross-package collision.** The file match
+  was basename/suffix-fuzzy, so a *committed clean* finding in `pkgB/R/utils.R` was
+  mis-tagged `[uncommitted]` when an unrelated `pkgA/R/utils.R` was dirty. Now findings
+  are rebased to repo-relative coordinates and matched **exactly** against
+  `git status --porcelain -z` (the `-z` form also fixes spaced/quoted paths).
+- **IMPORTANT — sync-gate multi-line stripping.** `_check_commands_doc.py` only stripped
+  the first line of a `\`-continued `python3 -m lib.*` invocation, which could promote a
+  positional name to a required flag. Now tracks continuation state.
+- Plus: quoted-name handling + `--flag` prefix-collision (`--base` vs `--base-dir`) in the
+  sync-gate; the s7 base-package allowlist now derives from
+  `installed.packages(priority="base")`; `next`/`quick` `argument-hint` aligned to `--flags`.
 
 ---
 
