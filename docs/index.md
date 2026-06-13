@@ -54,6 +54,14 @@ Most daily work runs through these; the rest of the plugin's {{ rforge.command_c
 /rforge:thorough "Prepare for CRAN release"
 ```
 
+## What's new in v2.10.0
+
+Three additive features — now {{ rforge.command_count }} commands.
+
+- **`/rforge:r:s7-review`** — a static **S7 OOP convention checker**. Scans `R/*.R` + `NAMESPACE` across five families — naming, validators, methods, legacy (S4/R5/S3 leftovers), and docs — and reports advisory "looks like / consider" findings. **Advisory only, never blocks**, mirroring `r:cran-prep`'s Tier-4 tone. Pure Python (no R, no Rscript), no `--write`. See the [`s7review` reference](reference/s7review.md).
+- **Scaffolding for existing packages** — `/rforge:r:use-test`, `/rforge:r:use-package`, `/rforge:r:use-vignette`. Draft a testthat file (one `test_that()` per branch, assertions left as `# TODO`), declare a dependency (Imports-vs-Suggests auto-picked via `deps_sync`, with an `@importFrom` tag), or scaffold a vignette/article skeleton. **Dry-run by default**; `--write` applies, `--force` overwrites. See the [`scaffold` reference](reference/scaffold.md) and the [scaffolding tutorial](tutorials/scaffolding-existing-packages.md).
+- **diff-aware `--changed`** — a new flag on `/rforge:r:check`, `/rforge:r:test`, and `/rforge:r:lint` that scopes the run to the package(s) changed on this branch (diff vs `merge-base(HEAD, --base)`). On `r:check` it also tags every finding `[introduced]` vs `[pre-existing]` — a clean answer to "did *my* change cause this?" — with `--changed-strict` to count pre-existing findings toward exit too. See the [`changed` reference](reference/changed.md).
+
 ## What's new in v2.9.0
 
 - **The [orchestrator agent](orchestrator.md), reborn** — ask a *goal* ("is this CRAN-ready?", "what's the impact of this change?") instead of picking commands, and the orchestrator recognizes the intent and runs the right read-only analyses, then synthesizes one summary. It now delegates through the pure-Python `lib/*` modules (the old MCP-tool delegation, dead since v1.3.0, is gone), recognizes **7 intents**, and enforces a **read-only / recommend-only safety boundary** — anything that writes files or hits the network is recommended, never auto-run. See the [orchestrator cookbook](tutorials/orchestrator-cookbook.md) for worked examples.

@@ -1,5 +1,5 @@
 site_name: RForge Plugin
-site_description: R package ecosystem orchestrator - 35 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)
+site_description: R package ecosystem orchestrator - 39 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)
 site_url: https://data-wise.github.io/rforge/
 
 repo_name: Data-Wise/rforge
@@ -100,6 +100,7 @@ nav:
     - "Ecosystem orchestration": tutorials/ecosystem-orchestration.md
     - "Orchestrator cookbook": tutorials/orchestrator-cookbook.md
     - "R package dev cycle": tutorials/r-dev-cycle.md
+    - "Scaffolding existing packages": tutorials/scaffolding-existing-packages.md
     - "CRAN release prep": tutorials/cran-release-prep.md
     - "CRAN submission with rforge": tutorials/cran-submission-with-rforge.md
     - "R-universe early-access": tutorials/r-universe-early-access.md
