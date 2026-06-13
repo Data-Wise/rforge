@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import re
 import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -19,6 +20,21 @@ import pytest
 from lib import scaffold
 
 FIXTURE = Path(__file__).parent / "fixtures" / "scaffoldpkg"
+
+_RSCRIPT = shutil.which("Rscript")
+
+
+def _assert_r_parses(content: str) -> None:
+    """Paren-balance always; R-parse gate behind a skipif when Rscript exists."""
+    assert content.count("(") == content.count(")"), (
+        "generated R has unbalanced parentheses:\n" + content)
+    if _RSCRIPT is None:
+        pytest.skip("Rscript not available — paren-balance checked, parse gate skipped")
+    proc = subprocess.run(
+        [_RSCRIPT, "-e", "invisible(parse(text=commandArgs(TRUE)[1]))", content],
+        capture_output=True, text=True)
+    assert proc.returncode == 0, (
+        f"generated R failed to parse:\n{content}\n--- stderr ---\n{proc.stderr}")
 
 
 @pytest.fixture
@@ -288,6 +304,23 @@ def test_scaffold_data_write_collision_no_duplicate_warns(pkg: Path):
     assert any("already" in m.lower() or "exist" in m.lower() for m in env["messages"])
 
 
+def test_scaffold_data_collision_guard_matches_indented_doc(pkg: Path):
+    """MINOR 11: the collision guard must match an EXISTING `"name"` line even
+    when it is indented and/or carries a trailing comment (the column-0 anchor
+    used to miss those, duplicating the doc)."""
+    data_r = pkg / "R" / "data.R"
+    data_r.parent.mkdir(parents=True, exist_ok=True)
+    data_r.write_text(
+        "# hand-written docs\n"
+        '#\' some roxygen\n'
+        '    "mydat"   # documented, but indented + commented\n',
+        encoding="utf-8")
+    env = scaffold.scaffold_data("mydat", path=pkg, write=True)
+    assert env["status"] == "warn"
+    body = data_r.read_text(encoding="utf-8")
+    assert body.count('"mydat"') == 1, body
+
+
 def test_scaffold_data_is_pure_stdlib():
     """No R subprocess imports in the scaffold module (pure-stdlib)."""
     src = (Path(scaffold.__file__)).read_text(encoding="utf-8")
@@ -346,3 +379,50 @@ def test_scaffold_citation_unparseable_authors_warns_not_raises(tmp_path: Path):
     assert "TODO" in content
     assert env["status"] == "warn"
     assert any("Authors@R" in m or "author" in m.lower() for m in env["messages"])
+
+
+# ── BLOCKER 1+2 regression: generated CITATION must be valid, parseable R ──
+
+def _cite_for(tmp_path: Path, authors_r: str, *, title: str = "A Title",
+              version: str = "1.2.3") -> str:
+    root = tmp_path / "citpkg"
+    root.mkdir()
+    (root / "DESCRIPTION").write_text(
+        f"Package: citpkg\nTitle: {title}\nVersion: {version}\n"
+        f"Authors@R: {authors_r}\n", encoding="utf-8")
+    return scaffold.scaffold_citation(path=root, write=False)["plan"]["content"]
+
+
+def test_scaffold_citation_single_person_parses(tmp_path: Path):
+    content = _cite_for(tmp_path, 'person("Ada", "Lovelace")')
+    _assert_r_parses(content)
+
+
+def test_scaffold_citation_nested_role_c_parses(tmp_path: Path):
+    """BLOCKER 1: the normal `role = c("aut","cre")` idiom must not truncate."""
+    content = _cite_for(
+        tmp_path, 'person("Ada", "Lovelace", email = "a@b.com", '
+                  'role = c("aut", "cre"))')
+    assert 'role = c("aut", "cre")' in content   # not truncated at `c("aut"`
+    _assert_r_parses(content)
+
+
+def test_scaffold_citation_two_authors_parses(tmp_path: Path):
+    content = _cite_for(
+        tmp_path,
+        'c(person("Ada", "Lovelace", role = c("aut", "cre")), '
+        'person("Grace", "Hopper", role = "ctb"))')
+    _assert_r_parses(content)
+
+
+def test_scaffold_citation_fixture_authors_r_parses():
+    """The repo's OWN scaffoldpkg fixture uses role=c(...) — it must parse."""
+    content = scaffold.scaffold_citation(path=FIXTURE, write=False)["plan"]["content"]
+    _assert_r_parses(content)
+
+
+def test_scaffold_citation_quoted_title_escaped_and_parses(tmp_path: Path):
+    """BLOCKER 2: a Title containing `"` must not break the R string literal."""
+    content = _cite_for(tmp_path, 'person("Ada", "Lovelace")',
+                        title='A "Quoted" Title')
+    _assert_r_parses(content)

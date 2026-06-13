@@ -523,9 +523,6 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
 
 # ───────────────────────── diff-aware (--changed) ─────────────────────────
 
-# Kinds that get the cheap "scope to the changed package" treatment only.
-_CHANGED_SCOPE_ONLY = frozenset({"test", "lint"})
-
 
 def _extract_findings(env: dict, kind: str) -> list:
     """Flatten a single check/lint/test envelope into one comparable finding list.
@@ -558,10 +555,14 @@ def run_changed(
     """Run `kind` on the package(s) changed on this branch vs `base`, with diff-aware
     [introduced]/[pre-existing] tagging (SPEC P0 completion, v2.11.0).
 
-    Two-run tagging: when the merge-base resolves, `changed.scope_check` runs the
-    SAME engine against a detached worktree at git merge-base(HEAD, base) (the
+    Two-run tagging applies UNIFORMLY to every taggable kind — `check`, `lint`,
+    and `test` all get the same baseline-vs-HEAD tagging (there is no scope-only
+    kind): when the merge-base resolves, `changed.scope_check` runs the SAME
+    engine against a detached worktree at git merge-base(HEAD, base) (the
     baseline) and against the live HEAD tree, then tags each HEAD finding
     [introduced] (new on this branch) vs [pre-existing] (already on base).
+    Lint findings (dicts) are compared by `(file, message, linter)` so a
+    line-shifted pre-existing lint stays [pre-existing] (see changed.tag_findings).
 
     `--fail-on` (default "introduced") controls the exit status: with the default,
     status is "error" iff ≥1 introduced finding (so CI fails only on regressions you

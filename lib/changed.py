@@ -136,6 +136,22 @@ def changed_packages(files: list[str], root: str = ".") -> list[Package]:
 # ───────────────────────── finding tagging ─────────────────────────
 
 
+def _finding_identity(f) -> tuple:
+    """Stable identity for set-diffing a finding, robust to line-number shifts.
+
+    R CMD check findings are plain strings → identity is the string itself.
+    Lint findings are dicts (`{file, line, linter, message}`); their raw `line`
+    moves when an unrelated edit inserts/removes lines above, so a pre-existing
+    lint would be mis-tagged `[introduced]` if `line` were part of the key.
+    For dicts we key on `(file, message, linter)` — the stable content of the
+    finding — explicitly EXCLUDING `line`. The full finding is still carried for
+    display; only the comparison key drops the line number.
+    """
+    if isinstance(f, dict):
+        return ("dict", f.get("file"), f.get("message"), f.get("linter"))
+    return ("str", str(f))
+
+
 def tag_findings(
     head_findings: list, base_findings: list
 ) -> list[dict]:
@@ -143,13 +159,18 @@ def tag_findings(
 
     A finding present on HEAD but absent from base is `introduced`. A finding on
     both is `pre-existing`. Multiset semantics: if HEAD has a finding twice and
-    base once, one copy is introduced and one pre-existing. Findings are compared
-    by their string form (R CMD check findings are plain strings).
+    base once, one copy is introduced and one pre-existing.
+
+    Identity is `_finding_identity`: plain-string findings (R CMD check) compare
+    by string; dict findings (lint) compare by `(file, message, linter)` —
+    EXCLUDING the raw `line`, so a line-shifted pre-existing lint stays
+    `pre-existing` rather than flipping to `introduced`. The full finding is
+    preserved in `text` for display.
     """
-    base_remaining = Counter(str(f) for f in base_findings)
+    base_remaining: Counter = Counter(_finding_identity(f) for f in base_findings)
     tagged: list[dict] = []
     for f in head_findings:
-        key = str(f)
+        key = _finding_identity(f)
         if base_remaining.get(key, 0) > 0:
             base_remaining[key] -= 1
             tagged.append({"text": f, "tag": "pre-existing"})

@@ -617,8 +617,12 @@ def test_changed_no_changes_is_noop_ok(monkeypatch, tmp_path):
     assert any("no changes" in m.lower() for m in env.get("messages", []))
 
 
-def test_test_kind_changed_is_scope_only(monkeypatch, tmp_path):
-    """r:test --changed scopes to the changed package but does NOT tag findings."""
+def test_test_kind_changed_no_merge_base_fallback_is_scope_only(monkeypatch, tmp_path):
+    """r:test --changed on a tree with NO resolvable merge-base (tmp_path is not a
+    git repo) falls back to scope-only: it scopes to the changed package but does
+    NOT tag findings. (This exercises the fallback path, not the tagging path —
+    the real tagging path is covered by the v2.11.0 tagging tests below and by
+    the dict-finding tests in test_changed.py.)"""
     pkg = changed_mod.Package(name="pkgA", version="0.1.0",
                               path=str(tmp_path / "pkgA"))
     monkeypatch.setattr(rcmd.changed, "changed_files",
@@ -859,3 +863,24 @@ def test_s7runtime_e2e_detects_dead_generic_and_lax_validator(tmp_path):
     assert "Lax" in rt.get("nonenforcing_validators", []), env
     # the well-behaved generic must not be flagged dead
     assert "live_gen" not in rt.get("dead_generics", []), env
+
+
+@pytest.mark.skipif(not _have_r_with_s7(),
+                    reason="R + S7 + pkgload + jsonlite not installed")
+def test_s7runtime_e2e_on_committed_bad_fixture():
+    """Real-R e2e (MINOR 9): the committed s7pkg.bad fixture must actually LOAD
+    under S7 (Imports: S7 + import(S7)) so the runtime engine has real coverage —
+    it populates dead_generics (ComputeEffect) and nonenforcing_validators
+    (NonEnforcing), and does NOT flag the generic that has a method."""
+    fixture = Path(__file__).parent / "fixtures" / "s7pkg.bad"
+    env = rcmd.run("s7runtime", str(fixture))
+    # If the fixture failed to load, messages carries the load error and the
+    # lists stay empty — that is exactly the silent-degradation bug MINOR 9 fixes.
+    msgs = env.get("messages", [])
+    msg_text = msgs if isinstance(msgs, str) else " ".join(msgs)
+    assert "failed" not in msg_text.lower(), f"fixture did not load cleanly: {env}"
+    rt = env.get("s7runtime", {})
+    assert "ComputeEffect" in rt.get("dead_generics", []), env
+    assert "NonEnforcing" in rt.get("nonenforcing_validators", []), env
+    # external_generic has a method -> must NOT be flagged dead
+    assert "external_generic" not in rt.get("dead_generics", []), env

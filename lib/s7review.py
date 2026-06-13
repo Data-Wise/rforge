@@ -762,13 +762,9 @@ def _runtime_stages(path: str | os.PathLike) -> list[dict]:
             "message": (f"S7 generic '{gen}' has no registered method at runtime "
                         "— dispatch can never resolve (dead generic)."),
         })
-    for meth in rt.get("methods_on_missing_class", []):
-        md_findings.append({
-            "code": "method_on_missing_class", "severity": "advisory",
-            "file": "", "line": 0, "symbol": meth, "source": "runtime",
-            "message": (f"method '{meth}' is registered to a class that does not "
-                        "exist at runtime."),
-        })
+    # NOTE: `method_on_missing_class` is DEFERRED — the registry can't decide it
+    # from introspection alone (the R engine returns an empty placeholder list),
+    # so we do not build findings for it. Only `dead_generic` is wired here.
     vr_findings: list[dict] = []
     for cls in rt.get("nonenforcing_validators", []):
         vr_findings.append({

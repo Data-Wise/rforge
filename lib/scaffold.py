@@ -589,7 +589,7 @@ def scaffold_data(name: str, path: str | os.PathLike = ".", *,
     # ── --write ───────────────────────────────────────────────────────────
     # collision guard: don't duplicate an existing doc for the same \name
     existing = data_r.read_text(encoding="utf-8", errors="replace") if data_r.exists() else ""
-    if re.search(rf'(?m)^"{re.escape(name)}"\s*$', existing):
+    if re.search(rf'(?m)^\s*"{re.escape(name)}"\s*(#.*)?$', existing):
         return _envelope("use-data", "warn",
                          plan={"target": str(data_r)},
                          messages=[f"`R/data.R` already documents `{name}` "
@@ -628,16 +628,29 @@ def scaffold_data(name: str, path: str | os.PathLike = ".", *,
 
 # ── r:use-citation ──────────────────────────────────────────────────────────
 
-_PERSON_RE = re.compile(r"person\((.*?)\)", re.DOTALL)
 
+def _author_arg_from_authors_r(authors_r: str) -> Optional[str]:
+    """Return the ``Authors@R`` field value verbatim, for use as ``author = ``.
 
-def _persons_from_authors_r(authors_r: str) -> list[str]:
-    """Return the verbatim ``person(...)`` call(s) from an Authors@R field.
-
-    We re-emit the package's own ``person()`` calls (the canonical form) rather
-    than re-parsing names — deterministic and lossless. Returns [] if none found.
+    The DESCRIPTION ``Authors@R`` field is *already valid R* — a ``person(...)``
+    call or a ``c(person(...), person(...))`` vector. We re-emit it verbatim
+    rather than extracting ``person()`` substrings with a flat regex (which
+    truncates on the normal nested ``role = c("aut", "cre")`` idiom). Deterministic
+    and lossless. Returns None when the field is empty / unparseable so the caller
+    degrades to a ``# TODO`` author block.
     """
-    return [f"person({m.group(1).strip()})" for m in _PERSON_RE.finditer(authors_r)]
+    if not authors_r:
+        return None
+    val = authors_r.strip()
+    if not val:
+        return None
+    # Must look like an R person()/c() expression with balanced parens, else the
+    # caller treats it as unparseable (the legacy `Author:` fallback case).
+    if "person(" not in val:
+        return None
+    if val.count("(") != val.count(")"):
+        return None
+    return val
 
 
 def _read_dcf_field_block(text: str, field_name: str) -> Optional[str]:
@@ -680,25 +693,31 @@ def scaffold_citation(path: str | os.PathLike = ".", *, write: bool = False,
 
     warned = False
     authors_r = _read_dcf_field_block(text, "Authors@R")
-    persons = _persons_from_authors_r(authors_r) if authors_r else []
-    if persons:
-        author_arg = ("c(\n    " + ",\n    ".join(persons) + "\n  )"
-                      if len(persons) > 1 else persons[0])
-    else:
+    author_arg = _author_arg_from_authors_r(authors_r)
+    if author_arg is None:
         warned = True
         author_arg = ("# TODO: could not parse Authors@R — fill in the author(s):\n"
                       "  person(\"<Given>\", \"<Family>\")")
 
+    # Every interpolated value goes through _r_string() so embedded `"` / `\`
+    # in Title/Package/Version can't break the surrounding R string literal.
+    title_r = _r_string(f"{{{title}}}: {pkg}")
+    note_r = _r_string(f"R package version {version}")
+    year_r = _r_string(year)
+    pkg_r = _r_string(pkg)
+    plain_title_r = _r_string(f"{title}. ")
+    note_text_r = _r_string(f"R package version {version}.")
+
     content = (
         f'bibentry(\n'
         f'  bibtype  = "Manual",\n'
-        f'  title    = "{{{title}}}: {pkg}",\n'
+        f'  title    = {title_r},\n'
         f'  author   = {author_arg},\n'
-        f'  year     = "{year}",\n'
-        f'  note     = "R package version {version}",\n'
+        f'  year     = {year_r},\n'
+        f'  note     = {note_r},\n'
         f'  textVersion = paste0(\n'
-        f'    "{pkg} (", "{year}", "). {title}. ",\n'
-        f'    "R package version {version}."\n'
+        f'    {pkg_r}, " (", {year_r}, "). ", {plain_title_r},\n'
+        f'    {note_text_r}\n'
         f'  )\n'
         f')\n'
     )

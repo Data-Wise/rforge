@@ -170,6 +170,36 @@ def test_tag_findings_empty_head_returns_empty():
     assert changed.tag_findings(head_findings=[], base_findings=["NOTE: x"]) == []
 
 
+# ── IMPORTANT 4 regression: dict (lint) findings tagged by stable identity ──
+
+def test_tag_findings_lint_line_shift_stays_pre_existing():
+    """A pre-existing lint that moved (blank line inserted above) must NOT flip
+    to [introduced]. Identity excludes the raw `line`."""
+    base = [{"file": "R/a.R", "line": 10, "linter": "object_usage_linter",
+             "message": "no visible binding for 'x'"}]
+    # same lint on HEAD, but the line shifted 10 -> 11 (an unrelated edit above)
+    head = [{"file": "R/a.R", "line": 11, "linter": "object_usage_linter",
+             "message": "no visible binding for 'x'"}]
+    tagged = changed.tag_findings(head_findings=head, base_findings=base)
+    assert [t["tag"] for t in tagged] == ["pre-existing"]
+    # the full finding (with its real, shifted line) is still carried for display
+    assert tagged[0]["text"]["line"] == 11
+
+
+def test_tag_findings_lint_genuinely_new_is_introduced():
+    """A lint with a different message IS a new finding even if line/file match."""
+    base = [{"file": "R/a.R", "line": 10, "linter": "object_usage_linter",
+             "message": "no visible binding for 'x'"}]
+    head = [{"file": "R/a.R", "line": 10, "linter": "object_usage_linter",
+             "message": "no visible binding for 'x'"},
+            {"file": "R/a.R", "line": 12, "linter": "seq_linter",
+             "message": "use seq_len()"}]
+    tagged = changed.tag_findings(head_findings=head, base_findings=base)
+    tags = {t["text"]["message"]: t["tag"] for t in tagged}
+    assert tags == {"no visible binding for 'x'": "pre-existing",
+                    "use seq_len()": "introduced"}
+
+
 # ───────── REAL-GIT fixtures for merge_base / run_baseline / scope_check ─────────
 
 
@@ -290,3 +320,23 @@ def test_scope_check_none_when_no_merge_base(tmp_path):
     repo, _ = _init_repo(tmp_path)
     assert changed.scope_check(lambda d: [], path=str(repo),
                                base="no-such-branch") is None
+
+
+def test_scope_check_line_shifted_lint_tagged_pre_existing(tmp_path):
+    """End-to-end (IMPORTANT 4): a pre-existing lint whose line shifted on the
+    branch must be tagged [pre-existing] through scope_check, not [introduced]."""
+    repo, _ = _init_repo(tmp_path)
+
+    def run_lint(treedir):
+        with open(os.path.join(treedir, "f.txt"), encoding="utf-8") as fh:
+            txt = fh.read().strip()
+        # The lint is the SAME content on both trees; only `line` differs (a
+        # blank line was inserted above it on the branch).
+        line = 11 if txt == "branch" else 10
+        return [{"file": "R/a.R", "line": line, "linter": "object_usage_linter",
+                 "message": "no visible binding for 'x'"}]
+
+    result = changed.scope_check(run_lint, path=str(repo), base="dev")
+    assert result is not None
+    assert [t["tag"] for t in result["findings"]] == ["pre-existing"]
+    assert result["introduced_count"] == 0
