@@ -465,6 +465,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#whats-new-in-v290" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.9.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-new-in-v280" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1014,6 +1025,34 @@
   
   
     <li class="md-nav__item">
+      <a href="tutorials/orchestrator-cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Orchestrator cookbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="tutorials/r-dev-cycle/" class="md-nav__link">
         
   
@@ -1267,6 +1306,34 @@
   
   
     <li class="md-nav__item">
+      <a href="orchestrator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🤖 Orchestrator Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="configuration/" class="md-nav__link">
         
   
@@ -1362,10 +1429,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
         
           
-          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
             
   
   
@@ -1383,8 +1450,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2174,6 +2241,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#whats-new-in-v290" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.9.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-new-in-v280" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2456,9 +2534,14 @@
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Ecosystem rollup (2-5 minutes) — cross-package validation + submission order</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Prepare for CRAN release&quot;</span>
 </span></code></pre></div>
+<h2 id="whats-new-in-v290">What's new in v2.9.0<a class="headerlink" href="#whats-new-in-v290" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>The <a href="orchestrator/">orchestrator agent</a>, reborn</strong> — ask a <em>goal</em> ("is this CRAN-ready?", "what's the impact of this change?") instead of picking commands, and the orchestrator recognizes the intent and runs the right read-only analyses, then synthesizes one summary. It now delegates through the pure-Python <code>lib/*</code> modules (the old MCP-tool delegation, dead since v1.3.0, is gone), recognizes <strong>7 intents</strong>, and enforces a <strong>read-only / recommend-only safety boundary</strong> — anything that writes files or hits the network is recommended, never auto-run. See the <a href="tutorials/orchestrator-cookbook/">orchestrator cookbook</a> for worked examples.</li>
+<li><strong><code>Ecosystem.manifest_order</code></strong> (#20) — discovery now exposes the manifest's <em>declared</em> package order, so <code>/rforge:status</code> can render in a curated order rather than alphabetical.</li>
+</ul>
 <h2 id="whats-new-in-v280">What's new in v2.8.0<a class="headerlink" href="#whats-new-in-v280" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Single-source version/count for docs</strong> — the docs now render the current version and command count from one source of truth, so they stop drifting. A <strong>mkdocs-macros</strong> layer renders <code>2.8.0</code> / <code>35</code> at build time, and pure-stdlib <strong><code>scripts/version_sync.py</code></strong> stamps the surfaces macros can't reach (<code>README.md</code>, <code>plugin.json</code>, <code>CLAUDE.md</code>, …); its <code>--check</code> is a CI drift gate wired into <code>ci.yml</code> + <code>test-all.sh</code>. No command-surface change — still 35 commands.</li>
+<li><strong>Single-source version/count for docs</strong> — the docs now render the current version and command count from one source of truth, so they stop drifting. A <strong>mkdocs-macros</strong> layer renders <code>2.9.0</code> / <code>35</code> at build time, and pure-stdlib <strong><code>scripts/version_sync.py</code></strong> stamps the surfaces macros can't reach (<code>README.md</code>, <code>plugin.json</code>, <code>CLAUDE.md</code>, …); its <code>--check</code> is a CI drift gate wired into <code>ci.yml</code> + <code>test-all.sh</code>. No command-surface change — still 35 commands.</li>
 </ul>
 <h2 id="whats-new-in-v270">What's new in v2.7.0<a class="headerlink" href="#whats-new-in-v270" title="Permanent link">&para;</a></h2>
 <ul>

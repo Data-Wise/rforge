@@ -37,6 +37,10 @@
          <lastmod>2026-06-13</lastmod>
     </url>
     <url>
+         <loc>https://data-wise.github.io/rforge/orchestrator/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
          <loc>https://data-wise.github.io/rforge/quickstart/</loc>
          <lastmod>2026-06-13</lastmod>
     </url>
@@ -97,6 +101,10 @@
          <lastmod>2026-06-13</lastmod>
     </url>
     <url>
+         <loc>https://data-wise.github.io/rforge/specs/PLAN-phase4-orchestrator-rewrite-2026-06-12/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
          <loc>https://data-wise.github.io/rforge/specs/SPEC-cran-incoming-hardening-2026-06-10/</loc>
          <lastmod>2026-06-13</lastmod>
     </url>
@@ -121,6 +129,10 @@
          <lastmod>2026-06-13</lastmod>
     </url>
     <url>
+         <loc>https://data-wise.github.io/rforge/specs/SPEC-phase4-orchestrator-rewrite-2026-06-12/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
          <loc>https://data-wise.github.io/rforge/specs/SPEC-r-cran-prep-2026-06-01/</loc>
          <lastmod>2026-06-13</lastmod>
     </url>
@@ -130,6 +142,10 @@
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/specs/SPEC-r-dev-commands-2026-05-31/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/specs/SPEC-r-s7-review-2026-06-12/</loc>
          <lastmod>2026-06-13</lastmod>
     </url>
     <url>
@@ -170,6 +186,10 @@
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/tutorials/migrate-from-mcp/</loc>
+         <lastmod>2026-06-13</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/tutorials/orchestrator-cookbook/</loc>
          <lastmod>2026-06-13</lastmod>
     </url>
     <url>

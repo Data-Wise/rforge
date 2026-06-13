@@ -10,13 +10,9 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/reference/deps_sync/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-phase4-orchestrator-rewrite-2026-06-12/">
       
       
-        <link rel="prev" href="../deps/">
-      
-      
-        <link rel="next" href="../status/">
       
       
         
@@ -27,7 +23,7 @@
     
     
       
-        <title>deps_sync - RForge Plugin</title>
+        <title>SPEC: Phase 4 — orchestrator rewrite (lib-envelope delegation) - RForge Plugin</title>
       
     
     
@@ -80,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#libdeps_syncpy-api-reference" class="md-skip">
+        <a href="#spec-phase-4-orchestrator-rewrite-lib-envelope-delegation" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              deps_sync
+              SPEC: Phase 4 — orchestrator rewrite (lib-envelope delegation)
             
           </span>
         </div>
@@ -284,12 +280,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../../REFCARD/" class="md-tabs__link">
           
   
@@ -932,29 +926,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -972,7 +961,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1155,8 +1144,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1167,11 +1154,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
         
           
           <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
@@ -1192,7 +1179,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_7">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1210,7 +1197,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../discovery/" class="md-nav__link">
+      <a href="../../reference/discovery/" class="md-nav__link">
         
   
   
@@ -1238,7 +1225,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../deps/" class="md-nav__link">
+      <a href="../../reference/deps/" class="md-nav__link">
         
   
   
@@ -1263,37 +1250,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    deps_sync
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../reference/deps_sync/" class="md-nav__link">
         
   
   
@@ -1309,126 +1269,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#module-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Module overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dataclasses" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dataclasses
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Dataclasses">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#class-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        class Usage
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Functions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#deps_sync" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        deps_sync()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#format_text" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        format_text()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#reconcile" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        reconcile()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#scan_usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        scan_usage()
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1441,7 +1281,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../status/" class="md-nav__link">
+      <a href="../../reference/status/" class="md-nav__link">
         
   
   
@@ -1469,7 +1309,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../init/" class="md-nav__link">
+      <a href="../../reference/init/" class="md-nav__link">
         
   
   
@@ -1497,7 +1337,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../rcmd/" class="md-nav__link">
+      <a href="../../reference/rcmd/" class="md-nav__link">
         
   
   
@@ -1525,7 +1365,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cranlint/" class="md-nav__link">
+      <a href="../../reference/cranlint/" class="md-nav__link">
         
   
   
@@ -1553,7 +1393,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ghrelease/" class="md-nav__link">
+      <a href="../../reference/ghrelease/" class="md-nav__link">
         
   
   
@@ -1581,7 +1421,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../runiverse/" class="md-nav__link">
+      <a href="../../reference/runiverse/" class="md-nav__link">
         
   
   
@@ -1780,7 +1620,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -1808,7 +1648,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
+      <a href="../SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
         
   
   
@@ -1836,7 +1676,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
+      <a href="../SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
         
   
   
@@ -1864,7 +1704,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
+      <a href="../SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
         
   
   
@@ -1892,7 +1732,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../specs/SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
+      <a href="../SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
         
   
   
@@ -2097,10 +1937,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#module-overview" class="md-nav__link">
+  <a href="#summary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Module overview
+        Summary
       
     </span>
   </a>
@@ -2108,22 +1948,66 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dataclasses" class="md-nav__link">
+  <a href="#motivation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Dataclasses
+        Motivation
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Dataclasses">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#non-goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Non-goals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scope
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scope">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#class-usage" class="md-nav__link">
+  <a href="#in-scope-decided" class="md-nav__link">
     <span class="md-ellipsis">
       
-        class Usage
+        In scope (decided)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#out-of-scope-yagni-deferred" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Out of scope (YAGNI / deferred)
       
     </span>
   </a>
@@ -2136,63 +2020,90 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#functions" class="md-nav__link">
+  <a href="#architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Functions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#deps_sync" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        deps_sync()
+        Architecture
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#format_text" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        format_text()
+        Dependencies
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#reconcile" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
     <span class="md-ellipsis">
       
-        reconcile()
+        Error handling
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#scan_usage" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        scan_usage()
+        Testing
       
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#documentation-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation impact
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation order
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions-risks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open questions / risks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2213,7 +2124,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/reference/deps_sync.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-phase4-orchestrator-rewrite-2026-06-12.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2221,85 +2132,242 @@
   
 
 
-<h1 id="libdeps_syncpy-api-reference"><code>lib/deps_sync.py</code> — API Reference<a class="headerlink" href="#libdeps_syncpy-api-reference" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p>Auto-generated by <code>scripts/gen_lib_reference.py</code>. Do not edit by hand — re-run the generator to update.</p>
-</blockquote>
-<h2 id="module-overview">Module overview<a class="headerlink" href="#module-overview" title="Permanent link">&para;</a></h2>
-<p>Intra-package dependency reconciliation (<code>r:deps-sync</code>).</p>
-<p>Scans a package's R sources for namespace usage and reconciles it against the
-<code>Depends</code>/<code>Imports</code>/<code>Suggests</code> fields of <code>DESCRIPTION</code> — surfacing
-<strong>missing</strong>, <strong>unused</strong>, and <strong>misclassified</strong> dependencies plus a suggested
-<code>DESCRIPTION</code> patch. Report-only by default; <code>--write</code> applies the
-unambiguous changes.</p>
-<p>Pure Python — no R subprocess, no external deps beyond the stdlib. Reuses
-<code>lib.discovery.read_description</code> for the DCF parse. <em>Intra</em>-package — it
-complements <code>lib.deps</code> (the <em>inter</em>-package ecosystem graph), which is a
-different concern.</p>
-<p>The <strong>misclassified</strong> finding (a <code>Suggests</code> package used <em>unconditionally</em> in
-<code>R/</code>) is the static sibling of the cran-incoming noSuggests check
-(<code>_R_CHECK_DEPENDS_ONLY_</code>): this catches it before R runs.</p>
-<p>Usage (CLI, from repo root):
-    python3 -m lib.deps_sync --path /path/to/pkg            # report (dry-run default)
-    python3 -m lib.deps_sync --path /path/to/pkg --write    # apply unambiguous changes</p>
-<h2 id="dataclasses">Dataclasses<a class="headerlink" href="#dataclasses" title="Permanent link">&para;</a></h2>
-<h3 id="class-usage"><code>class Usage</code><a class="headerlink" href="#class-usage" title="Permanent link">&para;</a></h3>
-<p>Where and how one package is used across a package's sources.</p>
-<p><code>in_r_unconditional</code> means it needs <code>Imports</code>; guarded / tests-only use is
-satisfied by <code>Suggests</code>.</p>
+<h1 id="spec-phase-4-orchestrator-rewrite-lib-envelope-delegation">SPEC: Phase 4 — orchestrator rewrite (lib-envelope delegation)<a class="headerlink" href="#spec-phase-4-orchestrator-rewrite-lib-envelope-delegation" title="Permanent link">&para;</a></h1>
+<ul>
+<li><strong>Status:</strong> Draft — awaiting user review  <!-- Draft → In Progress → Shipped (vX.Y.Z) | Abandoned --></li>
+<li><strong>Date:</strong> 2026-06-12  <!-- creation date, not ship date --></li>
+<li><strong>Target version:</strong> v2.9.0</li>
+<li><strong>Author:</strong> brainstormed with Claude (deep brainstorm, <code>/workflow:brainstorm -d -s</code>)</li>
+<li><strong>Related:</strong> <a href="../SPEC-phase3-namespacing-2026-05-11/">SPEC-phase3-namespacing-2026-05-11.md</a>,
+  <a href="../SPEC-mcp-absorb-2026-05-10/">SPEC-mcp-absorb-2026-05-10.md</a>,
+  <code>agents/orchestrator.md</code>, <code>lib/rcmd.py</code>, <code>lib/discovery.py</code>, <code>lib/deps.py</code>,
+  <code>lib/status.py</code>, <code>lib/deps_sync.py</code>, <code>lib/cranlint.py</code>, <code>lib/runiverse.py</code>;
+  issue #9 (rename ergonomics — "feeds Phase 4")</li>
+</ul>
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>Rewrite the single existing agent, <code>agents/orchestrator.md</code>, in place. The current
+file is <strong>stale</strong>: it delegates to 13 <code>rforge_*</code> MCP tools (43 references) that were
+removed when rforge-mcp was absorbed into pure-Python <code>lib/</code> modules in v1.3.0 — those
+tools no longer exist. The rewrite replaces MCP delegation with <strong>lib-envelope
+delegation</strong>: the orchestrator maps each R-package <em>intent</em> to concrete
+<code>python3 -m lib.*</code> calls, runs them via Bash, and synthesizes the JSON envelopes into an
+ADHD-friendly summary. This is the last craft-parity roadmap item ("Phase 4 — discovery
+engine + agents"; the discovery half shipped in v2.4.0). <strong>Surface unchanged</strong> — still 1
+agent, still 35 commands; no new agent files.</p>
+<h2 id="motivation">Motivation<a class="headerlink" href="#motivation" title="Permanent link">&para;</a></h2>
+<p>Two forces converge:</p>
+<ol>
+<li><strong>Correctness debt.</strong> <code>agents/orchestrator.md</code> references <code>rforge_quick_impact</code>,
+   <code>rforge_quick_tests</code>, <code>rforge_launch_analysis</code>, <code>rforge_get_results</code>, and 9 other
+   MCP tool names. rforge-mcp was a local-only prototype, tombstoned 2026-05-11, never
+   public; its capabilities now live in <code>lib/</code> (<code>lib.discovery</code>, <code>lib.deps</code>,
+   <code>lib.status</code>, <code>lib.rcmd</code>, …). An agent that names dead tools either silently fails
+   or hallucinates a tool call. This is a latent bug, not a feature gap.</li>
+<li><strong>The last parity item.</strong> Phase 4 has been bumped from v2.2.0 forward repeatedly and
+   is the only unshipped craft-parity work. craft ships an orchestrator agent
+   (<code>orchestrator-v2</code>); rforge's equivalent should actually function against rforge's
+   real (post-MCP) architecture.</li>
+</ol>
+<p>The delegation crux: a Claude Code subagent cannot invoke <code>/rforge:*</code> slash commands
+(those are user-facing); it acts through its <strong>tools</strong> (Bash, Read). So "delegate to
+<code>/rforge:impact</code>" must resolve to a real mechanism. The brainstorm evaluated three
+(lib-envelope / command-file-follow / prompt-routing-only) and chose <strong>lib-envelope
+delegation</strong> — the only option that is both honest about the post-MCP architecture and
+does real work, while reusing the exact tested <code>lib/</code> layer the commands already use.</p>
+<h2 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Remove <strong>all</strong> <code>rforge_*</code> MCP references from <code>agents/orchestrator.md</code> (target: 0).</li>
+<li>Define an explicit <strong>intent → lib-call</strong> mapping table as the agent's single source of
+  delegation recipes.</li>
+<li>Auto-run only <strong>read-only/analysis</strong> lib calls; <strong>recommend-only</strong> (never auto-execute)
+  any intent that mutates files or touches the outside world.</li>
+<li>Synthesize envelopes into a box summary: what ran, key findings, 🔴 blockers,
+  → recommended next command.</li>
+<li>Lock the regression out with a <code>tests/test-all.sh</code> gate that fails if <code>rforge_</code> ever
+  reappears in an agent file.</li>
+<li>Keep agent/command surface counts unchanged (1 agent, 35 commands).</li>
+</ul>
+<h2 id="non-goals">Non-goals<a class="headerlink" href="#non-goals" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>No new agent files.</strong> Single domain orchestrator (decided in brainstorm). A
+  multi-agent split (cran-shepherd / ecosystem-auditor / impact-analyst) is explicitly
+  deferred — revisit only if real usage shows the single orchestrator is overloaded.</li>
+<li><strong>No command-file-follow or prompt-only delegation</strong> (rejected approaches B and C).</li>
+<li><strong>No auto-execution of mutating/external commands</strong> — see Safety boundary. rforge's
+  "never auto-submit" principle (from <code>r:submit</code>) extends to the agent.</li>
+<li><strong>No resolution of issue #9's naming decision</strong> — this spec only records how the agent
+  layer <em>interacts</em> with <code>quick</code>/<code>thorough</code> (see Open questions). The rename decision
+  stays in #9.</li>
+<li><strong>No new <code>lib/</code> modules.</strong> The rewrite consumes existing envelopes only.</li>
+</ul>
+<h2 id="scope">Scope<a class="headerlink" href="#scope" title="Permanent link">&para;</a></h2>
+<h3 id="in-scope-decided">In scope (decided)<a class="headerlink" href="#in-scope-decided" title="Permanent link">&para;</a></h3>
+<p>Intent taxonomy and the lib calls each intent auto-runs:</p>
 <table>
 <thead>
 <tr>
-<th>Field</th>
-<th>Type</th>
-<th>Default</th>
+<th>Intent</th>
+<th>Triggers (examples)</th>
+<th>Auto-runs (read-only)</th>
+<th>Synthesis</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>name</code></td>
-<td><code>str</code></td>
-<td>—</td>
+<td><strong>CODE_CHANGE</strong></td>
+<td>"update/refactor/modify X"</td>
+<td><code>lib.discovery</code>, <code>lib.deps</code>, <code>lib.rcmd --kind test</code></td>
+<td>impacted pkgs + test status</td>
 </tr>
 <tr>
-<td><code>in_r_unconditional</code></td>
-<td><code>bool</code></td>
-<td><code>False</code></td>
+<td><strong>NEW_FUNCTION</strong></td>
+<td>"add/implement function"</td>
+<td><code>lib.discovery</code>, <code>lib.rcmd --kind document</code></td>
+<td>structure + roxygen readiness</td>
 </tr>
 <tr>
-<td><code>in_r_guarded</code></td>
-<td><code>bool</code></td>
-<td><code>False</code></td>
+<td><strong>BUG_FIX</strong></td>
+<td>"fix/broken/error/failing"</td>
+<td><code>lib.rcmd --kind test</code>, <code>lib.deps</code></td>
+<td>failing tests + blast radius</td>
 </tr>
 <tr>
-<td><code>in_tests_or_vignettes</code></td>
-<td><code>bool</code></td>
-<td><code>False</code></td>
+<td><strong>DEPS_AUDIT</strong></td>
+<td>"dependencies/imports/DESCRIPTION"</td>
+<td><code>lib.deps_sync</code> (dry-run), <code>lib.deps</code></td>
+<td>missing / misclassified / unused</td>
+</tr>
+<tr>
+<td><strong>CRAN_READINESS</strong></td>
+<td>"cran-ready?/prep for CRAN"</td>
+<td><code>lib.rcmd --kind cran-prep</code>, <code>lib.cranlint</code>, <code>lib.runiverse</code> (advisory)</td>
+<td>gate status; <strong>stops at handoff</strong></td>
+</tr>
+<tr>
+<td><strong>ECOSYSTEM_HEALTH</strong></td>
+<td>"status/health/overview"</td>
+<td><code>lib.status</code>, <code>lib.discovery</code>, <code>lib.deps</code></td>
+<td>rollup dashboard</td>
 </tr>
 </tbody>
 </table>
-<h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
-<h3 id="deps_sync"><code>deps_sync()</code><a class="headerlink" href="#deps_sync" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">deps_sync</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">write</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
-</span></code></pre></div>
-<p>Reconcile + (optionally) apply. Default is report-only (dry-run).</p>
-<h3 id="format_text"><code>format_text()</code><a class="headerlink" href="#format_text" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_text</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
-</span></code></pre></div>
-<p>Terminal-friendly rendering of a deps-sync envelope.</p>
-<h3 id="reconcile"><code>reconcile()</code><a class="headerlink" href="#reconcile" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">reconcile</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
-</span></code></pre></div>
-<p>Reconcile a package's code usage against its DESCRIPTION dependencies.</p>
-<p>Emits findings (missing / missing-suggests / unused / misclassified) and a
-suggested patch. Never raises on a missing/unparseable DESCRIPTION — returns
-a <code>warn</code> envelope instead.</p>
-<h3 id="scan_usage"><code>scan_usage()</code><a class="headerlink" href="#scan_usage" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">scan_usage</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict[str, Usage]&#39;</span>
-</span></code></pre></div>
-<p>Scan <code>R/</code>, <code>tests/</code>, <code>vignettes/</code> + <code>NAMESPACE</code> for package usage.</p>
-<p>Returns a map of lowercased package name → :class:<code>Usage</code>. Base-priority R
-packages are excluded (they never need declaring).</p>
+<p>All <code>--kind</code> values above are real <code>lib.rcmd</code> choices (verified against
+<code>python3 -m lib.rcmd --help</code>: <code>load,document,test,check,coverage,build,install,site,cycle,lint,spell,urlcheck,style,winbuilder,rhub,revdep,goodpractice,cran-prep</code>).</p>
+<h3 id="out-of-scope-yagni-deferred">Out of scope (YAGNI / deferred)<a class="headerlink" href="#out-of-scope-yagni-deferred" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Recommend-only intents</strong> are <em>named</em> but never executed (Safety boundary). The agent
+  prints the exact command and stops.</li>
+<li>Multi-agent decomposition → deferred (Non-goals).</li>
+<li>Issue #20 (<code>manifest_order</code>), #26 (<code>r:s7-review</code>) → separate items, separate sessions.</li>
+<li>A <code>quick</code>/<code>thorough</code> rename → stays in issue #9.</li>
+</ul>
+<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
+<p>Single file rewrite: <code>agents/orchestrator.md</code> (currently 14 KB, ~43 MCP refs).</p>
+<p>Structure of the rewritten agent prompt:</p>
+<ol>
+<li><strong>Role</strong> — domain orchestrator for R-package ecosystems; acts via Bash + Read only.</li>
+<li><strong>Intent recognition</strong> — the table above (triggers → intent).</li>
+<li><strong>Delegation recipes</strong> — for each intent, the literal <code>python3 -m lib.*</code> invocations,
+   run from the package/ecosystem root. <code>lib/</code> is a package: invoke as
+   <code>python3 -m lib.&lt;module&gt;</code> (never <code>python3 lib/&lt;module&gt;.py</code>) per the lib convention.</li>
+<li><strong>Safety gate</strong> — classify the resolved actions; auto-run read-only, recommend-only
+   the rest.</li>
+<li><strong>Synthesis</strong> — parse each JSON envelope's <code>status</code>/<code>blockers</code>/<code>hints</code>; render the box.</li>
+</ol>
+<p>No code changes to <code>lib/</code> — the agent is a consumer of existing CLIs. <code>lib.ghrelease</code> has
+no CLI entrypoint (used internally by <code>r:submit</code>); the agent never calls it directly and
+routes CRAN/GitHub-release work to the recommend-only path.</p>
+<pre class="mermaid"><code>flowchart TD
+    U["User request"] --&gt; I{Intent?}
+    I --&gt;|read-only| R["Bash: python3 -m lib.*"]
+    I --&gt;|mutating/external| Rec["Recommend exact /rforge:* command — STOP"]
+    R --&gt; S["Synthesize envelopes → box summary"]
+    Rec --&gt; S
+    S --&gt; O["What ran · findings · 🔴 blockers · → next command"]</code></pre>
+<h2 id="dependencies">Dependencies<a class="headerlink" href="#dependencies" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>No new dependencies.</strong> Python 3 stdlib + existing <code>lib/</code> modules.</li>
+<li><code>lib.rcmd</code> engines (R-side: <code>rcmdcheck</code>/<code>testthat</code>/<code>roxygen2</code>/…) are already guarded by
+  <code>lib.rcmd</code> itself; the agent inherits whatever degrade behavior <code>lib.rcmd</code> emits when an
+  engine is absent (warn envelope, never raise). The agent must surface, not swallow, a
+  <code>warn</code>/<code>error</code> envelope.</li>
+</ul>
+<h2 id="error-handling">Error handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
+<ul>
+<li>A lib call that returns a non-<code>ok</code> envelope (<code>warn</code>/<code>error</code>) is reported verbatim in the
+  synthesis under 🔴 blockers — the agent never claims success it didn't get.</li>
+<li>A lib call that fails to run (non-zero exit, no JSON) is reported as a tool failure with
+  the command shown, so the user can reproduce it. The agent does not retry blindly.</li>
+<li>If intent is ambiguous, the agent states its best-guess intent and the recipe it will
+  run <strong>before</strong> running, so a wrong guess is visible.</li>
+</ul>
+<h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
+<p>Both gates must pass: <code>python3 -m pytest tests/</code> and <code>bash tests/test-all.sh</code>.</p>
+<p>New <code>tests/test-all.sh</code> checks (the agent is prose, so checks are structural):</p>
+<ol>
+<li><strong>MCP-reference regression guard (P0):</strong> <code>grep -L 'rforge_' agents/*.md</code> — fail if any
+   agent file contains the string <code>rforge_</code> (the exact bug this spec fixes; locked out
+   permanently).</li>
+<li><strong>Valid agent frontmatter:</strong> <code>agents/orchestrator.md</code> has <code>name:</code> and <code>description:</code>.</li>
+<li><strong>No phantom engines:</strong> every <code>--kind &lt;x&gt;</code> named in <code>agents/orchestrator.md</code> is in
+   <code>lib.rcmd</code>'s actual <code>--kind</code> choices (parse <code>lib/rcmd.py</code> argparse choices; assert
+   subset). Prevents the agent from drifting to a non-existent engine.</li>
+</ol>
+<p>No new pytest cases expected (no <code>lib/</code> code change); if check 3 is implemented as a tiny
+Python helper, it may live as a pytest case instead of inline shell.</p>
+<h2 id="documentation-impact">Documentation impact<a class="headerlink" href="#documentation-impact" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>agents/orchestrator.md</code> — the rewrite itself.</li>
+<li><code>CHANGELOG.md</code> — <code>[Unreleased]</code> → <code>[2.9.0]</code> entry.</li>
+<li><code>.STATUS</code> — mark Phase 4 shipped; clear it from the roadmap/Next Action.</li>
+<li><code>CLAUDE.md</code> — note the orchestrator delegates via <code>lib.*</code> (not MCP); update the
+  "Current state" line and test-gate counts (test-all.sh check count + the new guards).</li>
+<li>Architecture doc / <code>docs/</code> page describing hooks-and-agents, if present — describe the
+  intent table and safety boundary.</li>
+<li>No <code>scripts/gen_lib_reference.py</code> impact (no <code>lib/</code> change). No command frontmatter
+  change (no command added/removed). No REFCARD command-count change.</li>
+<li><code>version_sync.py</code> after bumping <code>package.json</code> to 2.9.0 (+ manual <code>marketplace.json</code>).</li>
+</ul>
+<h2 id="implementation-order">Implementation order<a class="headerlink" href="#implementation-order" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>(worktree)</strong> <code>git worktree add … -b feature/phase4-orchestrator dev</code>. Code +
+   agent-file changes need a feature branch (agent <code>.md</code> is a behavioral artifact, not
+   docs — treat as code).</li>
+<li>Rewrite <code>agents/orchestrator.md</code>: role, intent table, lib recipes, safety gate,
+   synthesis. Delete every <code>rforge_*</code> reference.</li>
+<li>Add the three <code>tests/test-all.sh</code> checks (esp. the <code>rforge_</code> regression guard).</li>
+<li>Run both gates green.</li>
+<li>Version bump to 2.9.0 (<code>package.json</code> → <code>version_sync.py</code> → manual <code>marketplace.json</code>);
+   CHANGELOG; .STATUS; CLAUDE.md.</li>
+<li>PR feature → dev; then release dev → main per the standard pipeline (+ tap sync).</li>
+</ol>
+<p>Steps 2–4 are code (worktree). Step 5's doc edits land with the same PR. This spec file
+itself is docs-only and is committed on <code>dev</code>.</p>
+<h2 id="open-questions-risks">Open questions / risks<a class="headerlink" href="#open-questions-risks" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Risk — duplication of orchestration logic.</strong> Approach A re-states lib-call recipes
+  that also live in command <code>.md</code> files. <em>Resolution:</em> keep the orchestrator a <em>thin
+  intent-router</em> — one mapping table, no bespoke logic beyond it; the commands remain the
+  authoritative per-task surface.</li>
+<li><strong>Issue #9 interaction (the folded-in note).</strong> #9 asks whether <code>quick</code>/<code>thorough</code>
+  should become <code>analyze:quick</code>/<code>analyze:thorough</code>. The orchestrator does <strong>not</strong> depend
+  on those names — it routes by <em>intent</em>, not by command name, so it is naming-agnostic
+  and does not block or pre-empt the #9 decision. If #9 later renames them, only the
+  ECOSYSTEM_HEALTH recipe's <em>recommended next command</em> string changes (a one-line edit),
+  not the agent's behavior. <em>Resolution:</em> Phase 4 ships independently of #9; #9 stays open.</li>
+<li><strong>Behavior change for existing users:</strong> anyone invoking the <code>rforge:orchestrator</code> agent
+  today gets dead-tool behavior; post-rewrite they get real delegation. Strictly an
+  improvement; no migration needed.</li>
+</ul>
+<h2 id="sources">Sources<a class="headerlink" href="#sources" title="Permanent link">&para;</a></h2>
+<ul>
+<li>rforge <code>CLAUDE.md</code> — lib/ package convention (<code>python3 -m lib.&lt;module&gt;</code>), public module
+  list, "rforge-mcp is gone" section.</li>
+<li><code>python3 -m lib.rcmd --help</code> — authoritative <code>--kind</code> engine list (verified 2026-06-12).</li>
+<li><code>agents/orchestrator.md</code> (current) — the 43-reference / 13-tool stale surface.</li>
+<li><a href="../SPEC-mcp-absorb-2026-05-10/">SPEC-mcp-absorb-2026-05-10.md</a> — the v1.3.0 MCP→lib
+  absorption that orphaned the orchestrator's tool references.</li>
+</ul>
 
 
 

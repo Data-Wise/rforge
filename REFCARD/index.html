@@ -760,6 +760,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../tutorials/orchestrator-cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Orchestrator cookbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../tutorials/r-dev-cycle/" class="md-nav__link">
         
   
@@ -1033,6 +1061,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#orchestrator-agent-v290" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Orchestrator agent (v2.9.0)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#common-workflows" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1247,6 +1286,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../orchestrator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🤖 Orchestrator Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../configuration/" class="md-nav__link">
         
   
@@ -1342,10 +1409,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
         
           
-          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
             
   
   
@@ -1363,8 +1430,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2132,6 +2199,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#orchestrator-agent-v290" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Orchestrator agent (v2.9.0)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#common-workflows" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2329,7 +2407,7 @@
 
 <h1 id="rforge-plugin-reference-card">📚 RForge Plugin - Reference Card<a class="headerlink" href="#rforge-plugin-reference-card" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>Version:</strong> 2.8.0 | <strong>Last Updated:</strong> 2026-06-12</p>
+<p><strong>Version:</strong> 2.9.0 | <strong>Last Updated:</strong> 2026-06-12</p>
 </blockquote>
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
@@ -2341,7 +2419,7 @@
 </ul>
 </div>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────────────────────────────────────────────────┐
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  RFORGE PLUGIN REFERENCE                                            v2.8.0  │
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  RFORGE PLUGIN REFERENCE                                            v2.9.0  │
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├─────────────────────────────────────────────────────────────────────────────┤
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│                                                                             │
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  COMMANDS (35)                                                              │
@@ -2429,6 +2507,58 @@
 </span></code></pre></div>
 <p>No MCP server. No Node.js. No R subprocess for status/discovery/deps —
 only <code>r:*</code> commands and <code>thorough</code> shell out to R (via <code>lib.rcmd</code>).</p>
+<h2 id="orchestrator-agent-v290">Orchestrator agent (v2.9.0)<a class="headerlink" href="#orchestrator-agent-v290" title="Permanent link">&para;</a></h2>
+<p>Ask a <em>goal</em> instead of picking commands — the <a href="../orchestrator/">orchestrator</a>
+recognizes the intent and runs the read-only analyses, then synthesizes one summary.</p>
+<table>
+<thead>
+<tr>
+<th>Intent</th>
+<th>Trigger</th>
+<th>Auto-runs (read-only)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CODE_CHANGE</td>
+<td>"refactor / impact of"</td>
+<td>discovery · deps impact · rcmd test</td>
+</tr>
+<tr>
+<td>NEW_FUNCTION</td>
+<td>"add a function"</td>
+<td>discovery · rcmd check</td>
+</tr>
+<tr>
+<td>BUG_FIX</td>
+<td>"fix / failing"</td>
+<td>rcmd test · deps</td>
+</tr>
+<tr>
+<td>DEPS_AUDIT</td>
+<td>"dependencies / imports"</td>
+<td>deps_sync · deps</td>
+</tr>
+<tr>
+<td>QUALITY</td>
+<td>"coverage / lint / spelling"</td>
+<td>rcmd coverage · lint · spell</td>
+</tr>
+<tr>
+<td>CRAN_READINESS</td>
+<td>"is this CRAN-ready"</td>
+<td>rcmd check · cranlint · runiverse</td>
+</tr>
+<tr>
+<td>ECOSYSTEM_HEALTH</td>
+<td>"status / overview"</td>
+<td>status · discovery · deps</td>
+</tr>
+</tbody>
+</table>
+<p>🔒 <strong>Safety:</strong> writes/network are <strong>recommend-only</strong> — <code>document</code>, <code>style</code>, <code>build</code>,
+<code>cran-prep</code>, <code>submit</code>, <code>winbuilder</code>, <code>rhub</code>, <code>urlcheck</code>, <code>revdep</code>, <code>deps-sync --write</code>
+are named and handed back to you, never auto-run.</p>
 <hr />
 <h2 id="common-workflows">Common Workflows<a class="headerlink" href="#common-workflows" title="Permanent link">&para;</a></h2>
 <table>
@@ -2630,7 +2760,7 @@ install options.</p>
 <hr />
 <h2 id="file-structure">File Structure<a class="headerlink" href="#file-structure" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>rforge/
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>├── .claude-plugin/        # Plugin manifest + extras (v2.8.0)
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>├── .claude-plugin/        # Plugin manifest + extras (v2.9.0)
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>│   ├── plugin.json
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>│   ├── marketplace.json
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>│   ├── config.json
