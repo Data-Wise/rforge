@@ -39,7 +39,9 @@ Usage (Python API):
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -270,6 +272,122 @@ def run_baseline(
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+# ───────────────────────── baseline cache (candidate A) ─────────────────────────
+#
+# The baseline run (run_baseline above) is a pure function of (merge_base_sha,
+# kind, package-set, engine-kwargs): the baselined tree is immutable at that SHA
+# and the engine is deterministic. We cache its finding list so a repeat
+# `--changed` run with an unchanged merge-base skips the worktree+engine entirely.
+# Self-invalidating: new commits on `base` → new merge-base SHA → new key → miss.
+#
+# This module stays R-free: the caller passes an OPAQUE `cache_key` string
+# (rcmd builds it from kind+pkgset+kwargs). We own only the repo-id, SHA, file
+# IO, and LRU prune. Everything here is advisory — a cache failure degrades to a
+# normal (uncached) baseline run; nothing here ever raises to the caller.
+
+_CACHE_SCHEMA = 1
+_CACHE_KEEP = 20  # LRU: max entries retained per repo-id dir (pruned on write)
+
+
+def _cache_root() -> Path:
+    """Root of the on-disk baseline cache: ``~/.rforge/baseline-cache``.
+
+    Matches the existing ``~/.rforge/context.json`` convention (lib.init).
+    Monkeypatched in tests so they never touch the real home directory.
+    """
+    return Path.home() / ".rforge" / "baseline-cache"
+
+
+def _repo_id(path: str) -> str:
+    """A stable, collision-resistant id for the repo owning ``path``.
+
+    ``sha1(git toplevel)[:16]`` so worktrees of the same repo share a cache dir
+    and distinct repos never collide. Falls back to the absolute path when
+    ``path`` is not a git repo (defensive — scope_check only caches after a
+    merge-base resolved, so in practice this is always a real repo).
+    """
+    top = _git(["rev-parse", "--show-toplevel"], cwd=path)
+    key = top.stdout.strip() if (top is not None and top.returncode == 0
+                                 and top.stdout.strip()) else os.path.abspath(path)
+    return hashlib.sha1(key.encode("utf-8")).hexdigest()[:16]
+
+
+def _cache_file(path: str, base_sha: str, cache_key: str) -> Path:
+    """Resolve the JSON cache path for one (repo, base_sha, cache_key) tuple."""
+    key_token = hashlib.sha1(cache_key.encode("utf-8")).hexdigest()[:16]
+    return _cache_root() / _repo_id(path) / f"{base_sha}-{key_token}.json"
+
+
+def read_baseline_cache(
+    path: str, base_sha: str, cache_key: str
+) -> Optional[list]:
+    """Return the cached baseline finding list, or None on miss/corrupt/error.
+
+    A corrupt or unreadable file is treated as a miss (never raises), so a bad
+    cache entry can only ever cost one extra baseline run — never a crash.
+    """
+    f = _cache_file(path, base_sha, cache_key)
+    try:
+        data = json.loads(f.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    if not isinstance(data, dict) or data.get("schema") != _CACHE_SCHEMA:
+        return None
+    findings = data.get("findings")
+    return findings if isinstance(findings, list) else None
+
+
+def write_baseline_cache(
+    path: str, base_sha: str, cache_key: str, findings: list,
+    *, keep: int = _CACHE_KEEP,
+) -> None:
+    """Persist ``findings`` for one (repo, base_sha, cache_key), then LRU-prune.
+
+    Atomic (tmp file + os.replace) so a concurrent reader never sees a partial
+    write. After writing, prune the repo-id dir to the ``keep`` newest entries
+    by mtime. Advisory — any IO error is swallowed (caching is best-effort).
+    """
+    f = _cache_file(path, base_sha, cache_key)
+    try:
+        f.parent.mkdir(parents=True, exist_ok=True)
+        payload = {"schema": _CACHE_SCHEMA, "base_sha": base_sha,
+                   "cache_key": cache_key, "findings": findings}
+        tmp = f.with_suffix(f".{os.getpid()}.tmp")
+        tmp.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+        os.replace(tmp, f)
+        _prune(f.parent, keep)
+    except OSError:
+        return
+
+
+def _prune(repo_dir: Path, keep: int) -> None:
+    """Keep the ``keep`` newest ``*.json`` entries in ``repo_dir`` by mtime."""
+    try:
+        entries = sorted(repo_dir.glob("*.json"),
+                         key=lambda p: p.stat().st_mtime, reverse=True)
+    except OSError:
+        return
+    for stale in entries[keep:]:
+        try:
+            stale.unlink()
+        except OSError:
+            pass
+
+
+def clear_baseline_cache(path: Optional[str] = None) -> int:
+    """Remove cached baseline entries; return the number of files removed.
+
+    With ``path``: clear only that repo's cache dir. With ``path=None``: clear
+    the entire cache root. Only ever deletes inside ``_cache_root()``.
+    """
+    target = _cache_root() / _repo_id(path) if path is not None else _cache_root()
+    if not target.exists():
+        return 0
+    count = sum(1 for _ in target.rglob("*.json"))
+    shutil.rmtree(target, ignore_errors=True)
+    return count
+
+
 # ───────────────────────── two-run orchestration ─────────────────────────
 
 
@@ -326,6 +444,9 @@ def scope_check(
     runner: Callable[[str], list],
     path: str,
     base: str = "dev",
+    *,
+    cache_key: Optional[str] = None,
+    use_cache: bool = True,
 ) -> Optional[dict]:
     """Two-run introduced/pre-existing tagging over a REAL merge-base checkout.
 
@@ -359,9 +480,19 @@ def scope_check(
     if base_sha is None:
         return None
 
-    base_findings = run_baseline(path=path, base_sha=base_sha, runner=runner)
-    if base_findings is None:
-        return None
+    # Baseline cache (candidate A): when a cache_key is supplied and caching is
+    # enabled, reuse a prior baseline for this (repo, merge-base, key) instead of
+    # re-running the worktree+engine. A miss runs the baseline and writes it.
+    cached = (read_baseline_cache(path, base_sha, cache_key)
+              if use_cache and cache_key is not None else None)
+    if cached is not None:
+        base_findings = cached
+    else:
+        base_findings = run_baseline(path=path, base_sha=base_sha, runner=runner)
+        if base_findings is None:
+            return None
+        if use_cache and cache_key is not None:
+            write_baseline_cache(path, base_sha, cache_key, base_findings)
 
     head_findings = runner(path)
     tagged = tag_findings(head_findings, base_findings)
@@ -404,7 +535,14 @@ def _main(argv: Optional[list[str]] = None) -> int:
                         help="Comparison ref; diff is vs merge-base(HEAD, base) "
                              "(default: HEAD = uncommitted working-tree changes)")
     parser.add_argument("--format", choices=("text", "json"), default="text")
+    parser.add_argument("--clear-cache", action="store_true",
+                        help="Remove this repo's baseline cache and exit")
     args = parser.parse_args(argv)
+
+    if args.clear_cache:
+        n = clear_baseline_cache(args.path)
+        print(f"🧹 cleared {n} baseline cache file(s)")
+        return 0
 
     files = changed_files(path=args.path, base=args.base)
     if files is None:

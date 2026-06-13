@@ -1,7 +1,7 @@
 ---
 name: rforge:r:check
 description: Run R CMD check with smart parsing — NOTEs classified as spurious or real
-argument-hint: "[package] [--as-cran] [--strict] [--incoming] [--changed] [--base <ref>] [--fail-on introduced|none]"
+argument-hint: "[package] [--as-cran] [--strict] [--incoming] [--changed] [--base <ref>] [--fail-on introduced|none] [--no-cache]"
 arguments:
   - name: package
     description: Package path to check (defaults to current directory)
@@ -37,6 +37,11 @@ arguments:
     required: false
     type: string
     default: introduced
+  - name: no-cache
+    description: "--changed: bypass the baseline cache — force a fresh merge-base baseline run and skip writing it. Use after upgrading an R engine (e.g. lintr) that could change the immutable-tree baseline."
+    required: false
+    type: boolean
+    default: false
 ---
 
 # R Package Check
@@ -50,7 +55,7 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
    and/or `--incoming` if requested).
 3. Render the JSON envelope below. Do not re-run R yourself.
 4. If `--changed` is set: run `python3 -m lib.rcmd --kind check --changed
-   --base "<ref>" [--fail-on introduced|none] --path "<path>"`. The envelope gains
+   --base "<ref>" [--fail-on introduced|none] [--no-cache] --path "<path>"`. The envelope gains
    a `changed` block with `packages` (the changed package(s)), `merge_base` (the
    fork-point SHA), `introduced_count`, and `findings` — each finding tagged
    `introduced` (new on this branch), `uncommitted` (an introduced finding whose
@@ -73,6 +78,7 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
 /rforge:r:check --changed                # tag findings vs merge-base(HEAD, dev)
 /rforge:r:check --changed --base main    # compare against main instead of dev
 /rforge:r:check --changed --fail-on none # tag findings but never fail (advisory)
+/rforge:r:check --changed --no-cache     # force a fresh baseline (skip the cache)
 ```
 
 - **`--changed`** — runs the check on the R package(s) touched on this branch
@@ -93,10 +99,17 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
   scope-only (real status on the changed package(s), no tagging) + a warning; no
   changes → a clean no-op.
 
-!!! note "Cost — `--changed` runs the check twice"
-    Tagging pays one extra check run (the merge-base baseline). Baseline results are
-    not cached across invocations. For a quick scoped run without the second pass,
-    omit `--changed` and pass the package path directly.
+!!! note "Cost — `--changed` runs the check twice (baseline is cached, v2.13.0)"
+    Tagging pays one extra check run (the merge-base baseline). Since v2.13.0 that
+    baseline is **cached** under `~/.rforge/baseline-cache/`, keyed by
+    `(repo, merge-base SHA, kind, changed-package set, engine flags)`, so a repeat
+    `--changed` run with an unchanged merge-base reuses it and skips the second
+    pass. The cache is **self-invalidating**: new commits on `--base` move the
+    merge-base SHA → new key → automatic miss. Pass **`--no-cache`** to force a
+    fresh baseline (and skip writing one) — useful after upgrading an R engine that
+    could change the immutable-tree baseline. Clear it with
+    `python3 -m lib.changed --clear-cache`. For a quick scoped run without any
+    baseline pass, omit `--changed` and pass the package path directly.
 
 - **Plain `r:check` (no flag)** — unchanged: one `--as-cran` pass, one `check` stage row.
 - **`--strict`** — runs **both** Suggests-withholding flavor passes as two distinct

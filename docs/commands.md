@@ -578,6 +578,7 @@ R CMD check integration with detailed error reporting.
 - `--changed` (optional, v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0) - Scope the check to the package(s) changed on this branch and tag each finding **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already at the fork point), via a baseline run in a detached worktree at `merge-base(HEAD, --base)`; an `[introduced]` finding whose file still has uncommitted changes is further refined to **`[uncommitted]`** (counts as introduced for `--fail-on`) (default: false)
 - `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed`; the baseline is run at `merge-base(HEAD, base)` (default: `dev`)
 - `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on findings tagged `[introduced]` (default: `introduced`); `none` is advisory
+- `--no-cache` (optional, v2.13.0) - `--changed`: bypass the baseline cache; force a fresh merge-base baseline run and skip writing it (default: false)
 - `--changed-strict` (optional, v2.10.0) - Documented no-op (default: false)
 
 **Examples:**
@@ -696,6 +697,7 @@ Run package tests via `testthat` and report pass/fail/skip counts.
 - `--changed` (optional, v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0) - Scope tests to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; an introduced failure in an uncommitted file is refined to `[uncommitted]` (default: false)
 - `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed` (default: `dev`)
 - `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on `[introduced]` findings (default: `introduced`)
+- `--no-cache` (optional, v2.13.0) - `--changed`: bypass the baseline cache; force a fresh merge-base baseline run and skip writing it (default: false)
 
 **Examples:**
 
@@ -904,6 +906,7 @@ Static analysis of the package via `lintr` — grouped report of style and code-
 - `--changed` (optional, v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0) - Scope lint to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; line-shift-immune identity; an introduced lint in an uncommitted file is refined to `[uncommitted]` (default: false)
 - `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed` (default: `dev`)
 - `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on `[introduced]` findings (default: `introduced`)
+- `--no-cache` (optional, v2.13.0) - `--changed`: bypass the baseline cache; force a fresh merge-base baseline run and skip writing it (default: false)
 
 **Examples:**
 

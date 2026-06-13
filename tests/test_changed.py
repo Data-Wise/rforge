@@ -543,3 +543,145 @@ def test_scope_check_no_cross_package_basename_collision(tmp_path):
     assert tags["finding-in-pkgA"] == "uncommitted"
     assert tags["finding-in-pkgB"] == "introduced", (
         "cross-package basename collision: pkgB finding wrongly re-tagged")
+
+
+# ───────── baseline caching (candidate A, v2.13.0) ─────────
+#
+# The baseline run is a pure function of (merge_base_sha, kind, package-set,
+# kwargs). `scope_check` accepts an opaque `cache_key` (rcmd builds it from
+# kind+pkgset+kwargs) and caches the baseline finding list under
+# ~/.rforge/baseline-cache/<repo-id>/<sha>-<keyhash>.json. The tests below
+# monkeypatch `_cache_root` so they never touch the real ~/.rforge.
+
+
+@pytest.fixture()
+def cache_root(tmp_path, monkeypatch):
+    root = tmp_path / "bcache"
+    monkeypatch.setattr(changed, "_cache_root", lambda: root)
+    return root
+
+
+def test_baseline_cache_write_then_read_roundtrip(tmp_path, cache_root):
+    findings = ["NOTE: a", {"file": "R/x.R", "line": 3, "linter": "L",
+                            "message": "m"}]
+    changed.write_baseline_cache(str(tmp_path), "deadbeef", "check|.|{}", findings)
+    got = changed.read_baseline_cache(str(tmp_path), "deadbeef", "check|.|{}")
+    assert got == findings
+
+
+def test_baseline_cache_miss_on_different_sha(tmp_path, cache_root):
+    changed.write_baseline_cache(str(tmp_path), "sha1", "k", ["x"])
+    assert changed.read_baseline_cache(str(tmp_path), "sha2", "k") is None
+
+
+def test_baseline_cache_miss_on_different_key(tmp_path, cache_root):
+    changed.write_baseline_cache(str(tmp_path), "sha1", "k1", ["x"])
+    assert changed.read_baseline_cache(str(tmp_path), "sha1", "k2") is None
+
+
+def test_baseline_cache_miss_when_absent(tmp_path, cache_root):
+    assert changed.read_baseline_cache(str(tmp_path), "nope", "k") is None
+
+
+def test_baseline_cache_corrupt_file_is_miss(tmp_path, cache_root):
+    changed.write_baseline_cache(str(tmp_path), "sha1", "k", ["x"])
+    # Corrupt the on-disk JSON.
+    f = changed._cache_file(str(tmp_path), "sha1", "k")
+    f.write_text("{not json", encoding="utf-8")
+    assert changed.read_baseline_cache(str(tmp_path), "sha1", "k") is None
+
+
+def test_baseline_cache_prune_keeps_newest(tmp_path, cache_root):
+    import os as _os
+    import time as _time
+    # Write 5 distinct entries (same repo) with keep=3; the 2 oldest go.
+    for i in range(5):
+        changed.write_baseline_cache(str(tmp_path), f"sha{i}", "k", [i], keep=3)
+        # Stagger mtimes so "newest" is well-defined.
+        f = changed._cache_file(str(tmp_path), f"sha{i}", "k")
+        _os.utime(f, (1_000 + i, 1_000 + i))
+    # Re-prune to settle (last write used the staggered times above).
+    changed.write_baseline_cache(str(tmp_path), "sha4", "k", [4], keep=3)
+    repo_dir = changed._cache_file(str(tmp_path), "sha4", "k").parent
+    remaining = sorted(p.name for p in repo_dir.glob("*.json"))
+    assert len(remaining) == 3
+
+
+def test_clear_baseline_cache_removes_and_counts(tmp_path, cache_root):
+    changed.write_baseline_cache(str(tmp_path), "sha1", "k1", ["x"])
+    changed.write_baseline_cache(str(tmp_path), "sha2", "k2", ["y"])
+    n = changed.clear_baseline_cache(str(tmp_path))
+    assert n == 2
+    assert changed.read_baseline_cache(str(tmp_path), "sha1", "k1") is None
+
+
+def test_repo_id_stable_and_distinct(tmp_path):
+    a = tmp_path / "a"
+    b = tmp_path / "b"
+    a.mkdir()
+    b.mkdir()
+    assert changed._repo_id(str(a)) == changed._repo_id(str(a))
+    assert changed._repo_id(str(a)) != changed._repo_id(str(b))
+
+
+def _counting_runner():
+    """A runner that records every tree it is asked to evaluate.
+
+    Distinguishes baseline ('base' content) from HEAD ('branch' content) by
+    reading f.txt, so we can assert the baseline run was skipped on a cache hit.
+    """
+    seen = []
+
+    def runner(treedir):
+        with open(os.path.join(treedir, "f.txt"), encoding="utf-8") as fh:
+            txt = fh.read().strip()
+        seen.append(txt)
+        return ["NOTE: old"] if txt == "base" else ["NOTE: old", "NOTE: new"]
+
+    return runner, seen
+
+
+def test_scope_check_caches_baseline_then_hits(tmp_path, cache_root):
+    repo, _ = _init_repo(tmp_path)
+    runner1, seen1 = _counting_runner()
+    r1 = changed.scope_check(runner1, path=str(repo), base="dev",
+                             cache_key="check|.|{}")
+    assert r1 is not None
+    assert sorted(seen1) == ["base", "branch"]  # MISS: baseline + HEAD ran
+
+    runner2, seen2 = _counting_runner()
+    r2 = changed.scope_check(runner2, path=str(repo), base="dev",
+                             cache_key="check|.|{}")
+    assert r2 is not None
+    assert seen2 == ["branch"]  # HIT: baseline served from cache, only HEAD ran
+    # Tagging is identical whether or not the baseline came from cache.
+    assert {t["text"]: t["tag"] for t in r1["findings"]} == \
+           {t["text"]: t["tag"] for t in r2["findings"]}
+
+
+def test_scope_check_no_cache_bypasses(tmp_path, cache_root):
+    repo, _ = _init_repo(tmp_path)
+    runner, seen = _counting_runner()
+    changed.scope_check(runner, path=str(repo), base="dev",
+                        cache_key="check|.|{}", use_cache=False)
+    # Nothing written, so a use_cache=False run leaves no cache file behind.
+    assert changed.read_baseline_cache(str(repo), "x", "check|.|{}") is None
+    assert sorted(seen) == ["base", "branch"]
+
+
+def test_scope_check_without_cache_key_does_not_cache(tmp_path, cache_root):
+    repo, _ = _init_repo(tmp_path)
+    runner, seen = _counting_runner()
+    # cache_key omitted (default None) → exactly the pre-A behavior, no caching.
+    changed.scope_check(runner, path=str(repo), base="dev")
+    runner2, seen2 = _counting_runner()
+    changed.scope_check(runner2, path=str(repo), base="dev")
+    assert sorted(seen2) == ["base", "branch"]  # second run still ran baseline
+
+
+def test_changed_cli_clear_cache(tmp_path, cache_root, capsys):
+    repo, _ = _init_repo(tmp_path)
+    changed.write_baseline_cache(str(repo), "sha1", "k", ["x"])
+    rc = changed._main(["--path", str(repo), "--clear-cache"])
+    assert rc == 0
+    assert changed.read_baseline_cache(str(repo), "sha1", "k") is None

@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Diff-aware baseline caching** (`lib/changed.py`; `r:check`/`r:test`/`r:lint`
+  `--changed` + new `--no-cache` flag). The last v2.11.0 `--changed` follow-up
+  (`[uncommitted]` tagging shipped v2.12.0). Each `--changed` run does two engine
+  passes: a HEAD run and a **baseline** run in a detached worktree at
+  `merge-base(HEAD, --base)` — and for `kind=check` that baseline is `R CMD check`
+  per package, costing minutes. The baseline finding list is a **pure function** of
+  `(merge-base SHA, kind, changed-package set, engine flags)`, so it is now cached
+  under `~/.rforge/baseline-cache/<repo-id>/<sha>-<keyhash>.json`: a repeat
+  `--changed` run with an unchanged merge-base reuses it and skips the baseline pass.
+  **Self-invalidating** — new commits on `--base` move the merge-base SHA → new key
+  → automatic miss; no manual invalidation. The cache key includes the
+  changed-package set and engine flags precisely *because* an under-keyed cache
+  would serve an under-covering baseline and mis-tag pre-existing findings as
+  `[introduced]`. **LRU prune** to the 20 newest entries per repo (by mtime, on
+  write). New `--no-cache` (bypass read+write, e.g. after an R-engine upgrade that
+  changes the immutable-tree baseline) and `python3 -m lib.changed --clear-cache`.
+  `lib/changed.py` stays R-free: it takes an opaque `cache_key` string (rcmd builds
+  it) and owns only repo-id + SHA + file IO + prune. Advisory throughout — a cache
+  failure degrades to a normal uncached baseline; nothing here raises. +12 pytest
+  cases (roundtrip, sha/key miss, corrupt-is-miss, prune, clear, repo-id, scope_check
+  hit/bypass/no-key, CLI). Spec: `SPEC-diff-aware-baseline-caching-2026-06-13.md`.
+
+---
+
 ## [2.12.0] - 2026-06-13
 
 > Three recommendations from a doc gap analysis, built TDD-first and hardened by a

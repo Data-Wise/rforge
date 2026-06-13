@@ -617,6 +617,7 @@ def run_changed(
     base: str = "dev",
     changed_strict: bool = False,
     fail_on: str = "introduced",
+    use_cache: bool = True,
     **run_kwargs,
 ) -> dict:
     """Run `kind` on the package(s) changed on this branch vs `base`, with diff-aware
@@ -681,7 +682,18 @@ def run_changed(
                 findings.append(f)
         return findings
 
-    result = changed.scope_check(runner, path=root, base=base)
+    # Opaque baseline-cache key (candidate A): the baseline finding list is a
+    # pure function of (merge-base sha, kind, package-set, engine-kwargs). sha is
+    # added by changed.scope_check; we encode the rest here. MUST include every
+    # input that changes the baseline output — an under-keyed cache would serve an
+    # under-covering baseline and mis-tag pre-existing findings as [introduced].
+    cache_key = "|".join((
+        kind,
+        ",".join(sorted(rel_pkgs)),
+        json.dumps(run_kwargs, sort_keys=True, default=str),
+    ))
+    result = changed.scope_check(runner, path=root, base=base,
+                                 cache_key=cache_key, use_cache=use_cache)
     if result is not None:
         introduced = result["introduced_count"]
         # --fail-on: default "introduced" → error iff ≥1 introduced; "none" → never.
@@ -935,6 +947,9 @@ def main(argv: list[str] | None = None) -> int:
                          "non-zero iff ≥1 introduced finding; 'none' is advisory")
     ap.add_argument("--changed-strict", action="store_true",
                     help="no-op (reserved): kept for back-compat with v2.10.0 flags")
+    ap.add_argument("--no-cache", action="store_true", dest="no_cache",
+                    help="--changed: bypass the baseline cache (force a fresh "
+                         "merge-base baseline run, and skip writing it)")
     ns = ap.parse_args(argv)
     if ns.kind == "cycle":
         env = _run_cycle(ns.path)
@@ -946,6 +961,7 @@ def main(argv: list[str] | None = None) -> int:
     elif ns.changed:
         env = run_changed(ns.kind, ns.path, base=ns.base,
                           changed_strict=ns.changed_strict, fail_on=ns.fail_on,
+                          use_cache=not ns.no_cache,
                           as_cran=ns.as_cran, strict=ns.strict,
                           incoming=ns.incoming)
     else:

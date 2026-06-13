@@ -75,6 +75,17 @@ package set, then keeps packages with at least one changed file under them.
 Files owning no package (top-level README, docs/) are silently dropped.
 Result order follows discovery order; each package is returned at most once.
 
+### `clear_baseline_cache()`
+
+```python
+def clear_baseline_cache(path: 'Optional[str]' = None) -> 'int'
+```
+
+Remove cached baseline entries; return the number of files removed.
+
+With ``path``: clear only that repo's cache dir. With ``path=None``: clear
+the entire cache root. Only ever deletes inside ``_cache_root()``.
+
 ### `merge_base()`
 
 ```python
@@ -86,6 +97,17 @@ Resolve the fork point: git merge-base(HEAD, base).
 Returns the merge-base SHA, or None when there is no common ancestor, `base`
 is unknown, `path` is not a git repo, or git is missing. Advisory — never
 raises; callers warn and fall back to a full/scope-only run on None.
+
+### `read_baseline_cache()`
+
+```python
+def read_baseline_cache(path: 'str', base_sha: 'str', cache_key: 'str') -> 'Optional[list]'
+```
+
+Return the cached baseline finding list, or None on miss/corrupt/error.
+
+A corrupt or unreadable file is treated as a miss (never raises), so a bad
+cache entry can only ever cost one extra baseline run — never a crash.
 
 ### `run_baseline()`
 
@@ -110,7 +132,7 @@ the exception propagates (callers that want a fallback catch it upstream).
 ### `scope_check()`
 
 ```python
-def scope_check(runner: 'Callable[[str], list]', path: 'str', base: 'str' = 'dev') -> 'Optional[dict]'
+def scope_check(runner: 'Callable[[str], list]', path: 'str', base: 'str' = 'dev', *, cache_key: 'Optional[str]' = None, use_cache: 'bool' = True) -> 'Optional[dict]'
 ```
 
 Two-run introduced/pre-existing tagging over a REAL merge-base checkout.
@@ -181,3 +203,15 @@ finding path. The `-z` stream is: each entry `XY<space>PATH` terminated by a
 NUL; a rename/copy (R/C status) is `XY<space>NEW OLD ` — TWO NUL fields,
 new path first — so after a rename status we consume (skip) the following
 field as the old path and keep the new one.
+
+### `write_baseline_cache()`
+
+```python
+def write_baseline_cache(path: 'str', base_sha: 'str', cache_key: 'str', findings: 'list', *, keep: 'int' = 20) -> 'None'
+```
+
+Persist ``findings`` for one (repo, base_sha, cache_key), then LRU-prune.
+
+Atomic (tmp file + os.replace) so a concurrent reader never sees a partial
+write. After writing, prune the repo-id dir to the ``keep`` newest entries
+by mtime. Advisory — any IO error is swallowed (caching is best-effort).

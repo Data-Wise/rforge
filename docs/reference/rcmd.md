@@ -92,7 +92,7 @@ returns an error envelope when no DESCRIPTION is found.
 ### `run_changed()`
 
 ```python
-def run_changed(kind: 'str', root: 'str' = '.', *, base: 'str' = 'dev', changed_strict: 'bool' = False, fail_on: 'str' = 'introduced', **run_kwargs) -> 'dict'
+def run_changed(kind: 'str', root: 'str' = '.', *, base: 'str' = 'dev', changed_strict: 'bool' = False, fail_on: 'str' = 'introduced', use_cache: 'bool' = True, **run_kwargs) -> 'dict'
 ```
 
 Run `kind` on the package(s) changed on this branch vs `base`, with diff-aware
