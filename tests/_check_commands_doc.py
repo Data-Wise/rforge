@@ -51,9 +51,39 @@ def _split_frontmatter(text: str) -> tuple[str, str]:
 
 
 def _command_name(frontmatter: str) -> str | None:
-    """The `name:` frontmatter value, e.g. 'rforge:r:check'."""
+    """The `name:` frontmatter value, e.g. 'rforge:r:check'.
+
+    Strips surrounding quotes so a quoted YAML scalar (`name: "rforge:z"`) is
+    captured as `rforge:z`, not `"rforge:z"`.
+    """
     m = re.search(r"^name:\s*(\S+)", frontmatter, re.MULTILINE)
-    return m.group(1) if m else None
+    return m.group(1).strip("\"'") if m else None
+
+
+def _strip_lib_continuations(body: str) -> str:
+    """Body with internal `python3 -m lib.*` invocations removed — including
+    backslash-continued multi-line invocations.
+
+    A naive per-line `"python3 -m lib." not in line` filter only drops the FIRST
+    line of a `\\`-continued command, so a positional name that appears as
+    `--name` on a CONTINUATION line leaks through and gets wrongly promoted to a
+    required flag. Here we track continuation state: once a line contains
+    `python3 -m lib.`, we keep dropping subsequent lines while the PREVIOUS
+    dropped line ended in a backslash continuation.
+    """
+    kept: list[str] = []
+    in_lib_continuation = False
+    for line in body.splitlines():
+        if in_lib_continuation:
+            # Still inside a backslash-continued lib invocation: drop this line,
+            # and stay in continuation only while it too ends with `\`.
+            in_lib_continuation = line.rstrip().endswith("\\")
+            continue
+        if "python3 -m lib." in line:
+            in_lib_continuation = line.rstrip().endswith("\\")
+            continue
+        kept.append(line)
+    return "\n".join(kept)
 
 
 def slash_name(frontmatter: str) -> str | None:
@@ -74,17 +104,16 @@ def declared_flags(frontmatter: str, body: str) -> list[str]:
     block_m = re.search(r"^arguments:\s*\n(.*)", frontmatter, re.DOTALL | re.MULTILINE)
     if not block_m:
         return []
-    # Body minus internal lib invocation lines.
-    non_lib = "\n".join(
-        line for line in body.splitlines() if "python3 -m lib." not in line
-    )
+    # Body minus internal lib invocations (incl. multi-line `\`-continuations).
+    non_lib = _strip_lib_continuations(body)
     flags: list[str] = []
     for nm in re.finditer(r"^\s*-\s*name:\s*(\S+)", block_m.group(1), re.MULTILINE):
-        name = nm.group(1)
+        name = nm.group(1).strip("\"'")  # tolerate quoted YAML scalars
         bare = name.lstrip("-")
         if bare in POSITIONAL_NAMES:
+            # `(?![\w-])` (not `\b`): so `--base` does NOT match `--base-dir`.
             exposed = name.startswith("--") or re.search(
-                rf"--{re.escape(bare)}\b", non_lib
+                rf"--{re.escape(bare)}(?![\w-])", non_lib
             ) is not None
             if not exposed:
                 continue  # genuine positional → skip
@@ -153,7 +182,8 @@ def find_problems(commands: list[dict], doc_text: str) -> list[str]:
         if section is None:
             continue  # already reported as missing section
         for flag in c["flags"]:
-            if re.search(rf"--{re.escape(flag)}\b", section) is None:
+            # `(?![\w-])`, not `\b`: `--base` must not be satisfied by `--base-dir`.
+            if re.search(rf"--{re.escape(flag)}(?![\w-])", section) is None:
                 problems.append(
                     f"flag coverage: {c['slash']} --{flag} documented? no "
                     f"(declared in {c['path']})"

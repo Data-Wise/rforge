@@ -362,6 +362,28 @@ def test_uncommitted_files_reports_modified_staged_and_added(tmp_path):
     assert "staged.R" in files       # staged
 
 
+def test_uncommitted_files_handles_spaced_and_nonascii_paths(tmp_path):
+    """MINOR (feature 2): `git status --porcelain` quotes paths with spaces /
+    non-ASCII, leaving literal quotes that never exact-match. With `-z` the path
+    is NUL-separated and never quoted, so it survives verbatim."""
+    repo, _ = _init_repo(tmp_path)
+    # Commit a file in R/ first so R/ is a tracked dir → git reports new files
+    # under it individually (not as a single collapsed `R/` untracked entry).
+    (repo / "R").mkdir()
+    (repo / "R" / "keep.R").write_text("k <- 0\n", encoding="utf-8")
+    _git(["add", "R/keep.R"], cwd=repo)
+    _git(["commit", "-q", "-m", "seed R dir"], cwd=repo)
+    spaced = repo / "R" / "my util.R"
+    spaced.write_text("x <- 1\n", encoding="utf-8")
+    nonascii = repo / "R" / "café.R"
+    nonascii.write_text("y <- 2\n", encoding="utf-8")
+
+    files = changed.uncommitted_files(path=str(repo))
+    # Exact, unquoted, repo-relative — would be '"R/my util.R"' without -z.
+    assert "R/my util.R" in files
+    assert "R/café.R" in files
+
+
 def test_uncommitted_files_empty_on_clean_tree(tmp_path):
     repo, _ = _init_repo(tmp_path)
     assert changed.uncommitted_files(path=str(repo)) == set()
@@ -461,3 +483,63 @@ def test_scope_check_clean_tree_no_uncommitted_tags(tmp_path):
     tags = [t["tag"] for t in result["findings"]]
     assert "uncommitted" not in tags
     assert tags == ["introduced"]
+
+
+# ───────── BLOCKER: cross-package basename collision (v2.12.0 fix) ─────────
+
+
+def _write_pkg(root, name):
+    """Minimal R package skeleton under root/<name> with R/ dir."""
+    pkg = root / name
+    (pkg / "R").mkdir(parents=True)
+    (pkg / "DESCRIPTION").write_text(
+        f"Package: {name}\nVersion: 0.0.1\n", encoding="utf-8")
+    return pkg
+
+
+def test_scope_check_no_cross_package_basename_collision(tmp_path):
+    """REGRESSION (BLOCKER): two packages share a basename. pkgA/R/util.dat is
+    dirty+uncommitted; pkgB/R/util.dat is committed clean. A pkgB finding must
+    stay [introduced]; a pkgA finding must become [uncommitted]. The old
+    basename/suffix match wrongly re-tagged the pkgB finding [uncommitted]
+    because both files end in `util.dat` (same basename)."""
+    repo, _ = _init_repo(tmp_path)
+    # Two sibling packages, both with an R/util.dat.
+    _write_pkg(repo, "pkgA")
+    _write_pkg(repo, "pkgB")
+    (repo / "pkgA" / "R" / "util.dat").write_text("a\n", encoding="utf-8")
+    (repo / "pkgB" / "R" / "util.dat").write_text("b\n", encoding="utf-8")
+    # Commit BOTH packages clean on the branch.
+    _git(["add", "-A"], cwd=repo)
+    _git(["commit", "-q", "-m", "add two packages"], cwd=repo)
+    # Now dirty ONLY pkgA/R/util.dat (uncommitted). pkgB stays committed clean.
+    (repo / "pkgA" / "R" / "util.dat").write_text("a-dirty\n", encoding="utf-8")
+
+    # rel package dirs as rcmd computes them, in discovery order.
+    pkgs = changed.changed_packages(
+        changed.changed_files(path=str(repo), base="dev") or [], root=str(repo))
+    rel_pkgs = {p.name: str(p.path) for p in pkgs}
+
+    def runner(tree_root):
+        with open(os.path.join(tree_root, "f.txt"), encoding="utf-8") as fh:
+            txt = fh.read().strip()
+        if txt != "branch":
+            return []  # baseline: nothing → both findings are introduced
+        # HEAD: one finding per package, BOTH named R/util.dat (package-relative).
+        # Annotate the owning package's repo-relative dir so scope_check can
+        # rebase to repo-relative coordinates and exact-match.
+        return [
+            {"file": "R/util.dat", "line": 1, "linter": "L",
+             "message": "finding-in-pkgA", "pkg_dir": "pkgA"},
+            {"file": "R/util.dat", "line": 1, "linter": "L",
+             "message": "finding-in-pkgB", "pkg_dir": "pkgB"},
+        ]
+
+    result = changed.scope_check(runner, path=str(repo), base="dev")
+    assert result is not None
+    tags = {t["text"]["message"]: t["tag"] for t in result["findings"]}
+    # pkgA's file is dirty → uncommitted. pkgB's identical-basename file is
+    # committed clean → must NOT collide; stays introduced.
+    assert tags["finding-in-pkgA"] == "uncommitted"
+    assert tags["finding-in-pkgB"] == "introduced", (
+        "cross-package basename collision: pkgB finding wrongly re-tagged")

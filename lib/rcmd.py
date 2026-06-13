@@ -464,8 +464,15 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             # Imports+Depends+LinkingTo package names, plus an always-allowed set
             # (the package itself + base/recommended pkgs that need no Imports).
             # Used by check (4) below — a dispatch class from an undeclared package.
-            'allow <- c(nm, "base", "methods", "stats", "utils", "graphics", '
-            '"grDevices", "datasets", "tools", "S7"); '
+            # Always-allowed = the real base package set (priority="base", which
+            # includes grid/parallel/splines/stats4/compiler/tcltk that a hardcoded
+            # list kept omitting), plus the package itself and S7 — none of these
+            # need a DESCRIPTION Imports entry, so a dispatch class from them is
+            # never an "undeclared dependency".
+            'base_pkgs <- tryCatch(rownames(installed.packages(priority="base")), '
+            'error=function(e) c("base","methods","stats","utils","graphics",'
+            '"grDevices","datasets","tools")); '
+            'allow <- union(c(nm, "S7"), base_pkgs); '
             'declared <- tryCatch({ '
             f'd <- read.dcf(file.path(pkgload::pkg_path({p}), "DESCRIPTION")); '
             'fields <- intersect(c("Imports", "Depends", "LinkingTo"), colnames(d)); '
@@ -664,8 +671,14 @@ def run_changed(
         findings: list = []
         for rel in rel_pkgs:
             pkg_path = str(Path(tree_root) / rel) if rel != "." else tree_root
-            findings.extend(_extract_findings(run(kind, pkg_path, **run_kwargs),
-                                              kind))
+            for f in _extract_findings(run(kind, pkg_path, **run_kwargs), kind):
+                # Annotate dict findings with their owning package's repo-relative
+                # dir so scope_check can rebase a package-relative finding `file`
+                # (e.g. R/a.R) to repo-relative (pkgA/R/a.R) and EXACT-match it
+                # against `git status` — no cross-package basename collision.
+                if isinstance(f, dict):
+                    f = {**f, "pkg_dir": rel}
+                findings.append(f)
         return findings
 
     result = changed.scope_check(runner, path=root, base=base)

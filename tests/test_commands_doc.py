@@ -64,6 +64,53 @@ def test_non_positional_string_is_a_flag():
     assert chk.declared_flags(fm, "anything") == ["format"]
 
 
+def test_multiline_lib_continuation_does_not_promote_positional():
+    # IMPORTANT (feature 1): `name` is positional and appears as `--name` ONLY on
+    # a backslash-continuation line of a `python3 -m lib.*` invocation. The whole
+    # continued command must be stripped, so `name` stays positional (not a flag).
+    fm = ("name: rforge:r:use-data\narguments:\n"
+          "  - name: name\n    type: string\n    required: true\n")
+    body = (
+        "/rforge:r:use-data <name>\n"
+        "```\n"
+        "python3 -m lib.scaffold data \\\n"
+        "    --name foo \\\n"
+        "    --dir R/\n"
+        "```\n"
+    )
+    assert chk.declared_flags(fm, body) == []
+
+
+def test_quoted_name_scalar_is_handled():
+    # MINOR (feature 1): a quoted YAML scalar `name: "format"` must be captured
+    # as `format`, not `"format"`.
+    fm = 'name: rforge:r:foo\narguments:\n  - name: "format"\n    type: string\n'
+    assert chk.declared_flags(fm, "anything") == ["format"]
+
+
+def test_quoted_command_name_scalar_is_handled():
+    # MINOR (feature 1): a quoted command name scalar resolves cleanly.
+    fm = 'name: "rforge:z"\n'
+    assert chk._command_name(fm) == "rforge:z"
+    assert chk.slash_name(fm) == "/rforge:z"
+
+
+def test_flag_prefix_collision_not_satisfied_by_longer_flag():
+    # MINOR (feature 1): `--base` documented requirement must NOT be satisfied by
+    # `--base-dir` appearing in the section (prefix collision via `\b`).
+    commands = [_cmd("/rforge:r:check", ["base"])]
+    doc = "### /rforge:r:check\n\nUsage: only --base-dir is mentioned here.\n"
+    problems = chk.find_problems(commands, doc)
+    assert any("--base documented? no" in p for p in problems)
+
+
+def test_flag_exact_match_still_passes():
+    # Sanity companion: the exact flag still satisfies coverage.
+    commands = [_cmd("/rforge:r:check", ["base"])]
+    doc = "### /rforge:r:check\n\nUsage: --base dev is supported.\n"
+    assert chk.find_problems(commands, doc) == []
+
+
 # --- find_problems: presence checks -------------------------------------------
 
 def test_clean_when_section_and_flag_present():

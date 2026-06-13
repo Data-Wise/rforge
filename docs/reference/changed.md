@@ -172,8 +172,12 @@ tree — anything `git status --porcelain` reports as dirty. Used to refine an
 `[introduced]` finding to `[uncommitted]` when its file is still dirty.
 
 Advisory, never raises: not a git repo / git missing / any non-zero status →
-the empty set (no refinement, no error). The porcelain v1 format is
-`XY<space>PATH` (PATH possibly `old -> new` for renames); we take the path
-column, and for a rename we keep the NEW (post-arrow) path (that's the one a
-finding will reference). Quoted paths (non-ASCII) keep their git-quoting; that
-is acceptable for the suffix/basename match in `scope_check`.
+the empty set (no refinement, no error).
+
+Uses `git status --porcelain -z` (NUL-separated, NEVER quoted/escaped), so
+paths with spaces or non-ASCII bytes survive verbatim — plain `--porcelain`
+quotes those as `"a b.R"`, leaving literal quotes that never exact-match a
+finding path. The `-z` stream is: each entry `XY<space>PATH` terminated by a
+NUL; a rename/copy (R/C status) is `XY<space>NEW OLD ` — TWO NUL fields,
+new path first — so after a rename status we consume (skip) the following
+field as the old path and keep the new one.

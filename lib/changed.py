@@ -117,25 +117,31 @@ def uncommitted_files(path: str = ".") -> set[str]:
     `[introduced]` finding to `[uncommitted]` when its file is still dirty.
 
     Advisory, never raises: not a git repo / git missing / any non-zero status →
-    the empty set (no refinement, no error). The porcelain v1 format is
-    `XY<space>PATH` (PATH possibly `old -> new` for renames); we take the path
-    column, and for a rename we keep the NEW (post-arrow) path (that's the one a
-    finding will reference). Quoted paths (non-ASCII) keep their git-quoting; that
-    is acceptable for the suffix/basename match in `scope_check`.
+    the empty set (no refinement, no error).
+
+    Uses `git status --porcelain -z` (NUL-separated, NEVER quoted/escaped), so
+    paths with spaces or non-ASCII bytes survive verbatim — plain `--porcelain`
+    quotes those as `"a b.R"`, leaving literal quotes that never exact-match a
+    finding path. The `-z` stream is: each entry `XY<space>PATH` terminated by a
+    NUL; a rename/copy (R/C status) is `XY<space>NEW\0OLD\0` — TWO NUL fields,
+    new path first — so after a rename status we consume (skip) the following
+    field as the old path and keep the new one.
     """
-    proc = _git(["status", "--porcelain"], cwd=path)
+    proc = _git(["status", "--porcelain", "-z"], cwd=path)
     if proc is None or proc.returncode != 0:
         return set()
     out: set[str] = set()
-    for line in proc.stdout.splitlines():
-        if not line.strip():
-            continue
-        # Porcelain v1: two status chars + a space, then the path.
-        rest = line[3:] if len(line) > 3 else line.strip()
-        # Renames/copies render "old -> new"; keep the new path.
-        if " -> " in rest:
-            rest = rest.split(" -> ", 1)[1]
-        rest = rest.strip()
+    fields = [f for f in proc.stdout.split("\0") if f != ""]
+    i = 0
+    while i < len(fields):
+        entry = fields[i]
+        status = entry[:2]
+        # Path begins after "XY ": the two status chars + one space.
+        rest = entry[3:] if len(entry) > 3 else ""
+        i += 1
+        # Rename/copy: the NEXT NUL field is the OLD path; new path is `rest`.
+        if status and status[0] in ("R", "C"):
+            i += 1  # consume (skip) the old path
         if rest:
             out.add(rest)
     return out
@@ -279,24 +285,41 @@ def _finding_file(f) -> Optional[str]:
     return None
 
 
-def _is_uncommitted_file(finding_file: str, uncommitted: set[str]) -> bool:
+def _repo_rel_finding_path(finding_file: str, pkg_dir: Optional[str]) -> str:
+    """Rebase a (package-relative) `finding_file` to repo-relative coordinates.
+
+    Finding files are package-relative (e.g. `R/a.R`); `git status --porcelain`
+    paths are repo-relative (e.g. `pkgA/R/a.R`). When the finding's owning
+    package's repo-relative dir is known (`pkg_dir`, e.g. `pkgA`), join them →
+    `pkgA/R/a.R`. A `pkg_dir` of "" or "." (package == repo root) leaves the
+    finding path unchanged. Both sides are normalized to forward slashes / no
+    leading "./" so the later exact-set comparison is apples-to-apples.
+    """
+    ff = finding_file.replace("\\", "/").lstrip("./")
+    if not pkg_dir or pkg_dir in (".", "./"):
+        return ff
+    pd = pkg_dir.replace("\\", "/").strip("/").lstrip("./")
+    if not pd or pd == ".":
+        return ff
+    return f"{pd}/{ff}"
+
+
+def _is_uncommitted_file(
+    finding_file: str, uncommitted: set[str], pkg_dir: Optional[str] = None
+) -> bool:
     """True iff `finding_file` corresponds to an uncommitted-changed path.
 
-    Coordinate-system tolerant: finding files are package-relative (e.g.
-    `R/a.R`) while `git status --porcelain` paths are repo-relative (e.g.
-    `pkgA/R/a.R`). Match on exact membership, on a path-suffix (a porcelain path
-    ending in `/<finding_file>`), or on equal basenames — enough to attribute a
-    finding to a dirty file without a fragile path-rebasing step.
+    The finding is rebased to repo-relative coordinates using its owning
+    package's repo-relative dir (`pkg_dir`) and then EXACT-matched against the
+    repo-relative `uncommitted` set. There is no basename or suffix fallback:
+    those collide across packages (a clean `pkgB/R/util.R` would be re-tagged
+    `[uncommitted]` whenever `pkgA/R/util.R` is dirty). When `pkg_dir` is None
+    (owning package unknown), only a direct exact match is attempted — never a
+    basename guess — so an undeterminable finding conservatively stays
+    `[introduced]` rather than being wrongly re-tagged.
     """
-    if finding_file in uncommitted:
-        return True
-    ff_base = finding_file.rsplit("/", 1)[-1]
-    for u in uncommitted:
-        if u == finding_file or u.endswith("/" + finding_file):
-            return True
-        if u.rsplit("/", 1)[-1] == ff_base:
-            return True
-    return False
+    rel = _repo_rel_finding_path(finding_file, pkg_dir)
+    return rel in uncommitted
 
 
 def scope_check(
@@ -351,7 +374,11 @@ def scope_check(
             if t["tag"] != "introduced":
                 continue
             ff = _finding_file(t["text"])
-            if ff is not None and _is_uncommitted_file(ff, dirty):
+            if ff is None:
+                continue
+            pkg_dir = (t["text"].get("pkg_dir")
+                       if isinstance(t["text"], dict) else None)
+            if _is_uncommitted_file(ff, dirty, pkg_dir=pkg_dir):
                 t["tag"] = "uncommitted"
 
     # [uncommitted] is a subset of "introduced" for --fail-on purposes.
