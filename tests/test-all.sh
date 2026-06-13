@@ -443,6 +443,57 @@ assert d['engine_missing'] == [], 'pure-Python module: engine_missing must be []
 "
 }
 
+# lib.s7review CLI smoke — pure-Python (no R). Runs the static S7 convention
+# checker over the deliberately-bad fixture and asserts the advisory envelope:
+# a worst-of warn, kind s7review, engine_missing always [].
+lib_s7review_smoke() {
+    local out
+    out=$(python3 -m lib.s7review --path tests/fixtures/s7pkg.bad --format json 2>/dev/null)
+    printf '%s' "$out" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+assert d['kind'] == 's7review', f\"unexpected kind {d['kind']}\"
+assert d['status'] in ('ok', 'warn'), f\"advisory: must be ok/warn; got {d['status']}\"
+assert d['engine_missing'] == [], 'pure-Python module: engine_missing must be []'
+"
+}
+
+# lib.changed CLI smoke — pure-Python (subprocess git only, no R). Must emit a
+# valid JSON envelope and never traceback, even when run off a git repo. We run
+# against a tmpdir that is not a git repo so the call exercises the warn-degrade
+# path; status must be ok|warn and the two scope keys must be present.
+lib_changed_smoke() {
+    local tmpdir out
+    tmpdir=$(mktemp -d)
+    out=$(python3 -m lib.changed --path "$tmpdir" --base HEAD --format json 2>/dev/null)
+    rm -rf "$tmpdir"
+    printf '%s' "$out" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+assert d['status'] in ('ok', 'warn'), d
+assert 'changed_files' in d and 'changed_packages' in d, d
+"
+}
+
+# Scaffolding: the three use-* commands must carry name+description frontmatter.
+scaffold_cmds_frontmatter() {
+    for f in commands/r/use-test.md commands/r/use-package.md commands/r/use-vignette.md; do
+        grep -q "^name: rforge:r:use-" "$f" || { echo "missing name in $f"; return 1; }
+        grep -q "^description:" "$f" || { echo "missing description in $f"; return 1; }
+    done
+}
+
+# Scaffolding: lib.scaffold + lib.usethis_infra import + run --help cleanly.
+scaffold_lib_smoke() {
+    python3 -m lib.scaffold --help >/dev/null 2>&1 \
+        && python3 -m lib.usethis_infra --help >/dev/null 2>&1
+}
+
+# Scaffolding: every `--flag` in each use-* `arguments:` block appears in `## Usage`.
+scaffold_args_usage_sync() {
+    python3 tests/_check_scaffold_args.py
+}
+
 # Phase 4: no removed rforge-mcp tool references may survive in any agent file.
 # (rforge-mcp was absorbed into lib/ in v1.3.0; the tools no longer exist.)
 # Matches both the legacy `rforge_*` underscore form and the `mcp__rforge*`
@@ -525,6 +576,11 @@ run "Docs: version/count strings in sync with package.json" version_sync_in_sync
 run "Lib: rcmd CLI smoke (R-free — accepts engine_missing envelope)" lib_rcmd_smoke
 run "Dogfood: lib.cranlint Tier-4 advisory CLI on a fixture package" lib_cranlint_smoke
 run "Dogfood: lib.runiverse CLI smoke (offline → warn envelope)" lib_runiverse_smoke
+run "Dogfood: lib.s7review CLI smoke (advisory S7 convention envelope)" lib_s7review_smoke
+run "Dogfood: lib.changed CLI smoke (JSON envelope, never raises)" lib_changed_smoke
+run "Scaffolding: use-* commands have frontmatter" scaffold_cmds_frontmatter
+run "Scaffolding: lib.scaffold + usethis_infra smoke" scaffold_lib_smoke
+run "Scaffolding: use-* arguments match Usage" scaffold_args_usage_sync
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════"

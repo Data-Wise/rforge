@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.10.0] - 2026-06-12
+
+> Bundles three roadmap features — an S7 convention checker, diff-aware checks,
+> and a scaffolding theme — each built TDD-first from an approved spec.
+> **35 → 39 commands.**
+
+### Added
+
+- **`r:s7-review`** (#26) — S7 convention checker. New pure-stdlib
+  `lib/s7review.py` (`cranlint` archetype) statically checks five families —
+  naming, validators, methods, legacy-OOP leftovers, class docs — and emits an
+  advisory warn-only envelope (never blocks). `--eco` deferred to a follow-up;
+  R-backed runtime checks deferred to a v2 sibling. +1 command.
+- **Scaffolding theme** — `r:use-test`, `r:use-package`, `r:use-vignette` for
+  **existing** packages. Dry-run by default; writes only with `--write`. New
+  `lib/scaffold.py` + `lib/usethis_infra.py`; `r:use-package` **reuses**
+  `deps_sync`'s DESCRIPTION-patch writer (`_apply_patch`) and `scan_usage` for
+  the Imports-vs-Suggests call. +3 commands.
+- **diff-aware `--changed`** (P0) — new `lib/changed.py` (git-diff →
+  changed-files → owning packages via `discovery.find_r_packages`); `--changed`
+  scopes `r:check` (with `[introduced]`/`[pre-existing]` tagging), `r:test`, and
+  `r:lint` to what actually changed. No command-count change (flags). The
+  merge-base second-check for `[pre-existing]` is a documented follow-up.
+
+### Changed
+
+- Test gates rise: `tests/test-all.sh` **36 → 41 checks**; `pytest` **232 → 290**
+  (new `test_s7review`/`test_scaffold`/`test_changed` + rcmd flag cases). New
+  `docs/reference/{s7review,changed,scaffold}.md` (auto-generated, `--check`
+  gated).
+
+---
+
 ## [2.9.0] - 2026-06-12
 
 > Rewrites the single agent (`agents/orchestrator.md`), which had been stale

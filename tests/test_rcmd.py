@@ -453,3 +453,128 @@ def test_cran_prep_multi_platform_populates_dispatched(tmp_path, monkeypatch):
     env = rcmd._run_cran_prep(str(tmp_path), multi_platform=True)
     assert env["dispatched"] == ["winbuilder", "rhub"]
     assert env["status"] == "ready"
+
+
+# ───────── --changed (diff-aware) wiring ─────────
+
+from unittest import mock
+
+from lib import changed as changed_mod
+
+
+def test_check_changed_scopes_to_changed_package(monkeypatch, tmp_path):
+    """--changed restricts a multi-package run to the single changed package."""
+    # One changed package, name 'pkgA' at tmp path.
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+    # scope_check short-circuits to None (no merge-base) → plain scoped check.
+    monkeypatch.setattr(rcmd.changed, "scope_check",
+                        lambda run_check, path, base: None)
+    seen_paths = []
+
+    def fake_run(kind, path=".", **kw):
+        seen_paths.append(path)
+        return {"kind": "check", "status": "ok",
+                "check": {"errors": [], "warnings": [], "notes": []}}
+
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    assert env["changed"]["packages"] == ["pkgA"]
+    assert str(tmp_path / "pkgA") in seen_paths
+
+
+def test_check_changed_tags_introduced_vs_preexisting(monkeypatch, tmp_path):
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+    monkeypatch.setattr(rcmd.changed, "scope_check",
+                        lambda run_check, path, base: {
+                            "base": base, "merge_base": "abc",
+                            "findings": [
+                                {"text": "NOTE: foo", "level": "note",
+                                 "tag": "introduced"},
+                                {"text": "NOTE: baz", "level": "note",
+                                 "tag": "pre-existing"}],
+                            "introduced_counts": {"errors": 0, "warnings": 0,
+                                                  "notes": 1}})
+
+    def fake_run(kind, path=".", **kw):
+        return {"kind": "check", "status": "warn",
+                "check": {"errors": [], "warnings": [], "notes": ["x"]}}
+
+    monkeypatch.setattr(rcmd, "run", fake_run)
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    intro = [f for f in env["changed"]["findings"] if f["tag"] == "introduced"]
+    assert [f["text"] for f in intro] == ["NOTE: foo"]
+    # default: status reflects introduced findings only (warn here, not the
+    # pre-existing-driven full-check warn)
+    assert env["status"] == "warn"
+
+
+def test_check_changed_default_status_ok_when_only_preexisting(monkeypatch, tmp_path):
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+    monkeypatch.setattr(rcmd.changed, "scope_check",
+                        lambda run_check, path, base: {
+                            "base": base, "merge_base": "abc",
+                            "findings": [{"text": "NOTE: old", "level": "note",
+                                          "tag": "pre-existing"}],
+                            "introduced_counts": {"errors": 0, "warnings": 0,
+                                                  "notes": 0}})
+    monkeypatch.setattr(rcmd, "run", lambda kind, path=".", **kw: {
+        "kind": "check", "status": "warn",
+        "check": {"errors": [], "warnings": [], "notes": ["old"]}})
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    # only pre-existing findings → default exit-clean (status downgraded to ok)
+    assert env["status"] == "ok"
+
+
+def test_changed_no_git_falls_back_to_full(monkeypatch, tmp_path):
+    """Not a git repo (changed_files None) → full run + warn message, status preserved."""
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: None)
+    monkeypatch.setattr(rcmd, "run", lambda kind, path=".", **kw: {
+        "kind": "check", "status": "ok",
+        "check": {"errors": [], "warnings": [], "notes": []}})
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    assert env["changed"]["fell_back"] is True
+    assert any("git" in m.lower() for m in env.get("messages", []))
+
+
+def test_changed_no_changes_is_noop_ok(monkeypatch, tmp_path):
+    """Empty diff → nothing to check; status ok, packages empty."""
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: [])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [])
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    assert env["status"] == "ok"
+    assert env["changed"]["packages"] == []
+    assert any("no changes" in m.lower() for m in env.get("messages", []))
+
+
+def test_test_kind_changed_is_scope_only(monkeypatch, tmp_path):
+    """r:test --changed scopes to the changed package but does NOT tag findings."""
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+    seen = []
+    monkeypatch.setattr(rcmd, "run", lambda kind, path=".", **kw: seen.append((kind, path)) or {
+        "kind": "test", "status": "ok", "tests": {"passed": 1, "failed": 0}})
+    env = rcmd.run_changed("test", root=str(tmp_path), base="dev")
+    assert ("test", str(tmp_path / "pkgA")) in seen
+    assert "findings" not in env["changed"]   # scope-only: no tagging block

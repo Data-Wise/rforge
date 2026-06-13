@@ -21,6 +21,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from . import changed
 from . import cranlint
 
 OPTIONAL_ENGINES = {"covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
@@ -454,6 +455,104 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
     return env
 
 
+# ───────────────────────── diff-aware (--changed) ─────────────────────────
+
+# Kinds that get the cheap "scope to the changed package" treatment only.
+_CHANGED_SCOPE_ONLY = frozenset({"test", "lint"})
+
+
+def run_changed(
+    kind: str,
+    root: str = ".",
+    *,
+    base: str = "HEAD",
+    changed_strict: bool = False,
+    **run_kwargs,
+) -> dict:
+    """Run `kind` scoped to the package(s) changed on this branch vs `base`.
+
+    Behavior by kind:
+      - check: scope to changed package(s); when a merge-base resolves, tag each
+        finding [introduced] vs [pre-existing] (two R runs via changed.scope_check)
+        and, by default, fold the status to reflect *introduced* findings only.
+        `changed_strict=True` keeps the full-check status (pre-existing counts too).
+      - test / lint: scope only — run the engine against the changed package(s);
+        no finding tagging.
+
+    Degrades safely:
+      - not a git repo / git missing / no merge-base (changed_files None) → run a
+        full `kind` against `root` and annotate `changed.fell_back=True`.
+      - no changes (empty diff) → no-op `ok` envelope.
+      - multiple changed packages → run each; aggregate into stages.
+    """
+    files = changed.changed_files(path=root, base=base)
+    if files is None:
+        env = run(kind, root, **run_kwargs)
+        env.setdefault("messages", []).append(
+            "⚠️  not a git repo or no merge-base for "
+            f"'{base}' — ran a full {kind} instead of --changed")
+        env["changed"] = {"fell_back": True, "base": base, "packages": []}
+        return env
+
+    pkgs = changed.changed_packages(files, root=root)
+    if not pkgs:
+        return {"kind": kind, "status": "ok", "engine_missing": [],
+                "messages": [f"✓ no changes against '{base}' — "
+                             f"no changed R packages to {kind}"],
+                "changed": {"fell_back": False, "base": base, "packages": []}}
+
+    # check with tagging (only meaningful for a single check kind).
+    if kind == "check" and len(pkgs) == 1:
+        pkg = pkgs[0]
+
+        def _run_check_at(ref: str) -> dict:
+            # ref == "HEAD" → check the live worktree; otherwise a detached
+            # check at the merge-base sha (the command layer is responsible for
+            # providing a clean checkout; here we run against the same path and
+            # let scope_check inject — for the live path we reuse run()).
+            return run("check", pkg.path, **run_kwargs)
+
+        tagged = changed.scope_check(_run_check_at, path=pkg.path, base=base)
+        head_env = run("check", pkg.path, **run_kwargs)
+        if tagged is None:
+            head_env.setdefault("messages", []).append(
+                f"⚠️  no merge-base for '{base}' — scoped to {pkg.name} but "
+                "findings not tagged (full check shown)")
+            head_env["changed"] = {"fell_back": False, "base": base,
+                                   "packages": [pkg.name]}
+            return head_env
+        intro = tagged["introduced_counts"]
+        head_env["changed"] = {
+            "fell_back": False, "base": base, "merge_base": tagged["merge_base"],
+            "packages": [pkg.name], "findings": tagged["findings"],
+            "introduced_counts": intro,
+        }
+        if not changed_strict:
+            # default: status reflects introduced findings only.
+            if intro["errors"]:
+                head_env["status"] = "error"
+            elif intro["warnings"] or intro["notes"]:
+                head_env["status"] = "warn"
+            else:
+                head_env["status"] = "ok"
+        return head_env
+
+    # scope-only path (test/lint, or check across >1 package): run each, aggregate.
+    stages = []
+    worst = "ok"
+    for pkg in pkgs:
+        env = run(kind, pkg.path, **run_kwargs)
+        stages.append({"package": pkg.name, "status": env["status"],
+                       "detail": env})
+        if env["status"] == "error":
+            worst = "error"
+        elif env["status"] == "warn" and worst != "error":
+            worst = "warn"
+    return {"kind": kind, "status": worst, "engine_missing": [], "messages": [],
+            "changed": {"fell_back": False, "base": base,
+                        "packages": [p.name for p in pkgs], "stages": stages}}
+
+
 def _run_cycle(path: str) -> dict:
     """document -> test -> check; stop at first hard error."""
     stages = []
@@ -648,6 +747,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--flavor", choices=["depends", "suggests"], default=None,
                     help="check: run a single Suggests-withholding flavor "
                          "(internal selector; cran-prep loops over both by default)")
+    ap.add_argument("--changed", action="store_true",
+                    help="scope the run to packages changed on this branch; for "
+                         "check, tag findings introduced vs pre-existing")
+    ap.add_argument("--base", default="HEAD",
+                    help="comparison ref for --changed (diff is vs "
+                         "merge-base(HEAD, base); default HEAD = uncommitted)")
+    ap.add_argument("--changed-strict", action="store_true",
+                    help="with --changed on check: keep full-check status "
+                         "(pre-existing findings count toward exit code too)")
     ns = ap.parse_args(argv)
     if ns.kind == "cycle":
         env = _run_cycle(ns.path)
@@ -656,6 +764,11 @@ def main(argv: list[str] | None = None) -> int:
                              goodpractice=ns.goodpractice,
                              multi_platform=ns.multi_platform,
                              incoming=ns.incoming)
+    elif ns.changed:
+        env = run_changed(ns.kind, ns.path, base=ns.base,
+                          changed_strict=ns.changed_strict,
+                          as_cran=ns.as_cran, strict=ns.strict,
+                          incoming=ns.incoming)
     else:
         env = run(ns.kind, ns.path, as_cran=ns.as_cran, preview=ns.preview,
                   strict=ns.strict, articles_only=ns.articles_only, devel=ns.devel,
