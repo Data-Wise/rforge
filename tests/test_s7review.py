@@ -120,3 +120,18 @@ def test_methods_clean_fixture_ok():
     # clean fixture: compute_effect generic defined locally + methods_register() present
     env = s7review.check_methods(str(CLEAN))
     assert env["status"] == "ok"
+
+
+# ── legacy ──────────────────────────────────────────────────────────────
+def test_legacy_flag_bad_fixture():
+    env = s7review.check_legacy_oop(str(BAD))
+    c = _codes(env)
+    assert env["status"] == "warn"
+    assert "legacy_s4_in_s7" in c   # setClass/setGeneric
+    assert "legacy_r5_in_s7" in c   # R6::R6Class
+    assert "legacy_s3_generic" in c # print.mediator_model + UseMethod
+
+
+def test_legacy_clean_fixture_ok():
+    env = s7review.check_legacy_oop(str(CLEAN))
+    assert env["status"] == "ok"

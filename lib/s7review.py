@@ -327,8 +327,86 @@ def check_methods(path: str | os.PathLike = ".") -> dict:
 
 
 # ── temporary stubs (each replaced in its own task) ──
-def check_legacy_oop(path):  # Task 6
-    return _envelope("legacy", "ok", [], ["(stub)"])
+_S4_PATTERNS = [
+    (re.compile(r"\bsetClass\s*\("), "setClass"),
+    (re.compile(r"\bsetGeneric\s*\("), "setGeneric"),
+    (re.compile(r"\bsetMethod\s*\("), "setMethod"),
+    (re.compile(r"\brepresentation\s*\("), "representation"),
+]
+_R5_PATTERNS = [
+    (re.compile(r"\bsetRefClass\s*\("), "setRefClass"),
+    (re.compile(r"(?:\bR6::)?\bR6Class\s*\("), "R6Class"),
+]
+_USEMETHOD_RE = re.compile(r"\bUseMethod\s*\(")
+_S3_DEF_RE = re.compile(r"^\s*([A-Za-z.][\w.]*)\.([A-Za-z][\w]*)\s*<-\s*function")
+
+
+def check_legacy_oop(path: str | os.PathLike = ".") -> dict:
+    """Flag pre-S7 OOP co-residing with S7. ``setClass``/``setGeneric``/
+    ``representation`` → ``legacy_s4_in_s7``; ``setRefClass``/``R6Class`` →
+    ``legacy_r5_in_s7``; an S3 ``foo.<S7Class> <- function`` body calling
+    ``UseMethod()`` → ``legacy_s3_generic`` (heuristic). Only fires when the
+    file/package also uses ``new_class`` (a pure-S4 package is not an S7
+    convention problem). Never raises.
+    """
+    files = list(_scan_r_files(path))
+    uses_s7 = any("new_class" in text for _f, text in files)
+    if not uses_s7:
+        return _envelope("legacy", "ok", [],
+                         ["No new_class found — not an S7 package; legacy check "
+                          "skipped (absence is not a violation)."])
+
+    # set of S7 class names defined anywhere (for the S3 heuristic)
+    s7_classes: set[str] = set()
+    for _f, text in files:
+        for c in _find_s7_constructs(text):
+            if c["call"] == "new_class":
+                nm = _name_arg(c["args"]) or c["bound"]
+                if nm:
+                    s7_classes.add(nm)
+                if c["bound"]:
+                    s7_classes.add(c["bound"])
+
+    findings: list[dict] = []
+    for f, text in files:
+        rel = f.name
+        for i, line in enumerate(text.splitlines(), start=1):
+            for rx, sym in _S4_PATTERNS:
+                if rx.search(line):
+                    findings.append({
+                        "code": "legacy_s4_in_s7", "severity": "advisory",
+                        "file": rel, "line": i, "symbol": sym, "source": "static",
+                        "message": (f"'{sym}()' (S4) co-resides with S7 new_class "
+                                    "— looks like a mid-migration leftover; "
+                                    "consider porting to S7."),
+                    })
+            for rx, sym in _R5_PATTERNS:
+                if rx.search(line):
+                    findings.append({
+                        "code": "legacy_r5_in_s7", "severity": "advisory",
+                        "file": rel, "line": i, "symbol": sym, "source": "static",
+                        "message": (f"'{sym}()' (R5/R6) co-resides with S7 — "
+                                    "consider consolidating on S7."),
+                    })
+            m = _S3_DEF_RE.match(line)
+            if m and m.group(2) in s7_classes:
+                findings.append({
+                    "code": "legacy_s3_generic", "severity": "advisory",
+                    "file": rel, "line": i, "symbol": m.group(0).strip(),
+                    "source": "static",
+                    "message": (f"S3 method '{m.group(1)}.{m.group(2)}' dispatches "
+                                f"on S7 class '{m.group(2)}' — prefer an S7 "
+                                "method() over S3 UseMethod()."),
+                })
+            elif _USEMETHOD_RE.search(line):
+                # bare UseMethod whose generic name matches an S7 class suffix
+                continue
+    status = "warn" if findings else "ok"
+    messages = [] if findings else ["No legacy OOP co-residing with S7."]
+    return _envelope("legacy", status, findings, messages)
+
+
+# ── temporary stubs (each replaced in its own task) ──
 def check_class_docs(path):  # Task 7
     return _envelope("docs", "ok", [], ["(stub)"])
 
