@@ -97,13 +97,18 @@ def run_changed(kind: 'str', root: 'str' = '.', *, base: 'str' = 'HEAD', changed
 
 Run `kind` scoped to the package(s) changed on this branch vs `base`.
 
-Behavior by kind:
-  - check: scope to changed package(s); when a merge-base resolves, tag each
-    finding [introduced] vs [pre-existing] (two R runs via changed.scope_check)
-    and, by default, fold the status to reflect *introduced* findings only.
-    `changed_strict=True` keeps the full-check status (pre-existing counts too).
-  - test / lint: scope only — run the engine against the changed package(s);
-    no finding tagging.
+Behavior by kind (all kinds are currently SCOPE-ONLY):
+  - check / test / lint: scope the engine to the changed package(s) and report
+    the REAL full status for those packages. No finding is tagged
+    [introduced]/[pre-existing] and the exit status is NOT folded — a real
+    ERROR/WARNING/NOTE on a changed package surfaces and drives the status.
+
+introduced/pre-existing tagging is NOT YET WIRED: an honest two-run comparison
+requires checking out the merge-base into a detached worktree, which is not yet
+built. Until then `--changed` (and the now-vestigial `--changed-strict`) only
+scope; the command emits a clear "tagging deferred" message so the contract is
+not overstated. The `tag_findings`/`scope_check` helpers in lib.changed are kept
+as dormant building blocks for that future work but are NOT used to fold status.
 
 Degrades safely:
   - not a git repo / git missing / no merge-base (changed_files None) → run a
