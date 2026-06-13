@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **`docs/commands.md` sync-gate** (`tests/_check_commands_doc.py`, wired into
+  `tests/test-all.sh`; 41→42 checks). A pure-stdlib presence check closing the last
+  drift-prone documentation surface: (1) **command coverage** — every non-stub command
+  file (`commands/**/*.md`, excluding the v2.0.0 rename stubs) has a matching
+  `### /rforge:<name>` section, and every such section has a backing command file (both
+  directions); (2) **flag coverage** — every real CLI flag declared in a command's
+  frontmatter `arguments:` is documented as `--<name>` in that command's section.
+  Positionals (`package`/`path`/`context`/`task_id`/`function`/`name`) and lib-only
+  forwarded args are excluded, but a positional name genuinely exposed as a slash flag
+  (e.g. `/rforge:impact --package`) is still covered. Core logic is importable; a pytest
+  self-test (`tests/test_commands_doc.py`, 12 cases) feeds it fixtures to prove the gate
+  catches missing flags/sections/orphans (not vacuous). Spec:
+  `SPEC-commands-doc-sync-gate-2026-06-13.md`.
+
+### Fixed
+
+- **`docs/commands.md` flag drift surfaced + fixed by the new gate** — 10 undocumented
+  command flags added to their sections: `/rforge:quick --package`,
+  `/rforge:detect --format`, `/rforge:cascade --detailed`,
+  `/rforge:impact --package`/`--change-type`/`--affected-exports`,
+  `/rforge:release --detailed`, `/rforge:docs:check --detailed`,
+  `/rforge:complete --no-cascade`, `/rforge:next --context`.
+
+---
+
 ## [2.11.1] - 2026-06-13
 
 ### Added

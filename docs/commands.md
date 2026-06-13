@@ -155,11 +155,12 @@ Ultra-fast status check using only quick tools (<10 seconds).
 
 **Usage:**
 ```bash
-/rforge:quick [description]
+/rforge:quick [description] [--package PATH]
 ```
 
 **Parameters:**
-- `description` (optional) - Brief context for the check
+- `description` (optional) - Brief context for the check (narration only)
+- `--package` (optional) - Path to a specific package (defaults to current directory)
 
 **Examples:**
 ```bash
@@ -168,6 +169,9 @@ Ultra-fast status check using only quick tools (<10 seconds).
 
 # Pre-commit validation
 /rforge:quick "Before committing changes"
+
+# Snapshot a specific package
+/rforge:quick --package /path/to/RMediation
 ```
 
 **Provides:**
@@ -220,15 +224,19 @@ Auto-detect project structure (single package, ecosystem, or hybrid).
 
 **Usage:**
 ```bash
-/rforge:detect
+/rforge:detect [--format FORMAT]
 ```
 
-**No parameters**
+**Parameters:**
+- `--format` (optional) - Output format: `text` (default) or `json`
 
 **Examples:**
 ```bash
 # Detect current directory structure
 /rforge:detect
+
+# Machine-readable output
+/rforge:detect --format json
 ```
 
 **Output:**
@@ -251,11 +259,12 @@ Plan coordinated updates across dependent packages.
 
 **Usage:**
 ```bash
-/rforge:cascade [description]
+/rforge:cascade [description] [--detailed]
 ```
 
 **Parameters:**
 - `description` (optional) - What's changing and why
+- `--detailed` (optional) - Show the full per-package task breakdown
 
 **Examples:**
 ```bash
@@ -264,6 +273,9 @@ Plan coordinated updates across dependent packages.
 
 # Version bump cascade
 /rforge:cascade "Major version bump in core package"
+
+# Detailed cascade plan
+/rforge:cascade --detailed
 ```
 
 **Analyzes:**
@@ -280,19 +292,21 @@ Analyze change impact across ecosystem packages.
 
 **Usage:**
 ```bash
-/rforge:impact [description]
+/rforge:impact --package PKG [--change-type TYPE] [--affected-exports "a b c"]
 ```
 
 **Parameters:**
-- `description` (optional) - What changed
+- `--package` (required) - Package whose change is being analyzed
+- `--change-type` (optional) - Nature of change: `breaking`, `feature` (default), `fix`, `refactor`
+- `--affected-exports` (optional) - Space-separated list of changed exports
 
 **Examples:**
 ```bash
-# API change impact
-/rforge:impact "Changed function signature in base package"
+# API (breaking) change impact
+/rforge:impact --package medfit --change-type breaking
 
-# Dependency update impact
-/rforge:impact "Updated ggplot2 to v3.5.0"
+# Feature change with specific affected exports
+/rforge:impact --package medfit --change-type feature --affected-exports "extract_mediation predict"
 ```
 
 **Reports:**
@@ -309,15 +323,20 @@ Plan CRAN submission sequence based on dependencies.
 
 **Usage:**
 ```bash
-/rforge:release
+/rforge:release [package] [--detailed]
 ```
 
-**No parameters**
+**Parameters:**
+- `package` (optional) - Package to release (defaults to the ecosystem-wide CRAN sequence)
+- `--detailed` (optional) - Show the full submission sequence with internal dependency-order sequencing
 
 **Examples:**
 ```bash
 # Generate release plan
 /rforge:release
+
+# Detailed release plan
+/rforge:release --detailed
 ```
 
 **Provides:**
@@ -389,15 +408,20 @@ Check for documentation drift and inconsistencies across packages.
 
 **Usage:**
 ```bash
-/rforge:docs:check
+/rforge:docs:check [package] [--detailed]
 ```
 
-**No parameters**
+**Parameters:**
+- `package` (optional) - Package to check (defaults to current directory / ecosystem)
+- `--detailed` (optional) - Show the full per-file documentation drift report
 
 **Examples:**
 ```bash
 # Check documentation status
 /rforge:docs:check
+
+# Full drift report
+/rforge:docs:check --detailed
 ```
 
 **Validates:**
@@ -414,11 +438,12 @@ Mark tasks complete with automatic documentation cascade.
 
 **Usage:**
 ```bash
-/rforge:complete [task_description]
+/rforge:complete [task_id] [--no-cascade]
 ```
 
 **Parameters:**
-- `task_description` (optional) - What was completed
+- `task_id` (optional) - Task ID (e.g. `T-YYYY-MM-DD-NNN`) or short description
+- `--no-cascade` (optional) - Skip the documentation cascade detection
 
 **Examples:**
 ```bash
@@ -427,6 +452,9 @@ Mark tasks complete with automatic documentation cascade.
 
 # Trigger doc cascade
 /rforge:complete "Fixed critical bug in mediation function"
+
+# Complete without the doc cascade
+/rforge:complete T-2025-01-15-001 --no-cascade
 ```
 
 **Actions:**
@@ -471,15 +499,20 @@ Get ecosystem-aware next task recommendation.
 
 **Usage:**
 ```bash
-/rforge:next
+/rforge:next [package] [--context TEXT]
 ```
 
-**No parameters**
+**Parameters:**
+- `package` (optional) - Package to focus the recommendation on
+- `--context` (optional) - Free-form context (e.g. `"Before release"`, `"Daily check-in"`)
 
 **Examples:**
 ```bash
 # Get next task suggestion
 /rforge:next
+
+# Focused on a release context
+/rforge:next --context "Before release"
 ```
 
 **Considers:**
