@@ -940,10 +940,10 @@ There is **no** `--write`/`--fix` — S7 fixes need human judgement.
 | methods | `dangling_method`, `missing_methods_register` | static |
 | legacy | `legacy_s4_in_s7`, `legacy_r5_in_s7`, `legacy_s3_generic` | static |
 | docs | `undocumented_export`, `prop_type_unresolvable` | static |
-| method-dispatch (`--runtime`) | `dead_generic` | runtime |
+| method-dispatch (`--runtime`) | `dead_generic`, `method_on_missing_class` | runtime |
 | validator-runtime (`--runtime`) | `validator_not_enforcing` | runtime |
 
-The `method-dispatch` runtime family currently reports only `dead_generic`; `method_on_missing_class` is **deferred** (it can't be decided from the S7 registry alone — future work).
+The `method-dispatch` runtime family reports `dead_generic` (an S7 generic with no registered method) and `method_on_missing_class` (a method whose dispatch signature references an S7 class with no resolvable namespace binding — e.g. an inline `new_class()` left in a `method()` call — making the method unreachable). Each `S7_method` carries its dispatch class objects (`attr(., "signature")`), so resolvability is decided by object identity against the package's classes; base types and imported classes are not flagged.
 
 **Output:** one `{kind: "s7review", status: "ok"|"warn", stages: [...]}` envelope. Each finding carries `source: "static"` and `severity: "advisory"`, worded "looks like / consider", never "must". Exit 0 always.
 

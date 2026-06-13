@@ -1,8 +1,9 @@
 project: rforge
 updated: 2026-06-13
 status: Active
-version: 2.10.0 (RELEASED 2026-06-13)
-last_release: 2026-06-13 v2.10.0 (PR #32 bundle + #33 review fixes feature→dev, PR #34 dev→main merge e478fca; release https://github.com/Data-Wise/rforge/releases/tag/v2.10.0; CI green on main RForge CI + Deploy Documentation; docs live-verified v2.10.0 + /reference/{s7review,scaffold,changed}/ + /tutorials/scaffolding-existing-packages/ all HTTP 200; tap PR Data-Wise/homebrew-tap#121 MERGED — formula+manifest → v2.10.0, sha256 96ef1108…, desc 35→39, ruby -c OK, --diff only pre-existing bin.mkpath drift). Three-feature bundle (35→39 commands): #26 r:s7-review + scaffolding r:use-* + diff-aware --changed (scope-only). Hardened by a pre-release adversarial review that caught + fixed 3 bug-classes the gates missed (diff-aware false-negative, deps_sync constraint-drop, s7review FPs). pytest 298, test-all 41/41.
+version: 2.11.0 (RELEASED 2026-06-13)
+last_release: 2026-06-13 v2.11.0 (PR #35 feature→dev merge 0f3f548, PR #36 dev→main merge 989eb23; release https://github.com/Data-Wise/rforge/releases/tag/v2.11.0; CI green on main RForge CI + Deploy Documentation; docs live-verified 41 commands + "NOT YET WIRED" gone + /reference/{s7review,scaffold}/ HTTP 200; tap PR Data-Wise/homebrew-tap#122 MERGED — formula+manifest → v2.11.0, sha256 196686eb…, desc 39→41, ruby -c OK, --diff only pre-existing bin.mkpath drift). Three follow-up features (39→41 commands): diff-aware [introduced]/[pre-existing] tagging (P0 completion — merge-base detached-worktree baseline run, --base/--fail-on, line-shift-immune) + r:s7-review --eco (ecosystem sweep) / --runtime (new lib.rcmd s7runtime engine: dead_generic + validator_not_enforcing) + r:use-data/r:use-citation (+2). Built by 3 sequential implementer agents in one bundle worktree. Hardened by a 4-dimension pre-release adversarial review that caught + fixed 3 BLOCKERs + 3 IMPORTANTs the green gates missed (recurrence of v2.10.0 classes: invalid-R citation gen, lint line-shift mis-tag, s7 placeholder family advertised as working, docs "NOT YET WIRED" overclaim). pytest 347, test-all 41/41. Lesson reinforced [[feedback_adversarial_review_prose_contracts]].
+last_release_prior_v2_10: 2026-06-13 v2.10.0 (PR #32 bundle + #33 review fixes feature→dev, PR #34 dev→main merge e478fca; release https://github.com/Data-Wise/rforge/releases/tag/v2.10.0; tap PR #121 MERGED, sha256 96ef1108…). Three-feature bundle (35→39 commands): #26 r:s7-review + scaffolding r:use-* + diff-aware --changed (scope-only). Adversarial review caught 3 bug-classes (diff-aware false-negative, deps_sync constraint-drop, s7review FPs). pytest 298, test-all 41/41.
 in_progress_prior: 2026-06-13 v2.10.0 — review-hardened. Adversarial review of the bundle (5 dims, 2-lens verify) before release caught 3 real bug-classes the TDD gates missed, all FIXED via PR #33 (merge d7bd31b): (1) BLOCKER diff-aware --changed silent false-negative — _run_check_at ignored its ref (HEAD vs HEAD) so r:check --changed reported ok with real ERRORs; now honest scope-only, tagging deferred, real-git e2e test replaces the mocked one that hid it; (2) deps_sync _apply_patch dropped version constraints on --write (corrupted DESCRIPTION; affected r:use-package AND r:deps-sync since v2.5.0) — now preserves verbatim specs; (3) s7review 4 false positives (no comment/string masking; new_property flagged as type) — added masking seam. pytest 290→298; test-all 41/41. Lesson saved [[feedback_adversarial_review_prose_contracts]]. ---- Bundle (PR #32, merge 85881e8): #26 r:s7-review (+1) + scaffolding r:use-* (+3) + diff-aware --changed (+0). #26 r:s7-review (lib/s7review.py, cranlint archetype, 5 advisory families; --eco/R-pass deferred; +1) + scaffolding r:use-test/use-package/use-vignette (lib/scaffold.py+usethis_infra.py, dry-run default + --write, reuses deps_sync._apply_patch/scan_usage; +3) + diff-aware --changed (lib/changed.py, flags on r:check/test/lint, merge-base 2nd-check deferred; +0). 35→39 commands; test-all 36→41; pytest 232→290. Built by 3 sequential implementer agents + a docs gap-pass agent in one bundle worktree; mkdocs --strict clean. Specs+plans in docs/specs/. NEXT: dev→main release PR + tap sync (or bundle more first).
 last_release_prior: 2026-06-12 v2.9.0 (PR #29+#30 feature→dev, PR #31 dev→main merge c747b24, release https://github.com/Data-Wise/rforge/releases/tag/v2.9.0; CI green on main RForge CI + Deploy Documentation; docs live-verified v2.9.0 + /orchestrator/ HTTP 200; tap PR Data-Wise/homebrew-tap#120 MERGED — formula+manifest → v2.9.0, sha256 08c45b9b…, ruby -c OK; --diff shows only pre-existing bin.mkpath drift, no new version/sha drift). Phase 4 orchestrator rewrite (last craft-parity item): stale agents/orchestrator.md (13 removed rforge_* MCP tools) → python3 -m lib.* delegation, 7 intents, read-only/recommend-only safety gate, per-module synthesis; +3 test-all guards (33→36, incl. recipe validator). Validated by TWO adversarial review workflows (caught 2 blockers in draft + 1 self-introduced in the fix). Bundled: #20 Ecosystem.manifest_order + #26 r:s7-review spec (post-v2.9.0 candidate) + orchestrator docs (guide/cookbook/REFCARD/homepage) + commands.md count fix + argument-hint inline help on 10 r: commands. 232 pytest + test-all 36/36. 35 commands (no surface change).
 last_release_prior_2: 2026-06-12 v2.8.0 (PR #27 feature→dev, PR #28 dev→main merge 0a70e97, release https://github.com/Data-Wise/rforge/releases/tag/v2.8.0; CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#119 MERGED — origin/main formula+manifest → v2.8.0, sha256 9dc3c5d2…, ruby -c OK; --diff shows only pre-existing bin.mkpath drift, no new version/sha drift). Single-source docs version/count: mkdocs-macros render layer + pure-stdlib scripts/version_sync.py (--check CI gate). 35 commands (no surface change). Live-verified REFCARD renders 2.8.0, no literal braces. 230 pytest + test-all 33/33.
@@ -10,6 +11,7 @@ last_release_prior_2: 2026-06-12 v2.8.0 (PR #27 feature→dev, PR #28 dev→main
 last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --universe R-universe early-access tier (lib/runiverse.py, pure-stdlib); 35 commands (flag, not new command). Prior: v2.6.0 (2026-06-10, tap #114) bundled v2.3–v2.6.
 
 worktrees: []  # none active
+# prior: feature/s7-method-missing-class merged (PR #37 → dev 2026-06-13, merge 144324e) + worktree removed;
 # prior: feature/v2.11.0-bundle merged (PR #35 → dev 2026-06-13, merge 0f3f548) + worktree removed;
 # prior: feature/v2.10.0-bundle merged (PR #32 → dev 2026-06-12, merge 85881e8) + worktree removed;
 # prior: feature/phase4-orchestrator merged (PR #29 → dev 2026-06-12, merge d6803ca) + worktree removed;
@@ -279,13 +281,13 @@ decisions:
 
 ## 🎯 Next Action
 
-✅ **v2.10.0 RELEASED (2026-06-13) — no active task.** dev ≡ main @ v2.10.0; no open PRs; no worktrees. Issues #26 (r:s7-review) and #20 (manifest_order) both shipped — close them on GitHub.
+✅ **v2.11.0 RELEASED (2026-06-13) — no active task.** dev ≡ main @ v2.11.0; no open PRs; no worktrees. The three v2.10.0-deferred follow-ups all shipped (diff-aware tagging, s7-review --eco/--runtime, r:use-data/use-citation). 41 commands. pytest 347, test-all 41/41.
 
 Open candidates (all optional, net-new work → own session/worktree):
 
-A) 🟢 **diff-aware `[introduced]`/`[pre-existing]` tagging** — the deferred P0 follow-up. Needs merge-base detached-worktree checkout in `lib/changed.py` (current `--changed` is honest scope-only). Spec: `SPEC-diff-aware-checks-and-coverage-2026-05-31.md`.
-B) 🟢 **`r:s7-review --eco`** + R-backed runtime checks — the v2 sibling deferred from #26. Needs a fresh spec.
-C) 🟢 **Scaffolding follow-ups** — `r:use-*` shipped (v2.10.0); any gaps surfaced by real use.
+A) 🟢 **s7-review `method_on_missing_class`** — the one runtime family deferred from v2.11.0 (can't be decided from the S7 registry alone; ships as a documented placeholder). Needs an approach (e.g. parse `method(generic, Class)` registrations + cross-check class existence).
+B) 🟢 **diff-aware follow-ups** — uncommitted-change tagging + cross-run baseline caching (both explicitly out-of-scope in `SPEC-diff-aware-tagging-2026-06-13.md`).
+C) 🟢 **s7-review breadth** — cross-package S7 *contract* checks (class in pkg A used by pkg B) + R6/S4 OOP (currently S7-only). Both need specs.
 
 Background, no active task:
 
@@ -314,19 +316,32 @@ backlog:
     priority: IMPLEMENTED (feature/r-submit — PR-ready; gates green, pytest 199+2, test-all 31/31)
     spec: docs/specs/SPEC-r-submit-github-prerelease-2026-06-10.md
     notes: "Draft. gh pre-release of submitted tarball, promote on acceptance. No auto-submit."
-  - title: "Phase 4 — discovery engine + agents (post-v2.6.0)"
-    priority: medium
-    notes: "Last craft-parity item. Bumped repeatedly (v2.2.0→…→post-v2.6.0). Still unspecced; feeds off issue #9 signal."
+  - title: "Phase 4 — discovery engine + agents"
+    priority: SHIPPED
+    notes: "Last craft-parity item. SHIPPED: discovery engine in v2.4.0 (lib/discovery.py manifest), agents in v2.9.0 (orchestrator rewrite, PR #29). Craft-parity roadmap COMPLETE."
 
-  # Unscheduled candidates (have specs/brainstorms, no slot yet)
+  # SHIPPED (were unscheduled candidates, now done — kept for provenance)
   - title: "diff-aware checks P0 (--changed)"
+    priority: SHIPPED
+    spec: docs/specs/SPEC-diff-aware-checks-and-coverage-2026-05-31.md → SPEC-diff-aware-tagging-2026-06-13.md
+    notes: "SHIPPED: scope-only v2.10.0, [introduced]/[pre-existing] tagging v2.11.0 (merge-base detached-worktree baseline). Follow-ups (uncommitted/caching) → post-v2.11.0 below."
+  - title: "Scaffolding theme (r:use-*)"
+    priority: SHIPPED
+    spec: docs/specs/SPEC-r-scaffolding-2026-06-10.md + SPEC-r-scaffolding-v2-2026-06-13.md
+    notes: "SHIPPED: r:use-test/use-package/use-vignette v2.10.0; r:use-data/use-citation v2.11.0. 41 commands."
+
+  # Post-v2.11.0 candidates (rforge-native depth, NOT craft-parity; none specced unless noted)
+  - title: "s7-review method_on_missing_class"
     priority: candidate
-    spec: docs/specs/SPEC-diff-aware-checks-and-coverage-2026-05-31.md
-    notes: "Refocused to P0 (2026-06-10); the unbuilt flagship. P1 shipped; P2/P3/P4 migrated to other specs."
-  - title: "Scaffolding theme (r:use-test/r:use-package/r:use-vignette)"
+    spec: docs/specs/SPEC-r-s7-review-eco-2026-06-13.md (Deferred section)
+    notes: "The one runtime family deferred from v2.11.0 — ships as a documented empty placeholder. Not decidable from the S7 method registry alone; needs parse of method(generic, Class) registrations + cross-check class existence. Disclosed in commands/r/s7-review.md."
+  - title: "diff-aware follow-ups (uncommitted tagging + baseline caching)"
     priority: candidate
-    spec: docs/specs/SPEC-r-scaffolding-2026-06-10.md
-    notes: "Now specced (2026-06-10). Mission resolved: EXISTING ecosystems only — r:create dropped. Hybrid engine (usethis infra + Python/AI content), dry-run default. Builds on r:deps-sync (shared DESCRIPTION-patch writer). Competes with Phase 4 for post-v2.6.0."
+    spec: docs/specs/SPEC-diff-aware-tagging-2026-06-13.md (Out of scope)
+    notes: "Baseline is committed merge-base only; dirty working-tree findings count as HEAD's. Each --changed invocation pays one extra check (no cross-run cache). Both explicitly deferred."
+  - title: "s7-review breadth (cross-package contracts + R6/S4)"
+    priority: candidate
+    notes: "Cross-package S7 contract checks (class in pkg A used by pkg B) + R6/S4 OOP (currently S7-only). Both need specs. Natural --eco extension."
 
   # Parked (waits on external signal)
   - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"
@@ -335,6 +350,11 @@ backlog:
     notes: "lib/status.py shipped as a thin faithful port in v1.3.0. The 4-mode contract (default/debug/optimize/release with R subprocess) was descoped pending real-user input on what depth is wanted. Open a new SPEC when there's demand."
 
 shipped:
+  - "v2.11.0 — 2026-06-13 — bundle: diff-aware [introduced]/[pre-existing] tagging (merge-base detached-worktree baseline, --base/--fail-on, line-shift-immune) + r:s7-review --eco (ecosystem sweep) / --runtime (new lib.rcmd s7runtime engine: dead_generic + validator_not_enforcing) + r:use-data/r:use-citation; 39→41 commands; PR #35/#36; tap #122; 4-dim adversarial review caught 3 BLOCKER+3 IMPORTANT (recurrence of v2.10.0 doc-overclaim + spec-claims-unbuilt classes); pytest 347, test-all 41/41"
+  - "v2.10.0 — 2026-06-13 — bundle: #26 r:s7-review (lib/s7review.py, 5 static families) + scaffolding r:use-test/use-package/use-vignette (lib/scaffold.py+usethis_infra.py) + diff-aware --changed (scope-only, lib/changed.py); 35→39 commands; PR #32/#34; tap #121; adversarial review caught diff-aware false-negative + deps_sync constraint-drop + s7review FPs; pytest 298, test-all 41/41"
+  - "v2.9.0 — 2026-06-12 — Phase 4 orchestrator rewrite (agents/orchestrator.md → python3 -m lib.* delegation, 7 intents, read-only/recommend-only safety gate) + #20 manifest_order + #26 spec; +3 test-all guards (33→36); 35 commands; PR #29/#31; tap #120; last craft-parity item"
+  - "v2.8.0 — 2026-06-12 — single-source docs version/count (mkdocs-macros + scripts/version_sync.py --check CI gate); 35 commands (no surface change); PR #27/#28; tap #119"
+  - "v2.7.0 — 2026-06-11 — r:submit --universe R-universe early-access (lib/runiverse.py, pure-stdlib urllib); 35 commands (flag); PR #24/#25; tap #115; live-verified vs data-wise.r-universe.dev"
   - "v2.6.0 — 2026-06-10 — one release bundling four features accumulated since v2.2.0: cran-incoming hardening (r:check --strict/--incoming + cran-prep strict passes + lib/cranlint.py Tier 4), ecosystem-manifest discovery (lib/discovery.py manifest enrichment + drift, +path-escape guard #19), r:deps-sync (lib/deps_sync.py DESCRIPTION↔code reconciliation), r:submit (lib/ghrelease.py GitHub pre-release + CRAN submit handoff); 33→35 commands; PR #23; tap PR #114 pending"
   - "v2.2.0 — 2026-06-02 — CRAN-submission suite: r:cran-prep orchestrator + r:revdep/r:goodpractice/r:winbuilder/r:rhub + r:check NOTE classifier (spurious/real); 28→33 commands; argument-hint added to all 17 commands lacking it; new tutorials: r-dev-cycle + cran-submission-with-rforge; workflow flowcharts updated"
   - "v2.1.0 — 2026-05-31 — 12 new r: commands (r:load, r:document, r:test, r:coverage, r:build, r:install, r:site, r:cycle, r:lint, r:spell, r:urlcheck, r:style) + lib/rcmd.py; 16→28 commands; r:check retrofitted onto lib.rcmd envelope"
