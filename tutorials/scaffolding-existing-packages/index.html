@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://data-wise.github.io/rforge/tutorials/scaffolding-existing-packages/">
       
       
-        <link rel="prev" href="../r-dev-cycle/">
+        <link rel="prev" href="../s7-convention-checking/">
       
       
         <link rel="next" href="../cran-release-prep/">
@@ -818,6 +818,62 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../diff-aware-checks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diff-aware checks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../s7-convention-checking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    S7 convention checking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -918,6 +974,28 @@
     <span class="md-ellipsis">
       
         Part 3: Author a vignette — r:use-vignette
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-4-document-a-dataset-ruse-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 4: Document a dataset — r:use-data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-5-add-a-citation-ruse-citation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 5: Add a citation — r:use-citation
       
     </span>
   </a>
@@ -2217,6 +2295,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#part-4-document-a-dataset-ruse-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 4: Document a dataset — r:use-data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#part-5-add-a-citation-ruse-citation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Part 5: Add a citation — r:use-citation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#putting-it-together" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2267,8 +2367,8 @@
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
-<li><strong>What:</strong> Three <code>r:use-*</code> commands that scaffold a test file, a dependency, and a vignette into an <strong>existing</strong> package.</li>
-<li><strong>Why:</strong> Less boilerplate, fewer forgotten steps (NAMESPACE, VignetteBuilder, testthat infra) — and rforge picks <code>Imports</code> vs <code>Suggests</code> for you.</li>
+<li><strong>What:</strong> Five <code>r:use-*</code> commands that scaffold a test file, a dependency, a vignette, a documented dataset, and a citation into an <strong>existing</strong> package.</li>
+<li><strong>Why:</strong> Less boilerplate, fewer forgotten steps (NAMESPACE, VignetteBuilder, testthat infra, <code>LazyData</code>, <code>inst/CITATION</code>) — and rforge picks <code>Imports</code> vs <code>Suggests</code> for you.</li>
 <li><strong>How:</strong> Everything is <strong>dry-run by default</strong>. Read the plan, then re-run with <code>--write</code>.</li>
 <li><strong>Safety:</strong> No oracle — generated assertions and prose are <code># TODO</code>. The engine never invents expected values.</li>
 <li><strong>Next:</strong> <a href="../r-dev-cycle/">R package dev cycle</a> to run what you scaffolded.</li>
@@ -2395,14 +2495,55 @@ the <code>.Rmd</code> is still written. Once you've filled the outline, build th
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>/rforge:r:check<span class="w">   </span><span class="c1"># confirm the vignette builds under R CMD check</span>
 </span></code></pre></div>
 <hr />
+<h2 id="part-4-document-a-dataset-ruse-data">Part 4: Document a dataset — <code>r:use-data</code><a class="headerlink" href="#part-4-document-a-dataset-ruse-data" title="Permanent link">&para;</a></h2>
+<p>Document a package dataset: append a roxygen stub to <code>R/data.R</code> (<code>@title</code>, a <code>@format
+\describe{}</code> skeleton, <code>@source</code>, and the trailing <code>"&lt;name&gt;"</code> documented-data idiom) and
+patch <code>DESCRIPTION</code> (<code>LazyData: true</code> / <code>Depends: R (&gt;= 2.10)</code>).</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Dry-run: see the roxygen stub + the DESCRIPTION delta it would apply</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>/rforge:r:use-data<span class="w"> </span>starwars
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Apply: append to R/data.R (creates it if absent) + patch DESCRIPTION</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>/rforge:r:use-data<span class="w"> </span>starwars<span class="w"> </span>--write
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">It documents — it never fabricates the data</p>
+<p><code>r:use-data</code> does <strong>not</strong> create the <code>data/&lt;name&gt;.rda</code>. The dataset is yours; the
+command prints the exact <code>usethis::use_data(&lt;name&gt;)</code> reminder to produce it. A
+collision guard skips a duplicate <code>\name</code> block if the dataset is already documented.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Constraints are preserved</p>
+<p>The <code>DESCRIPTION</code> patch goes through the same constraint-preserving writer as
+<code>r:use-package</code> / <code>r:deps-sync</code> — existing version floors like <code>foo (&gt;= 1.2.0)</code> survive.</p>
+</div>
+<hr />
+<h2 id="part-5-add-a-citation-ruse-citation">Part 5: Add a citation — <code>r:use-citation</code><a class="headerlink" href="#part-5-add-a-citation-ruse-citation" title="Permanent link">&para;</a></h2>
+<p>Scaffold <code>inst/CITATION</code> from <code>DESCRIPTION</code> (<code>Title</code> / <code>Authors@R</code> → <code>person()</code> / <code>Version</code>)
+as a <code>bibentry(bibtype = "Manual", ...)</code>.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Dry-run: see the rendered bibentry</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>/rforge:r:use-citation
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Apply: write inst/CITATION (refuses to clobber an existing one without --force)</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>/rforge:r:use-citation<span class="w"> </span>--write
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>/rforge:r:use-citation<span class="w"> </span>--write<span class="w"> </span>--force<span class="w">   </span><span class="c1"># overwrite an existing CITATION</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Deterministic — no wall-clock date</p>
+<p>The year comes from the <code>DESCRIPTION</code> <code>Date:</code> field if present, else a <code>&lt;YEAR&gt;</code> TODO
+placeholder — the output never embeds the current date, so re-running is reproducible.
+Unparseable <code>Authors@R</code> degrades to a <code># TODO</code> author block plus a warning (never fails).</p>
+</div>
+<hr />
 <h2 id="putting-it-together">Putting it together<a class="headerlink" href="#putting-it-together" title="Permanent link">&para;</a></h2>
-<p>A realistic "add a feature, document it" pass:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:r:use-package<span class="w"> </span>rlang<span class="w"> </span>--write<span class="w">     </span><span class="c1"># 1. declare the dep</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>/rforge:r:document<span class="w">                      </span><span class="c1"># 2. regenerate NAMESPACE</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>/rforge:r:use-test<span class="w"> </span>my_new_function<span class="w"> </span>--write<span class="w">   </span><span class="c1"># 3. scaffold tests, then fill the TODOs</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>/rforge:r:test<span class="w">                          </span><span class="c1"># 4. run them</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>/rforge:r:use-vignette<span class="w"> </span>intro<span class="w"> </span>--write<span class="w">    </span><span class="c1"># 5. scaffold a vignette, then expand it</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>/rforge:r:site<span class="w">                          </span><span class="c1"># 6. build the site</span>
+<p>A realistic "add a feature, document it, ship the data + citation" pass:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/rforge:r:use-package<span class="w"> </span>rlang<span class="w"> </span>--write<span class="w">          </span><span class="c1"># 1. declare the dep</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>/rforge:r:document<span class="w">                           </span><span class="c1"># 2. regenerate NAMESPACE</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>/rforge:r:use-test<span class="w"> </span>my_new_function<span class="w"> </span>--write<span class="w">   </span><span class="c1"># 3. scaffold tests, then fill the TODOs</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>/rforge:r:test<span class="w">                               </span><span class="c1"># 4. run them</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>/rforge:r:use-vignette<span class="w"> </span>intro<span class="w"> </span>--write<span class="w">         </span><span class="c1"># 5. scaffold a vignette, then expand it</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>/rforge:r:use-data<span class="w"> </span>demo_data<span class="w"> </span>--write<span class="w">         </span><span class="c1"># 6. document a bundled dataset</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>/rforge:r:use-citation<span class="w"> </span>--write<span class="w">               </span><span class="c1"># 7. scaffold inst/CITATION</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>/rforge:r:site<span class="w">                               </span><span class="c1"># 8. build the site</span>
 </span></code></pre></div>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>

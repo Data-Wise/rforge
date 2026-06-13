@@ -923,6 +923,62 @@
   
   
     <li class="md-nav__item">
+      <a href="diff-aware-checks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diff-aware checks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="s7-convention-checking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    S7 convention checking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="scaffolding-existing-packages/" class="md-nav__link">
         
   
@@ -2289,6 +2345,26 @@ scenario and walks through the exact commands and expected output.</p>
 <td>~10 min</td>
 </tr>
 <tr>
+<td>Separating <em>your</em> regressions from pre-existing debt before merge</td>
+<td><a href="diff-aware-checks/">Diff-aware checks</a></td>
+<td>~8 min</td>
+</tr>
+<tr>
+<td>Auditing S7 OOP conventions (static / ecosystem / runtime)</td>
+<td><a href="s7-convention-checking/">S7 convention checking</a></td>
+<td>~10 min</td>
+</tr>
+<tr>
+<td>Scaffolding tests, deps, vignettes, data, citations into a package</td>
+<td><a href="scaffolding-existing-packages/">Scaffolding existing packages</a></td>
+<td>~10 min</td>
+</tr>
+<tr>
+<td>Asking the orchestrator agent a <em>goal</em> instead of picking commands</td>
+<td><a href="orchestrator-cookbook/">Orchestrator cookbook</a></td>
+<td>~10 min</td>
+</tr>
+<tr>
 <td>Preparing a CRAN submission — ecosystem ordering</td>
 <td><a href="cran-release-prep/">CRAN release prep</a></td>
 <td>~15 min</td>
@@ -2346,6 +2422,18 @@ scenario and walks through the exact commands and expected output.</p>
   use: <code>r:load</code>, <code>r:document</code>, <code>r:test</code>, <code>r:check</code>, <code>r:cycle</code> (dev loop) +
   <code>r:lint</code>, <code>r:spell</code>, <code>r:urlcheck</code>, <code>r:style</code>, <code>r:coverage</code>, <code>r:build</code>,
   <code>r:install</code>, <code>r:site</code> (quality layer). ~10 min.</li>
+<li><strong><a href="diff-aware-checks/">Diff-aware checks</a></strong> — <code>--changed</code> on
+  <code>r:check</code>/<code>r:test</code>/<code>r:lint</code>: tag findings <code>[introduced]</code> vs <code>[pre-existing]</code>
+  via a merge-base baseline run, and gate CI with <code>--fail-on introduced</code>. ~8 min.</li>
+<li><strong><a href="s7-convention-checking/">S7 convention checking</a></strong> — <code>r:s7-review</code>
+  static (pure-Python), <code>--eco</code> ecosystem sweep, and <code>--runtime</code> (R-backed:
+  dead generics, non-enforcing validators, unreachable methods). ~10 min.</li>
+<li><strong><a href="scaffolding-existing-packages/">Scaffolding existing packages</a></strong> — the
+  five <code>r:use-*</code> commands (test, package, vignette, data, citation),
+  dry-run by default. ~10 min.</li>
+<li><strong><a href="orchestrator-cookbook/">Orchestrator cookbook</a></strong> — ask the orchestrator
+  agent a <em>goal</em> ("is this CRAN-ready?") and let it run the right read-only
+  analyses. ~10 min.</li>
 <li><strong><a href="cran-release-prep/">CRAN release prep</a></strong> — Ecosystem-level pipeline:
   <code>/rforge:docs:check</code> → <code>/rforge:r:cran-prep</code> → <code>/rforge:thorough</code> →
   <code>/rforge:release</code>. ~15 min.</li>

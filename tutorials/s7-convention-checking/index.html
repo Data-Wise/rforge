@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-diff-aware-checks-and-coverage-2026-05-31/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/tutorials/s7-convention-checking/">
       
       
-        <link rel="prev" href="../SPEC-phase3-namespacing-2026-05-11/">
+        <link rel="prev" href="../diff-aware-checks/">
       
       
-        <link rel="next" href="../SPEC-r-dev-commands-2026-05-31/">
+        <link rel="next" href="../scaffolding-existing-packages/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Diff-aware checks & coverage - RForge Plugin</title>
+        <title>S7 convention checking - RForge Plugin</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#spec-feature-request-diff-aware-checks-coverage-and-ecosystem-note-classification" class="md-skip">
+        <a href="#s7-convention-checking-rs7-review" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Diff-aware checks & coverage
+              S7 convention checking
             
           </span>
         </div>
@@ -264,10 +264,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../../workflows/" class="md-tabs__link">
           
   
@@ -304,12 +306,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../../architecture/" class="md-tabs__link">
           
   
@@ -539,24 +539,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -574,7 +579,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -620,7 +625,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -648,7 +653,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/getting-started/" class="md-nav__link">
+      <a href="../getting-started/" class="md-nav__link">
         
   
   
@@ -676,7 +681,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
+      <a href="../rforge-in-the-r-lifecycle/" class="md-nav__link">
         
   
   
@@ -704,7 +709,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/understanding-modes/" class="md-nav__link">
+      <a href="../understanding-modes/" class="md-nav__link">
         
   
   
@@ -732,7 +737,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/ecosystem-orchestration/" class="md-nav__link">
+      <a href="../ecosystem-orchestration/" class="md-nav__link">
         
   
   
@@ -760,7 +765,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/orchestrator-cookbook/" class="md-nav__link">
+      <a href="../orchestrator-cookbook/" class="md-nav__link">
         
   
   
@@ -788,7 +793,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/r-dev-cycle/" class="md-nav__link">
+      <a href="../r-dev-cycle/" class="md-nav__link">
         
   
   
@@ -816,7 +821,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/diff-aware-checks/" class="md-nav__link">
+      <a href="../diff-aware-checks/" class="md-nav__link">
         
   
   
@@ -841,10 +846,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../tutorials/s7-convention-checking/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    S7 convention checking
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -860,6 +892,109 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-three-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The three modes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-families" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The families
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#walkthrough" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Walkthrough
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Walkthrough">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-static-review-the-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Static review (the default)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-ecosystem-sweep-eco" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Ecosystem sweep — --eco
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-runtime-pass-runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Runtime pass — --runtime
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -872,7 +1007,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/scaffolding-existing-packages/" class="md-nav__link">
+      <a href="../scaffolding-existing-packages/" class="md-nav__link">
         
   
   
@@ -900,7 +1035,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/cran-release-prep/" class="md-nav__link">
+      <a href="../cran-release-prep/" class="md-nav__link">
         
   
   
@@ -928,7 +1063,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/cran-submission-with-rforge/" class="md-nav__link">
+      <a href="../cran-submission-with-rforge/" class="md-nav__link">
         
   
   
@@ -956,7 +1091,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/r-universe-early-access/" class="md-nav__link">
+      <a href="../r-universe-early-access/" class="md-nav__link">
         
   
   
@@ -984,7 +1119,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/migrate-from-mcp/" class="md-nav__link">
+      <a href="../migrate-from-mcp/" class="md-nav__link">
         
   
   
@@ -1635,29 +1770,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -1675,7 +1805,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1746,8 +1876,6 @@
                 
   
   
-    
-  
   
   
     
@@ -1758,11 +1886,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
         
           
           <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
@@ -1783,7 +1911,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1801,7 +1929,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../../specs/" class="md-nav__link">
         
   
   
@@ -1829,7 +1957,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
+      <a href="../../specs/SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
         
   
   
@@ -1857,7 +1985,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
+      <a href="../../specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
         
   
   
@@ -1882,37 +2010,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Diff-aware checks & coverage
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../specs/SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
         
   
   
@@ -1928,136 +2029,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#status-refocus-2026-06-10" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Status &amp; refocus (2026-06-10)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#summary" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Summary
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#p0-changed-diff-aware-mode-for-rforgercheck" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        P0 — --changed / diff-aware mode for /rforge:r:check
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#p1-rforgercoverage-using-package_coverage-correctly" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        P1 — /rforge:r:coverage using package_coverage() correctly
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#p2-auto-handle-missing-suggests-packages" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        P2 — Auto-handle missing Suggests packages
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#p3-ecosystem-aware-note-classification" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        P3 — Ecosystem-aware NOTE classification
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#p4-test-authoring-scaffold-rforgertest-gen" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        P4 — Test-authoring scaffold (/rforge:r:test-gen)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#p5-minor-worktree-collision-guard" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        P5 (minor) — Worktree-collision guard
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#prioritization" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prioritization
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#acceptance-sketch-p0" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Acceptance sketch (P0)
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2070,7 +2041,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
+      <a href="../../specs/SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
         
   
   
@@ -2275,10 +2246,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#status-refocus-2026-06-10" class="md-nav__link">
+  <a href="#the-three-modes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Status &amp; refocus (2026-06-10)
+        The three modes
       
     </span>
   </a>
@@ -2286,10 +2257,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#summary" class="md-nav__link">
+  <a href="#the-families" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Summary
+        The families
       
     </span>
   </a>
@@ -2297,87 +2268,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#p0-changed-diff-aware-mode-for-rforgercheck" class="md-nav__link">
+  <a href="#walkthrough" class="md-nav__link">
     <span class="md-ellipsis">
       
-        P0 — --changed / diff-aware mode for /rforge:r:check
+        Walkthrough
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Walkthrough">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-static-review-the-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Static review (the default)
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#p1-rforgercoverage-using-package_coverage-correctly" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#2-ecosystem-sweep-eco" class="md-nav__link">
     <span class="md-ellipsis">
       
-        P1 — /rforge:r:coverage using package_coverage() correctly
+        2. Ecosystem sweep — --eco
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#p2-auto-handle-missing-suggests-packages" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#3-runtime-pass-runtime" class="md-nav__link">
     <span class="md-ellipsis">
       
-        P2 — Auto-handle missing Suggests packages
+        3. Runtime pass — --runtime
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#p3-ecosystem-aware-note-classification" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        P3 — Ecosystem-aware NOTE classification
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#p4-test-authoring-scaffold-rforgertest-gen" class="md-nav__link">
+  <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
-        P4 — Test-authoring scaffold (/rforge:r:test-gen)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#p5-minor-worktree-collision-guard" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        P5 (minor) — Worktree-collision guard
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#prioritization" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prioritization
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#acceptance-sketch-p0" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Acceptance sketch (P0)
+        See also
       
     </span>
   </a>
@@ -2401,7 +2345,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-diff-aware-checks-and-coverage-2026-05-31.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/tutorials/s7-convention-checking.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2409,187 +2353,138 @@
   
 
 
-<h1 id="spec-feature-request-diff-aware-checks-coverage-and-ecosystem-note-classification">SPEC / Feature Request: Diff-Aware Checks, Coverage, and Ecosystem NOTE Classification<a class="headerlink" href="#spec-feature-request-diff-aware-checks-coverage-and-ecosystem-note-classification" title="Permanent link">&para;</a></h1>
-<p><strong>Date:</strong> 2026-05-31
-<strong>Author:</strong> Davood Tofighi (with Claude Code)
-<strong>Status:</strong> Draft — <strong>refocused to P0</strong> (2026-06-10); P1–P5 migrated (see below)
-<strong>Origin:</strong> Friction encountered using rforge (<code>/rforge:r:check</code>, <code>/rforge:docs:check</code>) across a
-3-package ecosystem change (RMediation + medfit covariance work) under the workflow
-"address all issues and errors before merging."</p>
-<hr />
-<h2 id="status-refocus-2026-06-10">Status &amp; refocus (2026-06-10)<a class="headerlink" href="#status-refocus-2026-06-10" title="Permanent link">&para;</a></h2>
-<p>This started as a 6-item wishlist; events have since absorbed most of it. <strong>The live scope of
-this spec is now P0 only</strong> — <code>--changed</code> diff-aware checks, the one high-value item still
-unbuilt. The rest are migrated:</p>
-<table>
-<thead>
-<tr>
-<th>Item</th>
-<th>Disposition</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>P0</strong> <code>--changed</code> diff-aware check</td>
-<td><strong>LIVE — the focus of this spec.</strong> Still unbuilt. Candidate target: post-v2.6.0 (unscheduled).</td>
-</tr>
-<tr>
-<td>P1 <code>r:coverage</code> (package_coverage)</td>
-<td>✅ base <strong>shipped v2.1.0</strong>; the <code>--changed</code> slice folds into P0's diff-aware mode.</td>
-</tr>
-<tr>
-<td>P2 auto-handle missing <code>Suggests</code> (<code>_R_CHECK_FORCE_SUGGESTS_</code>)</td>
-<td>→ <strong><code>SPEC-cran-incoming-hardening</code></strong> (v2.3.0), which owns the <code>_R_CHECK_*</code> flavor surface.</td>
-</tr>
-<tr>
-<td>P3 ecosystem-aware NOTE classification</td>
-<td>partly done by the v2.2.0 NOTE classifier; the ecosystem-metadata half → <strong><code>SPEC-ecosystem-manifest-discovery</code></strong> (v2.4.0).</td>
-</tr>
-<tr>
-<td>P4 <code>r:test-gen</code> scaffold</td>
-<td>→ the deferred <strong>scaffolding theme</strong> (<code>r:use-test</code>), its own future spec.</td>
-</tr>
-<tr>
-<td>P5 worktree-collision guard</td>
-<td>minor; keep as a parked note under P0.</td>
-</tr>
-</tbody>
-</table>
-<p>Everything below P0 is retained for historical context only; act on <strong>P0</strong>.</p>
-<hr />
-<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
-<p>rforge's check/test/docs commands answer <em>"is this package healthy right now?"</em> well. But real PR
-work keeps asking a different question: <em>"did </em><em>my change</em><em> introduce this, and is it actionable?"</em>
-— and that is currently a manual, error-prone chore. This proposes five enhancements, ranked by the
-time they would have saved this session.</p>
-<hr />
-<h2 id="p0-changed-diff-aware-mode-for-rforgercheck">P0 — <code>--changed</code> / diff-aware mode for <code>/rforge:r:check</code><a class="headerlink" href="#p0-changed-diff-aware-mode-for-rforgercheck" title="Permanent link">&para;</a></h2>
-<p><strong>Problem.</strong> <code>R CMD check</code> runs on the whole package, so every NOTE/WARNING surfaces regardless of
-whether the branch caused it. I repeatedly ran <code>git diff &lt;base&gt;..HEAD --name-only</code> and reasoned by
-hand about whether each finding was <em>mine</em> or <em>pre-existing</em>. Example: a medfit vignette WARNING
-looked like a blocker until I confirmed it pre-existed on <code>dev</code> (the branch touched 4 unrelated
-files).</p>
-<p><strong>Request.</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/rforge:r:check --changed [--base dev]
-</span></code></pre></div>
-<ol>
-<li>Run the check (or reuse a cached run).</li>
-<li>Diff findings against a check of <code>git merge-base HEAD &lt;base&gt;</code>.</li>
-<li>Tag each NOTE/WARNING/ERROR <strong><code>[introduced]</code></strong> vs <strong><code>[pre-existing]</code></strong>.</li>
-<li>Exit non-zero only on <em>introduced</em> findings (configurable).</li>
-</ol>
-<p><strong>Impact.</strong> Highest-value item — directly answers the merge-gate question.</p>
-<hr />
-<h2 id="p1-rforgercoverage-using-package_coverage-correctly">P1 — <code>/rforge:r:coverage</code> using <code>package_coverage()</code> correctly<a class="headerlink" href="#p1-rforgercoverage-using-package_coverage-correctly" title="Permanent link">&para;</a></h2>
-<p><strong>Problem.</strong> <code>covr::file_coverage("R/x.R", "tests/.../test-x.R")</code> <strong>fails</strong>: it sources the test file
-in isolation without testthat's harness, so <code>skip_if_not_installed()</code>, <code>test_that()</code>, etc. throw
-"could not find function" and the result reads as 0%/uncovered — a misleading false signal.</p>
-<p><strong>Request.</strong> A coverage command that:
-1. Uses <code>covr::package_coverage()</code> (loads package + full test infra), not <code>file_coverage()</code>.
-2. Supports <code>--changed</code> to report coverage only for functions/lines modified on the branch
-   (git-diff-scoped), per-function.
-3. Surfaces the <code>file_coverage</code> helper-loading pitfall if a user asks for single-file coverage.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>/rforge:r:coverage --changed --base dev
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a># R/ci_medfit.R: ci_mediation_data 100%, ci_serial_mediation_data 96%, .resolve_path_indices 100%
-</span></code></pre></div>
-<hr />
-<h2 id="p2-auto-handle-missing-suggests-packages">P2 — Auto-handle missing <code>Suggests</code> packages<a class="headerlink" href="#p2-auto-handle-missing-suggests-packages" title="Permanent link">&para;</a></h2>
-<p><strong>Problem.</strong> An uninstalled <code>Suggests</code> dep (e.g. <code>OpenMx</code>) makes <code>R CMD check</code> emit a hard <strong>ERROR</strong>
-(<code>Package suggested but not available</code>), masking true health. I set <code>_R_CHECK_FORCE_SUGGESTS_=false</code>
-on every invocation by hand.</p>
-<p><strong>Request.</strong> <code>/rforge:r:check</code> should detect uninstalled <code>Suggests</code>, then either auto-set
-<code>_R_CHECK_FORCE_SUGGESTS_=false</code> (noting it in output) or offer to install — and report which
-suggest-gated checks were skipped, so reduced coverage is explicit rather than read as breakage.</p>
-<hr />
-<h2 id="p3-ecosystem-aware-note-classification">P3 — Ecosystem-aware NOTE classification<a class="headerlink" href="#p3-ecosystem-aware-note-classification" title="Permanent link">&para;</a></h2>
-<p><strong>Problem.</strong> RMediation's only remaining NOTE was <code>Unknown field 'Remotes'</code> + <code>Suggests not in
-mainstream repositories: medfit</code>. Correct and expected for an ecosystem package depending on a
-sibling not yet on CRAN — but a naive reading treats it as actionable, risking a "fix" that deletes
-<code>Remotes:</code> and breaks pre-CRAN install.</p>
-<p><strong>Request.</strong> rforge already models the ecosystem (<code>/rforge:deps</code>, <code>/rforge:status</code>). Classify such
-NOTEs from that manifest:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>NOTE: Remotes / medfit not in mainstream repositories
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  -&gt; [ecosystem-expected] medfit is a GitHub-only sibling pending CRAN.
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>     Clears automatically when medfit is published. Do NOT remove Remotes:.
-</span></code></pre></div>
-<hr />
-<h2 id="p4-test-authoring-scaffold-rforgertest-gen">P4 — Test-authoring scaffold (<code>/rforge:r:test-gen</code>)<a class="headerlink" href="#p4-test-authoring-scaffold-rforgertest-gen" title="Permanent link">&para;</a></h2>
-<p><strong>Problem.</strong> rforge runs/validates tests but cannot <em>author</em> them. After changing a function I
-hand-wrote fixtures (S7 constructors with every required slot) and risked gaps. (<code>craft:test:gen</code>
-exists but is not R/testthat/S7-aware.)</p>
-<p><strong>Request.</strong> Given a changed exported function, scaffold a <code>tests/testthat/test-&lt;fn&gt;.R</code> that:
-1. Reads signature + roxygen <code>@examples</code> + the S7/S4 classes of its arguments.
-2. Emits a fixture builder (from the class definition's required properties) and stub <code>test_that()</code>
-   blocks for: happy path, each documented <code>stop()</code>, and <code>@param</code>-constraint edge cases.
-3. Leaves assertions as <code># TODO</code> — does <strong>not</strong> guess expected values.</p>
+<h1 id="s7-convention-checking-rs7-review">🧬 S7 convention checking — <code>r:s7-review</code><a class="headerlink" href="#s7-convention-checking-rs7-review" title="Permanent link">&para;</a></h1>
+<div class="admonition tip">
+<p class="admonition-title">TL;DR (30 seconds)</p>
+<ul>
+<li><strong>What:</strong> <code>r:s7-review</code> audits <a href="https://rconsortium.github.io/S7/">S7</a> (the modern R
+  OOP system) for convention issues — naming, validators, methods, legacy leftovers,
+  and docs.</li>
+<li><strong>Static (default):</strong> pure-Python, no R — parses <code>R/*.R</code> + <code>NAMESPACE</code>. Fast,
+  runs anywhere.</li>
+<li><strong><code>--eco</code>:</strong> sweep the static families across <strong>every package</strong> in your ecosystem
+  manifest, with a per-package + roll-up report.</li>
+<li><strong><code>--runtime</code>:</strong> an R-backed pass that <em>loads</em> the package and introspects S7 at
+  runtime — catches dead generics, non-enforcing validators, and unreachable methods
+  that source parsing can't see.</li>
+<li><strong>Always advisory</strong> — worded "looks like / consider", never "must"; exit 0 always.</li>
+<li><strong>Next:</strong> <a href="../r-dev-cycle/">R package dev cycle</a> to fix and re-check.</li>
+</ul>
+</div>
 <blockquote>
-<p>Explicitly a <em>scaffold</em>, not an oracle. A real bug this session — a test asserting the naive
-product <code>a*b</code> for a delta-method estimate that is actually bias-corrected to <code>a*b + cov(a,b)</code> —
-shows generated <strong>assertions</strong> must not be trusted; the human/agent supplies expected values.</p>
+<p><strong>For whom:</strong> Author of an R package (or ecosystem) that uses S7 classes/generics.
+<strong>Estimated time:</strong> 10 minutes.
+<strong>Prior knowledge:</strong> A package using S7, registered with <code>/rforge:init</code>. <code>--runtime</code>
+additionally needs R + the <code>S7</code>/<code>pkgload</code> packages installed.</p>
 </blockquote>
 <hr />
-<h2 id="p5-minor-worktree-collision-guard">P5 (minor) — Worktree-collision guard<a class="headerlink" href="#p5-minor-worktree-collision-guard" title="Permanent link">&para;</a></h2>
-<p><strong>Problem.</strong> Running <code>/rforge:r:check</code> on a worktree while a background agent edits files there can
-race. <strong>Request:</strong> detect a concurrent writer and warn, or offer a read-only snapshot check.</p>
-<hr />
-<h2 id="prioritization">Prioritization<a class="headerlink" href="#prioritization" title="Permanent link">&para;</a></h2>
+<h2 id="the-three-modes">The three modes<a class="headerlink" href="#the-three-modes" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart TD
+    A["/rforge:r:s7-review"] --&gt; B{"scope?"}
+    B -- "this package, fast" --&gt; C["STATIC (default)&lt;br/&gt;pure-Python, parses R/*.R + NAMESPACE"]
+    B -- "--eco" --&gt; D["ECOSYSTEM SWEEP&lt;br/&gt;static families × every package&lt;br/&gt;(via the manifest)"]
+    B -- "--runtime" --&gt; E["RUNTIME PASS&lt;br/&gt;load the package, introspect S7&lt;br/&gt;(needs R + S7)"]
+    C --&gt; F["5 static families"]
+    D --&gt; F
+    E --&gt; G["2 runtime families"]
+    F --&gt; H["advisory envelope&lt;br/&gt;(looks like / consider)"]
+    G --&gt; H
+    E -. "R/S7 absent" .-&gt; I["degrades to advisory warn&lt;br/&gt;(static result intact, exit 0)"]</code></pre>
+<h2 id="the-families">The families<a class="headerlink" href="#the-families" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>#</th>
-<th>Feature</th>
-<th>Effort</th>
-<th>Value</th>
+<th>Family</th>
+<th>Mode</th>
+<th>Example finding codes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>P0</td>
-<td><code>--changed</code> diff-aware check</td>
-<td>Medium</td>
-<td>⭐⭐⭐⭐⭐</td>
+<td>naming</td>
+<td>static</td>
+<td><code>class_name_case</code>, <code>generic_name_case</code>, <code>prop_name_case</code></td>
 </tr>
 <tr>
-<td>P1</td>
-<td><code>/rforge:r:coverage</code> (package_coverage, diff-scoped)</td>
-<td>Medium</td>
-<td>⭐⭐⭐⭐</td>
+<td>validators</td>
+<td>static</td>
+<td><code>missing_validator</code>, <code>validator_return_shape</code></td>
 </tr>
 <tr>
-<td>P2</td>
-<td>Auto-handle missing Suggests</td>
-<td>Low</td>
-<td>⭐⭐⭐⭐</td>
+<td>methods</td>
+<td>static</td>
+<td><code>dangling_method</code>, <code>missing_methods_register</code></td>
 </tr>
 <tr>
-<td>P3</td>
-<td>Ecosystem-aware NOTE classification</td>
-<td>Low–Med</td>
-<td>⭐⭐⭐</td>
+<td>legacy</td>
+<td>static</td>
+<td><code>legacy_s4_in_s7</code>, <code>legacy_r5_in_s7</code>, <code>legacy_s3_generic</code></td>
 </tr>
 <tr>
-<td>P4</td>
-<td>Test-authoring scaffold</td>
-<td>High</td>
-<td>⭐⭐⭐</td>
+<td>docs</td>
+<td>static</td>
+<td><code>undocumented_export</code>, <code>prop_type_unresolvable</code></td>
 </tr>
 <tr>
-<td>P5</td>
-<td>Worktree-collision guard</td>
-<td>Low</td>
-<td>⭐⭐</td>
+<td>method-dispatch</td>
+<td><code>--runtime</code></td>
+<td><code>dead_generic</code>, <code>method_on_missing_class</code></td>
+</tr>
+<tr>
+<td>validator-runtime</td>
+<td><code>--runtime</code></td>
+<td><code>validator_not_enforcing</code></td>
 </tr>
 </tbody>
 </table>
-<p><strong>Recommended first cut:</strong> P0 + P2 — cheapest high-value pair, directly serving the
-"address all issues before merging" workflow.</p>
-<hr />
-<h2 id="acceptance-sketch-p0">Acceptance sketch (P0)<a class="headerlink" href="#acceptance-sketch-p0" title="Permanent link">&para;</a></h2>
+<h2 id="walkthrough">Walkthrough<a class="headerlink" href="#walkthrough" title="Permanent link">&para;</a></h2>
+<h3 id="1-static-review-the-default">1. Static review (the default)<a class="headerlink" href="#1-static-review-the-default" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Audit the current package — pure-Python, no R needed</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>/rforge:r:s7-review
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># A specific package, JSON for tooling</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>/rforge:r:s7-review<span class="w"> </span>path/to/pkg<span class="w"> </span>--format<span class="w"> </span>json
+</span></code></pre></div>
+<h3 id="2-ecosystem-sweep-eco">2. Ecosystem sweep — <code>--eco</code><a class="headerlink" href="#2-ecosystem-sweep-eco" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Run the static families across every package in the manifest</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>/rforge:r:s7-review<span class="w"> </span>--eco
+</span></code></pre></div>
+<p>Packages are ordered by the manifest's <code>manifest_order</code>; a package that fails to parse
+becomes a per-package <code>warn</code> and never aborts the sweep.</p>
+<h3 id="3-runtime-pass-runtime">3. Runtime pass — <code>--runtime</code><a class="headerlink" href="#3-runtime-pass-runtime" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Load the package and introspect S7 at runtime</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>/rforge:r:s7-review<span class="w"> </span>--runtime
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Compose: sweep the ecosystem AND run the runtime pass per package</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>/rforge:r:s7-review<span class="w"> </span>--eco<span class="w"> </span>--runtime
+</span></code></pre></div>
+<p>The runtime pass adds three checks source parsing can't make:</p>
 <ul>
-<li>[ ] <code>/rforge:r:check --changed --base &lt;branch&gt;</code> tags every finding introduced vs pre-existing.</li>
-<li>[ ] Exit code reflects introduced findings only (flag-configurable).</li>
-<li>[ ] Works on a git worktree and a normal checkout.</li>
-<li>[ ] Falls back gracefully (full check + warning) when no merge-base resolves.</li>
+<li><strong><code>dead_generic</code></strong> — an S7 generic with <strong>no registered method</strong> (dispatch can never resolve).</li>
+<li><strong><code>validator_not_enforcing</code></strong> — a validator whose body is a constant no-op, so it accepts
+  a deliberately-invalid property value at runtime (present, but not actually enforcing).</li>
+<li><strong><code>method_on_missing_class</code></strong> — a method whose dispatch class has <strong>no resolvable
+  namespace binding</strong> (e.g. an inline <code>new_class()</code> left in a <code>method()</code> call) — nothing
+  can ever construct that class, so the method is unreachable.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Runtime degrades gracefully</p>
+<p><code>--runtime</code> needs R + S7 + <code>pkgload</code>. When they're absent (or load fails), the runtime
+stages degrade to advisory <code>warn</code> ("runtime pass skipped: …") — the static result is
+always intact and the command always exits 0.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Why object identity, not name</p>
+<p><code>method_on_missing_class</code> resolves classes by <strong>object identity</strong> over the package's
+classes, not by <code>@name</code> — so the idiomatic <code>Foo &lt;- new_class("Bar")</code> (binding name ≠
+<code>@name</code>) is correctly <strong>not</strong> flagged. Base types and imported classes are also excluded.</p>
+</div>
+<h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../reference/s7review/"><code>s7review</code> reference</a> — the <code>lib.s7review</code> engine + family details</li>
+<li><a href="../../reference/rcmd/"><code>rcmd</code> reference</a> — the <code>s7runtime</code> R engine behind <code>--runtime</code></li>
+<li><a href="../ecosystem-orchestration/">Ecosystem orchestration</a> — the <code>--eco</code> manifest model</li>
+<li><a href="../r-dev-cycle/">R package dev cycle</a> — fix findings, then re-review</li>
 </ul>
 
 

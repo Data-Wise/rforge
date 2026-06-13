@@ -679,6 +679,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#diff-aware-merge-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔬 Diff-aware merge gate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#s7-convention-checking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧬 S7 convention checking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ecosystem-daily-loop" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -947,6 +969,62 @@
     
   
     R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/diff-aware-checks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diff-aware checks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/s7-convention-checking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    S7 convention checking
   
 
     
@@ -2228,6 +2306,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#diff-aware-merge-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔬 Diff-aware merge gate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#s7-convention-checking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧬 S7 convention checking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ecosystem-daily-loop" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2365,6 +2465,30 @@ tutorial that walks it through in detail.</p>
     H -- "style issues" --&gt; J["/rforge:r:style\n(auto-fix formatting)"]
     J --&gt; G</code></pre>
 <p>→ <a href="../tutorials/r-dev-cycle/">R package dev cycle</a> (~10 min)</p>
+<h2 id="diff-aware-merge-gate">🔬 Diff-aware merge gate<a class="headerlink" href="#diff-aware-merge-gate" title="Permanent link">&para;</a></h2>
+<p>Before merging a branch: separate the findings <em>you</em> introduced from pre-existing debt.</p>
+<pre class="mermaid"><code>flowchart TD
+    A["/rforge:r:check --changed --base dev"] --&gt; B{"merge-base found?"}
+    B -- "no" --&gt; Z["full check + warning&lt;br/&gt;(scope-only fallback)"]
+    B -- "yes" --&gt; C["baseline run in a detached&lt;br/&gt;worktree at the merge-base"]
+    C --&gt; D["set-diff vs HEAD findings"]
+    D --&gt; E["tag [introduced] / [pre-existing]"]
+    E --&gt; F{"--fail-on introduced?"}
+    F -- "≥1 introduced" --&gt; G["exit non-zero ❌&lt;br/&gt;(fix before merge)"]
+    F -- "none introduced" --&gt; H["exit 0 ✅&lt;br/&gt;(pre-existing debt only)"]</code></pre>
+<p>→ <a href="../tutorials/diff-aware-checks/">Diff-aware checks</a> (~8 min)</p>
+<h2 id="s7-convention-checking">🧬 S7 convention checking<a class="headerlink" href="#s7-convention-checking" title="Permanent link">&para;</a></h2>
+<p>Audit S7 OOP conventions — statically, across the ecosystem, or at runtime.</p>
+<pre class="mermaid"><code>flowchart TD
+    A["/rforge:r:s7-review"] --&gt; B{"scope?"}
+    B -- "this package" --&gt; C["STATIC (default)&lt;br/&gt;pure-Python, 5 families"]
+    B -- "--eco" --&gt; D["ecosystem sweep&lt;br/&gt;static × every package"]
+    B -- "--runtime" --&gt; E["runtime pass (needs R+S7)&lt;br/&gt;dead_generic · validator_not_enforcing&lt;br/&gt;· method_on_missing_class"]
+    C --&gt; F["advisory envelope&lt;br/&gt;(looks like / consider)"]
+    D --&gt; F
+    E --&gt; F
+    E -. "R/S7 absent" .-&gt; G["degrades to warn&lt;br/&gt;(static intact, exit 0)"]</code></pre>
+<p>→ <a href="../tutorials/s7-convention-checking/">S7 convention checking</a> (~10 min)</p>
 <h2 id="ecosystem-daily-loop">🔁 Ecosystem daily loop<a class="headerlink" href="#ecosystem-daily-loop" title="Permanent link">&para;</a></h2>
 <p>The habit: change code with R tools, check the ecosystem with rforge.</p>
 <pre class="mermaid"><code>flowchart TD
