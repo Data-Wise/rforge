@@ -39,6 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--kind x` and `--kind=x` forms), every `lib.<module>` it names exists, and
   every recipe command **actually parses** (no argparse usage error — catches
   wrong flag ordering / missing required args that token checks miss).
+- **`Ecosystem.manifest_order`** (issue #20) — `lib.discovery` now exposes the
+  manifest's package names in *declared* order (empty in the zero-manifest case)
+  via the dataclass field and `to_dict()`, so consumers like `/rforge:status` can
+  render in a curated order rather than disk/alphabetical. Closes the PR #17
+  follow-up gap where manifest order was discarded after enrichment.
 
 ---
 

@@ -117,6 +117,10 @@ class Ecosystem:
     config_found: bool
     config_path: Optional[str] = None
     manifest_path: Optional[str] = None
+    # Issue #20: the manifest's package names in *declared* order (empty in the
+    # zero-manifest case), so consumers like `/rforge:status` can render in a
+    # curated order rather than disk/alphabetical. Disk order stays in `packages`.
+    manifest_order: list[str] = field(default_factory=list)
     drift: Drift = field(default_factory=Drift)
 
     def to_dict(self) -> dict:
@@ -127,6 +131,7 @@ class Ecosystem:
             "config_found": self.config_found,
             "config_path": self.config_path,
             "manifest_path": self.manifest_path,
+            "manifest_order": self.manifest_order,
             "drift": asdict(self.drift),
             "packages": [
                 {**asdict(p), "description": asdict(p.description) if p.description else None}
@@ -452,6 +457,7 @@ def detect_ecosystem(path: str | os.PathLike = ".") -> Ecosystem:
     # Optional manifest enrichment — keyed off `.rforge.yaml`'s `manifest:` path.
     # Degrades silently to the zero-manifest case on any miss; never raises.
     manifest_path: Optional[str] = None
+    manifest_order: list[str] = []
     drift = Drift()
     if config_found:
         manifest_rel = _read_config_manifest_path(root)
@@ -464,6 +470,8 @@ def detect_ecosystem(path: str | os.PathLike = ".") -> Ecosystem:
                 parsed = read_manifest(candidate)
                 if parsed is not None:
                     manifest_path = str(candidate)
+                    # Issue #20: preserve the manifest's declared package order.
+                    manifest_order = [e.name for e in parsed.packages if e.name]
                     drift = _enrich_packages(packages, parsed)
 
     return Ecosystem(
@@ -474,6 +482,7 @@ def detect_ecosystem(path: str | os.PathLike = ".") -> Ecosystem:
         config_found=config_found,
         config_path=str(config_path) if config_found else None,
         manifest_path=manifest_path,
+        manifest_order=manifest_order,
         drift=drift,
     )
 
