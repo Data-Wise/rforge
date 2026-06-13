@@ -904,9 +904,13 @@ def test_s7runtime_e2e_detects_method_on_missing_class(tmp_path):
     (pkg / "NAMESPACE").write_text("import(S7)\n")
     (pkg / "R" / "classes.R").write_text(textwrap.dedent("""\
         Real <- S7::new_class("Real")
+        # binding name != @name — the idiomatic case that must NOT false-positive
+        Aliased <- S7::new_class("DifferentName")
         speak <- S7::new_generic("speak", "x")
         # (ok) method on a real, namespace-bound class
         S7::method(speak, Real) <- function(x, ...) "real"
+        # (ok) method on a class bound under a name != its @name
+        S7::method(speak, Aliased) <- function(x, ...) "aliased"
         # (ok) method on a base type -> not an S7 class, must NOT be flagged
         S7::method(speak, S7::class_integer) <- function(x, ...) "int"
         # (BAD) method on an inline class with NO namespace binding -> unreachable
@@ -919,7 +923,9 @@ def test_s7runtime_e2e_detects_method_on_missing_class(tmp_path):
     assert "failed" not in msg_text.lower(), f"fixture did not load: {env}"
     rt = env.get("s7runtime", {})
     missing = rt.get("methods_on_missing_class", [])
-    flat = " ".join(missing)
-    assert "Ghost" in flat, env          # dangling method flagged
-    assert "Real" not in flat, env       # real bound class NOT flagged
-    assert "integer" not in flat, env    # base type NOT flagged (false-positive guard)
+    classes = [m.get("class") if isinstance(m, dict) else str(m) for m in missing]
+    assert "Ghost" in classes, env             # dangling method flagged
+    assert "Real" not in classes, env          # real bound class NOT flagged
+    # binding-name != @name must NOT false-positive (identity, not @name, resolution)
+    assert "DifferentName" not in classes, env
+    assert "integer" not in classes, env       # base type NOT flagged

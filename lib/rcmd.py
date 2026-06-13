@@ -470,7 +470,7 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             'for (k in ls(env, all.names=TRUE)) { v <- get(k, envir=env); '
             'if (is.environment(v)) acc <- collect_methods(v, acc) '
             'else acc <- c(acc, list(v)) }; acc }; '
-            'missing <- character(); '
+            'missing <- list(); '
             'for (gn in names(gens)) { g <- gens[[gn]]; '
             'ms <- collect_methods(attr(g, "methods"), list()); '
             'for (md in ms) { sigs <- attr(md, "signature"); '
@@ -479,12 +479,16 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             'cnm <- attr(s, "name"); cpkg <- attr(s, "package"); '
             'if (is.null(cnm) || !nzchar(cnm) || cnm %in% c("ANY", "S7_object")) next; '
             'ext <- !is.null(cpkg) && nzchar(cpkg) && !identical(cpkg, nm); '
+            # Resolve by OBJECT IDENTITY, not by @name: a class may be bound under a
+            # name != its @name (e.g. `Foo <- new_class("Bar")`). For internal classes
+            # the dispatch object must BE one of this package's gathered class objects;
+            # for imported classes (ext) fall back to a name lookup in the provider ns.
             'resolves <- if (ext) { '
             'tryCatch(exists(cnm, envir=asNamespace(cpkg), inherits=FALSE), '
             'error=function(e) TRUE) } else { '
-            'o <- get0(cnm, envir=ns, inherits=FALSE); '
-            '!is.null(o) && inherits(o, "S7_class") }; '
-            'if (!resolves) missing <- c(missing, paste(gn, "->", cnm)) } } }; '
+            'any(vapply(clss, function(o) identical(o, s), logical(1))) }; '
+            'if (!resolves) missing <- c(missing, '
+            'list(list(generic=gn, class=cnm))) } } }; '
             'missing <- unique(missing); '
             'list(dead_generics=dead, methods_on_missing_class=missing, '
             'nonenforcing_validators=lax)}, '

@@ -336,7 +336,8 @@ def test_runtime_maps_method_on_missing_class(tmp_path, monkeypatch):
     monkeypatch.setattr(
         s7review.rcmd, "run",
         lambda kind, path=".", **kw: _fake_runtime_env(
-            dead=(), nonenforcing=(), missing=("speak -> Ghost",)))
+            dead=(), nonenforcing=(),
+            missing=({"generic": "speak", "class": "Ghost"},)))
     env = s7review.run_all_with_runtime(str(pkg))
     md = next(s for s in env["stages"] if s["kind"] == "method-dispatch")
     miss = [f for f in md["findings"] if f["code"] == "method_on_missing_class"]
