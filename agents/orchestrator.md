@@ -55,7 +55,7 @@ dir. Pass `--path <pkg>` to `lib.rcmd` when operating on a specific package.
 
 | Intent | Auto-run (read-only) |
 |--------|----------------------|
-| CODE_CHANGE | `python3 -m lib.discovery --format json` · `python3 -m lib.deps impact --format json` · `python3 -m lib.rcmd --kind test` |
+| CODE_CHANGE | `python3 -m lib.discovery --format json` · `python3 -m lib.deps --format json impact --package <pkg>` · `python3 -m lib.rcmd --kind test` |
 | NEW_FUNCTION | `python3 -m lib.discovery --format json` · `python3 -m lib.rcmd --kind check` |
 | BUG_FIX | `python3 -m lib.rcmd --kind test` · `python3 -m lib.deps --format json` |
 | DEPS_AUDIT | `python3 -m lib.deps_sync --format json` · `python3 -m lib.deps --format json` |
@@ -63,6 +63,8 @@ dir. Pass `--path <pkg>` to `lib.rcmd` when operating on a specific package.
 | CRAN_READINESS | `python3 -m lib.rcmd --kind check` · `python3 -m lib.cranlint` · `python3 -m lib.runiverse --format json` |
 | ECOSYSTEM_HEALTH | `python3 -m lib.status --format json` · `python3 -m lib.discovery --format json` · `python3 -m lib.deps --format json` |
 
+`lib.deps` takes the top-level `--format json` *before* the `impact` subcommand,
+and `impact` needs `--package <pkg>` — substitute the changed package's name.
 `lib.deps_sync` runs in its dry-run (read-only) form — never pass `--write`.
 `lib.runiverse` is read-only and advisory (a network *read* that degrades to a
 `warn` envelope offline; it never uploads).
@@ -75,7 +77,8 @@ user's goal implies one of these, name the exact `/rforge:*` command and
 principle.
 
 - Regenerate/format/build (writes source or artifacts): `/rforge:r:document`,
-  `/rforge:r:style`, `/rforge:r:build`, `/rforge:r:install`, `/rforge:r:site`
+  `/rforge:r:style`, `/rforge:r:build`, `/rforge:r:install`, `/rforge:r:site`,
+  `/rforge:r:cycle` (its first stage runs `document`)
 - CRAN gate (writes `cran-comments.md`, runs `document`): `/rforge:r:cran-prep`
 - CRAN/GitHub handoff: `/rforge:r:submit` (and `--promote`, `--universe`)
 - External uploads / network: `/rforge:r:winbuilder`, `/rforge:r:rhub`,

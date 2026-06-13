@@ -35,8 +35,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   this release fixes), orchestrator carries `name`+`description` frontmatter, and
   a recipe validator (`tests/_check_agent_engines.py`) asserting every `--kind`
   is a **real** `lib.rcmd` engine, is **safe to auto-run** (read-only — the gate
-  rejects mutating kinds like `document`/`cran-prep` in auto-run recipes), and
-  every `lib.<module>` it names exists.
+  rejects mutating kinds like `document`/`cran-prep` in auto-run recipes, in both
+  `--kind x` and `--kind=x` forms), every `lib.<module>` it names exists, and
+  every recipe command **actually parses** (no argparse usage error — catches
+  wrong flag ordering / missing required args that token checks miss).
 
 ---
 
