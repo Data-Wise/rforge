@@ -27,16 +27,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the Imports-vs-Suggests call. +3 commands.
 - **diff-aware `--changed`** (P0) — new `lib/changed.py` (git-diff →
   changed-files → owning packages via `discovery.find_r_packages`); `--changed`
-  scopes `r:check` (with `[introduced]`/`[pre-existing]` tagging), `r:test`, and
-  `r:lint` to what actually changed. No command-count change (flags). The
-  merge-base second-check for `[pre-existing]` is a documented follow-up.
+  **scopes** `r:check`/`r:test`/`r:lint` to the package(s) touched on the branch
+  and reports their genuine full status. No command-count change (flags).
+  `[introduced]`/`[pre-existing]` finding tagging is **deferred** until a
+  merge-base checkout is wired (see `commands/r/check.md`) — `--changed` is
+  scope-only for now.
 
 ### Changed
 
-- Test gates rise: `tests/test-all.sh` **36 → 41 checks**; `pytest` **232 → 290**
+- Test gates rise: `tests/test-all.sh` **36 → 41 checks**; `pytest` **232 → 298**
   (new `test_s7review`/`test_scaffold`/`test_changed` + rcmd flag cases). New
   `docs/reference/{s7review,changed,scaffold}.md` (auto-generated, `--check`
   gated).
+
+### Fixed (pre-release adversarial review)
+
+- An adversarial review before the release caught three bug-classes the gates
+  missed (fixed in the same release): a diff-aware `--changed` **silent
+  false-negative** (it had compared HEAD against itself, reporting `ok` even
+  with real `R CMD check` errors — now honest scope-only); a `deps_sync`
+  `--write` bug that **dropped version constraints** on untouched deps (also
+  affected `r:deps-sync`); and four `r:s7-review` **false positives** (the
+  parser hadn't masked comments/strings, flagging idiomatic `new_property()`).
 
 ---
 

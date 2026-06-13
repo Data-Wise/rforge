@@ -23,7 +23,7 @@ arguments:
     type: boolean
     default: false
   - name: changed
-    description: Scope the check to packages changed on this branch and tag each finding [introduced] vs [pre-existing] (diff vs merge-base with --base)
+    description: Scope the check to packages changed on this branch (vs --base); reports their full status. [introduced]/[pre-existing] tagging is not yet wired — scope-only for now.
     required: false
     type: boolean
     default: false
