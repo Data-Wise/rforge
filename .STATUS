@@ -1,17 +1,14 @@
 project: rforge
 updated: 2026-06-12
 status: Active
-version: 2.9.0 (in progress — feature/phase4-orchestrator → dev)
-in_progress: 2026-06-12 v2.9.0 — Phase 4 orchestrator rewrite (last craft-parity item). Stale agents/orchestrator.md (13 removed rforge_* MCP tools, 43 refs) rewritten to delegate via python3 -m lib.* envelopes; intent→lib mapping + read-only/recommend-only safety gate (never-auto-submit) + synthesis. +3 test-all guards (33→36) incl. rforge_-ref regression lock; tests/_check_agent_engines.py. Gates green: test-all 36/36, pytest 230. Spec+plan: docs/specs/SPEC-phase4-orchestrator-rewrite-2026-06-12.md (+PLAN). PR feature→dev pending.
+version: 2.9.0 (merged to dev — PR #29; pending dev→main release)
+in_progress: 2026-06-12 v2.9.0 — Phase 4 orchestrator rewrite (last craft-parity item). MERGED to dev (PR #29, merge d6803ca; feature branch + worktree removed). Stale agents/orchestrator.md (13 removed rforge_* MCP tools, 43 refs) rewritten to delegate via python3 -m lib.* envelopes; 7-intent mapping + read-only-auto-run/recommend-only safety gate (never-auto-submit) + per-module synthesis. +3 test-all guards (33→36) incl. rforge_/mcp__rforge regression lock + recipe validator (real+safe+exists+parses); tests/_check_agent_engines.py. Validated by TWO adversarial review workflows — caught 2 safety blockers in draft 1, then 1 self-introduced blocker (lib.deps impact arg-order) in the fix. Gates green: test-all 36/36, pytest 230. Spec+plan: docs/specs/SPEC-phase4-orchestrator-rewrite-2026-06-12.md (+PLAN). NEXT: dev→main release PR + tap sync.
 last_release: 2026-06-12 v2.8.0 (PR #27 feature→dev, PR #28 dev→main merge 0a70e97, release https://github.com/Data-Wise/rforge/releases/tag/v2.8.0; CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#119 MERGED — origin/main formula+manifest → v2.8.0, sha256 9dc3c5d2…, ruby -c OK; --diff shows only pre-existing bin.mkpath drift, no new version/sha drift). Single-source docs version/count: mkdocs-macros render layer + pure-stdlib scripts/version_sync.py (--check CI gate). 35 commands (no surface change). Live-verified REFCARD renders 2.8.0, no literal braces. 230 pytest + test-all 33/33.
 
 last_release_prior: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --universe R-universe early-access tier (lib/runiverse.py, pure-stdlib); 35 commands (flag, not new command). Prior: v2.6.0 (2026-06-10, tap #114) bundled v2.3–v2.6.
 
-worktrees:
-  - path: ~/.git-worktrees/rforge/feature-phase4-orchestrator
-    branch: feature/phase4-orchestrator
-    base: dev
-    purpose: "v2.9.0 Phase 4 orchestrator rewrite — gates green, PR feature→dev pending"
+worktrees: []  # none active
+# prior: feature/phase4-orchestrator merged (PR #29 → dev 2026-06-12, merge d6803ca) + worktree removed;
 # prior: feature/mkdocs-version-macros merged (PR #27 → dev 2026-06-12) + worktree removed;
 #        review follow-ups (index.md stale counts, mkdocs version anchor, decoy test) + ORCHESTRATE dropped pre-merge.
 #        feature/r-submit-runiverse merged (PR #24) + worktree removed 2026-06-11
