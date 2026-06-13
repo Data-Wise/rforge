@@ -1,6 +1,7 @@
 ---
 name: rforge:r:urlcheck
 description: Check package URLs for breakage/redirects (urlchecker)
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

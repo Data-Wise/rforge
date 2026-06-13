@@ -1,6 +1,7 @@
 ---
 name: rforge:r:load
 description: Load the package into a namespace (pkgload::load_all) for dev
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

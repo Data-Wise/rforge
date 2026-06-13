@@ -70,6 +70,7 @@ Result of `detect_ecosystem()`.
 | `config_found` | `bool` | — |
 | `config_path` | `Optional[str]` | `None` |
 | `manifest_path` | `Optional[str]` | `None` |
+| `manifest_order` | `list[str]` | `list()` |
 | `drift` | `Drift` | `Drift()` |
 
 ### `class Manifest`

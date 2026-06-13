@@ -6,17 +6,17 @@
     - **How:** Jump to a category below, or `Ctrl+F` for a specific command.
     - **Next:** [REFCARD](REFCARD.md) for the at-a-glance summary.
 
-Complete reference for all **33** RForge commands. Commands are organized by category with usage examples and parameter details.
+Complete reference for all **{{ rforge.command_count }}** RForge commands. Commands are organized by category with usage examples and parameter details.
 
 ## Command Categories
 
 - [Setup & State](#setup-state) (1 command)
 - [Status & Analysis](#status-analysis) (4 commands)
-- [Ecosystem Management](#ecosystem-management) (5 commands)
+- [Ecosystem Management](#ecosystem-management) (6 commands)
 - [Documentation & Tasks](#documentation-tasks) (4 commands)
 - [Health Checks](#health-checks) (2 commands)
-- [R Development Cycle](#r-development-cycle) (9 commands)
-- [R Quality](#r-quality) (5 commands)
+- [R Development Cycle](#r-development-cycle) (8 commands)
+- [R Quality](#r-quality) (4 commands)
 - [CRAN Submission](#cran-submission) (6 commands)
 
 ---

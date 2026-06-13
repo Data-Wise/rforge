@@ -77,7 +77,7 @@ graph LR
 | `marketplace.json` | At install (`/plugin marketplace add`) | `.claude-plugin/` | Claude Code marketplace |
 | `config.json` | When plugin loads | `.claude-plugin/` | rforge runtime |
 | `commands/*.md` | When user types `/rforge:<cmd>` | `commands/` | Claude Code |
-| `agents/orchestrator.md` | When pattern recognition triggers | `agents/` | Claude Code |
+| `agents/orchestrator.md` | When you ask an open-ended R-package goal (intent recognition, v2.9.0) | `agents/` | Claude Code |
 | `hooks/pretooluse.py` | Every `Write`/`Edit` tool call | `.claude-plugin/hooks/` | Claude Code hook system |
 | `skills/validation/*.md` | When Claude needs to verify state | `.claude-plugin/skills/` | Claude Code skill discovery |
 
@@ -86,7 +86,9 @@ is the *runtime brain*. The pieces above are the *static surface*
 the plugin advertises to Claude Code.
 
 For a user-facing tour of the new hook + skill, see
-[Hooks & Skills Reference](hooks-and-skills.md).
+[Hooks & Skills Reference](hooks-and-skills.md). For the orchestrator agent's
+intent taxonomy, read-only/recommend-only safety boundary, and lib-envelope
+delegation (v2.9.0), see [The Orchestrator Agent](orchestrator.md).
 
 ---
 

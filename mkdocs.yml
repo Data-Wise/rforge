@@ -51,7 +51,7 @@ extra_css:
 # scripts/version_sync.py — do not hand-edit version/prev_version/release_date.
 extra:
   rforge:
-    version: "2.8.0"
+    version: "2.9.0"
     prev_version: "2.7.0"
     release_date: "2026-06-12"
     command_count: 35
@@ -98,6 +98,7 @@ nav:
     - "rforge in the R package lifecycle": tutorials/rforge-in-the-r-lifecycle.md
     - "Understanding modes": tutorials/understanding-modes.md
     - "Ecosystem orchestration": tutorials/ecosystem-orchestration.md
+    - "Orchestrator cookbook": tutorials/orchestrator-cookbook.md
     - "R package dev cycle": tutorials/r-dev-cycle.md
     - "CRAN release prep": tutorials/cran-release-prep.md
     - "CRAN submission with rforge": tutorials/cran-submission-with-rforge.md
@@ -106,6 +107,7 @@ nav:
   - Reference:
     - 📚 Reference Card: REFCARD.md
     - Commands: commands.md
+    - 🤖 Orchestrator Agent: orchestrator.md
     - Configuration: configuration.md
     - Lib Modules: lib-modules.md
     - Troubleshooting: troubleshooting.md

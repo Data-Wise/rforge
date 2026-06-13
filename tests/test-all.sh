@@ -443,6 +443,34 @@ assert d['engine_missing'] == [], 'pure-Python module: engine_missing must be []
 "
 }
 
+# Phase 4: no removed rforge-mcp tool references may survive in any agent file.
+# (rforge-mcp was absorbed into lib/ in v1.3.0; the tools no longer exist.)
+# Matches both the legacy `rforge_*` underscore form and the `mcp__rforge*`
+# MCP tool-call shape a stale reference could take.
+agent_no_mcp_refs() {
+    ! grep -lqE "rforge_|mcp__rforge" agents/*.md
+}
+
+# Phase 4: orchestrator agent must carry name + description frontmatter.
+agent_frontmatter_complete() {
+    python3 - <<'PY'
+import sys, re
+src = open("agents/orchestrator.md", encoding="utf-8").read()
+m = re.match(r"^---\n(.*?)\n---\n", src, re.DOTALL)
+if not m:
+    print("no YAML frontmatter block"); sys.exit(1)
+fm = m.group(1)
+for key in ("name:", "description:"):
+    if key not in fm:
+        print(f"missing {key} in frontmatter"); sys.exit(1)
+PY
+}
+
+# Phase 4: agent must not name lib.rcmd engines that don't exist.
+agent_engines_valid() {
+    python3 tests/_check_agent_engines.py
+}
+
 echo "═══════════════════════════════════════════════════════════════"
 echo "  RForge plugin — full validation suite"
 echo "═══════════════════════════════════════════════════════════════"
@@ -475,6 +503,11 @@ run "Command name: frontmatter values are unique"   command_names_unique
 run "E2E: migration tutorial sed recipe is correct"  migration_recipe_works
 run "E2E: stubs' /help descriptions show rename warning" stub_help_listings_show_warning
 run "Dogfood: lib.discovery handles non-R-package repo" lib_discovery_on_self
+
+# Agents (Phase 4)
+run "Agents: no removed rforge_* MCP refs"                  agent_no_mcp_refs
+run "Agents: orchestrator has name+description frontmatter" agent_frontmatter_complete
+run "Agents: orchestrator recipes valid (real+safe engines, real modules)" agent_engines_valid
 
 # Docs site
 run "mkdocs.yml parses"            mkdocs_parses

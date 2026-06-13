@@ -1,6 +1,7 @@
 ---
 name: rforge:r:install
 description: Install the package locally (R CMD INSTALL) and report version
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

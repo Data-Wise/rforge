@@ -4,7 +4,11 @@
 > Follows the global `~/.claude/CLAUDE.md`; this file only captures
 > rforge-specific patterns that don't apply to other dev-tools repos.
 
-## Current state (2026-06-11)
+## Current state (2026-06-12)
+
+**v2.9.0 — merged to dev (PR #29); pending dev→main release** — **35 commands, 1 agent** (no surface change). **Phase 4 — the last craft-parity item.** Rewrites `agents/orchestrator.md`, stale since v1.3.0: it delegated to 13 removed `rforge_*` MCP tools (43 refs) that vanished when rforge-mcp was absorbed into `lib/`. The rewrite delegates via `python3 -m lib.*` envelopes (Bash), with `name`/`description` frontmatter, an **intent→lib mapping** over 7 intents (CODE_CHANGE incl. `lib.deps impact`/NEW_FUNCTION/BUG_FIX/DEPS_AUDIT/QUALITY/CRAN_READINESS/ECOSYSTEM_HEALTH), a strict **read-only auto-run / recommend-only safety boundary** (mirrors never-auto-submit: every file-writing or network command — `document`/`cran-prep`/`style`/`submit`/`winbuilder`/`rhub`/`urlcheck`/`revdep`/`--write` — is recommended, never run), and per-module envelope synthesis. Three new `test-all.sh` guards (**33→36**) lock it in: a regression guard failing on any `rforge_`/`mcp__rforge` ref in `agents/*.md`, frontmatter presence, and a recipe validator asserting every auto-run `--kind` is a real **and safe-to-auto-run** `lib.rcmd` engine (rejects mutating kinds). Validated by a max-effort adversarial review workflow that caught 2 safety-boundary blockers in the first draft. Spec/plan: `SPEC-phase4-orchestrator-rewrite-2026-06-12.md` + `PLAN-…`.
+
+**v2.8.0 — released 2026-06-12** (PR #27 feature→dev, PR #28 dev→main; [release](https://github.com/Data-Wise/rforge/releases/tag/v2.8.0); CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#119 MERGED — formula+manifest → v2.8.0, sha256 9dc3c5d2…, `--diff` shows only pre-existing `bin.mkpath` drift) — **35 commands** (no surface change). **Single-source-of-truth version/count for docs**, killing the drift that produced the 33→35 staleness: a **mkdocs-macros render layer** (`extra.rforge.{version,prev_version,release_date,command_count}`; ~10 user-facing docs render `{{ rforge.version }}`/`{{ rforge.command_count }}`) plus pure-stdlib **`scripts/version_sync.py`** that stamps the macro-unreachable surfaces (`plugin.json`/`package.json`/`README.md`/`CLAUDE.md`/`mkdocs.yml extra`); `--check` is a CI drift gate wired into `ci.yml` + `test-all.sh`. Bump `package.json` version → run `version_sync.py` (see Version sync section). Spec: `SPEC-mkdocs-version-macros-2026-06-12.md`.
 
 **v2.7.0 — released 2026-06-11** (PR #24 feature→dev, PR #25 dev→main; [release](https://github.com/Data-Wise/rforge/releases/tag/v2.7.0); CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#115 MERGED — formula+manifest → v2.7.0, sha256 6c31a316…, --diff IDENTICAL) — 35 commands (count unchanged; a flag, not a
 new command). Adds an **R-universe early-access tier** to `r:submit`: the new opt-in `--universe`
@@ -111,8 +115,8 @@ The `arguments:` array is the machine-readable spec; the `## Usage` body is the 
 
 Both must pass before any PR:
 
-- `bash tests/test-all.sh` — **33 checks** (versions, hook compile + behavior, manifests parse, skills valid, lib pytest, lib CLI smoke incl. `rcmd`/`cranlint`/`runiverse`, lib reference docs in sync, **version/count sync (`version_sync.py --check`)**, rename stubs/targets, command-name uniqueness, migration recipe E2E)
-- `python3 -m pytest tests/` — **229 lib/\* cases** (discovery, deps, status, init, rcmd, cranlint, deps_sync, ghrelease, runiverse, **version_sync**)
+- `bash tests/test-all.sh` — **36 checks** (versions, hook compile + behavior, manifests parse, skills valid, lib pytest, lib CLI smoke incl. `rcmd`/`cranlint`/`runiverse`, lib reference docs in sync, **version/count sync (`version_sync.py --check`)**, rename stubs/targets, command-name uniqueness, migration recipe E2E, **agent guards: no `rforge_` MCP refs / orchestrator frontmatter / real `lib.rcmd` engines**)
+- `python3 -m pytest tests/` — **230 lib/\* cases** (discovery, deps, status, init, rcmd, cranlint, deps_sync, ghrelease, runiverse, **version_sync**)
 
 ## Homebrew tap quirks (rforge-specific)
 

@@ -1,6 +1,7 @@
 ---
 name: rforge:r:spell
 description: Spell-check the package (spelling) and triage typos
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

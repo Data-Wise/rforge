@@ -7,7 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.8.0] - 2026-06-12
+## [2.9.0] - 2026-06-12
+
+> Rewrites the single agent (`agents/orchestrator.md`), which had been stale
+> since v1.3.0: it delegated to 13 `rforge_*` MCP tools (43 references) removed
+> when rforge-mcp was absorbed into pure-Python `lib/` modules. The rewrite
+> delegates via `python3 -m lib.*` envelopes instead. Last craft-parity item
+> (Phase 4). No command-surface change — still 35 commands, still 1 agent.
+
+### Changed
+
+- **Orchestrator agent rewritten** — `agents/orchestrator.md` now delegates via
+  `python3 -m lib.*` envelopes (run through Bash) instead of the removed
+  `rforge_*` MCP tools. Adds `name`/`description` frontmatter, an intent→lib
+  mapping over **7 intents** (CODE_CHANGE incl. `lib.deps impact` / NEW_FUNCTION /
+  BUG_FIX / DEPS_AUDIT / QUALITY / CRAN_READINESS / ECOSYSTEM_HEALTH), a strict
+  read-only/recommend-only safety boundary (mirrors "never auto-submit": every
+  file-writing or network command — `document`/`cran-prep`/`style`/`build`/
+  `submit`/`winbuilder`/`rhub`/`urlcheck`/`revdep`/`--write` — is recommended,
+  never auto-run), correct `--format json` flags, and per-module envelope
+  synthesis (modules don't share one schema).
+
+### Added
+
+- Three `tests/test-all.sh` guards (**33 → 36 checks**): no removed rforge-mcp
+  refs in any agent file (`rforge_`/`mcp__rforge`; regression lock for the bug
+  this release fixes), orchestrator carries `name`+`description` frontmatter, and
+  a recipe validator (`tests/_check_agent_engines.py`) asserting every `--kind`
+  is a **real** `lib.rcmd` engine, is **safe to auto-run** (read-only — the gate
+  rejects mutating kinds like `document`/`cran-prep` in auto-run recipes, in both
+  `--kind x` and `--kind=x` forms), every `lib.<module>` it names exists, and
+  every recipe command **actually parses** (no argparse usage error — catches
+  wrong flag ordering / missing required args that token checks miss).
+- **`Ecosystem.manifest_order`** (issue #20) — `lib.discovery` now exposes the
+  manifest's package names in *declared* order (empty in the zero-manifest case)
+  via the dataclass field and `to_dict()`, so consumers like `/rforge:status` can
+  render in a curated order rather than disk/alphabetical. Closes the PR #17
+  follow-up gap where manifest order was discarded after enrichment.
+
+### Documentation
+
+- **Orchestrator agent docs** — new [`orchestrator.md`](docs/orchestrator.md) guide
+  (4-step flow, 7-intent table, safety boundary, synthesis) + a worked-examples
+  [cookbook tutorial](docs/tutorials/orchestrator-cookbook.md), a REFCARD section,
+  an architecture.md refresh (pre-v2.9.0 "pattern recognition" → intent
+  recognition), and mkdocs nav entries.
+- **`commands.md` count drift fixed** — the header now renders
+  `{{ rforge.command_count }}` (was a stale literal "33"; drift-proof like the
+  other v2.8.0-macro'd surfaces), and three category subtotals were corrected to
+  match the actual entries (Ecosystem 5→6, R Dev Cycle 9→8, R Quality 5→4; now
+  sum to 35).
+- **Inline help completed** — added `argument-hint` frontmatter to the 10 `r:`
+  commands that lacked it (`load`/`document`/`test`/`build`/`install`/`site`/
+  `lint`/`spell`/`urlcheck`/`style`), so `/help` shows usage hints for every
+  non-stub command. `r:site` carries its four boolean flags; the rest `[package]`.
 
 > Makes docs render the current version/command-count from a single source of
 > truth (`package.json`) so they stop drifting (the 33→35 staleness root-caused

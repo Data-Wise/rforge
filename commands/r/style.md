@@ -1,6 +1,7 @@
 ---
 name: rforge:r:style
 description: Auto-format the package (styler) and show the diff
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)
