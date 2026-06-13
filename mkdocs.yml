@@ -122,6 +122,7 @@ nav:
       - "ghrelease": reference/ghrelease.md
       - "runiverse": reference/runiverse.md
       - "s7review": reference/s7review.md
+      - "changed": reference/changed.md
   - Project:
     - Architecture: architecture.md
     - Hooks & Skills: hooks-and-skills.md
