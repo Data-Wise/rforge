@@ -1,6 +1,7 @@
 ---
 name: rforge:r:test
 description: Run package tests (testthat) and report pass/fail/skip counts
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

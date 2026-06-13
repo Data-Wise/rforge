@@ -57,6 +57,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   other v2.8.0-macro'd surfaces), and three category subtotals were corrected to
   match the actual entries (Ecosystem 5→6, R Dev Cycle 9→8, R Quality 5→4; now
   sum to 35).
+- **Inline help completed** — added `argument-hint` frontmatter to the 10 `r:`
+  commands that lacked it (`load`/`document`/`test`/`build`/`install`/`site`/
+  `lint`/`spell`/`urlcheck`/`style`), so `/help` shows usage hints for every
+  non-stub command. `r:site` carries its four boolean flags; the rest `[package]`.
 
 > Makes docs render the current version/command-count from a single source of
 > truth (`package.json`) so they stop drifting (the 33→35 staleness root-caused

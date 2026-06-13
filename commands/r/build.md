@@ -1,6 +1,7 @@
 ---
 name: rforge:r:build
 description: Build an R package tarball (pkgbuild) and report the artifact
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

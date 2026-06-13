@@ -1,6 +1,7 @@
 ---
 name: rforge:r:site
 description: Build the pkgdown website (vignettes→articles); optional preview
+argument-hint: "[package] [--preview] [--strict] [--articles-only] [--devel]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

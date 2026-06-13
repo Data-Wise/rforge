@@ -1,6 +1,7 @@
 ---
 name: rforge:r:lint
 description: Static analysis of the package (lintr) — grouped report
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)

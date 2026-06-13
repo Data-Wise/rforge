@@ -1,6 +1,7 @@
 ---
 name: rforge:r:document
 description: Regenerate Rd docs and NAMESPACE (roxygen2)
+argument-hint: "[package]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)
