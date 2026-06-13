@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-r-s7-review-eco-2026-06-13/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-s7-method-missing-class-2026-06-13/">
       
       
       
@@ -23,7 +23,7 @@
     
     
       
-        <title>SPEC: r:s7-review --eco + R-backed runtime checks (v2 sibling) - RForge Plugin</title>
+        <title>SPEC: s7-review methods_on_missing_class — close the deferred runtime family - RForge Plugin</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#spec-rs7-review-eco-r-backed-runtime-checks-v2-sibling" class="md-skip">
+        <a href="#spec-s7-review-methods_on_missing_class-close-the-deferred-runtime-family" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              SPEC: r:s7-review --eco + R-backed runtime checks (v2 sibling)
+              SPEC: s7-review methods_on_missing_class — close the deferred runtime family
             
           </span>
         </div>
@@ -2060,10 +2060,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#-eco-ecosystem-static-sweep-pure-stdlib" class="md-nav__link">
+  <a href="#empirical-finding-refutes-the-deferral" class="md-nav__link">
     <span class="md-ellipsis">
       
-        --eco — ecosystem static sweep (pure-stdlib)
+        Empirical finding (refutes the deferral)
       
     </span>
   </a>
@@ -2071,60 +2071,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#-runtime-r-backed-runtime-checks" class="md-nav__link">
+  <a href="#what-the-family-detects" class="md-nav__link">
     <span class="md-ellipsis">
       
-        --runtime — R-backed runtime checks
+        What the family detects
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="--runtime — R-backed runtime checks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#new-engine-s7runtime" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        New engine: s7runtime
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#two-new-runtime-families" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Two new runtime families
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#safety-classification" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Safety classification
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#command-surface" class="md-nav__link">
+  <a href="#algorithm-in-the-s7runtime-engine-librcmdpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Command surface
+        Algorithm (in the s7runtime engine, lib/rcmd.py)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#false-positive-guards-the-adversarial-concerns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        False-positive guards (the adversarial concerns)
       
     </span>
   </a>
@@ -2170,7 +2142,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-r-s7-review-eco-2026-06-13.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-s7-method-missing-class-2026-06-13.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2178,111 +2150,86 @@
   
 
 
-<h1 id="spec-rs7-review-eco-r-backed-runtime-checks-v2-sibling">SPEC: <code>r:s7-review --eco</code> + R-backed runtime checks (v2 sibling)<a class="headerlink" href="#spec-rs7-review-eco-r-backed-runtime-checks-v2-sibling" title="Permanent link">&para;</a></h1>
+<h1 id="spec-s7-review-methods_on_missing_class-close-the-deferred-runtime-family">SPEC: s7-review <code>methods_on_missing_class</code> — close the deferred runtime family<a class="headerlink" href="#spec-s7-review-methods_on_missing_class-close-the-deferred-runtime-family" title="Permanent link">&para;</a></h1>
 <p><strong>Date:</strong> 2026-06-13
 <strong>Author:</strong> Davood Tofighi (with Claude Code)
-<strong>Status:</strong> Approved
-<strong>Parent:</strong> <code>SPEC-r-s7-review-2026-06-12.md</code> (the shipped v1 static checker)
-<strong>Target:</strong> v2.11.0 bundle (feature 2 of 3)</p>
+<strong>Status:</strong> Approved (autonomous build, pre-approved)
+<strong>Parent:</strong> <code>SPEC-r-s7-review-eco-2026-06-13.md</code> (Deferred note)
+<strong>Target:</strong> post-v2.11.0 (single deferred family)</p>
 <hr />
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
-<p><code>r:s7-review</code> v1 (shipped v2.10.0) is a <strong>pure-stdlib static</strong> S7 convention checker:
-5 advisory families (naming/validators/methods/legacy/docs) parsed from source, no R.
-This adds two <strong>composable flags</strong> that extend it without rewriting v1:</p>
-<table>
-<thead>
-<tr>
-<th>Flag</th>
-<th>What it adds</th>
-<th>Architecture impact</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--eco</code></td>
-<td>Run the existing 5 static families across <strong>every package</strong> in the ecosystem manifest, aggregate into one report.</td>
-<td><strong>None — stays pure-stdlib.</strong></td>
-</tr>
-<tr>
-<td><code>--runtime</code></td>
-<td>An <strong>R subprocess pass</strong> that loads the package and introspects S7 at runtime; 2 new families.</td>
-<td>Adds R, routed through <code>lib.rcmd</code> (the only R-touching module).</td>
-</tr>
-</tbody>
-</table>
-<p>The flags compose: <code>r:s7-review --eco --runtime</code> sweeps the ecosystem statically <em>and</em>
-runs the runtime pass per package.</p>
-<h2 id="-eco-ecosystem-static-sweep-pure-stdlib"><code>--eco</code> — ecosystem static sweep (pure-stdlib)<a class="headerlink" href="#-eco-ecosystem-static-sweep-pure-stdlib" title="Permanent link">&para;</a></h2>
+<p><code>r:s7-review --runtime</code> (v2.11.0) ships two working runtime families (<code>dead_generic</code>,
+<code>validator_not_enforcing</code>) plus a <strong>third hardcoded-empty placeholder</strong>:
+<code>methods_on_missing_class</code>. The v2.11.0 spec deferred it claiming it was "not decidable
+from the S7 method registry alone." <strong>This spec refutes that empirically and implements it.</strong></p>
+<h2 id="empirical-finding-refutes-the-deferral">Empirical finding (refutes the deferral)<a class="headerlink" href="#empirical-finding-refutes-the-deferral" title="Permanent link">&para;</a></h2>
+<p>Investigated S7's real method-table structure (R + S7 present):</p>
 <ul>
-<li>Resolve the package set via <strong><code>lib.discovery.find_r_packages</code></strong> (the single source of
-  truth for the on-disk package set; honors the ecosystem manifest + <code>manifest_order</code>).</li>
-<li>Run <code>s7review.run_all</code> (the existing static families) on each package.</li>
-<li>Aggregate: one envelope with a per-package breakdown + an ecosystem roll-up
-  (total findings by family, packages clean vs flagged). Ordered by <code>manifest_order</code>
-  when present, else discovery order.</li>
-<li>Degrades gracefully: a package that fails to parse is reported as a per-package warn,
-  never aborts the sweep.</li>
+<li><code>attr(generic, "methods")</code> is an environment keyed by class <strong>name</strong> (nested for
+  multi-dispatch). Each value is an <code>S7_method</code> object.</li>
+<li>Each <code>S7_method</code> carries <strong><code>attr(method, "signature")</code></strong> — a <em>list of the actual
+  dispatch class objects</em> (S7_class objects for S7 classes; base-type specs otherwise).</li>
+<li>So for every registered method we can recover its dispatch class object(s) and check
+  <strong>resolvability by name against the loaded namespace</strong> — fully decidable.</li>
 </ul>
-<h2 id="-runtime-r-backed-runtime-checks"><code>--runtime</code> — R-backed runtime checks<a class="headerlink" href="#-runtime-r-backed-runtime-checks" title="Permanent link">&para;</a></h2>
-<p>The architecture invariant: <strong><code>lib.rcmd</code> is the only module that shells out to Rscript.</strong>
-So the runtime pass is a <strong>new <code>s7runtime</code> engine in <code>lib/rcmd.py</code></strong>, not a direct
-subprocess call from <code>s7review.py</code>.</p>
-<h3 id="new-engine-s7runtime">New engine: <code>s7runtime</code><a class="headerlink" href="#new-engine-s7runtime" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>lib.rcmd.run(kind="s7runtime", path=...)</code> shells to <code>Rscript</code> running an embedded R
-  program that: loads the package (<code>pkgload::load_all</code> / installed namespace), enumerates
-  S7 classes, generics, and methods, then emits <strong>JSON</strong> (via <code>jsonlite</code>, the existing
-  rcmd convention — auto_unbox guarded, stdout-contamination guarded per the v2.1.0
-  serialization lessons).</li>
-<li>Normalized into the standard rcmd envelope, then <strong>merged</strong> by <code>s7review</code> with the
-  static findings into one combined envelope.</li>
-</ul>
-<h3 id="two-new-runtime-families">Two new runtime families<a class="headerlink" href="#two-new-runtime-families" title="Permanent link">&para;</a></h3>
+<p>Confirmed detection: a method registered on an inline, unbound class
+(<code>method(gen, new_class("Ghost")) &lt;- fn</code>) yields a registry whose <code>Ghost</code> signature
+class is an <code>S7_class</code> whose name does <strong>not</strong> resolve in the namespace → a dead,
+unreachable method (nothing can ever construct a <code>Ghost</code> to dispatch on). Base-type
+methods (<code>method(gen, class_integer)</code>) have a signature element that is <strong>not</strong> an
+<code>S7_class</code> and are correctly excluded.</p>
+<h2 id="what-the-family-detects">What the family detects<a class="headerlink" href="#what-the-family-detects" title="Permanent link">&para;</a></h2>
+<p><strong><code>methods_on_missing_class</code></strong>: a registered method whose dispatch signature includes an
+<strong>S7 class that is not resolvable by name</strong> in the loaded package namespace (or a declared,
+loaded import). This is the runtime sibling of <code>dead_generic</code> — a method that can never be
+dispatched because its dispatch class has no reachable binding (typically an inline /
+unexported <code>new_class()</code> left in a <code>method()</code> call, or a method left dangling after a
+class was renamed/removed).</p>
+<h2 id="algorithm-in-the-s7runtime-engine-librcmdpy">Algorithm (in the <code>s7runtime</code> engine, <code>lib/rcmd.py</code>)<a class="headerlink" href="#algorithm-in-the-s7runtime-engine-librcmdpy" title="Permanent link">&para;</a></h2>
+<p>For each S7 generic in the namespace, walk its method registry; for each <code>S7_method</code>, for
+each element of <code>attr(method, "signature")</code>:</p>
 <ol>
-<li><strong><code>method-dispatch</code></strong> — for each declared S7 generic, does dispatch actually resolve
-   to a method for its registered classes? Flags generics with no resolvable method
-   (<code>dead_generic</code>) <strong>and</strong> methods whose dispatch class has no resolvable namespace
-   binding (<code>method_on_missing_class</code>). <strong>UPDATE (post-v2.11.0):</strong> <code>method_on_missing_class</code>
-   is now implemented — the original "not decidable from the registry alone" deferral was
-   refuted: each <code>S7_method</code> carries <code>attr(., "signature")</code> (its dispatch class objects),
-   so resolvability against the loaded namespace is decidable. See
-   <code>SPEC-s7-method-missing-class-2026-06-13.md</code>.</li>
-<li><strong><code>validator-runtime</code></strong> — instantiate each S7 class with a deliberately invalid
-   property value; flag classes whose <code>validator</code> fails to reject it (validator present
-   in source but not actually enforcing — the runtime sibling of v1's static
-   <code>validators</code> family).</li>
+<li><strong>Skip non-S7 signature elements</strong> — base types (<code>class_integer</code>/<code>class_character</code>/…)
+   are not <code>S7_class</code> objects → never "missing".</li>
+<li><strong>Skip the universal types</strong> — <code>S7_object</code> / <code>class_any</code> (<code>ANY</code>) union dispatch.</li>
+<li>For an <code>S7_class</code> element with name <code>N</code> and package <code>P</code>:</li>
+<li><code>P</code> set and <code>P != this_package</code> → <strong>resolvable</strong> iff <code>exists(N, asNamespace(P))</code>
+     (imported class — the import is loaded, so it resolves). Not missing.</li>
+<li><code>P</code> unset or <code>P == this_package</code> → <strong>resolvable</strong> iff <code>N</code> is bound to an <code>S7_class</code>
+     in this package's namespace. If not bound → <strong>MISSING</strong> → flag
+     <code>"&lt;generic&gt; -&gt; &lt;N&gt;"</code>.</li>
 </ol>
-<h3 id="safety-classification">Safety classification<a class="headerlink" href="#safety-classification" title="Permanent link">&para;</a></h3>
+<p>Emit <code>methods_on_missing_class</code> as the list of <code>"&lt;generic&gt; -&gt; &lt;class&gt;"</code> strings (was
+<code>character()</code>). Normalization in <code>_status_for</code> / <code>normalize</code> already aggregates all three
+runtime lists — no change needed there.</p>
+<h2 id="false-positive-guards-the-adversarial-concerns">False-positive guards (the adversarial concerns)<a class="headerlink" href="#false-positive-guards-the-adversarial-concerns" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>s7runtime</code> <strong>loads and executes package code</strong> (like <code>load</code>/<code>test</code>), so it is <em>not</em>
-  inert — but it is <strong>read-only</strong> (no file writes, no network, no install). It is added
-  to <strong><code>SAFE_AUTORUN</code></strong> alongside <code>load</code>/<code>test</code>/<code>check</code>/<code>coverage</code>/<code>lint</code>/<code>spell</code>.</li>
-<li>The orchestrator agent's recipe validator (<code>tests/_check_agent_engines.py</code>) already
-  asserts auto-run kinds are real + safe; <code>s7runtime</code> must pass it.</li>
-<li>Requires R + the package's deps. When R is missing or load fails, <code>--runtime</code> degrades
-  to a <code>warn</code> envelope ("runtime pass skipped: <reason>") and the static result still
-  returns — never raises, mirroring <code>runiverse</code>'s offline degradation.</li>
+<li><strong>Base types</strong> — excluded by the <code>inherits(sig, "S7_class")</code> gate (empirically verified:
+  <code>integer</code> key → <code>s7class=FALSE</code>).</li>
+<li><strong>Imported classes</strong> — resolved via the class's <code>package</code> attribute against that
+  package's loaded namespace; not flagged.</li>
+<li><strong><code>ANY</code> / <code>S7_object</code> union dispatch</strong> — explicitly skipped.</li>
+<li><strong>Parent classes</strong> — irrelevant; only the dispatch class itself is checked.</li>
+<li><strong>Multi-dispatch</strong> — every signature element checked independently; a method dispatching
+  on <code>list(Real, Ghost)</code> flags only <code>Ghost</code>.</li>
 </ul>
-<h2 id="command-surface">Command surface<a class="headerlink" href="#command-surface" title="Permanent link">&para;</a></h2>
-<p><code>commands/r/s7-review.md</code> gains <code>--eco</code> and <code>--runtime</code> in the <code>arguments:</code> array +
-<code>## Usage</code> body. No new command (flags, not commands) → <strong>command count unchanged</strong>.</p>
 <h2 id="out-of-scope">Out of scope<a class="headerlink" href="#out-of-scope" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Fixing S7 issues (advisory only, like v1).</li>
-<li>Cross-package S7 <em>contract</em> checks (e.g. a class in pkg A used by pkg B) — future.</li>
-<li><code>--runtime</code> for non-S7 OOP (R6/S4) — S7 only.</li>
+<li>Cross-package <em>undeclared-dependency</em> dispatch (method on <code>otherpkg::Class</code> where
+  <code>otherpkg</code> ∉ DESCRIPTION) — a different, DESCRIPTION-aware check; future.</li>
+<li>Static (non-runtime) detection — this is a <code>--runtime</code>-only family, like its siblings.</li>
 </ul>
 <h2 id="tests-gates">Tests (gates)<a class="headerlink" href="#tests-gates" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>--eco</code> over a 2-package fixture ecosystem → asserts aggregation + <code>manifest_order</code>.</li>
-<li><code>s7runtime</code> rcmd engine: opt-in real-R e2e (like the existing rcmd e2e tests) against
-  a fixture package with (a) a dead generic and (b) a non-enforcing validator → asserts
-  both runtime families fire. Skipped when R absent.</li>
-<li>Degradation: <code>--runtime</code> with R unavailable → warn envelope, static result intact,
-  exit 0.</li>
-<li><code>_check_agent_engines.py</code> still green with <code>s7runtime</code> in SAFE_AUTORUN.</li>
-<li>pure-stdlib guard: <code>s7review.py</code> imports no R and shells out to nothing (greppable —
-  all R goes through <code>lib.rcmd</code>).</li>
+<li><strong>Real-R e2e</strong> (R-gated <code>skipif</code>, like the existing s7runtime tests): a fixture package
+  with (a) a method on a real bound class (NOT flagged) and (b) a method on an inline
+  unbound class (flagged). Assert <code>methods_on_missing_class</code> contains exactly the dangling
+  one. Reuse/extend the <code>s7pkg.bad</code> fixture.</li>
+<li><strong>Base-type non-flag</strong>: a <code>method(gen, class_integer)</code> in the fixture must NOT appear.</li>
+<li><strong>Degradation</strong>: unchanged — R/S7 absent → <code>--runtime</code> still degrades to advisory <code>warn</code>.</li>
+<li><code>_check_agent_engines.py</code>, <code>version_sync --check</code>, <code>gen_lib_reference --check</code> stay green.</li>
+<li>Update <code>commands/r/s7-review.md</code> (move <code>method_on_missing_class</code> from Deferred into the
+  active family table) + this parent spec's Deferred note.</li>
 </ul>
 
 

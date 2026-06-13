@@ -4186,7 +4186,7 @@ auto-applied).</p>
 </tr>
 <tr>
 <td>method-dispatch (<code>--runtime</code>)</td>
-<td><code>dead_generic</code></td>
+<td><code>dead_generic</code>, <code>method_on_missing_class</code></td>
 <td>runtime</td>
 </tr>
 <tr>
@@ -4196,7 +4196,7 @@ auto-applied).</p>
 </tr>
 </tbody>
 </table>
-<p>The <code>method-dispatch</code> runtime family currently reports only <code>dead_generic</code>; <code>method_on_missing_class</code> is <strong>deferred</strong> (it can't be decided from the S7 registry alone — future work).</p>
+<p>The <code>method-dispatch</code> runtime family reports <code>dead_generic</code> (an S7 generic with no registered method) and <code>method_on_missing_class</code> (a method whose dispatch signature references an S7 class with no resolvable namespace binding — e.g. an inline <code>new_class()</code> left in a <code>method()</code> call — making the method unreachable). Each <code>S7_method</code> carries its dispatch class objects (<code>attr(., "signature")</code>), so resolvability is decided by object identity against the package's classes; base types and imported classes are not flagged.</p>
 <p><strong>Output:</strong> one <code>{kind: "s7review", status: "ok"|"warn", stages: [...]}</code> envelope. Each finding carries <code>source: "static"</code> and <code>severity: "advisory"</code>, worded "looks like / consider", never "must". Exit 0 always.</p>
 <p><strong>Related commands:</strong> <code>/rforge:r:cran-prep</code> (Tier-4 advisory siblings), <code>/rforge:r:document</code></p>
 <hr />
