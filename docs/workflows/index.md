@@ -45,6 +45,42 @@ flowchart TD
 
 → [R package dev cycle](../tutorials/r-dev-cycle.md) (~10 min)
 
+## 🔬 Diff-aware merge gate
+
+Before merging a branch: separate the findings *you* introduced from pre-existing debt.
+
+```mermaid
+flowchart TD
+    A["/rforge:r:check --changed --base dev"] --> B{"merge-base found?"}
+    B -- "no" --> Z["full check + warning<br/>(scope-only fallback)"]
+    B -- "yes" --> C["baseline run in a detached<br/>worktree at the merge-base"]
+    C --> D["set-diff vs HEAD findings"]
+    D --> E["tag [introduced] / [pre-existing]"]
+    E --> F{"--fail-on introduced?"}
+    F -- "≥1 introduced" --> G["exit non-zero ❌<br/>(fix before merge)"]
+    F -- "none introduced" --> H["exit 0 ✅<br/>(pre-existing debt only)"]
+```
+
+→ [Diff-aware checks](../tutorials/diff-aware-checks.md) (~8 min)
+
+## 🧬 S7 convention checking
+
+Audit S7 OOP conventions — statically, across the ecosystem, or at runtime.
+
+```mermaid
+flowchart TD
+    A["/rforge:r:s7-review"] --> B{"scope?"}
+    B -- "this package" --> C["STATIC (default)<br/>pure-Python, 5 families"]
+    B -- "--eco" --> D["ecosystem sweep<br/>static × every package"]
+    B -- "--runtime" --> E["runtime pass (needs R+S7)<br/>dead_generic · validator_not_enforcing<br/>· method_on_missing_class"]
+    C --> F["advisory envelope<br/>(looks like / consider)"]
+    D --> F
+    E --> F
+    E -. "R/S7 absent" .-> G["degrades to warn<br/>(static intact, exit 0)"]
+```
+
+→ [S7 convention checking](../tutorials/s7-convention-checking.md) (~10 min)
+
 ## 🔁 Ecosystem daily loop
 
 The habit: change code with R tools, check the ecosystem with rforge.

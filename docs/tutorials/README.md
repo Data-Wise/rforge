@@ -18,6 +18,10 @@ scenario and walks through the exact commands and expected output.
 | Confused by the `--mode` flag | [Understanding modes](understanding-modes.md) | ~5 min |
 | Managing several inter-dependent packages | [Ecosystem orchestration](ecosystem-orchestration.md) | ~15 min |
 | Using the 12 `r:` dev-cycle commands daily | [R package dev cycle](r-dev-cycle.md) | ~10 min |
+| Separating *your* regressions from pre-existing debt before merge | [Diff-aware checks](diff-aware-checks.md) | ~8 min |
+| Auditing S7 OOP conventions (static / ecosystem / runtime) | [S7 convention checking](s7-convention-checking.md) | ~10 min |
+| Scaffolding tests, deps, vignettes, data, citations into a package | [Scaffolding existing packages](scaffolding-existing-packages.md) | ~10 min |
+| Asking the orchestrator agent a *goal* instead of picking commands | [Orchestrator cookbook](orchestrator-cookbook.md) | ~10 min |
 | Preparing a CRAN submission — ecosystem ordering | [CRAN release prep](cran-release-prep.md) | ~15 min |
 | Running the full per-package CRAN gate | [CRAN submission with rforge](cran-submission-with-rforge.md) | ~15 min |
 | Shipping early-access binaries while CRAN reviews | [R-universe early-access](r-universe-early-access.md) | ~10 min |
@@ -55,6 +59,18 @@ flowchart LR
   use: `r:load`, `r:document`, `r:test`, `r:check`, `r:cycle` (dev loop) +
   `r:lint`, `r:spell`, `r:urlcheck`, `r:style`, `r:coverage`, `r:build`,
   `r:install`, `r:site` (quality layer). ~10 min.
+- **[Diff-aware checks](diff-aware-checks.md)** — `--changed` on
+  `r:check`/`r:test`/`r:lint`: tag findings `[introduced]` vs `[pre-existing]`
+  via a merge-base baseline run, and gate CI with `--fail-on introduced`. ~8 min.
+- **[S7 convention checking](s7-convention-checking.md)** — `r:s7-review`
+  static (pure-Python), `--eco` ecosystem sweep, and `--runtime` (R-backed:
+  dead generics, non-enforcing validators, unreachable methods). ~10 min.
+- **[Scaffolding existing packages](scaffolding-existing-packages.md)** — the
+  five `r:use-*` commands (test, package, vignette, data, citation),
+  dry-run by default. ~10 min.
+- **[Orchestrator cookbook](orchestrator-cookbook.md)** — ask the orchestrator
+  agent a *goal* ("is this CRAN-ready?") and let it run the right read-only
+  analyses. ~10 min.
 - **[CRAN release prep](cran-release-prep.md)** — Ecosystem-level pipeline:
   `/rforge:docs:check` → `/rforge:r:cran-prep` → `/rforge:thorough` →
   `/rforge:release`. ~15 min.
