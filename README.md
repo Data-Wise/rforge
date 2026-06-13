@@ -448,7 +448,7 @@ Plugin settings in `plugin.json`:
 ```
 ~/.claude/plugins/rforge/
 ├── .claude-plugin/
-│   ├── plugin.json          # Plugin manifest (v2.7.0)
+│   ├── plugin.json          # Plugin manifest (v2.8.0)
 │   ├── marketplace.json     # Marketplace install metadata
 │   ├── config.json          # User-tunable options (CRAN mirror, etc.)
 │   ├── hooks/
@@ -491,6 +491,6 @@ MIT
 
 ---
 
-**Version:** 2.7.0
+**Version:** 2.8.0
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+

@@ -1,6 +1,6 @@
 {
   "name": "rforge",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "RForge toolkit for Claude Code: 35 commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration",
   "author": {
     "name": "Data-Wise",
