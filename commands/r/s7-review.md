@@ -74,7 +74,7 @@ There is **no** `--write`/`--fix` (S7 fixes need human judgement, like `r:cran-p
 | methods | `dangling_method`, `missing_methods_register` | static |
 | legacy | `legacy_s4_in_s7`, `legacy_r5_in_s7`, `legacy_s3_generic` | static |
 | docs | `undocumented_export`, `prop_type_unresolvable` | static |
-| method-dispatch (`--runtime`) | `dead_generic` | runtime |
+| method-dispatch (`--runtime`) | `dead_generic`, `method_on_missing_class` | runtime |
 | validator-runtime (`--runtime`) | `validator_not_enforcing` | runtime |
 
 Static findings carry `source: "static"`; the two `--runtime` families carry
@@ -87,10 +87,15 @@ like / consider", never "must".
   by pkg B) remain future work; `--eco` today aggregates per-package static
   results, it does not yet cross-reference between packages.
 - `--runtime` for non-S7 OOP (R6/S4) is out of scope — S7 only.
-- **`method_on_missing_class`** (a method registered to a class that doesn't
-  exist at runtime) is **future work** — it can't be decided from the S7 method
-  registry alone, so it is not reported today. Only `dead_generic` fires in the
-  `method-dispatch` family.
+- **Cross-package *undeclared-dependency* dispatch** (a method on `otherpkg::Class`
+  where `otherpkg` isn't in `DESCRIPTION`) is a different, DESCRIPTION-aware check —
+  future work, distinct from `method_on_missing_class` below.
+
+> **`method_on_missing_class` is now implemented** (was deferred in v2.11.0). Each
+> `S7_method` carries its dispatch class objects (`attr(., "signature")`), so the
+> `method-dispatch` family flags a method whose signature references an S7 class with
+> no resolvable namespace binding (e.g. an inline `new_class()` left in a `method()`
+> call — an unreachable method). Base types and imported classes are not flagged.
 
 ## Output
 

@@ -457,9 +457,36 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             'val <- attr(cl, "validator"); '
             'if (is.null(val)) next; '
             'if (is_noop(val)) lax <- c(lax, cn) }; '
-            # (3) methods registered on a non-existent class: not decidable from
-            # the registry alone; reported empty (placeholder for future work).
-            'list(dead_generics=dead, methods_on_missing_class=character(), '
+            # (3) methods on a missing class: a method whose dispatch signature
+            # references an S7 class with no resolvable namespace binding (e.g. an
+            # inline `new_class()` left in a method() call) is unreachable — nothing
+            # can ever construct that class to dispatch on. Each S7_method carries
+            # attr(.,"signature") = the list of dispatch class OBJECTS, so this is
+            # decidable. Guards: base-type signature elements are not S7_class (skip);
+            # ANY/S7_object union dispatch skipped; imported classes (package attr set
+            # and != this package) are trusted to resolve (not flagged).
+            'collect_methods <- function(env, acc) { '
+            'if (!is.environment(env)) return(acc); '
+            'for (k in ls(env, all.names=TRUE)) { v <- get(k, envir=env); '
+            'if (is.environment(v)) acc <- collect_methods(v, acc) '
+            'else acc <- c(acc, list(v)) }; acc }; '
+            'missing <- character(); '
+            'for (gn in names(gens)) { g <- gens[[gn]]; '
+            'ms <- collect_methods(attr(g, "methods"), list()); '
+            'for (md in ms) { sigs <- attr(md, "signature"); '
+            'if (is.null(sigs)) next; '
+            'for (s in sigs) { if (!inherits(s, "S7_class")) next; '
+            'cnm <- attr(s, "name"); cpkg <- attr(s, "package"); '
+            'if (is.null(cnm) || !nzchar(cnm) || cnm %in% c("ANY", "S7_object")) next; '
+            'ext <- !is.null(cpkg) && nzchar(cpkg) && !identical(cpkg, nm); '
+            'resolves <- if (ext) { '
+            'tryCatch(exists(cnm, envir=asNamespace(cpkg), inherits=FALSE), '
+            'error=function(e) TRUE) } else { '
+            'o <- get0(cnm, envir=ns, inherits=FALSE); '
+            '!is.null(o) && inherits(o, "S7_class") }; '
+            'if (!resolves) missing <- c(missing, paste(gn, "->", cnm)) } } }; '
+            'missing <- unique(missing); '
+            'list(dead_generics=dead, methods_on_missing_class=missing, '
             'nonenforcing_validators=lax)}, '
             'error=function(e) list(engine_missing=character(), '
             'messages=paste("s7runtime load/introspection failed:", '

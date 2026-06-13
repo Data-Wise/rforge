@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **`r:s7-review` `method_on_missing_class`** runtime finding (closes the family
+  deferred in v2.11.0). The `--runtime` `method-dispatch` family now flags a method
+  whose dispatch signature references an S7 class with **no resolvable namespace
+  binding** (e.g. an inline `new_class()` left in a `method()` call) — an unreachable
+  method, the runtime sibling of `dead_generic`. The v2.11.0 "not decidable from the
+  registry alone" deferral was refuted empirically: each `S7_method` carries
+  `attr(., "signature")` (its dispatch class objects), so resolvability is decidable.
+  Base-type methods and imported classes are guarded against false positives. Lands in
+  the `s7runtime` engine (`lib/rcmd.py`) + consumer (`lib/s7review.py`); R-gated e2e
+  test. Spec: `SPEC-s7-method-missing-class-2026-06-13.md`. No command-count change.
+
+---
+
 ## [2.11.0] - 2026-06-13
 
 > Bundles three follow-up features — diff-aware `[introduced]`/`[pre-existing]`

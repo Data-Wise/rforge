@@ -884,3 +884,42 @@ def test_s7runtime_e2e_on_committed_bad_fixture():
     assert "NonEnforcing" in rt.get("nonenforcing_validators", []), env
     # external_generic has a method -> must NOT be flagged dead
     assert "external_generic" not in rt.get("dead_generics", []), env
+
+
+@pytest.mark.skipif(not _have_r_with_s7(),
+                    reason="R + S7 + pkgload + jsonlite not installed")
+def test_s7runtime_e2e_detects_method_on_missing_class(tmp_path):
+    """Real-R e2e: a method registered on an inline, unbound class (nothing can ever
+    construct it) is flagged in methods_on_missing_class; a method on a real bound
+    class and a base-type method are NOT flagged."""
+    pkg = tmp_path / "s7mm"
+    (pkg / "R").mkdir(parents=True)
+    (pkg / "DESCRIPTION").write_text(textwrap.dedent("""\
+        Package: s7mm
+        Version: 0.0.1
+        Title: S7 missing-class fixture
+        Imports: S7
+        Encoding: UTF-8
+    """))
+    (pkg / "NAMESPACE").write_text("import(S7)\n")
+    (pkg / "R" / "classes.R").write_text(textwrap.dedent("""\
+        Real <- S7::new_class("Real")
+        speak <- S7::new_generic("speak", "x")
+        # (ok) method on a real, namespace-bound class
+        S7::method(speak, Real) <- function(x, ...) "real"
+        # (ok) method on a base type -> not an S7 class, must NOT be flagged
+        S7::method(speak, S7::class_integer) <- function(x, ...) "int"
+        # (BAD) method on an inline class with NO namespace binding -> unreachable
+        S7::method(speak, S7::new_class("Ghost")) <- function(x, ...) "boo"
+    """))
+    env = rcmd.run("s7runtime", str(pkg))
+    assert env["kind"] == "s7runtime", env
+    msgs = env.get("messages", [])
+    msg_text = msgs if isinstance(msgs, str) else " ".join(msgs)
+    assert "failed" not in msg_text.lower(), f"fixture did not load: {env}"
+    rt = env.get("s7runtime", {})
+    missing = rt.get("methods_on_missing_class", [])
+    flat = " ".join(missing)
+    assert "Ghost" in flat, env          # dangling method flagged
+    assert "Real" not in flat, env       # real bound class NOT flagged
+    assert "integer" not in flat, env    # base type NOT flagged (false-positive guard)

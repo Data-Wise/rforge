@@ -53,10 +53,12 @@ subprocess call from `s7review.py`.
 
 1. **`method-dispatch`** — for each declared S7 generic, does dispatch actually resolve
    to a method for its registered classes? Flags generics with no resolvable method
-   (`dead_generic`). **Deferred:** `method_on_missing_class` (methods registered to a
-   non-existent class) is *not implemented* — it can't be decided from the S7 method
-   registry alone; the R engine returns an empty placeholder list and the Python
-   consumer builds no findings for it. Future work.
+   (`dead_generic`) **and** methods whose dispatch class has no resolvable namespace
+   binding (`method_on_missing_class`). **UPDATE (post-v2.11.0):** `method_on_missing_class`
+   is now implemented — the original "not decidable from the registry alone" deferral was
+   refuted: each `S7_method` carries `attr(., "signature")` (its dispatch class objects),
+   so resolvability against the loaded namespace is decidable. See
+   `SPEC-s7-method-missing-class-2026-06-13.md`.
 2. **`validator-runtime`** — instantiate each S7 class with a deliberately invalid
    property value; flag classes whose `validator` fails to reject it (validator present
    in source but not actually enforcing — the runtime sibling of v1's static
