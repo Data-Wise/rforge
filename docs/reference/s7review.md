@@ -101,3 +101,31 @@ Run all 5 convention checks; roll into one worst-of (ok<warn) envelope.
 
 Returns ``{kind: "s7review", status, stages, engine_missing: []}``. If no
 ``R/`` directory exists, returns a single ``warn`` envelope (advisory).
+
+### `run_all_with_runtime()`
+
+```python
+def run_all_with_runtime(path: 'str | os.PathLike' = '.') -> 'dict'
+```
+
+``run_all`` + the two R-backed runtime families, merged into one envelope.
+
+Never raises: the runtime pass degrades to advisory ``warn`` stages when R is
+unavailable, so the static result is always intact. Worst-of (ok<warn) status.
+
+### `run_eco()`
+
+```python
+def run_eco(root: 'str | os.PathLike' = '.') -> 'dict'
+```
+
+Run the 5 static families across **every package** in the ecosystem.
+
+Resolves the package set via ``discovery.detect_ecosystem`` (the single source
+of truth + the curated ``manifest_order``), runs ``run_all`` per package, and
+aggregates one envelope: a per-package breakdown plus an ecosystem roll-up
+(total findings by family, packages clean vs flagged). Ordered by
+``manifest_order`` when present, else discovery order.
+
+Pure-stdlib (no R). A package that raises during its sweep is reported as a
+per-package ``warn`` rather than aborting the whole sweep — never raises.

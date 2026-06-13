@@ -475,9 +475,10 @@ assert 'changed_files' in d and 'changed_packages' in d, d
 "
 }
 
-# Scaffolding: the three use-* commands must carry name+description frontmatter.
+# Scaffolding: the use-* commands must carry name+description frontmatter.
 scaffold_cmds_frontmatter() {
-    for f in commands/r/use-test.md commands/r/use-package.md commands/r/use-vignette.md; do
+    for f in commands/r/use-test.md commands/r/use-package.md commands/r/use-vignette.md \
+             commands/r/use-data.md commands/r/use-citation.md; do
         grep -q "^name: rforge:r:use-" "$f" || { echo "missing name in $f"; return 1; }
         grep -q "^description:" "$f" || { echo "missing description in $f"; return 1; }
     done

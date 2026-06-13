@@ -18,7 +18,7 @@ Complete reference for all **{{ rforge.command_count }}** RForge commands. Comma
 - [R Development Cycle](#r-development-cycle) (8 commands)
 - [R Quality](#r-quality) (5 commands)
 - [CRAN Submission](#cran-submission) (6 commands)
-- [R Authoring](#r-authoring) (3 commands)
+- [R Authoring](#r-authoring) (5 commands)
 
 ---
 
@@ -542,9 +542,10 @@ R CMD check integration with detailed error reporting.
 - `package` (optional) - Package to check (defaults to current)
 - `--strict` (optional) - Run both CRAN Suggests-withholding flavors (default: false)
 - `--incoming` (optional) - Emulate CRAN's incoming `_R_CHECK_*` bundle; implies `--strict` (default: false)
-- `--changed` (optional, v2.10.0) - Scope the check to the package(s) changed on this branch (diff vs `merge-base(HEAD, --base)`) and report their REAL full check status. **`[introduced]`/`[pre-existing]` tagging is NOT YET WIRED** (needs a merge-base checkout) — `--changed` is currently scope-only (default: false)
-- `--base <ref>` (optional, v2.10.0) - Comparison ref for `--changed`; diff is taken against `merge-base(HEAD, base)` (default: `HEAD` = uncommitted working-tree changes)
-- `--changed-strict` (optional, v2.10.0) - Documented no-op reserved for when tagging lands; `--changed` is always scope-only for now (default: false)
+- `--changed` (optional, v2.10.0; tagging v2.11.0) - Scope the check to the package(s) changed on this branch and tag each finding **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already at the fork point), via a baseline run in a detached worktree at `merge-base(HEAD, --base)` (default: false)
+- `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed`; the baseline is run at `merge-base(HEAD, base)` (default: `dev`)
+- `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on findings tagged `[introduced]` (default: `introduced`); `none` is advisory
+- `--changed-strict` (optional, v2.10.0) - Documented no-op (default: false)
 
 **Examples:**
 ```bash
@@ -560,7 +561,7 @@ R CMD check integration with detailed error reporting.
 # Add the opt-in incoming env-var bundle
 /rforge:r:check --incoming
 
-# Scope the check to the package(s) changed on this branch (scope-only)
+# Tag findings [introduced]/[pre-existing] vs the fork point; fail only on introduced
 /rforge:r:check --changed --base dev
 ```
 
@@ -577,7 +578,7 @@ R CMD check integration with detailed error reporting.
 
 **Note:** This can take 1-5 minutes depending on package size. Strict mode runs the baseline plus two flavor passes (~3× check time; ~4× with `--incoming`).
 
-**Diff-aware mode (v2.10.0):** `--changed` scopes the check to the R package(s) touched on this branch and reports their REAL full check status, so a real ERROR/WARNING/NOTE on a changed package surfaces and drives the exit status. **`[introduced]`/`[pre-existing]` tagging is NOT YET WIRED** — an honest comparison needs a merge-base checkout (running R against the fork point in a detached worktree), which is not built yet. Until then `--changed` is **scope-only** and does not yet answer "did *my* change cause this?"; `--changed-strict` is a documented no-op reserved for when tagging lands. Degrades gracefully: not a git repo / no merge-base → a full check plus a warning; no changes → a clean no-op.
+**Diff-aware mode (v2.10.0; tagging v2.11.0):** `--changed` scopes the check to the R package(s) touched on this branch and tags each finding **`[introduced]`** vs **`[pre-existing]`** — computed honestly by a second baseline run in a detached worktree checked out at `merge-base(HEAD, --base)` (default base `dev`). `--fail-on introduced` (the default) exits non-zero only on findings your branch introduced, so CI fails on regressions you caused — not pre-existing debt (`--fail-on none` is advisory). Identity is line-shift-immune (findings key on file + message, not raw line). Degrades gracefully: not a git repo / no merge-base / baseline-worktree failure → falls back to a real full check plus a warning (scope-only, no tagging — no regression of v2.10.0); no changes → a clean no-op. Out of scope: uncommitted-change tagging and cross-run baseline caching (each invocation pays one extra check). `--changed-strict` is a documented no-op.
 
 ---
 
@@ -659,8 +660,9 @@ Run package tests via `testthat` and report pass/fail/skip counts.
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
-- `--changed` (optional, v2.10.0) - Scope tests to the package(s) changed on this branch (diff vs `merge-base(HEAD, --base)`; scope-only, results reported as-is — no finding tagging) (default: false)
-- `--base <ref>` (optional, v2.10.0) - Comparison ref for `--changed` (default: `HEAD`)
+- `--changed` (optional, v2.10.0; tagging v2.11.0) - Scope tests to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run (default: false)
+- `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed` (default: `dev`)
+- `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on `[introduced]` findings (default: `introduced`)
 
 **Examples:**
 
@@ -866,8 +868,9 @@ Static analysis of the package via `lintr` — grouped report of style and code-
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
-- `--changed` (optional, v2.10.0) - Scope lint to the package(s) changed on this branch (diff vs `merge-base(HEAD, --base)`; scope-only, lints reported as-is — no finding tagging) (default: false)
-- `--base <ref>` (optional, v2.10.0) - Comparison ref for `--changed` (default: `HEAD`)
+- `--changed` (optional, v2.10.0; tagging v2.11.0) - Scope lint to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; line-shift-immune identity (default: false)
+- `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed` (default: `dev`)
+- `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on `[introduced]` findings (default: `introduced`)
 
 **Examples:**
 
@@ -891,18 +894,20 @@ Static analysis of the package via `lintr` — grouped report of style and code-
 
 ### /rforge:r:s7-review
 
-Static **S7 OOP convention checker** — scans `R/*.R` + `NAMESPACE` and reports advisory convention findings across five families. **Advisory only, never blocks** (mirrors `r:cran-prep`'s Tier-4 tone). Pure Python — no R, no Rscript.
+Static **S7 OOP convention checker** — scans `R/*.R` + `NAMESPACE` and reports advisory convention findings across five static families. **Advisory only, never blocks** (mirrors `r:cran-prep`'s Tier-4 tone). The static pass is pure Python — no R, no Rscript. An opt-in `--runtime` pass adds two R-backed families (loads the package and introspects S7 at runtime), and `--eco` sweeps the static families across the whole ecosystem manifest.
 
 **Usage:**
 
 ```bash
-/rforge:r:s7-review [package] [--kind all|naming|validators|methods|legacy|docs] [--format json|text]
+/rforge:r:s7-review [package] [--kind all|naming|validators|methods|legacy|docs] [--eco] [--runtime] [--format json|text]
 ```
 
 **Parameters:**
 
 - `package` (optional, positional) - Package directory to review (defaults to current directory)
 - `--kind` (optional) - Limit to one convention family: `all` (default), `naming`, `validators`, `methods`, `legacy`, or `docs`
+- `--eco` (optional) - Sweep the static families across **every package** in the ecosystem manifest, aggregated (pure-stdlib; composes with `--runtime`)
+- `--runtime` (optional) - Add an R-backed runtime pass (`method-dispatch` + `validator-runtime`) via `lib.rcmd`; degrades to an advisory `warn` when R/S7 is unavailable
 - `--format` (optional) - Output format: `json` (default) or `text`
 
 There is **no** `--write`/`--fix` — S7 fixes need human judgement.
@@ -918,17 +923,27 @@ There is **no** `--write`/`--fix` — S7 fixes need human judgement.
 
 # Review a specific package
 /rforge:r:s7-review ~/projects/mypackage
+
+# Sweep the whole ecosystem (static families)
+/rforge:r:s7-review --eco
+
+# Add the R-backed runtime pass (dead generics + non-enforcing validators)
+/rforge:r:s7-review --runtime
 ```
 
 **Convention families:**
 
-| Family | Example codes |
-|---|---|
-| naming | `class_name_case`, `class_name_mismatch`, `generic_name_case`, `prop_name_case` |
-| validators | `missing_validator`, `validator_return_shape` |
-| methods | `dangling_method`, `missing_methods_register` |
-| legacy | `legacy_s4_in_s7`, `legacy_r5_in_s7`, `legacy_s3_generic` |
-| docs | `undocumented_export`, `prop_type_unresolvable` |
+| Family | Example codes | Source |
+|---|---|---|
+| naming | `class_name_case`, `class_name_mismatch`, `generic_name_case`, `prop_name_case` | static |
+| validators | `missing_validator`, `validator_return_shape` | static |
+| methods | `dangling_method`, `missing_methods_register` | static |
+| legacy | `legacy_s4_in_s7`, `legacy_r5_in_s7`, `legacy_s3_generic` | static |
+| docs | `undocumented_export`, `prop_type_unresolvable` | static |
+| method-dispatch (`--runtime`) | `dead_generic` | runtime |
+| validator-runtime (`--runtime`) | `validator_not_enforcing` | runtime |
+
+The `method-dispatch` runtime family currently reports only `dead_generic`; `method_on_missing_class` is **deferred** (it can't be decided from the S7 registry alone — future work).
 
 **Output:** one `{kind: "s7review", status: "ok"|"warn", stages: [...]}` envelope. Each finding carries `source: "static"` and `severity: "advisory"`, worded "looks like / consider", never "must". Exit 0 always.
 
@@ -1368,13 +1383,76 @@ If `usethis` is absent, a manual `usethis::use_vignette()` recipe is printed (no
 
 ---
 
+### /rforge:r:use-data
+
+Document a package dataset for an existing package: appends a roxygen doc stub to `R/data.R` (`@title`, `@format` with a `\describe{}` skeleton, `@source`, and the trailing `"<name>"` documented-data idiom) and patches `DESCRIPTION` (`LazyData: true` / `Depends: R (>= 2.10)`). Never fabricates the `.rda` — emits a `usethis::use_data(<name>)` reminder. DESCRIPTION edits preserve existing version constraints.
+
+**Usage:**
+
+```bash
+/rforge:r:use-data <name> [--write]
+```
+
+**Parameters:**
+
+- `name` (required) - The dataset/object name to document
+- `--write` (optional) - Apply the plan: append to `R/data.R` (create if absent) + patch DESCRIPTION. Default is dry-run (default: false)
+
+**Examples:**
+
+```bash
+# Dry-run: print the planned roxygen block + DESCRIPTION delta
+/rforge:r:use-data mydata
+
+# Apply: append the doc + patch DESCRIPTION
+/rforge:r:use-data mydata --write
+```
+
+A collision guard skips appending if `R/data.R` already documents the same `\name` (warns, no duplicate).
+
+**Related commands:** `/rforge:r:document` (regenerate the Rd), `/rforge:r:check`
+
+---
+
+### /rforge:r:use-citation
+
+Scaffold `inst/CITATION` from `DESCRIPTION`: parses `Title`, `Authors@R` (or fallback `Author`), and `Version`, and renders a `bibentry(bibtype = "Manual", ...)` using the package's own `person()` calls. The year comes from `Date:` if present, else a `<YEAR>` TODO — never a wall-clock date (determinism). Unparseable authors degrade to a `# TODO` block + a warning.
+
+**Usage:**
+
+```bash
+/rforge:r:use-citation [--write] [--force]
+```
+
+**Parameters:**
+
+- `--write` (optional) - Apply the plan: write `inst/CITATION` (create `inst/` if absent). Default is dry-run (default: false)
+- `--force` (optional) - Overwrite an existing `inst/CITATION` (refused without this flag) (default: false)
+
+**Examples:**
+
+```bash
+# Dry-run: print the planned inst/CITATION
+/rforge:r:use-citation
+
+# Apply: write inst/CITATION
+/rforge:r:use-citation --write
+
+# Overwrite an existing inst/CITATION
+/rforge:r:use-citation --write --force
+```
+
+**Related commands:** `/rforge:r:check` (validates `inst/CITATION` parses)
+
+---
+
 ## Command Categories Summary
 
 ### By Time Budget
 
 | Time | Commands |
 |------|----------|
-| <10s | `status`, `quick`, `detect`, `deps` (visual), `next`, `r:s7-review`, `r:use-test`/`r:use-package`/`r:use-vignette` (dry-run) |
+| <10s | `status`, `quick`, `detect`, `deps` (visual), `next`, `r:s7-review`, `r:use-test`/`r:use-package`/`r:use-vignette`/`r:use-data`/`r:use-citation` (dry-run) |
 | <30s | `analyze` (default), `cascade`, `impact`, `docs:check` |
 | <1min | `r:load`, `r:document`, `r:lint`, `r:spell`, `r:urlcheck`, `r:style` |
 | <2min | `analyze` (debug/optimize), `r:test`, `r:coverage`, `r:build`, `r:install` |

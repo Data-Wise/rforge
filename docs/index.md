@@ -54,13 +54,21 @@ Most daily work runs through these; the rest of the plugin's {{ rforge.command_c
 /rforge:thorough "Prepare for CRAN release"
 ```
 
+## What's new in v2.11.0
+
+Three follow-up features — now {{ rforge.command_count }} commands.
+
+- **diff-aware `--changed` tagging** — `/rforge:r:check`/`r:test`/`r:lint` now tag each finding **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already at the fork point), via a second baseline run in a detached worktree at `merge-base(HEAD, --base)` (default base `dev`). New **`--fail-on introduced`** (the default) fails CI only on regressions you caused. Finding identity is line-shift-immune. Falls back to the v2.10.0 scope-only behavior when no merge-base is available. See the [`changed` reference](reference/changed.md).
+- **`/rforge:r:s7-review --eco` + `--runtime`** — `--eco` runs the static families across **every package** in the ecosystem manifest (pure-stdlib); `--runtime` adds an R-backed pass (via a new `s7runtime` engine) with two runtime families — **`dead_generic`** (an S7 generic with no methods) and **`validator_not_enforcing`** (a no-op validator). Degrades to advisory when R/S7 is absent. See the [`s7review` reference](reference/s7review.md).
+- **`/rforge:r:use-data` + `/rforge:r:use-citation`** — complete the `r:use-*` family. `use-data` documents a dataset (`R/data.R` roxygen + `DESCRIPTION` patch through the constraint-preserving writer); `use-citation` scaffolds `inst/CITATION` from `DESCRIPTION` (deterministic — no wall-clock date). **Dry-run by default**, `--write` applies. See the [`scaffold` reference](reference/scaffold.md).
+
 ## What's new in v2.10.0
 
-Three additive features — now {{ rforge.command_count }} commands.
+Three additive features.
 
 - **`/rforge:r:s7-review`** — a static **S7 OOP convention checker**. Scans `R/*.R` + `NAMESPACE` across five families — naming, validators, methods, legacy (S4/R5/S3 leftovers), and docs — and reports advisory "looks like / consider" findings. **Advisory only, never blocks**, mirroring `r:cran-prep`'s Tier-4 tone. Pure Python (no R, no Rscript), no `--write`. See the [`s7review` reference](reference/s7review.md).
 - **Scaffolding for existing packages** — `/rforge:r:use-test`, `/rforge:r:use-package`, `/rforge:r:use-vignette`. Draft a testthat file (one `test_that()` per branch, assertions left as `# TODO`), declare a dependency (Imports-vs-Suggests auto-picked via `deps_sync`, with an `@importFrom` tag), or scaffold a vignette/article skeleton. **Dry-run by default**; `--write` applies, `--force` overwrites. See the [`scaffold` reference](reference/scaffold.md) and the [scaffolding tutorial](tutorials/scaffolding-existing-packages.md).
-- **diff-aware `--changed`** — a new flag on `/rforge:r:check`, `/rforge:r:test`, and `/rforge:r:lint` that scopes the run to the package(s) changed on this branch (diff vs `merge-base(HEAD, --base)`) and reports their REAL full status. **`[introduced]`/`[pre-existing]` finding tagging is NOT YET WIRED** (it needs a merge-base checkout that isn't built), so `--changed` ships as **scope-only** for now — it does not yet answer "did *my* change cause this?". `--changed-strict` is a documented no-op reserved for when tagging lands. See the [`changed` reference](reference/changed.md).
+- **diff-aware `--changed`** — a new flag on `/rforge:r:check`, `/rforge:r:test`, and `/rforge:r:lint` that scopes the run to the package(s) changed on this branch and reports their REAL full status. (Shipped scope-only in v2.10.0; **`[introduced]`/`[pre-existing]` tagging landed in v2.11.0** — see above.) See the [`changed` reference](reference/changed.md).
 
 ## What's new in v2.9.0
 

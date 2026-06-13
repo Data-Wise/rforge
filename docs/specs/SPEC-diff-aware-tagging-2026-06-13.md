@@ -56,10 +56,23 @@ test must use a real git repo (no mocking the diff).
   description updated from "scope-only" back to describing tagging; add `--base` and
   `--fail-on` to the `arguments:` array.
 
-### Finding identity (already implemented)
+### Finding identity
 
-`tag_findings` keys on `(file, normalized-line, message)` with multiset (Counter)
-semantics so duplicate findings count correctly. No change needed.
+`tag_findings` keys each finding via `changed._finding_identity` with multiset
+(Counter) semantics so duplicate findings count correctly:
+
+- **String findings** (R CMD check errors/warnings/notes) → keyed by the string itself.
+- **Dict findings** (lint: `{file, line, linter, message}`) → keyed by
+  `(file, message, linter)`, **EXCLUDING the raw `line`**. A pre-existing lint
+  whose line shifted because an unrelated edit inserted/removed lines above it
+  therefore stays `[pre-existing]` instead of mis-flipping to `[introduced]`. The
+  full finding (with its real line) is preserved in `text` for display.
+
+(The earlier draft of this spec claimed a `(file, normalized-line, message)`
+key; no line-normalization step ever existed — excluding `line` for dict findings
+is the actual, simpler implementation, regression-tested in
+`tests/test_changed.py::test_tag_findings_lint_line_shift_stays_pre_existing` and
+`::test_scope_check_line_shifted_lint_tagged_pre_existing`.)
 
 ### Safety / cleanup
 

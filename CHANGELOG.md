@@ -7,6 +7,93 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.11.0] - 2026-06-13
+
+> Bundles three follow-up features — diff-aware `[introduced]`/`[pre-existing]`
+> tagging (P0 completion), `r:s7-review --eco`/`--runtime`, and the
+> `r:use-data`/`r:use-citation` scaffolders — each built TDD-first from an
+> approved spec, then hardened by a pre-release adversarial review.
+> **39 → 41 commands.**
+
+### Added
+
+- **`r:use-data` + `r:use-citation`** (scaffolding v2 — completes the `r:use-*`
+  family; **39 → 41 commands**). Same contract as the v2.10.0 scaffolders:
+  dry-run by default, `--write` applies, pure-stdlib (no R). **`r:use-data`**
+  documents a package dataset — appends a roxygen stub to `R/data.R` (`@title`,
+  `@format` with a `\describe{}` skeleton, `@source`, and the trailing
+  `"<name>"` documented-data idiom) and patches `DESCRIPTION`
+  (`LazyData: true` / `Depends: R (>= 2.10)`) through the shared
+  constraint-preserving DCF writer (`deps_sync._read_field_specs` /
+  `_rewrite_field` — existing version floors survive, regression-locking the
+  v2.10.0 fix on the new path). It **never fabricates the `.rda`** (the data is
+  the user's) — it emits the exact `usethis::use_data(<name>)` reminder — and a
+  collision guard skips duplicate `\name` docs. **`r:use-citation`** scaffolds
+  `inst/CITATION` from `DESCRIPTION` (`Title`/`Authors@R`→`person()`/`Version`)
+  as a `bibentry(bibtype = "Manual", ...)`; the year comes from `Date:` if
+  present, else a `<YEAR>` TODO — **never a wall-clock date** (determinism).
+  `--write` writes the file, `--force` to clobber; unparseable authors degrade
+  to a `# TODO` block + warn (never raises). Both land in `lib/scaffold.py`
+  (12 new tests). Spec: `SPEC-r-scaffolding-v2-2026-06-13.md`.
+- **`r:s7-review --eco` + `--runtime`** (v2 sibling of the v2.10.0 static checker) —
+  two composable flags, no new command. **`--eco`** runs the 5 static families
+  across **every package** in the ecosystem manifest and aggregates one
+  `s7review-eco` envelope (per-package breakdown + roll-up by family, ordered by
+  the manifest's `manifest_order`); pure-stdlib, a parse-failure package degrades
+  to a per-package `warn` without aborting the sweep. **`--runtime`** adds an
+  R-backed pass — a new **`s7runtime` engine in `lib/rcmd.py`** (`pkgload::load_all`
+  + S7 runtime introspection) contributing two new families: **`method-dispatch`**
+  (`dead_generic` — an S7 generic with zero registered methods) and
+  **`validator-runtime`** (`validator_not_enforcing` — a validator whose body is a
+  constant no-op that can never reject input). The runtime families carry
+  `source: "runtime"`; static findings keep `source: "static"`. All R routes
+  through `lib.rcmd` (the only R-touching module); `s7runtime` is read-only and
+  added to `SAFE_AUTORUN`. The flags compose (`--eco --runtime`). `--runtime`
+  degrades to advisory `warn` stages ("runtime pass skipped: …") when R / S7 is
+  unavailable — the static result is always intact, exit 0 always (mirrors
+  `runiverse` offline degradation). Spec: `SPEC-r-s7-review-eco-2026-06-13.md`.
+- **diff-aware `--changed` tagging** (P0 completion) — completes the v2.10.0
+  scope-only `--changed` flag on `r:check`/`r:test`/`r:lint`. Each finding is now
+  tagged **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already
+  present at the fork point), computed honestly via a second baseline run in a
+  detached worktree checked out at `git merge-base(HEAD, --base)` (`--base`
+  default: `dev`). New `merge_base()` + `run_baseline()` in `lib/changed.py`
+  (guaranteed worktree cleanup in a `finally`) wake the previously dormant
+  `scope_check()`; `lib/rcmd.run_changed` wires them in with a per-kind runner.
+  New **`--fail-on`** flag (default `introduced`) exits non-zero iff ≥1 introduced
+  finding, so CI fails only on regressions you caused — not pre-existing debt;
+  `--fail-on none` is advisory. No command-count change (flags). Spec:
+  `SPEC-diff-aware-tagging-2026-06-13.md`.
+
+### Changed
+
+- `--changed` baseline now runs in a real merge-base detached worktree instead of
+  the scope-only fallback. The fallback (real status, no tagging) is preserved
+  when no merge-base / baseline worktree is available — no regression of v2.10.0.
+
+### Fixed (pre-release adversarial review)
+
+A multi-agent adversarial review caught three bug-classes the green gates missed:
+
+- **`r:use-citation` emitted invalid R** for the standard `Authors@R` idioms —
+  a flat regex truncated `person(role = c("aut", "cre"))` (fired on the repo's
+  own fixture), and interpolated `Title`/`Version` weren't escaped (a `"` in the
+  title broke the literal). Now the `Authors@R` value is re-emitted verbatim and
+  every interpolated value routes through `_r_string()`. New tests assert the
+  generated CITATION actually parses under `Rscript`.
+- **diff-aware tagging mis-tagged shifted lint findings** — `tag_findings` keyed
+  on the raw line number, so inserting a blank line above a pre-existing lint
+  tagged it `[introduced]` (a false positive). Dict findings now key on
+  `(file, message, linter)`, line-shift-immune.
+- **`r:s7-review` advertised a non-working family** — `method_on_missing_class`
+  was a hardcoded-empty placeholder listed as a runtime finding. Removed the dead
+  code path and marked it deferred in the command help + spec.
+- Plus: dead `_CHANGED_SCOPE_ONLY` constant removed, s7 test fixtures fixed to
+  actually load under S7 (real-R runtime path now has a regression test), and
+  `use-data`'s collision guard now matches indented doc lines.
+
+---
+
 ## [2.10.0] - 2026-06-13
 
 > Bundles three roadmap features — an S7 convention checker, diff-aware checks,

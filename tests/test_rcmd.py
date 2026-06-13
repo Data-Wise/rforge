@@ -484,12 +484,11 @@ def test_check_changed_scopes_to_changed_package(monkeypatch, tmp_path):
     assert str(tmp_path / "pkgA") in seen_paths
 
 
-def test_check_changed_surfaces_real_status_no_false_ok(monkeypatch, tmp_path):
-    """Honest scope-only: a REAL check finding on the changed package must NOT be
-    folded to ok. This is the regression guard for the v2.10.0 false-negative —
-    the old code fabricated introduced_counts={0,0,0} from two identical runs and
-    silently downgraded status to ok. Here the changed package reports a real
-    WARNING; the result must stay 'warn' and carry the tagging-deferred message.
+def test_check_changed_scope_only_fallback_surfaces_real_status(monkeypatch, tmp_path):
+    """When tagging is unavailable (no merge-base — tmp_path is not a git repo),
+    the scope-only fallback must surface the REAL status, never fold to ok. This is
+    the regression guard for the v2.10.0 false-negative: the changed package
+    reports a real WARNING; the result stays 'warn' with the scope-only message.
     """
     pkg = changed_mod.Package(name="pkgA", version="0.1.0",
                               path=str(tmp_path / "pkgA"))
@@ -510,15 +509,15 @@ def test_check_changed_surfaces_real_status_no_false_ok(monkeypatch, tmp_path):
     assert env["status"] == "warn"
     # the real finding is surfaced
     assert env["check"]["warnings"] == ["W: introduced by branch"]
-    # no fabricated tagging block
+    # no tagging block in the fallback
     assert "findings" not in env["changed"]
-    assert "introduced_counts" not in env["changed"]
-    # honest deferral message present
-    assert any("tagging deferred" in m for m in env.get("messages", []))
+    assert "introduced_count" not in env["changed"]
+    # scope-only fallback message present
+    assert any("scope-only" in m for m in env.get("messages", []))
 
 
-def test_check_changed_strict_is_noop_still_scope_only(monkeypatch, tmp_path):
-    """--changed-strict is a documented no-op: still scope-only, real status."""
+def test_check_changed_strict_is_noop_still_works(monkeypatch, tmp_path):
+    """--changed-strict is a documented no-op: scope-only fallback, real status."""
     pkg = changed_mod.Package(name="pkgA", version="0.1.0",
                               path=str(tmp_path / "pkgA"))
     monkeypatch.setattr(rcmd.changed, "changed_files",
@@ -531,21 +530,24 @@ def test_check_changed_strict_is_noop_still_scope_only(monkeypatch, tmp_path):
     env = rcmd.run_changed("check", root=str(tmp_path), base="dev",
                            changed_strict=True)
     assert env["status"] == "error"
-    assert "introduced_counts" not in env["changed"]
+    assert "introduced_count" not in env["changed"]
 
 
-def test_check_changed_real_git_repo_scope_only_e2e(monkeypatch, tmp_path):
-    """END-TO-END through the REAL git + discovery path (only R `run` is faked).
+def test_check_changed_real_git_repo_tagging_e2e(monkeypatch, tmp_path):
+    """END-TO-END through the REAL git + discovery + worktree path (only R `run`
+    is faked). Drives `run_changed("check", ...)` against a throwaway git repo with
+    one R package modified on a feature branch. `changed_files`, `changed_packages`,
+    `merge_base`, `run_baseline` (a real `git worktree add --detach`), and
+    `scope_check` all run for real.
 
-    This drives `run_changed("check", ...)` against a throwaway git repo with one
-    R package whose source was modified on a feature branch. Nothing about findings
-    is monkeypatched — `changed_files`, `changed_packages`, and `scope_check` all
-    run for real. The faked R engine reports a real ERROR for the changed package.
+    The faked R engine is PATH-SENSITIVE: it reports an ERROR only when the
+    package's f.R contains the branch content ("2"), mimicking a real
+    branch-introduced failure. The baseline detached worktree holds the base
+    content ("1") → no error there → the finding tags [introduced] → status error.
 
     This is the test that would have caught the v2.10.0 false-negative: the old
-    code ran `scope_check` (which checked the live worktree twice), tagged the real
-    ERROR as [pre-existing], computed introduced_counts={0,0,0}, and folded status
-    to 'ok'. The honest scope-only path keeps status 'error'.
+    broken draft compared HEAD against HEAD and tagged the real error pre-existing.
+    Here the baseline is a genuine checkout of the merge-base, so the diff is real.
     """
     import subprocess
 
@@ -569,22 +571,26 @@ def test_check_changed_real_git_repo_scope_only_e2e(monkeypatch, tmp_path):
     git("add", "-A")
     git("commit", "-qm", "change f")
 
-    # Only the R engine is faked — it reports a REAL error for the changed pkg.
+    # Path-sensitive faked engine: error iff f.R holds the branch content.
     def fake_run(kind, path=".", **kw):
-        return {"kind": "check", "status": "error",
-                "check": {"errors": ["E: real check failure"], "warnings": [],
-                          "notes": []}}
+        src = (Path(path) / "R" / "f.R").read_text()
+        errs = ["E: real check failure"] if "2" in src else []
+        status = "error" if errs else "ok"
+        return {"kind": "check", "status": status,
+                "check": {"errors": errs, "warnings": [], "notes": []}}
 
     monkeypatch.setattr(rcmd, "run", fake_run)
 
     env = rcmd.run_changed("check", root=str(tmp_path), base="main")
-    # (a) scoped to the changed package
+    # (a) scoped to the changed package, two-run tagging engaged
     assert env["changed"]["packages"] == ["mypkg"]
-    # (b) real finding surfaced, status NOT falsely folded to ok
+    assert env["changed"]["fell_back"] is False
+    # (b) the error is genuinely NEW on the branch → tagged introduced
+    tags = {f["text"]: f["tag"] for f in env["changed"]["findings"]}
+    assert tags == {"E: real check failure": "introduced"}
+    assert env["changed"]["introduced_count"] == 1
+    # (c) default --fail-on introduced → status error
     assert env["status"] == "error"
-    assert env["check"]["errors"] == ["E: real check failure"]
-    # (c) honest tagging-deferred message present
-    assert any("tagging deferred" in m for m in env.get("messages", []))
 
 
 def test_changed_no_git_falls_back_to_full(monkeypatch, tmp_path):
@@ -611,8 +617,12 @@ def test_changed_no_changes_is_noop_ok(monkeypatch, tmp_path):
     assert any("no changes" in m.lower() for m in env.get("messages", []))
 
 
-def test_test_kind_changed_is_scope_only(monkeypatch, tmp_path):
-    """r:test --changed scopes to the changed package but does NOT tag findings."""
+def test_test_kind_changed_no_merge_base_fallback_is_scope_only(monkeypatch, tmp_path):
+    """r:test --changed on a tree with NO resolvable merge-base (tmp_path is not a
+    git repo) falls back to scope-only: it scopes to the changed package but does
+    NOT tag findings. (This exercises the fallback path, not the tagging path —
+    the real tagging path is covered by the v2.11.0 tagging tests below and by
+    the dict-finding tests in test_changed.py.)"""
     pkg = changed_mod.Package(name="pkgA", version="0.1.0",
                               path=str(tmp_path / "pkgA"))
     monkeypatch.setattr(rcmd.changed, "changed_files",
@@ -624,4 +634,253 @@ def test_test_kind_changed_is_scope_only(monkeypatch, tmp_path):
         "kind": "test", "status": "ok", "tests": {"passed": 1, "failed": 0}})
     env = rcmd.run_changed("test", root=str(tmp_path), base="dev")
     assert ("test", str(tmp_path / "pkgA")) in seen
-    assert "findings" not in env["changed"]   # scope-only: no tagging block
+    assert "findings" not in env["changed"]   # fallback (no merge-base): no tagging
+
+
+# ───────── --changed (diff-aware) TAGGING (v2.11.0) ─────────
+
+
+def test_changed_tags_introduced_when_scope_check_succeeds(monkeypatch, tmp_path):
+    """When merge-base/baseline resolve, findings are tagged and an introduced
+    finding drives status=error (default --fail-on introduced)."""
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+    # scope_check resolves and returns one introduced + one pre-existing finding.
+    monkeypatch.setattr(rcmd.changed, "scope_check",
+                        lambda runner, path, base: {
+                            "base": base, "merge_base": "abc123",
+                            "findings": [{"text": "E: new", "tag": "introduced"},
+                                         {"text": "N: old", "tag": "pre-existing"}],
+                            "introduced_count": 1})
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    assert env["changed"]["fell_back"] is False
+    assert env["changed"]["introduced_count"] == 1
+    assert env["changed"]["merge_base"] == "abc123"
+    tags = {f["text"]: f["tag"] for f in env["changed"]["findings"]}
+    assert tags == {"E: new": "introduced", "N: old": "pre-existing"}
+    # default --fail-on introduced → status error with >=1 introduced
+    assert env["status"] == "error"
+    # no stale "tagging deferred" wording
+    assert not any("deferred" in m for m in env.get("messages", []))
+
+
+def test_changed_no_introduced_findings_is_ok(monkeypatch, tmp_path):
+    """All findings pre-existing → no introduced → status ok (nothing new on branch)."""
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+    monkeypatch.setattr(rcmd.changed, "scope_check",
+                        lambda runner, path, base: {
+                            "base": base, "merge_base": "abc",
+                            "findings": [{"text": "N: old", "tag": "pre-existing"}],
+                            "introduced_count": 0})
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    assert env["status"] == "ok"
+    assert env["changed"]["introduced_count"] == 0
+
+
+def test_changed_fail_on_none_never_errors_on_introduced(monkeypatch, tmp_path):
+    """--fail-on none: introduced findings are reported but do not drive a nonzero
+    status (advisory mode)."""
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+    monkeypatch.setattr(rcmd.changed, "scope_check",
+                        lambda runner, path, base: {
+                            "base": base, "merge_base": "abc",
+                            "findings": [{"text": "E: new", "tag": "introduced"}],
+                            "introduced_count": 1})
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev", fail_on="none")
+    assert env["status"] == "ok"
+    assert env["changed"]["introduced_count"] == 1
+
+
+def test_changed_falls_back_to_scope_only_when_scope_check_none(monkeypatch, tmp_path):
+    """No regression of v2.10.0: when scope_check returns None (no merge-base /
+    baseline add failed) the command stays scope-only and exits 0."""
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+    monkeypatch.setattr(rcmd.changed, "scope_check",
+                        lambda runner, path, base: None)
+    monkeypatch.setattr(rcmd, "run", lambda kind, path=".", **kw: {
+        "kind": "check", "status": "ok",
+        "check": {"errors": [], "warnings": [], "notes": []}})
+    env = rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    assert env["status"] == "ok"
+    assert env["changed"]["fell_back"] is False
+    assert "findings" not in env["changed"]   # scope-only fallback: no tagging
+    assert any("scope-only" in m for m in env.get("messages", []))
+
+
+def test_changed_runner_extracts_findings_per_kind(monkeypatch, tmp_path):
+    """The runner closure handed to scope_check flattens each kind's envelope into
+    a finding list (check: errors+warnings+notes; lint: lints; test: failing files)."""
+    pkg = changed_mod.Package(name="pkgA", version="0.1.0",
+                              path=str(tmp_path / "pkgA"))
+    monkeypatch.setattr(rcmd.changed, "changed_files",
+                        lambda path, base: ["pkgA/R/x.R"])
+    monkeypatch.setattr(rcmd.changed, "changed_packages",
+                        lambda files, root: [pkg])
+    monkeypatch.setattr(rcmd, "run", lambda kind, path=".", **kw: {
+        "kind": "check", "status": "error",
+        "check": {"errors": ["E1"], "warnings": ["W1"], "notes": ["N1"]}})
+
+    captured = {}
+
+    def capture(runner, path, base):
+        captured["findings"] = runner(str(tmp_path))
+        return {"base": base, "merge_base": "x", "findings": [], "introduced_count": 0}
+
+    monkeypatch.setattr(rcmd.changed, "scope_check", capture)
+    rcmd.run_changed("check", root=str(tmp_path), base="dev")
+    assert captured["findings"] == ["E1", "W1", "N1"]
+
+
+# ───────────────────────── s7runtime engine (v2.11.0) ─────────────────────────
+def test_r_snippet_s7runtime_loads_and_guards():
+    """s7runtime: loads via pkgload, guards S7+jsonlite, emits JSON, never devtools."""
+    src = rcmd.r_snippet("s7runtime", "/tmp/foo")
+    assert "pkgload::load_all" in src
+    assert "jsonlite::toJSON" in src
+    assert "auto_unbox" in src
+    assert "devtools::" not in src
+    # the guard must check for the S7 engine package
+    assert "S7" in src
+
+
+def test_s7runtime_in_safe_autorun_taxonomy():
+    """s7runtime must be classified read-only/safe-to-auto-run."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "_check_agent_engines",
+        str(Path(__file__).parent / "_check_agent_engines.py"))
+    cae = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(cae)
+    assert "s7runtime" in cae.SAFE_AUTORUN
+
+
+def test_normalize_s7runtime_warn_when_issues():
+    raw = {"dead_generics": ["dead_gen"], "methods_on_missing_class": [],
+           "nonenforcing_validators": ["Lax"]}
+    env = rcmd.normalize("s7runtime", raw, 0, {"package": "foo", "version": "1.0"})
+    assert env["status"] == "warn"
+    assert env["s7runtime"]["dead_generics"] == ["dead_gen"]
+    assert env["s7runtime"]["nonenforcing_validators"] == ["Lax"]
+
+
+def test_normalize_s7runtime_ok_when_clean():
+    raw = {"dead_generics": [], "methods_on_missing_class": [],
+           "nonenforcing_validators": []}
+    env = rcmd.normalize("s7runtime", raw, 0, None)
+    assert env["status"] == "ok"
+
+
+def test_run_s7runtime_engine_missing_downgrades_to_warn(tmp_path, monkeypatch):
+    _write_desc(tmp_path, "foo", "0.1.0")
+    monkeypatch.setattr(rcmd, "_invoke_r",
+                        lambda s: ('{"engine_missing":["S7"]}', 0))
+    env = rcmd.run("s7runtime", str(tmp_path))
+    # S7 is an optional engine → downgrade error→warn, never hard error
+    assert env["status"] == "warn"
+    assert "S7" in env["engine_missing"]
+
+
+def test_main_accepts_s7runtime_kind(tmp_path, monkeypatch, capsys):
+    _write_desc(tmp_path, "foo", "0.1.0")
+    monkeypatch.setattr(rcmd, "_invoke_r",
+                        lambda s: ('{"dead_generics":[],"methods_on_missing_class":[],'
+                                   '"nonenforcing_validators":[]}', 0))
+    rc = rcmd.main(["--kind", "s7runtime", "--path", str(tmp_path)])
+    assert rc == 0
+    assert json.loads(capsys.readouterr().out)["kind"] == "s7runtime"
+
+
+# ── opt-in real-R e2e ──
+def _have_r_with_s7():
+    import shutil
+    import subprocess
+    if shutil.which("Rscript") is None:
+        return False
+    try:
+        out = subprocess.run(
+            ["Rscript", "-e",
+             'cat(requireNamespace("S7", quietly=TRUE) && '
+             'requireNamespace("pkgload", quietly=TRUE) && '
+             'requireNamespace("jsonlite", quietly=TRUE))'],
+            capture_output=True, text=True, timeout=60)
+        return out.stdout.strip() == "TRUE"
+    except Exception:
+        return False
+
+
+@pytest.mark.skipif(not _have_r_with_s7(),
+                    reason="R + S7 + pkgload + jsonlite not installed")
+def test_s7runtime_e2e_detects_dead_generic_and_lax_validator(tmp_path):
+    """Real-R e2e: a fixture package with (a) a generic that has NO method (dead)
+    and (b) a class whose validator does not reject bad input → both fire."""
+    pkg = tmp_path / "s7rt"
+    (pkg / "R").mkdir(parents=True)
+    (pkg / "DESCRIPTION").write_text(textwrap.dedent("""\
+        Package: s7rt
+        Version: 0.0.1
+        Title: S7 runtime fixture
+        Imports: S7
+        Encoding: UTF-8
+    """))
+    (pkg / "NAMESPACE").write_text("import(S7)\n")
+    (pkg / "R" / "classes.R").write_text(textwrap.dedent("""\
+        # A generic with NO registered method anywhere -> dead generic
+        dead_gen <- S7::new_generic("dead_gen", "x")
+
+        # A class whose validator NEVER rejects (always passes) -> non-enforcing
+        Lax <- S7::new_class("Lax",
+          properties = list(x = S7::class_numeric),
+          validator = function(self) NULL
+        )
+
+        # A well-behaved generic + method (must NOT be flagged dead)
+        live_gen <- S7::new_generic("live_gen", "x")
+        S7::method(live_gen, Lax) <- function(x, ...) x@x
+    """))
+    env = rcmd.run("s7runtime", str(pkg))
+    assert env["kind"] == "s7runtime", env
+    rt = env.get("s7runtime", {})
+    assert "dead_gen" in rt.get("dead_generics", []), env
+    assert "Lax" in rt.get("nonenforcing_validators", []), env
+    # the well-behaved generic must not be flagged dead
+    assert "live_gen" not in rt.get("dead_generics", []), env
+
+
+@pytest.mark.skipif(not _have_r_with_s7(),
+                    reason="R + S7 + pkgload + jsonlite not installed")
+def test_s7runtime_e2e_on_committed_bad_fixture():
+    """Real-R e2e (MINOR 9): the committed s7pkg.bad fixture must actually LOAD
+    under S7 (Imports: S7 + import(S7)) so the runtime engine has real coverage —
+    it populates dead_generics (ComputeEffect) and nonenforcing_validators
+    (NonEnforcing), and does NOT flag the generic that has a method."""
+    fixture = Path(__file__).parent / "fixtures" / "s7pkg.bad"
+    env = rcmd.run("s7runtime", str(fixture))
+    # If the fixture failed to load, messages carries the load error and the
+    # lists stay empty — that is exactly the silent-degradation bug MINOR 9 fixes.
+    msgs = env.get("messages", [])
+    msg_text = msgs if isinstance(msgs, str) else " ".join(msgs)
+    assert "failed" not in msg_text.lower(), f"fixture did not load cleanly: {env}"
+    rt = env.get("s7runtime", {})
+    assert "ComputeEffect" in rt.get("dead_generics", []), env
+    assert "NonEnforcing" in rt.get("nonenforcing_validators", []), env
+    # external_generic has a method -> must NOT be flagged dead
+    assert "external_generic" not in rt.get("dead_generics", []), env

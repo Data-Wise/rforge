@@ -92,26 +92,30 @@ returns an error envelope when no DESCRIPTION is found.
 ### `run_changed()`
 
 ```python
-def run_changed(kind: 'str', root: 'str' = '.', *, base: 'str' = 'HEAD', changed_strict: 'bool' = False, **run_kwargs) -> 'dict'
+def run_changed(kind: 'str', root: 'str' = '.', *, base: 'str' = 'dev', changed_strict: 'bool' = False, fail_on: 'str' = 'introduced', **run_kwargs) -> 'dict'
 ```
 
-Run `kind` scoped to the package(s) changed on this branch vs `base`.
+Run `kind` on the package(s) changed on this branch vs `base`, with diff-aware
+[introduced]/[pre-existing] tagging (SPEC P0 completion, v2.11.0).
 
-Behavior by kind (all kinds are currently SCOPE-ONLY):
-  - check / test / lint: scope the engine to the changed package(s) and report
-    the REAL full status for those packages. No finding is tagged
-    [introduced]/[pre-existing] and the exit status is NOT folded — a real
-    ERROR/WARNING/NOTE on a changed package surfaces and drives the status.
+Two-run tagging applies UNIFORMLY to every taggable kind — `check`, `lint`,
+and `test` all get the same baseline-vs-HEAD tagging (there is no scope-only
+kind): when the merge-base resolves, `changed.scope_check` runs the SAME
+engine against a detached worktree at git merge-base(HEAD, base) (the
+baseline) and against the live HEAD tree, then tags each HEAD finding
+[introduced] (new on this branch) vs [pre-existing] (already on base).
+Lint findings (dicts) are compared by `(file, message, linter)` so a
+line-shifted pre-existing lint stays [pre-existing] (see changed.tag_findings).
 
-introduced/pre-existing tagging is NOT YET WIRED: an honest two-run comparison
-requires checking out the merge-base into a detached worktree, which is not yet
-built. Until then `--changed` (and the now-vestigial `--changed-strict`) only
-scope; the command emits a clear "tagging deferred" message so the contract is
-not overstated. The `tag_findings`/`scope_check` helpers in lib.changed are kept
-as dormant building blocks for that future work but are NOT used to fold status.
+`--fail-on` (default "introduced") controls the exit status: with the default,
+status is "error" iff ≥1 introduced finding (so CI fails only on regressions you
+caused, not pre-existing debt). `--fail-on none` reports findings but never
+folds status (advisory).
 
-Degrades safely:
+Degrades safely (no regression of the v2.10.0 scope-only behavior):
   - not a git repo / git missing / no merge-base (changed_files None) → run a
     full `kind` against `root` and annotate `changed.fell_back=True`.
   - no changes (empty diff) → no-op `ok` envelope.
-  - multiple changed packages → run each; aggregate into stages.
+  - merge-base / baseline worktree unavailable (scope_check None) → SCOPE-ONLY:
+    run the engine on the changed package(s), surface the REAL status, and warn
+    that tagging was unavailable (findings are NOT tagged, status NOT folded).
