@@ -443,10 +443,12 @@ assert d['engine_missing'] == [], 'pure-Python module: engine_missing must be []
 "
 }
 
-# Phase 4: no removed rforge_* MCP tool references may survive in any agent file.
+# Phase 4: no removed rforge-mcp tool references may survive in any agent file.
 # (rforge-mcp was absorbed into lib/ in v1.3.0; the tools no longer exist.)
+# Matches both the legacy `rforge_*` underscore form and the `mcp__rforge*`
+# MCP tool-call shape a stale reference could take.
 agent_no_mcp_refs() {
-    ! grep -lq "rforge_" agents/*.md
+    ! grep -lqE "rforge_|mcp__rforge" agents/*.md
 }
 
 # Phase 4: orchestrator agent must carry name + description frontmatter.
@@ -505,7 +507,7 @@ run "Dogfood: lib.discovery handles non-R-package repo" lib_discovery_on_self
 # Agents (Phase 4)
 run "Agents: no removed rforge_* MCP refs"                  agent_no_mcp_refs
 run "Agents: orchestrator has name+description frontmatter" agent_frontmatter_complete
-run "Agents: orchestrator names only real lib.rcmd engines" agent_engines_valid
+run "Agents: orchestrator recipes valid (real+safe engines, real modules)" agent_engines_valid
 
 # Docs site
 run "mkdocs.yml parses"            mkdocs_parses

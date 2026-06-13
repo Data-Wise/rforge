@@ -20,17 +20,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Orchestrator agent rewritten** — `agents/orchestrator.md` now delegates via
   `python3 -m lib.*` envelopes (run through Bash) instead of the removed
   `rforge_*` MCP tools. Adds `name`/`description` frontmatter, an intent→lib
-  mapping (CODE_CHANGE / NEW_FUNCTION / BUG_FIX / DEPS_AUDIT / CRAN_READINESS /
-  ECOSYSTEM_HEALTH), a read-only/recommend-only safety boundary (mirrors the
-  "never auto-submit" principle — `r:submit`/`winbuilder`/`rhub`/`--write`/
-  `revdep` are recommended, never auto-run), and envelope synthesis.
+  mapping over **7 intents** (CODE_CHANGE incl. `lib.deps impact` / NEW_FUNCTION /
+  BUG_FIX / DEPS_AUDIT / QUALITY / CRAN_READINESS / ECOSYSTEM_HEALTH), a strict
+  read-only/recommend-only safety boundary (mirrors "never auto-submit": every
+  file-writing or network command — `document`/`cran-prep`/`style`/`build`/
+  `submit`/`winbuilder`/`rhub`/`urlcheck`/`revdep`/`--write` — is recommended,
+  never auto-run), correct `--format json` flags, and per-module envelope
+  synthesis (modules don't share one schema).
 
 ### Added
 
-- Three `tests/test-all.sh` guards (**33 → 36 checks**): no `rforge_` MCP refs in
-  any agent file (regression lock for the bug this release fixes), orchestrator
-  carries `name`+`description` frontmatter, and every `--kind` it names is a real
-  `lib.rcmd` engine (`tests/_check_agent_engines.py`).
+- Three `tests/test-all.sh` guards (**33 → 36 checks**): no removed rforge-mcp
+  refs in any agent file (`rforge_`/`mcp__rforge`; regression lock for the bug
+  this release fixes), orchestrator carries `name`+`description` frontmatter, and
+  a recipe validator (`tests/_check_agent_engines.py`) asserting every `--kind`
+  is a **real** `lib.rcmd` engine, is **safe to auto-run** (read-only — the gate
+  rejects mutating kinds like `document`/`cran-prep` in auto-run recipes), and
+  every `lib.<module>` it names exists.
 
 ---
 
