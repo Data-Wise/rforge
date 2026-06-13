@@ -1,7 +1,7 @@
 ---
 name: rforge:r:check
 description: Run R CMD check with smart parsing — NOTEs classified as spurious or real
-argument-hint: "[package] [--as-cran] [--strict] [--incoming]"
+argument-hint: "[package] [--as-cran] [--strict] [--incoming] [--changed] [--base <ref>] [--changed-strict]"
 arguments:
   - name: package
     description: Package path to check (defaults to current directory)
@@ -22,6 +22,21 @@ arguments:
     required: false
     type: boolean
     default: false
+  - name: changed
+    description: Scope the check to packages changed on this branch and tag each finding [introduced] vs [pre-existing] (diff vs merge-base with --base)
+    required: false
+    type: boolean
+    default: false
+  - name: base
+    description: Comparison ref for --changed; the diff is taken against merge-base(HEAD, base). Default HEAD = uncommitted working-tree changes
+    required: false
+    type: string
+    default: HEAD
+  - name: changed-strict
+    description: With --changed, keep the full-check exit status (pre-existing findings count too) instead of exiting clean on introduced-only
+    required: false
+    type: boolean
+    default: false
 ---
 
 # R Package Check
@@ -34,6 +49,13 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
 2. `python3 -m lib.rcmd --kind check --path "<path>"` (add `--as-cran`, `--strict`,
    and/or `--incoming` if requested).
 3. Render the JSON envelope below. Do not re-run R yourself.
+4. If `--changed` is set: run `python3 -m lib.rcmd --kind check --changed
+   --base "<ref>" --path "<path>"` (add `--changed-strict` to count pre-existing
+   findings toward exit). The envelope gains a `changed` block: `packages`,
+   `findings` (each tagged `introduced`/`pre-existing`), and `introduced_counts`.
+   Render introduced findings first; show pre-existing dimmed. **Note:** until the
+   merge-base checkout mechanism lands, `pre-existing` tagging compares against the
+   merge-base ref's recorded findings; treat it as advisory.
 
 ## Usage
 
@@ -42,7 +64,17 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
 /rforge:r:check --as-cran          # explicit --as-cran pass
 /rforge:r:check --strict           # two extra flavor passes (see below)
 /rforge:r:check --incoming         # --strict + a third CRAN-incoming pass
+/rforge:r:check --changed --base dev   # scope to changed pkg; tag findings introduced vs pre-existing
+/rforge:r:check --changed --changed-strict --base dev  # pre-existing findings count toward exit too
 ```
+
+- **`--changed`** — scopes the check to the R package(s) touched on this branch
+  (diff vs `merge-base(HEAD, --base)`; `--base` defaults to `HEAD` = uncommitted
+  working-tree changes) and tags every finding `[introduced]` vs `[pre-existing]`.
+  By default the exit status reflects **introduced** findings only — a clean answer
+  to "did *my* change cause this?". `--changed-strict` keeps the full-check status.
+  Degrades gracefully: not a git repo / no merge-base → a full check + a warning;
+  no changes → a clean no-op.
 
 - **Plain `r:check` (no flag)** — unchanged: one `--as-cran` pass, one `check` stage row.
 - **`--strict`** — runs **both** Suggests-withholding flavor passes as two distinct
