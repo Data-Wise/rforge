@@ -89,3 +89,19 @@ def test_naming_clean_fixture_ok():
     env = s7review.check_naming(str(CLEAN))
     assert env["status"] == "ok"
     assert env["findings"] == []
+
+
+# ── validators ──────────────────────────────────────────────────────────
+def test_validators_flag_bad_fixture():
+    env = s7review.check_validators(str(BAD))
+    c = _codes(env)
+    assert env["status"] == "warn"
+    assert "missing_validator" in c       # mediator_model has typed props, no validator
+    assert "validator_return_shape" in c  # Validated returns TRUE
+    for f in env["findings"]:
+        assert f["source"] == "static" and f["severity"] == "advisory"
+
+
+def test_validators_clean_fixture_ok():
+    env = s7review.check_validators(str(CLEAN))
+    assert env["status"] == "ok"

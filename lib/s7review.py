@@ -194,8 +194,47 @@ def check_naming(path: str | os.PathLike = ".") -> dict:
 
 
 # ── temporary stubs (each replaced in its own task) ──
-def check_validators(path):  # Task 4
-    return _envelope("validators", "ok", [], ["(stub)"])
+_RETURN_BOOL_RE = re.compile(r"return\s*\(\s*(TRUE|FALSE)\s*\)")
+
+
+def check_validators(path: str | os.PathLike = ".") -> dict:
+    """Validator presence + return-shape. A typed-properties ``new_class`` should
+    declare a ``validator=``; a validator returning ``TRUE``/``FALSE`` is wrong
+    (S7 wants ``character()``/``NULL``). Advisory. Never raises.
+    """
+    findings: list[dict] = []
+    for f, text in _scan_r_files(path):
+        rel = f.name
+        for c in _find_s7_constructs(text):
+            if c["call"] != "new_class":
+                continue
+            name = _name_arg(c["args"]) or c["bound"] or "<class>"
+            has_props = bool(_prop_names(c["args"]))
+            has_validator = bool(_VALIDATOR_RE.search(c["args"]))
+            if has_props and not has_validator:
+                findings.append({
+                    "code": "missing_validator", "severity": "advisory",
+                    "file": rel, "line": c["line"], "symbol": name,
+                    "source": "static",
+                    "message": (f"S7 class '{name}' has typed properties but no "
+                                "validator= — consider adding one to enforce "
+                                "invariants."),
+                })
+            if has_validator and _RETURN_BOOL_RE.search(c["args"]):
+                findings.append({
+                    "code": "validator_return_shape", "severity": "advisory",
+                    "file": rel, "line": c["line"], "symbol": name,
+                    "source": "static",
+                    "message": (f"validator for '{name}' looks like it returns "
+                                "TRUE/FALSE — S7 validators should return "
+                                "character() (errors) or NULL (ok)."),
+                })
+    status = "warn" if findings else "ok"
+    messages = [] if findings else ["S7 validators look well-formed."]
+    return _envelope("validators", status, findings, messages)
+
+
+# ── temporary stubs (each replaced in its own task) ──
 def check_methods(path):     # Task 5
     return _envelope("methods", "ok", [], ["(stub)"])
 def check_legacy_oop(path):  # Task 6
