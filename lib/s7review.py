@@ -129,9 +129,71 @@ _PROP_NAME_RE = re.compile(r"(\w+)\s*=")
 _VALIDATOR_RE = re.compile(r"validator\s*=\s*function")
 
 
+def _name_arg(args: str) -> str:
+    """First string-literal argument inside a call's arg block, or ''."""
+    m = _NAME_ARG_RE.match(args)
+    return m.group(1) if m else ""
+
+
+def _prop_names(args: str) -> list[str]:
+    """Property names from a ``properties = list(a = ..., b = ...)`` block."""
+    pm = _PROPS_RE.search(args)
+    if not pm:
+        return []
+    return _PROP_NAME_RE.findall(pm.group(1))
+
+
+def check_naming(path: str | os.PathLike = ".") -> dict:
+    """Naming conventions: class UpperCamelCase + bound-var match; generic and
+    property names snake_case. Advisory; ``warn`` if any finding. Never raises.
+    """
+    findings: list[dict] = []
+    for f, text in _scan_r_files(path):
+        rel = f.name
+        for c in _find_s7_constructs(text):
+            name = _name_arg(c["args"])
+            if c["call"] == "new_class":
+                if name and not _UPPER_CAMEL_RE.match(name):
+                    findings.append({
+                        "code": "class_name_case", "severity": "advisory",
+                        "file": rel, "line": c["line"], "symbol": name,
+                        "source": "static",
+                        "message": (f"S7 class '{name}' is not UpperCamelCase — "
+                                    "consider e.g. 'MyClass'."),
+                    })
+                if c["bound"] and name and c["bound"] != name:
+                    findings.append({
+                        "code": "class_name_mismatch", "severity": "advisory",
+                        "file": rel, "line": c["line"], "symbol": c["bound"],
+                        "source": "static",
+                        "message": (f"bound variable '{c['bound']}' differs from "
+                                    f"new_class name '{name}' — they look like "
+                                    "they should match."),
+                    })
+                for pn in _prop_names(c["args"]):
+                    if not _SNAKE_RE.match(pn):
+                        findings.append({
+                            "code": "prop_name_case", "severity": "advisory",
+                            "file": rel, "line": c["line"], "symbol": pn,
+                            "source": "static",
+                            "message": (f"property '{pn}' is not snake_case — "
+                                        "consider e.g. 'my_prop'."),
+                        })
+            elif c["call"] == "new_generic":
+                if name and not _SNAKE_RE.match(name):
+                    findings.append({
+                        "code": "generic_name_case", "severity": "advisory",
+                        "file": rel, "line": c["line"], "symbol": name,
+                        "source": "static",
+                        "message": (f"S7 generic '{name}' is not snake_case — "
+                                    "consider e.g. 'compute_effect'."),
+                    })
+    status = "warn" if findings else "ok"
+    messages = [] if findings else ["S7 naming looks idiomatic."]
+    return _envelope("naming", status, findings, messages)
+
+
 # ── temporary stubs (each replaced in its own task) ──
-def check_naming(path):      # Task 3
-    return _envelope("naming", "ok", [], ["(stub)"])
 def check_validators(path):  # Task 4
     return _envelope("validators", "ok", [], ["(stub)"])
 def check_methods(path):     # Task 5

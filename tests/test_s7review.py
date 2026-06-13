@@ -65,3 +65,27 @@ def test_run_all_no_r_dir_warns_not_raises(tmp_path):
     env = s7review.run_all(str(tmp_path))
     assert env["status"] == "warn"
     assert env["engine_missing"] == []
+
+
+# ── naming ──────────────────────────────────────────────────────────────
+def _codes(env):
+    return {f["code"] for f in env["findings"]}
+
+
+def test_naming_flags_bad_fixture():
+    env = s7review.check_naming(str(BAD))
+    c = _codes(env)
+    assert env["status"] == "warn"
+    assert "class_name_case" in c        # mediator_model
+    assert "class_name_mismatch" in c    # Estimator <- new_class("Estimater")
+    assert "generic_name_case" in c      # ComputeEffect
+    assert "prop_name_case" in c         # BadProp
+    for f in env["findings"]:
+        assert f["severity"] == "advisory"
+        assert f["source"] == "static"
+
+
+def test_naming_clean_fixture_ok():
+    env = s7review.check_naming(str(CLEAN))
+    assert env["status"] == "ok"
+    assert env["findings"] == []
