@@ -465,6 +465,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#whats-new-in-v280" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.8.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-new-in-v270" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2163,6 +2174,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#whats-new-in-v280" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's new in v2.8.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#whats-new-in-v270" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2434,6 +2456,10 @@
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Ecosystem rollup (2-5 minutes) — cross-package validation + submission order</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Prepare for CRAN release&quot;</span>
 </span></code></pre></div>
+<h2 id="whats-new-in-v280">What's new in v2.8.0<a class="headerlink" href="#whats-new-in-v280" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Single-source version/count for docs</strong> — the docs now render the current version and command count from one source of truth, so they stop drifting. A <strong>mkdocs-macros</strong> layer renders <code>2.8.0</code> / <code>35</code> at build time, and pure-stdlib <strong><code>scripts/version_sync.py</code></strong> stamps the surfaces macros can't reach (<code>README.md</code>, <code>plugin.json</code>, <code>CLAUDE.md</code>, …); its <code>--check</code> is a CI drift gate wired into <code>ci.yml</code> + <code>test-all.sh</code>. No command-surface change — still 35 commands.</li>
+</ul>
 <h2 id="whats-new-in-v270">What's new in v2.7.0<a class="headerlink" href="#whats-new-in-v270" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong><code>r:submit --universe</code></strong> — opt-in <strong>R-universe early-access tier</strong>. Verifies your package's R-universe build (CRAN-like binaries rebuilt from GitHub within minutes) so users can install the new version while CRAN review runs in parallel. Auto-detects the universe from the git <code>origin</code> remote (<code>--universe-name &lt;owner&gt;</code> to override), reports per-platform build status, and prints the <code>install.packages(..., repos=...)</code> snippet. <strong>Read-only</strong> (R-universe builds on <code>git push</code>); status is <strong>advisory</strong> in the CRAN checklist and never blocks the still-manual CRAN handoff. Backed by new pure-stdlib <code>lib/runiverse.py</code> (<code>urllib</code>-only); degrades to <code>warn</code> offline/unregistered.</li>
