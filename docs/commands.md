@@ -542,9 +542,9 @@ R CMD check integration with detailed error reporting.
 - `package` (optional) - Package to check (defaults to current)
 - `--strict` (optional) - Run both CRAN Suggests-withholding flavors (default: false)
 - `--incoming` (optional) - Emulate CRAN's incoming `_R_CHECK_*` bundle; implies `--strict` (default: false)
-- `--changed` (optional, v2.10.0) - Scope the check to the package(s) changed on this branch (diff vs `merge-base(HEAD, --base)`) and tag every finding `[introduced]` vs `[pre-existing]` (default: false)
+- `--changed` (optional, v2.10.0) - Scope the check to the package(s) changed on this branch (diff vs `merge-base(HEAD, --base)`) and report their REAL full check status. **`[introduced]`/`[pre-existing]` tagging is NOT YET WIRED** (needs a merge-base checkout) — `--changed` is currently scope-only (default: false)
 - `--base <ref>` (optional, v2.10.0) - Comparison ref for `--changed`; diff is taken against `merge-base(HEAD, base)` (default: `HEAD` = uncommitted working-tree changes)
-- `--changed-strict` (optional, v2.10.0) - With `--changed`, keep the full-check exit status (pre-existing findings count too) instead of exiting clean on introduced-only (default: false)
+- `--changed-strict` (optional, v2.10.0) - Documented no-op reserved for when tagging lands; `--changed` is always scope-only for now (default: false)
 
 **Examples:**
 ```bash
@@ -560,11 +560,8 @@ R CMD check integration with detailed error reporting.
 # Add the opt-in incoming env-var bundle
 /rforge:r:check --incoming
 
-# Scope to packages changed on this branch; tag findings introduced vs pre-existing
+# Scope the check to the package(s) changed on this branch (scope-only)
 /rforge:r:check --changed --base dev
-
-# Same, but count pre-existing findings toward exit too
-/rforge:r:check --changed --changed-strict --base dev
 ```
 
 **Executes:**
@@ -580,7 +577,7 @@ R CMD check integration with detailed error reporting.
 
 **Note:** This can take 1-5 minutes depending on package size. Strict mode runs the baseline plus two flavor passes (~3× check time; ~4× with `--incoming`).
 
-**Diff-aware mode (v2.10.0):** `--changed` scopes the check to the R package(s) touched on this branch and tags every finding `[introduced]` vs `[pre-existing]` — a clean answer to "did *my* change cause this?". By default the exit status reflects **introduced** findings only; `--changed-strict` keeps the full-check status. Degrades gracefully: not a git repo / no merge-base → a full check plus a warning; no changes → a clean no-op.
+**Diff-aware mode (v2.10.0):** `--changed` scopes the check to the R package(s) touched on this branch and reports their REAL full check status, so a real ERROR/WARNING/NOTE on a changed package surfaces and drives the exit status. **`[introduced]`/`[pre-existing]` tagging is NOT YET WIRED** — an honest comparison needs a merge-base checkout (running R against the fork point in a detached worktree), which is not built yet. Until then `--changed` is **scope-only** and does not yet answer "did *my* change cause this?"; `--changed-strict` is a documented no-op reserved for when tagging lands. Degrades gracefully: not a git repo / no merge-base → a full check plus a warning; no changes → a clean no-op.
 
 ---
 

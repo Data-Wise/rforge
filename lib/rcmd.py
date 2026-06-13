@@ -471,13 +471,18 @@ def run_changed(
 ) -> dict:
     """Run `kind` scoped to the package(s) changed on this branch vs `base`.
 
-    Behavior by kind:
-      - check: scope to changed package(s); when a merge-base resolves, tag each
-        finding [introduced] vs [pre-existing] (two R runs via changed.scope_check)
-        and, by default, fold the status to reflect *introduced* findings only.
-        `changed_strict=True` keeps the full-check status (pre-existing counts too).
-      - test / lint: scope only — run the engine against the changed package(s);
-        no finding tagging.
+    Behavior by kind (all kinds are currently SCOPE-ONLY):
+      - check / test / lint: scope the engine to the changed package(s) and report
+        the REAL full status for those packages. No finding is tagged
+        [introduced]/[pre-existing] and the exit status is NOT folded — a real
+        ERROR/WARNING/NOTE on a changed package surfaces and drives the status.
+
+    introduced/pre-existing tagging is NOT YET WIRED: an honest two-run comparison
+    requires checking out the merge-base into a detached worktree, which is not yet
+    built. Until then `--changed` (and the now-vestigial `--changed-strict`) only
+    scope; the command emits a clear "tagging deferred" message so the contract is
+    not overstated. The `tag_findings`/`scope_check` helpers in lib.changed are kept
+    as dormant building blocks for that future work but are NOT used to fold status.
 
     Degrades safely:
       - not a git repo / git missing / no merge-base (changed_files None) → run a
@@ -501,43 +506,23 @@ def run_changed(
                              f"no changed R packages to {kind}"],
                 "changed": {"fell_back": False, "base": base, "packages": []}}
 
-    # check with tagging (only meaningful for a single check kind).
-    if kind == "check" and len(pkgs) == 1:
+    # Single changed package: scope the engine to it and report its REAL status.
+    # introduced/pre-existing tagging is deferred (no merge-base checkout yet), so
+    # we do NOT fabricate counts and do NOT fold the exit status — a real finding
+    # on the changed package surfaces honestly.
+    if len(pkgs) == 1:
         pkg = pkgs[0]
+        env = run(kind, pkg.path, **run_kwargs)
+        env["changed"] = {"fell_back": False, "base": base,
+                          "packages": [pkg.name]}
+        if kind == "check":
+            env.setdefault("messages", []).append(
+                "ℹ️  introduced/pre-existing tagging deferred (merge-base "
+                "checkout not yet wired) — showing full check status for "
+                f"changed package {pkg.name}")
+        return env
 
-        def _run_check_at(ref: str) -> dict:
-            # ref == "HEAD" → check the live worktree; otherwise a detached
-            # check at the merge-base sha (the command layer is responsible for
-            # providing a clean checkout; here we run against the same path and
-            # let scope_check inject — for the live path we reuse run()).
-            return run("check", pkg.path, **run_kwargs)
-
-        tagged = changed.scope_check(_run_check_at, path=pkg.path, base=base)
-        head_env = run("check", pkg.path, **run_kwargs)
-        if tagged is None:
-            head_env.setdefault("messages", []).append(
-                f"⚠️  no merge-base for '{base}' — scoped to {pkg.name} but "
-                "findings not tagged (full check shown)")
-            head_env["changed"] = {"fell_back": False, "base": base,
-                                   "packages": [pkg.name]}
-            return head_env
-        intro = tagged["introduced_counts"]
-        head_env["changed"] = {
-            "fell_back": False, "base": base, "merge_base": tagged["merge_base"],
-            "packages": [pkg.name], "findings": tagged["findings"],
-            "introduced_counts": intro,
-        }
-        if not changed_strict:
-            # default: status reflects introduced findings only.
-            if intro["errors"]:
-                head_env["status"] = "error"
-            elif intro["warnings"] or intro["notes"]:
-                head_env["status"] = "warn"
-            else:
-                head_env["status"] = "ok"
-        return head_env
-
-    # scope-only path (test/lint, or check across >1 package): run each, aggregate.
+    # Multiple changed packages: run each, aggregate (scope-only).
     stages = []
     worst = "ok"
     for pkg in pkgs:
@@ -748,14 +733,15 @@ def main(argv: list[str] | None = None) -> int:
                     help="check: run a single Suggests-withholding flavor "
                          "(internal selector; cran-prep loops over both by default)")
     ap.add_argument("--changed", action="store_true",
-                    help="scope the run to packages changed on this branch; for "
-                         "check, tag findings introduced vs pre-existing")
+                    help="scope the run to packages changed on this branch and "
+                         "report their real check status (introduced/pre-existing "
+                         "tagging is NOT YET WIRED — scope-only for now)")
     ap.add_argument("--base", default="HEAD",
                     help="comparison ref for --changed (diff is vs "
                          "merge-base(HEAD, base); default HEAD = uncommitted)")
     ap.add_argument("--changed-strict", action="store_true",
-                    help="with --changed on check: keep full-check status "
-                         "(pre-existing findings count toward exit code too)")
+                    help="no-op (reserved): introduced/pre-existing tagging is "
+                         "not yet wired, so --changed is always scope-only")
     ns = ap.parse_args(argv)
     if ns.kind == "cycle":
         env = _run_cycle(ns.path)

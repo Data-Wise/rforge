@@ -11,8 +11,10 @@ Pure-stdlib (subprocess + pathlib only — no R, no third-party). Three jobs:
                           list, tagging each finding [introduced] vs
                           [pre-existing] (multiset semantics: duplicates count).
 
-Plus scope_check(): orchestrate the two-run introduced/pre-existing tagging for
-one package (used by lib.rcmd when `--changed` is set on `r:check`).
+Plus scope_check(): a DORMANT helper for future two-run introduced/pre-existing
+tagging. It is NOT wired into the live `r:check --changed` path (which is
+scope-only) because the merge-base checkout it needs is not yet built. See its
+docstring.
 
 Advisory, never raises. git failures (not a repo, no merge-base, git missing)
 return None so callers can warn and fall back to a full run. "No changes" is the
@@ -158,14 +160,23 @@ def scope_check(
     path: str,
     base: str,
 ) -> Optional[dict]:
-    """Run `r:check` on HEAD and on the merge-base, tag findings, summarize.
+    """DORMANT (NOT YET WIRED): two-run introduced/pre-existing tagging helper.
 
-    `run_check(checkout_ref) -> envelope` is injected (the caller wires it to
-    `lib.rcmd.run("check", ...)` under a detached worktree at `checkout_ref`).
-    Kept injectable so this module stays R-free and unit-testable.
+    This is a building block for a *future* honest comparison, and is NOT used by
+    the live `r:check --changed` path. The blocker: an honest comparison needs
+    `run_check(merge_base)` to actually check out the merge-base into a detached
+    worktree and run R there. That checkout mechanism is not built yet — the
+    command layer currently has no way to run R against anything but the live
+    worktree, so wiring this in would compare the worktree against itself and tag
+    every finding identically (a silent false-negative). Until the merge-base
+    checkout lands, `r:check --changed` is scope-only (see lib.rcmd.run_changed)
+    and this function is unreachable from the command path. It is kept (with its
+    unit tests) so the future wiring has a tested core.
 
-    Returns None when no merge-base resolves (caller falls back to a plain check).
-    Otherwise returns:
+    `run_check(checkout_ref) -> envelope` is injected so this module stays R-free
+    and unit-testable.
+
+    Returns None when no merge-base resolves. Otherwise returns:
         {"base": <ref>, "merge_base": <sha>,
          "findings": [{"text":..., "level":"error|warning|note", "tag":...}, ...],
          "introduced_counts": {"errors": n, "warnings": n, "notes": n}}

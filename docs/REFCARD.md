@@ -84,8 +84,9 @@
 │                                                                             │
 │  DIFF-AWARE --changed (v2.10.0) on r:check / r:test / r:lint                │
 │    --changed [--base <ref>] Scope to packages changed on this branch        │
-│    r:check --changed        + tag findings [introduced] vs [pre-existing]   │
-│    r:check --changed-strict  pre-existing findings count toward exit too    │
+│    r:check --changed        scope-only: real full status (introduced/pre-   │
+│                             existing tagging NOT YET WIRED — needs merge-    │
+│                             base checkout; --changed-strict is a no-op)      │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -361,7 +362,7 @@ rforge/
 | Reverse-dep check | `/rforge:r:revdep` | CRAN downstream obligation |
 | Advisory best practices | `/rforge:r:goodpractice` | Pre-submission advisory pass |
 | Check S7 conventions | `/rforge:r:s7-review` | Static, advisory — naming/validators/methods/legacy/docs |
-| Did *my* change break check? | `/rforge:r:check --changed` | Tags findings introduced vs pre-existing |
+| Check only changed packages | `/rforge:r:check --changed` | Scope-only; real full status (introduced/pre-existing tagging not yet wired) |
 | Scaffold a test file | `/rforge:r:use-test` | Draft test_that() blocks (TODO assertions) |
 | Add a dependency | `/rforge:r:use-package` | Imports/Suggests + @importFrom |
 | Scaffold a vignette | `/rforge:r:use-vignette` | knitr skeleton + outline |
