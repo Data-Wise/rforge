@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **diff-aware `--changed` tagging** (P0 completion) — completes the v2.10.0
+  scope-only `--changed` flag on `r:check`/`r:test`/`r:lint`. Each finding is now
+  tagged **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already
+  present at the fork point), computed honestly via a second baseline run in a
+  detached worktree checked out at `git merge-base(HEAD, --base)` (`--base`
+  default: `dev`). New `merge_base()` + `run_baseline()` in `lib/changed.py`
+  (guaranteed worktree cleanup in a `finally`) wake the previously dormant
+  `scope_check()`; `lib/rcmd.run_changed` wires them in with a per-kind runner.
+  New **`--fail-on`** flag (default `introduced`) exits non-zero iff ≥1 introduced
+  finding, so CI fails only on regressions you caused — not pre-existing debt;
+  `--fail-on none` is advisory. No command-count change (flags). Spec:
+  `SPEC-diff-aware-tagging-2026-06-13.md`.
+
+### Changed
+
+- `--changed` baseline now runs in a real merge-base detached worktree instead of
+  the scope-only fallback. The fallback (real status, no tagging) is preserved
+  when no merge-base / baseline worktree is available — no regression of v2.10.0.
+
+---
+
 ## [2.10.0] - 2026-06-13
 
 > Bundles three roadmap features — an S7 convention checker, diff-aware checks,

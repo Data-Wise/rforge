@@ -1,7 +1,7 @@
 ---
 name: rforge:r:check
 description: Run R CMD check with smart parsing — NOTEs classified as spurious or real
-argument-hint: "[package] [--as-cran] [--strict] [--incoming] [--changed] [--base <ref>] [--changed-strict]"
+argument-hint: "[package] [--as-cran] [--strict] [--incoming] [--changed] [--base <ref>] [--fail-on introduced|none]"
 arguments:
   - name: package
     description: Package path to check (defaults to current directory)
@@ -23,20 +23,20 @@ arguments:
     type: boolean
     default: false
   - name: changed
-    description: Scope the check to packages changed on this branch (vs --base); reports their full status. [introduced]/[pre-existing] tagging is not yet wired — scope-only for now.
+    description: Run the check on the package(s) changed on this branch (vs --base) and tag each finding [introduced] (new on your branch) vs [pre-existing] (already on base) via a two-run merge-base baseline.
     required: false
     type: boolean
     default: false
   - name: base
-    description: Comparison ref for --changed; the diff is taken against merge-base(HEAD, base). Default HEAD = uncommitted working-tree changes
+    description: Comparison ref for --changed; the diff + baseline run are taken against merge-base(HEAD, base). Default dev.
     required: false
     type: string
-    default: HEAD
-  - name: changed-strict
-    description: With --changed, keep the full-check exit status (pre-existing findings count too) instead of exiting clean on introduced-only
+    default: dev
+  - name: fail-on
+    description: "--changed exit policy: introduced (default) exits non-zero iff >=1 introduced finding; none reports findings but never folds the status (advisory)."
     required: false
-    type: boolean
-    default: false
+    type: string
+    default: introduced
 ---
 
 # R Package Check
@@ -50,14 +50,16 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
    and/or `--incoming` if requested).
 3. Render the JSON envelope below. Do not re-run R yourself.
 4. If `--changed` is set: run `python3 -m lib.rcmd --kind check --changed
-   --base "<ref>" --path "<path>"`. The envelope gains a `changed` block with
-   `packages` (the changed package(s) the check was scoped to) plus a
-   `tagging deferred` message. **`introduced`/`pre-existing` tagging is NOT YET
-   WIRED** — an honest comparison needs a merge-base checkout (running R against
-   the fork point in a detached worktree), which is not built yet. Until then
-   `--changed` is **scope-only**: it runs the full check on the changed
-   package(s) and reports the REAL full status. Render the full check result as
-   usual.
+   --base "<ref>" [--fail-on introduced|none] --path "<path>"`. The envelope gains
+   a `changed` block with `packages` (the changed package(s)), `merge_base` (the
+   fork-point SHA), `introduced_count`, and `findings` — each finding tagged
+   `introduced` (new on this branch) or `pre-existing` (already on `base`). The
+   tagging is honest: a baseline run executes the SAME check in a detached worktree
+   checked out at `merge-base(HEAD, base)`. With `--fail-on introduced` (default)
+   the status is `error` iff ≥1 introduced finding. Render the tagged findings,
+   grouping by tag. If the `changed` block instead has `fell_back`/scope-only
+   wording (no merge-base / baseline worktree unavailable), render the full check
+   result as usual.
 
 ## Usage
 
@@ -66,18 +68,27 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
 /rforge:r:check --as-cran          # explicit --as-cran pass
 /rforge:r:check --strict           # two extra flavor passes (see below)
 /rforge:r:check --incoming         # --strict + a third CRAN-incoming pass
-/rforge:r:check --changed --base dev   # scope the check to the changed package(s) — scope-only
+/rforge:r:check --changed                # tag findings vs merge-base(HEAD, dev)
+/rforge:r:check --changed --base main    # compare against main instead of dev
+/rforge:r:check --changed --fail-on none # tag findings but never fail (advisory)
 ```
 
-- **`--changed`** — scopes the check to the R package(s) touched on this branch
-  (diff vs `merge-base(HEAD, --base)`; `--base` defaults to `HEAD` = uncommitted
-  working-tree changes) and reports their REAL full check status. The exit status
-  reflects the actual findings on those packages, so a real ERROR/WARNING/NOTE
-  surfaces. **`introduced`/`pre-existing` tagging is NOT YET WIRED** (it needs a
-  merge-base checkout that isn't built), so `--changed` is currently scope-only —
-  it does NOT yet answer "did *my* change cause this?". `--changed-strict` is a
-  documented no-op reserved for when tagging lands. Degrades gracefully: not a git
-  repo / no merge-base → a full check + a warning; no changes → a clean no-op.
+- **`--changed`** — runs the check on the R package(s) touched on this branch
+  (diff vs `merge-base(HEAD, --base)`; `--base` defaults to `dev`) and tags each
+  finding **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already
+  present at the fork point). The tag is computed honestly: a second baseline run
+  executes the same check in a detached worktree checked out at the merge-base SHA,
+  and the two finding lists are set-diffed. **`--fail-on introduced`** (default)
+  exits non-zero iff ≥1 introduced finding, so CI fails only on regressions you
+  caused — not pre-existing debt; **`--fail-on none`** is advisory. Degrades
+  gracefully: not a git repo / no merge-base / baseline worktree unavailable →
+  scope-only (real status on the changed package(s), no tagging) + a warning; no
+  changes → a clean no-op.
+
+!!! note "Cost — `--changed` runs the check twice"
+    Tagging pays one extra check run (the merge-base baseline). Baseline results are
+    not cached across invocations. For a quick scoped run without the second pass,
+    omit `--changed` and pass the package path directly.
 
 - **Plain `r:check` (no flag)** — unchanged: one `--as-cran` pass, one `check` stage row.
 - **`--strict`** — runs **both** Suggests-withholding flavor passes as two distinct
