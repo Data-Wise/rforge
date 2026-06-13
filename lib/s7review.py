@@ -235,8 +235,98 @@ def check_validators(path: str | os.PathLike = ".") -> dict:
 
 
 # ── temporary stubs (each replaced in its own task) ──
-def check_methods(path):     # Task 5
-    return _envelope("methods", "ok", [], ["(stub)"])
+# first identifier argument to method(generic, Class)
+_METHOD_GENERIC_RE = re.compile(r"^\s*([A-Za-z.][\w.]*)")
+# imported symbols: importFrom(pkg, sym) / @importFrom pkg sym
+_NS_IMPORTFROM_SYM_RE = re.compile(r"^\s*importFrom\(\s*[\w.]+\s*,\s*([\w.]+)")
+_ROX_IMPORTFROM_SYM_RE = re.compile(r"^#'\s*@importFrom\s+[\w.]+\s+(.+)$")
+
+
+def _imported_symbols(pkg_path: Path) -> set[str]:
+    """Symbols imported via NAMESPACE importFrom + roxygen @importFrom in R/."""
+    syms: set[str] = set()
+    ns = pkg_path / "NAMESPACE"
+    if ns.is_file():
+        try:
+            for line in ns.read_text(encoding="utf-8", errors="replace").splitlines():
+                m = _NS_IMPORTFROM_SYM_RE.match(line)
+                if m:
+                    syms.add(m.group(1))
+        except OSError:
+            pass
+    for _f, text in _scan_r_files(pkg_path):
+        for line in text.splitlines():
+            m = _ROX_IMPORTFROM_SYM_RE.match(line)
+            if m:
+                syms.update(re.split(r"[,\s]+", m.group(1).strip()))
+    return syms
+
+
+def check_methods(path: str | os.PathLike = ".") -> dict:
+    """Method registration sanity. Flags a ``method(generic, Class)`` whose
+    ``generic`` is neither defined (``new_generic``) nor imported in scanned
+    source (``dangling_method``); and — per the bounded v1 decision — a method
+    on an external generic with no ``methods_register()`` call anywhere in R/
+    (``missing_methods_register``, quiet advisory). Never raises.
+    """
+    p = Path(path)
+    pkg = p if (p / "R").is_dir() or p.name != "R" else p.parent
+
+    # collect locally-defined generics + methods + register-presence in one pass
+    local_generics: set[str] = set()
+    methods: list[dict] = []
+    has_register = False
+    for f, text in _scan_r_files(path):
+        if _S7_VOCAB["register"] + "(" in text:
+            has_register = True
+        for c in _find_s7_constructs(text):
+            if c["call"] == "new_generic":
+                nm = _name_arg(c["args"]) or c["bound"]
+                if nm:
+                    local_generics.add(nm)
+                if c["bound"]:
+                    local_generics.add(c["bound"])
+            elif c["call"] == "method":
+                gm = _METHOD_GENERIC_RE.match(c["args"])
+                methods.append({
+                    "generic": gm.group(1) if gm else "",
+                    "file": f.name, "line": c["line"],
+                })
+
+    imported = _imported_symbols(pkg)
+    findings: list[dict] = []
+    saw_external = False
+    for m in methods:
+        g = m["generic"]
+        if not g:
+            continue
+        in_scope = g in local_generics or g in imported
+        if not in_scope:
+            saw_external = True
+            findings.append({
+                "code": "dangling_method", "severity": "advisory",
+                "file": m["file"], "line": m["line"], "symbol": g,
+                "source": "static",
+                "message": (f"method() targets generic '{g}' which is neither "
+                            "defined (new_generic) nor imported here — looks "
+                            "dangling; check the generic is in scope."),
+            })
+    if saw_external and not has_register:
+        findings.append({
+            "code": "missing_methods_register", "severity": "advisory",
+            "file": "R/", "line": 0, "symbol": "methods_register",
+            "source": "static",
+            "message": ("method() registers on an external generic but no "
+                        "methods_register() call was found — S7 methods may be "
+                        "silently unregistered; consider calling "
+                        "methods_register() in .onLoad()."),
+        })
+    status = "warn" if findings else "ok"
+    messages = [] if findings else ["S7 method registration looks consistent."]
+    return _envelope("methods", status, findings, messages)
+
+
+# ── temporary stubs (each replaced in its own task) ──
 def check_legacy_oop(path):  # Task 6
     return _envelope("legacy", "ok", [], ["(stub)"])
 def check_class_docs(path):  # Task 7

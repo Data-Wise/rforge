@@ -105,3 +105,18 @@ def test_validators_flag_bad_fixture():
 def test_validators_clean_fixture_ok():
     env = s7review.check_validators(str(CLEAN))
     assert env["status"] == "ok"
+
+
+# ── methods ─────────────────────────────────────────────────────────────
+def test_methods_flag_bad_fixture():
+    env = s7review.check_methods(str(BAD))
+    c = _codes(env)
+    assert env["status"] == "warn"
+    assert "dangling_method" in c            # method(external_generic, ...)
+    assert "missing_methods_register" in c   # no methods_register() in bad fixture
+
+
+def test_methods_clean_fixture_ok():
+    # clean fixture: compute_effect generic defined locally + methods_register() present
+    env = s7review.check_methods(str(CLEAN))
+    assert env["status"] == "ok"
