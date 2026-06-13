@@ -49,10 +49,16 @@ def check_legacy_oop(path: 'str | os.PathLike' = '.') -> 'dict'
 
 Flag pre-S7 OOP co-residing with S7. ``setClass``/``setGeneric``/
 ``representation`` → ``legacy_s4_in_s7``; ``setRefClass``/``R6Class`` →
-``legacy_r5_in_s7``; an S3 ``foo.<S7Class> <- function`` body calling
-``UseMethod()`` → ``legacy_s3_generic`` (heuristic). Only fires when the
-file/package also uses ``new_class`` (a pure-S4 package is not an S7
-convention problem). Never raises.
+``legacy_r5_in_s7``; an S3 generic definition of the *name shape*
+``foo.<S7Class> <- function`` → ``legacy_s3_generic`` (a static heuristic on
+the method name; it does **not** inspect the body for ``UseMethod()``).
+
+A method that is *registered* as a real S3 method — via roxygen
+``@exportS3Method`` immediately above it, or NAMESPACE
+``S3method(generic, class)`` — is exempt: it is a deliberately-registered S3
+method, not a migration leftover. Comments and string literals are masked
+before scanning, so commented-out or quoted constructs never fire. Only runs
+when the package also uses ``new_class``. Never raises.
 
 ### `check_methods()`
 

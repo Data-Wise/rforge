@@ -74,6 +74,56 @@ def _scan_r_files(path: str | os.PathLike):
             continue
 
 
+def _mask_strings_and_comments(text: str) -> str:
+    """Return ``text`` with string-literal interiors and ``#`` comments blanked.
+
+    Length-, offset- and line-preserving: every masked character becomes a
+    single space (newlines are kept verbatim), so indices and line numbers
+    computed on the masked text map 1:1 back to the source. The parser and the
+    family regexes run on this view so that R comments and the *contents* of
+    string literals can never be mistaken for code (the systemic root cause of
+    the s7review false positives). String *delimiters* are preserved (only the
+    interior is blanked) so ``_name_arg`` can still recognise that a quoted
+    argument was present, while ``_name_arg_raw`` recovers the literal value.
+
+    Handles ``"..."`` and ``'...'`` with backslash escapes, and ``#`` comments
+    that are not themselves inside a string. R has no block comments.
+    """
+    out = list(text)
+    i = 0
+    n = len(text)
+    in_str: Optional[str] = None  # the active quote char, or None
+    while i < n:
+        c = text[i]
+        if in_str is not None:
+            if c == "\\" and i + 1 < n:
+                # blank the escape pair (keep newline if escaped one follows)
+                out[i] = " "
+                out[i + 1] = "\n" if text[i + 1] == "\n" else " "
+                i += 2
+                continue
+            if c == in_str:
+                in_str = None  # closing delimiter kept as-is
+            elif c != "\n":
+                out[i] = " "
+            i += 1
+            continue
+        if c in ('"', "'"):
+            in_str = c  # opening delimiter kept as-is
+            i += 1
+            continue
+        if c == "#":
+            # comment to end of line
+            j = i
+            while j < n and text[j] != "\n":
+                out[j] = " "
+                j += 1
+            i = j
+            continue
+        i += 1
+    return "".join(out)
+
+
 def _match_balanced(text: str, open_idx: int) -> Optional[int]:
     """Return the index of the ``)`` matching the ``(`` at ``open_idx``.
 
@@ -99,23 +149,32 @@ _CALL_RE = re.compile(r"(?:(\w+)\s*<-\s*)?\b(new_class|new_generic|method)\s*\("
 def _find_s7_constructs(text: str) -> list[dict]:
     """Find S7 constructor/generic/method calls with balanced-paren arg blocks.
 
-    Returns a list of ``{call, bound, args, line}`` dicts where ``call`` is one
-    of ``new_class``/``new_generic``/``method``, ``bound`` is the LHS variable
-    (or ``""``), ``args`` is the raw inside-parens text, and ``line`` is the
-    1-based line of the call. Unbalanced calls are silently skipped.
+    Parses a **masked** view of ``text`` (R comments and string-literal
+    interiors blanked to spaces — see ``_mask_strings_and_comments``) so that a
+    commented-out ``new_class(...)`` or a construct mentioned inside a string is
+    never picked up. Offsets are preserved by the mask, so ``line`` numbers and
+    paren matching stay accurate against the original source.
+
+    Returns a list of ``{call, bound, args, args_raw, line}`` dicts where
+    ``call`` is one of ``new_class``/``new_generic``/``method``, ``bound`` is
+    the LHS variable (or ``""``), ``args`` is the masked inside-parens text
+    (safe for code regexes), ``args_raw`` is the original inside-parens text
+    (needed to recover string-literal names), and ``line`` is the 1-based line
+    of the call. Unbalanced calls are silently skipped.
     """
+    masked = _mask_strings_and_comments(text)
     out: list[dict] = []
-    for m in _CALL_RE.finditer(text):
+    for m in _CALL_RE.finditer(masked):
         open_idx = m.end() - 1  # index of the '('
-        close_idx = _match_balanced(text, open_idx)
+        close_idx = _match_balanced(masked, open_idx)
         if close_idx is None:
             continue
-        args = text[open_idx + 1:close_idx]
         out.append({
             "call": m.group(2),
             "bound": m.group(1) or "",
-            "args": args,
-            "line": text.count("\n", 0, m.start()) + 1,
+            "args": masked[open_idx + 1:close_idx],
+            "args_raw": text[open_idx + 1:close_idx],
+            "line": masked.count("\n", 0, m.start()) + 1,
         })
     return out
 
@@ -167,7 +226,7 @@ def check_naming(path: str | os.PathLike = ".") -> dict:
     for f, text in _scan_r_files(path):
         rel = f.name
         for c in _find_s7_constructs(text):
-            name = _name_arg(c["args"])
+            name = _name_arg(c["args_raw"])
             if c["call"] == "new_class":
                 if name and not _UPPER_CAMEL_RE.match(name):
                     findings.append({
@@ -223,7 +282,7 @@ def check_validators(path: str | os.PathLike = ".") -> dict:
         for c in _find_s7_constructs(text):
             if c["call"] != "new_class":
                 continue
-            name = _name_arg(c["args"]) or c["bound"] or "<class>"
+            name = _name_arg(c["args_raw"]) or c["bound"] or "<class>"
             has_props = bool(_prop_names(c["args"]))
             has_validator = bool(_VALIDATOR_RE.search(c["args"]))
             if has_props and not has_validator:
@@ -295,7 +354,7 @@ def check_methods(path: str | os.PathLike = ".") -> dict:
             has_register = True
         for c in _find_s7_constructs(text):
             if c["call"] == "new_generic":
-                nm = _name_arg(c["args"]) or c["bound"]
+                nm = _name_arg(c["args_raw"]) or c["bound"]
                 if nm:
                     local_generics.add(nm)
                 if c["bound"]:
@@ -350,20 +409,56 @@ _R5_PATTERNS = [
     (re.compile(r"\bsetRefClass\s*\("), "setRefClass"),
     (re.compile(r"(?:\bR6::)?\bR6Class\s*\("), "R6Class"),
 ]
-_USEMETHOD_RE = re.compile(r"\bUseMethod\s*\(")
 _S3_DEF_RE = re.compile(r"^\s*([A-Za-z.][\w.]*)\.([A-Za-z][\w]*)\s*<-\s*function")
+# Registered-S3 markers: roxygen @exportS3Method (optionally `generic class`)
+# and NAMESPACE S3method(generic, class). A method carrying either is a
+# legitimately registered S3 method, not an S7-migration leftover.
+_ROX_S3METHOD_RE = re.compile(r"^#'\s*@exportS3Method(?:\s+(.*))?$")
+_NS_S3METHOD_RE = re.compile(r"^\s*S3method\(\s*([\w.]+)\s*,\s*([\w.]+)")
+
+
+def _registered_s3_methods(pkg_path: Path) -> set[str]:
+    """``generic.class`` names registered as S3 methods via NAMESPACE
+    ``S3method(generic, class)`` or roxygen ``@exportS3Method generic class``.
+
+    Returns the set of fully-qualified ``generic.class`` strings so the S7
+    legacy heuristic can exempt genuinely-registered S3 methods. A bare
+    ``@exportS3Method`` (no args, roxygen infers from the `.`-name on the next
+    def) is recorded specially via the empty-string sentinel ``""`` so the
+    caller can fall back to "the tag is present at all".
+    """
+    reg: set[str] = set()
+    ns = pkg_path / "NAMESPACE"
+    if ns.is_file():
+        try:
+            for line in ns.read_text(encoding="utf-8", errors="replace").splitlines():
+                m = _NS_S3METHOD_RE.match(line)
+                if m:
+                    reg.add(f"{m.group(1)}.{m.group(2)}")
+        except OSError:
+            pass
+    return reg
 
 
 def check_legacy_oop(path: str | os.PathLike = ".") -> dict:
     """Flag pre-S7 OOP co-residing with S7. ``setClass``/``setGeneric``/
     ``representation`` → ``legacy_s4_in_s7``; ``setRefClass``/``R6Class`` →
-    ``legacy_r5_in_s7``; an S3 ``foo.<S7Class> <- function`` body calling
-    ``UseMethod()`` → ``legacy_s3_generic`` (heuristic). Only fires when the
-    file/package also uses ``new_class`` (a pure-S4 package is not an S7
-    convention problem). Never raises.
+    ``legacy_r5_in_s7``; an S3 generic definition of the *name shape*
+    ``foo.<S7Class> <- function`` → ``legacy_s3_generic`` (a static heuristic on
+    the method name; it does **not** inspect the body for ``UseMethod()``).
+
+    A method that is *registered* as a real S3 method — via roxygen
+    ``@exportS3Method`` immediately above it, or NAMESPACE
+    ``S3method(generic, class)`` — is exempt: it is a deliberately-registered S3
+    method, not a migration leftover. Comments and string literals are masked
+    before scanning, so commented-out or quoted constructs never fire. Only runs
+    when the package also uses ``new_class``. Never raises.
     """
+    p = Path(path)
+    pkg = p if (p / "R").is_dir() or p.name != "R" else p.parent
     files = list(_scan_r_files(path))
-    uses_s7 = any("new_class" in text for _f, text in files)
+    uses_s7 = any("new_class" in _mask_strings_and_comments(text)
+                  for _f, text in files)
     if not uses_s7:
         return _envelope("legacy", "ok", [],
                          ["No new_class found — not an S7 package; legacy check "
@@ -374,16 +469,20 @@ def check_legacy_oop(path: str | os.PathLike = ".") -> dict:
     for _f, text in files:
         for c in _find_s7_constructs(text):
             if c["call"] == "new_class":
-                nm = _name_arg(c["args"]) or c["bound"]
+                nm = _name_arg(c["args_raw"]) or c["bound"]
                 if nm:
                     s7_classes.add(nm)
                 if c["bound"]:
                     s7_classes.add(c["bound"])
 
+    ns_registered = _registered_s3_methods(pkg)
+
     findings: list[dict] = []
     for f, text in files:
         rel = f.name
-        for i, line in enumerate(text.splitlines(), start=1):
+        masked_lines = _mask_strings_and_comments(text).splitlines()
+        raw_lines = text.splitlines()
+        for i, line in enumerate(masked_lines, start=1):
             for rx, sym in _S4_PATTERNS:
                 if rx.search(line):
                     findings.append({
@@ -403,17 +502,29 @@ def check_legacy_oop(path: str | os.PathLike = ".") -> dict:
                     })
             m = _S3_DEF_RE.match(line)
             if m and m.group(2) in s7_classes:
+                qualified = f"{m.group(1)}.{m.group(2)}"
+                # exempt registered S3 methods: NAMESPACE S3method(...) or a
+                # preceding roxygen @exportS3Method tag.
+                registered = qualified in ns_registered
+                j = i - 2  # 0-based index of the line above the def (raw)
+                while not registered and j >= 0 and (
+                        raw_lines[j].lstrip().startswith("#'")
+                        or not raw_lines[j].strip()):
+                    if _ROX_S3METHOD_RE.match(raw_lines[j].strip()):
+                        registered = True
+                    j -= 1
+                if registered:
+                    continue
                 findings.append({
                     "code": "legacy_s3_generic", "severity": "advisory",
                     "file": rel, "line": i, "symbol": m.group(0).strip(),
                     "source": "static",
-                    "message": (f"S3 method '{m.group(1)}.{m.group(2)}' dispatches "
-                                f"on S7 class '{m.group(2)}' — prefer an S7 "
-                                "method() over S3 UseMethod()."),
+                    "message": (f"S3 method '{qualified}' has the name shape of an "
+                                f"S3 generic dispatching on S7 class "
+                                f"'{m.group(2)}', and is not registered via "
+                                "@exportS3Method / S3method() — prefer an S7 "
+                                "method() over an S3 method."),
                 })
-            elif _USEMETHOD_RE.search(line):
-                # bare UseMethod whose generic name matches an S7 class suffix
-                continue
     status = "warn" if findings else "ok"
     messages = [] if findings else ["No legacy OOP co-residing with S7."]
     return _envelope("legacy", status, findings, messages)
@@ -423,7 +534,16 @@ def check_legacy_oop(path: str | os.PathLike = ".") -> dict:
 # no export parser to reuse).
 _NS_EXPORT_RE = re.compile(r"^\s*export\(\s*([\w.]+)\s*\)")
 _ROX_EXPORT_RE = re.compile(r"^#'\s*@export\b")
-_PROP_TYPE_RE = re.compile(r"\w+\s*=\s*([A-Za-z.][\w.:]*)")  # name = TypeExpr
+# name = TypeExpr. The trailing ``(?![\w.:(])`` pins the capture to a *whole*
+# token (no partial match) AND rejects a token that is immediately a call —
+# ``label = new_property(...)``. Idiomatic S7 property wrappers
+# (``new_property``/``new_union``/...) are functions whose *return* is the
+# type, resolved at runtime — out of scope for a static check, so they must
+# not be misread as a property type literally named "new_property". The S7
+# type-constructor vocabulary is additionally whitelisted as belt-and-braces.
+_PROP_TYPE_RE = re.compile(r"\w+\s*=\s*([A-Za-z.][\w.:]*)(?![\w.:(])")
+_S7_TYPE_CTORS = frozenset({"new_property", "new_union", "new_class",
+                            "new_S3_class", "as_class"})
 
 
 def _exported_names(pkg_path: Path) -> set[str]:
@@ -457,7 +577,7 @@ def check_class_docs(path: str | os.PathLike = ".") -> dict:
     for _f, text in files:
         for c in _find_s7_constructs(text):
             if c["call"] == "new_class":
-                nm = _name_arg(c["args"]) or c["bound"]
+                nm = _name_arg(c["args_raw"]) or c["bound"]
                 if nm:
                     defined.add(nm)
                 if c["bound"]:
@@ -470,7 +590,7 @@ def check_class_docs(path: str | os.PathLike = ".") -> dict:
         for c in _find_s7_constructs(text):
             if c["call"] != "new_class":
                 continue
-            name = _name_arg(c["args"]) or c["bound"] or "<class>"
+            name = _name_arg(c["args_raw"]) or c["bound"] or "<class>"
             bound = c["bound"]
             # roxygen block immediately above the construct's line?
             li = c["line"] - 1  # 0-based index of the call line
@@ -499,6 +619,8 @@ def check_class_docs(path: str | os.PathLike = ".") -> dict:
                 for tm in _PROP_TYPE_RE.finditer(block):
                     typ = tm.group(1)
                     base = typ.split("::")[-1]
+                    if base in _S7_TYPE_CTORS:
+                        continue            # new_property(...)/new_union(...) call
                     if base.startswith(_S7_VOCAB["class_prefix"]):
                         continue            # class_numeric etc. — builtin
                     if "::" in typ:
