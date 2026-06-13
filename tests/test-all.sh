@@ -523,6 +523,13 @@ agent_engines_valid() {
     python3 tests/_check_agent_engines.py
 }
 
+# docs/commands.md sync-gate (v2.12.0): every non-stub command has a section,
+# every section has a backing command file, and every declared CLI flag is
+# documented in that command's section. Presence check, pure stdlib.
+commands_doc_in_sync() {
+    python3 tests/_check_commands_doc.py
+}
+
 echo "═══════════════════════════════════════════════════════════════"
 echo "  RForge plugin — full validation suite"
 echo "═══════════════════════════════════════════════════════════════"
@@ -560,6 +567,7 @@ run "Dogfood: lib.discovery handles non-R-package repo" lib_discovery_on_self
 run "Agents: no removed rforge_* MCP refs"                  agent_no_mcp_refs
 run "Agents: orchestrator has name+description frontmatter" agent_frontmatter_complete
 run "Agents: orchestrator recipes valid (real+safe engines, real modules)" agent_engines_valid
+run "Docs: commands.md mirrors command files (sections + flags)" commands_doc_in_sync
 
 # Docs site
 run "mkdocs.yml parses"            mkdocs_parses

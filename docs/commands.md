@@ -155,11 +155,12 @@ Ultra-fast status check using only quick tools (<10 seconds).
 
 **Usage:**
 ```bash
-/rforge:quick [description]
+/rforge:quick [description] [--package PATH]
 ```
 
 **Parameters:**
-- `description` (optional) - Brief context for the check
+- `description` (optional) - Brief context for the check (narration only)
+- `--package` (optional) - Path to a specific package (defaults to current directory)
 
 **Examples:**
 ```bash
@@ -168,6 +169,9 @@ Ultra-fast status check using only quick tools (<10 seconds).
 
 # Pre-commit validation
 /rforge:quick "Before committing changes"
+
+# Snapshot a specific package
+/rforge:quick --package /path/to/RMediation
 ```
 
 **Provides:**
@@ -220,15 +224,19 @@ Auto-detect project structure (single package, ecosystem, or hybrid).
 
 **Usage:**
 ```bash
-/rforge:detect
+/rforge:detect [--format FORMAT]
 ```
 
-**No parameters**
+**Parameters:**
+- `--format` (optional) - Output format: `text` (default) or `json`
 
 **Examples:**
 ```bash
 # Detect current directory structure
 /rforge:detect
+
+# Machine-readable output
+/rforge:detect --format json
 ```
 
 **Output:**
@@ -251,11 +259,12 @@ Plan coordinated updates across dependent packages.
 
 **Usage:**
 ```bash
-/rforge:cascade [description]
+/rforge:cascade [description] [--detailed]
 ```
 
 **Parameters:**
 - `description` (optional) - What's changing and why
+- `--detailed` (optional) - Show the full per-package task breakdown
 
 **Examples:**
 ```bash
@@ -264,6 +273,9 @@ Plan coordinated updates across dependent packages.
 
 # Version bump cascade
 /rforge:cascade "Major version bump in core package"
+
+# Detailed cascade plan
+/rforge:cascade --detailed
 ```
 
 **Analyzes:**
@@ -280,19 +292,21 @@ Analyze change impact across ecosystem packages.
 
 **Usage:**
 ```bash
-/rforge:impact [description]
+/rforge:impact --package PKG [--change-type TYPE] [--affected-exports "a b c"]
 ```
 
 **Parameters:**
-- `description` (optional) - What changed
+- `--package` (required) - Package whose change is being analyzed
+- `--change-type` (optional) - Nature of change: `breaking`, `feature` (default), `fix`, `refactor`
+- `--affected-exports` (optional) - Space-separated list of changed exports
 
 **Examples:**
 ```bash
-# API change impact
-/rforge:impact "Changed function signature in base package"
+# API (breaking) change impact
+/rforge:impact --package medfit --change-type breaking
 
-# Dependency update impact
-/rforge:impact "Updated ggplot2 to v3.5.0"
+# Feature change with specific affected exports
+/rforge:impact --package medfit --change-type feature --affected-exports "extract_mediation predict"
 ```
 
 **Reports:**
@@ -309,15 +323,20 @@ Plan CRAN submission sequence based on dependencies.
 
 **Usage:**
 ```bash
-/rforge:release
+/rforge:release [package] [--detailed]
 ```
 
-**No parameters**
+**Parameters:**
+- `package` (optional) - Package to release (defaults to the ecosystem-wide CRAN sequence)
+- `--detailed` (optional) - Show the full submission sequence with internal dependency-order sequencing
 
 **Examples:**
 ```bash
 # Generate release plan
 /rforge:release
+
+# Detailed release plan
+/rforge:release --detailed
 ```
 
 **Provides:**
@@ -389,15 +408,20 @@ Check for documentation drift and inconsistencies across packages.
 
 **Usage:**
 ```bash
-/rforge:docs:check
+/rforge:docs:check [package] [--detailed]
 ```
 
-**No parameters**
+**Parameters:**
+- `package` (optional) - Package to check (defaults to current directory / ecosystem)
+- `--detailed` (optional) - Show the full per-file documentation drift report
 
 **Examples:**
 ```bash
 # Check documentation status
 /rforge:docs:check
+
+# Full drift report
+/rforge:docs:check --detailed
 ```
 
 **Validates:**
@@ -414,11 +438,12 @@ Mark tasks complete with automatic documentation cascade.
 
 **Usage:**
 ```bash
-/rforge:complete [task_description]
+/rforge:complete [task_id] [--no-cascade]
 ```
 
 **Parameters:**
-- `task_description` (optional) - What was completed
+- `task_id` (optional) - Task ID (e.g. `T-YYYY-MM-DD-NNN`) or short description
+- `--no-cascade` (optional) - Skip the documentation cascade detection
 
 **Examples:**
 ```bash
@@ -427,6 +452,9 @@ Mark tasks complete with automatic documentation cascade.
 
 # Trigger doc cascade
 /rforge:complete "Fixed critical bug in mediation function"
+
+# Complete without the doc cascade
+/rforge:complete T-2025-01-15-001 --no-cascade
 ```
 
 **Actions:**
@@ -471,15 +499,20 @@ Get ecosystem-aware next task recommendation.
 
 **Usage:**
 ```bash
-/rforge:next
+/rforge:next [package] [--context TEXT]
 ```
 
-**No parameters**
+**Parameters:**
+- `package` (optional) - Package to focus the recommendation on
+- `--context` (optional) - Free-form context (e.g. `"Before release"`, `"Daily check-in"`)
 
 **Examples:**
 ```bash
 # Get next task suggestion
 /rforge:next
+
+# Focused on a release context
+/rforge:next --context "Before release"
 ```
 
 **Considers:**
@@ -542,7 +575,7 @@ R CMD check integration with detailed error reporting.
 - `package` (optional) - Package to check (defaults to current)
 - `--strict` (optional) - Run both CRAN Suggests-withholding flavors (default: false)
 - `--incoming` (optional) - Emulate CRAN's incoming `_R_CHECK_*` bundle; implies `--strict` (default: false)
-- `--changed` (optional, v2.10.0; tagging v2.11.0) - Scope the check to the package(s) changed on this branch and tag each finding **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already at the fork point), via a baseline run in a detached worktree at `merge-base(HEAD, --base)` (default: false)
+- `--changed` (optional, v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0) - Scope the check to the package(s) changed on this branch and tag each finding **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already at the fork point), via a baseline run in a detached worktree at `merge-base(HEAD, --base)`; an `[introduced]` finding whose file still has uncommitted changes is further refined to **`[uncommitted]`** (counts as introduced for `--fail-on`) (default: false)
 - `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed`; the baseline is run at `merge-base(HEAD, base)` (default: `dev`)
 - `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on findings tagged `[introduced]` (default: `introduced`); `none` is advisory
 - `--changed-strict` (optional, v2.10.0) - Documented no-op (default: false)
@@ -578,7 +611,7 @@ R CMD check integration with detailed error reporting.
 
 **Note:** This can take 1-5 minutes depending on package size. Strict mode runs the baseline plus two flavor passes (~3× check time; ~4× with `--incoming`).
 
-**Diff-aware mode (v2.10.0; tagging v2.11.0):** `--changed` scopes the check to the R package(s) touched on this branch and tags each finding **`[introduced]`** vs **`[pre-existing]`** — computed honestly by a second baseline run in a detached worktree checked out at `merge-base(HEAD, --base)` (default base `dev`). `--fail-on introduced` (the default) exits non-zero only on findings your branch introduced, so CI fails on regressions you caused — not pre-existing debt (`--fail-on none` is advisory). Identity is line-shift-immune (findings key on file + message, not raw line). Degrades gracefully: not a git repo / no merge-base / baseline-worktree failure → falls back to a real full check plus a warning (scope-only, no tagging — no regression of v2.10.0); no changes → a clean no-op. Out of scope: uncommitted-change tagging and cross-run baseline caching (each invocation pays one extra check). `--changed-strict` is a documented no-op.
+**Diff-aware mode (v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0):** `--changed` scopes the check to the R package(s) touched on this branch and tags each finding **`[introduced]`** vs **`[pre-existing]`** — computed honestly by a second baseline run in a detached worktree checked out at `merge-base(HEAD, --base)` (default base `dev`). An `[introduced]` finding whose file still has **uncommitted** changes (per `git status --porcelain`) is further refined to **`[uncommitted]`** — "you caused this with edits you haven't committed yet" vs committed branch work. This is a file-level refinement (no third check run), so every introduced finding in a dirty file tags `[uncommitted]`; string findings (R CMD check messages with no file) stay `[introduced]`. `[uncommitted]` is a subset of introduced: `--fail-on introduced` still fails on it. `--fail-on introduced` (the default) exits non-zero only on findings your branch introduced (incl. `[uncommitted]`), so CI fails on regressions you caused — not pre-existing debt (`--fail-on none` is advisory). Identity is line-shift-immune (findings key on file + message, not raw line). Degrades gracefully: not a git repo / no merge-base / baseline-worktree failure → falls back to a real full check plus a warning (scope-only, no tagging — no regression of v2.10.0); no changes → a clean no-op. Out of scope: finding-precise uncommitted attribution (would need a third clean-HEAD run) and cross-run baseline caching (each invocation pays one extra check). `--changed-strict` is a documented no-op.
 
 ---
 
@@ -660,7 +693,7 @@ Run package tests via `testthat` and report pass/fail/skip counts.
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
-- `--changed` (optional, v2.10.0; tagging v2.11.0) - Scope tests to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run (default: false)
+- `--changed` (optional, v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0) - Scope tests to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; an introduced failure in an uncommitted file is refined to `[uncommitted]` (default: false)
 - `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed` (default: `dev`)
 - `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on `[introduced]` findings (default: `introduced`)
 
@@ -868,7 +901,7 @@ Static analysis of the package via `lintr` — grouped report of style and code-
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
-- `--changed` (optional, v2.10.0; tagging v2.11.0) - Scope lint to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; line-shift-immune identity (default: false)
+- `--changed` (optional, v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0) - Scope lint to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; line-shift-immune identity; an introduced lint in an uncommitted file is refined to `[uncommitted]` (default: false)
 - `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed` (default: `dev`)
 - `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on `[introduced]` findings (default: `introduced`)
 
@@ -940,10 +973,10 @@ There is **no** `--write`/`--fix` — S7 fixes need human judgement.
 | methods | `dangling_method`, `missing_methods_register` | static |
 | legacy | `legacy_s4_in_s7`, `legacy_r5_in_s7`, `legacy_s3_generic` | static |
 | docs | `undocumented_export`, `prop_type_unresolvable` | static |
-| method-dispatch (`--runtime`) | `dead_generic`, `method_on_missing_class` | runtime |
+| method-dispatch (`--runtime`) | `dead_generic`, `method_on_missing_class`, `method_undeclared_dependency` | runtime |
 | validator-runtime (`--runtime`) | `validator_not_enforcing` | runtime |
 
-The `method-dispatch` runtime family reports `dead_generic` (an S7 generic with no registered method) and `method_on_missing_class` (a method whose dispatch signature references an S7 class with no resolvable namespace binding — e.g. an inline `new_class()` left in a `method()` call — making the method unreachable). Each `S7_method` carries its dispatch class objects (`attr(., "signature")`), so resolvability is decided by object identity against the package's classes; base types and imported classes are not flagged.
+The `method-dispatch` runtime family reports `dead_generic` (an S7 generic with no registered method), `method_on_missing_class` (a method whose dispatch signature references an S7 class with no resolvable namespace binding — e.g. an inline `new_class()` left in a `method()` call — making the method unreachable), and `method_undeclared_dependency` (a method dispatching on an S7 class that *does* resolve but whose providing package — `attr(class, "package")` — is not declared in `DESCRIPTION` `Imports`/`Depends`/`LinkingTo`, typically a `Suggests`-only class; where that package is absent the dispatch class never registers and the method never fires). Each `S7_method` carries its dispatch class objects (`attr(., "signature")`), so resolvability is decided by object identity against the package's classes; base types and the package's own classes are not flagged, and base/recommended packages (`base`, `methods`, `stats`, `utils`, `S7`, …) are always treated as declared.
 
 **Output:** one `{kind: "s7review", status: "ok"|"warn", stages: [...]}` envelope. Each finding carries `source: "static"` and `severity: "advisory"`, worded "looks like / consider", never "must". Exit 0 always.
 

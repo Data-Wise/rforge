@@ -74,7 +74,7 @@ There is **no** `--write`/`--fix` (S7 fixes need human judgement, like `r:cran-p
 | methods | `dangling_method`, `missing_methods_register` | static |
 | legacy | `legacy_s4_in_s7`, `legacy_r5_in_s7`, `legacy_s3_generic` | static |
 | docs | `undocumented_export`, `prop_type_unresolvable` | static |
-| method-dispatch (`--runtime`) | `dead_generic`, `method_on_missing_class` | runtime |
+| method-dispatch (`--runtime`) | `dead_generic`, `method_on_missing_class`, `method_undeclared_dependency` | runtime |
 | validator-runtime (`--runtime`) | `validator_not_enforcing` | runtime |
 
 Static findings carry `source: "static"`; the two `--runtime` families carry
@@ -87,15 +87,21 @@ like / consider", never "must".
   by pkg B) remain future work; `--eco` today aggregates per-package static
   results, it does not yet cross-reference between packages.
 - `--runtime` for non-S7 OOP (R6/S4) is out of scope — S7 only.
-- **Cross-package *undeclared-dependency* dispatch** (a method on `otherpkg::Class`
-  where `otherpkg` isn't in `DESCRIPTION`) is a different, DESCRIPTION-aware check —
-  future work, distinct from `method_on_missing_class` below.
 
 > **`method_on_missing_class` is now implemented** (was deferred in v2.11.0). Each
 > `S7_method` carries its dispatch class objects (`attr(., "signature")`), so the
 > `method-dispatch` family flags a method whose signature references an S7 class with
 > no resolvable namespace binding (e.g. an inline `new_class()` left in a `method()`
-> call — an unreachable method). Base types and imported classes are not flagged.
+> call — an unreachable method). Base types are not flagged.
+
+> **`method_undeclared_dependency` is now implemented** (was deferred in v2.11.1).
+> A method dispatching on an S7 class that *does* resolve but whose providing
+> package (`attr(class, "package")`) is set, differs from this package, and is **not**
+> in `DESCRIPTION` `Imports`/`Depends`/`LinkingTo` (typically a `Suggests`-only class)
+> is flagged: at a site without that package the dispatch class never registers, so
+> the method silently never fires. The package itself and base/recommended packages
+> (`base`, `methods`, `stats`, `utils`, `graphics`, `grDevices`, `datasets`, `tools`,
+> `S7`) are always allowed; `Depends` counts as declared the same as `Imports`.
 
 ## Output
 

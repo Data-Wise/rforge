@@ -37,8 +37,12 @@ If `--changed`: `python3 -m lib.rcmd --kind test --changed --base "<ref>"
 [--fail-on introduced|none]` — runs tests on the package(s) changed on this branch
 and tags each failing-test finding `[introduced]` (new on your branch) vs
 `[pre-existing]` (already failing at `merge-base(HEAD, base)`) via a second baseline
-run in a detached worktree. `--fail-on introduced` (default) exits non-zero iff ≥1
-introduced failure. Degrades to scope-only (no tagging) when no merge-base /
+run in a detached worktree. An `[introduced]` failure whose test file still has
+**uncommitted** changes is further refined to `[uncommitted]` (you caused it with
+edits you haven't committed yet) — a file-level refinement (no third run).
+`[uncommitted]` counts as introduced for `--fail-on`. `--fail-on introduced`
+(default) exits non-zero iff ≥1 introduced failure (incl. `[uncommitted]`). Degrades
+to scope-only (no tagging) when no merge-base /
 baseline worktree is available. Costs one extra test run (the baseline).
 
 ## Output Format

@@ -53,11 +53,13 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
    --base "<ref>" [--fail-on introduced|none] --path "<path>"`. The envelope gains
    a `changed` block with `packages` (the changed package(s)), `merge_base` (the
    fork-point SHA), `introduced_count`, and `findings` — each finding tagged
-   `introduced` (new on this branch) or `pre-existing` (already on `base`). The
+   `introduced` (new on this branch), `uncommitted` (an introduced finding whose
+   file still has uncommitted changes), or `pre-existing` (already on `base`). The
    tagging is honest: a baseline run executes the SAME check in a detached worktree
-   checked out at `merge-base(HEAD, base)`. With `--fail-on introduced` (default)
-   the status is `error` iff ≥1 introduced finding. Render the tagged findings,
-   grouping by tag. If the `changed` block instead has `fell_back`/scope-only
+   checked out at `merge-base(HEAD, base)`. `uncommitted` counts as introduced for
+   `--fail-on`. With `--fail-on introduced` (default)
+   the status is `error` iff ≥1 introduced finding (incl. `uncommitted`). Render the
+   tagged findings, grouping by tag. If the `changed` block instead has `fell_back`/scope-only
    wording (no merge-base / baseline worktree unavailable), render the full check
    result as usual.
 
@@ -78,8 +80,14 @@ Run `R CMD check` (via `rcmdcheck`) and report structured results.
   finding **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already
   present at the fork point). The tag is computed honestly: a second baseline run
   executes the same check in a detached worktree checked out at the merge-base SHA,
-  and the two finding lists are set-diffed. **`--fail-on introduced`** (default)
-  exits non-zero iff ≥1 introduced finding, so CI fails only on regressions you
+  and the two finding lists are set-diffed. An `[introduced]` finding whose file
+  still has **uncommitted** changes is further refined to **`[uncommitted]`** (you
+  caused it with edits you haven't committed yet) — a file-level refinement with no
+  third check run, so all introduced findings in a dirty file tag `[uncommitted]`;
+  string findings (R CMD check messages with no file) stay `[introduced]`.
+  **`--fail-on introduced`** (default)
+  exits non-zero iff ≥1 introduced finding (`[uncommitted]` counts as introduced),
+  so CI fails only on regressions you
   caused — not pre-existing debt; **`--fail-on none`** is advisory. Degrades
   gracefully: not a git repo / no merge-base / baseline worktree unavailable →
   scope-only (real status on the changed package(s), no tagging) + a warning; no

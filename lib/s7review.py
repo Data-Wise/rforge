@@ -779,6 +779,31 @@ def _runtime_stages(path: str | os.PathLike) -> list[dict]:
                         f"'{cls}', which has no resolvable namespace binding — the "
                         "method is unreachable (nothing can construct that class)."),
         })
+    # `method_undeclared_dependency`: a method dispatches on an S7 class that DOES
+    # resolve, but whose providing package is set, != this package, and is NOT in
+    # DESCRIPTION Imports/Depends/LinkingTo (typically a Suggests-only class). At a
+    # site without that package the dispatch class never registers → the method
+    # silently never fires. The engine reports these as {"generic","class","package"}
+    # objects; tolerate legacy strings too.
+    for entry in rt.get("methods_undeclared_dependency", []):
+        if isinstance(entry, dict):
+            gen = entry.get("generic", "")
+            cls = entry.get("class", "")
+            pkg = entry.get("package", "")
+        else:  # legacy "<generic> -> <package>::<class>" string form
+            gen, _, rest = str(entry).partition(" -> ")
+            pkg, _, cls = rest.partition("::")
+            if not cls:
+                cls, pkg = pkg, ""
+        md_findings.append({
+            "code": "method_undeclared_dependency", "severity": "advisory",
+            "file": "", "line": 0, "symbol": cls or str(entry), "source": "runtime",
+            "message": (f"S7 method on generic '{gen}' dispatches on class "
+                        f"'{cls}' from package '{pkg}', which is not declared in "
+                        "DESCRIPTION (Imports/Depends/LinkingTo) — likely a "
+                        "Suggests-only class. Where that package is absent the "
+                        "dispatch class never registers and the method never fires."),
+        })
     vr_findings: list[dict] = []
     for cls in rt.get("nonenforcing_validators", []):
         vr_findings.append({

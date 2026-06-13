@@ -7,6 +7,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.12.0] - 2026-06-13
+
+> Three recommendations from a doc gap analysis, built TDD-first and hardened by a
+> 3-dimension pre-release adversarial review. **41 commands** (no surface change).
+
+### Added
+
+- **Diff-aware `[uncommitted]` tag** (`lib/changed.py`; refines `r:check`/`r:test`/`r:lint`
+  `--changed`, no new flag). v2.11.0's two-run `--changed` tags findings `[introduced]`
+  (new on this branch vs the merge-base) vs `[pre-existing]`; it deferred
+  uncommitted-change tagging. This refines it: an `[introduced]` finding whose file has
+  **uncommitted** changes (per new `uncommitted_files()` → `git status --porcelain`) is
+  re-tagged **`[uncommitted]`**, so you can tell "I caused this with edits I haven't
+  committed yet" from committed branch work. File-level, **no third check run** (a
+  finding-precise version would need a clean-HEAD run, tripling cost): all introduced
+  findings in a dirty file tag `[uncommitted]`. String findings (R CMD check messages
+  with no file) stay `[introduced]`; `[pre-existing]` is never re-tagged; a finding is
+  never both. `[uncommitted]` is a **subset of introduced** — `--fail-on introduced`
+  (default) still fails on it (it's your work). Advisory: a git failure yields no
+  refinement (never raises). +8 pytest cases (real-git e2e + `uncommitted_files` units +
+  `--fail-on` on uncommitted-only). Spec: `SPEC-diff-aware-uncommitted-tag-2026-06-13.md`.
+
+- **`docs/commands.md` sync-gate** (`tests/_check_commands_doc.py`, wired into
+  `tests/test-all.sh`; 41→42 checks). A pure-stdlib presence check closing the last
+  drift-prone documentation surface: (1) **command coverage** — every non-stub command
+  file (`commands/**/*.md`, excluding the v2.0.0 rename stubs) has a matching
+  `### /rforge:<name>` section, and every such section has a backing command file (both
+  directions); (2) **flag coverage** — every real CLI flag declared in a command's
+  frontmatter `arguments:` is documented as `--<name>` in that command's section.
+  Positionals (`package`/`path`/`context`/`task_id`/`function`/`name`) and lib-only
+  forwarded args are excluded, but a positional name genuinely exposed as a slash flag
+  (e.g. `/rforge:impact --package`) is still covered. Core logic is importable; a pytest
+  self-test (`tests/test_commands_doc.py`, 12 cases) feeds it fixtures to prove the gate
+  catches missing flags/sections/orphans (not vacuous). Spec:
+  `SPEC-commands-doc-sync-gate-2026-06-13.md`.
+
+- **`r:s7-review` `method_undeclared_dependency`** runtime finding (closes the
+  cross-package check deferred in v2.11.1; no new flag). The `--runtime`
+  `method-dispatch` family now flags a method dispatching on an S7 class that *does*
+  resolve but whose providing package (`attr(class, "package")`) is set, differs from
+  this package, and is **not** in `DESCRIPTION` `Imports`/`Depends`/`LinkingTo` —
+  typically a `Suggests`-only class. At a site without that package the dispatch class
+  never registers, so the method silently never fires (a real correctness/CRAN bug).
+  Extends the v2.11.1 per-signature loop in the `s7runtime` engine (`lib/rcmd.py`):
+  declared deps are parsed R-side once from the loaded DESCRIPTION, with an always-allow
+  set (the package itself + `base`/`methods`/`stats`/`utils`/`graphics`/`grDevices`/
+  `datasets`/`tools`/`S7`); the three per-signature outcomes are mutually exclusive
+  (unresolvable → `method_on_missing_class`; resolvable + undeclared package →
+  `method_undeclared_dependency`; resolvable + declared → clean). Engine emits
+  structured `{generic, class, package}`; consumer (`lib/s7review.py`) maps them into
+  advisory `source: "runtime"` findings. +3 pytest cases (real-R e2e with two installed
+  helper packages — one declared, one not — plus consumer-mapping + normalize units).
+  Spec: `SPEC-s7-undeclared-dependency-2026-06-13.md`.
+
+### Fixed
+
+- **`docs/commands.md` flag drift surfaced + fixed by the new gate** — 10 undocumented
+  command flags added to their sections: `/rforge:quick --package`,
+  `/rforge:detect --format`, `/rforge:cascade --detailed`,
+  `/rforge:impact --package`/`--change-type`/`--affected-exports`,
+  `/rforge:release --detailed`, `/rforge:docs:check --detailed`,
+  `/rforge:complete --no-cascade`, `/rforge:next --context`.
+
+### Fixed (pre-release adversarial review)
+
+A 3-dimension adversarial review caught issues the green gates missed:
+
+- **BLOCKER — diff-aware `[uncommitted]` cross-package collision.** The file match
+  was basename/suffix-fuzzy, so a *committed clean* finding in `pkgB/R/utils.R` was
+  mis-tagged `[uncommitted]` when an unrelated `pkgA/R/utils.R` was dirty. Now findings
+  are rebased to repo-relative coordinates and matched **exactly** against
+  `git status --porcelain -z` (the `-z` form also fixes spaced/quoted paths).
+- **IMPORTANT — sync-gate multi-line stripping.** `_check_commands_doc.py` only stripped
+  the first line of a `\`-continued `python3 -m lib.*` invocation, which could promote a
+  positional name to a required flag. Now tracks continuation state.
+- Plus: quoted-name handling + `--flag` prefix-collision (`--base` vs `--base-dir`) in the
+  sync-gate; the s7 base-package allowlist now derives from
+  `installed.packages(priority="base")`; `next`/`quick` `argument-hint` aligned to `--flags`.
+
+---
+
 ## [2.11.1] - 2026-06-13
 
 ### Added

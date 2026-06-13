@@ -1,7 +1,7 @@
 ---
 name: rforge:next
 description: Get ecosystem-aware next task recommendation
-argument-hint: "[package] [context]"
+argument-hint: "[package] [--context <text>]"
 arguments:
   - name: package
     description: Optional package to focus the recommendation on
