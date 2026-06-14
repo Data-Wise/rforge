@@ -3,7 +3,8 @@
 !!! tip "TL;DR (30 seconds)"
     - **What:** `--changed` on `r:check` / `r:test` / `r:lint` scopes the run to the
       package(s) you touched on this branch and tags each finding **`[introduced]`**
-      (new on your branch) vs **`[pre-existing]`** (already at the fork point).
+      (new on your branch), **`[pre-existing]`** (already at the fork point), or
+      **`[uncommitted]`** (introduced, but in a file you haven't committed yet).
     - **Why:** A full `R CMD check` surfaces every NOTE/WARNING regardless of whether
       *your* branch caused it. Diff-aware mode answers the merge-gate question directly.
     - **How:** It runs a second baseline check in a throwaway worktree at
@@ -37,7 +38,7 @@ flowchart TD
     C --> E["run check in a detached<br/>worktree at the merge-base<br/>(baseline findings)"]
     D --> F["set-diff findings"]
     E --> F
-    F --> G["tag each:<br/>[introduced] vs [pre-existing]"]
+    F --> G["tag each:<br/>[introduced] / [pre-existing] / [uncommitted]"]
     G --> H{"--fail-on"}
     H -- "introduced (default)" --> I["exit non-zero iff ≥1<br/>[introduced] finding"]
     H -- "none" --> J["advisory: always exit 0"]
@@ -62,9 +63,12 @@ A tagged result reads like:
 ```
 [pre-existing]  NOTE: vignette 'intro.Rmd' has long-running examples
 [introduced]    WARNING: undocumented argument 'newparam' in foo()
+[uncommitted]   WARNING: undocumented argument 'draft' in bar()  (not committed yet)
 ```
 
-The first is debt you inherited; the second is yours to fix before merge.
+The first is debt you inherited; the second is yours to fix before merge; the third is
+also yours, but it lives in a file you haven't committed — commit it to promote it to
+`[introduced]` so CI gates on it.
 
 ### Wiring it into CI
 
@@ -82,16 +86,21 @@ The first is debt you inherited; the second is yours to fix before merge.
     `[introduced]`.
 
 !!! warning "Scope & cost"
-    - The baseline is the **committed** merge-base — uncommitted working-tree findings
-      count as HEAD's (commit first for accurate tagging).
-    - Each `--changed` run pays one **extra** check (the baseline). There is no cross-run
-      cache yet.
+    - The baseline is the **committed** merge-base. A finding you *introduced* in a file
+      with uncommitted edits is tagged **`[uncommitted]`** (not `[introduced]`) — commit
+      the file to promote it to `[introduced]` so `--fail-on introduced` gates on it.
+    - The first `--changed` run pays one **extra** check (the baseline), but the baseline
+      is **cached per package** (keyed by the merge-base SHA), so re-runs reuse it and
+      re-check only packages not yet baselined. Disable with `--no-cache`; clear with
+      `python3 -m lib.changed --clear-cache`.
     - No git repo / no merge-base / baseline-worktree failure → graceful fallback to a
       full check plus a warning (scope-only, no tagging).
 
 ## See also
 
+- [Diff-aware checks — command guide](../guides/diff-aware.md) — the exhaustive reference:
+  all three tags, the per-package cache key + invalidation, every flag
 - [`changed` reference](../reference/changed.md) — the `lib.changed` engine (`merge_base`,
-  `run_baseline`, `scope_check`, `tag_findings`)
+  `run_baseline`, `scope_check`, `tag_findings`, `cached_baseline`)
 - [R package dev cycle](r-dev-cycle.md) — the inner loop these checks gate
 - [CRAN release prep](cran-release-prep.md) — the full-package strict checks for submission

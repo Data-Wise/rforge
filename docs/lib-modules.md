@@ -1,7 +1,7 @@
 # 🐍 Lib Modules (`lib/`)
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** Pure-Python analysis modules (`discovery`, `deps`, `status`, `init`, `cranlint`) — no R, no Node — plus `rcmd` (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the `r:` commands.
+    - **What:** Pure-Python analysis modules (`discovery`, `deps`, `status`, `init`, `cranlint`, `deps_sync`, `ghrelease`, `runiverse`, `s7review`, `changed`, `scaffold`) — no R, no Node — plus `rcmd` (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the `r:` commands.
     - **Why:** No MCP server, no Node, no external deps — just `python3 -m lib.<module>`, fast and scriptable.
     - **How:** Each takes `--path` and `--format text|json`; importable as a Python API too.
     - **Next:** [Reference API docs](reference/discovery.md) for signatures, or [Architecture](architecture.md#path-b-lib-modules) for fit.
@@ -43,6 +43,11 @@ flowchart LR
 | `lib/deps_sync.py` | `scan_usage`, `reconcile`, `deps_sync` (v2.5.0 — *intra*-package DESCRIPTION↔usage reconciliation; complements the *inter*-package `lib.deps`) | `python3 -m lib.deps_sync --path . [--write] [--format text\|json]` |
 | `lib/ghrelease.py` | `gh_available`, `submission_tag`, `prerelease_cmd`, `promote_cmd`, `manual_recipe` (v2.6.0 — `gh release` command builders for `r:submit`; pure-Python, shells to nothing itself) | used from `commands/r/submit.md` (constructs the `gh` argv it runs) |
 | `lib/runiverse.py` | `remote_owner`, `resolve_universe`, `api_url`, `install_snippet`, `fetch_status`, `summarize`, `verify` (v2.7.0 — R-universe early-access status for `r:submit --universe`; pure-stdlib, `urllib`-only, read-only — never uploads) | `python3 -m lib.runiverse --path . [--universe <owner>] [--format text\|json]` |
+| `lib/status.py` | `parse_status_file`, `calculate_health_score`, `aggregate_status`, `format_text`, `format_json` (ecosystem `.STATUS` health snapshot; MCP-compatible shape) | `python3 -m lib.status --path . [--format text\|json]` |
+| `lib/init.py` | `init_context`, `format_text`, `format_json` (writes `~/.rforge/context.json`) | `python3 -m lib.init [--path .] [--format text\|json]` |
+| `lib/s7review.py` | `check_naming`, `check_validators`, `check_methods`, `check_legacy_oop`, `check_class_docs`, `run_all`, `build_class_registry`, `check_cross_package_contracts`, `run_eco`, `run_all_with_runtime` (v2.10.0 — static S7 convention checker; `--eco` cross-package contracts + `--runtime`) | backs `/rforge:r:s7-review` |
+| `lib/changed.py` | `changed_files`, `uncommitted_files`, `changed_packages`, `tag_findings`, `merge_base`, `run_baseline`, `cached_baseline`, `clear_baseline_cache`, `scope_check` (v2.10.0 diff-aware `--changed`; per-package baseline cache v2.13.0) | `python3 -m lib.changed [--path .] [--base dev] [--clear-cache]` |
+| `lib/scaffold.py` | `parse_function`, `plan_test`, `plan_package`, `plan_vignette`, `scaffold_data`, `scaffold_citation`, `scaffold` (v2.10.0 — `r:use-*` existing-package scaffolding; dry-run default, `--write` applies) | backs `/rforge:r:use-test\|use-package\|use-vignette\|use-data\|use-citation` |
 
 > **`cranlint` is a pure-stdlib analysis module** like `discovery`/`deps`/`status`/`init`
 > — it never touches R. It backs the Tier 4 advisory stages of `r:cran-prep` (v2.3.0):
@@ -291,23 +296,32 @@ transparently with no copy step.
 ## Testing
 
 ```bash
-python3 -m pytest tests/test_lib_discovery.py tests/test_lib_deps.py tests/test_lib_status.py tests/test_lib_init.py tests/test_rcmd.py -v
+python3 -m pytest tests/ -v
 ```
 
-110 cases cover DESCRIPTION edge cases, FS traversal, classification,
+400+ cases cover DESCRIPTION edge cases, FS traversal, classification,
 graph construction, cycle detection, impact heuristics, blockers,
 `.STATUS` parsing + health-score math, `~/.rforge/context.json`
-round-trip with idempotency, and the `rcmd` envelope/normalizer/snippets
-(R subprocess mocked, so CI stays R-free). Integrated into
-`tests/test-all.sh` (full plugin suite — 30 checks).
+round-trip with idempotency, the `rcmd` envelope/normalizer/snippets,
+and the analysis modules above — `cranlint`, `deps_sync`, `ghrelease`,
+`runiverse`, `s7review`, `changed`, `scaffold` (R subprocess mocked, so
+CI stays R-free). Integrated into `tests/test-all.sh` (the full plugin suite).
 
 ## See also
 
-- [Reference: `discovery` API](reference/discovery.md) — auto-extracted signatures + docstrings
-- [Reference: `deps` API](reference/deps.md) — auto-extracted signatures + docstrings
-- [Reference: `status` API](reference/status.md) — auto-extracted signatures + docstrings
-- [Reference: `init` API](reference/init.md) — auto-extracted signatures + docstrings
-- [Reference: `cranlint` API](reference/cranlint.md) — auto-extracted signatures + docstrings
+- Reference API (auto-extracted signatures + docstrings):
+  [`discovery`](reference/discovery.md) ·
+  [`deps`](reference/deps.md) ·
+  [`status`](reference/status.md) ·
+  [`init`](reference/init.md) ·
+  [`rcmd`](reference/rcmd.md) ·
+  [`cranlint`](reference/cranlint.md) ·
+  [`deps_sync`](reference/deps_sync.md) ·
+  [`ghrelease`](reference/ghrelease.md) ·
+  [`runiverse`](reference/runiverse.md) ·
+  [`s7review`](reference/s7review.md) ·
+  [`changed`](reference/changed.md) ·
+  [`scaffold`](reference/scaffold.md)
 - [SPEC: Absorb rforge-mcp (Path B)](specs/SPEC-mcp-absorb-2026-05-10.md) — full migration plan
 - [Migration: rforge-mcp deprecation](migration/rforge-mcp-deprecation.md) — old MCP tool → new lib module table
 - [Architecture](architecture.md#path-b-lib-modules) — where lib/ fits in the plugin surface

@@ -60,9 +60,9 @@
 │    /rforge:r:urlcheck     URL breakage check (urlchecker)                   │
 │    /rforge:r:style        Auto-format source (styler)                       │
 │    /rforge:r:deps-sync    Reconcile DESCRIPTION vs code usage (--write)     │
-│    /rforge:r:s7-review    Static S7 convention checker (advisory, v2.11.0)  │
+│    /rforge:r:s7-review    S7 conventions; --eco/--runtime (v2.10.0)         │
 │                                                                             │
-│  R AUTHORING (v2.11.0, scaffold existing pkgs — dry-run; --write to apply)  │
+│  R AUTHORING (v2.10.0+, scaffold existing pkgs — dry-run; --write to apply) │
 │    /rforge:r:use-test     Draft a testthat file (assertions left as TODO)   │
 │    /rforge:r:use-package  Declare a dep (Imports/Suggests) + @importFrom    │
 │    /rforge:r:use-vignette Scaffold a vignette/article skeleton + outline    │
@@ -84,12 +84,12 @@
 │                           [check (incoming)], description, build-hygiene,   │
 │                           docs-consistency  (strict ERROR blocks ready)     │
 │                                                                             │
-│  DIFF-AWARE --changed (v2.11.0) on r:check / r:test / r:lint                │
-│    --changed [--base <ref>] Scope to packages changed on this branch        │
-│    r:check --changed        two-run tagging: same engine at merge-base      │
-│                             baseline vs HEAD → [introduced]/[pre-existing]; │
-│                             --fail-on introduced (default) errors on new    │
-│                             findings only; --changed-strict is a no-op      │
+│  DIFF-AWARE --changed on r:check / r:test / r:lint (v2.11-2.13)             │
+│    --changed [--base <ref>]  scope to changed packages vs the baseline      │
+│    tags each finding:  [introduced] / [pre-existing] / [uncommitted]        │
+│    --fail-on introduced (default) errors only on findings you introduced    │
+│    per-package baseline cache (merge-base SHA key); --no-cache to skip it   │
+│    clear with:  python3 -m lib.changed --clear-cache                        │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -179,6 +179,12 @@ As of v1.3.0 the plugin is self-contained — slash commands dispatch to pure-Py
 | `lib.init` | Initialize `~/.rforge/context.json` | <5s |
 | `lib.rcmd` | R dev-cycle + quality + CRAN-submission engines (v2.2.0) | R-bound |
 | `lib.cranlint` | CRAN-incoming linter — DESCRIPTION + build-hygiene (v2.3.0) | <2s |
+| `lib.deps_sync` | DESCRIPTION ↔ usage reconciliation (v2.5.0) | <2s |
+| `lib.ghrelease` | `gh release` builders for `r:submit` (v2.6.0) | <1s |
+| `lib.runiverse` | R-universe early-access status (v2.7.0) | net |
+| `lib.s7review` | S7 convention checker; `--eco`/`--runtime` (v2.10.0) | <2s |
+| `lib.changed` | Diff-aware `--changed` + baseline cache (v2.10.0) | <2s |
+| `lib.scaffold` | `r:use-*` scaffolding (v2.10.0) | <1s |
 
 See [`docs/lib-modules.md`](lib-modules.md) and the [reference API docs](reference/discovery.md) for full call signatures.
 
@@ -283,7 +289,13 @@ rforge/
 │   ├── status.py
 │   ├── init.py
 │   ├── rcmd.py            # R dev-cycle + quality + CRAN-submission engines (v2.7.0)
-│   ├── cranlint.py        # CRAN-incoming linter (DESCRIPTION + build-hygiene) (v2.3.0)
+│   ├── cranlint.py        # CRAN-incoming linter (v2.3.0)
+│   ├── deps_sync.py       # DESCRIPTION ↔ usage reconciliation (v2.5.0)
+│   ├── ghrelease.py       # gh release builders for r:submit (v2.6.0)
+│   ├── runiverse.py       # R-universe early-access status (v2.7.0)
+│   ├── s7review.py        # S7 convention checker; --eco/--runtime (v2.10.0)
+│   ├── changed.py         # diff-aware --changed + baseline cache (v2.10.0)
+│   ├── scaffold.py        # r:use-* scaffolding (v2.10.0)
 │   └── formatters.py
 └── docs/                  # Documentation
     └── REFCARD.md (this file)
@@ -344,6 +356,7 @@ rforge/
 - **Plugin Repository:** <https://github.com/Data-Wise/rforge>
 - **GitHub Releases:** <https://github.com/Data-Wise/rforge/releases>
 - **Migration tutorials:** [v2.0.0 rename](migration/v2.0.0-rename.md) · [rforge-mcp deprecation](migration/rforge-mcp-deprecation.md)
+- **Command guides** (per-family deep-dives): [dev-cycle](guides/dev-cycle.md) · [quality](guides/quality.md) · [scaffolding](guides/scaffolding.md) · [s7-review](guides/s7-review.md) · [diff-aware](guides/diff-aware.md) · [CRAN submission](guides/cran-submission.md)
 
 ---
 
@@ -364,8 +377,8 @@ rforge/
 | CRAN multi-platform | `/rforge:r:rhub` | Async GitHub Actions matrix |
 | Reverse-dep check | `/rforge:r:revdep` | CRAN downstream obligation |
 | Advisory best practices | `/rforge:r:goodpractice` | Pre-submission advisory pass |
-| Check S7 conventions | `/rforge:r:s7-review` | Static, advisory — naming/validators/methods/legacy/docs |
-| Check only changed packages | `/rforge:r:check --changed` | Scopes to packages changed vs `--base`; tags findings [introduced]/[pre-existing] via a merge-base baseline (`--fail-on introduced` by default); `--changed-strict` is a no-op |
+| Check S7 conventions | `/rforge:r:s7-review` | Static, advisory — naming/validators/methods/legacy/docs; `--eco` cross-package contracts, `--runtime` dispatch checks |
+| Check only changed packages | `/rforge:r:check --changed` | Scopes to packages changed vs `--base`; tags findings [introduced]/[pre-existing]/[uncommitted] via a per-package-cached merge-base baseline (`--fail-on introduced` by default; `--no-cache` to skip the cache) |
 | Scaffold a test file | `/rforge:r:use-test` | Draft test_that() blocks (TODO assertions) |
 | Add a dependency | `/rforge:r:use-package` | Imports/Suggests + @importFrom |
 | Scaffold a vignette | `/rforge:r:use-vignette` | knitr skeleton + outline |
