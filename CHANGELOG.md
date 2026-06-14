@@ -29,8 +29,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `method(g, list(A, B))` checks each class; `class_*` base helpers and `pkg::`
   explicit refs are skipped. Surfaced in the `--eco` rollup `by_family`; automatic
   (inherently needs the ecosystem), silent when no cross-package S7 dispatch
-  exists. +12 pytest cases. Spec: `SPEC-s7-cross-package-contracts-2026-06-13.md`.
-  (Candidate B sub-item 2 — full R6/S4 convention checking — parked.)
+  exists. Reachability is **re-export-aware**: a class reached through a declared
+  re-exporting facade (`importFrom` + `export`) is correctly clean, not flagged.
+  Hardened by a 3-lens pre-merge adversarial review that caught 2 BLOCKERs + 2
+  IMPORTANTs the green gates missed — re-export false positive; `=`-assigned
+  classes (`Foo = new_class()`) invisible to the registry → genuine contracts
+  silently missed (the `_CALL_RE` binding fix also restores `check_naming`'s
+  bound-vs-`@name` check for `=`); multi-line `export()` parsed as the empty set
+  → false unexported (now balanced-paren, multi-line aware); and the `run_eco`
+  pre-loop registry build guarded so a malformed package can't abort the sweep —
+  all fixed + re-verified. +19 pytest cases. Spec:
+  `SPEC-s7-cross-package-contracts-2026-06-13.md`. (Candidate B sub-item 2 — full
+  R6/S4 convention checking — parked.)
 
 - **Diff-aware baseline caching** (`lib/changed.py`; `r:check`/`r:test`/`r:lint`
   `--changed` + new `--no-cache` flag). The last v2.11.0 `--changed` follow-up

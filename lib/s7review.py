@@ -146,7 +146,12 @@ def _match_balanced(text: str, open_idx: int) -> Optional[int]:
     return None
 
 
-_CALL_RE = re.compile(r"(?:(\w+)\s*<-\s*)?\b(new_class|new_generic|method)\s*\(")
+# Binding via `<-` OR `=` — both are valid top-level R assignment, and a class
+# defined `Foo = new_class("Foo")` must register the same as `Foo <- ...` (else a
+# genuine cross-package contract on it is silently missed, and check_naming loses
+# its bound-vs-@name comparison). `method(...) <- function` is unaffected: that
+# form has no `name <-`/`name =` prefix, so the optional group simply stays empty.
+_CALL_RE = re.compile(r"(?:(\w+)\s*(?:<-|=)\s*)?\b(new_class|new_generic|method)\s*\(")
 
 
 def _find_s7_constructs(text: str) -> list[dict]:
@@ -690,10 +695,10 @@ def run_all(path: str | os.PathLike = ".") -> dict:
 # exist. Resolution is on the R BINDING name (`bound`) — that is what
 # `method(g, C)` references and what `export(C)` names — not the `@name` string.
 
-# NAMESPACE export lines: export(A, B) / exportClasses(A) / exportPattern(...)
-_NS_EXPORT_RE = re.compile(r"^\s*export\s*\(([^)]*)\)")
-_NS_EXPORTCLASSES_RE = re.compile(r"^\s*exportClasses\s*\(([^)]*)\)")
-_NS_EXPORTPATTERN_RE = re.compile(r"^\s*exportPattern\s*\(")
+# NAMESPACE export calls, matched across line boundaries via balanced parens:
+# export(...) / exportClasses(...). exportPattern(...) makes the set unknowable.
+_NS_EXPORT_CALL_RE = re.compile(r"\b(?:export|exportClasses)\s*\(")
+_NS_EXPORTPATTERN_RE = re.compile(r"\bexportPattern\s*\(")
 _IDENT_RE = re.compile(r"^[A-Za-z.][\w.]*$")
 
 
@@ -722,19 +727,18 @@ def _exported_s7_classes(pkg_path: str | os.PathLike) -> Optional[set[str]]:
     if not ns.is_file():
         return None
     try:
-        lines = ns.read_text(encoding="utf-8", errors="replace").splitlines()
+        text = ns.read_text(encoding="utf-8", errors="replace")
     except OSError:
         return None
+    if _NS_EXPORTPATTERN_RE.search(text):
+        return None  # regex export → set unknowable → suppress unexported
     names: set[str] = set()
-    for line in lines:
-        if _NS_EXPORTPATTERN_RE.match(line):
-            return None  # regex export → set unknowable → suppress unexported
-        m = _NS_EXPORT_RE.match(line)
-        if m:
-            names |= _split_export_names(m.group(1))
-        mc = _NS_EXPORTCLASSES_RE.match(line)
-        if mc:
-            names |= _split_export_names(mc.group(1))
+    for m in _NS_EXPORT_CALL_RE.finditer(text):
+        open_idx = m.end() - 1  # the '('
+        close_idx = _match_balanced(text, open_idx)
+        if close_idx is None:
+            return None  # truncated/unbalanced export() → unknowable → suppress
+        names |= _split_export_names(text[open_idx + 1:close_idx])
     return names
 
 
@@ -821,8 +825,36 @@ def check_cross_package_contracts(pkg, registry: dict, exports: dict) -> dict:
                 siblings = [p for p in providers if p != pkg.name]
                 if not siblings:
                     continue
-                declared_siblings = [s for s in siblings if s in declared]
-                if not declared_siblings:
+                # Declared definers: sibling packages that DEFINE cls and are
+                # declared deps. The class is reachable from `pkg` iff some
+                # DECLARED ecosystem dep exports cls — whether it DEFINES it or
+                # RE-EXPORTS it (importFrom + export, the facade idiom: `pkg`
+                # rightly depends on the re-exporter, not the original definer) —
+                # OR a declared DEFINER's export set is statically unknowable (no
+                # NAMESPACE / exportPattern → suppress to avoid a false positive).
+                declared_definers = [s for s in siblings if s in declared]
+                reachable = (
+                    any(cls in (exports.get(d) or set())
+                        for d in declared if d in exports)
+                    or any(exports.get(s) is None for s in declared_definers))
+                if reachable:
+                    continue
+                if declared_definers:
+                    findings.append({
+                        "code": "cross_package_unexported_class",
+                        "severity": "advisory", "file": f.name, "line": c["line"],
+                        "class": cls, "generic": generic,
+                        "providers": declared_definers, "consumer": pkg.name,
+                        "source": "static",
+                        "message": (
+                            f"method({generic}, {cls}) in '{pkg.name}' dispatches "
+                            f"on S7 class '{cls}' from declared sibling package(s) "
+                            f"{declared_definers}, but none export it "
+                            "(no export()/exportClasses() in their NAMESPACE) — it "
+                            f"is not reachable from '{pkg.name}'. Export the class "
+                            "in the providing package (or depend on one that does)."),
+                    })
+                else:
                     findings.append({
                         "code": "cross_package_undeclared_contract",
                         "severity": "advisory", "file": f.name, "line": c["line"],
@@ -833,30 +865,10 @@ def check_cross_package_contracts(pkg, registry: dict, exports: dict) -> dict:
                             f"method({generic}, {cls}) in '{pkg.name}' dispatches "
                             f"on S7 class '{cls}' defined in sibling package(s) "
                             f"{siblings}, which '{pkg.name}' does not declare in "
-                            "Imports/Depends/LinkingTo — the class will not resolve "
-                            "at load and the method will never dispatch. Declare "
-                            "the providing package."),
-                    })
-                    continue
-                # Declared: reachable iff some declared sibling exports it (or its
-                # export set is unknowable — then suppress to avoid a false positive).
-                reachable = any(
-                    exports.get(s) is None or cls in exports.get(s, set())
-                    for s in declared_siblings)
-                if not reachable:
-                    findings.append({
-                        "code": "cross_package_unexported_class",
-                        "severity": "advisory", "file": f.name, "line": c["line"],
-                        "class": cls, "generic": generic,
-                        "providers": declared_siblings, "consumer": pkg.name,
-                        "source": "static",
-                        "message": (
-                            f"method({generic}, {cls}) in '{pkg.name}' dispatches "
-                            f"on S7 class '{cls}' from declared sibling package(s) "
-                            f"{declared_siblings}, but none export it "
-                            "(no export()/exportClasses() in their NAMESPACE) — it "
-                            f"is not reachable from '{pkg.name}'. Export the class "
-                            "in the providing package."),
+                            "Imports/Depends/LinkingTo (nor depend on a package "
+                            "that re-exports it) — the class will not resolve at "
+                            "load and the method will never dispatch. Declare the "
+                            "providing package."),
                     })
     status = "warn" if findings else "ok"
     messages = [] if findings else ["No cross-package S7 contract issues."]
@@ -886,8 +898,18 @@ def run_eco(root: str | os.PathLike = ".") -> dict:
 
     # Ecosystem-wide passes, built once across all packages (cross-package
     # contracts need the whole picture, unlike the per-package static families).
-    registry = build_class_registry(pkgs)
-    exports = {p.name: _exported_s7_classes(p.path) for p in pkgs}
+    # Guarded so a malformed package can't abort the whole sweep — run_eco's
+    # "never raises / per-package warn" contract covers the pre-loop build too.
+    try:
+        registry = build_class_registry(pkgs)
+    except Exception:  # noqa: BLE001 — advisory sweep must never abort
+        registry = {}
+    exports: dict = {}
+    for p in pkgs:
+        try:
+            exports[p.name] = _exported_s7_classes(p.path)
+        except Exception:  # noqa: BLE001
+            exports[p.name] = None
 
     per_package: list[dict] = []
     by_family: dict[str, int] = {}
