@@ -337,18 +337,28 @@ backlog:
     spec: docs/specs/SPEC-r-scaffolding-2026-06-10.md + SPEC-r-scaffolding-v2-2026-06-13.md
     notes: "SHIPPED: r:use-test/use-package/use-vignette v2.10.0; r:use-data/use-citation v2.11.0. 41 commands."
 
-  # Post-v2.11.0 candidates (rforge-native depth, NOT craft-parity; none specced unless noted)
+  # Post-v2.11.0 candidates (rforge-native depth, NOT craft-parity) — mostly SHIPPED; provenance kept
   - title: "s7-review method_on_missing_class"
-    priority: candidate
-    spec: docs/specs/SPEC-r-s7-review-eco-2026-06-13.md (Deferred section)
-    notes: "The one runtime family deferred from v2.11.0 — ships as a documented empty placeholder. Not decidable from the S7 method registry alone; needs parse of method(generic, Class) registrations + cross-check class existence. Disclosed in commands/r/s7-review.md."
+    priority: SHIPPED
+    spec: docs/specs/SPEC-s7-method-missing-class-2026-06-13.md
+    notes: "SHIPPED v2.11.1 (PR #37→dev, #38→main). Refuted the 'not decidable from the registry alone' deferral: each S7_method carries attr(.,'signature'); the s7runtime engine flags a dispatch class with no resolvable namespace binding (unreachable method), resolved by object identity (not @name). Maps to the method-dispatch family in lib/s7review.py."
   - title: "diff-aware follow-ups (uncommitted tagging + baseline caching)"
+    priority: SHIPPED
+    spec: docs/specs/SPEC-diff-aware-uncommitted-tag-2026-06-13.md + SPEC-diff-aware-baseline-caching-2026-06-13.md
+    notes: "SHIPPED: [uncommitted] tag v2.12.0 (PR #40→dev, #41→main); per-package baseline caching v2.13.0 (candidate A, PR #43→dev, #45→main) — cache under ~/.rforge/baseline-cache/ keyed by (repo, merge-base SHA, kind, package, flags), LRU-20, self-invalidating, + --no-cache / lib.changed --clear-cache."
+  - title: "s7-review breadth — cross-package contracts (B1)"
+    priority: SHIPPED
+    spec: docs/specs/SPEC-s7-cross-package-contracts-2026-06-13.md
+    notes: "SHIPPED v2.13.0 (candidate B1, PR #44→dev, #45→main) — the cross-package-contract family in --eco: cross_package_undeclared_contract + cross_package_unexported_class (re-export-aware, name-based, conservative). The static ecosystem sibling of v2.12.0 method_undeclared_dependency."
+
+  # Open candidates (rforge-native depth; none active)
+  - title: "s7-review breadth — R6/S4 convention checking (B2)"
+    priority: PARKED
+    notes: "PARKED 2026-06-13 (low ecosystem value): rforge is S7-focused; check_legacy_oop (v2.10.0) already flags migration leftovers (legacy_s4_in_s7/legacy_r5_in_s7/legacy_s3_generic); full R6/S4 convention linting overlaps lintr. Revisit only on concrete need; would need its own spec."
+  - title: "diff-aware cross-package contract_drift (S7 third family)"
     priority: candidate
-    spec: docs/specs/SPEC-diff-aware-tagging-2026-06-13.md (Out of scope)
-    notes: "Baseline is committed merge-base only; dirty working-tree findings count as HEAD's. Each --changed invocation pays one extra check (no cross-run cache). Both explicitly deferred."
-  - title: "s7-review breadth (cross-package contracts + R6/S4)"
-    priority: candidate
-    notes: "Cross-package S7 contract checks (class in pkg A used by pkg B) + R6/S4 OOP (currently S7-only). Both need specs. Natural --eco extension."
+    spec: docs/specs/SPEC-s7-cross-package-contracts-2026-06-13.md (deferred)
+    notes: "Third cross-package S7 family deferred from B1: signature/return-type drift for a method dispatching on a sibling package's class. Natural follow-on to the v2.13.0 contract family. Needs a spec section."
 
   # Parked (waits on external signal)
   - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"
