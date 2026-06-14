@@ -207,6 +207,7 @@ With a green gate and reviewed `cran-comments.md`, hand off to the ecosystem-lev
 
 ## Related commands
 
+- [CRAN submission command guide](../guides/cran-submission.md) — the per-command reference + safety model
 - `/rforge:r:cran-prep` — the full gate (this tutorial)
 - `/rforge:r:revdep` — reverse-dependency check only
 - `/rforge:r:goodpractice` — advisory best-practice bundle only

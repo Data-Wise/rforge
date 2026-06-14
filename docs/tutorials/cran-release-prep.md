@@ -267,6 +267,7 @@ For multi-platform verification before submission:
 
 ## What's next
 
+- **[CRAN submission command guide](../guides/cran-submission.md)** — every command's flags, tiers, and the safety model
 - **[Ecosystem orchestration](ecosystem-orchestration.md)** — if the
   release surfaced a needed cross-package change, plan it with
   `/rforge:cascade`.

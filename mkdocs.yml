@@ -93,6 +93,7 @@ nav:
     - 📖 Detailed Quick Start: quickstart.md
   - Learn:
     - 📊 Visual Workflows: workflows/index.md
+    - "🧰 Package Development Guide": package-development-guide.md
     - Tutorials Overview: tutorials/README.md
     - "Getting started": tutorials/getting-started.md
     - "rforge in the R package lifecycle": tutorials/rforge-in-the-r-lifecycle.md
@@ -100,6 +101,7 @@ nav:
     - "Ecosystem orchestration": tutorials/ecosystem-orchestration.md
     - "Orchestrator cookbook": tutorials/orchestrator-cookbook.md
     - "R package dev cycle": tutorials/r-dev-cycle.md
+    - "Dependency reconciliation": tutorials/dependency-reconciliation.md
     - "Diff-aware checks": tutorials/diff-aware-checks.md
     - "S7 convention checking": tutorials/s7-convention-checking.md
     - "Scaffolding existing packages": tutorials/scaffolding-existing-packages.md
@@ -110,6 +112,13 @@ nav:
   - Reference:
     - 📚 Reference Card: REFCARD.md
     - Commands: commands.md
+    - Command Guides:
+      - "Dev cycle (load/document/test/check)": guides/dev-cycle.md
+      - "Quality (lint/spell/style/urlcheck)": guides/quality.md
+      - "Scaffolding (r:use-*)": guides/scaffolding.md
+      - "S7 review (--eco/--runtime)": guides/s7-review.md
+      - "Diff-aware checks (--changed)": guides/diff-aware.md
+      - "CRAN submission": guides/cran-submission.md
     - 🤖 Orchestrator Agent: orchestrator.md
     - Configuration: configuration.md
     - Lib Modules: lib-modules.md

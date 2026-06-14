@@ -180,6 +180,7 @@ A realistic "add a feature, document it, ship the data + citation" pass:
 
 ## See also
 
+- [Scaffolding command guide](../guides/scaffolding.md) — the full `r:use-*` flag + behavior reference
 - [`scaffold` reference](../reference/scaffold.md) — the `lib.scaffold` engine behind these commands
 - [R package dev cycle](r-dev-cycle.md) — run document/test/check after scaffolding
 - [`/rforge:r:deps-sync`](../commands.md#rforgerdeps-sync) — reconcile all deps at once
