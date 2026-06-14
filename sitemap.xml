@@ -41,11 +41,39 @@
          <lastmod>2026-06-14</lastmod>
     </url>
     <url>
+         <loc>https://data-wise.github.io/rforge/package-development-guide/</loc>
+         <lastmod>2026-06-14</lastmod>
+    </url>
+    <url>
          <loc>https://data-wise.github.io/rforge/quickstart/</loc>
          <lastmod>2026-06-14</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/troubleshooting/</loc>
+         <lastmod>2026-06-14</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/guides/cran-submission/</loc>
+         <lastmod>2026-06-14</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/guides/dev-cycle/</loc>
+         <lastmod>2026-06-14</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/guides/diff-aware/</loc>
+         <lastmod>2026-06-14</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/guides/quality/</loc>
+         <lastmod>2026-06-14</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/guides/s7-review/</loc>
+         <lastmod>2026-06-14</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/guides/scaffolding/</loc>
          <lastmod>2026-06-14</lastmod>
     </url>
     <url>
@@ -246,6 +274,10 @@
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/tutorials/cran-submission-with-rforge/</loc>
+         <lastmod>2026-06-14</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/tutorials/dependency-reconciliation/</loc>
          <lastmod>2026-06-14</lastmod>
     </url>
     <url>
