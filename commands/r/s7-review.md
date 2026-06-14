@@ -47,6 +47,18 @@ python3 -m lib.s7review --path "<package-dir>" --kind all --format json
   manifest and aggregate into one report (per-package breakdown + roll-up by
   family, ordered by the manifest's `manifest_order`). Pure-stdlib (no R). A
   package that fails to parse becomes a per-package `warn` — the sweep continues.
+  `--eco` additionally runs the ecosystem-only **`cross-package-contract`** family
+  (it needs the whole package set): it builds a registry of every S7 class →
+  defining package, then flags a `method(generic, C)` that dispatches on a
+  **sibling** package's class C when (a) that package isn't declared in this
+  package's `Imports`/`Depends`/`LinkingTo` (`cross_package_undeclared_contract` —
+  C never resolves at load, the method silently never dispatches), or (b) it is
+  declared but the provider doesn't `export(C)` (`cross_package_unexported_class`).
+  Static and **name-based** (it can't do the runtime object-identity `--runtime`
+  uses), so it is deliberately conservative — it flags only when no declared,
+  exporting provider can exist, and suppresses the export check when a provider's
+  NAMESPACE is absent or uses `exportPattern()`. The static, ecosystem-scoped
+  sibling of `--runtime`'s `method_undeclared_dependency`.
 - `--runtime` — add an **R-backed runtime pass** that loads the package and
   introspects S7 at runtime, contributing two more families (`method-dispatch`,
   `validator-runtime`). Routed through `lib.rcmd` (the only R-touching module).

@@ -46,6 +46,7 @@ flowchart TD
 | methods | static | `dangling_method`, `missing_methods_register` |
 | legacy | static | `legacy_s4_in_s7`, `legacy_r5_in_s7`, `legacy_s3_generic` |
 | docs | static | `undocumented_export`, `prop_type_unresolvable` |
+| cross-package-contract | `--eco` | `cross_package_undeclared_contract`, `cross_package_unexported_class` |
 | method-dispatch | `--runtime` | `dead_generic`, `method_on_missing_class` |
 | validator-runtime | `--runtime` | `validator_not_enforcing` |
 
@@ -70,6 +71,30 @@ flowchart TD
 
 Packages are ordered by the manifest's `manifest_order`; a package that fails to parse
 becomes a per-package `warn` and never aborts the sweep.
+
+`--eco` also runs one **ecosystem-only** family the per-package modes can't: the
+**`cross-package-contract`** family. It builds a registry of every S7 class → its
+defining package, then flags a method that dispatches on a **sibling** package's class
+whose contract is unsatisfiable:
+
+- **`cross_package_undeclared_contract`** — package B has `method(generic, C)` where `C`
+  is defined in sibling package A, but B doesn't declare A in `Imports`/`Depends`/
+  `LinkingTo`. The class never resolves at B's load → the method **silently never
+  dispatches**. (The static, ecosystem-scoped sibling of `--runtime`'s
+  `method_undeclared_dependency`, caught *before* anything is installed.)
+- **`cross_package_unexported_class`** — A *is* declared, but A's `NAMESPACE` doesn't
+  `export(C)`, so B still can't reach it.
+
+```bash
+# Cross-package contracts are part of every --eco sweep (no extra flag)
+/rforge:r:s7-review --eco
+```
+
+!!! note "Static and conservative"
+    This family is name-based (it can't do the runtime object-identity `--runtime`
+    uses), so it flags **only** when no declared, exporting provider can exist. If a
+    provider's NAMESPACE is missing or uses `exportPattern()`, the export set is
+    unknowable and the unexported check is **suppressed** — no false positive.
 
 ### 3. Runtime pass — `--runtime`
 
