@@ -1,7 +1,7 @@
 ---
 name: rforge:r:test
 description: Run package tests (testthat) and report pass/fail/skip counts
-argument-hint: "[package] [--changed] [--base <ref>] [--fail-on introduced|none]"
+argument-hint: "[package] [--changed] [--base <ref>] [--fail-on introduced|none] [--no-cache]"
 arguments:
   - name: package
     description: Package path (defaults to current directory)
@@ -22,6 +22,11 @@ arguments:
     required: false
     type: string
     default: introduced
+  - name: no-cache
+    description: "--changed: bypass the baseline cache — force a fresh merge-base baseline run and skip writing it."
+    required: false
+    type: boolean
+    default: false
 ---
 
 # R Package Tests
@@ -34,7 +39,7 @@ python3 -m lib.rcmd --kind test --path "<path>"
 ```
 
 If `--changed`: `python3 -m lib.rcmd --kind test --changed --base "<ref>"
-[--fail-on introduced|none]` — runs tests on the package(s) changed on this branch
+[--fail-on introduced|none] [--no-cache]` — runs tests on the package(s) changed on this branch
 and tags each failing-test finding `[introduced]` (new on your branch) vs
 `[pre-existing]` (already failing at `merge-base(HEAD, base)`) via a second baseline
 run in a detached worktree. An `[introduced]` failure whose test file still has
@@ -43,7 +48,12 @@ edits you haven't committed yet) — a file-level refinement (no third run).
 `[uncommitted]` counts as introduced for `--fail-on`. `--fail-on introduced`
 (default) exits non-zero iff ≥1 introduced failure (incl. `[uncommitted]`). Degrades
 to scope-only (no tagging) when no merge-base /
-baseline worktree is available. Costs one extra test run (the baseline).
+baseline worktree is available. Costs one extra test run (the baseline) — but that
+baseline is **cached per package** under `~/.rforge/baseline-cache/` (keyed by
+repo + merge-base SHA + kind + package + flags) and self-invalidates when `--base`
+advances, so a repeat `--changed` run reuses each already-baselined package and
+re-runs only the uncached ones. Pass `--no-cache` to force a fresh baseline; clear
+it with `python3 -m lib.changed --clear-cache`.
 
 ## Output Format
 ```markdown

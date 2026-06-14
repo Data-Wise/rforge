@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from lib import s7review
+from lib import discovery, s7review
 
 FIX = Path(__file__).parent / "fixtures"
 BAD = FIX / "s7pkg.bad"
@@ -447,3 +447,220 @@ def test_string_masking_preserves_offsets():
     assert "#" not in masked
     assert "ab" not in masked
     assert "tail" not in masked
+
+
+# ── cross-package S7 contracts (candidate B sub-item 1) ──────────────────
+#
+# Static, ecosystem-scoped sibling of v2.12.0 method_undeclared_dependency:
+# build a class registry across all packages, flag a method dispatching on a
+# SIBLING package's S7 class that isn't declared (or is declared but unexported).
+
+
+def _xpkg(root, name, r_src, *, imports=(), depends=(), namespace=""):
+    """A package with controllable Imports/Depends + NAMESPACE.
+
+    namespace="" → empty NAMESPACE file (exists, exports nothing);
+    namespace=None → NO NAMESPACE file (exports statically unknowable).
+    """
+    p = root / name
+    (p / "R").mkdir(parents=True)
+    (p / "R" / "classes.R").write_text(r_src, encoding="utf-8")
+    if namespace is not None:
+        (p / "NAMESPACE").write_text(namespace, encoding="utf-8")
+    desc = f"Package: {name}\nVersion: 0.0.1\n"
+    if imports:
+        desc += "Imports: " + ", ".join(imports) + "\n"
+    if depends:
+        desc += "Depends: " + ", ".join(depends) + "\n"
+    (p / "DESCRIPTION").write_text(desc, encoding="utf-8")
+    return p
+
+
+def _pkg_named(tmp_path, name):
+    for p in discovery.find_r_packages(str(tmp_path)):
+        if p.name == name:
+            return p
+    raise AssertionError(f"package {name!r} not found under {tmp_path}")
+
+
+def _contracts(tmp_path, consumer):
+    """Build registry + exports across the ecosystem, run the contract check on
+    `consumer`, and return its finding codes."""
+    pkgs = discovery.find_r_packages(str(tmp_path))
+    reg = s7review.build_class_registry(pkgs)
+    exports = {p.name: s7review._exported_s7_classes(p.path) for p in pkgs}
+    env = s7review.check_cross_package_contracts(_pkg_named(tmp_path, consumer),
+                                                 reg, exports)
+    return env, [f["code"] for f in env["findings"]]
+
+
+_GEN_METHOD = ('fmt <- new_generic("fmt", "x")\n'
+               'method(fmt, {sig}) <- function(x, ...) x\n')
+
+
+def test_build_class_registry_maps_class_to_package(tmp_path):
+    _xpkg(tmp_path, "alpha", 'Foo <- new_class("Foo")\n', namespace="export(Foo)\n")
+    _xpkg(tmp_path, "beta", 'Bar <- new_class("Bar")\n', namespace="export(Bar)\n")
+    reg = s7review.build_class_registry(discovery.find_r_packages(str(tmp_path)))
+    assert reg["Foo"] == ["alpha"]
+    assert reg["Bar"] == ["beta"]
+
+
+def test_build_class_registry_records_collisions(tmp_path):
+    _xpkg(tmp_path, "alpha", 'Dup <- new_class("Dup")\n', namespace="export(Dup)\n")
+    _xpkg(tmp_path, "beta", 'Dup <- new_class("Dup")\n', namespace="export(Dup)\n")
+    reg = s7review.build_class_registry(discovery.find_r_packages(str(tmp_path)))
+    assert reg["Dup"] == ["alpha", "beta"]
+
+
+def test_cross_package_undeclared_contract(tmp_path):
+    _xpkg(tmp_path, "alpha", 'Foo <- new_class("Foo")\n', namespace="export(Foo)\n")
+    _xpkg(tmp_path, "beta", _GEN_METHOD.format(sig="Foo"), namespace="export(fmt)\n")
+    _, codes = _contracts(tmp_path, "beta")  # beta does NOT declare alpha
+    assert "cross_package_undeclared_contract" in codes
+
+
+def test_cross_package_declared_and_exported_clean(tmp_path):
+    _xpkg(tmp_path, "alpha", 'Foo <- new_class("Foo")\n', namespace="export(Foo)\n")
+    _xpkg(tmp_path, "beta", _GEN_METHOD.format(sig="Foo"),
+          imports=("alpha",), namespace="export(fmt)\n")
+    env, codes = _contracts(tmp_path, "beta")
+    assert codes == [], env["findings"]
+
+
+def test_cross_package_declared_but_unexported(tmp_path):
+    _xpkg(tmp_path, "alpha", 'Foo <- new_class("Foo")\n', namespace="")  # empty NS
+    _xpkg(tmp_path, "beta", _GEN_METHOD.format(sig="Foo"),
+          imports=("alpha",), namespace="export(fmt)\n")
+    _, codes = _contracts(tmp_path, "beta")
+    assert codes == ["cross_package_unexported_class"]
+
+
+def test_cross_package_no_namespace_suppresses_unexported(tmp_path):
+    _xpkg(tmp_path, "alpha", 'Foo <- new_class("Foo")\n', namespace=None)  # no NS
+    _xpkg(tmp_path, "beta", _GEN_METHOD.format(sig="Foo"),
+          imports=("alpha",), namespace="export(fmt)\n")
+    _, codes = _contracts(tmp_path, "beta")
+    assert codes == []  # declared + exports-unknowable → no false positive
+
+
+def test_cross_package_local_class_clean(tmp_path):
+    _xpkg(tmp_path, "beta",
+          'Foo <- new_class("Foo")\n' + _GEN_METHOD.format(sig="Foo"),
+          namespace="export(Foo)\nexport(fmt)\n")
+    _, codes = _contracts(tmp_path, "beta")
+    assert codes == []  # dispatches on its OWN class
+
+
+def test_cross_package_external_class_out_of_scope(tmp_path):
+    _xpkg(tmp_path, "beta", _GEN_METHOD.format(sig="SomeCRANClass"),
+          namespace="export(fmt)\n")
+    _, codes = _contracts(tmp_path, "beta")
+    assert codes == []  # class not in the ecosystem registry → skipped
+
+
+def test_cross_package_collision_one_satisfying_provider_clean(tmp_path):
+    _xpkg(tmp_path, "alpha", 'Dup <- new_class("Dup")\n', namespace="export(Dup)\n")
+    _xpkg(tmp_path, "gamma", 'Dup <- new_class("Dup")\n', namespace="export(Dup)\n")
+    _xpkg(tmp_path, "beta", _GEN_METHOD.format(sig="Dup"),
+          imports=("alpha",), namespace="export(fmt)\n")
+    _, codes = _contracts(tmp_path, "beta")
+    assert codes == []  # alpha (declared+exported) satisfies despite gamma
+
+
+def test_cross_package_multidispatch_each_class_checked(tmp_path):
+    _xpkg(tmp_path, "alpha", 'Foo <- new_class("Foo")\n', namespace="export(Foo)\n")
+    _xpkg(tmp_path, "beta", _GEN_METHOD.format(sig="list(Foo, Foo)"),
+          namespace="export(fmt)\n")  # alpha NOT declared
+    _, codes = _contracts(tmp_path, "beta")
+    assert "cross_package_undeclared_contract" in codes
+
+
+def test_run_eco_surfaces_cross_package_family(tmp_path):
+    _xpkg(tmp_path, "alpha", 'Foo <- new_class("Foo")\n', namespace="export(Foo)\n")
+    _xpkg(tmp_path, "beta", _GEN_METHOD.format(sig="Foo"), namespace="export(fmt)\n")
+    (tmp_path / "eco.yaml").write_text(
+        "packages:\n  - name: alpha\n  - name: beta\n", encoding="utf-8")
+    (tmp_path / ".rforge.yaml").write_text("manifest: eco.yaml\n", encoding="utf-8")
+    env = s7review.run_eco(str(tmp_path))
+    assert env["rollup"]["by_family"].get("cross-package-contract", 0) >= 1
+    beta = [p for p in env["packages"] if p["package"] == "beta"][0]
+    assert "cross-package-contract" in [s["kind"] for s in beta["stages"]]
+
+
+def test_run_eco_single_package_no_cross_package_findings(tmp_path):
+    _xpkg(tmp_path, "solo",
+          'Foo <- new_class("Foo")\n' + _GEN_METHOD.format(sig="Foo"),
+          namespace="export(Foo)\nexport(fmt)\n")
+    env = s7review.run_eco(str(tmp_path))
+    assert env["rollup"]["by_family"].get("cross-package-contract", 0) == 0
+
+
+# ── adversarial-review regressions (cross-package contracts) ──────────────
+
+
+def test_cross_package_reexport_facade_clean(tmp_path):
+    """BLOCKER regression: a class reached via a DECLARED re-exporting facade
+    (importFrom + export) is valid — must NOT flag undeclared just because the
+    consumer depends on the re-exporter rather than the original definer."""
+    _xpkg(tmp_path, "core", 'Foo <- new_class("Foo")\n', namespace="export(Foo)\n")
+    _xpkg(tmp_path, "facade", "# re-exports core's Foo\n",
+          imports=("core",), namespace="importFrom(core, Foo)\nexport(Foo)\n")
+    _xpkg(tmp_path, "app", _GEN_METHOD.format(sig="Foo"),
+          imports=("facade",), namespace="export(fmt)\n")  # depends on facade only
+    _, codes = _contracts(tmp_path, "app")
+    assert codes == [], codes
+
+
+def test_exported_s7_classes_multiline(tmp_path):
+    """IMPORTANT regression: a wrapped multi-line export() must parse, not read as
+    the empty set (which would wrongly fire cross_package_unexported_class)."""
+    p = _xpkg(tmp_path, "alpha",
+              'Foo <- new_class("Foo")\nBar <- new_class("Bar")\n',
+              namespace="export(\n  Foo,\n  Bar\n)\n")
+    assert s7review._exported_s7_classes(p) == {"Foo", "Bar"}
+
+
+def test_exported_s7_classes_unbalanced_is_unknowable(tmp_path):
+    # a truncated export( with no close → unknowable → None (suppress, no FP)
+    p = _xpkg(tmp_path, "alpha", 'Foo <- new_class("Foo")\n',
+              namespace="export(\n  Foo\n")
+    assert s7review._exported_s7_classes(p) is None
+
+
+def test_build_class_registry_captures_equals_assignment(tmp_path):
+    """BLOCKER regression: `Foo = new_class(...)` (= not <-) must register."""
+    _xpkg(tmp_path, "alpha", 'Foo = new_class("Foo")\n', namespace="export(Foo)\n")
+    reg = s7review.build_class_registry(discovery.find_r_packages(str(tmp_path)))
+    assert reg.get("Foo") == ["alpha"]
+
+
+def test_cross_package_undeclared_with_equals_definition(tmp_path):
+    """BLOCKER regression end-to-end: a sibling class defined with `=` still
+    produces the undeclared-contract finding (was silently missed)."""
+    _xpkg(tmp_path, "alpha", 'Foo = new_class("Foo")\n', namespace="export(Foo)\n")
+    _xpkg(tmp_path, "beta", _GEN_METHOD.format(sig="Foo"), namespace="export(fmt)\n")
+    _, codes = _contracts(tmp_path, "beta")
+    assert "cross_package_undeclared_contract" in codes
+
+
+def test_naming_flags_equals_assignment_mismatch(tmp_path):
+    """Collateral of the `=` fix: check_naming's bound-vs-@name comparison is
+    restored for `=`-assigned classes (previously lost)."""
+    pkg = _write_pkg(tmp_path, 'Widget = new_class("Gadget")\n')
+    assert "class_name_mismatch" in {f["code"] for f in s7review.check_naming(str(pkg))["findings"]}
+
+
+def test_run_eco_registry_build_failure_does_not_abort(tmp_path, monkeypatch):
+    """IMPORTANT regression: the pre-loop registry build is guarded — a raise
+    there must not abort the whole sweep (never-raises contract)."""
+    _xpkg(tmp_path, "alpha", 'Foo <- new_class("Foo")\n', namespace="export(Foo)\n")
+    (tmp_path / "eco.yaml").write_text("packages:\n  - name: alpha\n", encoding="utf-8")
+    (tmp_path / ".rforge.yaml").write_text("manifest: eco.yaml\n", encoding="utf-8")
+
+    def boom(_pkgs):
+        raise RuntimeError("registry boom")
+
+    monkeypatch.setattr(s7review, "build_class_registry", boom)
+    env = s7review.run_eco(str(tmp_path))  # must not raise
+    assert env["kind"] == "s7review-eco"

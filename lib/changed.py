@@ -39,7 +39,9 @@ Usage (Python API):
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -270,6 +272,209 @@ def run_baseline(
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+# ───────────────────────── baseline cache (candidate A) ─────────────────────────
+#
+# The baseline run (run_baseline above) is a pure function of (merge_base_sha,
+# kind, package-set, engine-kwargs): the baselined tree is immutable at that SHA
+# and the engine is deterministic. We cache its finding list so a repeat
+# `--changed` run with an unchanged merge-base skips the worktree+engine entirely.
+# Self-invalidating: new commits on `base` → new merge-base SHA → new key → miss.
+#
+# This module stays R-free: the caller passes an OPAQUE `cache_key` string
+# (rcmd builds it from kind+pkgset+kwargs). We own only the repo-id, SHA, file
+# IO, and LRU prune. Everything here is advisory — a cache failure degrades to a
+# normal (uncached) baseline run; nothing here ever raises to the caller.
+
+_CACHE_SCHEMA = 1
+_CACHE_KEEP = 20  # LRU: max entries retained per repo-id dir (pruned on write)
+
+
+def _cache_root() -> Path:
+    """Root of the on-disk baseline cache: ``~/.rforge/baseline-cache``.
+
+    Resolves home the **raise-proof** way ``lib.init`` does — ``$HOME`` then
+    ``os.path.expanduser`` — NOT ``Path.home()``, which raises ``RuntimeError``
+    (a non-``OSError``) when home is unresolvable: HOME unset AND no passwd entry
+    for the uid (containers, ``nobody``, scratch CI users — the "weird HOME" case
+    this cache must degrade through, not crash on). If home still can't resolve
+    (``expanduser`` returns a literal ``~``), fall back to the system temp dir so
+    caching becomes ephemeral rather than aborting the caller's ``--changed`` run.
+    Monkeypatched in tests so they never touch the real home directory.
+    """
+    home = os.environ.get("HOME") or os.path.expanduser("~")
+    if not home or home.startswith("~"):
+        home = tempfile.gettempdir()
+    return Path(home) / ".rforge" / "baseline-cache"
+
+
+def _repo_id(path: str) -> str:
+    """A stable, collision-resistant id for the repo owning ``path``.
+
+    ``sha1(git toplevel)[:16]`` so worktrees of the same repo share a cache dir
+    and distinct repos never collide. Falls back to the absolute path when
+    ``path`` is not a git repo (defensive — scope_check only caches after a
+    merge-base resolved, so in practice this is always a real repo).
+    """
+    top = _git(["rev-parse", "--show-toplevel"], cwd=path)
+    key = top.stdout.strip() if (top is not None and top.returncode == 0
+                                 and top.stdout.strip()) else os.path.abspath(path)
+    return hashlib.sha1(key.encode("utf-8")).hexdigest()[:16]
+
+
+def _cache_file(path: str, base_sha: str, cache_key: str) -> Path:
+    """Resolve the JSON cache path for one (repo, base_sha, cache_key) tuple."""
+    key_token = hashlib.sha1(cache_key.encode("utf-8")).hexdigest()[:16]
+    return _cache_root() / _repo_id(path) / f"{base_sha}-{key_token}.json"
+
+
+def read_baseline_cache(
+    path: str, base_sha: str, cache_key: str
+) -> Optional[list]:
+    """Return the cached baseline finding list, or None on miss/corrupt/error.
+
+    A corrupt or unreadable file is treated as a miss (never raises), so a bad
+    cache entry can only ever cost one extra baseline run — never a crash.
+    """
+    try:
+        f = _cache_file(path, base_sha, cache_key)
+        data = json.loads(f.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    if not isinstance(data, dict) or data.get("schema") != _CACHE_SCHEMA:
+        return None
+    findings = data.get("findings")
+    return findings if isinstance(findings, list) else None
+
+
+def write_baseline_cache(
+    path: str, base_sha: str, cache_key: str, findings: list,
+    *, keep: int = _CACHE_KEEP,
+) -> None:
+    """Persist ``findings`` for one (repo, base_sha, cache_key), then LRU-prune.
+
+    Atomic (tmp file + os.replace) so a concurrent reader never sees a partial
+    write. After writing, prune the repo-id dir to the ``keep`` newest entries
+    by mtime. Advisory — any IO error is swallowed (caching is best-effort).
+    """
+    tmp = None
+    try:
+        f = _cache_file(path, base_sha, cache_key)
+        tmp = f.with_suffix(f".{os.getpid()}.tmp")
+        f.parent.mkdir(parents=True, exist_ok=True)
+        payload = {"schema": _CACHE_SCHEMA, "base_sha": base_sha,
+                   "cache_key": cache_key, "findings": findings}
+        tmp.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+        os.replace(tmp, f)
+        _prune(f.parent, keep)
+    except OSError:
+        pass
+    finally:
+        # Never leak an orphan `.tmp`: on success os.replace already consumed it
+        # (missing_ok makes the unlink a no-op); on a write/replace failure this
+        # removes the partial file so it can't accumulate (it's a `.tmp`, which
+        # neither _prune nor the clear-count globs would ever sweep).
+        if tmp is not None:
+            try:
+                tmp.unlink(missing_ok=True)
+            except OSError:
+                pass
+
+
+def _prune(repo_dir: Path, keep: int) -> None:
+    """Keep the ``keep`` newest ``*.json`` entries in ``repo_dir`` by mtime."""
+    try:
+        entries = sorted(repo_dir.glob("*.json"),
+                         key=lambda p: p.stat().st_mtime, reverse=True)
+    except OSError:
+        return
+    for stale in entries[keep:]:
+        try:
+            stale.unlink()
+        except OSError:
+            pass
+
+
+def clear_baseline_cache(path: Optional[str] = None) -> int:
+    """Remove cached baseline entries; return the number of files removed.
+
+    With ``path``: clear only that repo's cache dir. With ``path=None``: clear
+    the entire cache root. Only ever deletes inside ``_cache_root()``.
+    """
+    try:
+        target = (_cache_root() / _repo_id(path)) if path is not None else _cache_root()
+        if not target.exists():
+            return 0
+        # Count every file actually removed (not just *.json), so the reported
+        # number matches what rmtree deletes — including any stray .tmp.
+        count = sum(1 for p in target.rglob("*") if p.is_file())
+        shutil.rmtree(target, ignore_errors=True)
+        return count
+    except OSError:
+        return 0
+
+
+def cached_baseline(
+    path: str,
+    base_sha: str,
+    items: list,
+    run_item: Callable[[str, object], list],
+    key_item: Callable[[object], str],
+    *,
+    use_cache: bool = True,
+) -> Optional[list]:
+    """Per-item baseline finding list, each item cached independently.
+
+    The whole-baseline cache hits only when the EXACT item set recurs; this hits
+    any item already baselined and re-runs ONLY the uncached ones. That matters
+    for ecosystem cascade work where the changed-package set grows run-over-run,
+    and where the per-item engine run (e.g. ``R CMD check`` per package) — not the
+    worktree — is the real cost. For a single item it is behaviour-identical to a
+    whole-baseline cache.
+
+    For each item: serve ``read_baseline_cache(path, base_sha, key_item(item))`` if
+    present; else mark it for a fresh run. If ANY item is uncached, create ONE
+    detached merge-base worktree (as ``run_baseline`` does), call
+    ``run_item(tree_root, item)`` for each uncached item, cache it, and ALWAYS
+    remove the worktree (``finally``). Returns the flat combined finding list in
+    ``items`` order. When every item is a cache hit, NO worktree is created.
+
+    Stays R-free: ``items`` are opaque, ``run_item``/``key_item`` are injected.
+    Returns None iff a worktree was needed but ``git worktree add`` failed — same
+    contract as ``run_baseline`` (caller falls back to scope-only). If
+    ``run_item`` raises, the worktree is still cleaned up and the exception
+    propagates (matches ``run_baseline``).
+    """
+    results: list = [None] * len(items)
+    uncached: list = []
+    for i, it in enumerate(items):
+        hit = read_baseline_cache(path, base_sha, key_item(it)) if use_cache else None
+        if hit is not None:
+            results[i] = hit
+        else:
+            uncached.append(i)
+
+    if uncached:
+        tmp = tempfile.mkdtemp(prefix="rforge-baseline-")
+        add = _git(["worktree", "add", "--detach", tmp, base_sha], cwd=path)
+        if add is None or add.returncode != 0:
+            shutil.rmtree(tmp, ignore_errors=True)
+            return None
+        try:
+            for i in uncached:
+                findings = run_item(tmp, items[i])
+                results[i] = findings
+                if use_cache:
+                    write_baseline_cache(path, base_sha, key_item(items[i]), findings)
+        finally:
+            _git(["worktree", "remove", "--force", tmp], cwd=path)
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    combined: list = []
+    for r in results:
+        combined.extend(r or [])
+    return combined
+
+
 # ───────────────────────── two-run orchestration ─────────────────────────
 
 
@@ -326,18 +531,28 @@ def scope_check(
     runner: Callable[[str], list],
     path: str,
     base: str = "dev",
+    *,
+    baseline: Optional[Callable[[str, str], Optional[list]]] = None,
 ) -> Optional[dict]:
     """Two-run introduced/pre-existing tagging over a REAL merge-base checkout.
 
-    Orchestrates: merge_base(HEAD, base) → run_baseline (runner at the merge-base
-    detached worktree) → runner against the live HEAD tree → tag_findings, then a
-    file-level `[uncommitted]` refinement (v2.12.0).
+    Orchestrates: merge_base(HEAD, base) → acquire baseline findings → runner
+    against the live HEAD tree → tag_findings, then a file-level `[uncommitted]`
+    refinement (v2.12.0).
 
     `runner(treedir) -> list[finding]` is injected so this module stays R-free and
     unit-testable; rcmd injects a closure that runs the chosen --kind engine in
-    `treedir` and returns its flat finding list. The baseline run executes in a
-    genuinely different working tree (the v2.10.0 bug was tagging HEAD vs HEAD —
-    here the baseline tree is a real checkout of the merge-base SHA).
+    `treedir` and returns its flat finding list. The baseline tree is a genuinely
+    different working tree (the v2.10.0 bug was tagging HEAD vs HEAD — here the
+    baseline is a real checkout of the merge-base SHA).
+
+    **Baseline acquisition is pluggable.** By default scope_check runs `runner`
+    once against the merge-base detached worktree (uncached). A caller can inject
+    `baseline(path, base_sha) -> Optional[list]` to supply the baseline findings
+    its own way — rcmd injects a PER-PACKAGE cached baseline (`cached_baseline`)
+    so a repeat --changed run reuses each package's baseline. `baseline` returning
+    None means "fall back" (treated like a failed worktree add). The HEAD run
+    always uses `runner` directly, so HEAD is never cached.
 
     `[uncommitted]` refinement: after tagging, each `[introduced]` finding whose
     file is in `uncommitted_files(path)` is re-tagged `[uncommitted]` — "you
@@ -359,7 +574,13 @@ def scope_check(
     if base_sha is None:
         return None
 
-    base_findings = run_baseline(path=path, base_sha=base_sha, runner=runner)
+    # Acquire the baseline findings: an injected `baseline` (rcmd's per-package
+    # cached_baseline) or, by default, a single uncached run_baseline. Either may
+    # return None to signal "fall back to scope-only" (no merge-base checkout).
+    if baseline is not None:
+        base_findings = baseline(path, base_sha)
+    else:
+        base_findings = run_baseline(path=path, base_sha=base_sha, runner=runner)
     if base_findings is None:
         return None
 
@@ -404,7 +625,14 @@ def _main(argv: Optional[list[str]] = None) -> int:
                         help="Comparison ref; diff is vs merge-base(HEAD, base) "
                              "(default: HEAD = uncommitted working-tree changes)")
     parser.add_argument("--format", choices=("text", "json"), default="text")
+    parser.add_argument("--clear-cache", action="store_true",
+                        help="Remove this repo's baseline cache and exit")
     args = parser.parse_args(argv)
+
+    if args.clear_cache:
+        n = clear_baseline_cache(args.path)
+        print(f"🧹 cleared {n} baseline cache file(s)")
+        return 0
 
     files = changed_files(path=args.path, base=args.base)
     if files is None:

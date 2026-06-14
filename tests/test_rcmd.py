@@ -653,7 +653,7 @@ def test_changed_tags_introduced_when_scope_check_succeeds(monkeypatch, tmp_path
                         lambda files, root: [pkg])
     # scope_check resolves and returns one introduced + one pre-existing finding.
     monkeypatch.setattr(rcmd.changed, "scope_check",
-                        lambda runner, path, base: {
+                        lambda runner, path, base, **kw: {
                             "base": base, "merge_base": "abc123",
                             "findings": [{"text": "E: new", "tag": "introduced"},
                                          {"text": "N: old", "tag": "pre-existing"}],
@@ -679,7 +679,7 @@ def test_changed_no_introduced_findings_is_ok(monkeypatch, tmp_path):
     monkeypatch.setattr(rcmd.changed, "changed_packages",
                         lambda files, root: [pkg])
     monkeypatch.setattr(rcmd.changed, "scope_check",
-                        lambda runner, path, base: {
+                        lambda runner, path, base, **kw: {
                             "base": base, "merge_base": "abc",
                             "findings": [{"text": "N: old", "tag": "pre-existing"}],
                             "introduced_count": 0})
@@ -699,7 +699,7 @@ def test_changed_fail_on_introduced_fails_on_only_uncommitted(monkeypatch, tmp_p
     monkeypatch.setattr(rcmd.changed, "changed_packages",
                         lambda files, root: [pkg])
     monkeypatch.setattr(rcmd.changed, "scope_check",
-                        lambda runner, path, base: {
+                        lambda runner, path, base, **kw: {
                             "base": base, "merge_base": "abc",
                             "findings": [{"text": {"file": "R/x.R",
                                                    "message": "m"},
@@ -720,7 +720,7 @@ def test_changed_fail_on_none_never_errors_on_introduced(monkeypatch, tmp_path):
     monkeypatch.setattr(rcmd.changed, "changed_packages",
                         lambda files, root: [pkg])
     monkeypatch.setattr(rcmd.changed, "scope_check",
-                        lambda runner, path, base: {
+                        lambda runner, path, base, **kw: {
                             "base": base, "merge_base": "abc",
                             "findings": [{"text": "E: new", "tag": "introduced"}],
                             "introduced_count": 1})
@@ -739,7 +739,7 @@ def test_changed_falls_back_to_scope_only_when_scope_check_none(monkeypatch, tmp
     monkeypatch.setattr(rcmd.changed, "changed_packages",
                         lambda files, root: [pkg])
     monkeypatch.setattr(rcmd.changed, "scope_check",
-                        lambda runner, path, base: None)
+                        lambda runner, path, base, **kw: None)
     monkeypatch.setattr(rcmd, "run", lambda kind, path=".", **kw: {
         "kind": "check", "status": "ok",
         "check": {"errors": [], "warnings": [], "notes": []}})
@@ -765,7 +765,7 @@ def test_changed_runner_extracts_findings_per_kind(monkeypatch, tmp_path):
 
     captured = {}
 
-    def capture(runner, path, base):
+    def capture(runner, path, base, **kw):
         captured["findings"] = runner(str(tmp_path))
         return {"base": base, "merge_base": "x", "findings": [], "introduced_count": 0}
 

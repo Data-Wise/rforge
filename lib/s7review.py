@@ -146,7 +146,12 @@ def _match_balanced(text: str, open_idx: int) -> Optional[int]:
     return None
 
 
-_CALL_RE = re.compile(r"(?:(\w+)\s*<-\s*)?\b(new_class|new_generic|method)\s*\(")
+# Binding via `<-` OR `=` — both are valid top-level R assignment, and a class
+# defined `Foo = new_class("Foo")` must register the same as `Foo <- ...` (else a
+# genuine cross-package contract on it is silently missed, and check_naming loses
+# its bound-vs-@name comparison). `method(...) <- function` is unaffected: that
+# form has no `name <-`/`name =` prefix, so the optional group simply stays empty.
+_CALL_RE = re.compile(r"(?:(\w+)\s*(?:<-|=)\s*)?\b(new_class|new_generic|method)\s*\(")
 
 
 def _find_s7_constructs(text: str) -> list[dict]:
@@ -677,6 +682,199 @@ def run_all(path: str | os.PathLike = ".") -> dict:
             "engine_missing": []}
 
 
+# ───────────────── cross-package S7 contracts (ecosystem) ─────────────────
+#
+# Static, ecosystem-scoped sibling of v2.12.0's runtime method_undeclared_
+# dependency: build a registry of every S7 class binding → defining package(s),
+# then flag a method that dispatches on a SIBLING package's class whose package
+# isn't declared in DESCRIPTION (the class never resolves at the consumer's site
+# → the method silently never dispatches), or is declared but not exported.
+#
+# Name-based (static can't do the runtime object-identity the --runtime engine
+# uses), hence conservative: flag only when NO declared+exporting provider can
+# exist. Resolution is on the R BINDING name (`bound`) — that is what
+# `method(g, C)` references and what `export(C)` names — not the `@name` string.
+
+# NAMESPACE export calls, matched across line boundaries via balanced parens:
+# export(...) / exportClasses(...). exportPattern(...) makes the set unknowable.
+_NS_EXPORT_CALL_RE = re.compile(r"\b(?:export|exportClasses)\s*\(")
+_NS_EXPORTPATTERN_RE = re.compile(r"\bexportPattern\s*\(")
+_IDENT_RE = re.compile(r"^[A-Za-z.][\w.]*$")
+
+
+def _split_export_names(inside: str) -> set[str]:
+    """Names inside an ``export(...)``/``exportClasses(...)`` arg list.
+
+    Handles bare (``export(Foo, Bar)``) and quoted (``export("Foo")``) names.
+    """
+    names: set[str] = set()
+    for tok in inside.split(","):
+        tok = tok.strip().strip("\"'").strip()
+        if tok and _IDENT_RE.match(tok):
+            names.add(tok)
+    return names
+
+
+def _exported_s7_classes(pkg_path: str | os.PathLike) -> Optional[set[str]]:
+    """Binding names a package exports via NAMESPACE ``export``/``exportClasses``.
+
+    Returns None — exports are statically **unknowable**, so the consumer must
+    suppress the unexported finding (avoid a false positive) — when the package
+    has no NAMESPACE (source-only, not yet ``document()``-ed) or its NAMESPACE
+    uses ``exportPattern(...)`` (regex export). Otherwise the explicit export set.
+    """
+    ns = Path(pkg_path) / "NAMESPACE"
+    if not ns.is_file():
+        return None
+    try:
+        text = ns.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    if _NS_EXPORTPATTERN_RE.search(text):
+        return None  # regex export → set unknowable → suppress unexported
+    names: set[str] = set()
+    for m in _NS_EXPORT_CALL_RE.finditer(text):
+        open_idx = m.end() - 1  # the '('
+        close_idx = _match_balanced(text, open_idx)
+        if close_idx is None:
+            return None  # truncated/unbalanced export() → unknowable → suppress
+        names |= _split_export_names(text[open_idx + 1:close_idx])
+    return names
+
+
+def build_class_registry(packages: list) -> dict:
+    """Map every S7 class binding name → the sorted package(s) that define it.
+
+    Scans each package's ``R/`` for ``new_class`` constructs; the registry key is
+    the construct's ``bound`` LHS (what ``method(g, C)`` references — an anonymous
+    ``new_class("X")`` with no binding can't be cross-referenced, so it is
+    skipped). A name defined in more than one package maps to a list with more
+    than one entry (a statically-ambiguous collision; the consumer is
+    conservative). Pure-stdlib, never raises.
+    """
+    reg: dict[str, set] = {}
+    for pkg in packages:
+        for _f, text in _scan_r_files(pkg.path):
+            for c in _find_s7_constructs(text):
+                if c["call"] == "new_class" and c["bound"]:
+                    reg.setdefault(c["bound"], set()).add(pkg.name)
+    return {name: sorted(pkgs) for name, pkgs in reg.items()}
+
+
+def _method_dispatch_classes(args: str) -> list[str]:
+    """Bare class identifiers a ``method(...)`` dispatches on (after the generic).
+
+    Handles ``method(g, Foo)`` and multi-dispatch ``method(g, list(A, B))``.
+    Skips S7 base-type helpers (``class_*``), explicitly-namespaced refs
+    (``pkg::Class`` — the ``::`` makes them non-identifiers), and anything that
+    isn't a plain identifier. Operates on the masked ``args`` (no strings/comments).
+    """
+    # Drop the generic: everything up to the first top-level comma.
+    depth = 0
+    gen_end = None
+    for i, ch in enumerate(args):
+        if ch in "([{":
+            depth += 1
+        elif ch in ")]}":
+            depth -= 1
+        elif ch == "," and depth == 0:
+            gen_end = i
+            break
+    if gen_end is None:
+        return []
+    rest = args[gen_end + 1:].strip()
+    lm = re.match(r"list\((.*)\)\s*$", rest, re.DOTALL)  # multi-dispatch
+    if lm:
+        rest = lm.group(1)
+    out: list[str] = []
+    for tok in rest.split(","):
+        tok = tok.strip()
+        if not _IDENT_RE.match(tok) or tok.startswith("class_"):
+            continue
+        out.append(tok)
+    return out
+
+
+def check_cross_package_contracts(pkg, registry: dict, exports: dict) -> dict:
+    """Flag this package's S7 methods that dispatch on a sibling's class whose
+    contract is unsatisfiable. Two advisory findings — ``cross_package_undeclared_
+    contract`` (sibling pkg ∉ DESCRIPTION Imports/Depends/LinkingTo) and
+    ``cross_package_unexported_class`` (declared, but no declared provider exports
+    the class). Family ``cross-package-contract``. Conservative on collisions and
+    unknowable exports (no false positive). Never raises.
+    """
+    desc = discovery.read_description(Path(pkg.path) / "DESCRIPTION")
+    declared: set = set()
+    if desc:
+        for dep in (desc.imports + desc.depends + desc.linking_to):
+            nm = dep.split("(")[0].strip()
+            if nm and nm != "R":
+                declared.add(nm)
+
+    findings: list[dict] = []
+    for f, text in _scan_r_files(pkg.path):
+        for c in _find_s7_constructs(text):
+            if c["call"] != "method":
+                continue
+            gm = _METHOD_GENERIC_RE.match(c["args"])
+            generic = gm.group(1) if gm else ""
+            for cls in _method_dispatch_classes(c["args"]):
+                providers = registry.get(cls, [])
+                if not providers or pkg.name in providers:
+                    continue  # external/unknown, or defined locally → out of scope
+                siblings = [p for p in providers if p != pkg.name]
+                if not siblings:
+                    continue
+                # Declared definers: sibling packages that DEFINE cls and are
+                # declared deps. The class is reachable from `pkg` iff some
+                # DECLARED ecosystem dep exports cls — whether it DEFINES it or
+                # RE-EXPORTS it (importFrom + export, the facade idiom: `pkg`
+                # rightly depends on the re-exporter, not the original definer) —
+                # OR a declared DEFINER's export set is statically unknowable (no
+                # NAMESPACE / exportPattern → suppress to avoid a false positive).
+                declared_definers = [s for s in siblings if s in declared]
+                reachable = (
+                    any(cls in (exports.get(d) or set())
+                        for d in declared if d in exports)
+                    or any(exports.get(s) is None for s in declared_definers))
+                if reachable:
+                    continue
+                if declared_definers:
+                    findings.append({
+                        "code": "cross_package_unexported_class",
+                        "severity": "advisory", "file": f.name, "line": c["line"],
+                        "class": cls, "generic": generic,
+                        "providers": declared_definers, "consumer": pkg.name,
+                        "source": "static",
+                        "message": (
+                            f"method({generic}, {cls}) in '{pkg.name}' dispatches "
+                            f"on S7 class '{cls}' from declared sibling package(s) "
+                            f"{declared_definers}, but none export it "
+                            "(no export()/exportClasses() in their NAMESPACE) — it "
+                            f"is not reachable from '{pkg.name}'. Export the class "
+                            "in the providing package (or depend on one that does)."),
+                    })
+                else:
+                    findings.append({
+                        "code": "cross_package_undeclared_contract",
+                        "severity": "advisory", "file": f.name, "line": c["line"],
+                        "class": cls, "generic": generic,
+                        "providers": siblings, "consumer": pkg.name,
+                        "source": "static",
+                        "message": (
+                            f"method({generic}, {cls}) in '{pkg.name}' dispatches "
+                            f"on S7 class '{cls}' defined in sibling package(s) "
+                            f"{siblings}, which '{pkg.name}' does not declare in "
+                            "Imports/Depends/LinkingTo (nor depend on a package "
+                            "that re-exports it) — the class will not resolve at "
+                            "load and the method will never dispatch. Declare the "
+                            "providing package."),
+                    })
+    status = "warn" if findings else "ok"
+    messages = [] if findings else ["No cross-package S7 contract issues."]
+    return _envelope("cross-package-contract", status, findings, messages)
+
+
 # ─────────────────────────── --eco ecosystem sweep ───────────────────────────
 def run_eco(root: str | os.PathLike = ".") -> dict:
     """Run the 5 static families across **every package** in the ecosystem.
@@ -698,18 +896,38 @@ def run_eco(root: str | os.PathLike = ".") -> dict:
         rank = {name: i for i, name in enumerate(eco.manifest_order)}
         pkgs.sort(key=lambda p: (rank.get(p.name, len(rank)), p.name))
 
+    # Ecosystem-wide passes, built once across all packages (cross-package
+    # contracts need the whole picture, unlike the per-package static families).
+    # Guarded so a malformed package can't abort the whole sweep — run_eco's
+    # "never raises / per-package warn" contract covers the pre-loop build too.
+    try:
+        registry = build_class_registry(pkgs)
+    except Exception:  # noqa: BLE001 — advisory sweep must never abort
+        registry = {}
+    exports: dict = {}
+    for p in pkgs:
+        try:
+            exports[p.name] = _exported_s7_classes(p.path)
+        except Exception:  # noqa: BLE001
+            exports[p.name] = None
+
     per_package: list[dict] = []
     by_family: dict[str, int] = {}
     for pkg in pkgs:
         try:
             env = run_all(pkg.path)
-            findings = [f for s in env.get("stages", []) for f in s.get("findings", [])]
-            for s in env.get("stages", []):
+            # The cross-package contract stage joins the per-package static families.
+            contract = check_cross_package_contracts(pkg, registry, exports)
+            stages = list(env.get("stages", [])) + [contract]
+            findings = [f for s in stages for f in s.get("findings", [])]
+            for s in stages:
                 if s.get("findings"):
                     by_family[s["kind"]] = by_family.get(s["kind"], 0) + len(s["findings"])
+            pkg_status = "warn" if (env["status"] == "warn"
+                                    or contract["status"] == "warn") else "ok"
             per_package.append({
                 "package": pkg.name, "path": pkg.path,
-                "status": env["status"], "stages": env.get("stages", []),
+                "status": pkg_status, "stages": stages,
                 "finding_count": len(findings),
                 "messages": env.get("messages", []),
             })
