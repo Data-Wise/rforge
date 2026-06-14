@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [2.13.0] - 2026-06-13
+
+> Two diff-aware/ecosystem features, each built TDD-first from an approved spec and
+> hardened by a pre-merge adversarial review (which caught BLOCKERs the green gates
+> missed). **41 commands** (no surface change — both add flags/families, no new
+> command). pytest 416, test-all 42/42.
 
 ### Added
 
