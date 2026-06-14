@@ -125,8 +125,8 @@ The `arguments:` array is the machine-readable spec; the `## Usage` body is the 
 
 Both must pass before any PR:
 
-- `bash tests/test-all.sh` — **36 checks** (versions, hook compile + behavior, manifests parse, skills valid, lib pytest, lib CLI smoke incl. `rcmd`/`cranlint`/`runiverse`, lib reference docs in sync, **version/count sync (`version_sync.py --check`)**, rename stubs/targets, command-name uniqueness, migration recipe E2E, **agent guards: no `rforge_` MCP refs / orchestrator frontmatter / real `lib.rcmd` engines**)
-- `python3 -m pytest tests/` — **230 lib/\* cases** (discovery, deps, status, init, rcmd, cranlint, deps_sync, ghrelease, runiverse, **version_sync**)
+- `bash tests/test-all.sh` — **43 checks** (versions, hook compile + behavior, manifests parse, skills valid, lib pytest, lib CLI smoke incl. `rcmd`/`cranlint`/`runiverse`/`s7review`/`changed`, lib reference docs in sync, **version/count sync (`version_sync.py --check`)**, **commands.md sync (`_check_commands_doc.py`)**, **mkdocs nav integrity (every nav file exists + no orphaned guide/tutorial/reference page)**, rename stubs/targets, command-name uniqueness, migration recipe E2E, **agent guards: no `rforge_` MCP refs / orchestrator frontmatter / real `lib.rcmd` engines**)
+- `python3 -m pytest tests/` — **400+ lib/\* cases** (discovery, deps, status, init, rcmd, cranlint, deps_sync, ghrelease, runiverse, s7review, changed, scaffold, **version_sync**)
 
 ## Homebrew tap quirks (rforge-specific)
 
