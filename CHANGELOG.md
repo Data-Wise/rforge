@@ -11,6 +11,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Cross-package S7 contract checks** (`lib/s7review.py`; `r:s7-review --eco`, no
+  new flag). The ecosystem-only `cross-package-contract` family — candidate B
+  sub-item 1, the **static, ecosystem-scoped sibling** of v2.12.0's runtime
+  `method_undeclared_dependency`. `--eco` now builds an ecosystem-wide registry of
+  every S7 class binding → defining package (`build_class_registry`), then flags a
+  `method(generic, C)` that dispatches on a **sibling** package's class C when:
+  (1) that package isn't declared in this package's `Imports`/`Depends`/`LinkingTo`
+  (`cross_package_undeclared_contract` — C never resolves at the consumer's load,
+  the method silently never dispatches); or (2) it IS declared but no declared
+  provider exports C (`cross_package_unexported_class`). Static and **name-based**
+  (resolves on the R binding `method(g, C)` references, not the `@name` string;
+  can't do the runtime object-identity `--runtime` uses), so deliberately
+  conservative: flags only when no declared, exporting provider can exist, and
+  **suppresses** the export check when a provider's NAMESPACE is absent or uses
+  `exportPattern()` (export set unknowable → no false positive). Multi-dispatch
+  `method(g, list(A, B))` checks each class; `class_*` base helpers and `pkg::`
+  explicit refs are skipped. Surfaced in the `--eco` rollup `by_family`; automatic
+  (inherently needs the ecosystem), silent when no cross-package S7 dispatch
+  exists. Reachability is **re-export-aware**: a class reached through a declared
+  re-exporting facade (`importFrom` + `export`) is correctly clean, not flagged.
+  Hardened by a 3-lens pre-merge adversarial review that caught 2 BLOCKERs + 2
+  IMPORTANTs the green gates missed — re-export false positive; `=`-assigned
+  classes (`Foo = new_class()`) invisible to the registry → genuine contracts
+  silently missed (the `_CALL_RE` binding fix also restores `check_naming`'s
+  bound-vs-`@name` check for `=`); multi-line `export()` parsed as the empty set
+  → false unexported (now balanced-paren, multi-line aware); and the `run_eco`
+  pre-loop registry build guarded so a malformed package can't abort the sweep —
+  all fixed + re-verified. +19 pytest cases. Spec:
+  `SPEC-s7-cross-package-contracts-2026-06-13.md`. (Candidate B sub-item 2 — full
+  R6/S4 convention checking — parked.)
+
 - **Diff-aware baseline caching** (`lib/changed.py`; `r:check`/`r:test`/`r:lint`
   `--changed` + new `--no-cache` flag). The last v2.11.0 `--changed` follow-up
   (`[uncommitted]` tagging shipped v2.12.0). Each `--changed` run does two engine

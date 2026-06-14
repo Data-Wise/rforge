@@ -942,7 +942,7 @@ Static **S7 OOP convention checker** — scans `R/*.R` + `NAMESPACE` and reports
 
 - `package` (optional, positional) - Package directory to review (defaults to current directory)
 - `--kind` (optional) - Limit to one convention family: `all` (default), `naming`, `validators`, `methods`, `legacy`, or `docs`
-- `--eco` (optional) - Sweep the static families across **every package** in the ecosystem manifest, aggregated (pure-stdlib; composes with `--runtime`)
+- `--eco` (optional) - Sweep the static families across **every package** in the ecosystem manifest, aggregated (pure-stdlib; composes with `--runtime`). Also runs the ecosystem-only `cross-package-contract` family: flags a method dispatching on a **sibling** package's S7 class that isn't declared (`cross_package_undeclared_contract`) or is declared but unexported (`cross_package_unexported_class`) — the static, ecosystem-scoped sibling of `--runtime`'s `method_undeclared_dependency`
 - `--runtime` (optional) - Add an R-backed runtime pass (`method-dispatch` + `validator-runtime`) via `lib.rcmd`; degrades to an advisory `warn` when R/S7 is unavailable
 - `--format` (optional) - Output format: `json` (default) or `text`
 

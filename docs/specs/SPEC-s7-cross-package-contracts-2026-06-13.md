@@ -112,18 +112,39 @@ multi-dispatch `method(g, list(A, B))` forms):
    not a cross-package break).
 3. `siblings = [p for p in providers if p != pkg.name]` (all sibling definers).
    `declared = imports ∪ depends ∪ linking_to` (version specs stripped) from
-   `read_description(pkg.path)`.
-   - `declared_siblings = [s for s in siblings if s in declared]`.
-   - If `declared_siblings` is empty → **`cross_package_undeclared_contract`**
-     (none of the packages that define C are declared deps).
-   - Else if **no** `declared_sibling` exports C (none has C in `exports[s]`) →
-     **`cross_package_unexported_class`** (declared, but the class isn't reachable).
-   - Else → clean (a declared, exporting sibling provider exists).
+   `read_description(Path(pkg.path)/"DESCRIPTION")`.
 
-   Collision handling falls out of this naturally: if C is defined in a declared+
-   exporting sibling, it's clean regardless of other ambiguous definers; only when
-   *no* declared+exporting provider exists is it flagged. The finding message
-   names all candidate provider packages so the ambiguity is visible.
+   **Reachability (re-export-aware — hardened after the adversarial review).** C is
+   reachable from `pkg` iff some **declared ecosystem dep exports C** — whether it
+   *defines* C **or** *re-exports* it (`importFrom(A, C)` + `export(C)`, the facade
+   idiom: `pkg` rightly depends on the re-exporter, not the original definer) — OR a
+   declared **definer**'s export set is statically unknowable (no NAMESPACE /
+   `exportPattern` → suppress to avoid a false positive). Concretely:
+
+   ```
+   declared_definers = [s for s in siblings if s in declared]
+   reachable = any(C in (exports[d] or set()) for d in declared if d in exports) \
+               or any(exports[s] is None for s in declared_definers)
+   if reachable:            → clean
+   elif declared_definers:  → cross_package_unexported_class (a declared definer
+                              exists but no declared dep exports/re-exports C)
+   else:                    → cross_package_undeclared_contract (no declared dep
+                              defines OR re-exports C)
+   ```
+
+   Collision handling falls out naturally: if any declared dep exports C, it's clean
+   regardless of other ambiguous definers; only when no declared dep can provide C is
+   it flagged. The finding message names the candidate provider packages.
+
+   > **Why re-export-aware:** the first design checked only whether a declared
+   > *definer* exported C, which false-flagged the common facade pattern (consumer
+   > depends on a re-exporter, not the definer). The adversarial review (whose
+   > rollout focus list below explicitly named "re-exported classes") caught it; the
+   > reachability test now consults every declared dep's export set, not just
+   > definers'. Two other review fixes: the construct parser binds on `=` as well as
+   > `<-` (`Foo = new_class()` was invisible to the registry → missed contracts), and
+   > NAMESPACE `export()` is parsed with balanced parens across lines (a wrapped
+   > multi-line export() had read as the empty set → false `unexported`).
 
 Finding shape (consistent with existing s7review dict findings):
 

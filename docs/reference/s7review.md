@@ -29,6 +29,21 @@ Usage (Python API):
 
 ## Functions
 
+### `build_class_registry()`
+
+```python
+def build_class_registry(packages: 'list') -> 'dict'
+```
+
+Map every S7 class binding name → the sorted package(s) that define it.
+
+Scans each package's ``R/`` for ``new_class`` constructs; the registry key is
+the construct's ``bound`` LHS (what ``method(g, C)`` references — an anonymous
+``new_class("X")`` with no binding can't be cross-referenced, so it is
+skipped). A name defined in more than one package maps to a list with more
+than one entry (a statically-ambiguous collision; the consumer is
+conservative). Pure-stdlib, never raises.
+
 ### `check_class_docs()`
 
 ```python
@@ -40,6 +55,19 @@ preceding roxygen ``@export``) should have a ``#'`` block immediately above
 its ``new_class`` (``undocumented_export``); a property's declared class
 should resolve to a ``class_*`` builtin or a class defined in scanned source
 (``prop_type_unresolvable``). Never raises.
+
+### `check_cross_package_contracts()`
+
+```python
+def check_cross_package_contracts(pkg, registry: 'dict', exports: 'dict') -> 'dict'
+```
+
+Flag this package's S7 methods that dispatch on a sibling's class whose
+contract is unsatisfiable. Two advisory findings — ``cross_package_undeclared_
+contract`` (sibling pkg ∉ DESCRIPTION Imports/Depends/LinkingTo) and
+``cross_package_unexported_class`` (declared, but no declared provider exports
+the class). Family ``cross-package-contract``. Conservative on collisions and
+unknowable exports (no false positive). Never raises.
 
 ### `check_legacy_oop()`
 
