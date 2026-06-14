@@ -284,7 +284,7 @@ decisions:
 
 ## 🎯 Next Action
 
-🟢 **candidate A — diff-aware baseline caching: BUILT, on `feature/diff-aware-baseline-caching` (PR-ready, not merged).** Worktree `~/.git-worktrees/rforge/feature-baseline-caching` (off dev @ fd6e4e9). 4 commits @ 338f0b4: TDD feature → 4-lens adversarial fixes (1 BLOCKER unresolvable-HOME crash + 2 IMPORTANT + 2 MINOR) → **per-package generalization** (step 2) → focused per-package review (clean, 1 MINOR comment). Gates: pytest 397, test-all 42/42, reference docs in sync. Baseline: v2.12.0 RELEASED; dev ≡ main @ v2.12.0; 41 commands. Spec: `SPEC-diff-aware-baseline-caching-2026-06-13.md`.
+🟢 **candidate A — diff-aware baseline caching: PR #43 OPEN (feature→dev), not merged.** RForge CI (structure/version-drift validation) GREEN; full suite (pytest 397, test-all 42) green locally — note: ci.yml does NOT run pytest/test-all, only structure+version checks. Worktree `~/.git-worktrees/rforge/feature-baseline-caching` (off dev @ fd6e4e9). 4 commits @ 338f0b4: TDD feature → 4-lens adversarial fixes (1 BLOCKER unresolvable-HOME crash + 2 IMPORTANT + 2 MINOR) → **per-package generalization** (step 2) → focused per-package review (clean, 1 MINOR comment). Gates: pytest 397, test-all 42/42, reference docs in sync. Baseline: v2.12.0 RELEASED; dev ≡ main @ v2.12.0; 41 commands. Spec: `SPEC-diff-aware-baseline-caching-2026-06-13.md`.
 
 Open candidates (B/C optional; A built, awaiting your merge call):
 
