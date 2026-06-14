@@ -2426,6 +2426,11 @@ additionally needs R + the <code>S7</code>/<code>pkgload</code> packages install
 <td><code>undocumented_export</code>, <code>prop_type_unresolvable</code></td>
 </tr>
 <tr>
+<td>cross-package-contract</td>
+<td><code>--eco</code></td>
+<td><code>cross_package_undeclared_contract</code>, <code>cross_package_unexported_class</code></td>
+</tr>
+<tr>
 <td>method-dispatch</td>
 <td><code>--runtime</code></td>
 <td><code>dead_generic</code>, <code>method_on_missing_class</code></td>
@@ -2451,12 +2456,35 @@ additionally needs R + the <code>S7</code>/<code>pkgload</code> packages install
 </span></code></pre></div>
 <p>Packages are ordered by the manifest's <code>manifest_order</code>; a package that fails to parse
 becomes a per-package <code>warn</code> and never aborts the sweep.</p>
+<p><code>--eco</code> also runs one <strong>ecosystem-only</strong> family the per-package modes can't: the
+<strong><code>cross-package-contract</code></strong> family. It builds a registry of every S7 class → its
+defining package, then flags a method that dispatches on a <strong>sibling</strong> package's class
+whose contract is unsatisfiable:</p>
+<ul>
+<li><strong><code>cross_package_undeclared_contract</code></strong> — package B has <code>method(generic, C)</code> where <code>C</code>
+  is defined in sibling package A, but B doesn't declare A in <code>Imports</code>/<code>Depends</code>/
+  <code>LinkingTo</code>. The class never resolves at B's load → the method <strong>silently never
+  dispatches</strong>. (The static, ecosystem-scoped sibling of <code>--runtime</code>'s
+  <code>method_undeclared_dependency</code>, caught <em>before</em> anything is installed.)</li>
+<li><strong><code>cross_package_unexported_class</code></strong> — A <em>is</em> declared, but A's <code>NAMESPACE</code> doesn't
+  <code>export(C)</code>, so B still can't reach it.</li>
+</ul>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Cross-package contracts are part of every --eco sweep (no extra flag)</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>/rforge:r:s7-review<span class="w"> </span>--eco
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Static and conservative</p>
+<p>This family is name-based (it can't do the runtime object-identity <code>--runtime</code>
+uses), so it flags <strong>only</strong> when no declared, exporting provider can exist. If a
+provider's NAMESPACE is missing or uses <code>exportPattern()</code>, the export set is
+unknowable and the unexported check is <strong>suppressed</strong> — no false positive.</p>
+</div>
 <h3 id="3-runtime-pass-runtime">3. Runtime pass — <code>--runtime</code><a class="headerlink" href="#3-runtime-pass-runtime" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Load the package and introspect S7 at runtime</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>/rforge:r:s7-review<span class="w"> </span>--runtime
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Compose: sweep the ecosystem AND run the runtime pass per package</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>/rforge:r:s7-review<span class="w"> </span>--eco<span class="w"> </span>--runtime
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Load the package and introspect S7 at runtime</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>/rforge:r:s7-review<span class="w"> </span>--runtime
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Compose: sweep the ecosystem AND run the runtime pass per package</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>/rforge:r:s7-review<span class="w"> </span>--eco<span class="w"> </span>--runtime
 </span></code></pre></div>
 <p>The runtime pass adds three checks source parsing can't make:</p>
 <ul>

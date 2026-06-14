@@ -10,29 +10,27 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-s7-cross-package-contracts-2026-06-13/">
       
       
-      
-        <link rel="next" href="installation/">
       
       
         
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>RForge Plugin</title>
+        <title>SPEC — cross-package S7 contract checks (candidate B, sub-item 1) - RForge Plugin</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -51,9 +49,9 @@
       
     
     
-      <link rel="stylesheet" href="stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -78,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#rforge-plugin" class="md-skip">
+        <a href="#spec-cross-package-s7-contract-checks-candidate-b-sub-item-1" class="md-skip">
           Skip to content
         </a>
       
@@ -92,7 +90,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="RForge Plugin" class="md-header__button md-logo" aria-label="RForge Plugin" data-md-component="logo">
+    <a href="../.." title="RForge Plugin" class="md-header__button md-logo" aria-label="RForge Plugin" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -112,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              SPEC — cross-package S7 contract checks (candidate B, sub-item 1)
             
           </span>
         </div>
@@ -223,11 +221,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="." class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -248,7 +244,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="installation/" class="md-tabs__link">
+        <a href="../../installation/" class="md-tabs__link">
           
   
   
@@ -268,7 +264,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="workflows/" class="md-tabs__link">
+        <a href="../../workflows/" class="md-tabs__link">
           
   
   
@@ -288,7 +284,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="REFCARD/" class="md-tabs__link">
+        <a href="../../REFCARD/" class="md-tabs__link">
           
   
   
@@ -308,7 +304,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="architecture/" class="md-tabs__link">
+        <a href="../../architecture/" class="md-tabs__link">
           
   
   
@@ -342,7 +338,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="RForge Plugin" class="md-nav__button md-logo" aria-label="RForge Plugin" data-md-component="logo">
+    <a href="../.." title="RForge Plugin" class="md-nav__button md-logo" aria-label="RForge Plugin" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -369,37 +365,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Home
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -415,136 +384,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#where-rforge-fits" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where rforge fits
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-to-start" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where to start
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-youll-run-daily" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What you'll run daily
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-new-in-2130" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's new in 2.13.0
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How it works
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Requirements
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#design-principles-adhd-friendly" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Design principles (ADHD-friendly)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#more-documentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        More documentation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#license" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        License
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -606,7 +445,7 @@
   
   
     <li class="md-nav__item">
-      <a href="installation/" class="md-nav__link">
+      <a href="../../installation/" class="md-nav__link">
         
   
   
@@ -634,7 +473,7 @@
   
   
     <li class="md-nav__item">
-      <a href="QUICK-START/" class="md-nav__link">
+      <a href="../../QUICK-START/" class="md-nav__link">
         
   
   
@@ -662,7 +501,7 @@
   
   
     <li class="md-nav__item">
-      <a href="quickstart/" class="md-nav__link">
+      <a href="../../quickstart/" class="md-nav__link">
         
   
   
@@ -747,7 +586,7 @@
   
   
     <li class="md-nav__item">
-      <a href="workflows/" class="md-nav__link">
+      <a href="../../workflows/" class="md-nav__link">
         
   
   
@@ -775,7 +614,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/" class="md-nav__link">
+      <a href="../../tutorials/" class="md-nav__link">
         
   
   
@@ -803,7 +642,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/getting-started/" class="md-nav__link">
+      <a href="../../tutorials/getting-started/" class="md-nav__link">
         
   
   
@@ -831,7 +670,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
+      <a href="../../tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
         
   
   
@@ -859,7 +698,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/understanding-modes/" class="md-nav__link">
+      <a href="../../tutorials/understanding-modes/" class="md-nav__link">
         
   
   
@@ -887,7 +726,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/ecosystem-orchestration/" class="md-nav__link">
+      <a href="../../tutorials/ecosystem-orchestration/" class="md-nav__link">
         
   
   
@@ -915,7 +754,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/orchestrator-cookbook/" class="md-nav__link">
+      <a href="../../tutorials/orchestrator-cookbook/" class="md-nav__link">
         
   
   
@@ -943,7 +782,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/r-dev-cycle/" class="md-nav__link">
+      <a href="../../tutorials/r-dev-cycle/" class="md-nav__link">
         
   
   
@@ -971,7 +810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/diff-aware-checks/" class="md-nav__link">
+      <a href="../../tutorials/diff-aware-checks/" class="md-nav__link">
         
   
   
@@ -999,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/s7-convention-checking/" class="md-nav__link">
+      <a href="../../tutorials/s7-convention-checking/" class="md-nav__link">
         
   
   
@@ -1027,7 +866,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/scaffolding-existing-packages/" class="md-nav__link">
+      <a href="../../tutorials/scaffolding-existing-packages/" class="md-nav__link">
         
   
   
@@ -1055,7 +894,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/cran-release-prep/" class="md-nav__link">
+      <a href="../../tutorials/cran-release-prep/" class="md-nav__link">
         
   
   
@@ -1083,7 +922,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/cran-submission-with-rforge/" class="md-nav__link">
+      <a href="../../tutorials/cran-submission-with-rforge/" class="md-nav__link">
         
   
   
@@ -1111,7 +950,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/r-universe-early-access/" class="md-nav__link">
+      <a href="../../tutorials/r-universe-early-access/" class="md-nav__link">
         
   
   
@@ -1139,7 +978,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/migrate-from-mcp/" class="md-nav__link">
+      <a href="../../tutorials/migrate-from-mcp/" class="md-nav__link">
         
   
   
@@ -1224,7 +1063,7 @@
   
   
     <li class="md-nav__item">
-      <a href="REFCARD/" class="md-nav__link">
+      <a href="../../REFCARD/" class="md-nav__link">
         
   
   
@@ -1252,7 +1091,7 @@
   
   
     <li class="md-nav__item">
-      <a href="commands/" class="md-nav__link">
+      <a href="../../commands/" class="md-nav__link">
         
   
   
@@ -1280,7 +1119,7 @@
   
   
     <li class="md-nav__item">
-      <a href="orchestrator/" class="md-nav__link">
+      <a href="../../orchestrator/" class="md-nav__link">
         
   
   
@@ -1308,7 +1147,7 @@
   
   
     <li class="md-nav__item">
-      <a href="configuration/" class="md-nav__link">
+      <a href="../../configuration/" class="md-nav__link">
         
   
   
@@ -1336,7 +1175,7 @@
   
   
     <li class="md-nav__item">
-      <a href="lib-modules/" class="md-nav__link">
+      <a href="../../lib-modules/" class="md-nav__link">
         
   
   
@@ -1364,7 +1203,7 @@
   
   
     <li class="md-nav__item">
-      <a href="troubleshooting/" class="md-nav__link">
+      <a href="../../troubleshooting/" class="md-nav__link">
         
   
   
@@ -1442,7 +1281,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/discovery/" class="md-nav__link">
+      <a href="../../reference/discovery/" class="md-nav__link">
         
   
   
@@ -1470,7 +1309,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/deps/" class="md-nav__link">
+      <a href="../../reference/deps/" class="md-nav__link">
         
   
   
@@ -1498,7 +1337,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/deps_sync/" class="md-nav__link">
+      <a href="../../reference/deps_sync/" class="md-nav__link">
         
   
   
@@ -1526,7 +1365,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/status/" class="md-nav__link">
+      <a href="../../reference/status/" class="md-nav__link">
         
   
   
@@ -1554,7 +1393,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/init/" class="md-nav__link">
+      <a href="../../reference/init/" class="md-nav__link">
         
   
   
@@ -1582,7 +1421,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/rcmd/" class="md-nav__link">
+      <a href="../../reference/rcmd/" class="md-nav__link">
         
   
   
@@ -1610,7 +1449,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/cranlint/" class="md-nav__link">
+      <a href="../../reference/cranlint/" class="md-nav__link">
         
   
   
@@ -1638,7 +1477,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/ghrelease/" class="md-nav__link">
+      <a href="../../reference/ghrelease/" class="md-nav__link">
         
   
   
@@ -1666,7 +1505,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/runiverse/" class="md-nav__link">
+      <a href="../../reference/runiverse/" class="md-nav__link">
         
   
   
@@ -1694,7 +1533,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/s7review/" class="md-nav__link">
+      <a href="../../reference/s7review/" class="md-nav__link">
         
   
   
@@ -1722,7 +1561,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/changed/" class="md-nav__link">
+      <a href="../../reference/changed/" class="md-nav__link">
         
   
   
@@ -1750,7 +1589,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/scaffold/" class="md-nav__link">
+      <a href="../../reference/scaffold/" class="md-nav__link">
         
   
   
@@ -1843,7 +1682,7 @@
   
   
     <li class="md-nav__item">
-      <a href="architecture/" class="md-nav__link">
+      <a href="../../architecture/" class="md-nav__link">
         
   
   
@@ -1871,7 +1710,7 @@
   
   
     <li class="md-nav__item">
-      <a href="hooks-and-skills/" class="md-nav__link">
+      <a href="../../hooks-and-skills/" class="md-nav__link">
         
   
   
@@ -1949,7 +1788,7 @@
   
   
     <li class="md-nav__item">
-      <a href="specs/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -1977,7 +1816,7 @@
   
   
     <li class="md-nav__item">
-      <a href="specs/SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
+      <a href="../SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
         
   
   
@@ -2005,7 +1844,7 @@
   
   
     <li class="md-nav__item">
-      <a href="specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
+      <a href="../SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
         
   
   
@@ -2033,7 +1872,7 @@
   
   
     <li class="md-nav__item">
-      <a href="specs/SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
+      <a href="../SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
         
   
   
@@ -2061,7 +1900,7 @@
   
   
     <li class="md-nav__item">
-      <a href="specs/SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
+      <a href="../SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
         
   
   
@@ -2147,7 +1986,7 @@
   
   
     <li class="md-nav__item">
-      <a href="migration/v2.0.0-rename/" class="md-nav__link">
+      <a href="../../migration/v2.0.0-rename/" class="md-nav__link">
         
   
   
@@ -2175,7 +2014,7 @@
   
   
     <li class="md-nav__item">
-      <a href="migration/rforge-mcp-deprecation/" class="md-nav__link">
+      <a href="../../migration/rforge-mcp-deprecation/" class="md-nav__link">
         
   
   
@@ -2203,7 +2042,7 @@
   
   
     <li class="md-nav__item">
-      <a href="migration/v1.3.0-post-merge-checklist/" class="md-nav__link">
+      <a href="../../migration/v1.3.0-post-merge-checklist/" class="md-nav__link">
         
   
   
@@ -2266,10 +2105,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#where-rforge-fits" class="md-nav__link">
+  <a href="#problem" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where rforge fits
+        Problem
       
     </span>
   </a>
@@ -2277,10 +2116,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-to-start" class="md-nav__link">
+  <a href="#goal" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where to start
+        Goal
       
     </span>
   </a>
@@ -2288,10 +2127,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-youll-run-daily" class="md-nav__link">
+  <a href="#non-goals" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What you'll run daily
+        Non-goals
       
     </span>
   </a>
@@ -2299,10 +2138,82 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-new-in-2130" class="md-nav__link">
+  <a href="#design" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's new in 2.13.0
+        Design
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#approach-static-extending-run_eco" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Approach: static, extending run_eco
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-ecosystem-class-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Ecosystem class registry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-per-package-contract-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Per-package contract check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-namespace-export-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. NAMESPACE export extraction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-wiring-into-run_eco" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Wiring into run_eco
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#new-changed-functions-libs7reviewpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New / changed functions (lib/s7review.py)
       
     </span>
   </a>
@@ -2310,10 +2221,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
+  <a href="#tests-tdd-teststest_s7reviewpy-pure-stdlib-tmp-ecosystems" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How it works
+        Tests (TDD, tests/test_s7review.py, pure-stdlib tmp ecosystems)
       
     </span>
   </a>
@@ -2321,10 +2232,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
+  <a href="#gates" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Requirements
+        Gates
       
     </span>
   </a>
@@ -2332,10 +2243,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#docs-to-update-ungated-audit-manually" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        Docs to update (ungated — audit manually)
       
     </span>
   </a>
@@ -2343,32 +2254,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#design-principles-adhd-friendly" class="md-nav__link">
+  <a href="#rollout" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Design principles (ADHD-friendly)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#more-documentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        More documentation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#license" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        License
+        Rollout
       
     </span>
   </a>
@@ -2392,7 +2281,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/index.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-s7-cross-package-contracts-2026-06-13.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2400,181 +2289,247 @@
   
 
 
-<h1 id="rforge-plugin">RForge Plugin<a class="headerlink" href="#rforge-plugin" title="Permanent link">&para;</a></h1>
-<p><a href="https://github.com/Data-Wise/rforge/releases"><img alt="Version" src="https://img.shields.io/github/package-json/v/Data-Wise/rforge?label=version&amp;color=blue" /></a>
-<a href="https://www.npmjs.com/package/@data-wise/rforge-plugin"><img alt="npm" src="https://img.shields.io/npm/v/@data-wise/rforge-plugin?label=npm&amp;color=red" /></a>
-<a href="https://github.com/Data-Wise/rforge/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/Data-Wise/rforge?color=green" /></a>
-<a href="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev" /></a></p>
-<p><strong>R package ecosystem orchestrator for Claude Code — 41 commands, R-aware hooks, validation skills.</strong></p>
-<div class="admonition tip">
-<p class="admonition-title">TL;DR (30 seconds)</p>
+<h1 id="spec-cross-package-s7-contract-checks-candidate-b-sub-item-1">SPEC — cross-package S7 contract checks (candidate B, sub-item 1)<a class="headerlink" href="#spec-cross-package-s7-contract-checks-candidate-b-sub-item-1" title="Permanent link">&para;</a></h1>
+<p><strong>Date:</strong> 2026-06-13
+<strong>Branch:</strong> <code>feature/s7-cross-package-contracts</code> (worktree off <code>dev</code> — created at
+implementation time, a separate session; not while <code>feature/diff-aware-baseline-caching</code>
+is still open).
+<strong>Status:</strong> approved design (approach + v1 taxonomy confirmed via AskUserQuestion).
+<strong>Builds on:</strong> <code>lib/s7review.py</code> (<code>run_eco</code>, <code>_find_s7_constructs</code>, NAMESPACE
+parsing at <code>_imported_symbols</code>/<code>_registered_s3_methods</code>), <code>lib/discovery.py</code>
+(<code>detect_ecosystem</code>, <code>Package</code>, <code>read_description</code> → <code>Description.{imports,depends,
+linking_to}</code>), and v2.12.0's runtime <code>method_undeclared_dependency</code> (this is its
+<strong>static, ecosystem-scoped</strong> sibling).</p>
+<h2 id="problem">Problem<a class="headerlink" href="#problem" title="Permanent link">&para;</a></h2>
+<p><code>r:s7-review --eco</code> sweeps every package in an ecosystem but runs the five static
+families <strong>per package, in isolation</strong>. It has no cross-package view, so it cannot
+catch the failure mode that only an ecosystem orchestrator can see:</p>
+<blockquote>
+<p>Package <strong>B</strong> defines an S7 <code>method(generic, C)</code> dispatching on a class <strong>C</strong>
+that is defined in a <strong>sibling</strong> package <strong>A</strong> — but B doesn't declare A in its
+<code>DESCRIPTION</code>. At a user's site the class object never resolves at B's load time,
+so the method <strong>silently never dispatches</strong>. (Or: A <em>is</em> declared, but A's
+<code>NAMESPACE</code> doesn't <code>export(C)</code>, so B still can't reach it.)</p>
+</blockquote>
+<p>This is the same contract v2.12.0's runtime <code>method_undeclared_dependency</code> enforces
+— but that resolves the dispatch class against <strong>installed</strong> packages (needs R +
+the whole stack installed and loadable). The ecosystem version resolves against
+<strong>sibling source packages in the repo</strong>, catching the break <em>before</em> anything is
+installed — exactly when a cascade developer introduces it (edit A's class, add a
+method in B that uses it, forget to declare A).</p>
+<h2 id="goal">Goal<a class="headerlink" href="#goal" title="Permanent link">&para;</a></h2>
+<p>In the <code>--eco</code> sweep, build an ecosystem-wide S7 class registry and flag
+cross-package S7 dispatch whose dependency contract is unsatisfiable:</p>
 <ul>
-<li><strong>What:</strong> R package <em>ecosystem</em> analysis from inside Claude Code. 41 slash commands.</li>
-<li><strong>Why:</strong> Fast feedback on multi-package R repos — discovery, dependencies, change impact, CRAN cascade planning.</li>
-<li><strong>How:</strong> <code>brew install data-wise/tap/rforge</code>, then <code>/rforge:analyze "&lt;what changed&gt;"</code>.</li>
-<li><strong>Next:</strong> <a href="QUICK-START/">Quick Start</a> (3 min) → <a href="#where-to-start">Where to start</a> below.</li>
+<li><strong><code>cross_package_undeclared_contract</code></strong> — B dispatches on A's class C; A ∉ B's
+  <code>DESCRIPTION</code> <code>Imports</code>/<code>Depends</code>/<code>LinkingTo</code>.</li>
+<li><strong><code>cross_package_unexported_class</code></strong> — A <em>is</em> declared in B's deps, but A's
+  <code>NAMESPACE</code> does not export C (no <code>export(C)</code> / <code>exportClasses(C)</code>), so B can't
+  reach it either.</li>
 </ul>
-</div>
-<p>Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python <code>lib/</code> modules handle discovery, dependencies, status, and init. <strong>No MCP server, no Node.js</strong> at runtime. The fast ecosystem commands (analysis, deps, status) are pure Python; the <code>r:*</code> dev-cycle commands and <code>/rforge:thorough</code> shell out to R via <code>lib/rcmd.py</code>.</p>
-<h2 id="where-rforge-fits">Where rforge fits<a class="headerlink" href="#where-rforge-fits" title="Permanent link">&para;</a></h2>
-<pre class="mermaid"><code>flowchart LR
-    A["usethis&lt;br/&gt;scaffold"] --&gt; B["devtools&lt;br/&gt;document · test · build"]
-    B --&gt; C["rforge&lt;br/&gt;discover · deps · impact · cascade"]
-    C --&gt; D["CRAN&lt;br/&gt;ordered submission"]
-    style C fill:#5e35b1,color:#fff</code></pre>
-<div class="admonition abstract">
-<p class="admonition-title">rforge orchestrates an ecosystem; it does not build packages</p>
-<p><strong>They build one package. rforge runs the ecosystem.</strong> rforge sits <em>alongside</em> the
-standard R toolchain, it doesn't replace it.</p>
+<p>Both answer one question: <em>can B actually reach A's class C?</em> Advisory family
+<code>cross-package-contract</code>, surfaced in the <code>--eco</code> rollup. Automatic under <code>--eco</code>
+(it inherently needs the ecosystem); silent when no cross-package S7 dispatch
+exists. <strong>No new command, no new flag.</strong></p>
+<h2 id="non-goals">Non-goals<a class="headerlink" href="#non-goals" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong><code>usethis</code> / <code>devtools</code></strong> scaffold, document, test, and build a <em>single</em> package.</li>
-<li><strong>rforge</strong> answers cross-cutting questions: <em>Which packages exist here? What depends on what? If I change <code>medfit</code>, what breaks downstream? In what order do I submit to CRAN?</em></li>
+<li><strong>Runtime resolution.</strong> Static, name-based, in <code>s7review.py</code> (pure-stdlib). A
+  runtime version would need every ecosystem package simultaneously loadable via
+  <code>pkgload</code> — a high, fragile bar — and the existing <code>--runtime</code> engine
+  (<code>rcmd.s7runtime</code>) is single-package. The static tradeoff is acceptable because
+  the family is advisory.</li>
+<li><strong><code>contract_drift</code></strong> (A changes C's property set → B's methods that assume the
+  old shape break). Deferred — needs static property-set extraction + usage
+  analysis in B; fuzzy and false-positive-prone. Noted as a future iteration.</li>
+<li><strong>Sub-item 2 of candidate B (full R6/S4 convention checking).</strong> A separate spec
+  if pursued at all (rforge is S7-focused; <code>check_legacy_oop</code> already gives the
+  migration signal).</li>
 </ul>
-<p>Looking for <code>create_package()</code> or <code>document()</code>? That's <code>usethis</code>/<code>devtools</code>. rforge picks
-up where they leave off — see <strong><a href="tutorials/rforge-in-the-r-lifecycle/">rforge in the R package lifecycle</a></strong>.</p>
-</div>
-<h2 id="where-to-start">Where to start<a class="headerlink" href="#where-to-start" title="Permanent link">&para;</a></h2>
-<div class="grid cards">
-<ul>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m13.13 22.19-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27zM5.64 12.5l-3.83-1.63 6.1-2.77C7 9.46 6.22 10.93 5.64 12.5M21.61 2.39S16.66.269 11 5.93c-2.19 2.19-3.5 4.6-4.35 6.71-.28.75-.09 1.57.46 2.13l2.13 2.12c.55.56 1.37.74 2.12.46A19.1 19.1 0 0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61m-7.07 7.07c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83s-2.05.78-2.83 0m-5.66 7.07-1.41-1.41zM6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22zM2 22h1.41l4.77-4.76-1.42-1.41L2 20.59zm0-2.83 4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76z"/></svg></span> <strong>Just want it working</strong></p>
-<hr />
-<p>3-minute install + first command.</p>
-<p><a href="QUICK-START/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Quick Start</a></p>
-</li>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17z"/></svg></span> <strong>New, have a package to try</strong></p>
-<hr />
-<p>Guided 10-minute walkthrough.</p>
-<p><a href="tutorials/getting-started/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Getting started</a></p>
-</li>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5A2.5 2.5 0 0 0 10.5 1 2.5 2.5 0 0 0 8 3.5V5H4a2 2 0 0 0-2 2v3.8h1.5c1.5 0 2.7 1.2 2.7 2.7S5 16.2 3.5 16.2H2V20a2 2 0 0 0 2 2h3.8v-1.5c0-1.5 1.2-2.7 2.7-2.7s2.7 1.2 2.7 2.7V22H17a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 2.5-2.5 2.5 2.5 0 0 0-2.5-2.5"/></svg></span> <strong>How it fits with devtools/usethis</strong></p>
-<hr />
-<p>Where rforge plugs into the lifecycle.</p>
-<p><a href="tutorials/rforge-in-the-r-lifecycle/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> The R lifecycle</a></p>
-</li>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.5 17c-.13 0-.26 0-.39.04l-1.61-3.25a2.5 2.5 0 0 0-1.75-4.29c-.13 0-.25 0-.39.04l-1.63-3.25c.48-.45.77-1.08.77-1.79a2.5 2.5 0 0 0-5 0c0 .71.29 1.34.76 1.79L8.64 9.54c-.14-.04-.26-.04-.39-.04a2.5 2.5 0 0 0-1.75 4.29l-1.61 3.25C4.76 17 4.63 17 4.5 17a2.5 2.5 0 0 0 0 5A2.5 2.5 0 0 0 7 19.5c0-.7-.29-1.34-.76-1.79l1.62-3.25c.14.04.26.04.39.04s.25 0 .39-.04l1.63 3.25c-.47.45-.77 1.09-.77 1.79a2.5 2.5 0 0 0 5 0A2.5 2.5 0 0 0 12 17c-.13 0-.26 0-.39.04L10 13.79c.46-.45.75-1.08.75-1.79s-.29-1.34-.75-1.79l1.61-3.25c.13.04.26.04.39.04s.26 0 .39-.04L14 10.21c-.45.45-.75 1.09-.75 1.79a2.5 2.5 0 0 0 2.5 2.5c.13 0 .25 0 .39-.04l1.63 3.25c-.47.45-.77 1.09-.77 1.79a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0-2.5-2.5"/></svg></span> <strong>Managing several packages</strong></p>
-<hr />
-<p>Cross-package orchestration.</p>
-<p><a href="tutorials/ecosystem-orchestration/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Ecosystem</a></p>
-</li>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.54 5.23c.29.34.46.77.46 1.27V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6.5c0-.5.17-.93.46-1.27l1.38-1.68C5.12 3.21 5.53 3 6 3h12c.47 0 .88.21 1.15.55zM5.12 5h13.75l-.94-1h-12zM12 9.5 6.5 15H10v2h4v-2h3.5z"/></svg></span> <strong>Preparing a CRAN submission</strong></p>
-<hr />
-<p>The full submission gate.</p>
-<p><a href="tutorials/cran-release-prep/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> CRAN prep</a></p>
-</li>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 20H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2M5 13v2h11v-2zm0-4v2h14V9z"/></svg></span> <strong>Looking up command syntax</strong></p>
-<hr />
-<p>All 41 commands, one page.</p>
-<p><a href="REFCARD/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Reference Card</a></p>
-</li>
-</ul>
-</div>
-<h2 id="what-youll-run-daily">What you'll run daily<a class="headerlink" href="#what-youll-run-daily" title="Permanent link">&para;</a></h2>
-<p>Most work runs through these four; the rest of the 41 commands are specialized — see the <a href="REFCARD/">Reference Card</a>.</p>
-<div class="grid cards">
-<ul>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg></span> <strong><code>/rforge:quick</code></strong> · &lt;10s</p>
-<hr />
-<p>Ultra-fast snapshot. Run before every commit.</p>
-</li>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 22v-2h3v-3h2v3.5c0 .39-.16.74-.46 1.04s-.65.46-1.04.46zM7 22H3.5c-.39 0-.74-.16-1.04-.46S2 20.89 2 20.5V17h2v3h3zM17 2h3.5c.39 0 .74.16 1.04.46s.46.65.46 1.04V7h-2V4h-3zM7 2v2H4v3H2V3.5c0-.39.16-.74.46-1.04S3.11 2 3.5 2zm3.5 4C13 6 15 8 15 10.5c0 .88-.25 1.7-.69 2.4l3.26 3.26-1.41 1.41-3.26-3.26c-.7.44-1.52.69-2.4.69C8 15 6 13 6 10.5S8 6 10.5 6m0 2a2.5 2.5 0 0 0 0 5 2.5 2.5 0 0 0 0-5"/></svg></span> <strong><code>/rforge:analyze "&lt;change&gt;"</code></strong> · ~30s</p>
-<hr />
-<p>Balanced analysis with impact + recommendations after a change.</p>
-</li>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m10 17-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9m-6-6a1 1 0 0 1 1 1 1 1 0 0 1-1 1 1 1 0 0 1-1-1 1 1 0 0 1 1-1m7 0h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2"/></svg></span> <strong><code>/rforge:r:cran-prep</code></strong> · per-pkg</p>
-<hr />
-<p>The full CRAN gate; document → strict check → Tier 4 → revdep; writes <code>cran-comments.md</code>.</p>
-</li>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 0 3 7l1.63 1.27L12 14l7.36-5.73L21 7zm7.37 10.73L12 16.47l-7.38-5.73L3 12l9 7 9-7zm0 5L12 21.47l-7.38-5.73L3 17l9 7 9-7z"/></svg></span> <strong><code>/rforge:thorough</code></strong> · 2-5 min</p>
-<hr />
-<p>Cross-package ecosystem rollup + submission order.</p>
-</li>
-</ul>
-</div>
-<h2 id="whats-new-in-2130">What's new in 2.13.0<a class="headerlink" href="#whats-new-in-2130" title="Permanent link">&para;</a></h2>
-<p>Three recommendations from a documentation gap analysis — <strong>41 commands</strong> (no surface change).</p>
-<ul>
-<li><strong><code>docs/commands.md</code> sync-gate</strong> — a new test gate (<code>tests/_check_commands_doc.py</code>) cross-checks every command + flag against the reference page; it immediately surfaced and fixed 10 undocumented flags. Closes the last drift-prone documentation surface.</li>
-<li><strong>diff-aware <code>[uncommitted]</code> tag</strong> — <code>/rforge:r:check</code>/<code>r:test</code>/<code>r:lint --changed</code> now re-tags an <code>[introduced]</code> finding in a file with uncommitted changes as <strong><code>[uncommitted]</code></strong>, so you can tell "edits I haven't committed yet" from committed branch work. See the <a href="tutorials/diff-aware-checks/">diff-aware checks tutorial</a>.</li>
-<li><strong><code>/rforge:r:s7-review method_undeclared_dependency</code></strong> — the <code>--runtime</code> pass now flags a method dispatching on an S7 class whose providing package isn't declared in <code>DESCRIPTION</code> (typically a <code>Suggests</code>-only class that silently never dispatches at a user's site). See the <a href="tutorials/s7-convention-checking/">S7 convention checking tutorial</a>.</li>
-</ul>
-<p>Full release history: <a href="https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</p>
-<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>You invoke /rforge:&lt;command&gt;
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    ↓
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Claude reads commands/&lt;name&gt;.md as its prompt
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ↓
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Claude orchestrates pure-Python lib/ modules + Bash tools as needed
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ├── python3 -m lib.discovery   (ecosystem + package detection)
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    ├── python3 -m lib.deps        (dependency graph + change impact)
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    ├── python3 -m lib.status      (health snapshot)
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    └── python3 -m lib.init        (~/.rforge/context.json setup)
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    ↓
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>PreToolUse hook diagnoses risky Write/Edit ops (blocks man/*.Rd edits, etc.)
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    ↓
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>Validation skills run autonomously (description-sync, etc.)
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    ↓
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>Results synthesized into an actionable summary
+<h2 id="design">Design<a class="headerlink" href="#design" title="Permanent link">&para;</a></h2>
+<h3 id="approach-static-extending-run_eco">Approach: static, extending <code>run_eco</code><a class="headerlink" href="#approach-static-extending-run_eco" title="Permanent link">&para;</a></h3>
+<p><code>run_eco</code> is pure-stdlib and already resolves the package set + paths via
+<code>discovery.detect_ecosystem</code>. The cross-package pass slots in there: build the
+registry once across all packages, then run a per-package contract check that
+consults it.</p>
+<h3 id="1-ecosystem-class-registry">1. Ecosystem class registry<a class="headerlink" href="#1-ecosystem-class-registry" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">build_class_registry</span><span class="p">(</span><span class="n">packages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">discovery</span><span class="o">.</span><span class="n">Package</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Map every S7 class NAME → the package(s) that define it (via new_class).</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="sd">    Scans each package&#39;s R/ with _find_s7_constructs; a `new_class` construct&#39;s</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="sd">    name is `_name_arg(args_raw)` or its `bound` LHS. Returns name → sorted unique</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="sd">    package names. A name defined in &gt;1 package (a collision) maps to a list with</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="sd">    &gt;1 entry — the consumer treats that as statically ambiguous (see below).</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="sd">    &quot;&quot;&quot;</span>
 </span></code></pre></div>
-<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
+<p>Name-based, because static parsing has only names (no runtime object identity —
+the v2.11.1 lesson that S7 resolution should be by identity applies to the
+<em>runtime</em> engine; the static <code>--eco</code> registry cannot do better than names). This
+is the <strong>key limitation</strong>, documented in the family's messages: two packages
+defining a same-named class is ambiguous; the check is conservative there (below).</p>
+<h3 id="2-per-package-contract-check">2. Per-package contract check<a class="headerlink" href="#2-per-package-contract-check" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_cross_package_contracts</span><span class="p">(</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">pkg</span><span class="p">:</span> <span class="n">discovery</span><span class="o">.</span><span class="n">Package</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">registry</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">exports</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>   <span class="c1"># pkg name → set of exported class names</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>                          <span class="c1"># envelope, kind=&quot;cross-package-contract&quot;</span>
+</span></code></pre></div>
+<p>For each <code>method(generic, C)</code> in <code>pkg</code>'s <code>R/</code> (dispatch class <code>C</code> extracted from
+the <code>method(...)</code> construct, the arg after the generic — reuse <code>_find_s7_constructs</code>
++ the <code>check_methods</code> arg parsing; handle <code>method(g, ClassName)</code> and the
+multi-dispatch <code>method(g, list(A, B))</code> forms):</p>
+<ol>
+<li><code>providers = registry.get(C, [])</code>. If empty → <strong>skip</strong> (C is local-undefined,
+   a base type, or an <em>external</em> CRAN class — out of scope here; the runtime
+   <code>method_on_missing_class</code> / <code>method_undeclared_dependency</code> families handle
+   external/missing). </li>
+<li>If <code>pkg.name in providers</code> → <strong>skip</strong> (C is defined locally; local definition
+   satisfies dispatch even if the name also exists elsewhere — ambiguous but
+   not a cross-package break).</li>
+<li><code>siblings = [p for p in providers if p != pkg.name]</code> (all sibling definers).
+   <code>declared = imports ∪ depends ∪ linking_to</code> (version specs stripped) from
+   <code>read_description(Path(pkg.path)/"DESCRIPTION")</code>.</li>
+</ol>
+<p><strong>Reachability (re-export-aware — hardened after the adversarial review).</strong> C is
+   reachable from <code>pkg</code> iff some <strong>declared ecosystem dep exports C</strong> — whether it
+   <em>defines</em> C <strong>or</strong> <em>re-exports</em> it (<code>importFrom(A, C)</code> + <code>export(C)</code>, the facade
+   idiom: <code>pkg</code> rightly depends on the re-exporter, not the original definer) — OR a
+   declared <strong>definer</strong>'s export set is statically unknowable (no NAMESPACE /
+   <code>exportPattern</code> → suppress to avoid a false positive). Concretely:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>declared_definers = [s for s in siblings if s in declared]
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>reachable = any(C in (exports[d] or set()) for d in declared if d in exports) \
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>            or any(exports[s] is None for s in declared_definers)
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>if reachable:            → clean
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>elif declared_definers:  → cross_package_unexported_class (a declared definer
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>                           exists but no declared dep exports/re-exports C)
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>else:                    → cross_package_undeclared_contract (no declared dep
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>                           defines OR re-exports C)
+</span></code></pre></div>
+<p>Collision handling falls out naturally: if any declared dep exports C, it's clean
+   regardless of other ambiguous definers; only when no declared dep can provide C is
+   it flagged. The finding message names the candidate provider packages.</p>
+<blockquote>
+<p><strong>Why re-export-aware:</strong> the first design checked only whether a declared
+<em>definer</em> exported C, which false-flagged the common facade pattern (consumer
+depends on a re-exporter, not the definer). The adversarial review (whose
+rollout focus list below explicitly named "re-exported classes") caught it; the
+reachability test now consults every declared dep's export set, not just
+definers'. Two other review fixes: the construct parser binds on <code>=</code> as well as
+<code>&lt;-</code> (<code>Foo = new_class()</code> was invisible to the registry → missed contracts), and
+NAMESPACE <code>export()</code> is parsed with balanced parens across lines (a wrapped
+multi-line export() had read as the empty set → false <code>unexported</code>).</p>
+</blockquote>
+<p>Finding shape (consistent with existing s7review dict findings):</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span><span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;cross_package_undeclared_contract&quot;</span><span class="p">,</span> <span class="s2">&quot;severity&quot;</span><span class="p">:</span> <span class="s2">&quot;advisory&quot;</span><span class="p">,</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a> <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="s2">&quot;R/methods.R&quot;</span><span class="p">,</span> <span class="s2">&quot;line&quot;</span><span class="p">:</span> <span class="mi">42</span><span class="p">,</span> <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;generic&quot;</span><span class="p">:</span> <span class="s2">&quot;format&quot;</span><span class="p">,</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a> <span class="s2">&quot;providers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">],</span> <span class="s2">&quot;consumer&quot;</span><span class="p">:</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;method(format, C) in &#39;B&#39; dispatches on S7 class &#39;C&#39; defined in &quot;</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>            <span class="s2">&quot;sibling package &#39;A&#39;, which &#39;B&#39; does not declare in &quot;</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>            <span class="s2">&quot;Imports/Depends/LinkingTo — the class will not resolve at B&#39;s site &quot;</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>            <span class="s2">&quot;and the method will never dispatch. Declare &#39;A&#39;.&quot;</span><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="3-namespace-export-extraction">3. NAMESPACE export extraction<a class="headerlink" href="#3-namespace-export-extraction" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_exported_s7_classes</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Class names a package exports via NAMESPACE export(C)/exportClasses(C).&quot;&quot;&quot;</span>
+</span></code></pre></div>
+<p>Reuse the existing NAMESPACE-reading pattern (<code>_imported_symbols</code>/
+<code>_registered_s3_methods</code> already open + scan <code>NAMESPACE</code>). S7 classes are usually
+exported with plain <code>export(&lt;ClassName&gt;)</code>; also honor <code>exportClasses(...)</code>. Treat
+exports as <strong>unknown</strong> (and <strong>suppress</strong> the unexported finding for that provider,
+to avoid a false positive) when the class set can't be enumerated statically:
+(a) the package has <strong>no</strong> NAMESPACE (source-only, not yet <code>document()</code>-ed), or
+(b) the NAMESPACE uses <code>exportPattern(...)</code> (regex export — the exported set is
+unknowable without evaluating the pattern against all symbols). In both cases only
+<code>undeclared</code> can fire for that provider, never <code>unexported</code>.</p>
+<h3 id="4-wiring-into-run_eco">4. Wiring into <code>run_eco</code><a class="headerlink" href="#4-wiring-into-run_eco" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>eco = discovery.detect_ecosystem(root)
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>pkgs = ordered(eco.packages)
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>registry = build_class_registry(pkgs)              # one pass over all pkgs
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>exports  = {p.name: _exported_s7_classes(p.path) for p in pkgs}
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>for pkg in pkgs:
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    ... existing run_all(pkg.path) stages ...
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    contract = check_cross_package_contracts(pkg, registry, exports)
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    append contract as an extra stage; fold its count into rollup.by_family
+</span></code></pre></div>
+<p>The per-package stages gain a <code>cross-package-contract</code> entry; the rollup
+<code>by_family</code> gains its count. <code>run_eco</code>'s "never raises / per-package warn on
+exception" contract is preserved (wrap the contract check the same way).</p>
+<h2 id="new-changed-functions-libs7reviewpy">New / changed functions (<code>lib/s7review.py</code>)<a class="headerlink" href="#new-changed-functions-libs7reviewpy" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Requirement</th>
-<th>Needed for</th>
+<th>Function</th>
+<th>Responsibility</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Claude Code CLI</strong></td>
-<td>everything (this is a Claude Code plugin)</td>
+<td><code>build_class_registry(packages) -&gt; dict[str, list[str]]</code></td>
+<td>ecosystem class name → defining package(s)</td>
 </tr>
 <tr>
-<td><strong>Python 3.10+</strong> on PATH</td>
-<td>the <code>lib/</code> modules (<code>discovery</code>, <code>deps</code>, <code>status</code>, <code>init</code>)</td>
+<td><code>_exported_s7_classes(pkg_path) -&gt; set[str]</code></td>
+<td>class names a package exports via NAMESPACE</td>
 </tr>
 <tr>
-<td><strong>R 4.0+</strong> (+ optional engines via <code>lib.rcmd</code>)</td>
-<td>all <code>r:*</code> commands and <code>/rforge:thorough</code></td>
+<td><code>check_cross_package_contracts(pkg, registry, exports) -&gt; dict</code></td>
+<td>per-package envelope, <code>cross-package-contract</code> family</td>
+</tr>
+<tr>
+<td><code>run_eco(...)</code></td>
+<td>build registry + exports once; add the contract stage per package; roll up</td>
 </tr>
 </tbody>
 </table>
-<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>/plugin marketplace add Data-Wise/rforge
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>/plugin install rforge
-</span></code></pre></div>
-<p>Restart Claude Code so the commands register, then verify with <code>/help</code> (look for <code>/rforge:</code> entries). Homebrew, npm, and from-source options are in <a href="installation/">Installation</a>.</p>
-<blockquote>
-<p><strong>Migrating from v1.2.x?</strong> If <code>~/.claude/settings.json</code> still has an <code>mcpServers.rforge</code> entry, it's no longer needed — remove it. See the <a href="migration/rforge-mcp-deprecation/">migration guide</a>.</p>
-</blockquote>
-<h2 id="design-principles-adhd-friendly">Design principles (ADHD-friendly)<a class="headerlink" href="#design-principles-adhd-friendly" title="Permanent link">&para;</a></h2>
+<p>All three new functions are <strong>public</strong> (s7review is a public module) → add to
+<code>docs/reference/s7review.md</code> via <code>scripts/gen_lib_reference.py</code> (CI gate).</p>
+<h2 id="tests-tdd-teststest_s7reviewpy-pure-stdlib-tmp-ecosystems">Tests (TDD, <code>tests/test_s7review.py</code>, pure-stdlib tmp ecosystems)<a class="headerlink" href="#tests-tdd-teststest_s7reviewpy-pure-stdlib-tmp-ecosystems" title="Permanent link">&para;</a></h2>
+<p>Build small multi-package fixtures (pkgA defines <code>new_class</code>, pkgB has a
+<code>method(g, C)</code> + a DESCRIPTION + NAMESPACE):</p>
 <ol>
-<li><strong>Fast feedback</strong> — <code>/rforge:quick</code> returns in seconds, not minutes.</li>
-<li><strong>Clear structure</strong> — consistent, scannable output across commands.</li>
-<li><strong>Visual progress</strong> — you see what's happening as it happens.</li>
-<li><strong>Always actionable</strong> — every result ends with next steps.</li>
-<li><strong>Interruptible &amp; incremental</strong> — results stream as they complete.</li>
+<li><code>build_class_registry</code> maps class → defining package across packages.</li>
+<li>registry collision: same-named class in two packages → both listed.</li>
+<li><strong>undeclared</strong>: B's <code>method(g, C)</code>, C defined in A, A ∉ B deps → <code>cross_package_undeclared_contract</code>.</li>
+<li><strong>declared + exported</strong> → no finding.</li>
+<li><strong>declared, NOT exported</strong> (A lacks <code>export(C)</code>) → <code>cross_package_unexported_class</code>.</li>
+<li><strong>declared, no NAMESPACE</strong> (un-generated) → undeclared suppressed-or-fires per deps, unexported <strong>suppressed</strong> (no FP).</li>
+<li><strong>local class</strong> (C defined in B itself) → no finding.</li>
+<li><strong>external/unknown class</strong> (C not in registry) → no finding (out of scope).</li>
+<li><strong>collision, one declared+exporting</strong>: C in A (declared+exported) and D (not declared) → no finding (a satisfying provider exists).</li>
+<li><code>run_eco</code> surfaces <code>cross-package-contract</code> in <code>rollup.by_family</code> and the per-package stages.</li>
+<li>single-package ecosystem → zero cross-package findings; never raises.</li>
+<li>multi-dispatch <code>method(g, list(A_class, B_class))</code> → each dispatch class checked.</li>
 </ol>
-<h2 id="more-documentation">More documentation<a class="headerlink" href="#more-documentation" title="Permanent link">&para;</a></h2>
+<h2 id="gates">Gates<a class="headerlink" href="#gates" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong><a href="REFCARD/">Reference Card</a></strong> — all 41 commands on one page</li>
-<li><strong><a href="commands/">Commands</a></strong> — full per-command reference</li>
-<li><strong><a href="architecture/">Architecture</a></strong> — how the <code>lib/</code> modules fit together</li>
-<li><strong><a href="hooks-and-skills/">Hooks &amp; Skills</a></strong> — the R-aware <code>PreToolUse</code> hook</li>
-<li><strong><a href="configuration/">Configuration</a></strong> — CRAN mirror, vignette engine, R version pin, CLAUDE.md budget</li>
-<li><strong><a href="troubleshooting/">Troubleshooting</a></strong> — when commands misbehave</li>
+<li><code>python3 -m pytest tests/</code> — new cross-package cases + all existing green.</li>
+<li><code>bash tests/test-all.sh</code> — incl. lib reference sync (regen <code>s7review.md</code>),
+  version/count sync, commands-doc sync-gate (no new flag, but update the
+  <code>r:s7-review</code> command prose + <code>docs/commands.md</code> to describe the new <code>--eco</code>
+  family — prose, gate is flag-level so it won't fail, but keep docs honest).</li>
+<li>No version bump on the feature branch — ships in the next release bundle.</li>
 </ul>
-<h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h2>
-<p>MIT. Source: <a href="https://github.com/Data-Wise/rforge">https://github.com/Data-Wise/rforge</a></p>
+<h2 id="docs-to-update-ungated-audit-manually">Docs to update (ungated — audit manually)<a class="headerlink" href="#docs-to-update-ungated-audit-manually" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>commands/r/s7-review.md</code> — <code>--eco</code> section: add the <code>cross-package-contract</code>
+  family (the two findings + the static name-based caveat).</li>
+<li><code>docs/commands.md</code> — <code>r:s7-review</code> <code>--eco</code> description.</li>
+<li><code>docs/tutorials/s7-convention-checking.md</code> — a cross-package example.</li>
+<li><code>docs/reference/s7review.md</code> — auto-regen (gated).</li>
+</ul>
+<h2 id="rollout">Rollout<a class="headerlink" href="#rollout" title="Permanent link">&para;</a></h2>
+<p>Feature branch <code>feature/s7-cross-package-contracts</code> off <code>dev</code>, <strong>its own session</strong>
+(no worktree stacking). TDD per <code>superpowers:subagent-driven-development</code> or inline.
+Pre-merge adversarial review (per the established cadence) focused on:</p>
+<ul>
+<li><strong>False-positive control</strong> — the static name-based limitation: collisions,
+  re-exported classes (pkg B re-exports A's class), classes defined via a non-<code>new_class</code>
+  path the parser misses, <code>method()</code> on a base-type/<code>class_*</code> S7 builtin.</li>
+<li><strong>Registry completeness</strong> — dynamically/programmatically defined classes,
+  <code>new_class</code> inside a function body, classes defined in a package but used only
+  internally (not a contract issue).</li>
+<li><strong>DESCRIPTION/NAMESPACE parsing edges</strong> — version specs, <code>Remotes</code>, no-NAMESPACE
+  source packages, <code>exportPattern</code> (a regex export → exports unknowable → suppress).</li>
+</ul>
 
 
 
@@ -2630,10 +2585,10 @@ up where they leave off — see <strong><a href="tutorials/rforge-in-the-r-lifec
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

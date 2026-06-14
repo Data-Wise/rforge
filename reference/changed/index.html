@@ -1657,6 +1657,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#cached_baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cached_baseline()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#changed_files" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1679,10 +1690,32 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#clear_baseline_cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clear_baseline_cache()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#merge_base" class="md-nav__link">
     <span class="md-ellipsis">
       
         merge_base()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#read_baseline_cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_baseline_cache()
       
     </span>
   </a>
@@ -1727,6 +1760,17 @@
     <span class="md-ellipsis">
       
         uncommitted_files()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#write_baseline_cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        write_baseline_cache()
       
     </span>
   </a>
@@ -2293,6 +2337,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#cached_baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cached_baseline()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#changed_files" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2315,10 +2370,32 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#clear_baseline_cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clear_baseline_cache()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#merge_base" class="md-nav__link">
     <span class="md-ellipsis">
       
         merge_base()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#read_baseline_cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_baseline_cache()
       
     </span>
   </a>
@@ -2363,6 +2440,17 @@
     <span class="md-ellipsis">
       
         uncommitted_files()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#write_baseline_cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        write_baseline_cache()
       
     </span>
   </a>
@@ -2438,8 +2526,29 @@ distinct empty-list case (a valid no-op, not a failure).</p>
     files = changed_files(path=".", base="dev")
     pkgs = changed_packages(files or [], root=".")</p>
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
+<h3 id="cached_baseline"><code>cached_baseline()</code><a class="headerlink" href="#cached_baseline" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">cached_baseline</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">base_sha</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">items</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">run_item</span><span class="p">:</span> <span class="s1">&#39;Callable[[str, object], list]&#39;</span><span class="p">,</span> <span class="n">key_item</span><span class="p">:</span> <span class="s1">&#39;Callable[[object], str]&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">use_cache</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[list]&#39;</span>
+</span></code></pre></div>
+<p>Per-item baseline finding list, each item cached independently.</p>
+<p>The whole-baseline cache hits only when the EXACT item set recurs; this hits
+any item already baselined and re-runs ONLY the uncached ones. That matters
+for ecosystem cascade work where the changed-package set grows run-over-run,
+and where the per-item engine run (e.g. <code>R CMD check</code> per package) — not the
+worktree — is the real cost. For a single item it is behaviour-identical to a
+whole-baseline cache.</p>
+<p>For each item: serve <code>read_baseline_cache(path, base_sha, key_item(item))</code> if
+present; else mark it for a fresh run. If ANY item is uncached, create ONE
+detached merge-base worktree (as <code>run_baseline</code> does), call
+<code>run_item(tree_root, item)</code> for each uncached item, cache it, and ALWAYS
+remove the worktree (<code>finally</code>). Returns the flat combined finding list in
+<code>items</code> order. When every item is a cache hit, NO worktree is created.</p>
+<p>Stays R-free: <code>items</code> are opaque, <code>run_item</code>/<code>key_item</code> are injected.
+Returns None iff a worktree was needed but <code>git worktree add</code> failed — same
+contract as <code>run_baseline</code> (caller falls back to scope-only). If
+<code>run_item</code> raises, the worktree is still cleaned up and the exception
+propagates (matches <code>run_baseline</code>).</p>
 <h3 id="changed_files"><code>changed_files()</code><a class="headerlink" href="#changed_files" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">changed_files</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[list[str]]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">changed_files</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[list[str]]&#39;</span>
 </span></code></pre></div>
 <p>Paths changed on the current branch relative to <code>base</code>'s merge-base.</p>
 <p>Returns repo-relative paths (committed <em>and</em> uncommitted), or:
@@ -2450,7 +2559,7 @@ distinct empty-list case (a valid no-op, not a failure).</p>
 both committed-on-branch and working-tree-uncommitted changes against the
 fork point — exactly the "what did this branch touch" question.</p>
 <h3 id="changed_packages"><code>changed_packages()</code><a class="headerlink" href="#changed_packages" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">changed_packages</span><span class="p">(</span><span class="n">files</span><span class="p">:</span> <span class="s1">&#39;list[str]&#39;</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[Package]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">changed_packages</span><span class="p">(</span><span class="n">files</span><span class="p">:</span> <span class="s1">&#39;list[str]&#39;</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[Package]&#39;</span>
 </span></code></pre></div>
 <p>Map changed <code>files</code> (root-relative) to the R packages that own them.</p>
 <p>Owns = the file path is inside (or equal to) the package directory. Uses
@@ -2458,15 +2567,27 @@ fork point — exactly the "what did this branch touch" question.</p>
 package set, then keeps packages with at least one changed file under them.
 Files owning no package (top-level README, docs/) are silently dropped.
 Result order follows discovery order; each package is returned at most once.</p>
+<h3 id="clear_baseline_cache"><code>clear_baseline_cache()</code><a class="headerlink" href="#clear_baseline_cache" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">clear_baseline_cache</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;Optional[str]&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;int&#39;</span>
+</span></code></pre></div>
+<p>Remove cached baseline entries; return the number of files removed.</p>
+<p>With <code>path</code>: clear only that repo's cache dir. With <code>path=None</code>: clear
+the entire cache root. Only ever deletes inside <code>_cache_root()</code>.</p>
 <h3 id="merge_base"><code>merge_base()</code><a class="headerlink" href="#merge_base" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">merge_base</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;dev&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[str]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">merge_base</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;dev&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[str]&#39;</span>
 </span></code></pre></div>
 <p>Resolve the fork point: git merge-base(HEAD, base).</p>
 <p>Returns the merge-base SHA, or None when there is no common ancestor, <code>base</code>
 is unknown, <code>path</code> is not a git repo, or git is missing. Advisory — never
 raises; callers warn and fall back to a full/scope-only run on None.</p>
+<h3 id="read_baseline_cache"><code>read_baseline_cache()</code><a class="headerlink" href="#read_baseline_cache" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_baseline_cache</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">base_sha</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">cache_key</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[list]&#39;</span>
+</span></code></pre></div>
+<p>Return the cached baseline finding list, or None on miss/corrupt/error.</p>
+<p>A corrupt or unreadable file is treated as a miss (never raises), so a bad
+cache entry can only ever cost one extra baseline run — never a crash.</p>
 <h3 id="run_baseline"><code>run_baseline()</code><a class="headerlink" href="#run_baseline" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_baseline</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">base_sha</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">runner</span><span class="p">:</span> <span class="s1">&#39;Callable[[str], list]&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[list]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_baseline</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">base_sha</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">runner</span><span class="p">:</span> <span class="s1">&#39;Callable[[str], list]&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[list]&#39;</span>
 </span></code></pre></div>
 <p>Run <code>runner</code> against a detached worktree checked out at <code>base_sha</code>.</p>
 <p>Steps: create a temp dir under the SYSTEM temp root (NOT inside the repo, so
@@ -2480,17 +2601,24 @@ in that case nothing was created, so there is nothing to clean up and the
 caller falls back. If <code>runner</code> raises, the worktree is still cleaned up and
 the exception propagates (callers that want a fallback catch it upstream).</p>
 <h3 id="scope_check"><code>scope_check()</code><a class="headerlink" href="#scope_check" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">scope_check</span><span class="p">(</span><span class="n">runner</span><span class="p">:</span> <span class="s1">&#39;Callable[[str], list]&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;dev&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[dict]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">scope_check</span><span class="p">(</span><span class="n">runner</span><span class="p">:</span> <span class="s1">&#39;Callable[[str], list]&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">base</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;dev&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">baseline</span><span class="p">:</span> <span class="s1">&#39;Optional[Callable[[str, str], Optional[list]]]&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[dict]&#39;</span>
 </span></code></pre></div>
 <p>Two-run introduced/pre-existing tagging over a REAL merge-base checkout.</p>
-<p>Orchestrates: merge_base(HEAD, base) → run_baseline (runner at the merge-base
-detached worktree) → runner against the live HEAD tree → tag_findings, then a
-file-level <code>[uncommitted]</code> refinement (v2.12.0).</p>
+<p>Orchestrates: merge_base(HEAD, base) → acquire baseline findings → runner
+against the live HEAD tree → tag_findings, then a file-level <code>[uncommitted]</code>
+refinement (v2.12.0).</p>
 <p><code>runner(treedir) -&gt; list[finding]</code> is injected so this module stays R-free and
 unit-testable; rcmd injects a closure that runs the chosen --kind engine in
-<code>treedir</code> and returns its flat finding list. The baseline run executes in a
-genuinely different working tree (the v2.10.0 bug was tagging HEAD vs HEAD —
-here the baseline tree is a real checkout of the merge-base SHA).</p>
+<code>treedir</code> and returns its flat finding list. The baseline tree is a genuinely
+different working tree (the v2.10.0 bug was tagging HEAD vs HEAD — here the
+baseline is a real checkout of the merge-base SHA).</p>
+<p><strong>Baseline acquisition is pluggable.</strong> By default scope_check runs <code>runner</code>
+once against the merge-base detached worktree (uncached). A caller can inject
+<code>baseline(path, base_sha) -&gt; Optional[list]</code> to supply the baseline findings
+its own way — rcmd injects a PER-PACKAGE cached baseline (<code>cached_baseline</code>)
+so a repeat --changed run reuses each package's baseline. <code>baseline</code> returning
+None means "fall back" (treated like a failed worktree add). The HEAD run
+always uses <code>runner</code> directly, so HEAD is never cached.</p>
 <p><code>[uncommitted]</code> refinement: after tagging, each <code>[introduced]</code> finding whose
 file is in <code>uncommitted_files(path)</code> is re-tagged <code>[uncommitted]</code> — "you
 caused this with edits you haven't committed yet" vs committed branch work.
@@ -2506,7 +2634,7 @@ resolve or the baseline worktree add fails. Otherwise:
                    "introduced"|"uncommitted"|"pre-existing"}, ...],
      "introduced_count": <int>}  # counts introduced + uncommitted</p>
 <h3 id="tag_findings"><code>tag_findings()</code><a class="headerlink" href="#tag_findings" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">tag_findings</span><span class="p">(</span><span class="n">head_findings</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">base_findings</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[dict]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">tag_findings</span><span class="p">(</span><span class="n">head_findings</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">base_findings</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[dict]&#39;</span>
 </span></code></pre></div>
 <p>Tag each HEAD finding <code>[introduced]</code> vs <code>[pre-existing]</code> (multiset diff).</p>
 <p>A finding present on HEAD but absent from base is <code>introduced</code>. A finding on
@@ -2518,7 +2646,7 @@ EXCLUDING the raw <code>line</code>, so a line-shifted pre-existing lint stays
 <code>pre-existing</code> rather than flipping to <code>introduced</code>. The full finding is
 preserved in <code>text</code> for display.</p>
 <h3 id="uncommitted_files"><code>uncommitted_files()</code><a class="headerlink" href="#uncommitted_files" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">uncommitted_files</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;set[str]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">uncommitted_files</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;set[str]&#39;</span>
 </span></code></pre></div>
 <p>Repo-relative paths with UNCOMMITTED changes (<code>git status --porcelain</code>).</p>
 <p>Returns the set of modified / added / renamed / staged paths in the working
@@ -2533,6 +2661,13 @@ finding path. The <code>-z</code> stream is: each entry <code>XY&lt;space&gt;PAT
 NUL; a rename/copy (R/C status) is <code>XY&lt;space&gt;NEW OLD </code> — TWO NUL fields,
 new path first — so after a rename status we consume (skip) the following
 field as the old path and keep the new one.</p>
+<h3 id="write_baseline_cache"><code>write_baseline_cache()</code><a class="headerlink" href="#write_baseline_cache" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">write_baseline_cache</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">base_sha</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">cache_key</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="n">findings</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">keep</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;None&#39;</span>
+</span></code></pre></div>
+<p>Persist <code>findings</code> for one (repo, base_sha, cache_key), then LRU-prune.</p>
+<p>Atomic (tmp file + os.replace) so a concurrent reader never sees a partial
+write. After writing, prune the repo-id dir to the <code>keep</code> newest entries
+by mtime. Advisory — any IO error is swallowed (caching is best-effort).</p>
 
 
 

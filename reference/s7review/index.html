@@ -1629,10 +1629,32 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#build_class_registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_class_registry()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#check_class_docs" class="md-nav__link">
     <span class="md-ellipsis">
       
         check_class_docs()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check_cross_package_contracts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_cross_package_contracts()
       
     </span>
   </a>
@@ -2304,10 +2326,32 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#build_class_registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_class_registry()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#check_class_docs" class="md-nav__link">
     <span class="md-ellipsis">
       
         check_class_docs()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check_cross_package_contracts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_cross_package_contracts()
       
     </span>
   </a>
@@ -2445,16 +2489,35 @@ promote/clear it without an envelope break.</p>
     env = s7review.run_all(".")
     print(env["status"], [f["code"] for s in env["stages"] for f in s["findings"]])</p>
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
+<h3 id="build_class_registry"><code>build_class_registry()</code><a class="headerlink" href="#build_class_registry" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">build_class_registry</span><span class="p">(</span><span class="n">packages</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+</span></code></pre></div>
+<p>Map every S7 class binding name → the sorted package(s) that define it.</p>
+<p>Scans each package's <code>R/</code> for <code>new_class</code> constructs; the registry key is
+the construct's <code>bound</code> LHS (what <code>method(g, C)</code> references — an anonymous
+<code>new_class("X")</code> with no binding can't be cross-referenced, so it is
+skipped). A name defined in more than one package maps to a list with more
+than one entry (a statically-ambiguous collision; the consumer is
+conservative). Pure-stdlib, never raises.</p>
 <h3 id="check_class_docs"><code>check_class_docs()</code><a class="headerlink" href="#check_class_docs" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_class_docs</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_class_docs</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
 <p>Doc + type-resolution. An exported S7 class (NAMESPACE <code>export()</code> or a
 preceding roxygen <code>@export</code>) should have a <code>#'</code> block immediately above
 its <code>new_class</code> (<code>undocumented_export</code>); a property's declared class
 should resolve to a <code>class_*</code> builtin or a class defined in scanned source
 (<code>prop_type_unresolvable</code>). Never raises.</p>
+<h3 id="check_cross_package_contracts"><code>check_cross_package_contracts()</code><a class="headerlink" href="#check_cross_package_contracts" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_cross_package_contracts</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">registry</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">,</span> <span class="n">exports</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+</span></code></pre></div>
+<p>Flag this package's S7 methods that dispatch on a sibling's class whose
+contract is unsatisfiable. Two advisory findings — <code>cross_package_undeclared_
+contract</code> (sibling pkg ∉ DESCRIPTION Imports/Depends/LinkingTo) and
+<code>cross_package_unexported_class</code> (declared, but no declared provider exports
+the class). Family <code>cross-package-contract</code>. Conservative on collisions and
+unknowable exports (no false positive). Never raises.</p>
 <h3 id="check_legacy_oop"><code>check_legacy_oop()</code><a class="headerlink" href="#check_legacy_oop" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_legacy_oop</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_legacy_oop</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
 <p>Flag pre-S7 OOP co-residing with S7. <code>setClass</code>/<code>setGeneric</code>/
 <code>representation</code> → <code>legacy_s4_in_s7</code>; <code>setRefClass</code>/<code>R6Class</code> →
@@ -2468,7 +2531,7 @@ method, not a migration leftover. Comments and string literals are masked
 before scanning, so commented-out or quoted constructs never fire. Only runs
 when the package also uses <code>new_class</code>. Never raises.</p>
 <h3 id="check_methods"><code>check_methods()</code><a class="headerlink" href="#check_methods" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_methods</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_methods</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
 <p>Method registration sanity. Flags a <code>method(generic, Class)</code> whose
 <code>generic</code> is neither defined (<code>new_generic</code>) nor imported in scanned
@@ -2476,30 +2539,30 @@ source (<code>dangling_method</code>); and — per the bounded v1 decision — a
 on an external generic with no <code>methods_register()</code> call anywhere in R/
 (<code>missing_methods_register</code>, quiet advisory). Never raises.</p>
 <h3 id="check_naming"><code>check_naming()</code><a class="headerlink" href="#check_naming" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_naming</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_naming</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
 <p>Naming conventions: class UpperCamelCase + bound-var match; generic and
 property names snake_case. Advisory; <code>warn</code> if any finding. Never raises.</p>
 <h3 id="check_validators"><code>check_validators()</code><a class="headerlink" href="#check_validators" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_validators</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_validators</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
 <p>Validator presence + return-shape. A typed-properties <code>new_class</code> should
 declare a <code>validator=</code>; a validator returning <code>TRUE</code>/<code>FALSE</code> is wrong
 (S7 wants <code>character()</code>/<code>NULL</code>). Advisory. Never raises.</p>
 <h3 id="run_all"><code>run_all()</code><a class="headerlink" href="#run_all" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_all</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_all</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
 <p>Run all 5 convention checks; roll into one worst-of (ok&lt;warn) envelope.</p>
 <p>Returns <code>{kind: "s7review", status, stages, engine_missing: []}</code>. If no
 <code>R/</code> directory exists, returns a single <code>warn</code> envelope (advisory).</p>
 <h3 id="run_all_with_runtime"><code>run_all_with_runtime()</code><a class="headerlink" href="#run_all_with_runtime" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_all_with_runtime</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_all_with_runtime</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
 <p><code>run_all</code> + the two R-backed runtime families, merged into one envelope.</p>
 <p>Never raises: the runtime pass degrades to advisory <code>warn</code> stages when R is
 unavailable, so the static result is always intact. Worst-of (ok&lt;warn) status.</p>
 <h3 id="run_eco"><code>run_eco()</code><a class="headerlink" href="#run_eco" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_eco</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_eco</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
 <p>Run the 5 static families across <strong>every package</strong> in the ecosystem.</p>
 <p>Resolves the package set via <code>discovery.detect_ecosystem</code> (the single source

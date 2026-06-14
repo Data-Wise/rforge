@@ -3960,6 +3960,7 @@ auto-applied).</p>
 - <code>--changed</code> (optional, v2.10.0; tagging v2.11.0; <code>[uncommitted]</code> refinement v2.12.0) - Scope the check to the package(s) changed on this branch and tag each finding <strong><code>[introduced]</code></strong> (new on your branch) vs <strong><code>[pre-existing]</code></strong> (already at the fork point), via a baseline run in a detached worktree at <code>merge-base(HEAD, --base)</code>; an <code>[introduced]</code> finding whose file still has uncommitted changes is further refined to <strong><code>[uncommitted]</code></strong> (counts as introduced for <code>--fail-on</code>) (default: false)
 - <code>--base &lt;ref&gt;</code> (optional, v2.11.0) - Comparison ref for <code>--changed</code>; the baseline is run at <code>merge-base(HEAD, base)</code> (default: <code>dev</code>)
 - <code>--fail-on &lt;introduced|none&gt;</code> (optional, v2.11.0) - Exit non-zero only on findings tagged <code>[introduced]</code> (default: <code>introduced</code>); <code>none</code> is advisory
+- <code>--no-cache</code> (optional, v2.13.0) - <code>--changed</code>: bypass the baseline cache; force a fresh merge-base baseline run and skip writing it (default: false)
 - <code>--changed-strict</code> (optional, v2.10.0) - Documented no-op (default: false)</p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="c1"># Check current package (single --as-cran pass)</span>
@@ -4045,6 +4046,7 @@ auto-applied).</p>
 <li><code>--changed</code> (optional, v2.10.0; tagging v2.11.0; <code>[uncommitted]</code> refinement v2.12.0) - Scope tests to the package(s) changed on this branch and tag findings <code>[introduced]</code>/<code>[pre-existing]</code> via a merge-base baseline run; an introduced failure in an uncommitted file is refined to <code>[uncommitted]</code> (default: false)</li>
 <li><code>--base &lt;ref&gt;</code> (optional, v2.11.0) - Comparison ref for <code>--changed</code> (default: <code>dev</code>)</li>
 <li><code>--fail-on &lt;introduced|none&gt;</code> (optional, v2.11.0) - Exit non-zero only on <code>[introduced]</code> findings (default: <code>introduced</code>)</li>
+<li><code>--no-cache</code> (optional, v2.13.0) - <code>--changed</code>: bypass the baseline cache; force a fresh merge-base baseline run and skip writing it (default: false)</li>
 </ul>
 <p><strong>Examples:</strong></p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="c1"># Test current package</span>
@@ -4192,6 +4194,7 @@ auto-applied).</p>
 <li><code>--changed</code> (optional, v2.10.0; tagging v2.11.0; <code>[uncommitted]</code> refinement v2.12.0) - Scope lint to the package(s) changed on this branch and tag findings <code>[introduced]</code>/<code>[pre-existing]</code> via a merge-base baseline run; line-shift-immune identity; an introduced lint in an uncommitted file is refined to <code>[uncommitted]</code> (default: false)</li>
 <li><code>--base &lt;ref&gt;</code> (optional, v2.11.0) - Comparison ref for <code>--changed</code> (default: <code>dev</code>)</li>
 <li><code>--fail-on &lt;introduced|none&gt;</code> (optional, v2.11.0) - Exit non-zero only on <code>[introduced]</code> findings (default: <code>introduced</code>)</li>
+<li><code>--no-cache</code> (optional, v2.13.0) - <code>--changed</code>: bypass the baseline cache; force a fresh merge-base baseline run and skip writing it (default: false)</li>
 </ul>
 <p><strong>Examples:</strong></p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-50-1"><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="c1"># Lint current package</span>
@@ -4217,7 +4220,7 @@ auto-applied).</p>
 <ul>
 <li><code>package</code> (optional, positional) - Package directory to review (defaults to current directory)</li>
 <li><code>--kind</code> (optional) - Limit to one convention family: <code>all</code> (default), <code>naming</code>, <code>validators</code>, <code>methods</code>, <code>legacy</code>, or <code>docs</code></li>
-<li><code>--eco</code> (optional) - Sweep the static families across <strong>every package</strong> in the ecosystem manifest, aggregated (pure-stdlib; composes with <code>--runtime</code>)</li>
+<li><code>--eco</code> (optional) - Sweep the static families across <strong>every package</strong> in the ecosystem manifest, aggregated (pure-stdlib; composes with <code>--runtime</code>). Also runs the ecosystem-only <code>cross-package-contract</code> family: flags a method dispatching on a <strong>sibling</strong> package's S7 class that isn't declared (<code>cross_package_undeclared_contract</code>) or is declared but unexported (<code>cross_package_unexported_class</code>) — the static, ecosystem-scoped sibling of <code>--runtime</code>'s <code>method_undeclared_dependency</code></li>
 <li><code>--runtime</code> (optional) - Add an R-backed runtime pass (<code>method-dispatch</code> + <code>validator-runtime</code>) via <code>lib.rcmd</code>; degrades to an advisory <code>warn</code> when R/S7 is unavailable</li>
 <li><code>--format</code> (optional) - Output format: <code>json</code> (default) or <code>text</code></li>
 </ul>
