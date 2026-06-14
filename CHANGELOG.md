@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Diff-aware baseline caching** (`lib/changed.py`; `r:check`/`r:test`/`r:lint`
+  `--changed` + new `--no-cache` flag). The last v2.11.0 `--changed` follow-up
+  (`[uncommitted]` tagging shipped v2.12.0). Each `--changed` run does two engine
+  passes: a HEAD run and a **baseline** run in a detached worktree at
+  `merge-base(HEAD, --base)` — and for `kind=check` that baseline is `R CMD check`
+  per package, costing minutes. A package's baseline finding list is a **pure
+  function** of `(merge-base SHA, kind, package, engine flags)`, so it is now cached
+  **per package** under `~/.rforge/baseline-cache/<repo-id>/<sha>-<keyhash>.json`.
+  A repeat `--changed` run with an unchanged merge-base reuses each package's
+  baseline and re-runs **only** the packages not yet cached — so an ecosystem
+  cascade where the changed-package set *grows* (edit pkgA, then pkgB, then pkgC)
+  reuses every package already baselined, and when the whole set is cached no
+  detached worktree is created at all. **Self-invalidating** — new commits on
+  `--base` move the merge-base SHA → new key → automatic miss; no manual
+  invalidation. The key includes the package and engine flags precisely *because*
+  an under-keyed cache would serve an under-covering baseline and mis-tag
+  pre-existing findings as `[introduced]`. **LRU prune** to the 20 newest entries
+  per repo (by mtime, on write). New `--no-cache` (bypass read+write, e.g. after an
+  R-engine upgrade that changes the immutable-tree baseline) and
+  `python3 -m lib.changed --clear-cache`. `lib/changed.py` stays R-free: a generic
+  `cached_baseline(items, run_item, key_item)` helper takes opaque items + injected
+  callbacks (rcmd supplies the per-package decomposition) and owns only repo-id +
+  SHA + file IO + prune; `scope_check` is now caching-agnostic (it takes a pluggable
+  `baseline` provider). Advisory throughout — a cache failure degrades to a normal
+  uncached baseline; nothing here raises (incl. an unresolvable HOME — `_cache_root`
+  resolves home the raise-proof `expanduser` way, falling back to the temp dir, NOT
+  `Path.home()` which raises in container/scratch-CI uids). +17 pytest cases
+  (cache roundtrip/miss/corrupt/prune/clear/repo-id, per-package partial-hit +
+  all-hits-skip + use_cache-false + worktree-fail, scope_check injected-baseline /
+  None-fallback / default-uncached, CLI, dict-finding hit==miss equivalence,
+  never-raises-on-unresolvable-HOME). Hardened by a 4-lens pre-merge adversarial
+  review of the initial whole-baseline design (1 BLOCKER unresolvable-HOME crash +
+  2 IMPORTANT tmp-leak/premature-version-label + 2 MINOR, all fixed + re-verified)
+  before the per-package generalization. Spec:
+  `SPEC-diff-aware-baseline-caching-2026-06-13.md`.
+
+---
+
 ## [2.12.0] - 2026-06-13
 
 > Three recommendations from a doc gap analysis, built TDD-first and hardened by a

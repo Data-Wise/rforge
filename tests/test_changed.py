@@ -543,3 +543,255 @@ def test_scope_check_no_cross_package_basename_collision(tmp_path):
     assert tags["finding-in-pkgA"] == "uncommitted"
     assert tags["finding-in-pkgB"] == "introduced", (
         "cross-package basename collision: pkgB finding wrongly re-tagged")
+
+
+# ───────── baseline caching (candidate A) ─────────
+#
+# A package's baseline run is a pure function of (merge_base_sha, kind, package,
+# kwargs). `cached_baseline(items, run_item, key_item)` caches each item's
+# findings under an opaque per-item key (rcmd builds `kind|rel|kwargs`) at
+# ~/.rforge/baseline-cache/<repo-id>/<sha>-<keyhash>.json, running only the
+# uncached items; `scope_check` is caching-agnostic (takes a pluggable `baseline`
+# provider). The tests below monkeypatch `_cache_root` so they never touch the
+# real ~/.rforge.
+
+
+@pytest.fixture()
+def cache_root(tmp_path, monkeypatch):
+    root = tmp_path / "bcache"
+    monkeypatch.setattr(changed, "_cache_root", lambda: root)
+    return root
+
+
+def test_baseline_cache_write_then_read_roundtrip(tmp_path, cache_root):
+    findings = ["NOTE: a", {"file": "R/x.R", "line": 3, "linter": "L",
+                            "message": "m"}]
+    changed.write_baseline_cache(str(tmp_path), "deadbeef", "check|.|{}", findings)
+    got = changed.read_baseline_cache(str(tmp_path), "deadbeef", "check|.|{}")
+    assert got == findings
+
+
+def test_baseline_cache_miss_on_different_sha(tmp_path, cache_root):
+    changed.write_baseline_cache(str(tmp_path), "sha1", "k", ["x"])
+    assert changed.read_baseline_cache(str(tmp_path), "sha2", "k") is None
+
+
+def test_baseline_cache_miss_on_different_key(tmp_path, cache_root):
+    changed.write_baseline_cache(str(tmp_path), "sha1", "k1", ["x"])
+    assert changed.read_baseline_cache(str(tmp_path), "sha1", "k2") is None
+
+
+def test_baseline_cache_miss_when_absent(tmp_path, cache_root):
+    assert changed.read_baseline_cache(str(tmp_path), "nope", "k") is None
+
+
+def test_baseline_cache_corrupt_file_is_miss(tmp_path, cache_root):
+    changed.write_baseline_cache(str(tmp_path), "sha1", "k", ["x"])
+    # Corrupt the on-disk JSON.
+    f = changed._cache_file(str(tmp_path), "sha1", "k")
+    f.write_text("{not json", encoding="utf-8")
+    assert changed.read_baseline_cache(str(tmp_path), "sha1", "k") is None
+
+
+def test_baseline_cache_prune_keeps_newest(tmp_path, cache_root):
+    import os as _os
+    import time as _time
+    # Write 5 distinct entries (same repo) with keep=3; the 2 oldest go.
+    for i in range(5):
+        changed.write_baseline_cache(str(tmp_path), f"sha{i}", "k", [i], keep=3)
+        # Stagger mtimes so "newest" is well-defined.
+        f = changed._cache_file(str(tmp_path), f"sha{i}", "k")
+        _os.utime(f, (1_000 + i, 1_000 + i))
+    # Re-prune to settle (last write used the staggered times above).
+    changed.write_baseline_cache(str(tmp_path), "sha4", "k", [4], keep=3)
+    repo_dir = changed._cache_file(str(tmp_path), "sha4", "k").parent
+    remaining = sorted(p.name for p in repo_dir.glob("*.json"))
+    assert len(remaining) == 3
+
+
+def test_clear_baseline_cache_removes_and_counts(tmp_path, cache_root):
+    changed.write_baseline_cache(str(tmp_path), "sha1", "k1", ["x"])
+    changed.write_baseline_cache(str(tmp_path), "sha2", "k2", ["y"])
+    n = changed.clear_baseline_cache(str(tmp_path))
+    assert n == 2
+    assert changed.read_baseline_cache(str(tmp_path), "sha1", "k1") is None
+
+
+def test_repo_id_stable_and_distinct(tmp_path):
+    a = tmp_path / "a"
+    b = tmp_path / "b"
+    a.mkdir()
+    b.mkdir()
+    assert changed._repo_id(str(a)) == changed._repo_id(str(a))
+    assert changed._repo_id(str(a)) != changed._repo_id(str(b))
+
+
+def test_cached_baseline_partial_hit_runs_only_uncached(tmp_path, cache_root):
+    """Per-package granularity (candidate-A step 2): caching pkgA's baseline, then
+    requesting [pkgA, pkgB], reuses pkgA from cache and runs ONLY pkgB — the
+    growing changed-set case that ecosystem cascade work hits."""
+    repo, base_sha = _init_repo(tmp_path)
+    ran = []
+
+    def run_item(tree_root, rel):
+        ran.append(rel)
+        return [f"NOTE: {rel}"]
+
+    def key_item(rel):
+        return f"check|{rel}|{{}}"
+
+    out1 = changed.cached_baseline(str(repo), base_sha, ["pkgA"], run_item, key_item)
+    assert out1 == ["NOTE: pkgA"]
+    assert ran == ["pkgA"]
+
+    ran.clear()
+    out2 = changed.cached_baseline(str(repo), base_sha, ["pkgA", "pkgB"],
+                                   run_item, key_item)
+    assert out2 == ["NOTE: pkgA", "NOTE: pkgB"]  # combined, in item order
+    assert ran == ["pkgB"]  # pkgA reused from cache, NOT re-run
+
+
+def test_cached_baseline_all_hits_skip_run(tmp_path, cache_root):
+    """When every item is cached, run_item is never called (no worktree)."""
+    repo, base_sha = _init_repo(tmp_path)
+    ran = []
+
+    def run_item(tree_root, rel):
+        ran.append(rel)
+        return [rel]
+
+    key_item = lambda rel: f"k|{rel}"
+    changed.cached_baseline(str(repo), base_sha, ["a", "b"], run_item, key_item)
+    ran.clear()
+    out = changed.cached_baseline(str(repo), base_sha, ["a", "b"], run_item, key_item)
+    assert out == ["a", "b"]
+    assert ran == []  # all cache hits → no run, no worktree
+
+
+def test_cached_baseline_use_cache_false_never_caches(tmp_path, cache_root):
+    repo, base_sha = _init_repo(tmp_path)
+    ran = []
+
+    def run_item(tree_root, rel):
+        ran.append(rel)
+        return [rel]
+
+    key_item = lambda rel: f"k|{rel}"
+    changed.cached_baseline(str(repo), base_sha, ["a"], run_item, key_item,
+                            use_cache=False)
+    changed.cached_baseline(str(repo), base_sha, ["a"], run_item, key_item,
+                            use_cache=False)
+    assert ran == ["a", "a"]  # ran both times, never cached
+    assert changed.read_baseline_cache(str(repo), base_sha, "k|a") is None
+
+
+def test_cached_baseline_none_when_worktree_add_fails(tmp_path, cache_root):
+    """Not a git repo → worktree add fails → None (caller falls back), and
+    run_item is never invoked."""
+    ran = []
+
+    def run_item(tree_root, rel):
+        ran.append(rel)
+        return [rel]
+
+    out = changed.cached_baseline(str(tmp_path), "deadbeef", ["a"],
+                                  run_item, lambda r: f"k|{r}")
+    assert out is None
+    assert ran == []
+
+
+def test_scope_check_uses_injected_baseline(tmp_path, cache_root):
+    """scope_check delegates baseline acquisition to the injected callable and
+    tags the always-fresh HEAD run against whatever it returns."""
+    repo, _ = _init_repo(tmp_path)
+    res = changed.scope_check(
+        lambda treedir: ["NOTE: old", "NOTE: new"],   # HEAD findings
+        path=str(repo), base="dev",
+        baseline=lambda p, sha: ["NOTE: old"],         # injected baseline
+    )
+    assert res is not None
+    tags = {t["text"]: t["tag"] for t in res["findings"]}
+    assert tags == {"NOTE: old": "pre-existing", "NOTE: new": "introduced"}
+
+
+def test_scope_check_baseline_none_falls_back(tmp_path, cache_root):
+    """A baseline callable returning None → scope_check returns None (caller falls
+    back to scope-only), same as a failed worktree add."""
+    repo, _ = _init_repo(tmp_path)
+    res = changed.scope_check(lambda d: ["x"], path=str(repo), base="dev",
+                              baseline=lambda p, sha: None)
+    assert res is None
+
+
+def test_scope_check_default_baseline_is_uncached(tmp_path, cache_root):
+    """No baseline callable → scope_check uses run_baseline directly (uncached):
+    the baseline runs on every call (no caching without an injected baseline)."""
+    repo, _ = _init_repo(tmp_path)
+    seen = []
+
+    def runner(treedir):
+        with open(os.path.join(treedir, "f.txt"), encoding="utf-8") as fh:
+            txt = fh.read().strip()
+        seen.append(txt)
+        return ["NOTE: old"] if txt == "base" else ["NOTE: old", "NOTE: new"]
+
+    changed.scope_check(runner, path=str(repo), base="dev")
+    changed.scope_check(runner, path=str(repo), base="dev")
+    assert seen.count("base") == 2  # baseline re-ran (uncached) both times
+
+
+def test_changed_cli_clear_cache(tmp_path, cache_root, capsys):
+    repo, _ = _init_repo(tmp_path)
+    changed.write_baseline_cache(str(repo), "sha1", "k", ["x"])
+    rc = changed._main(["--path", str(repo), "--clear-cache"])
+    assert rc == 0
+    assert changed.read_baseline_cache(str(repo), "sha1", "k") is None
+
+
+def test_scope_check_dict_findings_hit_equals_miss(tmp_path, cache_root):
+    """A per-package cache HIT must yield byte-for-byte the same tagging as a
+    fresh MISS, including dict (lint) findings that round-trip through JSON.
+    Guards hit/miss equivalence against future _finding_identity changes (the
+    string-finding path is covered by the cached_baseline tests above)."""
+    repo, _ = _init_repo(tmp_path)
+    base = {"file": "R/a.R", "line": 5, "linter": "L",
+            "message": "pre-existing", "pkg_dir": "."}
+
+    def run_item(tree_root, rel):                  # baseline: one package "."
+        return [base]
+
+    def runner(treedir):                           # HEAD: shifted + new
+        return [{**base, "line": 7},
+                {"file": "R/a.R", "line": 9, "linter": "L",
+                 "message": "introduced", "pkg_dir": "."}]
+
+    def mk_baseline():
+        return lambda p, sha: changed.cached_baseline(
+            p, sha, ["."], run_item, lambda rel: "lint|.|{}")
+
+    miss = changed.scope_check(runner, path=str(repo), base="dev",
+                               baseline=mk_baseline())   # writes the baseline
+    hit = changed.scope_check(runner, path=str(repo), base="dev",
+                              baseline=mk_baseline())     # reads it back via JSON
+    assert miss == hit  # JSON round-trip of the cached baseline is transparent
+    tags = {t["text"]["message"]: t["tag"] for t in hit["findings"]}
+    assert tags == {"pre-existing": "pre-existing", "introduced": "introduced"}
+    assert hit["introduced_count"] == 1
+
+
+def test_cache_never_raises_on_unresolvable_home(tmp_path, monkeypatch):
+    """BLOCKER regression: Path.home() raises RuntimeError (a non-OSError) when
+    HOME is unset AND the uid has no passwd entry (containers / scratch CI users).
+    _cache_root must fall back to the temp dir, and no public cache op may raise —
+    the advisory 'never raises' contract has to hold through the weird-HOME path
+    (previously this aborted r:check --changed with a traceback)."""
+    monkeypatch.delenv("HOME", raising=False)
+    monkeypatch.setattr(os.path, "expanduser", lambda p: p)  # unresolvable → "~"
+    monkeypatch.setattr(changed.tempfile, "gettempdir",
+                        lambda: str(tmp_path / "fallback"))
+    root = changed._cache_root()
+    assert root == tmp_path / "fallback" / ".rforge" / "baseline-cache"
+    # The three public ops must complete without raising (the regression).
+    changed.write_baseline_cache(str(tmp_path), "sha", "k", ["x"])
+    assert changed.read_baseline_cache(str(tmp_path), "sha", "k") == ["x"]
+    assert changed.clear_baseline_cache(str(tmp_path)) >= 0
