@@ -156,13 +156,14 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
     if kind == "check":
         env["check"] = {k: _as_list(raw.get(k)) for k in ("errors", "warnings", "notes")}
         env["check"]["notes_classified"] = _classify_notes(raw.get("notes"))
-        # G8: surface PDF-manual-skip as an advisory finding (LaTeX absent locally)
-        all_text = " ".join(env.get("messages", []) + env["check"].get("warnings", []))
+        # G8: surface PDF-manual-skip as an advisory note (LaTeX absent locally)
+        all_text = " ".join(env["check"].get("notes", []))
         if _PDF_SKIP_RE.search(all_text):
-            env.setdefault("findings", []).append({
-                "code": "pdf_manual_skipped",
-                "message": ("PDF manual skipped — LaTeX/pdflatex not available on "
-                            "this system. Rely on win-builder for the PDF manual."),
+            env["check"]["notes_classified"].append({
+                "text": ("PDF manual skipped — LaTeX/pdflatex not available on "
+                         "this system. Rely on win-builder for the PDF manual."),
+                "kind": "advisory",
+                "reason": "pdf_manual_skipped",
             })
     elif kind == "test":
         env["tests"] = {k: raw.get(k, 0) for k in
@@ -208,12 +209,13 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
             "broken": real_broken,
             "doi_blocked_count": len(doi_blocked),
         }
-        if real_broken:
-            env["status"] = "error"
-        elif doi_blocked:
-            env["status"] = "warn"
-        else:
-            env["status"] = "ok"
+        if not raw.get("engine_missing"):
+            if real_broken:
+                env["status"] = "error"
+            elif doi_blocked:
+                env["status"] = "warn"
+            else:
+                env["status"] = "ok"
     elif kind == "style":
         changed = _as_list(raw.get("changed_files"))
         env["style"] = {"count": len(changed), "changed_files": changed}
@@ -318,11 +320,10 @@ _WIN_FN = {
 }
 
 _CRAN_CHECKS_REGISTRY = {
-    "base": {
-        "_R_CHECK_DEPENDS_ONLY_": "true",
-        "_R_CHECK_SUGGESTS_ONLY_": "true",
-        "_R_CHECK_S3_REGISTRATION_": "true",
-    },
+    # base: extra env vars beyond _INCOMING_ENV + DEPENDS/SUGGESTS (which the
+    # two-pass logic adds structurally). Per the EXCLUDED list above, all other
+    # incoming-era vars are already in --as-cran or excluded for documented reasons.
+    "base": {},
     "R4.3": {},
     "R4.4": {},
     "R4.5": {},
@@ -373,8 +374,16 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             # G7: _R_CHECK_DEPENDS_ONLY_ and _R_CHECK_SUGGESTS_ONLY_ are
             # mutually exclusive in rcmdcheck — run two sequential passes and
             # merge errors/warnings/notes so both perspectives are captured.
-            env_p1 = {**_INCOMING_ENV, "_R_CHECK_DEPENDS_ONLY_": "true"}
-            env_p2 = {**_INCOMING_ENV, "_R_CHECK_SUGGESTS_ONLY_": "true"}
+            # _CRAN_CHECKS_REGISTRY supplies version-specific extra vars; base
+            # is the fallback when the installed R version has no specific entry.
+            _reg_key = _r_version_key()
+            _extra = (
+                _CRAN_CHECKS_REGISTRY[_reg_key]
+                if _reg_key in _CRAN_CHECKS_REGISTRY
+                else _CRAN_CHECKS_REGISTRY["base"]
+            )
+            env_p1 = {**_INCOMING_ENV, **_extra, "_R_CHECK_DEPENDS_ONLY_": "true"}
+            env_p2 = {**_INCOMING_ENV, **_extra, "_R_CHECK_SUGGESTS_ONLY_": "true"}
             return _guard("rcmdcheck",
                 f'r1 <- rcmdcheck::rcmdcheck({p}, args={args}, '
                 f'env={_r_named_char(env_p1)}, quiet=TRUE, error_on = "never"); '
@@ -1035,6 +1044,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--goodpractice", action="store_true")
     ap.add_argument("--multi-platform", action="store_true")
     ap.add_argument("--no-revdep", action="store_true")
+    ap.add_argument("--platform",
+                    choices=list(_WIN_FN.keys()) + ["all", "rhub"], default="all",
+                    help="winbuilder: platform(s) to submit to "
+                         "(devel|release|oldrelease|all|rhub); default all")
     ap.add_argument("--incoming", action="store_true",
                     help="check: add the CRAN-incoming _R_CHECK_* bundle "
                          "(implies --strict); cran-prep: add the check (incoming) row")
@@ -1074,7 +1087,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         env = run(ns.kind, ns.path, as_cran=ns.as_cran, preview=ns.preview,
                   strict=ns.strict, articles_only=ns.articles_only, devel=ns.devel,
-                  flavor=ns.flavor, incoming=ns.incoming)
+                  flavor=ns.flavor, incoming=ns.incoming, platform=ns.platform)
     print(json.dumps(env, indent=2))
     # "dispatched" (winbuilder/rhub) is non-error — exits 0 like "ok"/"warn"
     return 0 if env.get("status") not in ("error", "blocked") else 1

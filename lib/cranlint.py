@@ -556,6 +556,11 @@ def check_test_config(path: str | os.PathLike = ".") -> dict:
     Returns envelope ``{kind: "test_config", status, findings, messages,
     engine_missing: []}``.
     """
+    testthat_dir = Path(path) / "tests" / "testthat"
+    if not testthat_dir.is_dir():
+        return _envelope("test_config", "ok", [],
+                         ["No tests/testthat/ — edition check skipped."])
+
     desc_path = _resolve_description(path)
     if desc_path is None:
         return _envelope(

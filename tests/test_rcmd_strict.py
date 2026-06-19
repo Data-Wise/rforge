@@ -318,9 +318,10 @@ def test_check_non_strict_no_donttest():
 # --- G7: versioned registry + sequential passes ------------------------------
 
 def test_cran_checks_registry_base_keys():
-    assert "_R_CHECK_DEPENDS_ONLY_" in rcmd._CRAN_CHECKS_REGISTRY["base"]
-    assert "_R_CHECK_SUGGESTS_ONLY_" in rcmd._CRAN_CHECKS_REGISTRY["base"]
-    assert "_R_CHECK_S3_REGISTRATION_" in rcmd._CRAN_CHECKS_REGISTRY["base"]
+    # base is intentionally empty — all documented incoming-era _R_CHECK_* vars are
+    # already enforced by --as-cran; DEPENDS/SUGGESTS are added structurally per pass.
+    assert isinstance(rcmd._CRAN_CHECKS_REGISTRY["base"], dict)
+    assert "_R_CHECK_S3_REGISTRATION_" not in rcmd._CRAN_CHECKS_REGISTRY["base"]
 
 
 def test_incoming_fires_sequential_passes():
@@ -339,11 +340,10 @@ def test_r_version_key_format():
 # --- G8: PDF manual skip advisory -------------------------------------------
 
 def test_pdf_manual_skipped_advisory():
-    raw = {"errors": [], "warnings": [], "notes": [],
-           "messages": ["skipping PDF manual"]}
+    raw = {"errors": [], "warnings": [], "notes": ["skipping PDF manual"]}
     env = rcmd.normalize("check", raw, 0, None)
-    codes = {f.get("code") for f in env.get("findings", [])}
-    assert "pdf_manual_skipped" in codes
+    reasons = {f.get("reason") for f in env["check"].get("notes_classified", [])}
+    assert "pdf_manual_skipped" in reasons
 
 
 def test_pdf_manual_present_no_advisory():

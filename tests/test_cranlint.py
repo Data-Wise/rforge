@@ -400,7 +400,8 @@ def test_check_test_config_edition3(tmp_path):
 
 
 def test_check_test_config_no_description(tmp_path):
-    """No DESCRIPTION → warn envelope, no raise."""
+    """tests/testthat/ present but no DESCRIPTION → warn envelope, no raise."""
+    (tmp_path / "tests" / "testthat").mkdir(parents=True)
     env = cranlint.check_test_config(tmp_path)
     assert env["kind"] == "test_config"
     assert env["status"] == "warn"
