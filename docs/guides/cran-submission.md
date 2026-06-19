@@ -38,7 +38,7 @@ during) CRAN's review. They fall into four tiers:
 |---------|------|---------|--------|
 | `r:revdep` | gate (reverse-dep) | yes — broken downstream | `revdepcheck` via `lib.rcmd` |
 | `r:goodpractice` | advisory | no | `goodpractice` via `lib.rcmd` |
-| `r:winbuilder` | dispatch (async) | no — returns `dispatched` | `devtools::check_win_devel` via `lib.rcmd` |
+| `r:winbuilder` | dispatch (async) | no — returns `dispatched` | `devtools::check_win_{devel,release,oldrelease}` / `rhub::rhub_check` via `lib.rcmd` |
 | `r:rhub` | dispatch (async) | no — returns `dispatched` | `rhub::rhub_check` via `lib.rcmd` |
 | `r:cran-prep` | gate (full per-package) | yes — strict ERROR blocks `ready` | `lib.rcmd` (`cran-prep`) + `lib.cranlint` (Tier 4) |
 | `r:submit` | handoff | no — **never auto-submits** | `lib.ghrelease` (+ `lib.runiverse` for `--universe`) |
@@ -111,21 +111,28 @@ verdict.
 ## `r:winbuilder` — async win-builder dispatch
 
 Submits the package to [win-builder](https://win-builder.r-project.org/) for a remote
-R-devel check on Windows via `devtools::check_win_devel()`. This is an **async dispatch**:
-nothing returns synchronously — results are **emailed to the DESCRIPTION Maintainer** (~30
-min). A CRAN pre-submission obligation for Windows-targeting packages; run it at least once
-per release, typically after a clean `r:check --as-cran`. Missing `devtools` → 🟡 + hint.
+Windows check. **Default (`--platform all`) dispatches three flavors** (devel, release,
+oldrelease) in sequence. This is an **async dispatch**: nothing returns synchronously —
+results are **emailed to the DESCRIPTION Maintainer** (~30 min). A CRAN pre-submission
+obligation for Windows-targeting packages; run it at least once per release, typically
+after a clean `r:check --as-cran`. Missing `devtools` → 🟡 + hint.
 
 | Flag | Type | Default | Effect |
 |------|------|---------|--------|
 | `package` | string | current dir | Package path to submit |
+| `--platform` | string | `all` | `devel` / `release` / `oldrelease` (one flavor) — `all` (devel + release + oldrelease via devtools) — `rhub` (R-hub v2, results in Actions tab, not email) |
 
 ```bash
-/rforge:r:winbuilder
+/rforge:r:winbuilder                        # default: all 3 win-builder flavors
+/rforge:r:winbuilder --platform devel       # R-devel only
+/rforge:r:winbuilder --platform release     # current R release only
+/rforge:r:winbuilder --platform oldrelease  # previous R release only
+/rforge:r:winbuilder --platform rhub        # R-hub v2 (GitHub Actions, not email)
 ```
 
-**Output / status:** `🚀 dispatched` plus `winbuilder.note`. Check your inbox for the
-R-devel results email — you do not wait here.
+**Output / status:** `🚀 dispatched` plus `winbuilder.note`. For `all`, each flavor
+dispatches in turn — check your inbox for results emails. For `rhub`, check the
+repo's GitHub Actions tab instead.
 
 ## `r:rhub` — async R-hub v2 dispatch
 
@@ -160,6 +167,13 @@ cross-package ordering).
 (suggests-only)` → `description` / `build-hygiene` / `docs-consistency` (Tier 4) → `revdep`.
 It also verifies the PDF reference manual builds (Tier 1b) — `warn` (never block) if no
 LaTeX is available.
+
+!!! note "doi.org 403 handling in `urlcheck`"
+    `urlcheck` classifies doi.org URLs that return HTTP 403 separately from real broken
+    links. 403 responses from doi.org are transient server-side blocks (not dead URLs), so
+    they downgrade `urlcheck` status from `error` → `warn` and appear in `doi_blocked_count`
+    rather than `broken`. If `urlcheck` reports `🟡 warn` with only doi.org 403s, you may
+    proceed to submit — no link is actually broken.
 
 | Flag | Type | Default | Effect |
 |------|------|---------|--------|
