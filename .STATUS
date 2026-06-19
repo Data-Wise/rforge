@@ -12,7 +12,13 @@ last_release_prior_2: 2026-06-12 v2.8.0 (PR #27 feature→dev, PR #28 dev→main
 
 last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --universe R-universe early-access tier (lib/runiverse.py, pure-stdlib); 35 commands (flag, not new command). Prior: v2.6.0 (2026-06-10, tap #114) bundled v2.3–v2.6.
 
-worktrees: []  # none active
+worktrees:
+  - path: ~/.git-worktrees/rforge/feature-cran-check-gap-fill
+    branch: feature/cran-check-gap-fill
+    base: dev
+    created: 2026-06-19
+    spec: docs/specs/SPEC-cran-check-gap-fill-2026-06-19.md
+    purpose: v2.14.0 — 8-gap CRAN check bundle (G1 win-builder platform, G2 Language lint, G3 DOI lint, G4 doi.org 403, G5 testthat edition, G6 --run-donttest, G7 _R_CHECK_* registry, G8 PDF advisory)
 # prior: feature/v2.12.0-bundle merged (PR #40 → dev 2026-06-13, merge e1c2612) + worktree removed;
 # prior: feature/s7-method-missing-class merged (PR #37 → dev 2026-06-13, merge 144324e) + worktree removed;
 # prior: feature/v2.11.0-bundle merged (PR #35 → dev 2026-06-13, merge 0f3f548) + worktree removed;
