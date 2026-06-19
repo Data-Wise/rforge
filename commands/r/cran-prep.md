@@ -54,6 +54,7 @@ By default the gate runs (in order):
 | `description` | Tier 4 — DESCRIPTION incoming nits (non-`Authors@R`/no `cph`, weak/echoed `Title`, `Description` not a complete sentence, stale `Date`) | **no — advisory** |
 | `build-hygiene` | Tier 4 — planning/dev docs that would ship in the tarball; emits the exact `.Rbuildignore` regex to add | **no — advisory** |
 | `docs-consistency` | Tier 4 — lightweight advisory staleness/dangling-ref check | **no — advisory** |
+| `test_config` | Tier 4 — warns if `Config/testthat/edition` is absent or set to `"2"` (CI snapshot failures) | **no — advisory** |
 | `revdep` | reverse-dependency check (skip with `--no-revdep`) | yes |
 
 Also runs by default: **Tier 1b** — verify the PDF reference manual builds; `warn` (never

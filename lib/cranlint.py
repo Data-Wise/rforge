@@ -48,7 +48,7 @@ from typing import Optional
 
 # ───────────────────────── DCF parsing ─────────────────────────
 
-_FIELD_RE = re.compile(r"^([A-Za-z][A-Za-z0-9@.]*)\s*:\s*(.*)$")
+_FIELD_RE = re.compile(r"^([A-Za-z][A-Za-z0-9@./]*)\s*:\s*(.*)$")
 
 
 def _parse_dcf(text: str) -> dict[str, str]:
@@ -104,6 +104,15 @@ def _resolve_description(path) -> Optional[Path]:
 
 # A title that is "Title Case-ish" has most significant words capitalised.
 _WORD_RE = re.compile(r"[A-Za-z][A-Za-z'-]*")
+
+# G3 — bare DOI pattern in Description field.
+# Negative lookbehind avoids flagging already-wrapped forms: <doi:...>, (https://...),
+# \url{https://...} (Rd curly-brace).
+_BARE_DOI_RE = re.compile(
+    r'(?<![<({])'
+    r'(?:doi:\s*10\.|https?://(?:dx\.)?doi\.org/10\.)',
+    re.I,
+)
 # Small words that legitimately stay lower-case in title case.
 _TITLE_STOPWORDS = {
     "a", "an", "and", "as", "at", "but", "by", "for", "from", "in", "of",
@@ -267,6 +276,35 @@ def lint_description(path: str | os.PathLike = ".") -> dict:
             "code": "date_stale", "severity": "advisory", "field": "Date",
             "message": (f"Date '{date_val}' looks stale — update it at release "
                         "or drop the field (it is optional)."),
+        })
+
+    # G2 — Language field (CRAN incoming flags absence for packages with docs).
+    pkg_dir = desc_path.parent
+    has_docs = (pkg_dir / "vignettes").is_dir() or (pkg_dir / "man").is_dir()
+    if has_docs and not fields.get("Language"):
+        findings.append({
+            "code": "language_missing",
+            "severity": "advisory",
+            "field": "Language",
+            "message": (
+                "DESCRIPTION has no Language field — CRAN's incoming feasibility "
+                "check flags this for packages with vignettes or Rd files. "
+                "Add: Language: en-US"
+            ),
+        })
+
+    # G3 — DOI angle-bracket format in Description field.
+    desc_text = fields.get("Description", "")
+    if _BARE_DOI_RE.search(desc_text):
+        findings.append({
+            "code": "doi_format",
+            "severity": "advisory",
+            "field": "Description",
+            "message": (
+                "Description appears to contain a bare DOI or doi.org URL. "
+                "CRAN requires angle-bracket format: <doi:10.xxxx/yyyy> or "
+                "<https://doi.org/10.xxxx/yyyy>. Bare forms draw a NOTE at --as-cran."
+            ),
         })
 
     status = "warn" if findings else "ok"
@@ -505,6 +543,71 @@ def check_planning_consistency(path: str | os.PathLike = ".") -> dict:
     return _envelope("docs-consistency", status, findings, messages)
 
 
+# ───────────────────────── G5: testthat edition ─────────────────────────
+
+
+def check_test_config(path: str | os.PathLike = ".") -> dict:
+    """Advisory check: testthat edition and test infrastructure config (G5).
+
+    Reads ``Config/testthat/edition`` from DESCRIPTION. Warns if absent
+    (defaults to edition 2 in older testthat versions, where new snapshots
+    on CI fail) or explicitly set to ``"2"``.
+
+    Returns envelope ``{kind: "test_config", status, findings, messages,
+    engine_missing: []}``.
+    """
+    desc_path = _resolve_description(path)
+    if desc_path is None:
+        return _envelope(
+            "test_config", "warn", [],
+            ["No DESCRIPTION found — cannot check testthat edition."],
+        )
+    try:
+        text = desc_path.read_text(encoding="utf-8", errors="replace")
+    except OSError as exc:
+        return _envelope(
+            "test_config", "warn", [],
+            [f"Could not read {desc_path}: {exc}"],
+        )
+
+    fields = _parse_dcf(text)
+    if not fields.get("Package"):
+        return _envelope(
+            "test_config", "warn", [],
+            ["DESCRIPTION has no Package field — unparseable."],
+        )
+
+    findings: list[dict] = []
+    edition = fields.get("Config/testthat/edition", "").strip()
+
+    if not edition:
+        findings.append({
+            "code": "testthat_edition_missing",
+            "severity": "advisory",
+            "field": "Config/testthat/edition",
+            "message": (
+                "No Config/testthat/edition in DESCRIPTION — testthat defaults "
+                "to edition 2, which disables snapshot tests on CI. "
+                "Add: Config/testthat/edition: 3"
+            ),
+        })
+    elif edition == "2":
+        findings.append({
+            "code": "testthat_edition_outdated",
+            "severity": "advisory",
+            "field": "Config/testthat/edition",
+            "message": (
+                "Config/testthat/edition: 2 is outdated — upgrade to edition 3 "
+                "for snapshot support and improved parallel test runner. "
+                "Change to: Config/testthat/edition: 3"
+            ),
+        })
+
+    status = "warn" if findings else "ok"
+    messages = [] if findings else ["testthat edition is current (edition 3)."]
+    return _envelope("test_config", status, findings, messages)
+
+
 # ───────────────────────── aggregate + CLI ─────────────────────────
 
 
@@ -519,6 +622,7 @@ def run_all(path: str | os.PathLike = ".") -> dict:
         lint_description(path),
         check_build_hygiene(path),
         check_planning_consistency(path),
+        check_test_config(path),
     ]
     status = "warn" if any(s["status"] == "warn" for s in stages) else "ok"
     return {
@@ -557,4 +661,23 @@ def _main(argv: Optional[list[str]] = None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(_main())
+    # Hybrid entrypoint: positional subcommand style (for r:test prompt integration)
+    # takes priority when sys.argv[1] does NOT start with '--'.
+    # Falls back to the existing argparse-based _main() for --path/--kind style.
+    _args = sys.argv[1:]
+    if _args and not _args[0].startswith("-"):
+        _fn_map = {
+            "lint": lint_description,
+            "build-hygiene": check_build_hygiene,
+            "docs-consistency": check_planning_consistency,
+            "check_test_config": check_test_config,
+        }
+        _subcmd = _args[0]
+        _path = _args[1] if len(_args) > 1 else "."
+        _fn = _fn_map.get(_subcmd)
+        if _fn is None:
+            print(f"Unknown subcommand: {_subcmd}", file=sys.stderr)
+            sys.exit(1)
+        print(json.dumps(_fn(_path), indent=2))
+    else:
+        sys.exit(_main())

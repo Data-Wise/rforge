@@ -1153,29 +1153,34 @@ Advisory best-practice bundle — goodpractice checks (opt-in, not part of `r:cy
 
 ### /rforge:r:winbuilder
 
-Submit to win-builder (R-devel) via `devtools::check_win_devel()` — async dispatch.
+Submit to win-builder (devel/release/oldrelease) or R-hub — async dispatch.
 
 **Usage:**
 
 ```bash
-/rforge:r:winbuilder [package]
+/rforge:r:winbuilder [package] [--platform devel|release|oldrelease|all|rhub]
 ```
 
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
+- `--platform` (optional) - Target: `devel`, `release`, `oldrelease`, `all` (default, all three), or `rhub` (GitHub Actions via `rhub::rhub_check`)
 
 **Examples:**
 
 ```bash
-# Dispatch to win-builder
+# Dispatch to all three win-builder flavours (default)
 /rforge:r:winbuilder
+# Dispatch only to R-devel win-builder
+/rforge:r:winbuilder --platform devel
+# Dispatch via R-hub (results in GitHub Actions, not email)
+/rforge:r:winbuilder --platform rhub
 ```
 
 **Executes:**
 
-- Submits the package to [win-builder](https://win-builder.r-project.org/) for a remote R-devel check on Windows
-- **Async dispatch** — results are emailed to the DESCRIPTION Maintainer; nothing returns synchronously
+- Submits the package to [win-builder](https://win-builder.r-project.org/) for a remote Windows check
+- **Async dispatch** — results are emailed to the DESCRIPTION Maintainer (or appear in GitHub Actions for `--platform rhub`); nothing returns synchronously
 - `devtools` is optional — if missing, reports 🟡 with install hint
 - Run at least once per release after a clean `/rforge:r:check --as-cran` pass
 

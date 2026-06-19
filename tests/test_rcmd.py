@@ -51,11 +51,17 @@ def test_normalize_coverage_includes_untested():
     assert env["coverage"]["untested"][0]["first_line"] == 3
 
 
-@pytest.mark.parametrize("kind,key", [("lint", "lints"), ("spell", "misspelled"),
-                                      ("urlcheck", "broken")])
+@pytest.mark.parametrize("kind,key", [("lint", "lints"), ("spell", "misspelled")])
 def test_normalize_quality_warns_when_findings(kind, key):
     assert rcmd.normalize(kind, {key: [{"x": 1}]}, 0, None)["status"] == "warn"
     assert rcmd.normalize(kind, {key: []}, 0, None)["status"] == "ok"
+
+
+def test_normalize_urlcheck_empty_is_ok():
+    env = rcmd.normalize("urlcheck", {"broken": []}, 0, None)
+    assert env["status"] == "ok"
+    assert env["urlcheck"]["count"] == 0
+    assert env["urlcheck"]["doi_blocked_count"] == 0
 
 
 def test_normalize_style_ok_on_exit0():

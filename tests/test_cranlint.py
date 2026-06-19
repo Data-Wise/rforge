@@ -216,3 +216,207 @@ def test_cli_emits_json(tmp_path):
     payload = json.loads(proc.stdout)
     # the CLI rolls the three Tier-4 stages into one object
     assert "stages" in payload or "kind" in payload
+
+
+# ───────────────────────── G2: Language field lint ─────────────────────────
+
+
+def test_lint_description_language_missing(tmp_path):
+    """DESCRIPTION without Language:, with vignettes/ → language_missing."""
+    (tmp_path / "vignettes").mkdir()
+    body = """\
+Package: langpkg
+Title: Some Wonderful Tools for Statistical Work
+Version: 0.1.0
+Authors@R: person("Ada", "Lovelace", email = "ada@example.com",
+    role = c("aut", "cre", "cph"))
+Description: Provides helpers for statistical work. Very useful.
+License: MIT + file LICENSE
+"""
+    _write_desc(tmp_path, body)
+    env = cranlint.lint_description(tmp_path)
+    assert env["status"] == "warn"
+    assert "language_missing" in _finding_codes(env)
+
+
+def test_lint_description_language_missing_no_docs_skip(tmp_path):
+    """DESCRIPTION without Language:, no vignettes/ or man/ → no finding."""
+    body = """\
+Package: nodocspar
+Title: Some Wonderful Tools for Statistical Work
+Version: 0.1.0
+Authors@R: person("Ada", "Lovelace", email = "ada@example.com",
+    role = c("aut", "cre", "cph"))
+Description: Provides helpers for statistical work. Very useful.
+License: MIT + file LICENSE
+"""
+    _write_desc(tmp_path, body)
+    env = cranlint.lint_description(tmp_path)
+    assert "language_missing" not in _finding_codes(env)
+
+
+def test_lint_description_language_present(tmp_path):
+    """Language: en-US with docs dirs → no language_missing finding."""
+    (tmp_path / "man").mkdir()
+    body = """\
+Package: langok
+Title: Some Wonderful Tools for Statistical Work
+Version: 0.1.0
+Authors@R: person("Ada", "Lovelace", email = "ada@example.com",
+    role = c("aut", "cre", "cph"))
+Description: Provides helpers for statistical work. Very useful.
+License: MIT + file LICENSE
+Language: en-US
+"""
+    _write_desc(tmp_path, body)
+    env = cranlint.lint_description(tmp_path)
+    assert "language_missing" not in _finding_codes(env)
+
+
+# ───────────────────────── G3: DOI format lint ─────────────────────────
+
+
+def test_doi_format_bare_doi(tmp_path):
+    """Description with bare doi:10.xxx → doi_format finding."""
+    body = """\
+Package: doipkg
+Title: Some Wonderful Tools for Statistical Work
+Version: 0.1.0
+Authors@R: person("Ada", "Lovelace", email = "ada@example.com",
+    role = c("aut", "cre", "cph"))
+Description: Based on methods by Smith (2020). See doi:10.1000/xyz for details.
+License: MIT + file LICENSE
+"""
+    _write_desc(tmp_path, body)
+    env = cranlint.lint_description(tmp_path)
+    assert "doi_format" in _finding_codes(env)
+
+
+def test_doi_format_bare_url(tmp_path):
+    """Description with bare https://doi.org/... → doi_format finding."""
+    body = """\
+Package: doiurlpkg
+Title: Some Wonderful Tools for Statistical Work
+Version: 0.1.0
+Authors@R: person("Ada", "Lovelace", email = "ada@example.com",
+    role = c("aut", "cre", "cph"))
+Description: See https://doi.org/10.1000/xyz for details.
+License: MIT + file LICENSE
+"""
+    _write_desc(tmp_path, body)
+    env = cranlint.lint_description(tmp_path)
+    assert "doi_format" in _finding_codes(env)
+
+
+def test_doi_format_wrapped_ok(tmp_path):
+    """<doi:10.xxx> angle-bracket form → no doi_format finding."""
+    body = """\
+Package: doiwrappedpkg
+Title: Some Wonderful Tools for Statistical Work
+Version: 0.1.0
+Authors@R: person("Ada", "Lovelace", email = "ada@example.com",
+    role = c("aut", "cre", "cph"))
+Description: See <doi:10.1000/xyz> for more details.
+License: MIT + file LICENSE
+"""
+    _write_desc(tmp_path, body)
+    env = cranlint.lint_description(tmp_path)
+    assert "doi_format" not in _finding_codes(env)
+
+
+def test_doi_format_markdown_link_ok(tmp_path):
+    """(https://doi.org/...) paren-wrapped form → no doi_format finding."""
+    body = """\
+Package: doimdpkg
+Title: Some Wonderful Tools for Statistical Work
+Version: 0.1.0
+Authors@R: person("Ada", "Lovelace", email = "ada@example.com",
+    role = c("aut", "cre", "cph"))
+Description: See (https://doi.org/10.1000/xyz) for more details.
+License: MIT + file LICENSE
+"""
+    _write_desc(tmp_path, body)
+    env = cranlint.lint_description(tmp_path)
+    assert "doi_format" not in _finding_codes(env)
+
+
+def test_doi_format_url_curly_ok(tmp_path):
+    """\\url{https://doi.org/...} curly-brace Rd form → no doi_format finding."""
+    body = r"""Package: doicurlypkg
+Title: Some Wonderful Tools for Statistical Work
+Version: 0.1.0
+Authors@R: person("Ada", "Lovelace", email = "ada@example.com",
+    role = c("aut", "cre", "cph"))
+Description: See \url{https://doi.org/10.1000/xyz} for more details.
+License: MIT + file LICENSE
+"""
+    _write_desc(tmp_path, body)
+    env = cranlint.lint_description(tmp_path)
+    assert "doi_format" not in _finding_codes(env)
+
+
+# ───────────────────────── G5: testthat edition ─────────────────────────
+
+
+def _write_desc_with_testthat(tmp_path: Path, extra_fields: str = "") -> Path:
+    """Write a DESCRIPTION with a tests/testthat/ directory."""
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "testthat").mkdir()
+    body = f"""\
+Package: ttpkg
+Title: Some Wonderful Tools for Statistical Work
+Version: 0.1.0
+Authors@R: person("Ada", "Lovelace", email = "ada@example.com",
+    role = c("aut", "cre", "cph"))
+Description: Provides helpers for statistical work. Very useful.
+License: MIT + file LICENSE
+{extra_fields}"""
+    return _write_desc(tmp_path, body)
+
+
+def test_check_test_config_missing(tmp_path):
+    """No Config/testthat/edition → testthat_edition_missing."""
+    _write_desc_with_testthat(tmp_path)
+    env = cranlint.check_test_config(tmp_path)
+    assert env["kind"] == "test_config"
+    assert env["status"] == "warn"
+    assert "testthat_edition_missing" in _finding_codes(env)
+
+
+def test_check_test_config_edition2(tmp_path):
+    """Config/testthat/edition: 2 → testthat_edition_outdated."""
+    _write_desc_with_testthat(tmp_path, "Config/testthat/edition: 2")
+    env = cranlint.check_test_config(tmp_path)
+    assert env["status"] == "warn"
+    assert "testthat_edition_outdated" in _finding_codes(env)
+
+
+def test_check_test_config_edition3(tmp_path):
+    """Config/testthat/edition: 3 → clean ok."""
+    _write_desc_with_testthat(tmp_path, "Config/testthat/edition: 3")
+    env = cranlint.check_test_config(tmp_path)
+    assert env["status"] == "ok"
+    assert env["findings"] == []
+
+
+def test_check_test_config_no_description(tmp_path):
+    """No DESCRIPTION → warn envelope, no raise."""
+    env = cranlint.check_test_config(tmp_path)
+    assert env["kind"] == "test_config"
+    assert env["status"] == "warn"
+    assert env["engine_missing"] == []
+
+
+def test_cranlint_cli_check_test_config(tmp_path):
+    """Invoke python3 -m lib.cranlint check_test_config . via subprocess → valid JSON."""
+    _write_desc_with_testthat(tmp_path)
+    proc = subprocess.run(
+        [sys.executable, "-m", "lib.cranlint", "check_test_config", str(tmp_path)],
+        capture_output=True,
+        text=True,
+        cwd=str(Path(__file__).resolve().parent.parent),
+    )
+    assert proc.returncode == 0, proc.stderr
+    payload = json.loads(proc.stdout)
+    assert "kind" in payload
+    assert payload["kind"] == "test_config"
