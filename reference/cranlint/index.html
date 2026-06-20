@@ -1849,6 +1849,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#check_test_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_test_config()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#lint_description" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2564,6 +2575,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#check_test_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_test_config()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#lint_description" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2686,8 +2708,17 @@ blocks</strong> a <code>cran-prep</code> <code>ready</code> verdict.</p>
 <p>Returns an envelope: <code>{kind: "docs-consistency", status, findings,
 messages, engine_missing: []}</code>. Each finding is
 <code>{doc, code, message}</code> where <code>code</code> is <code>"stale"</code> or <code>"dangling_ref"</code>.</p>
+<h3 id="check_test_config"><code>check_test_config()</code><a class="headerlink" href="#check_test_config" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_test_config</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+</span></code></pre></div>
+<p>Advisory check: testthat edition and test infrastructure config (G5).</p>
+<p>Reads <code>Config/testthat/edition</code> from DESCRIPTION. Warns if absent
+(defaults to edition 2 in older testthat versions, where new snapshots
+on CI fail) or explicitly set to <code>"2"</code>.</p>
+<p>Returns envelope <code>{kind: "test_config", status, findings, messages,
+engine_missing: []}</code>.</p>
 <h3 id="lint_description"><code>lint_description()</code><a class="headerlink" href="#lint_description" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">lint_description</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">lint_description</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
 <p>Lint a package <code>DESCRIPTION</code> for CRAN-incoming style nits (Tier 4a).</p>
 <p>Parses the DESCRIPTION DCF (pure stdlib, no R) and emits <strong>advisory</strong>
@@ -2709,7 +2740,7 @@ message — this function never raises.</p>
 messages, engine_missing: []}</code>. Each finding is
 <code>{code, severity, field, message}</code>.</p>
 <h3 id="run_all"><code>run_all()</code><a class="headerlink" href="#run_all" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_all</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_all</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
 </span></code></pre></div>
 <p>Run all three Tier-4 advisory checks and roll them into one envelope.</p>
 <p>Returns <code>{kind: "cranlint", status, stages, engine_missing: []}</code> where

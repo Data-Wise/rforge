@@ -2876,6 +2876,8 @@ checks. <code>/rforge:release</code> computes the sequence:</p>
 <ul>
 <li>[ ] <code>/rforge:docs:check</code> clean (NEWS.md current, examples run)</li>
 <li>[ ] <code>description-sync</code> passes (DESCRIPTION version == NEWS top entry)</li>
+<li>[ ] DESCRIPTION has <code>Language: en-US</code> (or correct BCP 47 code) if package has <code>man/</code> or <code>vignettes/</code> dirs</li>
+<li>[ ] DOI references in DESCRIPTION use <code>&lt;doi:10.xxx/yyy&gt;</code> angle-bracket format, not bare <code>doi:</code> or raw <code>https://doi.org/</code> URLs</li>
 <li>[ ] <code>/rforge:r:cran-prep</code> → verdict <code>ready</code> (or <code>warn</code> with all NOTEs reviewed)</li>
 <li>[ ] <code>cran-comments.md</code> reviewed and accurate — you'll paste this into the CRAN form</li>
 <li>[ ] Multi-platform: win-builder and/or R-hub dispatched and results reviewed</li>

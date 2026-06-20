@@ -4688,21 +4688,24 @@ auto-applied).</p>
 <p><strong>Related commands:</strong> <code>/rforge:r:check</code>, <code>/rforge:r:lint</code>, <code>/rforge:r:coverage</code>, <code>/rforge:r:cran-prep</code></p>
 <hr />
 <h3 id="rforgerwinbuilder">/rforge:r:winbuilder<a class="headerlink" href="#rforgerwinbuilder" title="Permanent link">&para;</a></h3>
-<p>Submit to win-builder (R-devel) via <code>devtools::check_win_devel()</code> — async dispatch.</p>
+<p>Submit to win-builder (devel/release/oldrelease) — async dispatch.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-63-1"><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>/rforge:r:winbuilder<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-63-1"><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>/rforge:r:winbuilder<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--platform<span class="w"> </span>devel<span class="p">|</span>release<span class="p">|</span>oldrelease<span class="p">|</span>all<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
 <li><code>package</code> (optional) - Package path (defaults to current directory)</li>
+<li><code>--platform</code> (optional) - Target: <code>devel</code>, <code>release</code>, <code>oldrelease</code>, or <code>all</code> (default, all three). For multi-platform R-hub checks, use <code>/rforge:r:rhub</code>.</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-64-1"><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a><span class="c1"># Dispatch to win-builder</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-64-1"><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a><span class="c1"># Dispatch to all three win-builder flavours (default)</span>
 </span><span id="__span-64-2"><a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a>/rforge:r:winbuilder
+</span><span id="__span-64-3"><a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a><span class="c1"># Dispatch only to R-devel win-builder</span>
+</span><span id="__span-64-4"><a id="__codelineno-64-4" name="__codelineno-64-4" href="#__codelineno-64-4"></a>/rforge:r:winbuilder<span class="w"> </span>--platform<span class="w"> </span>devel
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
-<li>Submits the package to <a href="https://win-builder.r-project.org/">win-builder</a> for a remote R-devel check on Windows</li>
+<li>Submits the package to <a href="https://win-builder.r-project.org/">win-builder</a> for a remote Windows check</li>
 <li><strong>Async dispatch</strong> — results are emailed to the DESCRIPTION Maintainer; nothing returns synchronously</li>
 <li><code>devtools</code> is optional — if missing, reports 🟡 with install hint</li>
 <li>Run at least once per release after a clean <code>/rforge:r:check --as-cran</code> pass</li>
@@ -4712,21 +4715,31 @@ auto-applied).</p>
 <h3 id="rforgerrhub">/rforge:r:rhub<a class="headerlink" href="#rforgerrhub" title="Permanent link">&para;</a></h3>
 <p>Multi-platform checks via R-hub v2 (<code>rhub::rhub_check</code>) — async dispatch via GitHub Actions.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-65-1"><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>/rforge:r:rhub<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-65-1"><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>/rforge:r:rhub<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--platforms<span class="w"> </span>linux,windows<span class="o">]</span><span class="w"> </span><span class="o">[</span>--preset<span class="w"> </span>cran-submission<span class="o">]</span><span class="w"> </span><span class="o">[</span>--rc-mode<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
 <li><code>package</code> (optional) - Package path (defaults to current directory)</li>
+<li><code>--platforms</code> (optional) - Comma-separated platform list (e.g. <code>linux,windows,macos-arm64,atlas</code>); overrides preset</li>
+<li><code>--preset</code> (optional) - Named platform preset: <code>cran-submission</code> (default), <code>cran-submission-strict</code>, <code>sanitizers</code>, <code>all-vm</code></li>
+<li><code>--rc-mode</code> (optional) - Use RC shared runners via <code>rc_submit()</code> instead of your own GitHub account</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-66-1"><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a><span class="c1"># Dispatch to R-hub v2</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-66-1"><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a><span class="c1"># Default: cran-submission preset (linux, windows, macos-arm64, atlas)</span>
 </span><span id="__span-66-2"><a id="__codelineno-66-2" name="__codelineno-66-2" href="#__codelineno-66-2"></a>/rforge:r:rhub
+</span><span id="__span-66-3"><a id="__codelineno-66-3" name="__codelineno-66-3" href="#__codelineno-66-3"></a><span class="c1"># Named preset (adds clang-asan)</span>
+</span><span id="__span-66-4"><a id="__codelineno-66-4" name="__codelineno-66-4" href="#__codelineno-66-4"></a>/rforge:r:rhub<span class="w"> </span>--preset<span class="w"> </span>cran-submission-strict
+</span><span id="__span-66-5"><a id="__codelineno-66-5" name="__codelineno-66-5" href="#__codelineno-66-5"></a><span class="c1"># Explicit platforms</span>
+</span><span id="__span-66-6"><a id="__codelineno-66-6" name="__codelineno-66-6" href="#__codelineno-66-6"></a>/rforge:r:rhub<span class="w"> </span>--platforms<span class="w"> </span>linux,windows,macos-arm64
+</span><span id="__span-66-7"><a id="__codelineno-66-7" name="__codelineno-66-7" href="#__codelineno-66-7"></a><span class="c1"># RC shared runners</span>
+</span><span id="__span-66-8"><a id="__codelineno-66-8" name="__codelineno-66-8" href="#__codelineno-66-8"></a>/rforge:r:rhub<span class="w"> </span>--rc-mode
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
-<li>Runs <code>rhub::rhub_check()</code> — triggers GitHub Actions workflows across Linux, macOS, Windows, and various R versions</li>
-<li><strong>Async dispatch</strong> — results appear in the repo's Actions tab</li>
-<li>First run calls <code>rhub::rhub_setup()</code> (writes <code>.github/workflows/rhub.yaml</code>); subsequent runs skip setup</li>
+<li>Runs <code>rhub::rhub_check(platforms=...)</code> — triggers GitHub Actions workflows across the selected platforms (always passed explicitly; never <code>NULL</code>, never an interactive menu)</li>
+<li><strong>Async dispatch</strong> — results appear in the repo's Actions tab; the URL is built from your git remote and opened in your browser</li>
+<li><strong>Never</strong> calls <code>rhub::rhub_setup()</code> — <code>.github/workflows/rhub.yaml</code> must already exist and be committed (pre-flight hard-stops with <code>rhub_yaml_missing</code> if absent)</li>
+<li>Pre-flight: hard-blocks broken platforms (e.g. <code>macos</code>); advises on missing <code>pak-version: stable</code> and broken default-config platforms (advisories don't block)</li>
 <li>A GitHub remote is required</li>
 <li><code>rhub</code> is optional — if missing, reports 🟡 with install hint</li>
 </ul>

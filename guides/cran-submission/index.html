@@ -2754,7 +2754,7 @@ during) CRAN's review. They fall into four tiers:</p>
 <td><code>r:winbuilder</code></td>
 <td>dispatch (async)</td>
 <td>no — returns <code>dispatched</code></td>
-<td><code>devtools::check_win_devel</code> via <code>lib.rcmd</code></td>
+<td><code>devtools::check_win_{devel,release,oldrelease}</code> / <code>rhub::rhub_check</code> via <code>lib.rcmd</code></td>
 </tr>
 <tr>
 <td><code>r:rhub</code></td>
@@ -2854,10 +2854,11 @@ pass, not on every save. Missing <code>goodpractice</code> → 🟡 + install hi
 verdict.</p>
 <h2 id="rwinbuilder-async-win-builder-dispatch"><code>r:winbuilder</code> — async win-builder dispatch<a class="headerlink" href="#rwinbuilder-async-win-builder-dispatch" title="Permanent link">&para;</a></h2>
 <p>Submits the package to <a href="https://win-builder.r-project.org/">win-builder</a> for a remote
-R-devel check on Windows via <code>devtools::check_win_devel()</code>. This is an <strong>async dispatch</strong>:
-nothing returns synchronously — results are <strong>emailed to the DESCRIPTION Maintainer</strong> (~30
-min). A CRAN pre-submission obligation for Windows-targeting packages; run it at least once
-per release, typically after a clean <code>r:check --as-cran</code>. Missing <code>devtools</code> → 🟡 + hint.</p>
+Windows check. <strong>Default (<code>--platform all</code>) dispatches three flavors</strong> (devel, release,
+oldrelease) in sequence. This is an <strong>async dispatch</strong>: nothing returns synchronously —
+results are <strong>emailed to the DESCRIPTION Maintainer</strong> (~30 min). A CRAN pre-submission
+obligation for Windows-targeting packages; run it at least once per release, typically
+after a clean <code>r:check --as-cran</code>. Missing <code>devtools</code> → 🟡 + hint.</p>
 <table>
 <thead>
 <tr>
@@ -2874,20 +2875,33 @@ per release, typically after a clean <code>r:check --as-cran</code>. Missing <co
 <td>current dir</td>
 <td>Package path to submit</td>
 </tr>
+<tr>
+<td><code>--platform</code></td>
+<td>string</td>
+<td><code>all</code></td>
+<td><code>devel</code> / <code>release</code> / <code>oldrelease</code> (one flavor) — <code>all</code> (devel + release + oldrelease via devtools). For multi-platform R-hub checks, use <code>/rforge:r:rhub</code>.</td>
+</tr>
 </tbody>
 </table>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/rforge:r:winbuilder
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>/rforge:r:winbuilder<span class="w">                        </span><span class="c1"># default: all 3 win-builder flavors</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>/rforge:r:winbuilder<span class="w"> </span>--platform<span class="w"> </span>devel<span class="w">       </span><span class="c1"># R-devel only</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>/rforge:r:winbuilder<span class="w"> </span>--platform<span class="w"> </span>release<span class="w">     </span><span class="c1"># current R release only</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>/rforge:r:winbuilder<span class="w"> </span>--platform<span class="w"> </span>oldrelease<span class="w">  </span><span class="c1"># previous R release only</span>
 </span></code></pre></div>
-<p><strong>Output / status:</strong> <code>🚀 dispatched</code> plus <code>winbuilder.note</code>. Check your inbox for the
-R-devel results email — you do not wait here.</p>
+<p><strong>Output / status:</strong> <code>🚀 dispatched</code> plus <code>winbuilder.note</code>. For <code>all</code>, each flavor
+dispatches in turn — check your inbox for results emails.</p>
 <h2 id="rrhub-async-r-hub-v2-dispatch"><code>r:rhub</code> — async R-hub v2 dispatch<a class="headerlink" href="#rrhub-async-r-hub-v2-dispatch" title="Permanent link">&para;</a></h2>
-<p>Runs <code>rhub::rhub_check()</code> — an <strong>async dispatch</strong> to R-hub v2, which triggers GitHub Actions
-workflows checking the package across many platforms (Linux, macOS, Windows, multiple R
-versions). Results appear in the <strong>repo's Actions tab</strong>, not here. Missing <code>rhub</code> → 🟡 + hint.</p>
+<p>Runs <code>rhub::rhub_check(platforms=...)</code> — an <strong>async dispatch</strong> to R-hub v2, which triggers
+GitHub Actions workflows checking the package across the selected platforms (Linux, Windows,
+macOS-ARM, sanitizers). Platforms are <strong>always passed explicitly</strong> (never <code>NULL</code>, which would
+hang headlessly). Results appear in the <strong>repo's Actions tab</strong> — the URL is built from your
+git remote and opened in your browser. Missing <code>rhub</code> → 🟡 + hint.</p>
 <div class="admonition warning">
-<p class="admonition-title">First run commits a workflow file — a GitHub remote is required</p>
-<p><code>rhub::rhub_setup()</code> (called automatically) is idempotent but writes
-<code>.github/workflows/rhub.yaml</code> to the repo on the first run. Subsequent runs skip setup.</p>
+<p class="admonition-title">rhub.yaml must already exist — a GitHub remote is required</p>
+<p>This command <strong>never</strong> runs <code>rhub::rhub_setup()</code> (that would create a spurious commit on
+every invocation). <code>.github/workflows/rhub.yaml</code> must already exist and be committed; if
+it's missing, the pre-flight hard-stops with <code>rhub_yaml_missing</code>. Run <code>rhub::rhub_setup()</code>
+in R once and commit the file before dispatching.</p>
 </div>
 <table>
 <thead>
@@ -2905,12 +2919,36 @@ versions). Results appear in the <strong>repo's Actions tab</strong>, not here. 
 <td>current dir</td>
 <td>Package path to submit</td>
 </tr>
+<tr>
+<td><code>--platforms</code></td>
+<td>string</td>
+<td>—</td>
+<td>Comma-separated list (e.g. <code>linux,windows,macos-arm64,atlas</code>); overrides preset</td>
+</tr>
+<tr>
+<td><code>--preset</code></td>
+<td>string</td>
+<td><code>cran-submission</code></td>
+<td><code>cran-submission</code> / <code>cran-submission-strict</code> / <code>sanitizers</code> / <code>all-vm</code></td>
+</tr>
+<tr>
+<td><code>--rc-mode</code></td>
+<td>flag</td>
+<td>off</td>
+<td>Use RC shared runners via <code>rc_submit()</code> instead of your own GitHub account</td>
+</tr>
 </tbody>
 </table>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/rforge:r:rhub
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/rforge:r:rhub<span class="w">                                    </span><span class="c1"># cran-submission preset (linux, windows, macos-arm64, atlas)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>/rforge:r:rhub<span class="w"> </span>--preset<span class="w"> </span>cran-submission-strict<span class="w">    </span><span class="c1"># adds clang-asan [unstable]</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>/rforge:r:rhub<span class="w"> </span>--platforms<span class="w"> </span>linux,windows,macos-arm64
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>/rforge:r:rhub<span class="w"> </span>--rc-mode<span class="w">                          </span><span class="c1"># RC shared runners</span>
 </span></code></pre></div>
-<p><strong>Output / status:</strong> <code>🚀 dispatched</code> plus <code>rhub.note</code> and <code>rhub.run_url</code> (may be null until
-the run-URL capture lands — check the Actions tab).</p>
+<p><strong>Pre-flight (before dispatch):</strong> missing rhub.yaml or a broken platform (e.g. <code>macos</code>,
+retired Dec 2025) → hard-stop; missing <code>pak-version: stable</code> or a broken default-config
+platform → advisory (dispatch continues, finding surfaced).</p>
+<p><strong>Output / status:</strong> <code>🚀 dispatched</code> plus <code>run_url</code> (the Actions tab) and any advisory
+<code>findings</code>.</p>
 <h2 id="rcran-prep-the-full-per-package-gate"><code>r:cran-prep</code> — the full per-package gate<a class="headerlink" href="#rcran-prep-the-full-per-package-gate" title="Permanent link">&para;</a></h2>
 <p>The orchestrating gate. It sequences the dev-cycle + quality stages, then the strict check
 passes, the Tier-4 advisory stages, and the reverse-dependency check, and <strong>writes
@@ -2921,6 +2959,14 @@ cross-package ordering).</p>
 (suggests-only)</code> → <code>description</code> / <code>build-hygiene</code> / <code>docs-consistency</code> (Tier 4) → <code>revdep</code>.
 It also verifies the PDF reference manual builds (Tier 1b) — <code>warn</code> (never block) if no
 LaTeX is available.</p>
+<div class="admonition note">
+<p class="admonition-title">doi.org 403 handling in <code>urlcheck</code></p>
+<p><code>urlcheck</code> classifies doi.org URLs that return HTTP 403 separately from real broken
+links. 403 responses from doi.org are transient server-side blocks (not dead URLs), so
+they downgrade <code>urlcheck</code> status from <code>error</code> → <code>warn</code> and appear in <code>doi_blocked_count</code>
+rather than <code>broken</code>. If <code>urlcheck</code> reports <code>🟡 warn</code> with only doi.org 403s, you may
+proceed to submit — no link is actually broken.</p>
+</div>
 <table>
 <thead>
 <tr>
