@@ -334,6 +334,156 @@ _PDF_SKIP_RE = re.compile(
     re.IGNORECASE,
 )
 
+# ── R-hub v2 platform tables ────────────────────────────────────────────────
+# Known-broken R-hub platforms: dispatching to any of these fails immediately,
+# so _rhub_preflight() hard-blocks them with the keyed remediation message.
+_RHUB_BROKEN_PLATFORMS = {
+    "macos": (
+        "macos-13 runner retired December 2025; "
+        "use `macos-arm64` (ARM) or wait for rhub to update. "
+        "See https://github.com/r-hub/rhub/issues/669"
+    ),
+}
+
+# Named platform presets. `cran-submission` is the headless default (Q6): an OS
+# matrix plus `atlas`. `clang-asan` is opt-in only (issue #645, [unstable]).
+_RHUB_PRESETS = {
+    "cran-submission":        ["linux", "windows", "macos-arm64", "atlas"],
+    "cran-submission-strict": ["linux", "windows", "macos-arm64", "atlas", "clang-asan"],
+    "sanitizers":             ["clang-asan", "atlas"],
+    "all-vm":                 ["linux", "windows", "macos-arm64"],
+}
+
+
+def _check_rhub_yaml(pkg_path: str) -> list[dict]:
+    """Scan .github/workflows/rhub.yaml for advisory issues.
+
+    Two advisory checks: (1) each ``setup-deps`` block missing ``pak-version:
+    stable`` (pak devel bootstrap regression, r-lib/pak #887); (2) a default
+    config field naming a known-broken platform. Returns ``[]`` if rhub.yaml is
+    absent — its absence is a hard error handled by ``_rhub_preflight``.
+    """
+    # TODO: remove or loosen the pak-version check when r-lib/pak #887 is fixed in devel.
+    # Upstream: https://github.com/r-lib/pak/issues/887
+    yaml_path = Path(pkg_path) / ".github" / "workflows" / "rhub.yaml"
+    if not yaml_path.exists():
+        return []  # rhub_yaml_missing is handled by _rhub_preflight
+
+    content = yaml_path.read_text()
+    findings: list[dict] = []
+
+    # Check pak-version in every setup-deps block.
+    blocks = re.split(r"- uses: r-hub/actions/setup-deps", content)
+    # blocks[0] = content before first occurrence; blocks[1:] = after each.
+    for i, block in enumerate(blocks[1:], 1):
+        with_match = re.search(r"\s+with:\s*((?:\s+\S.*\n)*)", block)
+        if not with_match:
+            continue
+        with_block = with_match.group(1)
+        if "pak-version:" not in with_block:
+            findings.append({
+                "code": "rhub_pak_devel_regression",
+                "severity": "advisory",
+                "block": i,   # informational: which setup-deps block (1-indexed)
+                "message": (
+                    f"setup-deps block {i} is missing `pak-version: stable`. "
+                    "pak devel (0.10.0.9000) has a bootstrap regression "
+                    "(r-lib/pak #887, filed 2026-06-13) — rhub jobs will "
+                    "silently fail. Add `pak-version: stable` as the first "
+                    "`with:` entry in this block."
+                ),
+                "fix": (
+                    "- uses: r-hub/actions/setup-deps@v1\n"
+                    "  with:\n"
+                    "    pak-version: stable\n"
+                    "    token: ${{ secrets.RHUB_TOKEN }}\n"
+                    "    job-config: ${{ matrix.config.job-config }}"
+                ),
+            })
+
+    # Check default config field for broken platforms.
+    default_match = re.search(r"default:\s*'([^']+)'", content)
+    if default_match:
+        default_platforms = [p.strip() for p in default_match.group(1).split(",")]
+        broken_in_default = [p for p in default_platforms if p in _RHUB_BROKEN_PLATFORMS]
+        if broken_in_default:
+            findings.append({
+                "code": "rhub_yaml_default_broken_platform",
+                "severity": "advisory",
+                "platforms": broken_in_default,
+                "message": (
+                    f"rhub.yaml default config includes retired platform(s): "
+                    f"{', '.join(broken_in_default)}. Update the default field to "
+                    f"'linux,windows,macos-arm64' to avoid confusing others who "
+                    f"manually trigger the workflow."
+                ),
+            })
+
+    return findings
+
+
+def _rhub_preflight(pkg_path: str, platforms: list) -> list[dict]:
+    """Unified pre-flight checks for r:rhub. Returns a list of findings.
+
+    Fixed sequence: (a) yaml_missing hard-stops immediately; (b) each broken
+    platform yields an error; (c) advisory checks from ``_check_rhub_yaml``.
+    Only ``severity == 'error'`` findings block dispatch.
+    """
+    findings: list[dict] = []
+    yaml_path = Path(pkg_path) / ".github" / "workflows" / "rhub.yaml"
+
+    # (a) yaml_missing — hard error, short-circuits remaining checks.
+    if not yaml_path.exists():
+        findings.append({
+            "code": "rhub_yaml_missing",
+            "severity": "error",
+            "message": (
+                ".github/workflows/rhub.yaml not found. "
+                "Run `rhub::rhub_setup()` in R to create it (requires a GitHub remote). "
+                "This file must exist and be committed before r:rhub can dispatch."
+            ),
+        })
+        return findings  # No further checks possible.
+
+    # (b) broken_platform — hard error per broken platform requested.
+    for plat in platforms:
+        if plat in _RHUB_BROKEN_PLATFORMS:
+            findings.append({
+                "code": "rhub_broken_platform",
+                "severity": "error",
+                "platform": plat,
+                "message": (
+                    f"Platform '{plat}' is broken: {_RHUB_BROKEN_PLATFORMS[plat]}"
+                ),
+            })
+
+    # (c) pak_version + default config advisories.
+    findings.extend(_check_rhub_yaml(pkg_path))
+
+    return findings
+
+
+def _rhub_actions_url(pkg_path: str) -> str:
+    """Construct the GitHub Actions URL from the origin remote.
+
+    Normalizes SSH→HTTPS, strips a trailing ``.git``, appends ``/actions``.
+    Returns an empty string on any failure (no remote, git absent, timeout).
+    """
+    try:
+        result = subprocess.run(
+            ["git", "-C", pkg_path, "remote", "get-url", "origin"],
+            capture_output=True, text=True, timeout=5,
+        )
+        remote = result.stdout.strip()
+        # Normalize: ssh -> https, strip .git suffix.
+        if remote.startswith("git@github.com:"):
+            remote = "https://github.com/" + remote[len("git@github.com:"):]
+        if remote.endswith(".git"):
+            remote = remote[:-4]
+        return remote.rstrip("/") + "/actions" if remote else ""
+    except Exception:
+        return ""
+
 
 def _r_version_key() -> str:
     """Return 'R{major}.{minor}' for installed R, or 'base' if Rscript absent."""
