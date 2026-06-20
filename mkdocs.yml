@@ -51,7 +51,7 @@ extra_css:
 # scripts/version_sync.py — do not hand-edit version/prev_version/release_date.
 extra:
   rforge:
-    version: "2.13.0"
+    version: "2.14.0"
     prev_version: "2.11.1"
     release_date: "2026-06-13"
     command_count: 41
