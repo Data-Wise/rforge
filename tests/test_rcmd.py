@@ -244,7 +244,16 @@ def test_status_dispatched_engine_missing_is_error():
 
 def test_main_dispatched_exits_zero(tmp_path, monkeypatch, capsys):
     _write_desc(tmp_path)
+    # Pre-flight requires a committed rhub.yaml before any dispatch.
+    wf = tmp_path / ".github" / "workflows"
+    wf.mkdir(parents=True)
+    (wf / "rhub.yaml").write_text(
+        "      - uses: r-hub/actions/setup-deps@v1\n"
+        "        with:\n"
+        "          pak-version: stable\n"
+    )
     monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"run_url":"https://x"}', 0))
+    monkeypatch.setattr(rcmd, "_rhub_actions_url", lambda p: "")  # no browser launch
     rc = rcmd.main(["--kind", "rhub", "--path", str(tmp_path)])
     out = json.loads(capsys.readouterr().out)
     assert out["status"] == "dispatched" and rc == 0

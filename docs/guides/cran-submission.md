@@ -120,40 +120,52 @@ after a clean `r:check --as-cran`. Missing `devtools` → 🟡 + hint.
 | Flag | Type | Default | Effect |
 |------|------|---------|--------|
 | `package` | string | current dir | Package path to submit |
-| `--platform` | string | `all` | `devel` / `release` / `oldrelease` (one flavor) — `all` (devel + release + oldrelease via devtools) — `rhub` (R-hub v2, results in Actions tab, not email) |
+| `--platform` | string | `all` | `devel` / `release` / `oldrelease` (one flavor) — `all` (devel + release + oldrelease via devtools). For multi-platform R-hub checks, use `/rforge:r:rhub`. |
 
 ```bash
 /rforge:r:winbuilder                        # default: all 3 win-builder flavors
 /rforge:r:winbuilder --platform devel       # R-devel only
 /rforge:r:winbuilder --platform release     # current R release only
 /rforge:r:winbuilder --platform oldrelease  # previous R release only
-/rforge:r:winbuilder --platform rhub        # R-hub v2 (GitHub Actions, not email)
 ```
 
 **Output / status:** `🚀 dispatched` plus `winbuilder.note`. For `all`, each flavor
-dispatches in turn — check your inbox for results emails. For `rhub`, check the
-repo's GitHub Actions tab instead.
+dispatches in turn — check your inbox for results emails.
 
 ## `r:rhub` — async R-hub v2 dispatch
 
-Runs `rhub::rhub_check()` — an **async dispatch** to R-hub v2, which triggers GitHub Actions
-workflows checking the package across many platforms (Linux, macOS, Windows, multiple R
-versions). Results appear in the **repo's Actions tab**, not here. Missing `rhub` → 🟡 + hint.
+Runs `rhub::rhub_check(platforms=...)` — an **async dispatch** to R-hub v2, which triggers
+GitHub Actions workflows checking the package across the selected platforms (Linux, Windows,
+macOS-ARM, sanitizers). Platforms are **always passed explicitly** (never `NULL`, which would
+hang headlessly). Results appear in the **repo's Actions tab** — the URL is built from your
+git remote and opened in your browser. Missing `rhub` → 🟡 + hint.
 
-!!! warning "First run commits a workflow file — a GitHub remote is required"
-    `rhub::rhub_setup()` (called automatically) is idempotent but writes
-    `.github/workflows/rhub.yaml` to the repo on the first run. Subsequent runs skip setup.
+!!! warning "rhub.yaml must already exist — a GitHub remote is required"
+    This command **never** runs `rhub::rhub_setup()` (that would create a spurious commit on
+    every invocation). `.github/workflows/rhub.yaml` must already exist and be committed; if
+    it's missing, the pre-flight hard-stops with `rhub_yaml_missing`. Run `rhub::rhub_setup()`
+    in R once and commit the file before dispatching.
 
 | Flag | Type | Default | Effect |
 |------|------|---------|--------|
 | `package` | string | current dir | Package path to submit |
+| `--platforms` | string | — | Comma-separated list (e.g. `linux,windows,macos-arm64,atlas`); overrides preset |
+| `--preset` | string | `cran-submission` | `cran-submission` / `cran-submission-strict` / `sanitizers` / `all-vm` |
+| `--rc-mode` | flag | off | Use RC shared runners via `rc_submit()` instead of your own GitHub account |
 
 ```bash
-/rforge:r:rhub
+/rforge:r:rhub                                    # cran-submission preset (linux, windows, macos-arm64, atlas)
+/rforge:r:rhub --preset cran-submission-strict    # adds clang-asan [unstable]
+/rforge:r:rhub --platforms linux,windows,macos-arm64
+/rforge:r:rhub --rc-mode                          # RC shared runners
 ```
 
-**Output / status:** `🚀 dispatched` plus `rhub.note` and `rhub.run_url` (may be null until
-the run-URL capture lands — check the Actions tab).
+**Pre-flight (before dispatch):** missing rhub.yaml or a broken platform (e.g. `macos`,
+retired Dec 2025) → hard-stop; missing `pak-version: stable` or a broken default-config
+platform → advisory (dispatch continues, finding surfaced).
+
+**Output / status:** `🚀 dispatched` plus `run_url` (the Actions tab) and any advisory
+`findings`.
 
 ## `r:cran-prep` — the full per-package gate
 

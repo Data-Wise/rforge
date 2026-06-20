@@ -36,9 +36,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   broken URLs still produce `error`. See `urlcheck.doi_blocked_count` in the envelope.
 
 - **G1 — win-builder `--platform` kwarg** (`lib/rcmd.py`; `r:winbuilder`).
-  `/rforge:r:winbuilder` now accepts `--platform devel|release|oldrelease|all|rhub`.
-  Default `all` submits all three win-builder flavours in one call. `rhub` dispatches
-  via `rhub::rhub_check()` to GitHub Actions instead of email.
+  `/rforge:r:winbuilder` now accepts `--platform devel|release|oldrelease|all`.
+  Default `all` submits all three win-builder flavours in one call. (Multi-platform
+  R-hub dispatch moved to the dedicated `/rforge:r:rhub` command — see Fixed below.)
 
 - **G6 — `--run-donttest` in strict/incoming** (`lib/rcmd.py`; confirmed present).
   `--run-donttest` is already set whenever `strict=True`, `flavor` is set, or
@@ -58,6 +58,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   LaTeX on the build host), a `pdf_manual_skipped` finding is now surfaced as an
   advisory in the envelope — prompting the user to rely on win-builder for the PDF
   manual instead of treating the skip as silent.
+
+### Fixed
+
+- **`r:rhub` headless dispatch overhaul** (`lib/rcmd.py`, `commands/r/rhub.md`).
+  The command was non-functional: `rhub::rhub_check()` with no `platforms=` arg
+  opened an interactive console menu and hung headlessly, and `rhub::rhub_setup()`
+  was called on every invocation (a spurious git commit each run). It now:
+  - Passes platforms **explicitly** (never `NULL`); defaults to the `cran-submission`
+    preset (`linux, windows, macos-arm64, atlas`) — new `--platforms`/`--preset` flags.
+  - **Never** calls `rhub_setup()`; a Python-side pre-flight hard-stops with
+    `rhub_yaml_missing` when `.github/workflows/rhub.yaml` is absent.
+  - Hard-blocks known-broken platforms (`macos`, macos-13 runner retired Dec 2025)
+    and advises (non-blocking) on missing `pak-version: stable` (r-lib/pak #887) and
+    broken default-config platforms.
+  - Adds `--rc-mode` (`rhub::rc_submit()` on RC shared runners) and opens the GitHub
+    Actions URL (built from the git remote) in the browser.
+  - Removes the stale `r:winbuilder --platform rhub` sub-path (same hang bug, second
+    entry point). New `tests/test_rcmd_rhub.py` (18 tests).
 
 ---
 

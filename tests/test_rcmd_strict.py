@@ -291,11 +291,14 @@ def test_winbuilder_default_is_all():
     assert src_default == src_all
 
 
-def test_winbuilder_platform_rhub():
-    src = rcmd.r_snippet("winbuilder", "/tmp/foo", platform="rhub")
+def test_winbuilder_no_longer_dispatches_rhub():
+    """The stale winbuilder/platform='rhub' sub-path was removed (spec §1g).
+    rhub dispatch now goes through kind='rhub' exclusively; winbuilder only
+    handles win-builder flavours, so platform='rhub' is no longer a valid winbuilder
+    target (the snippet never mentions rhub)."""
+    src = rcmd.r_snippet("rhub", "/tmp/foo", platforms=["linux"])
     assert "rhub::rhub_check" in src
-    assert 'requireNamespace("rhub"' in src
-    assert "GitHub Actions" in src
+    assert "rhub_setup" not in src
 
 
 # --- G6: --run-donttest in strict/incoming -----------------------------------

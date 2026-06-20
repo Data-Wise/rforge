@@ -1,3 +1,7 @@
+---
+render_macros: false  # spec contains rhub.yaml `${{ secrets.* }}` literals — not mkdocs-macros Jinja
+---
+
 # SPEC: r:rhub Command (Unified)
 **Date:** 2026-06-20
 **Status:** READY — supersedes both prior rhub specs; all gaps closed by adversarial review
@@ -744,3 +748,4 @@ resolved in this spec:
 | Date | Change |
 |------|--------|
 | 2026-06-20 | Spec created; merged from SPEC-rhub-platform-selection-2026-06-19 + SPEC-rhub-pak-stable-guard-2026-06-20; all adversarial review gaps resolved |
+| 2026-06-19 | Implementation note: the §1b `_check_rhub_yaml` regex `\s+with:\s*((?:\s+\S.*\n)*)` is **buggy** — `\s*` after `with:` eats the newline + indent so the group captures nothing, falsely flagging clean blocks. Shipped fix uses `\s+with:[ \t]*\n((?:\s+\S.*\n)*)`. Do not regenerate from the §1b snippet verbatim. Pinned by `tests/test_rcmd_rhub.py::test_rhub_yaml_with_pak_stable_clean`. |

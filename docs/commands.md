@@ -1153,18 +1153,18 @@ Advisory best-practice bundle — goodpractice checks (opt-in, not part of `r:cy
 
 ### /rforge:r:winbuilder
 
-Submit to win-builder (devel/release/oldrelease) or R-hub — async dispatch.
+Submit to win-builder (devel/release/oldrelease) — async dispatch.
 
 **Usage:**
 
 ```bash
-/rforge:r:winbuilder [package] [--platform devel|release|oldrelease|all|rhub]
+/rforge:r:winbuilder [package] [--platform devel|release|oldrelease|all]
 ```
 
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
-- `--platform` (optional) - Target: `devel`, `release`, `oldrelease`, `all` (default, all three), or `rhub` (GitHub Actions via `rhub::rhub_check`)
+- `--platform` (optional) - Target: `devel`, `release`, `oldrelease`, or `all` (default, all three). For multi-platform R-hub checks, use `/rforge:r:rhub`.
 
 **Examples:**
 
@@ -1173,14 +1173,12 @@ Submit to win-builder (devel/release/oldrelease) or R-hub — async dispatch.
 /rforge:r:winbuilder
 # Dispatch only to R-devel win-builder
 /rforge:r:winbuilder --platform devel
-# Dispatch via R-hub (results in GitHub Actions, not email)
-/rforge:r:winbuilder --platform rhub
 ```
 
 **Executes:**
 
 - Submits the package to [win-builder](https://win-builder.r-project.org/) for a remote Windows check
-- **Async dispatch** — results are emailed to the DESCRIPTION Maintainer (or appear in GitHub Actions for `--platform rhub`); nothing returns synchronously
+- **Async dispatch** — results are emailed to the DESCRIPTION Maintainer; nothing returns synchronously
 - `devtools` is optional — if missing, reports 🟡 with install hint
 - Run at least once per release after a clean `/rforge:r:check --as-cran` pass
 
@@ -1195,25 +1193,35 @@ Multi-platform checks via R-hub v2 (`rhub::rhub_check`) — async dispatch via G
 **Usage:**
 
 ```bash
-/rforge:r:rhub [package]
+/rforge:r:rhub [package] [--platforms linux,windows] [--preset cran-submission] [--rc-mode]
 ```
 
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
+- `--platforms` (optional) - Comma-separated platform list (e.g. `linux,windows,macos-arm64,atlas`); overrides preset
+- `--preset` (optional) - Named platform preset: `cran-submission` (default), `cran-submission-strict`, `sanitizers`, `all-vm`
+- `--rc-mode` (optional) - Use RC shared runners via `rc_submit()` instead of your own GitHub account
 
 **Examples:**
 
 ```bash
-# Dispatch to R-hub v2
+# Default: cran-submission preset (linux, windows, macos-arm64, atlas)
 /rforge:r:rhub
+# Named preset (adds clang-asan)
+/rforge:r:rhub --preset cran-submission-strict
+# Explicit platforms
+/rforge:r:rhub --platforms linux,windows,macos-arm64
+# RC shared runners
+/rforge:r:rhub --rc-mode
 ```
 
 **Executes:**
 
-- Runs `rhub::rhub_check()` — triggers GitHub Actions workflows across Linux, macOS, Windows, and various R versions
-- **Async dispatch** — results appear in the repo's Actions tab
-- First run calls `rhub::rhub_setup()` (writes `.github/workflows/rhub.yaml`); subsequent runs skip setup
+- Runs `rhub::rhub_check(platforms=...)` — triggers GitHub Actions workflows across the selected platforms (always passed explicitly; never `NULL`, never an interactive menu)
+- **Async dispatch** — results appear in the repo's Actions tab; the URL is built from your git remote and opened in your browser
+- **Never** calls `rhub::rhub_setup()` — `.github/workflows/rhub.yaml` must already exist and be committed (pre-flight hard-stops with `rhub_yaml_missing` if absent)
+- Pre-flight: hard-blocks broken platforms (e.g. `macos`); advises on missing `pak-version: stable` and broken default-config platforms (advisories don't block)
 - A GitHub remote is required
 - `rhub` is optional — if missing, reports 🟡 with install hint
 
