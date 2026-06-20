@@ -156,6 +156,15 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
     if kind == "check":
         env["check"] = {k: _as_list(raw.get(k)) for k in ("errors", "warnings", "notes")}
         env["check"]["notes_classified"] = _classify_notes(raw.get("notes"))
+        # G8: surface PDF-manual-skip as an advisory note (LaTeX absent locally)
+        all_text = " ".join(env["check"].get("notes", []))
+        if _PDF_SKIP_RE.search(all_text):
+            env["check"]["notes_classified"].append({
+                "text": ("PDF manual skipped — LaTeX/pdflatex not available on "
+                         "this system. Rely on win-builder for the PDF manual."),
+                "kind": "advisory",
+                "reason": "pdf_manual_skipped",
+            })
     elif kind == "test":
         env["tests"] = {k: raw.get(k, 0) for k in
                         ("passed", "failed", "skipped", "warnings")}
@@ -181,8 +190,32 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
         misspelled = _as_list(raw.get("misspelled"))
         env["spell"] = {"count": len(misspelled), "misspelled": misspelled}
     elif kind == "urlcheck":
-        broken = _as_list(raw.get("broken"))
-        env["urlcheck"] = {"count": len(broken), "broken": broken}
+        # G4: classify doi.org 403s as advisory (firewall blocks, not real breakage)
+        raw_broken = _as_list(raw.get("broken"))
+        doi_blocked = []
+        real_broken = []
+        for item in raw_broken:
+            if isinstance(item, dict):
+                url = str(item.get("url", ""))
+                status_code = str(item.get("status", ""))
+                if "doi.org" in url and "403" in status_code:
+                    doi_blocked.append(item)
+                else:
+                    real_broken.append(item)
+            else:
+                real_broken.append(item)
+        env["urlcheck"] = {
+            "count": len(real_broken),
+            "broken": real_broken,
+            "doi_blocked_count": len(doi_blocked),
+        }
+        if not raw.get("engine_missing"):
+            if real_broken:
+                env["status"] = "error"
+            elif doi_blocked:
+                env["status"] = "warn"
+            else:
+                env["status"] = "ok"
     elif kind == "style":
         changed = _as_list(raw.get("changed_files"))
         env["style"] = {"count": len(changed), "changed_files": changed}
@@ -280,10 +313,47 @@ def _r_named_char(d: dict) -> str:
     return f"c({inner})"
 
 
+_WIN_FN = {
+    "devel": "devtools::check_win_devel",
+    "release": "devtools::check_win_release",
+    "oldrelease": "devtools::check_win_oldrelease",
+}
+
+_CRAN_CHECKS_REGISTRY = {
+    # base: extra env vars beyond _INCOMING_ENV + DEPENDS/SUGGESTS (which the
+    # two-pass logic adds structurally). Per the EXCLUDED list above, all other
+    # incoming-era vars are already in --as-cran or excluded for documented reasons.
+    "base": {},
+    "R4.3": {},
+    "R4.4": {},
+    "R4.5": {},
+}
+
+_PDF_SKIP_RE = re.compile(
+    r"skipping PDF manual|LaTeX not found|pdflatex(?:\s+is)? not (?:found|available)",
+    re.IGNORECASE,
+)
+
+
+def _r_version_key() -> str:
+    """Return 'R{major}.{minor}' for installed R, or 'base' if Rscript absent."""
+    rscript = shutil.which("Rscript")
+    if rscript is None:
+        return "base"
+    proc = subprocess.run(
+        [rscript, "-e", "cat(paste0('R', R.version$major, '.', R.version$minor))"],
+        capture_output=True, text=True,
+    )
+    text = proc.stdout.strip()
+    if re.match(r"^R\d+\.\d+$", text):
+        return text
+    return "base"
+
+
 def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = False,
               strict: bool = False, articles_only: bool = False,
               devel: bool = False, flavor: str | None = None,
-              incoming: bool = False) -> str:
+              incoming: bool = False, platform: str = "all") -> str:
     """Build the R one-liner for engine ``kind``, emitting JSON on stdout.
 
     For ``kind="check"``, ``flavor`` in {None, "depends", "suggests"} selects a
@@ -300,11 +370,31 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
         if run_donttest:
             flags.append("--run-donttest")
         args = f'c({", ".join(json.dumps(f) for f in flags)})' if flags else "character()"
+        if incoming:
+            # G7: _R_CHECK_DEPENDS_ONLY_ and _R_CHECK_SUGGESTS_ONLY_ are
+            # mutually exclusive in rcmdcheck — run two sequential passes and
+            # merge errors/warnings/notes so both perspectives are captured.
+            # _CRAN_CHECKS_REGISTRY supplies version-specific extra vars; base
+            # is the fallback when the installed R version has no specific entry.
+            _reg_key = _r_version_key()
+            _extra = (
+                _CRAN_CHECKS_REGISTRY[_reg_key]
+                if _reg_key in _CRAN_CHECKS_REGISTRY
+                else _CRAN_CHECKS_REGISTRY["base"]
+            )
+            env_p1 = {**_INCOMING_ENV, **_extra, "_R_CHECK_DEPENDS_ONLY_": "true"}
+            env_p2 = {**_INCOMING_ENV, **_extra, "_R_CHECK_SUGGESTS_ONLY_": "true"}
+            return _guard("rcmdcheck",
+                f'r1 <- rcmdcheck::rcmdcheck({p}, args={args}, '
+                f'env={_r_named_char(env_p1)}, quiet=TRUE, error_on = "never"); '
+                f'r2 <- rcmdcheck::rcmdcheck({p}, args={args}, '
+                f'env={_r_named_char(env_p2)}, quiet=TRUE, error_on = "never"); '
+                f'cat(jsonlite::toJSON(list(errors=c(r1$errors,r2$errors), '
+                f'warnings=c(r1$warnings,r2$warnings), notes=c(r1$notes,r2$notes)), '
+                f'auto_unbox=TRUE, null="list"))')
         env_vars: dict[str, str] = {}
         if flavor is not None:
             env_vars.update(_CHECK_ENV[flavor])
-        if incoming:
-            env_vars.update(_INCOMING_ENV)
         env_arg = f", env={_r_named_char(env_vars)}" if env_vars else ""
         return _guard("rcmdcheck",
             f'r <- rcmdcheck::rcmdcheck({p}, args={args}{env_arg}, '
@@ -402,9 +492,17 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             f'error=function(e) character()); '
             f'cat(jsonlite::toJSON(list(checks=ck), auto_unbox=TRUE, null="list"))')
     if kind == "winbuilder":
-        # NOTE: devtools::check_win_devel() submission verified live in Task 9.
+        # G1: platform kwarg selects which win-builder flavour(s) to submit to.
+        # platform="rhub" dispatches via rhub v2 instead of devtools.
+        if platform == "rhub":
+            return _guard("rhub",
+                f'rhub::rhub_check({p}); '
+                f'cat(jsonlite::toJSON(list(submitted=TRUE, platform="rhub", '
+                f'note="Results in GitHub Actions tab, not email"), auto_unbox=TRUE))')
+        plats = list(_WIN_FN.keys()) if platform == "all" else [platform]
+        calls = "; ".join(f"{_WIN_FN[pl]}({p})" for pl in plats)
         return _guard("devtools",
-            f'devtools::check_win_devel({p}); '
+            f'{calls}; '
             f'cat(jsonlite::toJSON(list(submitted=TRUE), auto_unbox=TRUE))')
     if kind == "rhub":
         # NOTE: rhub::rhub_check() run_url capture verified live in Task 9.
@@ -556,7 +654,8 @@ def _install_package(path: str) -> tuple[dict, int]:
 
 def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = False,
         strict: bool = False, articles_only: bool = False, devel: bool = False,
-        flavor: str | None = None, incoming: bool = False) -> dict:
+        flavor: str | None = None, incoming: bool = False,
+        platform: str = "all") -> dict:
     """Run one engine ``kind`` against ``path``; return the normalized envelope.
 
     Threads the check ``flavor`` / ``incoming`` selectors through to ``r_snippet``;
@@ -574,7 +673,7 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
             _install_package(path)  # standalone build_articles renders installed version
         snippet = r_snippet(kind, path, as_cran=as_cran, preview=preview,
                             strict=strict, articles_only=articles_only, devel=devel,
-                            flavor=flavor, incoming=incoming)
+                            flavor=flavor, incoming=incoming, platform=platform)
         stdout, code = _invoke_r(snippet)
         raw = _parse_json(stdout)
         if raw is None:
@@ -879,7 +978,7 @@ def _run_cran_prep(path: str = ".", *, no_revdep: bool = False,
     # via the real R CMD check NOTE once R runs.) Each degrades to `warn` on a
     # missing/unparseable DESCRIPTION/.Rbuildignore rather than raising.
     for tier4 in (cranlint.lint_description, cranlint.check_build_hygiene,
-                  cranlint.check_planning_consistency):
+                  cranlint.check_planning_consistency, cranlint.check_test_config):
         env = tier4(path)
         stages.append({"kind": env["kind"], "status": env["status"]})
         for finding in env.get("findings", []):
@@ -945,6 +1044,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--goodpractice", action="store_true")
     ap.add_argument("--multi-platform", action="store_true")
     ap.add_argument("--no-revdep", action="store_true")
+    ap.add_argument("--platform",
+                    choices=list(_WIN_FN.keys()) + ["all", "rhub"], default="all",
+                    help="winbuilder: platform(s) to submit to "
+                         "(devel|release|oldrelease|all|rhub); default all")
     ap.add_argument("--incoming", action="store_true",
                     help="check: add the CRAN-incoming _R_CHECK_* bundle "
                          "(implies --strict); cran-prep: add the check (incoming) row")
@@ -984,7 +1087,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         env = run(ns.kind, ns.path, as_cran=ns.as_cran, preview=ns.preview,
                   strict=ns.strict, articles_only=ns.articles_only, devel=ns.devel,
-                  flavor=ns.flavor, incoming=ns.incoming)
+                  flavor=ns.flavor, incoming=ns.incoming, platform=ns.platform)
     print(json.dumps(env, indent=2))
     # "dispatched" (winbuilder/rhub) is non-error — exits 0 like "ok"/"warn"
     return 0 if env.get("status") not in ("error", "blocked") else 1

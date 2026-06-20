@@ -34,6 +34,12 @@ arguments:
 Run the suite via `testthat::test_local()` (self-loads the package via pkgload).
 
 ## Process
+
+Pre-flight: if `tests/testthat/` exists, run
+`python3 -m lib.cranlint check_test_config "<path>"` and surface any
+`testthat_edition_missing` or `testthat_edition_outdated` findings as an advisory block
+before the test run. Skip silently if `tests/testthat/` is absent.
+
 ```bash
 python3 -m lib.rcmd --kind test --path "<path>"
 ```

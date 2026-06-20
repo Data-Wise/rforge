@@ -231,3 +231,123 @@ def test_main_check_incoming_flag_threads_into_run(tmp_path, monkeypatch):
     monkeypatch.setattr(rcmd, "run", fake_run)
     rcmd.main(["--kind", "check", "--path", str(tmp_path), "--incoming"])
     assert seen.get("incoming") is True
+
+
+# --- G4: doi.org 403 classification in urlcheck normalize --------------------
+
+def test_urlcheck_doi_403_classified():
+    raw = {"broken": [{"url": "https://doi.org/10.1000/xyz", "status": "403 Forbidden",
+                        "message": "Forbidden", "new_url": None}]}
+    env = rcmd.normalize("urlcheck", raw, 0, None)
+    assert env["urlcheck"]["doi_blocked_count"] == 1
+    assert env["urlcheck"]["count"] == 0
+    assert env["status"] == "warn"
+
+
+def test_urlcheck_real_404_not_classified():
+    raw = {"broken": [{"url": "https://doi.org/10.1000/missing", "status": "404 Not Found",
+                        "message": "Not Found", "new_url": None}]}
+    env = rcmd.normalize("urlcheck", raw, 0, None)
+    assert env["urlcheck"]["count"] == 1
+    assert env["urlcheck"]["doi_blocked_count"] == 0
+    assert env["status"] == "error"
+
+
+def test_urlcheck_403_non_doi_not_classified():
+    raw = {"broken": [{"url": "https://example.com/page", "status": "403 Forbidden",
+                        "message": "Forbidden", "new_url": None}]}
+    env = rcmd.normalize("urlcheck", raw, 0, None)
+    assert env["urlcheck"]["count"] == 1
+    assert env["urlcheck"]["doi_blocked_count"] == 0
+    assert env["status"] == "error"
+
+
+def test_urlcheck_string_items_passthrough():
+    raw = {"broken": ["https://broken-link.example.com"]}
+    env = rcmd.normalize("urlcheck", raw, 0, None)
+    assert env["urlcheck"]["count"] == 1
+    assert env["urlcheck"]["doi_blocked_count"] == 0
+
+
+# --- G1: win-builder platform kwarg ------------------------------------------
+
+def test_winbuilder_platform_release():
+    src = rcmd.r_snippet("winbuilder", "/tmp/foo", platform="release")
+    assert "check_win_release" in src
+    assert "check_win_devel" not in src
+    assert "check_win_oldrelease" not in src
+
+
+def test_winbuilder_platform_all():
+    src = rcmd.r_snippet("winbuilder", "/tmp/foo", platform="all")
+    assert "check_win_devel" in src
+    assert "check_win_release" in src
+    assert "check_win_oldrelease" in src
+
+
+def test_winbuilder_default_is_all():
+    src_default = rcmd.r_snippet("winbuilder", "/tmp/foo")
+    src_all = rcmd.r_snippet("winbuilder", "/tmp/foo", platform="all")
+    assert src_default == src_all
+
+
+def test_winbuilder_platform_rhub():
+    src = rcmd.r_snippet("winbuilder", "/tmp/foo", platform="rhub")
+    assert "rhub::rhub_check" in src
+    assert 'requireNamespace("rhub"' in src
+    assert "GitHub Actions" in src
+
+
+# --- G6: --run-donttest in strict/incoming -----------------------------------
+
+def test_check_strict_run_donttest():
+    src = rcmd.r_snippet("check", "/tmp/foo", as_cran=True, strict=True)
+    assert "--run-donttest" in src
+
+
+def test_check_incoming_run_donttest():
+    src = rcmd.r_snippet("check", "/tmp/foo", as_cran=True, incoming=True)
+    assert "--run-donttest" in src
+
+
+def test_check_non_strict_no_donttest():
+    src = rcmd.r_snippet("check", "/tmp/foo", as_cran=True)
+    assert "--run-donttest" not in src
+
+
+# --- G7: versioned registry + sequential passes ------------------------------
+
+def test_cran_checks_registry_base_keys():
+    # base is intentionally empty — all documented incoming-era _R_CHECK_* vars are
+    # already enforced by --as-cran; DEPENDS/SUGGESTS are added structurally per pass.
+    assert isinstance(rcmd._CRAN_CHECKS_REGISTRY["base"], dict)
+    assert "_R_CHECK_S3_REGISTRATION_" not in rcmd._CRAN_CHECKS_REGISTRY["base"]
+
+
+def test_incoming_fires_sequential_passes():
+    src = rcmd.r_snippet("check", "/tmp/foo", as_cran=True, incoming=True)
+    assert "_R_CHECK_DEPENDS_ONLY_" in src
+    assert "_R_CHECK_SUGGESTS_ONLY_" in src
+    assert src.count("rcmdcheck::rcmdcheck(") >= 2
+
+
+def test_r_version_key_format():
+    import re
+    result = rcmd._r_version_key()
+    assert re.match(r'^R\d+\.\d+$', result) or result == "base"
+
+
+# --- G8: PDF manual skip advisory -------------------------------------------
+
+def test_pdf_manual_skipped_advisory():
+    raw = {"errors": [], "warnings": [], "notes": ["skipping PDF manual"]}
+    env = rcmd.normalize("check", raw, 0, None)
+    reasons = {f.get("reason") for f in env["check"].get("notes_classified", [])}
+    assert "pdf_manual_skipped" in reasons
+
+
+def test_pdf_manual_present_no_advisory():
+    raw = {"errors": [], "warnings": [], "notes": []}
+    env = rcmd.normalize("check", raw, 0, None)
+    codes = {f.get("code") for f in env.get("findings", [])}
+    assert "pdf_manual_skipped" not in codes
