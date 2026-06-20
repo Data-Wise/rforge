@@ -106,3 +106,33 @@ jobs:
           echo "  - Commands: $COMMAND_COUNT"
           echo "  - Agents: Orchestrator"
           echo "  - Structure: R package ecosystem management"
+
+  test:
+    name: Tests (pytest + test-all)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          # lib/* and tests/* are R-free and pure-stdlib apart from these:
+          #  - pytest: the lib test suite
+          #  - pyyaml: mkdocs.yml parsing in test-all.sh
+          #  - mkdocs-material: test-all's "mkdocs.yml parses" check uses
+          #    yaml.unsafe_load, which must resolve the config's
+          #    !!python/name:material.* tags (Material theme)
+          python3 -m pip install pytest pyyaml mkdocs-material
+
+      - name: Run pytest suite
+        run: python3 -m pytest tests/ -q
+
+      - name: Run full validation suite (test-all.sh)
+        run: bash tests/test-all.sh
