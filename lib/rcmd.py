@@ -376,7 +376,10 @@ def _check_rhub_yaml(pkg_path: str) -> list[dict]:
     blocks = re.split(r"- uses: r-hub/actions/setup-deps", content)
     # blocks[0] = content before first occurrence; blocks[1:] = after each.
     for i, block in enumerate(blocks[1:], 1):
-        with_match = re.search(r"\s+with:\s*((?:\s+\S.*\n)*)", block)
+        # [ \t]* (not \s*) after `with:` so the trailing newline is left for the
+        # capture group to consume; \s* would eat it and capture nothing, making
+        # every block look like it's missing pak-version.
+        with_match = re.search(r"\s+with:[ \t]*\n((?:\s+\S.*\n)*)", block)
         if not with_match:
             continue
         with_block = with_match.group(1)
