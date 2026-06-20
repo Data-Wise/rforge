@@ -156,6 +156,15 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
     if kind == "check":
         env["check"] = {k: _as_list(raw.get(k)) for k in ("errors", "warnings", "notes")}
         env["check"]["notes_classified"] = _classify_notes(raw.get("notes"))
+        # G8: surface PDF-manual-skip as an advisory note (LaTeX absent locally)
+        all_text = " ".join(env["check"].get("notes", []))
+        if _PDF_SKIP_RE.search(all_text):
+            env["check"]["notes_classified"].append({
+                "text": ("PDF manual skipped — LaTeX/pdflatex not available on "
+                         "this system. Rely on win-builder for the PDF manual."),
+                "kind": "advisory",
+                "reason": "pdf_manual_skipped",
+            })
     elif kind == "test":
         env["tests"] = {k: raw.get(k, 0) for k in
                         ("passed", "failed", "skipped", "warnings")}
@@ -181,8 +190,32 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
         misspelled = _as_list(raw.get("misspelled"))
         env["spell"] = {"count": len(misspelled), "misspelled": misspelled}
     elif kind == "urlcheck":
-        broken = _as_list(raw.get("broken"))
-        env["urlcheck"] = {"count": len(broken), "broken": broken}
+        # G4: classify doi.org 403s as advisory (firewall blocks, not real breakage)
+        raw_broken = _as_list(raw.get("broken"))
+        doi_blocked = []
+        real_broken = []
+        for item in raw_broken:
+            if isinstance(item, dict):
+                url = str(item.get("url", ""))
+                status_code = str(item.get("status", ""))
+                if "doi.org" in url and "403" in status_code:
+                    doi_blocked.append(item)
+                else:
+                    real_broken.append(item)
+            else:
+                real_broken.append(item)
+        env["urlcheck"] = {
+            "count": len(real_broken),
+            "broken": real_broken,
+            "doi_blocked_count": len(doi_blocked),
+        }
+        if not raw.get("engine_missing"):
+            if real_broken:
+                env["status"] = "error"
+            elif doi_blocked:
+                env["status"] = "warn"
+            else:
+                env["status"] = "ok"
     elif kind == "style":
         changed = _as_list(raw.get("changed_files"))
         env["style"] = {"count": len(changed), "changed_files": changed}
@@ -280,10 +313,201 @@ def _r_named_char(d: dict) -> str:
     return f"c({inner})"
 
 
+_WIN_FN = {
+    "devel": "devtools::check_win_devel",
+    "release": "devtools::check_win_release",
+    "oldrelease": "devtools::check_win_oldrelease",
+}
+
+_CRAN_CHECKS_REGISTRY = {
+    # base: extra env vars beyond _INCOMING_ENV + DEPENDS/SUGGESTS (which the
+    # two-pass logic adds structurally). Per the EXCLUDED list above, all other
+    # incoming-era vars are already in --as-cran or excluded for documented reasons.
+    "base": {},
+    "R4.3": {},
+    "R4.4": {},
+    "R4.5": {},
+}
+
+_PDF_SKIP_RE = re.compile(
+    r"skipping PDF manual|LaTeX not found|pdflatex(?:\s+is)? not (?:found|available)",
+    re.IGNORECASE,
+)
+
+# ── R-hub v2 platform tables ────────────────────────────────────────────────
+# Known-broken R-hub platforms: dispatching to any of these fails immediately,
+# so _rhub_preflight() hard-blocks them with the keyed remediation message.
+_RHUB_BROKEN_PLATFORMS = {
+    "macos": (
+        "macos-13 runner retired December 2025; "
+        "use `macos-arm64` (ARM) or wait for rhub to update. "
+        "See https://github.com/r-hub/rhub/issues/669"
+    ),
+}
+
+# Named platform presets. `cran-submission` is the headless default (Q6): an OS
+# matrix plus `atlas`. `clang-asan` is opt-in only (issue #645, [unstable]).
+_RHUB_PRESETS = {
+    "cran-submission":        ["linux", "windows", "macos-arm64", "atlas"],
+    "cran-submission-strict": ["linux", "windows", "macos-arm64", "atlas", "clang-asan"],
+    "sanitizers":             ["clang-asan", "atlas"],
+    "all-vm":                 ["linux", "windows", "macos-arm64"],
+}
+
+
+def _check_rhub_yaml(pkg_path: str) -> list[dict]:
+    """Scan .github/workflows/rhub.yaml for advisory issues.
+
+    Two advisory checks: (1) each ``setup-deps`` block missing ``pak-version:
+    stable`` (pak devel bootstrap regression, r-lib/pak #887); (2) a default
+    config field naming a known-broken platform. Returns ``[]`` if rhub.yaml is
+    absent — its absence is a hard error handled by ``_rhub_preflight``.
+    """
+    # TODO: remove or loosen the pak-version check when r-lib/pak #887 is fixed in devel.
+    # Upstream: https://github.com/r-lib/pak/issues/887
+    yaml_path = Path(pkg_path) / ".github" / "workflows" / "rhub.yaml"
+    if not yaml_path.exists():
+        return []  # rhub_yaml_missing is handled by _rhub_preflight
+
+    content = yaml_path.read_text()
+    findings: list[dict] = []
+
+    # Check pak-version in every setup-deps block.
+    blocks = re.split(r"- uses: r-hub/actions/setup-deps", content)
+    # blocks[0] = content before first occurrence; blocks[1:] = after each.
+    for i, block in enumerate(blocks[1:], 1):
+        # [ \t]* (not \s*) after `with:` so the trailing newline is left for the
+        # capture group to consume; \s* would eat it and capture nothing, making
+        # every block look like it's missing pak-version.
+        with_match = re.search(r"\s+with:[ \t]*\n((?:\s+\S.*\n)*)", block)
+        if not with_match:
+            continue
+        with_block = with_match.group(1)
+        if "pak-version:" not in with_block:
+            findings.append({
+                "code": "rhub_pak_devel_regression",
+                "severity": "advisory",
+                "block": i,   # informational: which setup-deps block (1-indexed)
+                "message": (
+                    f"setup-deps block {i} is missing `pak-version: stable`. "
+                    "pak devel (0.10.0.9000) has a bootstrap regression "
+                    "(r-lib/pak #887, filed 2026-06-13) — rhub jobs will "
+                    "silently fail. Add `pak-version: stable` as the first "
+                    "`with:` entry in this block."
+                ),
+                "fix": (
+                    "- uses: r-hub/actions/setup-deps@v1\n"
+                    "  with:\n"
+                    "    pak-version: stable\n"
+                    "    token: ${{ secrets.RHUB_TOKEN }}\n"
+                    "    job-config: ${{ matrix.config.job-config }}"
+                ),
+            })
+
+    # Check default config field for broken platforms.
+    default_match = re.search(r"default:\s*'([^']+)'", content)
+    if default_match:
+        default_platforms = [p.strip() for p in default_match.group(1).split(",")]
+        broken_in_default = [p for p in default_platforms if p in _RHUB_BROKEN_PLATFORMS]
+        if broken_in_default:
+            findings.append({
+                "code": "rhub_yaml_default_broken_platform",
+                "severity": "advisory",
+                "platforms": broken_in_default,
+                "message": (
+                    f"rhub.yaml default config includes retired platform(s): "
+                    f"{', '.join(broken_in_default)}. Update the default field to "
+                    f"'linux,windows,macos-arm64' to avoid confusing others who "
+                    f"manually trigger the workflow."
+                ),
+            })
+
+    return findings
+
+
+def _rhub_preflight(pkg_path: str, platforms: list) -> list[dict]:
+    """Unified pre-flight checks for r:rhub. Returns a list of findings.
+
+    Fixed sequence: (a) yaml_missing hard-stops immediately; (b) each broken
+    platform yields an error; (c) advisory checks from ``_check_rhub_yaml``.
+    Only ``severity == 'error'`` findings block dispatch.
+    """
+    findings: list[dict] = []
+    yaml_path = Path(pkg_path) / ".github" / "workflows" / "rhub.yaml"
+
+    # (a) yaml_missing — hard error, short-circuits remaining checks.
+    if not yaml_path.exists():
+        findings.append({
+            "code": "rhub_yaml_missing",
+            "severity": "error",
+            "message": (
+                ".github/workflows/rhub.yaml not found. "
+                "Run `rhub::rhub_setup()` in R to create it (requires a GitHub remote). "
+                "This file must exist and be committed before r:rhub can dispatch."
+            ),
+        })
+        return findings  # No further checks possible.
+
+    # (b) broken_platform — hard error per broken platform requested.
+    for plat in platforms:
+        if plat in _RHUB_BROKEN_PLATFORMS:
+            findings.append({
+                "code": "rhub_broken_platform",
+                "severity": "error",
+                "platform": plat,
+                "message": (
+                    f"Platform '{plat}' is broken: {_RHUB_BROKEN_PLATFORMS[plat]}"
+                ),
+            })
+
+    # (c) pak_version + default config advisories.
+    findings.extend(_check_rhub_yaml(pkg_path))
+
+    return findings
+
+
+def _rhub_actions_url(pkg_path: str) -> str:
+    """Construct the GitHub Actions URL from the origin remote.
+
+    Normalizes SSH→HTTPS, strips a trailing ``.git``, appends ``/actions``.
+    Returns an empty string on any failure (no remote, git absent, timeout).
+    """
+    try:
+        result = subprocess.run(
+            ["git", "-C", pkg_path, "remote", "get-url", "origin"],
+            capture_output=True, text=True, timeout=5,
+        )
+        remote = result.stdout.strip()
+        # Normalize: ssh -> https, strip .git suffix.
+        if remote.startswith("git@github.com:"):
+            remote = "https://github.com/" + remote[len("git@github.com:"):]
+        if remote.endswith(".git"):
+            remote = remote[:-4]
+        return remote.rstrip("/") + "/actions" if remote else ""
+    except Exception:
+        return ""
+
+
+def _r_version_key() -> str:
+    """Return 'R{major}.{minor}' for installed R, or 'base' if Rscript absent."""
+    rscript = shutil.which("Rscript")
+    if rscript is None:
+        return "base"
+    proc = subprocess.run(
+        [rscript, "-e", "cat(paste0('R', R.version$major, '.', R.version$minor))"],
+        capture_output=True, text=True,
+    )
+    text = proc.stdout.strip()
+    if re.match(r"^R\d+\.\d+$", text):
+        return text
+    return "base"
+
+
 def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = False,
               strict: bool = False, articles_only: bool = False,
               devel: bool = False, flavor: str | None = None,
-              incoming: bool = False) -> str:
+              incoming: bool = False, platform: str = "all",
+              platforms: list | None = None, rc_mode: bool = False) -> str:
     """Build the R one-liner for engine ``kind``, emitting JSON on stdout.
 
     For ``kind="check"``, ``flavor`` in {None, "depends", "suggests"} selects a
@@ -300,11 +524,31 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
         if run_donttest:
             flags.append("--run-donttest")
         args = f'c({", ".join(json.dumps(f) for f in flags)})' if flags else "character()"
+        if incoming:
+            # G7: _R_CHECK_DEPENDS_ONLY_ and _R_CHECK_SUGGESTS_ONLY_ are
+            # mutually exclusive in rcmdcheck — run two sequential passes and
+            # merge errors/warnings/notes so both perspectives are captured.
+            # _CRAN_CHECKS_REGISTRY supplies version-specific extra vars; base
+            # is the fallback when the installed R version has no specific entry.
+            _reg_key = _r_version_key()
+            _extra = (
+                _CRAN_CHECKS_REGISTRY[_reg_key]
+                if _reg_key in _CRAN_CHECKS_REGISTRY
+                else _CRAN_CHECKS_REGISTRY["base"]
+            )
+            env_p1 = {**_INCOMING_ENV, **_extra, "_R_CHECK_DEPENDS_ONLY_": "true"}
+            env_p2 = {**_INCOMING_ENV, **_extra, "_R_CHECK_SUGGESTS_ONLY_": "true"}
+            return _guard("rcmdcheck",
+                f'r1 <- rcmdcheck::rcmdcheck({p}, args={args}, '
+                f'env={_r_named_char(env_p1)}, quiet=TRUE, error_on = "never"); '
+                f'r2 <- rcmdcheck::rcmdcheck({p}, args={args}, '
+                f'env={_r_named_char(env_p2)}, quiet=TRUE, error_on = "never"); '
+                f'cat(jsonlite::toJSON(list(errors=c(r1$errors,r2$errors), '
+                f'warnings=c(r1$warnings,r2$warnings), notes=c(r1$notes,r2$notes)), '
+                f'auto_unbox=TRUE, null="list"))')
         env_vars: dict[str, str] = {}
         if flavor is not None:
             env_vars.update(_CHECK_ENV[flavor])
-        if incoming:
-            env_vars.update(_INCOMING_ENV)
         env_arg = f", env={_r_named_char(env_vars)}" if env_vars else ""
         return _guard("rcmdcheck",
             f'r <- rcmdcheck::rcmdcheck({p}, args={args}{env_arg}, '
@@ -402,16 +646,32 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             f'error=function(e) character()); '
             f'cat(jsonlite::toJSON(list(checks=ck), auto_unbox=TRUE, null="list"))')
     if kind == "winbuilder":
-        # NOTE: devtools::check_win_devel() submission verified live in Task 9.
+        # G1: platform kwarg selects which win-builder flavour(s) to submit to.
+        # rhub dispatch removed — use kind='rhub' directly (see kind == "rhub" below).
+        plats = list(_WIN_FN.keys()) if platform == "all" else [platform]
+        calls = "; ".join(f"{_WIN_FN[pl]}({p})" for pl in plats)
         return _guard("devtools",
-            f'devtools::check_win_devel({p}); '
+            f'{calls}; '
             f'cat(jsonlite::toJSON(list(submitted=TRUE), auto_unbox=TRUE))')
     if kind == "rhub":
-        # NOTE: rhub::rhub_check() run_url capture verified live in Task 9.
+        # Two modes. rhub.yaml presence is confirmed by _rhub_preflight() before
+        # we reach here, so the snippet NEVER calls rhub::rhub_setup() (that would
+        # make a spurious git commit on every invocation) and NEVER passes NULL
+        # platforms (which opens an interactive console menu and hangs headlessly).
+        if rc_mode:
+            # RC shared runners: rc_submit() takes no platforms arg — it uses the
+            # rhub.yaml workflow-dispatch config.
+            return _guard("rhub",
+                f'rhub::rc_submit({p}); '
+                f'cat(jsonlite::toJSON(list(submitted=TRUE, mode="rc_submit", '
+                f'note="Results at https://builder.r-hub.io"), auto_unbox=TRUE))')
+        # Own GitHub account: explicit platforms vector, never NULL.
+        plats = platforms or _RHUB_PRESETS["cran-submission"]
+        plats_r = "c(" + ", ".join(f'"{pl}"' for pl in plats) + ")"
         return _guard("rhub",
-            f'rhub::rhub_setup({p}); '              # idempotent; writes workflow
-            f'rhub::rhub_check({p}); '
-            f'cat(jsonlite::toJSON(list(run_url=NA), auto_unbox=TRUE))')
+            f'rhub::rhub_check({p}, platforms={plats_r}); '
+            f'cat(jsonlite::toJSON(list(submitted=TRUE, platforms={plats_r}, '
+            f'note="Results in GitHub Actions tab"), auto_unbox=TRUE))')
     if kind == "s7runtime":
         # Load the package, introspect S7 at runtime, emit 3 issue lists as JSON.
         #
@@ -554,19 +814,80 @@ def _install_package(path: str) -> tuple[dict, int]:
     return ({"installed_version": pkg.get("version")}, proc.returncode)
 
 
+def _run_rhub(path: str, pkg: dict, *, platforms: list | None = None,
+              preset: str | None = None, rc_mode: bool = False) -> dict:
+    """Dispatch ``kind="rhub"``: resolve platforms, pre-flight, then dispatch.
+
+    Pre-flight runs entirely in Python before any R call. Error findings block
+    dispatch (returned as an error envelope); advisory findings ride along in the
+    returned envelope's ``findings`` key and never short-circuit dispatch.
+    """
+    # Resolve platforms: preset → explicit list → default preset.
+    if preset is not None:
+        if preset not in _RHUB_PRESETS:
+            return {"kind": "rhub", "status": "error", "engine_missing": [],
+                    "messages": [f"Unknown preset '{preset}'. "
+                                 f"Valid presets: {', '.join(_RHUB_PRESETS)}"]}
+        platforms = _RHUB_PRESETS[preset]
+    elif platforms is None:
+        # Never pass NULL headlessly — fall back to the default preset.
+        platforms = _RHUB_PRESETS["cran-submission"]
+
+    # Pre-flight gate (Python-side, before any R dispatch).
+    preflight = _rhub_preflight(path, platforms)
+    errors = [f for f in preflight if f.get("severity") == "error"]
+    if errors:
+        return {"kind": "rhub", "status": "error", "engine_missing": [],
+                "messages": [f["message"] for f in errors],
+                "findings": errors}
+    advisories = [f for f in preflight if f.get("severity") == "advisory"]
+
+    # Dispatch through the normal R pipeline.
+    snippet = r_snippet("rhub", path, platforms=platforms, rc_mode=rc_mode)
+    stdout, code = _invoke_r(snippet)
+    raw = _parse_json(stdout)
+    if raw is None:
+        raw = console_fallback("rhub", stdout)
+    env = normalize("rhub", raw, code, pkg)
+    for eng in env.get("engine_missing", []):
+        if INSTALL_HINT.get(eng):
+            env.setdefault("messages", []).append(f"Missing R package — run: {INSTALL_HINT[eng]}")
+        if eng in OPTIONAL_ENGINES and env["status"] == "error":
+            env["status"] = "warn"
+
+    # Construct and open the GitHub Actions URL (own-account mode only).
+    actions_url = _rhub_actions_url(path) if not rc_mode else ""
+    if actions_url:
+        import webbrowser
+        try:
+            webbrowser.open(actions_url)
+        except Exception:
+            pass
+
+    env["findings"] = advisories
+    env["run_url"] = actions_url or env.get("rhub", {}).get("run_url")
+    return env
+
+
 def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = False,
         strict: bool = False, articles_only: bool = False, devel: bool = False,
-        flavor: str | None = None, incoming: bool = False) -> dict:
+        flavor: str | None = None, incoming: bool = False,
+        platform: str = "all", platforms: list | None = None,
+        preset: str | None = None, rc_mode: bool = False) -> dict:
     """Run one engine ``kind`` against ``path``; return the normalized envelope.
 
     Threads the check ``flavor`` / ``incoming`` selectors through to ``r_snippet``;
-    returns an error envelope when no DESCRIPTION is found.
+    returns an error envelope when no DESCRIPTION is found. For ``kind="rhub"``,
+    ``platforms`` (``list[str]``), ``preset`` (``str``) and ``rc_mode`` (``bool``)
+    select the R-hub dispatch; a Python-side pre-flight gate runs before any R call.
     """
     pkg = find_package(path)
     if pkg is None:
         return {"kind": kind, "status": "error", "engine_missing": [],
                 "messages": ["No DESCRIPTION found — is this an R package? "
                              "Try /rforge:detect to locate packages."]}
+    if kind == "rhub":
+        return _run_rhub(path, pkg, platforms=platforms, preset=preset, rc_mode=rc_mode)
     if kind == "install":
         raw, code = _install_package(path)
     else:
@@ -574,7 +895,7 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
             _install_package(path)  # standalone build_articles renders installed version
         snippet = r_snippet(kind, path, as_cran=as_cran, preview=preview,
                             strict=strict, articles_only=articles_only, devel=devel,
-                            flavor=flavor, incoming=incoming)
+                            flavor=flavor, incoming=incoming, platform=platform)
         stdout, code = _invoke_r(snippet)
         raw = _parse_json(stdout)
         if raw is None:
@@ -879,7 +1200,7 @@ def _run_cran_prep(path: str = ".", *, no_revdep: bool = False,
     # via the real R CMD check NOTE once R runs.) Each degrades to `warn` on a
     # missing/unparseable DESCRIPTION/.Rbuildignore rather than raising.
     for tier4 in (cranlint.lint_description, cranlint.check_build_hygiene,
-                  cranlint.check_planning_consistency):
+                  cranlint.check_planning_consistency, cranlint.check_test_config):
         env = tier4(path)
         stages.append({"kind": env["kind"], "status": env["status"]})
         for finding in env.get("findings", []):
@@ -945,6 +1266,19 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--goodpractice", action="store_true")
     ap.add_argument("--multi-platform", action="store_true")
     ap.add_argument("--no-revdep", action="store_true")
+    ap.add_argument("--platform",
+                    choices=list(_WIN_FN.keys()) + ["all"], default="all",
+                    help="winbuilder: platform(s) to submit to "
+                         "(devel|release|oldrelease|all); default all")
+    ap.add_argument("--platforms", default=None,
+                    help="rhub: comma-separated platform list "
+                         "(e.g. linux,windows,macos-arm64,atlas); overrides preset")
+    ap.add_argument("--preset", default=None,
+                    help="rhub: named platform preset "
+                         "(cran-submission|cran-submission-strict|sanitizers|all-vm)")
+    ap.add_argument("--rc-mode", action="store_true", dest="rc_mode",
+                    help="rhub: use RC shared runners via rc_submit() "
+                         "instead of your own GitHub account")
     ap.add_argument("--incoming", action="store_true",
                     help="check: add the CRAN-incoming _R_CHECK_* bundle "
                          "(implies --strict); cran-prep: add the check (incoming) row")
@@ -982,9 +1316,12 @@ def main(argv: list[str] | None = None) -> int:
                           as_cran=ns.as_cran, strict=ns.strict,
                           incoming=ns.incoming)
     else:
+        plats = ([p.strip() for p in ns.platforms.split(",") if p.strip()]
+                 if ns.platforms else None)
         env = run(ns.kind, ns.path, as_cran=ns.as_cran, preview=ns.preview,
                   strict=ns.strict, articles_only=ns.articles_only, devel=ns.devel,
-                  flavor=ns.flavor, incoming=ns.incoming)
+                  flavor=ns.flavor, incoming=ns.incoming, platform=ns.platform,
+                  platforms=plats, preset=ns.preset, rc_mode=ns.rc_mode)
     print(json.dumps(env, indent=2))
     # "dispatched" (winbuilder/rhub) is non-error — exits 0 like "ok"/"warn"
     return 0 if env.get("status") not in ("error", "blocked") else 1

@@ -89,6 +89,21 @@ Returns an envelope: ``{kind: "docs-consistency", status, findings,
 messages, engine_missing: []}``. Each finding is
 ``{doc, code, message}`` where ``code`` is ``"stale"`` or ``"dangling_ref"``.
 
+### `check_test_config()`
+
+```python
+def check_test_config(path: 'str | os.PathLike' = '.') -> 'dict'
+```
+
+Advisory check: testthat edition and test infrastructure config (G5).
+
+Reads ``Config/testthat/edition`` from DESCRIPTION. Warns if absent
+(defaults to edition 2 in older testthat versions, where new snapshots
+on CI fail) or explicitly set to ``"2"``.
+
+Returns envelope ``{kind: "test_config", status, findings, messages,
+engine_missing: []}``.
+
 ### `lint_description()`
 
 ```python

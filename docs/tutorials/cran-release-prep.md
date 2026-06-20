@@ -258,6 +258,8 @@ For multi-platform verification before submission:
 
 - [ ] `/rforge:docs:check` clean (NEWS.md current, examples run)
 - [ ] `description-sync` passes (DESCRIPTION version == NEWS top entry)
+- [ ] DESCRIPTION has `Language: en-US` (or correct BCP 47 code) if package has `man/` or `vignettes/` dirs
+- [ ] DOI references in DESCRIPTION use `<doi:10.xxx/yyy>` angle-bracket format, not bare `doi:` or raw `https://doi.org/` URLs
 - [ ] `/rforge:r:cran-prep` → verdict `ready` (or `warn` with all NOTEs reviewed)
 - [ ] `cran-comments.md` reviewed and accurate — you'll paste this into the CRAN form
 - [ ] Multi-platform: win-builder and/or R-hub dispatched and results reviewed
@@ -267,6 +269,7 @@ For multi-platform verification before submission:
 
 ## What's next
 
+- **[CRAN submission command guide](../guides/cran-submission.md)** — every command's flags, tiers, and the safety model
 - **[Ecosystem orchestration](ecosystem-orchestration.md)** — if the
   release surfaced a needed cross-package change, plan it with
   `/rforge:cascade`.

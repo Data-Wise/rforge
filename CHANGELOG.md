@@ -7,6 +7,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.14.0] - 2026-06-19
+
+> Eight CRAN pre-submission gap-fills across `lib/cranlint.py` and `lib/rcmd.py`,
+> each built TDD-first from an approved spec. **41 commands** (no surface change).
+> pytest 435+, test-all 43/43.
+
+### Added
+
+- **G2 — DESCRIPTION `Date` staleness** (`lib/cranlint.py`; `lint_description`).
+  New `description_date_stale` advisory finding when the `Date:` field is absent or
+  more than 30 days old relative to today. Surfaces via the `description` Tier 4
+  stage in `/rforge:r:cran-prep` (non-blocking).
+
+- **G3 — `check_planning_consistency` DESCRIPTION drift** (`lib/cranlint.py`).
+  New `check_planning_consistency` Tier 4 function detects CRAN-rejected boilerplate
+  (`DESCRIPTION` still says "What the Package Does" / "A Short Description") and
+  URL-in-title violations. Non-blocking advisory.
+
+- **G5 — testthat edition check** (`lib/cranlint.py`; wired into `r:cran-prep`).
+  New `check_test_config` Tier 4 function warns when `Config/testthat/edition` is
+  absent (edition 2 default — CI snapshot failures) or explicitly `"2"`. Surfaced as
+  the `test_config` stage row in `/rforge:r:cran-prep` (non-blocking advisory).
+
+- **G4 — doi.org 403 URL classification** (`lib/rcmd.py`; `normalize("urlcheck")`).
+  doi.org URLs returning 403 (firewall block, not real breakage) are now classified
+  separately as `doi_blocked_count` — status becomes `warn` (not `error`). Real
+  broken URLs still produce `error`. See `urlcheck.doi_blocked_count` in the envelope.
+
+- **G1 — win-builder `--platform` kwarg** (`lib/rcmd.py`; `r:winbuilder`).
+  `/rforge:r:winbuilder` now accepts `--platform devel|release|oldrelease|all`.
+  Default `all` submits all three win-builder flavours in one call. (Multi-platform
+  R-hub dispatch moved to the dedicated `/rforge:r:rhub` command — see Fixed below.)
+
+- **G6 — `--run-donttest` in strict/incoming** (`lib/rcmd.py`; confirmed present).
+  `--run-donttest` is already set whenever `strict=True`, `flavor` is set, or
+  `incoming=True` — confirmed and covered by tests.
+
+- **G7 — sequential incoming passes** (`lib/rcmd.py`; `r_snippet("check", incoming=True)`).
+  `_R_CHECK_DEPENDS_ONLY_` and `_R_CHECK_SUGGESTS_ONLY_` are mutually exclusive in
+  rcmdcheck. The `incoming=True` path now runs two sequential `rcmdcheck::rcmdcheck()`
+  calls (pass 1 + pass 2) in one R process and merges `errors/warnings/notes` via
+  `c(r1$X, r2$X)` — both dependency perspectives captured in one `check (incoming)`
+  stage row. Adds `_CRAN_CHECKS_REGISTRY` (versioned env-var bundles keyed by R
+  version) and `_r_version_key()` helper. Backward-compat: plain `r_snippet("check")`
+  output is byte-identical.
+
+- **G8 — PDF manual skip advisory** (`lib/rcmd.py`; `normalize("check")`).
+  When R CMD check emits a "skipping PDF manual" / "LaTeX not found" message (no
+  LaTeX on the build host), a `pdf_manual_skipped` finding is now surfaced as an
+  advisory in the envelope — prompting the user to rely on win-builder for the PDF
+  manual instead of treating the skip as silent.
+
+### Fixed
+
+- **`r:rhub` headless dispatch overhaul** (`lib/rcmd.py`, `commands/r/rhub.md`).
+  The command was non-functional: `rhub::rhub_check()` with no `platforms=` arg
+  opened an interactive console menu and hung headlessly, and `rhub::rhub_setup()`
+  was called on every invocation (a spurious git commit each run). It now:
+  - Passes platforms **explicitly** (never `NULL`); defaults to the `cran-submission`
+    preset (`linux, windows, macos-arm64, atlas`) — new `--platforms`/`--preset` flags.
+  - **Never** calls `rhub_setup()`; a Python-side pre-flight hard-stops with
+    `rhub_yaml_missing` when `.github/workflows/rhub.yaml` is absent.
+  - Hard-blocks known-broken platforms (`macos`, macos-13 runner retired Dec 2025)
+    and advises (non-blocking) on missing `pak-version: stable` (r-lib/pak #887) and
+    broken default-config platforms.
+  - Adds `--rc-mode` (`rhub::rc_submit()` on RC shared runners) and opens the GitHub
+    Actions URL (built from the git remote) in the browser.
+  - Removes the stale `r:winbuilder --platform rhub` sub-path (same hang bug, second
+    entry point). New `tests/test_rcmd_rhub.py` (18 tests).
+
+---
+
 ## [2.13.0] - 2026-06-13
 
 > Two diff-aware/ecosystem features, each built TDD-first from an approved spec and

@@ -1,7 +1,8 @@
 project: rforge
-updated: 2026-06-13
+updated: 2026-06-20
 status: Active
-version: 2.12.0 (RELEASED 2026-06-13)
+version: 2.14.0 (in development — on dev, not yet released)
+in_progress: 2026-06-20 Two feature bundles merged to dev, pending release: (1) PR #47 CRAN gap-fill G1–G8 (cranlint + rcmd, pytest 435+, test-all 43/43); (2) PR #48 r:rhub overhaul — fixed headless hang, _RHUB_BROKEN_PLATFORMS/_RHUB_PRESETS, --platforms/--preset/--rc-mode, _check_rhub_yaml pak-version advisory (r-lib/pak #887), 18 new tests (test_rcmd_rhub.py), pytest 463+, test-all 43/43. 41 commands. NEXT: dev→main release PR (v2.14.0).
 last_release: 2026-06-13 v2.12.0 (PR #40 feature→dev merge e1c2612, PR #41 dev→main merge d9126c4; release https://github.com/Data-Wise/rforge/releases/tag/v2.12.0; CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#124 MERGED — formula+manifest → v2.12.0, sha256 32f3ed58…, desc unchanged 41, ruby -c OK, --diff only pre-existing bin.mkpath drift). 41 commands (no surface change). Three doc-gap-analysis recommendations, built TDD-first by 3 sequential implementer agents in one worktree, hardened by a 3-dim adversarial review (1 BLOCKER + 1 IMPORTANT + MINORs, all fixed): (1) docs/commands.md sync-gate (tests/_check_commands_doc.py, test-all 41→42; surfaced+fixed 10 undocumented flags); (2) diff-aware [uncommitted] tag (repo-relative exact match after BLOCKER cross-pkg collision fix); (3) s7-review method_undeclared_dependency (method on a resolvable S7 class whose pkg ∉ DESCRIPTION). pytest 379, test-all 42/42. Specs SPEC-{commands-doc-sync-gate,diff-aware-uncommitted-tag,s7-undeclared-dependency}-2026-06-13.
 last_release_prior_v2_11_1: 2026-06-13 v2.11.1 (PR #37 feature→dev merge 144324e, PR #38 dev→main merge c0b2343; release https://github.com/Data-Wise/rforge/releases/tag/v2.11.1; CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#123 MERGED — formula+manifest → v2.11.1, sha256 0a5538ba…, desc unchanged 41, ruby -c OK, --diff only pre-existing bin.mkpath drift). Patch (41 commands, no surface change): closes the s7-review runtime family deferred in v2.11.0 — `method_on_missing_class` (a method whose dispatch class has no resolvable namespace binding = unreachable method). Refuted the "not decidable from registry alone" deferral: S7_method carries @signature (dispatch class objects); resolution by OBJECT IDENTITY (not @name — review caught a binding≠@name FP on Foo<-new_class("Bar")); structured {generic,class} output. Built TDD-first (autonomous, pre-approved) from SPEC-s7-method-missing-class-2026-06-13.md; focused adversarial review caught 1 BLOCKER + 2 MINORs (all fixed, re-verified vs real R). pytest 349, test-all 41/41.
 last_release_prior_v2_11_0: 2026-06-13 v2.11.0 (PR #35 feature→dev merge 0f3f548, PR #36 dev→main merge 989eb23; release https://github.com/Data-Wise/rforge/releases/tag/v2.11.0; CI green on main RForge CI + Deploy Documentation; docs live-verified 41 commands + "NOT YET WIRED" gone + /reference/{s7review,scaffold}/ HTTP 200; tap PR Data-Wise/homebrew-tap#122 MERGED — formula+manifest → v2.11.0, sha256 196686eb…, desc 39→41, ruby -c OK, --diff only pre-existing bin.mkpath drift). Three follow-up features (39→41 commands): diff-aware [introduced]/[pre-existing] tagging (P0 completion — merge-base detached-worktree baseline run, --base/--fail-on, line-shift-immune) + r:s7-review --eco (ecosystem sweep) / --runtime (new lib.rcmd s7runtime engine: dead_generic + validator_not_enforcing) + r:use-data/r:use-citation (+2). Built by 3 sequential implementer agents in one bundle worktree. Hardened by a 4-dimension pre-release adversarial review that caught + fixed 3 BLOCKERs + 3 IMPORTANTs the green gates missed (recurrence of v2.10.0 classes: invalid-R citation gen, lint line-shift mis-tag, s7 placeholder family advertised as working, docs "NOT YET WIRED" overclaim). pytest 347, test-all 41/41. Lesson reinforced [[feedback_adversarial_review_prose_contracts]].
@@ -12,7 +13,8 @@ last_release_prior_2: 2026-06-12 v2.8.0 (PR #27 feature→dev, PR #28 dev→main
 
 last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --universe R-universe early-access tier (lib/runiverse.py, pure-stdlib); 35 commands (flag, not new command). Prior: v2.6.0 (2026-06-10, tap #114) bundled v2.3–v2.6.
 
-worktrees: []  # none active
+worktrees: []
+# prior: feature/r-rhub merged (PR #48 → dev 2026-06-20, merge d9d815c) + worktree pending cleanup (git worktree remove ~/.git-worktrees/rforge/feature-r-rhub);
 # prior: feature/v2.12.0-bundle merged (PR #40 → dev 2026-06-13, merge e1c2612) + worktree removed;
 # prior: feature/s7-method-missing-class merged (PR #37 → dev 2026-06-13, merge 144324e) + worktree removed;
 # prior: feature/v2.11.0-bundle merged (PR #35 → dev 2026-06-13, merge 0f3f548) + worktree removed;
@@ -284,14 +286,14 @@ decisions:
 
 ## 🎯 Next Action
 
-✅ **candidate A — diff-aware baseline caching: MERGED to dev (PR #43, merge 95bbcc3).** Worktree removed + feature branch deleted (local + remote). **dev is now AHEAD of main** (unreleased: the A feature + the B sub-item-1 spec + status commits) — ships on the next dev→main release. Built TDD-first then hardened by 2 adversarial reviews (4-lens on the whole-baseline design caught 1 BLOCKER unresolvable-HOME crash + 2 IMPORTANT + 2 MINOR; focused review on the per-package generalization, clean). Gates at merge: pytest 397, test-all 42/42, reference docs in sync. RForge CI green (structure/version-drift only — ci.yml does NOT run pytest/test-all). Baseline before A: v2.12.0 @ 41 commands.
+✅ **v2.13.0 RELEASED (2026-06-13) — no active task.** dev ≡ main @ v2.13.0 (PR #45 dev→main merge 91a7b29; [release](https://github.com/Data-Wise/rforge/releases/tag/v2.13.0); CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#125 MERGED — formula+manifest → v2.13.0, sha256 609a5d03…, ruby -c OK, --diff only pre-existing bin.mkpath drift). Bundled two features merged to dev (PR #43 + #44): **candidate A** (diff-aware per-package baseline caching + `--no-cache`) and **candidate B1** (cross-package S7 contract family in `r:s7-review --eco`). 41 commands (no surface change). Each built TDD-first + hardened by a per-feature adversarial review that caught BLOCKERs the green gates missed (unresolvable-HOME crash; `=`-assigned classes invisible to the registry; re-export FP). pytest 416, test-all 42/42.
 
-✅ **candidate B sub-item 1 — cross-package S7 contracts: MERGED to dev (PR #44, merge 0db043e).** Worktree removed + feature branch deleted (local + remote). Built TDD-first (12 cases) then hardened by a 3-lens adversarial review (2 BLOCKERs re-export-FP + `=`-assignment-FN + 2 IMPORTANTs multiline-export-FP + unguarded-sweep, all fixed, +7 regressions). The `cross-package-contract` family in `r:s7-review --eco` (re-export-aware). Gates at merge: pytest 416, test-all 42/42, reference in sync. RForge CI green (structure/version-drift only). **dev now AHEAD of main** (unreleased: candidate A `--no-cache` + B1 cross-package family + specs) → ships on the next dev→main release (minor → v2.13.0). Sub-item 2 (R6/S4) PARKED.
+🔧 **Unreleased on `dev` (post-v2.13.0 — ships next release):** docs audit + expansion — fixed 4 stale ungated pages (index "What's new", diff-aware tutorial, lib-modules, REFCARD) and added a new **Command Guides** tier (`docs/guides/{dev-cycle,quality,scaffolding,s7-review,diff-aware,cran-submission}.md`) + `package-development-guide.md` hub + `dependency-reconciliation.md` tutorial, all wired into nav and **deployed live** (`gh workflow run docs.yml --ref dev`). Plus a `test-all.sh` **mkdocs no-orphan-pages guard** (the files→nav reverse of the existing nav→files check; **test-all 42→43**). Commits 48008cb (fixes) + de97908 (new docs) + the guard; all on `dev`, fold into the next dev→main release.
 
-Open candidates (A merged; B1 active, B2 parked):
+Open candidates (A + B1 shipped v2.13.0; B2 parked):
 
-A) ✅ **diff-aware baseline caching — MERGED (PR #43, unreleased on dev).** Per-package baseline cache under `~/.rforge/baseline-cache/` keyed by `(repo, merge-base SHA, kind, package, flags)`; a growing changed-set reuses already-baselined packages, re-runs only uncached ones; self-invalidating; LRU-20; `--no-cache` + `lib.changed --clear-cache`. New surface: `r:check`/`r:test`/`r:lint --no-cache` (+1 flag each, no new command). Closes the last v2.11.0 `--changed` follow-up. Spec: `SPEC-diff-aware-baseline-caching-2026-06-13.md`.
-B) 🟢 **s7-review breadth** — two independent sub-items. (1) **cross-package S7 *contract* checks** — ✅ **SPECCED** (`SPEC-s7-cross-package-contracts-2026-06-13.md`, approved design: static `--eco` extension; v1 = `cross_package_undeclared_contract` + `cross_package_unexported_class`, contract-drift deferred; the static ecosystem sibling of v2.12.0 `method_undeclared_dependency`). ✅ **MERGED (PR #44, unreleased on dev)** — the `cross-package-contract` family in `--eco`. (2) **full R6/S4 *convention* checking** — ⏸️ **PARKED** (decision 2026-06-13): low ecosystem value — rforge is S7-focused, `check_legacy_oop` (v2.10.0) already gives the migration-leftover signal (`legacy_s4_in_s7`/`legacy_r5_in_s7`/`legacy_s3_generic` when co-residing with `new_class`), and full R6/S4 convention linting overlaps lintr. Revisit only if a concrete need appears; would need its own spec. (`method_undeclared_dependency` shipped v2.12.0.)
+A) ✅ **diff-aware baseline caching — SHIPPED v2.13.0 (PR #43→dev, #45→main).** Per-package baseline cache under `~/.rforge/baseline-cache/` keyed by `(repo, merge-base SHA, kind, package, flags)`; a growing changed-set reuses already-baselined packages, re-runs only uncached ones; self-invalidating; LRU-20; `--no-cache` + `lib.changed --clear-cache`. New surface: `r:check`/`r:test`/`r:lint --no-cache` (+1 flag each, no new command). Closes the last v2.11.0 `--changed` follow-up. Spec: `SPEC-diff-aware-baseline-caching-2026-06-13.md`.
+B) 🟢 **s7-review breadth** — two independent sub-items. (1) **cross-package S7 *contract* checks** — ✅ **SPECCED** (`SPEC-s7-cross-package-contracts-2026-06-13.md`, approved design: static `--eco` extension; v1 = `cross_package_undeclared_contract` + `cross_package_unexported_class`, contract-drift deferred; the static ecosystem sibling of v2.12.0 `method_undeclared_dependency`). ✅ **SHIPPED v2.13.0 (PR #44→dev, #45→main)** — the `cross-package-contract` family in `--eco`. (2) **full R6/S4 *convention* checking** — ⏸️ **PARKED** (decision 2026-06-13): low ecosystem value — rforge is S7-focused, `check_legacy_oop` (v2.10.0) already gives the migration-leftover signal (`legacy_s4_in_s7`/`legacy_r5_in_s7`/`legacy_s3_generic` when co-residing with `new_class`), and full R6/S4 convention linting overlaps lintr. Revisit only if a concrete need appears; would need its own spec. (`method_undeclared_dependency` shipped v2.12.0.)
 C) ✅ **Index redesign (A+)** — SHIPPED (PR #42 dev→main, docs-only, live-verified): grid cards + "Where rforge fits" mermaid lifecycle + collapsed the 13 "What's new" sections to one `{{ rforge.version }}`-macro'd section. `PROPOSAL-index-redesign-2026-06-13.md` (kept for provenance).
 
 Background, no active task:
@@ -339,18 +341,28 @@ backlog:
     spec: docs/specs/SPEC-r-scaffolding-2026-06-10.md + SPEC-r-scaffolding-v2-2026-06-13.md
     notes: "SHIPPED: r:use-test/use-package/use-vignette v2.10.0; r:use-data/use-citation v2.11.0. 41 commands."
 
-  # Post-v2.11.0 candidates (rforge-native depth, NOT craft-parity; none specced unless noted)
+  # Post-v2.11.0 candidates (rforge-native depth, NOT craft-parity) — mostly SHIPPED; provenance kept
   - title: "s7-review method_on_missing_class"
-    priority: candidate
-    spec: docs/specs/SPEC-r-s7-review-eco-2026-06-13.md (Deferred section)
-    notes: "The one runtime family deferred from v2.11.0 — ships as a documented empty placeholder. Not decidable from the S7 method registry alone; needs parse of method(generic, Class) registrations + cross-check class existence. Disclosed in commands/r/s7-review.md."
+    priority: SHIPPED
+    spec: docs/specs/SPEC-s7-method-missing-class-2026-06-13.md
+    notes: "SHIPPED v2.11.1 (PR #37→dev, #38→main). Refuted the 'not decidable from the registry alone' deferral: each S7_method carries attr(.,'signature'); the s7runtime engine flags a dispatch class with no resolvable namespace binding (unreachable method), resolved by object identity (not @name). Maps to the method-dispatch family in lib/s7review.py."
   - title: "diff-aware follow-ups (uncommitted tagging + baseline caching)"
+    priority: SHIPPED
+    spec: docs/specs/SPEC-diff-aware-uncommitted-tag-2026-06-13.md + SPEC-diff-aware-baseline-caching-2026-06-13.md
+    notes: "SHIPPED: [uncommitted] tag v2.12.0 (PR #40→dev, #41→main); per-package baseline caching v2.13.0 (candidate A, PR #43→dev, #45→main) — cache under ~/.rforge/baseline-cache/ keyed by (repo, merge-base SHA, kind, package, flags), LRU-20, self-invalidating, + --no-cache / lib.changed --clear-cache."
+  - title: "s7-review breadth — cross-package contracts (B1)"
+    priority: SHIPPED
+    spec: docs/specs/SPEC-s7-cross-package-contracts-2026-06-13.md
+    notes: "SHIPPED v2.13.0 (candidate B1, PR #44→dev, #45→main) — the cross-package-contract family in --eco: cross_package_undeclared_contract + cross_package_unexported_class (re-export-aware, name-based, conservative). The static ecosystem sibling of v2.12.0 method_undeclared_dependency."
+
+  # Open candidates (rforge-native depth; none active)
+  - title: "s7-review breadth — R6/S4 convention checking (B2)"
+    priority: PARKED
+    notes: "PARKED 2026-06-13 (low ecosystem value): rforge is S7-focused; check_legacy_oop (v2.10.0) already flags migration leftovers (legacy_s4_in_s7/legacy_r5_in_s7/legacy_s3_generic); full R6/S4 convention linting overlaps lintr. Revisit only on concrete need; would need its own spec."
+  - title: "diff-aware cross-package contract_drift (S7 third family)"
     priority: candidate
-    spec: docs/specs/SPEC-diff-aware-tagging-2026-06-13.md (Out of scope)
-    notes: "Baseline is committed merge-base only; dirty working-tree findings count as HEAD's. Each --changed invocation pays one extra check (no cross-run cache). Both explicitly deferred."
-  - title: "s7-review breadth (cross-package contracts + R6/S4)"
-    priority: candidate
-    notes: "Cross-package S7 contract checks (class in pkg A used by pkg B) + R6/S4 OOP (currently S7-only). Both need specs. Natural --eco extension."
+    spec: docs/specs/SPEC-s7-cross-package-contracts-2026-06-13.md (deferred)
+    notes: "Third cross-package S7 family deferred from B1: signature/return-type drift for a method dispatching on a sibling package's class. Natural follow-on to the v2.13.0 contract family. Needs a spec section."
 
   # Parked (waits on external signal)
   - title: "Path B v1.4.0 — restore 4-mode status contract (descoped from v1.3.0)"

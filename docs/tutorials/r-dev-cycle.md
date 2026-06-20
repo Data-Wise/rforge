@@ -418,6 +418,7 @@ Install them as you need them; `r:cycle` (document/test/check) has no optional d
 
 ## What's next
 
+- **[Dev-cycle command guide](../guides/dev-cycle.md)** — the full per-flag reference for these inner-loop commands
 - **[CRAN submission with rforge](cran-submission-with-rforge.md)** — once
   `r:cycle` is green, run the full pre-submission gate with `r:cran-prep`
 - **[CRAN release prep](cran-release-prep.md)** — ecosystem-level submission

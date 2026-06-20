@@ -56,7 +56,7 @@ Fold a raw engine result into the common envelope.
 ### `r_snippet()`
 
 ```python
-def r_snippet(kind: 'str', path: 'str', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False, flavor: 'str | None' = None, incoming: 'bool' = False) -> 'str'
+def r_snippet(kind: 'str', path: 'str', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False, flavor: 'str | None' = None, incoming: 'bool' = False, platform: 'str' = 'all', platforms: 'list | None' = None, rc_mode: 'bool' = False) -> 'str'
 ```
 
 Build the R one-liner for engine ``kind``, emitting JSON on stdout.
@@ -81,13 +81,15 @@ revdep_env=None when no revdep check was run (package has no dependents).
 ### `run()`
 
 ```python
-def run(kind: 'str', path: 'str' = '.', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False, flavor: 'str | None' = None, incoming: 'bool' = False) -> 'dict'
+def run(kind: 'str', path: 'str' = '.', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False, flavor: 'str | None' = None, incoming: 'bool' = False, platform: 'str' = 'all', platforms: 'list | None' = None, preset: 'str | None' = None, rc_mode: 'bool' = False) -> 'dict'
 ```
 
 Run one engine ``kind`` against ``path``; return the normalized envelope.
 
 Threads the check ``flavor`` / ``incoming`` selectors through to ``r_snippet``;
-returns an error envelope when no DESCRIPTION is found.
+returns an error envelope when no DESCRIPTION is found. For ``kind="rhub"``,
+``platforms`` (``list[str]``), ``preset`` (``str``) and ``rc_mode`` (``bool``)
+select the R-hub dispatch; a Python-side pre-flight gate runs before any R call.
 
 ### `run_changed()`
 

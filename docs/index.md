@@ -113,11 +113,10 @@ Most work runs through these four; the rest of the {{ rforge.command_count }} co
 
 ## What's new in {{ rforge.version }}
 
-Three recommendations from a documentation gap analysis — **{{ rforge.command_count }} commands** (no surface change).
+Two diff-aware / ecosystem features — **{{ rforge.command_count }} commands** (no surface change; both add flags and findings, not new commands).
 
-- **`docs/commands.md` sync-gate** — a new test gate (`tests/_check_commands_doc.py`) cross-checks every command + flag against the reference page; it immediately surfaced and fixed 10 undocumented flags. Closes the last drift-prone documentation surface.
-- **diff-aware `[uncommitted]` tag** — `/rforge:r:check`/`r:test`/`r:lint --changed` now re-tags an `[introduced]` finding in a file with uncommitted changes as **`[uncommitted]`**, so you can tell "edits I haven't committed yet" from committed branch work. See the [diff-aware checks tutorial](tutorials/diff-aware-checks.md).
-- **`/rforge:r:s7-review method_undeclared_dependency`** — the `--runtime` pass now flags a method dispatching on an S7 class whose providing package isn't declared in `DESCRIPTION` (typically a `Suggests`-only class that silently never dispatches at a user's site). See the [S7 convention checking tutorial](tutorials/s7-convention-checking.md).
+- **Per-package diff-aware baseline caching** — `/rforge:r:check`/`r:test`/`r:lint --changed` now cache the merge-base baseline **per package** under `~/.rforge/baseline-cache/`, so a re-run with an unchanged merge-base re-checks only the packages it hasn't baselined yet (the growing changed-set case). Self-invalidating and LRU-bounded; opt out with `--no-cache` or clear with `python3 -m lib.changed --clear-cache`. See the [diff-aware checks tutorial](tutorials/diff-aware-checks.md).
+- **Cross-package S7 contracts** — `/rforge:r:s7-review --eco` adds a `cross-package-contract` family: it flags a method dispatching on a *sibling* package's S7 class that the method's package never declares as a dependency (`cross_package_undeclared_contract`), or that the owning package defines but never exports (`cross_package_unexported_class`). Re-export-aware and conservative. See the [S7 convention checking tutorial](tutorials/s7-convention-checking.md).
 
 Full release history: [CHANGELOG.md](https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md).
 

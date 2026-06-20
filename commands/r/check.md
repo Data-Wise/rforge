@@ -18,7 +18,7 @@ arguments:
     type: boolean
     default: false
   - name: incoming
-    description: Implies --strict; adds a third check (incoming) pass using the CRAN-incoming _R_CHECK_* env switches
+    description: "Implies --strict; adds a third check (incoming) pass using the CRAN-incoming _R_CHECK_* env switches. Runs two sequential rcmdcheck passes (_R_CHECK_DEPENDS_ONLY_ + _R_CHECK_SUGGESTS_ONLY_) — expect ≈3× check time."
     required: false
     type: boolean
     default: false
@@ -136,8 +136,9 @@ no subprocess-layer change.
     `requireNamespace()` in code **and** `skip_if_not_installed()` in tests.
 
 !!! note "Cost"
-    `--strict` runs ≈ 2× the work of a plain check (two extra passes); `--incoming` adds a
-    third. Acceptable for a pre-submission gate.
+    `--strict` runs ≈ 2× the work of a plain check (two extra passes). `--incoming` implies
+    `--strict` and adds a third CRAN-incoming pass — expect **≈3× check time** vs. a plain
+    `r:check`. Acceptable for a pre-submission gate; run it once, not in CI.
 
 ## Output Format
 

@@ -143,6 +143,31 @@ print('\n'.join(walk(cfg.get('nav', []))))
     return $missing
 }
 
+mkdocs_no_orphan_pages() {
+    # Reverse of mkdocs_nav_files_exist: every page in the user-facing doc
+    # tiers (guides/, tutorials/, reference/) must be reachable from the nav,
+    # so a newly added guide/tutorial/reference page can't silently orphan
+    # (the v2.13.0 docs audit found this gap). specs/ and migration/ are
+    # intentionally not all navigated, so they are out of scope here.
+    # Text-scan mkdocs.yml for .md targets — avoids yaml.load on a file whose
+    # !!python/name: tags would otherwise require an unsafe loader.
+    python3 -c "
+import re, glob, os, sys
+nav = set(re.findall(r'[A-Za-z0-9_./-]+[.]md', open('mkdocs.yml').read()))
+orphans = []
+for tier in ('guides', 'tutorials', 'reference'):
+    for path in sorted(glob.glob('docs/' + tier + '/*.md')):
+        rel = os.path.relpath(path, 'docs')
+        if rel not in nav:
+            orphans.append(rel)
+if orphans:
+    print('ORPHANED (in docs/ but not referenced in mkdocs.yml nav):')
+    for o in orphans:
+        print('  ' + o)
+    sys.exit(1)
+"
+}
+
 # Skill checks.
 skill_extract_and_check() {
     local extracted
@@ -572,6 +597,7 @@ run "Docs: commands.md mirrors command files (sections + flags)" commands_doc_in
 # Docs site
 run "mkdocs.yml parses"            mkdocs_parses
 run "mkdocs nav files all exist"   mkdocs_nav_files_exist
+run "mkdocs no orphaned guide/tutorial/reference pages" mkdocs_no_orphan_pages
 
 # Skills
 run "Skill: embedded script syntax-checks"   skill_extract_and_check

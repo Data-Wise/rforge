@@ -127,6 +127,7 @@ The runtime pass adds three checks source parsing can't make:
 
 ## See also
 
+- [S7 review command guide](../guides/s7-review.md) — the complete finding-family catalog
 - [`s7review` reference](../reference/s7review.md) — the `lib.s7review` engine + family details
 - [`rcmd` reference](../reference/rcmd.md) — the `s7runtime` R engine behind `--runtime`
 - [Ecosystem orchestration](ecosystem-orchestration.md) — the `--eco` manifest model

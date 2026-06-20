@@ -51,11 +51,17 @@ def test_normalize_coverage_includes_untested():
     assert env["coverage"]["untested"][0]["first_line"] == 3
 
 
-@pytest.mark.parametrize("kind,key", [("lint", "lints"), ("spell", "misspelled"),
-                                      ("urlcheck", "broken")])
+@pytest.mark.parametrize("kind,key", [("lint", "lints"), ("spell", "misspelled")])
 def test_normalize_quality_warns_when_findings(kind, key):
     assert rcmd.normalize(kind, {key: [{"x": 1}]}, 0, None)["status"] == "warn"
     assert rcmd.normalize(kind, {key: []}, 0, None)["status"] == "ok"
+
+
+def test_normalize_urlcheck_empty_is_ok():
+    env = rcmd.normalize("urlcheck", {"broken": []}, 0, None)
+    assert env["status"] == "ok"
+    assert env["urlcheck"]["count"] == 0
+    assert env["urlcheck"]["doi_blocked_count"] == 0
 
 
 def test_normalize_style_ok_on_exit0():
@@ -238,7 +244,16 @@ def test_status_dispatched_engine_missing_is_error():
 
 def test_main_dispatched_exits_zero(tmp_path, monkeypatch, capsys):
     _write_desc(tmp_path)
+    # Pre-flight requires a committed rhub.yaml before any dispatch.
+    wf = tmp_path / ".github" / "workflows"
+    wf.mkdir(parents=True)
+    (wf / "rhub.yaml").write_text(
+        "      - uses: r-hub/actions/setup-deps@v1\n"
+        "        with:\n"
+        "          pak-version: stable\n"
+    )
     monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"run_url":"https://x"}', 0))
+    monkeypatch.setattr(rcmd, "_rhub_actions_url", lambda p: "")  # no browser launch
     rc = rcmd.main(["--kind", "rhub", "--path", str(tmp_path)])
     out = json.loads(capsys.readouterr().out)
     assert out["status"] == "dispatched" and rc == 0
