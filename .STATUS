@@ -17,6 +17,8 @@ worktrees:
     path: ~/.git-worktrees/rforge/feature-r-rhub
     spec: docs/specs/SPEC-r-rhub-command-2026-06-20.md
     summary: "r:rhub command — fix headless hang, add platform presets + pre-flight checks"
+    state: WIP
+    initiated: 2026-06-19
 # prior: feature/v2.12.0-bundle merged (PR #40 → dev 2026-06-13, merge e1c2612) + worktree removed;
 # prior: feature/s7-method-missing-class merged (PR #37 → dev 2026-06-13, merge 144324e) + worktree removed;
 # prior: feature/v2.11.0-bundle merged (PR #35 → dev 2026-06-13, merge 0f3f548) + worktree removed;
