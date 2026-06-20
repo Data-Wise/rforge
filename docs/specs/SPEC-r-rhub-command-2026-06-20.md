@@ -1,3 +1,7 @@
+---
+render_macros: false  # spec contains rhub.yaml `${{ secrets.* }}` literals — not mkdocs-macros Jinja
+---
+
 # SPEC: r:rhub Command (Unified)
 **Date:** 2026-06-20
 **Status:** READY — supersedes both prior rhub specs; all gaps closed by adversarial review

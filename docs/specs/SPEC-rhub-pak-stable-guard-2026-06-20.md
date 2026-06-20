@@ -1,3 +1,7 @@
+---
+render_macros: false  # spec contains rhub.yaml `${{ secrets.* }}` literals — not mkdocs-macros Jinja
+---
+
 # SPEC: rhub.yaml pak-version Guard (r:rhub pre-flight check)
 **Date:** 2026-06-20
 **Status:** READY — fix already shipped; spec drives rforge integration
