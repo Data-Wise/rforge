@@ -35,14 +35,23 @@ _RHUB_PRESETS = {
     "all-vm":                 ["linux", "windows", "macos-arm64"],
 }
 
-# Authoritative R-hub v2 platform tokens (superset of _RHUB_PRESETS values).
-# VERIFY the exact set against installed `rhub::rhub_platforms()` in Task 6;
-# widen here if a legitimate platform is rejected.
+# Authoritative R-hub v2 platform tokens — the full `rhub::rhub_platforms()$name`
+# set (reconciled live against rhub 2.x on 2026-06-21; superset of
+# _RHUB_PRESETS values). Regenerate when rhub adds platforms:
+#   Rscript -e 'cat(paste(sort(rhub::rhub_platforms()$name), collapse="\n"))'
+# Validation only rejects tokens NOT in this set (a typo / injection), so the
+# list must stay complete or legitimate platforms get wrongly rejected.
 ALLOWED_RHUB_PLATFORMS = frozenset({
+    # containers / VMs
     "linux", "windows", "macos", "macos-arm64", "atlas",
-    "clang-asan", "gcc-asan", "valgrind",
-    "ubuntu-clang", "ubuntu-gcc", "ubuntu-next", "ubuntu-release",
-    "nosuggests", "donttest",
+    "ubuntu-clang", "ubuntu-gcc12", "ubuntu-next", "ubuntu-release",
+    # sanitizers / instrumented
+    "clang-asan", "gcc-asan", "clang-ubsan", "valgrind", "m1-san", "rchk",
+    # compilers
+    "clang16", "clang17", "clang18", "clang19", "clang20", "clang21", "clang22",
+    "gcc13", "gcc14", "gcc15", "gcc16", "intel",
+    # special flavours
+    "c23", "donttest", "nosuggests", "lto", "mkl", "nold", "noremap", "vnu",
 })
 
 

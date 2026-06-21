@@ -1104,6 +1104,19 @@ def test_allowed_platforms_covers_presets():
             assert p in rhub.ALLOWED_RHUB_PLATFORMS
 
 
+def test_allowed_platforms_includes_real_rhub_tokens():
+    # Regression guard for the P1 narrowing bug (v2.15.0 adversarial verify): the
+    # allow-list must cover the real rhub::rhub_platforms() set, not a subset, or
+    # legitimate --platforms tokens are wrongly rejected with no R run. Sample
+    # across the families (compilers/sanitizers/flavours/containers).
+    for tok in ("m1-san", "clang20", "clang22", "gcc15", "gcc16", "intel",
+                "lto", "mkl", "nold", "noremap", "rchk", "vnu", "c23",
+                "clang-ubsan", "ubuntu-gcc12"):
+        assert tok in rhub.ALLOWED_RHUB_PLATFORMS, f"{tok} wrongly rejected"
+    # the real token is `ubuntu-gcc12`, NOT `ubuntu-gcc` (the original typo)
+    assert "ubuntu-gcc" not in rhub.ALLOWED_RHUB_PLATFORMS
+
+
 # ── Task 2 (P3): timeouts on the quick Rscript calls ──
 import subprocess as _sp
 
