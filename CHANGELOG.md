@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.15.0] - 2026-06-20
+
+> Hardening and de-cluttering of `lib/rcmd.py` from a code review (P1–P4), built
+> TDD-first from an approved spec. **41 commands** (no surface change); the
+> `python3 -m lib.rcmd` CLI and every envelope key are byte-identical.
+> pytest 463+, test-all 43/43.
+
+### Security
+
+- **`--platforms` allow-list validation** (`lib/rhub.py`; `_run_rhub`). The
+  R-hub `--platforms` list is now validated against `ALLOWED_RHUB_PLATFORMS`
+  (a frozenset superset of every `_RHUB_PRESETS` token) **before** any R call.
+  An unknown or injection-shaped token (e.g. `x"); cat(1); ("`) returns a clean
+  `{"kind":"rhub","status":"error",...}` envelope instead of reaching `Rscript` —
+  closing an R-injection vector.
+
+### Changed
+
+- **Bounded timeouts on the quick `Rscript` calls** (`lib/rcmd.py`; `_invoke_r`).
+  `_invoke_r` gained a `timeout` kwarg (default `None` keeps the long kinds —
+  check/test/coverage/revdep — unbounded). `_r_version_key` (15s) and the R-hub
+  dispatch (120s) now pass a bound; a `subprocess.TimeoutExpired` surfaces as
+  exit code 124 / `{"timed_out": true}` and folds to `status:"error"` with a
+  "Rscript timed out" message.
+
+### Internal
+
+- **Extracted `s7runtime` R into a shipped `lib/r/s7runtime.R`** — the embedded
+  S7 runtime-introspection program (`s7_runtime_report(pkg_path)`, four stable
+  return keys) now lives in a real `.R` script `source()`d by the snippet, not an
+  inline Python f-string. Establishes the `lib/r/*.R` script convention.
+- **Split `rcmd.py` → `lib/rsnippets.py` + `lib/rhub.py`** (behavior-preserving).
+  Snippet builders + CRAN env constants moved to `rsnippets`; the seven R-hub
+  names moved to `rhub`. Both are **internal** modules (no `docs/reference/`
+  page). `rcmd.py` re-exports the names it still references; the rhub dispatch is
+  a lazy import to keep the module graph acyclic. No surface change (41 commands).
+
+---
+
 ## [2.14.0] - 2026-06-19
 
 > Eight CRAN pre-submission gap-fills across `lib/cranlint.py` and `lib/rcmd.py`,
