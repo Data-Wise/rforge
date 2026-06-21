@@ -240,7 +240,7 @@ def test_run_advisory_rides_along_into_findings(tmp_path, monkeypatch):
         "        with:\n"
         "          token: ${{ secrets.RHUB_TOKEN }}\n"
     )
-    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"submitted":true}', 0))
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda *a, **k: ('{"submitted":true}', 0))
     monkeypatch.setattr(rcmd, "_rhub_actions_url", lambda p: "")  # no browser launch
     env = rcmd.run("rhub", str(tmp_path), platforms=["linux"])
     assert env["status"] == "dispatched"

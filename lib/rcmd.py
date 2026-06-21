@@ -109,6 +109,8 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
     if raw.get("engine_missing"):
         return "error"
     if kind == "check":
+        if exit_code == 124:
+            return "error"
         if raw.get("errors"):
             return "error"
         return "warn" if (raw.get("warnings") or raw.get("notes")) else "ok"
@@ -503,10 +505,13 @@ def _r_version_key() -> str:
     rscript = shutil.which("Rscript")
     if rscript is None:
         return "base"
-    proc = subprocess.run(
-        [rscript, "-e", "cat(paste0('R', R.version$major, '.', R.version$minor))"],
-        capture_output=True, text=True,
-    )
+    try:
+        proc = subprocess.run(
+            [rscript, "-e", "cat(paste0('R', R.version$major, '.', R.version$minor))"],
+            capture_output=True, text=True, timeout=15,
+        )
+    except subprocess.TimeoutExpired:
+        return "base"
     text = proc.stdout.strip()
     if re.match(r"^R\d+\.\d+$", text):
         return text
@@ -805,12 +810,21 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
     raise ValueError(f"unknown kind: {kind}")
 
 
-def _invoke_r(snippet: str) -> tuple[str, int]:
-    """Run an R snippet via Rscript; return (stdout, exit_code). Mocked in tests."""
+def _invoke_r(snippet: str, *, timeout: float | None = None) -> tuple[str, int]:
+    """Run an R snippet via Rscript; return (stdout, exit_code). Mocked in tests.
+
+    timeout=None (default) keeps the unbounded behavior the long kinds
+    (check/test/coverage/revdep) need; quick/dispatch callers pass a bound.
+    On subprocess.TimeoutExpired returns ('{"timed_out": true}', 124).
+    """
     rscript = shutil.which("Rscript")
     if rscript is None:
         return ('{"engine_missing":["R"]}', 127)
-    proc = subprocess.run([rscript, "-e", snippet], capture_output=True, text=True)
+    try:
+        proc = subprocess.run([rscript, "-e", snippet],
+                              capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return ('{"timed_out": true}', 124)
     return (proc.stdout.strip(), proc.returncode)
 
 
@@ -860,10 +874,13 @@ def _run_rhub(path: str, pkg: dict, *, platforms: list | None = None,
 
     # Dispatch through the normal R pipeline.
     snippet = r_snippet("rhub", path, platforms=platforms, rc_mode=rc_mode)
-    stdout, code = _invoke_r(snippet)
+    stdout, code = _invoke_r(snippet, timeout=120)
     raw = _parse_json(stdout)
     if raw is None:
         raw = console_fallback("rhub", stdout)
+    if code == 124 or raw.get("timed_out"):
+        raw = {"messages": ["Rscript timed out — the operation took too long "
+                            "(quick path bounded; long kinds are unbounded)."]}
     env = normalize("rhub", raw, code, pkg)
     for eng in env.get("engine_missing", []):
         if INSTALL_HINT.get(eng):
@@ -916,6 +933,9 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
         raw = _parse_json(stdout)
         if raw is None:
             raw = console_fallback(kind, stdout)
+    if code == 124 or raw.get("timed_out"):
+        raw = {"messages": ["Rscript timed out — the operation took too long "
+                            "(quick path bounded; long kinds are unbounded)."]}
     env = normalize(kind, raw, code, pkg)
     for eng in env.get("engine_missing", []):
         if INSTALL_HINT.get(eng):

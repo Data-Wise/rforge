@@ -252,7 +252,7 @@ def test_main_dispatched_exits_zero(tmp_path, monkeypatch, capsys):
         "        with:\n"
         "          pak-version: stable\n"
     )
-    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"run_url":"https://x"}', 0))
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda *a, **k: ('{"run_url":"https://x"}', 0))
     monkeypatch.setattr(rcmd, "_rhub_actions_url", lambda p: "")  # no browser launch
     rc = rcmd.main(["--kind", "rhub", "--path", str(tmp_path)])
     out = json.loads(capsys.readouterr().out)
@@ -1088,3 +1088,24 @@ def test_allowed_platforms_covers_presets():
     for plats in rcmd._RHUB_PRESETS.values():
         for p in plats:
             assert p in rcmd.ALLOWED_RHUB_PLATFORMS
+
+
+# ── Task 2 (P3): timeouts on the quick Rscript calls ──
+import subprocess as _sp
+
+
+def test_invoke_r_timeout_returns_124(monkeypatch):
+    def boom(*a, **k):
+        raise _sp.TimeoutExpired(cmd="Rscript", timeout=k.get("timeout", 1))
+    monkeypatch.setattr(rcmd.shutil, "which", lambda x: "/usr/bin/Rscript")
+    monkeypatch.setattr(rcmd.subprocess, "run", boom)
+    out, code = rcmd._invoke_r("1+1", timeout=1)
+    assert code == 124 and '"timed_out"' in out
+
+
+def test_run_surfaces_timeout_as_error(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda *a, **k: ('{"timed_out": true}', 124))
+    env = rcmd.run("check", str(tmp_path))
+    assert env["status"] == "error"
+    assert any("timed out" in m.lower() for m in env["messages"])
