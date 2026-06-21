@@ -791,14 +791,27 @@ def test_changed_runner_extracts_findings_per_kind(monkeypatch, tmp_path):
 
 # ───────────────────────── s7runtime engine (v2.11.0) ─────────────────────────
 def test_r_snippet_s7runtime_loads_and_guards():
-    """s7runtime: loads via pkgload, guards S7+jsonlite, emits JSON, never devtools."""
+    """s7runtime: loads via pkgload, guards S7+jsonlite, emits JSON, never devtools.
+
+    The introspection body (incl. pkgload::load_all) now ships in
+    lib/r/s7runtime.R; the snippet source()s it. Assert load_all in the file,
+    everything else in the snippet."""
     src = rcmd.r_snippet("s7runtime", "/tmp/foo")
-    assert "pkgload::load_all" in src
+    from pathlib import Path as _P
+    script = (_P(rcmd.__file__).parent / "r" / "s7runtime.R").read_text()
+    assert "pkgload::load_all" in script
     assert "jsonlite::toJSON" in src
     assert "auto_unbox" in src
     assert "devtools::" not in src
+    assert "devtools::" not in script
     # the guard must check for the S7 engine package
     assert "S7" in src
+
+
+def test_s7runtime_snippet_sources_script():
+    src = rcmd.r_snippet("s7runtime", "/tmp/foo")
+    assert "s7runtime.R" in src and "s7_runtime_report" in src
+    assert 'requireNamespace("S7"' in src and "tryCatch" in src
 
 
 def test_s7runtime_in_safe_autorun_taxonomy():

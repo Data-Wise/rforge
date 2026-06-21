@@ -435,6 +435,22 @@ if 'status' not in d:
 " 2>&1
 }
 
+# lib/r/s7runtime.R ships (sourced by lib.rcmd kind="s7runtime") and parses.
+# Parse check is R-optional: skip cleanly when Rscript is absent (R-free CI).
+lib_s7runtime_r_ships() {
+    if [ ! -f lib/r/s7runtime.R ]; then
+        echo "lib/r/s7runtime.R missing" >&2
+        return 1
+    fi
+    if command -v Rscript >/dev/null 2>&1; then
+        Rscript -e 'invisible(parse("lib/r/s7runtime.R"))' >/dev/null 2>&1 || {
+            echo "lib/r/s7runtime.R parse error" >&2
+            return 1
+        }
+    fi
+    return 0
+}
+
 # lib.cranlint CLI smoke — pure-Python (no R). Runs the three Tier-4 advisory
 # checks against a real fixture package and asserts a well-formed envelope.
 lib_cranlint_smoke() {
@@ -609,6 +625,7 @@ run "Lib: CLI smoke (discovery + deps + status + init)" lib_cli_smoke
 run "Lib: reference docs in sync with source" lib_reference_in_sync
 run "Docs: version/count strings in sync with package.json" version_sync_in_sync
 run "Lib: rcmd CLI smoke (R-free — accepts engine_missing envelope)" lib_rcmd_smoke
+run "Lib: s7runtime.R ships + parses (R-optional)" lib_s7runtime_r_ships
 run "Dogfood: lib.cranlint Tier-4 advisory CLI on a fixture package" lib_cranlint_smoke
 run "Dogfood: lib.runiverse CLI smoke (offline → warn envelope)" lib_runiverse_smoke
 run "Dogfood: lib.s7review CLI smoke (advisory S7 convention envelope)" lib_s7review_smoke

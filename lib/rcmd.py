@@ -688,124 +688,22 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             f'cat(jsonlite::toJSON(list(submitted=TRUE, platforms={plats_r}, '
             f'note="Results in GitHub Actions tab"), auto_unbox=TRUE))')
     if kind == "s7runtime":
-        # Load the package, introspect S7 at runtime, emit 3 issue lists as JSON.
-        #
-        # Serialization discipline (v2.1.0 lessons): the ENTIRE body runs inside a
-        # tryCatch so any R error still emits a valid one-line JSON object on
-        # stdout (never a bare traceback that would break _parse_json); load_all
-        # is quiet + suppressMessages to keep package startup chatter off stdout;
-        # toJSON uses auto_unbox=TRUE (scalars) + null="list" so empty result
-        # vectors serialize as `[]`, never `null`. _guard prepends the
-        # S7+jsonlite presence check (pkgload presence is asserted here too).
+        # The S7 runtime-introspection logic ships VERBATIM in lib/r/s7runtime.R
+        # (function s7_runtime_report(pkg_path) returning the four stable keys);
+        # this branch only source()s that file and calls it. _guard prepends the
+        # S7+jsonlite presence check; the pkgload presence check + the tryCatch
+        # around the call keep the serialization discipline identical to the
+        # former inline form — a single one-line JSON object on stdout, even on
+        # error (auto_unbox=TRUE scalars; null="list" so empty vectors serialize
+        # as `[]`, never `null`).
+        script = json.dumps(str(Path(__file__).parent / "r" / "s7runtime.R"))
         return _guard("S7",
             'if (!requireNamespace("pkgload", quietly=TRUE)) {'
             'cat(\'{"engine_missing":["pkgload"]}\'); quit(status=0)}; '
-            'res <- tryCatch({'
-            f'suppressMessages(pkgload::load_all({p}, quiet=TRUE, '
-            'helpers=FALSE, export_all=FALSE)); '
-            # gather exported + internal S7 objects from the loaded namespace
-            f'nm <- pkgload::pkg_name({p}); ns <- asNamespace(nm); '
-            'objs <- mget(ls(ns, all.names=TRUE), envir=ns, '
-            'ifnotfound=list(NULL)); '
-            'is_gen <- function(o) inherits(o, "S7_generic"); '
-            'is_cls <- function(o) inherits(o, "S7_class"); '
-            'gens <- Filter(is_gen, objs); clss <- Filter(is_cls, objs); '
-            # (1) dead generics: an S7 generic with zero registered methods. The
-            # registered methods live in the generic's `methods` attribute (an
-            # environment, possibly nested by dispatch arg); recurse + count.
-            'count_methods <- function(env) { if (!is.environment(env)) return(0L); '
-            'n <- 0L; for (k in ls(env, all.names=TRUE)) { v <- get(k, envir=env); '
-            'n <- n + if (is.environment(v)) count_methods(v) else 1L }; n }; '
-            'dead <- character(); '
-            'for (gn in names(gens)) { g <- gens[[gn]]; '
-            'mtab <- attr(g, "methods"); '
-            'if (count_methods(mtab) == 0L) dead <- c(dead, gn) }; '
-            # (2) non-enforcing validators: a validator whose body is a constant
-            # NULL/TRUE never inspects `self`, so it can never reject any input —
-            # it is present (passes the static family) but provably not enforcing.
-            'is_noop <- function(v) { if (!is.function(v)) return(FALSE); '
-            'b <- body(v); '
-            'if (is.null(b) || identical(b, quote(NULL)) || isTRUE(b) || '
-            'identical(b, quote(TRUE))) return(TRUE); '
-            'if (is.call(b) && identical(b[[1]], as.name("{")) && length(b) == 2L) '
-            '{ inner <- b[[2]]; return(is.null(inner) || identical(inner, quote(NULL)) '
-            '|| isTRUE(inner) || identical(inner, quote(TRUE))) }; FALSE }; '
-            'lax <- character(); '
-            'for (cn in names(clss)) { cl <- clss[[cn]]; '
-            'val <- attr(cl, "validator"); '
-            'if (is.null(val)) next; '
-            'if (is_noop(val)) lax <- c(lax, cn) }; '
-            # Declared deps (read ONCE): the loaded package's DESCRIPTION
-            # Imports+Depends+LinkingTo package names, plus an always-allowed set
-            # (the package itself + base/recommended pkgs that need no Imports).
-            # Used by check (4) below — a dispatch class from an undeclared package.
-            # Always-allowed = the real base package set (priority="base", which
-            # includes grid/parallel/splines/stats4/compiler/tcltk that a hardcoded
-            # list kept omitting), plus the package itself and S7 — none of these
-            # need a DESCRIPTION Imports entry, so a dispatch class from them is
-            # never an "undeclared dependency".
-            'base_pkgs <- tryCatch(rownames(installed.packages(priority="base")), '
-            'error=function(e) c("base","methods","stats","utils","graphics",'
-            '"grDevices","datasets","tools")); '
-            'allow <- union(c(nm, "S7"), base_pkgs); '
-            'declared <- tryCatch({ '
-            f'd <- read.dcf(file.path(pkgload::pkg_path({p}), "DESCRIPTION")); '
-            'fields <- intersect(c("Imports", "Depends", "LinkingTo"), colnames(d)); '
-            'raw <- paste(d[1, fields], collapse=","); '
-            'parts <- unlist(strsplit(raw, ",")); '
-            # strip version ranges "pkg (>= 1.0)" without a regex escape (R parsers
-            # reject "\\(" in a string literal): split on the literal "(" and keep [1]
-            'parts <- trimws(vapply(strsplit(parts, "(", fixed=TRUE), '
-            '`[`, character(1), 1)); '
-            'parts[nzchar(parts) & parts != "NA"] }, '
-            'error=function(e) character()); '
-            'declared <- union(declared, allow); '
-            # (3) methods on a missing class: a method whose dispatch signature
-            # references an S7 class with no resolvable namespace binding (e.g. an
-            # inline `new_class()` left in a method() call) is unreachable — nothing
-            # can ever construct that class to dispatch on. Each S7_method carries
-            # attr(.,"signature") = the list of dispatch class OBJECTS, so this is
-            # decidable. Guards: base-type signature elements are not S7_class (skip);
-            # ANY/S7_object union dispatch skipped.
-            # (4) methods on an UNDECLARED dependency: a dispatch class that DOES
-            # resolve but whose `package` attr P is set, != this package, and is not
-            # in `declared` — typically a Suggests-only class. At a site without P
-            # the class never registers and the method silently never fires.
-            # The two are mutually exclusive per signature: unresolvable -> (3);
-            # resolvable-but-undeclared-package -> (4); resolvable+declared -> clean.
-            'collect_methods <- function(env, acc) { '
-            'if (!is.environment(env)) return(acc); '
-            'for (k in ls(env, all.names=TRUE)) { v <- get(k, envir=env); '
-            'if (is.environment(v)) acc <- collect_methods(v, acc) '
-            'else acc <- c(acc, list(v)) }; acc }; '
-            'missing <- list(); undeclared <- list(); '
-            'for (gn in names(gens)) { g <- gens[[gn]]; '
-            'ms <- collect_methods(attr(g, "methods"), list()); '
-            'for (md in ms) { sigs <- attr(md, "signature"); '
-            'if (is.null(sigs)) next; '
-            'for (s in sigs) { if (!inherits(s, "S7_class")) next; '
-            'cnm <- attr(s, "name"); cpkg <- attr(s, "package"); '
-            'if (is.null(cnm) || !nzchar(cnm) || cnm %in% c("ANY", "S7_object")) next; '
-            'ext <- !is.null(cpkg) && nzchar(cpkg) && !identical(cpkg, nm); '
-            # Resolve by OBJECT IDENTITY, not by @name: a class may be bound under a
-            # name != its @name (e.g. `Foo <- new_class("Bar")`). For internal classes
-            # the dispatch object must BE one of this package's gathered class objects;
-            # for imported classes (ext) fall back to a name lookup in the provider ns.
-            'resolves <- if (ext) { '
-            'tryCatch(exists(cnm, envir=asNamespace(cpkg), inherits=FALSE), '
-            'error=function(e) TRUE) } else { '
-            'any(vapply(clss, function(o) identical(o, s), logical(1))) }; '
-            'if (!resolves) { missing <- c(missing, '
-            'list(list(generic=gn, class=cnm))); next }; '
-            'if (ext && !(cpkg %in% declared)) undeclared <- c(undeclared, '
-            'list(list(generic=gn, class=cnm, package=cpkg))) } } }; '
-            'missing <- unique(missing); undeclared <- unique(undeclared); '
-            'list(dead_generics=dead, methods_on_missing_class=missing, '
-            'methods_undeclared_dependency=undeclared, '
-            'nonenforcing_validators=lax)}, '
-            'error=function(e) list(engine_missing=character(), '
-            'messages=paste("s7runtime load/introspection failed:", '
-            'conditionMessage(e)))); '
+            f'source({script}); '
+            f'res <- tryCatch(s7_runtime_report({p}), '
+            'error=function(e) list(messages=paste('
+            '"s7runtime load/introspection failed:", conditionMessage(e)))); '
             'cat(jsonlite::toJSON(res, auto_unbox=TRUE, null="list"))')
     raise ValueError(f"unknown kind: {kind}")
 
