@@ -1,6 +1,6 @@
 {
   "name": "@data-wise/rforge-plugin",
-  "version": "2.14.0",
+  "version": "2.15.0",
   "description": "RForge toolkit for Claude Code: 41 commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration",
   "type": "module",
   "main": "index.js",

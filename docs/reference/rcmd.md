@@ -53,19 +53,6 @@ def normalize(kind: 'str', raw: 'dict', exit_code: 'int', pkg: 'dict | None') ->
 
 Fold a raw engine result into the common envelope.
 
-### `r_snippet()`
-
-```python
-def r_snippet(kind: 'str', path: 'str', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False, flavor: 'str | None' = None, incoming: 'bool' = False, platform: 'str' = 'all', platforms: 'list | None' = None, rc_mode: 'bool' = False) -> 'str'
-```
-
-Build the R one-liner for engine ``kind``, emitting JSON on stdout.
-
-For ``kind="check"``, ``flavor`` in {None, "depends", "suggests"} selects a
-Suggests-withholding env flavor and ``incoming`` adds the CRAN-incoming
-``_R_CHECK_*`` bundle; a flavor / ``incoming`` / ``strict`` pass also runs
-``\donttest{}`` examples. Each engine call is wrapped in ``_guard(...)``.
-
 ### `render_cran_comments()`
 
 ```python
