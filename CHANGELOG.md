@@ -7,12 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.15.0] - 2026-06-20
+## [2.15.0] - 2026-06-21
 
 > Hardening and de-cluttering of `lib/rcmd.py` from a code review (P1–P4), built
 > TDD-first from an approved spec. **41 commands** (no surface change); the
 > `python3 -m lib.rcmd` CLI and every envelope key are byte-identical.
-> pytest 463+, test-all 43/43.
+> pytest 470+, test-all 44/44.
 
 ### Security
 

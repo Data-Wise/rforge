@@ -1,7 +1,7 @@
 project: rforge
-updated: 2026-06-20
+updated: 2026-06-21
 status: Active
-version: 2.14.0 (released 2026-06-20)
+version: 2.15.0 (unreleased — on dev, release pipeline in progress)
 in_progress: ~
 last_release: 2026-06-20 v2.14.0 (PR #47 CRAN gap-fill G1–G8 feature→dev + PR #48 r:rhub overhaul feature→dev; PR #49 dev→main merge e717509; release https://github.com/Data-Wise/rforge/releases/tag/v2.14.0; CI green on main RForge CI + Deploy Documentation; tap Data-Wise/homebrew-tap — formula+manifest → v2.14.0, sha256 d1cb2eb1…). 41 commands (no surface change). pytest 463+, test-all 43/43.
 last_release_prior_v2_13_0: 2026-06-13 v2.12.0 (PR #40 feature→dev merge e1c2612, PR #41 dev→main merge d9126c4; release https://github.com/Data-Wise/rforge/releases/tag/v2.12.0; CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#124 MERGED — formula+manifest → v2.12.0, sha256 32f3ed58…, desc unchanged 41, ruby -c OK, --diff only pre-existing bin.mkpath drift). 41 commands (no surface change). Three doc-gap-analysis recommendations, built TDD-first by 3 sequential implementer agents in one worktree, hardened by a 3-dim adversarial review (1 BLOCKER + 1 IMPORTANT + MINORs, all fixed): (1) docs/commands.md sync-gate (tests/_check_commands_doc.py, test-all 41→42; surfaced+fixed 10 undocumented flags); (2) diff-aware [uncommitted] tag (repo-relative exact match after BLOCKER cross-pkg collision fix); (3) s7-review method_undeclared_dependency (method on a resolvable S7 class whose pkg ∉ DESCRIPTION). pytest 379, test-all 42/42. Specs SPEC-{commands-doc-sync-gate,diff-aware-uncommitted-tag,s7-undeclared-dependency}-2026-06-13.
@@ -14,16 +14,7 @@ last_release_prior_2: 2026-06-12 v2.8.0 (PR #27 feature→dev, PR #28 dev→main
 
 last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --universe R-universe early-access tier (lib/runiverse.py, pure-stdlib); 35 commands (flag, not new command). Prior: v2.6.0 (2026-06-10, tap #114) bundled v2.3–v2.6.
 
-worktrees:
-  - path: ~/.git-worktrees/rforge/feature-rcmd-remediation
-    branch: feature/rcmd-remediation
-    created: 2026-06-20
-    status: planned (handoff — implement in a NEW session cd'd into the worktree)
-    target: v2.15.0
-    scope: "lib/rcmd.py code-review remediation P1–P4: validate --platforms (R-injection), Rscript timeouts, extract s7runtime R → lib/r/s7runtime.R, split rcmd.py → rsnippets+rhub. No surface change (41 commands); CLI byte-identical."
-    plan: ORCHESTRATE-rcmd-remediation.md (6 sequenced TDD tasks, safe→risky)
-    spec: docs/specs/SPEC-rcmd-remediation-2026-06-20.md
-    notes: "Public-CLI invariant + 2 mandatory live-R checks (P2 byte-identical, P1 rhub smoke) before PR. P4 uses lazy imports to avoid cycles. From the v2.14.0 lib/rcmd.py review (8/10)."
+# prior: feature/rcmd-remediation merged (PR #50 → dev 2026-06-21, merge c5b69bd) + worktree removed;
 # prior: feature/r-rhub merged (PR #48 → dev 2026-06-20, merge d9d815c) + worktree removed;
 # prior: feature/v2.12.0-bundle merged (PR #40 → dev 2026-06-13, merge e1c2612) + worktree removed;
 # prior: feature/s7-method-missing-class merged (PR #37 → dev 2026-06-13, merge 144324e) + worktree removed;
@@ -296,11 +287,11 @@ decisions:
 
 ## 🎯 Next Action
 
-✅ **v2.13.0 RELEASED (2026-06-13) — no active task.** dev ≡ main @ v2.13.0 (PR #45 dev→main merge 91a7b29; [release](https://github.com/Data-Wise/rforge/releases/tag/v2.13.0); CI green on main RForge CI + Deploy Documentation; tap PR Data-Wise/homebrew-tap#125 MERGED — formula+manifest → v2.13.0, sha256 609a5d03…, ruby -c OK, --diff only pre-existing bin.mkpath drift). Bundled two features merged to dev (PR #43 + #44): **candidate A** (diff-aware per-package baseline caching + `--no-cache`) and **candidate B1** (cross-package S7 contract family in `r:s7-review --eco`). 41 commands (no surface change). Each built TDD-first + hardened by a per-feature adversarial review that caught BLOCKERs the green gates missed (unresolvable-HOME crash; `=`-assigned classes invisible to the registry; re-export FP). pytest 416, test-all 42/42.
+🚀 **v2.15.0 ON DEV — release pipeline in progress.** PR #50 merged to dev (2026-06-21, merge c5b69bd). `lib/rcmd.py` code-review remediation (P1–P4): `--platforms` allow-list validation (`lib/rhub.py`), bounded Rscript timeouts, `s7runtime` R extracted to `lib/r/s7runtime.R`, `rcmd.py` split into `lib/rsnippets.py` + `lib/rhub.py`. No surface change (41 commands); CLI byte-identical. pytest 470, test-all 44/44. CHANGELOG [2.15.0] stamped 2026-06-21. **Next: dev→main PR, tag, GitHub release, tap sync.**
 
-🔧 **Unreleased on `dev` (post-v2.13.0 — ships next release):** docs audit + expansion — fixed 4 stale ungated pages (index "What's new", diff-aware tutorial, lib-modules, REFCARD) and added a new **Command Guides** tier (`docs/guides/{dev-cycle,quality,scaffolding,s7-review,diff-aware,cran-submission}.md`) + `package-development-guide.md` hub + `dependency-reconciliation.md` tutorial, all wired into nav and **deployed live** (`gh workflow run docs.yml --ref dev`). Plus a `test-all.sh` **mkdocs no-orphan-pages guard** (the files→nav reverse of the existing nav→files check; **test-all 42→43**). Commits 48008cb (fixes) + de97908 (new docs) + the guard; all on `dev`, fold into the next dev→main release.
+✅ **v2.14.0 RELEASED (2026-06-20)** — 8 CRAN gap-fill checks (PR #47, G1–G8) + `r:rhub` overhaul (PR #48); PR #49 dev→main; CI green; tap PR synced to v2.14.0. 41 commands.
 
-Open candidates (A + B1 shipped v2.13.0; B2 parked):
+Open candidates (all low-priority):
 
 A) ✅ **diff-aware baseline caching — SHIPPED v2.13.0 (PR #43→dev, #45→main).** Per-package baseline cache under `~/.rforge/baseline-cache/` keyed by `(repo, merge-base SHA, kind, package, flags)`; a growing changed-set reuses already-baselined packages, re-runs only uncached ones; self-invalidating; LRU-20; `--no-cache` + `lib.changed --clear-cache`. New surface: `r:check`/`r:test`/`r:lint --no-cache` (+1 flag each, no new command). Closes the last v2.11.0 `--changed` follow-up. Spec: `SPEC-diff-aware-baseline-caching-2026-06-13.md`.
 B) 🟢 **s7-review breadth** — two independent sub-items. (1) **cross-package S7 *contract* checks** — ✅ **SPECCED** (`SPEC-s7-cross-package-contracts-2026-06-13.md`, approved design: static `--eco` extension; v1 = `cross_package_undeclared_contract` + `cross_package_unexported_class`, contract-drift deferred; the static ecosystem sibling of v2.12.0 `method_undeclared_dependency`). ✅ **SHIPPED v2.13.0 (PR #44→dev, #45→main)** — the `cross-package-contract` family in `--eco`. (2) **full R6/S4 *convention* checking** — ⏸️ **PARKED** (decision 2026-06-13): low ecosystem value — rforge is S7-focused, `check_legacy_oop` (v2.10.0) already gives the migration-leftover signal (`legacy_s4_in_s7`/`legacy_r5_in_s7`/`legacy_s3_generic` when co-residing with `new_class`), and full R6/S4 convention linting overlaps lintr. Revisit only if a concrete need appears; would need its own spec. (`method_undeclared_dependency` shipped v2.12.0.)
