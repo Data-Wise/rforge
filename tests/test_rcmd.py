@@ -5,6 +5,7 @@ import textwrap
 from pathlib import Path
 import pytest
 from lib import rcmd
+from lib import rhub
 
 
 def _write_desc(tmp_path: Path, name="foo", version="0.2.0"):
@@ -253,7 +254,7 @@ def test_main_dispatched_exits_zero(tmp_path, monkeypatch, capsys):
         "          pak-version: stable\n"
     )
     monkeypatch.setattr(rcmd, "_invoke_r", lambda *a, **k: ('{"run_url":"https://x"}', 0))
-    monkeypatch.setattr(rcmd, "_rhub_actions_url", lambda p: "")  # no browser launch
+    monkeypatch.setattr(rhub, "_rhub_actions_url", lambda p: "")  # no browser launch
     rc = rcmd.main(["--kind", "rhub", "--path", str(tmp_path)])
     out = json.loads(capsys.readouterr().out)
     assert out["status"] == "dispatched" and rc == 0
@@ -1082,7 +1083,7 @@ def test_run_rhub_rejects_injection_platform(tmp_path, monkeypatch):
     # _invoke_r must NOT be reached — validation happens first.
     monkeypatch.setattr(rcmd, "_invoke_r",
                         lambda *a, **k: (_ for _ in ()).throw(AssertionError("R ran!")))
-    env = rcmd._run_rhub(str(tmp_path), {"package": "foo", "version": "1.0"},
+    env = rhub._run_rhub(str(tmp_path), {"package": "foo", "version": "1.0"},
                          platforms=['x"); cat(1); ("'])
     assert env["status"] == "error"
     assert "Unknown platform" in " ".join(env["messages"])
@@ -1092,15 +1093,15 @@ def test_run_rhub_rejects_unknown_platform(tmp_path, monkeypatch):
     _write_desc(tmp_path)
     monkeypatch.setattr(rcmd, "_invoke_r",
                         lambda *a, **k: (_ for _ in ()).throw(AssertionError("R ran!")))
-    env = rcmd._run_rhub(str(tmp_path), {"package": "foo"}, platforms=["linux", "nope"])
+    env = rhub._run_rhub(str(tmp_path), {"package": "foo"}, platforms=["linux", "nope"])
     assert env["status"] == "error" and "nope" in " ".join(env["messages"])
 
 
 def test_allowed_platforms_covers_presets():
     # every token in every preset must be in the allow-list (internal consistency)
-    for plats in rcmd._RHUB_PRESETS.values():
+    for plats in rhub._RHUB_PRESETS.values():
         for p in plats:
-            assert p in rcmd.ALLOWED_RHUB_PLATFORMS
+            assert p in rhub.ALLOWED_RHUB_PLATFORMS
 
 
 # ── Task 2 (P3): timeouts on the quick Rscript calls ──
