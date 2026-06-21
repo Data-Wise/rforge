@@ -5,6 +5,7 @@ import textwrap
 from pathlib import Path
 import pytest
 from lib import rcmd
+from lib import rhub
 
 
 def _write_desc(tmp_path: Path, name="foo", version="0.2.0"):
@@ -252,8 +253,8 @@ def test_main_dispatched_exits_zero(tmp_path, monkeypatch, capsys):
         "        with:\n"
         "          pak-version: stable\n"
     )
-    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"run_url":"https://x"}', 0))
-    monkeypatch.setattr(rcmd, "_rhub_actions_url", lambda p: "")  # no browser launch
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda *a, **k: ('{"run_url":"https://x"}', 0))
+    monkeypatch.setattr(rhub, "_rhub_actions_url", lambda p: "")  # no browser launch
     rc = rcmd.main(["--kind", "rhub", "--path", str(tmp_path)])
     out = json.loads(capsys.readouterr().out)
     assert out["status"] == "dispatched" and rc == 0
@@ -791,14 +792,27 @@ def test_changed_runner_extracts_findings_per_kind(monkeypatch, tmp_path):
 
 # ───────────────────────── s7runtime engine (v2.11.0) ─────────────────────────
 def test_r_snippet_s7runtime_loads_and_guards():
-    """s7runtime: loads via pkgload, guards S7+jsonlite, emits JSON, never devtools."""
+    """s7runtime: loads via pkgload, guards S7+jsonlite, emits JSON, never devtools.
+
+    The introspection body (incl. pkgload::load_all) now ships in
+    lib/r/s7runtime.R; the snippet source()s it. Assert load_all in the file,
+    everything else in the snippet."""
     src = rcmd.r_snippet("s7runtime", "/tmp/foo")
-    assert "pkgload::load_all" in src
+    from pathlib import Path as _P
+    script = (_P(rcmd.__file__).parent / "r" / "s7runtime.R").read_text()
+    assert "pkgload::load_all" in script
     assert "jsonlite::toJSON" in src
     assert "auto_unbox" in src
     assert "devtools::" not in src
+    assert "devtools::" not in script
     # the guard must check for the S7 engine package
     assert "S7" in src
+
+
+def test_s7runtime_snippet_sources_script():
+    src = rcmd.r_snippet("s7runtime", "/tmp/foo")
+    assert "s7runtime.R" in src and "s7_runtime_report" in src
+    assert 'requireNamespace("S7"' in src and "tryCatch" in src
 
 
 def test_s7runtime_in_safe_autorun_taxonomy():
@@ -1062,3 +1076,63 @@ def test_s7runtime_e2e_detects_undeclared_dependency(tmp_path, monkeypatch):
     miss_classes = [m.get("class") if isinstance(m, dict) else str(m)
                     for m in rt.get("methods_on_missing_class", [])]
     assert "Widget" not in miss_classes, env
+
+
+def test_run_rhub_rejects_injection_platform(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    # _invoke_r must NOT be reached — validation happens first.
+    monkeypatch.setattr(rcmd, "_invoke_r",
+                        lambda *a, **k: (_ for _ in ()).throw(AssertionError("R ran!")))
+    env = rhub._run_rhub(str(tmp_path), {"package": "foo", "version": "1.0"},
+                         platforms=['x"); cat(1); ("'])
+    assert env["status"] == "error"
+    assert "Unknown platform" in " ".join(env["messages"])
+
+
+def test_run_rhub_rejects_unknown_platform(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r",
+                        lambda *a, **k: (_ for _ in ()).throw(AssertionError("R ran!")))
+    env = rhub._run_rhub(str(tmp_path), {"package": "foo"}, platforms=["linux", "nope"])
+    assert env["status"] == "error" and "nope" in " ".join(env["messages"])
+
+
+def test_allowed_platforms_covers_presets():
+    # every token in every preset must be in the allow-list (internal consistency)
+    for plats in rhub._RHUB_PRESETS.values():
+        for p in plats:
+            assert p in rhub.ALLOWED_RHUB_PLATFORMS
+
+
+def test_allowed_platforms_includes_real_rhub_tokens():
+    # Regression guard for the P1 narrowing bug (v2.15.0 adversarial verify): the
+    # allow-list must cover the real rhub::rhub_platforms() set, not a subset, or
+    # legitimate --platforms tokens are wrongly rejected with no R run. Sample
+    # across the families (compilers/sanitizers/flavours/containers).
+    for tok in ("m1-san", "clang20", "clang22", "gcc15", "gcc16", "intel",
+                "lto", "mkl", "nold", "noremap", "rchk", "vnu", "c23",
+                "clang-ubsan", "ubuntu-gcc12"):
+        assert tok in rhub.ALLOWED_RHUB_PLATFORMS, f"{tok} wrongly rejected"
+    # the real token is `ubuntu-gcc12`, NOT `ubuntu-gcc` (the original typo)
+    assert "ubuntu-gcc" not in rhub.ALLOWED_RHUB_PLATFORMS
+
+
+# ── Task 2 (P3): timeouts on the quick Rscript calls ──
+import subprocess as _sp
+
+
+def test_invoke_r_timeout_returns_124(monkeypatch):
+    def boom(*a, **k):
+        raise _sp.TimeoutExpired(cmd="Rscript", timeout=k.get("timeout", 1))
+    monkeypatch.setattr(rcmd.shutil, "which", lambda x: "/usr/bin/Rscript")
+    monkeypatch.setattr(rcmd.subprocess, "run", boom)
+    out, code = rcmd._invoke_r("1+1", timeout=1)
+    assert code == 124 and '"timed_out"' in out
+
+
+def test_run_surfaces_timeout_as_error(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda *a, **k: ('{"timed_out": true}', 124))
+    env = rcmd.run("check", str(tmp_path))
+    assert env["status"] == "error"
+    assert any("timed out" in m.lower() for m in env["messages"])

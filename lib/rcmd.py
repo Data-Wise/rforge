@@ -23,6 +23,12 @@ from pathlib import Path
 
 from . import changed
 from . import cranlint
+# Snippet builders + CRAN env constants live in lib.rsnippets (extracted v2.15.0).
+# Re-exported into this namespace so existing `rcmd.<name>` references stay valid.
+from .rsnippets import (  # noqa: F401  (re-exported for callers/tests)
+    r_snippet, _guard, _r_named_char, _r_version_key,
+    _CHECK_ENV, _INCOMING_ENV, _CRAN_CHECKS_REGISTRY, _WIN_FN, _PDF_SKIP_RE,
+)
 
 OPTIONAL_ENGINES = {"covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
                     "revdepcheck", "goodpractice", "devtools", "rhub", "S7"}
@@ -109,6 +115,8 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
     if raw.get("engine_missing"):
         return "error"
     if kind == "check":
+        if exit_code == 124:
+            return "error"
         if raw.get("errors"):
             return "error"
         return "warn" if (raw.get("warnings") or raw.get("notes")) else "ok"
@@ -266,541 +274,21 @@ def console_fallback(kind: str, text: str) -> dict:
     return {"messages": [ln for ln in text.splitlines() if ln.strip()][-10:]}
 
 
-def _guard(pkg_name: str, body: str) -> str:
-    """Prefix that emits engine_missing JSON if the package or jsonlite is absent."""
-    return (
-        f'if (!requireNamespace("{pkg_name}", quietly=TRUE) || '
-        f'!requireNamespace("jsonlite", quietly=TRUE)) {{'
-        f'cat(\'{{"engine_missing":["{pkg_name}"]}}\'); quit(status=0)}}; ' + body
-    )
+def _invoke_r(snippet: str, *, timeout: float | None = None) -> tuple[str, int]:
+    """Run an R snippet via Rscript; return (stdout, exit_code). Mocked in tests.
 
-
-# CRAN-incoming `_R_CHECK_*` env bundles for the strict check flavors.
-#
-# Each maps to a named-character `env=` vector passed straight into
-# rcmdcheck::rcmdcheck() (RESEARCH §A.4). The two flavor vars are the
-# Suggests-withholding flavors documented in Writing R Extensions (RESEARCH
-# §A.1); the incoming pair are the CRAN-incoming switches.
-#
-# `--incoming` bundle scope (confirmed against R Internals §8 "Tools", the
-# `R CMD check --as-cran` block — doc/manual/R-ints.texi): the manual states
-# the *entire* `_R_CHECK_CRAN_INCOMING_…/CODE_…/S3…` block is already "turned
-# on by R CMD check --as-cran". So there is no large incoming-only extra set to
-# add. We force the two INCOMING switches explicitly so the stage is
-# self-documenting and robust even if a future call path omits `--as-cran`.
-# EXCLUDED (with reason):
-#   _R_CHECK_S3_REGISTRATION_      — not a real var name; the real one is
-#                                    _R_CHECK_OVERWRITE_REGISTERED_S3_METHODS_,
-#                                    already in the --as-cran block.
-#   _R_CHECK_LENGTH_1_CONDITION_   — documented "No longer in use" (now an error).
-#   partial-match (_R_CHECK_*PARTIAL*) — already in the --as-cran block.
-#   _R_CHECK_RD_VALIDATE_RD2HTML_  — already on under --as-cran (RESEARCH §A.2).
-#   _R_CHECK_FORCE_SUGGESTS_=FALSE — the one true incoming-extra, but it RELAXES
-#                                    (tolerates unavailable Suggests) rather than
-#                                    tightening — deferred; it would undercut the
-#                                    noSuggests pass philosophy.
-_CHECK_ENV = {
-    "depends": {"_R_CHECK_DEPENDS_ONLY_": "true"},
-    "suggests": {"_R_CHECK_SUGGESTS_ONLY_": "true"},
-}
-_INCOMING_ENV = {"_R_CHECK_CRAN_INCOMING_": "true",
-                 "_R_CHECK_CRAN_INCOMING_REMOTE_": "true"}
-
-
-def _r_named_char(d: dict) -> str:
-    """Render a Python dict as an R named character vector literal: c("k"="v")."""
-    inner = ", ".join(f'"{k}"="{v}"' for k, v in d.items())
-    return f"c({inner})"
-
-
-_WIN_FN = {
-    "devel": "devtools::check_win_devel",
-    "release": "devtools::check_win_release",
-    "oldrelease": "devtools::check_win_oldrelease",
-}
-
-_CRAN_CHECKS_REGISTRY = {
-    # base: extra env vars beyond _INCOMING_ENV + DEPENDS/SUGGESTS (which the
-    # two-pass logic adds structurally). Per the EXCLUDED list above, all other
-    # incoming-era vars are already in --as-cran or excluded for documented reasons.
-    "base": {},
-    "R4.3": {},
-    "R4.4": {},
-    "R4.5": {},
-}
-
-_PDF_SKIP_RE = re.compile(
-    r"skipping PDF manual|LaTeX not found|pdflatex(?:\s+is)? not (?:found|available)",
-    re.IGNORECASE,
-)
-
-# ── R-hub v2 platform tables ────────────────────────────────────────────────
-# Known-broken R-hub platforms: dispatching to any of these fails immediately,
-# so _rhub_preflight() hard-blocks them with the keyed remediation message.
-_RHUB_BROKEN_PLATFORMS = {
-    "macos": (
-        "macos-13 runner retired December 2025; "
-        "use `macos-arm64` (ARM) or wait for rhub to update. "
-        "See https://github.com/r-hub/rhub/issues/669"
-    ),
-}
-
-# Named platform presets. `cran-submission` is the headless default (Q6): an OS
-# matrix plus `atlas`. `clang-asan` is opt-in only (issue #645, [unstable]).
-_RHUB_PRESETS = {
-    "cran-submission":        ["linux", "windows", "macos-arm64", "atlas"],
-    "cran-submission-strict": ["linux", "windows", "macos-arm64", "atlas", "clang-asan"],
-    "sanitizers":             ["clang-asan", "atlas"],
-    "all-vm":                 ["linux", "windows", "macos-arm64"],
-}
-
-
-def _check_rhub_yaml(pkg_path: str) -> list[dict]:
-    """Scan .github/workflows/rhub.yaml for advisory issues.
-
-    Two advisory checks: (1) each ``setup-deps`` block missing ``pak-version:
-    stable`` (pak devel bootstrap regression, r-lib/pak #887); (2) a default
-    config field naming a known-broken platform. Returns ``[]`` if rhub.yaml is
-    absent — its absence is a hard error handled by ``_rhub_preflight``.
+    timeout=None (default) keeps the unbounded behavior the long kinds
+    (check/test/coverage/revdep) need; quick/dispatch callers pass a bound.
+    On subprocess.TimeoutExpired returns ('{"timed_out": true}', 124).
     """
-    # TODO: remove or loosen the pak-version check when r-lib/pak #887 is fixed in devel.
-    # Upstream: https://github.com/r-lib/pak/issues/887
-    yaml_path = Path(pkg_path) / ".github" / "workflows" / "rhub.yaml"
-    if not yaml_path.exists():
-        return []  # rhub_yaml_missing is handled by _rhub_preflight
-
-    content = yaml_path.read_text()
-    findings: list[dict] = []
-
-    # Check pak-version in every setup-deps block.
-    blocks = re.split(r"- uses: r-hub/actions/setup-deps", content)
-    # blocks[0] = content before first occurrence; blocks[1:] = after each.
-    for i, block in enumerate(blocks[1:], 1):
-        # [ \t]* (not \s*) after `with:` so the trailing newline is left for the
-        # capture group to consume; \s* would eat it and capture nothing, making
-        # every block look like it's missing pak-version.
-        with_match = re.search(r"\s+with:[ \t]*\n((?:\s+\S.*\n)*)", block)
-        if not with_match:
-            continue
-        with_block = with_match.group(1)
-        if "pak-version:" not in with_block:
-            findings.append({
-                "code": "rhub_pak_devel_regression",
-                "severity": "advisory",
-                "block": i,   # informational: which setup-deps block (1-indexed)
-                "message": (
-                    f"setup-deps block {i} is missing `pak-version: stable`. "
-                    "pak devel (0.10.0.9000) has a bootstrap regression "
-                    "(r-lib/pak #887, filed 2026-06-13) — rhub jobs will "
-                    "silently fail. Add `pak-version: stable` as the first "
-                    "`with:` entry in this block."
-                ),
-                "fix": (
-                    "- uses: r-hub/actions/setup-deps@v1\n"
-                    "  with:\n"
-                    "    pak-version: stable\n"
-                    "    token: ${{ secrets.RHUB_TOKEN }}\n"
-                    "    job-config: ${{ matrix.config.job-config }}"
-                ),
-            })
-
-    # Check default config field for broken platforms.
-    default_match = re.search(r"default:\s*'([^']+)'", content)
-    if default_match:
-        default_platforms = [p.strip() for p in default_match.group(1).split(",")]
-        broken_in_default = [p for p in default_platforms if p in _RHUB_BROKEN_PLATFORMS]
-        if broken_in_default:
-            findings.append({
-                "code": "rhub_yaml_default_broken_platform",
-                "severity": "advisory",
-                "platforms": broken_in_default,
-                "message": (
-                    f"rhub.yaml default config includes retired platform(s): "
-                    f"{', '.join(broken_in_default)}. Update the default field to "
-                    f"'linux,windows,macos-arm64' to avoid confusing others who "
-                    f"manually trigger the workflow."
-                ),
-            })
-
-    return findings
-
-
-def _rhub_preflight(pkg_path: str, platforms: list) -> list[dict]:
-    """Unified pre-flight checks for r:rhub. Returns a list of findings.
-
-    Fixed sequence: (a) yaml_missing hard-stops immediately; (b) each broken
-    platform yields an error; (c) advisory checks from ``_check_rhub_yaml``.
-    Only ``severity == 'error'`` findings block dispatch.
-    """
-    findings: list[dict] = []
-    yaml_path = Path(pkg_path) / ".github" / "workflows" / "rhub.yaml"
-
-    # (a) yaml_missing — hard error, short-circuits remaining checks.
-    if not yaml_path.exists():
-        findings.append({
-            "code": "rhub_yaml_missing",
-            "severity": "error",
-            "message": (
-                ".github/workflows/rhub.yaml not found. "
-                "Run `rhub::rhub_setup()` in R to create it (requires a GitHub remote). "
-                "This file must exist and be committed before r:rhub can dispatch."
-            ),
-        })
-        return findings  # No further checks possible.
-
-    # (b) broken_platform — hard error per broken platform requested.
-    for plat in platforms:
-        if plat in _RHUB_BROKEN_PLATFORMS:
-            findings.append({
-                "code": "rhub_broken_platform",
-                "severity": "error",
-                "platform": plat,
-                "message": (
-                    f"Platform '{plat}' is broken: {_RHUB_BROKEN_PLATFORMS[plat]}"
-                ),
-            })
-
-    # (c) pak_version + default config advisories.
-    findings.extend(_check_rhub_yaml(pkg_path))
-
-    return findings
-
-
-def _rhub_actions_url(pkg_path: str) -> str:
-    """Construct the GitHub Actions URL from the origin remote.
-
-    Normalizes SSH→HTTPS, strips a trailing ``.git``, appends ``/actions``.
-    Returns an empty string on any failure (no remote, git absent, timeout).
-    """
-    try:
-        result = subprocess.run(
-            ["git", "-C", pkg_path, "remote", "get-url", "origin"],
-            capture_output=True, text=True, timeout=5,
-        )
-        remote = result.stdout.strip()
-        # Normalize: ssh -> https, strip .git suffix.
-        if remote.startswith("git@github.com:"):
-            remote = "https://github.com/" + remote[len("git@github.com:"):]
-        if remote.endswith(".git"):
-            remote = remote[:-4]
-        return remote.rstrip("/") + "/actions" if remote else ""
-    except Exception:
-        return ""
-
-
-def _r_version_key() -> str:
-    """Return 'R{major}.{minor}' for installed R, or 'base' if Rscript absent."""
-    rscript = shutil.which("Rscript")
-    if rscript is None:
-        return "base"
-    proc = subprocess.run(
-        [rscript, "-e", "cat(paste0('R', R.version$major, '.', R.version$minor))"],
-        capture_output=True, text=True,
-    )
-    text = proc.stdout.strip()
-    if re.match(r"^R\d+\.\d+$", text):
-        return text
-    return "base"
-
-
-def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = False,
-              strict: bool = False, articles_only: bool = False,
-              devel: bool = False, flavor: str | None = None,
-              incoming: bool = False, platform: str = "all",
-              platforms: list | None = None, rc_mode: bool = False) -> str:
-    """Build the R one-liner for engine ``kind``, emitting JSON on stdout.
-
-    For ``kind="check"``, ``flavor`` in {None, "depends", "suggests"} selects a
-    Suggests-withholding env flavor and ``incoming`` adds the CRAN-incoming
-    ``_R_CHECK_*`` bundle; a flavor / ``incoming`` / ``strict`` pass also runs
-    ``\\donttest{}`` examples. Each engine call is wrapped in ``_guard(...)``.
-    """
-    p = json.dumps(path)  # safely quote path for R
-    if kind == "check":
-        # Strict-grade passes (a flavor or the incoming bundle) always run
-        # \donttest{} examples (spec §Scope Tier 1a); --strict does too.
-        run_donttest = strict or flavor is not None or incoming
-        flags = ["--as-cran"] if as_cran else []
-        if run_donttest:
-            flags.append("--run-donttest")
-        args = f'c({", ".join(json.dumps(f) for f in flags)})' if flags else "character()"
-        if incoming:
-            # G7: _R_CHECK_DEPENDS_ONLY_ and _R_CHECK_SUGGESTS_ONLY_ are
-            # mutually exclusive in rcmdcheck — run two sequential passes and
-            # merge errors/warnings/notes so both perspectives are captured.
-            # _CRAN_CHECKS_REGISTRY supplies version-specific extra vars; base
-            # is the fallback when the installed R version has no specific entry.
-            _reg_key = _r_version_key()
-            _extra = (
-                _CRAN_CHECKS_REGISTRY[_reg_key]
-                if _reg_key in _CRAN_CHECKS_REGISTRY
-                else _CRAN_CHECKS_REGISTRY["base"]
-            )
-            env_p1 = {**_INCOMING_ENV, **_extra, "_R_CHECK_DEPENDS_ONLY_": "true"}
-            env_p2 = {**_INCOMING_ENV, **_extra, "_R_CHECK_SUGGESTS_ONLY_": "true"}
-            return _guard("rcmdcheck",
-                f'r1 <- rcmdcheck::rcmdcheck({p}, args={args}, '
-                f'env={_r_named_char(env_p1)}, quiet=TRUE, error_on = "never"); '
-                f'r2 <- rcmdcheck::rcmdcheck({p}, args={args}, '
-                f'env={_r_named_char(env_p2)}, quiet=TRUE, error_on = "never"); '
-                f'cat(jsonlite::toJSON(list(errors=c(r1$errors,r2$errors), '
-                f'warnings=c(r1$warnings,r2$warnings), notes=c(r1$notes,r2$notes)), '
-                f'auto_unbox=TRUE, null="list"))')
-        env_vars: dict[str, str] = {}
-        if flavor is not None:
-            env_vars.update(_CHECK_ENV[flavor])
-        env_arg = f", env={_r_named_char(env_vars)}" if env_vars else ""
-        return _guard("rcmdcheck",
-            f'r <- rcmdcheck::rcmdcheck({p}, args={args}{env_arg}, '
-            f'quiet=TRUE, error_on = "never"); '
-            f'cat(jsonlite::toJSON(list(errors=r$errors, warnings=r$warnings, '
-            f'notes=r$notes), auto_unbox=TRUE, null="list"))')
-    if kind == "build":
-        return _guard("pkgbuild",
-            f'p <- pkgbuild::build({p}, quiet=TRUE); '
-            f'cat(jsonlite::toJSON(list(artifact=basename(p), '
-            f'bytes=as.integer(file.info(p)$size)), auto_unbox=TRUE))')
-    if kind == "document":
-        return _guard("roxygen2",
-            f'roxygen2::roxygenize({p}); '
-            f'cat(jsonlite::toJSON(list(documented=TRUE), auto_unbox=TRUE))')
-    if kind == "load":
-        return _guard("pkgload",
-            f'pkgload::load_all({p}); '
-            f'cat(jsonlite::toJSON(list(loaded=TRUE), auto_unbox=TRUE))')
-    if kind == "test":
-        return _guard("testthat",
-            f'res <- testthat::test_local({p}, load_package="source", '
-            f'reporter="list", stop_on_failure=FALSE); df <- as.data.frame(res); '
-            f'cat(jsonlite::toJSON(list(passed=sum(df$passed), failed=sum(df$failed), '
-            f'skipped=sum(df$skipped), warnings=sum(df$warning), '
-            f'failing_files=unique(df$file[df$failed>0 | df$error>0])), auto_unbox=TRUE))')
-    if kind == "coverage":
-        return _guard("covr",
-            f'cv <- covr::package_coverage({p}); l <- covr::coverage_to_list(cv); '
-            f'z <- covr::zero_coverage(cv); '
-            f'untested <- if (nrow(z)) {{ag <- stats::aggregate(line ~ filename, z, '
-            f'function(x) c(first=min(x), last=max(x))); lapply(seq_len(nrow(ag)), '
-            f'function(i) list(file=ag$filename[i], '
-            f'first_line=as.integer(ag$line[i,"first"]), '
-            f'last_line=as.integer(ag$line[i,"last"])))}} else list(); '
-            f'cat(jsonlite::toJSON(list(total_pct=covr::percent_coverage(cv), '
-            f'per_file=as.list(l$filecoverage), untested=untested), '
-            f'auto_unbox=TRUE, null="list"))')
-    if kind == "site":
-        prev = f'pkgdown::preview_site({p}); ' if preview else ''
-        gate = (f'pkgdown::check_pkgdown({p}); ' if strict
-                else f'probs <- paste(utils::capture.output('
-                     f'pkgdown::pkgdown_sitrep({p})), collapse="\\n"); ')
-        build = (f'pkgdown::build_articles({p}, preview=FALSE)' if articles_only
-                 else f'pkgdown::build_site({p}, preview=FALSE, new_process=TRUE, '
-                      f'quiet=TRUE, devel={"TRUE" if devel else "FALSE"})')
-        probs = 'character()' if strict else 'if (exists("probs")) probs else ""'
-        return _guard("pkgdown",
-            f'{gate}{build}; {prev}'
-            f'cat(jsonlite::toJSON(list(checked=TRUE, built=TRUE, '
-            f'problems=as.list({probs})), auto_unbox=TRUE, null="list"))')
-    if kind == "lint":
-        return _guard("lintr",
-            f'ls <- lintr::lint_package({p}); '
-            f'cat(jsonlite::toJSON(list(lints=lapply(ls, function(x) list('
-            f'file=x$filename, line=x$line_number, linter=x$linter, '
-            f'message=x$message))), auto_unbox=TRUE, null="list"))')
-    if kind == "spell":
-        return _guard("spelling",
-            f'sp <- spelling::spell_check_package({p}); '
-            f'cat(jsonlite::toJSON(list(misspelled=lapply(seq_len(nrow(sp)), '
-            f'function(i) list(word=sp$word[i], files=sp$found[[i]]))), '
-            f'auto_unbox=TRUE, null="list"))')
-    if kind == "urlcheck":
-        # urlchecker::url_check() columns (v1.0.x): URL, From, Status, Message, New
-        return _guard("urlchecker",
-            f'u <- urlchecker::url_check({p}); '
-            f'cat(jsonlite::toJSON(list(broken=lapply(seq_len(nrow(u)), '
-            f'function(i) list(url=u$URL[i], status=u$Status[i], '
-            f'message=u$Message[i], new_url=u$New[i]))), auto_unbox=TRUE, null="list"))')
-    if kind == "style":
-        return _guard("styler",
-            f'res <- styler::style_pkg({p}); '
-            f'cat(jsonlite::toJSON(list(changed_files='
-            f'as.list(res$file[res$changed %in% TRUE])), auto_unbox=TRUE, null="list"))')
-    if kind == "revdep":
-        # NOTE: num_workers=4 is a fixed default (no CLI flag yet — add one to
-        # main() if CI core counts become a problem). new_problems and failures
-        # are hardcoded empty pending Task 9 live verification of revdepcheck's
-        # revdep_summary accessors; only `broken` is extracted today. The
-        # envelope keys stay stable so the renderer/orchestrator don't change.
-        return _guard("revdepcheck",
-            f'revdepcheck::revdep_check({p}, num_workers=4, quiet=TRUE); '
-            f'br <- tryCatch(revdepcheck::revdep_summary({p}), error=function(e) list()); '
-            f'broken <- tryCatch(names(Filter(function(x) isTRUE(x$status=="-"), br)), '
-            f'error=function(e) character()); '
-            f'cat(jsonlite::toJSON(list(broken=broken, new_problems=character(), '
-            f'failures=character()), auto_unbox=TRUE, null="list"))')
-    if kind == "goodpractice":
-        # NOTE: failed_checks accessor verified against live R in Task 9;
-        # tryCatch guards against API changes across goodpractice versions.
-        return _guard("goodpractice",
-            f'g <- goodpractice::gp({p}); '
-            f'ck <- tryCatch(as.character(goodpractice::failed_checks(g)), '
-            f'error=function(e) character()); '
-            f'cat(jsonlite::toJSON(list(checks=ck), auto_unbox=TRUE, null="list"))')
-    if kind == "winbuilder":
-        # G1: platform kwarg selects which win-builder flavour(s) to submit to.
-        # rhub dispatch removed — use kind='rhub' directly (see kind == "rhub" below).
-        plats = list(_WIN_FN.keys()) if platform == "all" else [platform]
-        calls = "; ".join(f"{_WIN_FN[pl]}({p})" for pl in plats)
-        return _guard("devtools",
-            f'{calls}; '
-            f'cat(jsonlite::toJSON(list(submitted=TRUE), auto_unbox=TRUE))')
-    if kind == "rhub":
-        # Two modes. rhub.yaml presence is confirmed by _rhub_preflight() before
-        # we reach here, so the snippet NEVER calls rhub::rhub_setup() (that would
-        # make a spurious git commit on every invocation) and NEVER passes NULL
-        # platforms (which opens an interactive console menu and hangs headlessly).
-        if rc_mode:
-            # RC shared runners: rc_submit() takes no platforms arg — it uses the
-            # rhub.yaml workflow-dispatch config.
-            return _guard("rhub",
-                f'rhub::rc_submit({p}); '
-                f'cat(jsonlite::toJSON(list(submitted=TRUE, mode="rc_submit", '
-                f'note="Results at https://builder.r-hub.io"), auto_unbox=TRUE))')
-        # Own GitHub account: explicit platforms vector, never NULL.
-        plats = platforms or _RHUB_PRESETS["cran-submission"]
-        plats_r = "c(" + ", ".join(f'"{pl}"' for pl in plats) + ")"
-        return _guard("rhub",
-            f'rhub::rhub_check({p}, platforms={plats_r}); '
-            f'cat(jsonlite::toJSON(list(submitted=TRUE, platforms={plats_r}, '
-            f'note="Results in GitHub Actions tab"), auto_unbox=TRUE))')
-    if kind == "s7runtime":
-        # Load the package, introspect S7 at runtime, emit 3 issue lists as JSON.
-        #
-        # Serialization discipline (v2.1.0 lessons): the ENTIRE body runs inside a
-        # tryCatch so any R error still emits a valid one-line JSON object on
-        # stdout (never a bare traceback that would break _parse_json); load_all
-        # is quiet + suppressMessages to keep package startup chatter off stdout;
-        # toJSON uses auto_unbox=TRUE (scalars) + null="list" so empty result
-        # vectors serialize as `[]`, never `null`. _guard prepends the
-        # S7+jsonlite presence check (pkgload presence is asserted here too).
-        return _guard("S7",
-            'if (!requireNamespace("pkgload", quietly=TRUE)) {'
-            'cat(\'{"engine_missing":["pkgload"]}\'); quit(status=0)}; '
-            'res <- tryCatch({'
-            f'suppressMessages(pkgload::load_all({p}, quiet=TRUE, '
-            'helpers=FALSE, export_all=FALSE)); '
-            # gather exported + internal S7 objects from the loaded namespace
-            f'nm <- pkgload::pkg_name({p}); ns <- asNamespace(nm); '
-            'objs <- mget(ls(ns, all.names=TRUE), envir=ns, '
-            'ifnotfound=list(NULL)); '
-            'is_gen <- function(o) inherits(o, "S7_generic"); '
-            'is_cls <- function(o) inherits(o, "S7_class"); '
-            'gens <- Filter(is_gen, objs); clss <- Filter(is_cls, objs); '
-            # (1) dead generics: an S7 generic with zero registered methods. The
-            # registered methods live in the generic's `methods` attribute (an
-            # environment, possibly nested by dispatch arg); recurse + count.
-            'count_methods <- function(env) { if (!is.environment(env)) return(0L); '
-            'n <- 0L; for (k in ls(env, all.names=TRUE)) { v <- get(k, envir=env); '
-            'n <- n + if (is.environment(v)) count_methods(v) else 1L }; n }; '
-            'dead <- character(); '
-            'for (gn in names(gens)) { g <- gens[[gn]]; '
-            'mtab <- attr(g, "methods"); '
-            'if (count_methods(mtab) == 0L) dead <- c(dead, gn) }; '
-            # (2) non-enforcing validators: a validator whose body is a constant
-            # NULL/TRUE never inspects `self`, so it can never reject any input —
-            # it is present (passes the static family) but provably not enforcing.
-            'is_noop <- function(v) { if (!is.function(v)) return(FALSE); '
-            'b <- body(v); '
-            'if (is.null(b) || identical(b, quote(NULL)) || isTRUE(b) || '
-            'identical(b, quote(TRUE))) return(TRUE); '
-            'if (is.call(b) && identical(b[[1]], as.name("{")) && length(b) == 2L) '
-            '{ inner <- b[[2]]; return(is.null(inner) || identical(inner, quote(NULL)) '
-            '|| isTRUE(inner) || identical(inner, quote(TRUE))) }; FALSE }; '
-            'lax <- character(); '
-            'for (cn in names(clss)) { cl <- clss[[cn]]; '
-            'val <- attr(cl, "validator"); '
-            'if (is.null(val)) next; '
-            'if (is_noop(val)) lax <- c(lax, cn) }; '
-            # Declared deps (read ONCE): the loaded package's DESCRIPTION
-            # Imports+Depends+LinkingTo package names, plus an always-allowed set
-            # (the package itself + base/recommended pkgs that need no Imports).
-            # Used by check (4) below — a dispatch class from an undeclared package.
-            # Always-allowed = the real base package set (priority="base", which
-            # includes grid/parallel/splines/stats4/compiler/tcltk that a hardcoded
-            # list kept omitting), plus the package itself and S7 — none of these
-            # need a DESCRIPTION Imports entry, so a dispatch class from them is
-            # never an "undeclared dependency".
-            'base_pkgs <- tryCatch(rownames(installed.packages(priority="base")), '
-            'error=function(e) c("base","methods","stats","utils","graphics",'
-            '"grDevices","datasets","tools")); '
-            'allow <- union(c(nm, "S7"), base_pkgs); '
-            'declared <- tryCatch({ '
-            f'd <- read.dcf(file.path(pkgload::pkg_path({p}), "DESCRIPTION")); '
-            'fields <- intersect(c("Imports", "Depends", "LinkingTo"), colnames(d)); '
-            'raw <- paste(d[1, fields], collapse=","); '
-            'parts <- unlist(strsplit(raw, ",")); '
-            # strip version ranges "pkg (>= 1.0)" without a regex escape (R parsers
-            # reject "\\(" in a string literal): split on the literal "(" and keep [1]
-            'parts <- trimws(vapply(strsplit(parts, "(", fixed=TRUE), '
-            '`[`, character(1), 1)); '
-            'parts[nzchar(parts) & parts != "NA"] }, '
-            'error=function(e) character()); '
-            'declared <- union(declared, allow); '
-            # (3) methods on a missing class: a method whose dispatch signature
-            # references an S7 class with no resolvable namespace binding (e.g. an
-            # inline `new_class()` left in a method() call) is unreachable — nothing
-            # can ever construct that class to dispatch on. Each S7_method carries
-            # attr(.,"signature") = the list of dispatch class OBJECTS, so this is
-            # decidable. Guards: base-type signature elements are not S7_class (skip);
-            # ANY/S7_object union dispatch skipped.
-            # (4) methods on an UNDECLARED dependency: a dispatch class that DOES
-            # resolve but whose `package` attr P is set, != this package, and is not
-            # in `declared` — typically a Suggests-only class. At a site without P
-            # the class never registers and the method silently never fires.
-            # The two are mutually exclusive per signature: unresolvable -> (3);
-            # resolvable-but-undeclared-package -> (4); resolvable+declared -> clean.
-            'collect_methods <- function(env, acc) { '
-            'if (!is.environment(env)) return(acc); '
-            'for (k in ls(env, all.names=TRUE)) { v <- get(k, envir=env); '
-            'if (is.environment(v)) acc <- collect_methods(v, acc) '
-            'else acc <- c(acc, list(v)) }; acc }; '
-            'missing <- list(); undeclared <- list(); '
-            'for (gn in names(gens)) { g <- gens[[gn]]; '
-            'ms <- collect_methods(attr(g, "methods"), list()); '
-            'for (md in ms) { sigs <- attr(md, "signature"); '
-            'if (is.null(sigs)) next; '
-            'for (s in sigs) { if (!inherits(s, "S7_class")) next; '
-            'cnm <- attr(s, "name"); cpkg <- attr(s, "package"); '
-            'if (is.null(cnm) || !nzchar(cnm) || cnm %in% c("ANY", "S7_object")) next; '
-            'ext <- !is.null(cpkg) && nzchar(cpkg) && !identical(cpkg, nm); '
-            # Resolve by OBJECT IDENTITY, not by @name: a class may be bound under a
-            # name != its @name (e.g. `Foo <- new_class("Bar")`). For internal classes
-            # the dispatch object must BE one of this package's gathered class objects;
-            # for imported classes (ext) fall back to a name lookup in the provider ns.
-            'resolves <- if (ext) { '
-            'tryCatch(exists(cnm, envir=asNamespace(cpkg), inherits=FALSE), '
-            'error=function(e) TRUE) } else { '
-            'any(vapply(clss, function(o) identical(o, s), logical(1))) }; '
-            'if (!resolves) { missing <- c(missing, '
-            'list(list(generic=gn, class=cnm))); next }; '
-            'if (ext && !(cpkg %in% declared)) undeclared <- c(undeclared, '
-            'list(list(generic=gn, class=cnm, package=cpkg))) } } }; '
-            'missing <- unique(missing); undeclared <- unique(undeclared); '
-            'list(dead_generics=dead, methods_on_missing_class=missing, '
-            'methods_undeclared_dependency=undeclared, '
-            'nonenforcing_validators=lax)}, '
-            'error=function(e) list(engine_missing=character(), '
-            'messages=paste("s7runtime load/introspection failed:", '
-            'conditionMessage(e)))); '
-            'cat(jsonlite::toJSON(res, auto_unbox=TRUE, null="list"))')
-    raise ValueError(f"unknown kind: {kind}")
-
-
-def _invoke_r(snippet: str) -> tuple[str, int]:
-    """Run an R snippet via Rscript; return (stdout, exit_code). Mocked in tests."""
     rscript = shutil.which("Rscript")
     if rscript is None:
         return ('{"engine_missing":["R"]}', 127)
-    proc = subprocess.run([rscript, "-e", snippet], capture_output=True, text=True)
+    try:
+        proc = subprocess.run([rscript, "-e", snippet],
+                              capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return ('{"timed_out": true}', 124)
     return (proc.stdout.strip(), proc.returncode)
 
 
@@ -812,61 +300,6 @@ def _install_package(path: str) -> tuple[dict, int]:
         return ({"engine_missing": ["R"]}, 127)
     proc = subprocess.run([rbin, "CMD", "INSTALL", path], capture_output=True, text=True)
     return ({"installed_version": pkg.get("version")}, proc.returncode)
-
-
-def _run_rhub(path: str, pkg: dict, *, platforms: list | None = None,
-              preset: str | None = None, rc_mode: bool = False) -> dict:
-    """Dispatch ``kind="rhub"``: resolve platforms, pre-flight, then dispatch.
-
-    Pre-flight runs entirely in Python before any R call. Error findings block
-    dispatch (returned as an error envelope); advisory findings ride along in the
-    returned envelope's ``findings`` key and never short-circuit dispatch.
-    """
-    # Resolve platforms: preset → explicit list → default preset.
-    if preset is not None:
-        if preset not in _RHUB_PRESETS:
-            return {"kind": "rhub", "status": "error", "engine_missing": [],
-                    "messages": [f"Unknown preset '{preset}'. "
-                                 f"Valid presets: {', '.join(_RHUB_PRESETS)}"]}
-        platforms = _RHUB_PRESETS[preset]
-    elif platforms is None:
-        # Never pass NULL headlessly — fall back to the default preset.
-        platforms = _RHUB_PRESETS["cran-submission"]
-
-    # Pre-flight gate (Python-side, before any R dispatch).
-    preflight = _rhub_preflight(path, platforms)
-    errors = [f for f in preflight if f.get("severity") == "error"]
-    if errors:
-        return {"kind": "rhub", "status": "error", "engine_missing": [],
-                "messages": [f["message"] for f in errors],
-                "findings": errors}
-    advisories = [f for f in preflight if f.get("severity") == "advisory"]
-
-    # Dispatch through the normal R pipeline.
-    snippet = r_snippet("rhub", path, platforms=platforms, rc_mode=rc_mode)
-    stdout, code = _invoke_r(snippet)
-    raw = _parse_json(stdout)
-    if raw is None:
-        raw = console_fallback("rhub", stdout)
-    env = normalize("rhub", raw, code, pkg)
-    for eng in env.get("engine_missing", []):
-        if INSTALL_HINT.get(eng):
-            env.setdefault("messages", []).append(f"Missing R package — run: {INSTALL_HINT[eng]}")
-        if eng in OPTIONAL_ENGINES and env["status"] == "error":
-            env["status"] = "warn"
-
-    # Construct and open the GitHub Actions URL (own-account mode only).
-    actions_url = _rhub_actions_url(path) if not rc_mode else ""
-    if actions_url:
-        import webbrowser
-        try:
-            webbrowser.open(actions_url)
-        except Exception:
-            pass
-
-    env["findings"] = advisories
-    env["run_url"] = actions_url or env.get("rhub", {}).get("run_url")
-    return env
 
 
 def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = False,
@@ -887,6 +320,9 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
                 "messages": ["No DESCRIPTION found — is this an R package? "
                              "Try /rforge:detect to locate packages."]}
     if kind == "rhub":
+        # Lazy import keeps the rcmd→rhub edge off the module top (acyclic:
+        # rhub imports rsnippets + lazily imports rcmd envelope helpers).
+        from lib.rhub import _run_rhub
         return _run_rhub(path, pkg, platforms=platforms, preset=preset, rc_mode=rc_mode)
     if kind == "install":
         raw, code = _install_package(path)
@@ -900,6 +336,9 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
         raw = _parse_json(stdout)
         if raw is None:
             raw = console_fallback(kind, stdout)
+    if code == 124 or raw.get("timed_out"):
+        raw = {"messages": ["Rscript timed out — the operation took too long "
+                            "(quick path bounded; long kinds are unbounded)."]}
     env = normalize(kind, raw, code, pkg)
     for eng in env.get("engine_missing", []):
         if INSTALL_HINT.get(eng):

@@ -1,5 +1,10 @@
 # BRAINSTORM: rforge command expansion — beyond the dev cycle
 
+> **⚠️ SUPERSEDED — historical record (banner added 2026-06-20).** The expansions
+> brainstormed here SHIPPED across rforge v2.2.0–v2.14.0 — the CRAN suite, the
+> scaffolding theme (`r:use-test`/`use-package`/`use-vignette`/`use-data`/`use-citation`),
+> and `r:deps-sync` are all live as of v2.14.0. Kept for history only — NOT action-guidance.
+
 - **Date:** 2026-05-31
 - **Context:** The `r:` dev-cycle spec (load/document/test/check/coverage/build/install/site/cycle) is done. This explores *what else* is worth adding. Ideation only — no spec yet.
 - **Research:** two parallel agents (usethis/scaffolding + quality/CRAN-release tooling).
