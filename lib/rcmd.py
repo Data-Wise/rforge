@@ -354,6 +354,16 @@ _RHUB_PRESETS = {
     "all-vm":                 ["linux", "windows", "macos-arm64"],
 }
 
+# Authoritative R-hub v2 platform tokens (superset of _RHUB_PRESETS values).
+# VERIFY the exact set against installed `rhub::rhub_platforms()` in Task 6;
+# widen here if a legitimate platform is rejected.
+ALLOWED_RHUB_PLATFORMS = frozenset({
+    "linux", "windows", "macos", "macos-arm64", "atlas",
+    "clang-asan", "gcc-asan", "valgrind",
+    "ubuntu-clang", "ubuntu-gcc", "ubuntu-next", "ubuntu-release",
+    "nosuggests", "donttest",
+})
+
 
 def _check_rhub_yaml(pkg_path: str) -> list[dict]:
     """Scan .github/workflows/rhub.yaml for advisory issues.
@@ -832,6 +842,12 @@ def _run_rhub(path: str, pkg: dict, *, platforms: list | None = None,
     elif platforms is None:
         # Never pass NULL headlessly — fall back to the default preset.
         platforms = _RHUB_PRESETS["cran-submission"]
+
+    bad = [p for p in platforms if p not in ALLOWED_RHUB_PLATFORMS]
+    if bad:
+        return {"kind": "rhub", "status": "error", "engine_missing": [],
+                "messages": [f"Unknown platform(s): {', '.join(bad)}. "
+                             f"Valid: {', '.join(sorted(ALLOWED_RHUB_PLATFORMS))}"]}
 
     # Pre-flight gate (Python-side, before any R dispatch).
     preflight = _rhub_preflight(path, platforms)

@@ -1062,3 +1062,29 @@ def test_s7runtime_e2e_detects_undeclared_dependency(tmp_path, monkeypatch):
     miss_classes = [m.get("class") if isinstance(m, dict) else str(m)
                     for m in rt.get("methods_on_missing_class", [])]
     assert "Widget" not in miss_classes, env
+
+
+def test_run_rhub_rejects_injection_platform(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    # _invoke_r must NOT be reached — validation happens first.
+    monkeypatch.setattr(rcmd, "_invoke_r",
+                        lambda *a, **k: (_ for _ in ()).throw(AssertionError("R ran!")))
+    env = rcmd._run_rhub(str(tmp_path), {"package": "foo", "version": "1.0"},
+                         platforms=['x"); cat(1); ("'])
+    assert env["status"] == "error"
+    assert "Unknown platform" in " ".join(env["messages"])
+
+
+def test_run_rhub_rejects_unknown_platform(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r",
+                        lambda *a, **k: (_ for _ in ()).throw(AssertionError("R ran!")))
+    env = rcmd._run_rhub(str(tmp_path), {"package": "foo"}, platforms=["linux", "nope"])
+    assert env["status"] == "error" and "nope" in " ".join(env["messages"])
+
+
+def test_allowed_platforms_covers_presets():
+    # every token in every preset must be in the allow-list (internal consistency)
+    for plats in rcmd._RHUB_PRESETS.values():
+        for p in plats:
+            assert p in rcmd.ALLOWED_RHUB_PLATFORMS
