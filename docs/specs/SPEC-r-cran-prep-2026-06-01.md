@@ -1,6 +1,13 @@
 # SPEC: CRAN-submission suite — `r:cran-prep` + revdep / goodpractice / multi-platform
 
-- **Status:** Draft — awaiting user review
+> **⚠️ SUPERSEDED — historical record (banner added 2026-06-20).** This design
+> SHIPPED across rforge v2.2.0–v2.14.0. `r:cran-prep`, `r:revdep`, `r:goodpractice`,
+> `r:winbuilder`, `r:rhub` are all live as of v2.14.0. The shipped implementation
+> evolved beyond this doc (e.g. strict noSuggests / suggests-only passes, Tier 4
+> advisory; CRAN gap-fill G1–G8 in PR #47, r:rhub overhaul in PR #48). See CHANGELOG.
+> Kept for history only — NOT action-guidance.
+
+- **Status:** SHIPPED (v2.2.0–v2.14.0) — superseded; was "Draft" when written
 - **Date:** 2026-06-01
 - **Target version:** v2.2.0 (bumps the parked Phase 4 "agents" work to v2.3.0)
 - **Author:** brainstormed with Claude, grounded in `RESEARCH-cran-dev-2026-06-01.md`

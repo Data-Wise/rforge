@@ -1,5 +1,9 @@
 # RESEARCH: CRAN submission + modern R dev practices (2026) vs rforge v2.1.0
 
+> **⚠️ SUPERSEDED — historical record (banner added 2026-06-20).** The CRAN suite
+> this research informed SHIPPED across rforge v2.2.0–v2.14.0 (see CHANGELOG). Kept
+> for history only — NOT action-guidance.
+
 > **Type:** Research + recommendations (no code, no spec). Informs planning for the deferred `r:cran-prep` orchestrator and improvements to the v2.1.0 `r:` command surface.
 > **Date:** 2026-06-01
 > **Scope:** rforge is an R-package *ecosystem orchestrator* (Claude Code plugin). It develops OTHER R packages and has no DESCRIPTION of its own. Commands referenced are the v2.1.0 28-command surface, especially `r:load/document/test/check/coverage/build/install/site/cycle/lint/spell/urlcheck/style`.
