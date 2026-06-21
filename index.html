@@ -465,10 +465,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-new-in-2140" class="md-nav__link">
+  <a href="#whats-new-in-2150" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's new in 2.14.0
+        What's new in 2.15.0
       
     </span>
   </a>
@@ -2581,10 +2581,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-new-in-2140" class="md-nav__link">
+  <a href="#whats-new-in-2150" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's new in 2.14.0
+        What's new in 2.15.0
       
     </span>
   </a>
@@ -2782,7 +2782,7 @@ up where they leave off — see <strong><a href="tutorials/rforge-in-the-r-lifec
 </li>
 </ul>
 </div>
-<h2 id="whats-new-in-2140">What's new in 2.14.0<a class="headerlink" href="#whats-new-in-2140" title="Permanent link">&para;</a></h2>
+<h2 id="whats-new-in-2150">What's new in 2.15.0<a class="headerlink" href="#whats-new-in-2150" title="Permanent link">&para;</a></h2>
 <p>Two diff-aware / ecosystem features — <strong>41 commands</strong> (no surface change; both add flags and findings, not new commands).</p>
 <ul>
 <li><strong>Per-package diff-aware baseline caching</strong> — <code>/rforge:r:check</code>/<code>r:test</code>/<code>r:lint --changed</code> now cache the merge-base baseline <strong>per package</strong> under <code>~/.rforge/baseline-cache/</code>, so a re-run with an unchanged merge-base re-checks only the packages it hasn't baselined yet (the growing changed-set case). Self-invalidating and LRU-bounded; opt out with <code>--no-cache</code> or clear with <code>python3 -m lib.changed --clear-cache</code>. See the <a href="tutorials/diff-aware-checks/">diff-aware checks tutorial</a>.</li>
