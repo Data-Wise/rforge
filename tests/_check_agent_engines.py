@@ -40,8 +40,22 @@ def rcmd_kinds() -> set[str]:
     return {k.strip() for k in m.group(1).split(",")}
 
 
+def _is_prohibition(line: str) -> bool:
+    """A line that PROHIBITS an engine (recommend-only boundary) rather than
+    instructing an auto-run. Such lines may legitimately name `--kind <x>` for a
+    mutating/network engine; they must NOT be read as auto-run recipes."""
+    low = line.lower()
+    return any(w in low for w in ("never", "prohibit", "recommend-only",
+                                  "recommend only"))
+
+
 def agent_kinds(text: str) -> set[str]:
-    return set(re.findall(r"--kind[=\s]+([a-z-]+)", text))
+    kinds: set[str] = set()
+    for line in text.splitlines():
+        if _is_prohibition(line):
+            continue
+        kinds.update(re.findall(r"--kind[=\s]+([a-z-]+)", line))
+    return kinds
 
 
 def agent_modules(text: str) -> set[str]:
@@ -55,11 +69,14 @@ def agent_recipes(text: str) -> list[str]:
     an angle-bracket placeholder (those are illustrative, e.g. `lib.<module>`).
     """
     cmds = []
-    for raw in re.findall(r"`(python3 -m lib\.[^`]+)`", text):
-        cmd = raw.replace("<pkg>", "RMediation")
-        if "<" in cmd:
-            continue
-        cmds.append(cmd)
+    for line in text.splitlines():
+        if _is_prohibition(line):
+            continue  # prohibition lines may name a recommend-only invocation
+        for raw in re.findall(r"`(python3 -m lib\.[^`]+)`", line):
+            cmd = raw.replace("<pkg>", "RMediation")
+            if "<" in cmd:
+                continue
+            cmds.append(cmd)
     return cmds
 
 
@@ -99,6 +116,22 @@ def main() -> int:
         if rc == 2:
             print(f"FAIL: recipe does not parse (argparse usage error): {cmd}")
             failed = True
+
+    # Positive deploy assertions (Part 3-D): deploy is MUTATING + NETWORK and
+    # must stay recommend-only. (a) deploy must be ABSENT from SAFE_AUTORUN;
+    # (b) the orchestrator must explicitly name `/rforge:r:site --deploy` on a
+    # recommend-only (prohibition) line — so dropping the instruction fails here.
+    if "deploy" in SAFE_AUTORUN:
+        print("FAIL: 'deploy' must not be in SAFE_AUTORUN (MUTATING + NETWORK)")
+        failed = True
+    deploy_recommend_only = any(
+        _is_prohibition(line) and "--deploy" in line
+        for line in text.splitlines()
+    )
+    if not deploy_recommend_only:
+        print("FAIL: orchestrator.md must name `/rforge:r:site --deploy` as "
+              "recommend-only (a prohibition line mentioning --deploy)")
+        failed = True
 
     if failed:
         return 1

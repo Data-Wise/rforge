@@ -85,6 +85,12 @@ principle.
   `/rforge:r:urlcheck`
 - Reverse-dependency runs (heavy/external): `/rforge:r:revdep`
 - Dependency patch writes: `/rforge:r:deps-sync --write`
+- Site deploy (MUTATING + NETWORK — pushes to a remote branch via
+  `pkgdown::deploy_to_branch`): `/rforge:r:site --deploy` is recommend-only —
+  recommend it and **stop**.
+  It is never auto-run. Never invoke the engine directly — `--kind deploy` is
+  prohibited as an auto-run recipe (it is deliberately absent from every
+  read-only auto-run enumeration above and from `SAFE_AUTORUN`).
 
 So: NEW_FUNCTION's read-only recipe checks structure, then you **recommend**
 `/rforge:r:document` to regenerate `man/*.Rd` + `NAMESPACE`. CRAN_READINESS runs

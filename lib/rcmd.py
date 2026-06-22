@@ -383,11 +383,6 @@ def _git_worktree_cleanup(repo: str, dest: Path) -> None:
         pass
 
 
-# Files git_status values that ARE present in the clean HEAD worktree and so would
-# actually publish. `untracked`/`ignored`/None never reach the worktree.
-_DEPLOY_BLOCKING_STATUS = {"tracked", "modified"}
-
-
 def _run_deploy(path: str, pkg: dict, *, branch: str = "gh-pages",
                 force: bool = False) -> dict:
     """Clean-ref pkgdown deploy (issue #52). MUTATING + NETWORK — recommend-only.
@@ -409,11 +404,19 @@ def _run_deploy(path: str, pkg: dict, *, branch: str = "gh-pages",
     """
     # — 1. pre-deploy leak scan —
     gate = sitelint.check_site_leaks(path)
+    # A-gate: a finding blocks the deploy IFF it is actually in HEAD — the deploy
+    # republishes `git worktree add --detach HEAD`, so only HEAD-resident files
+    # can reach the published site. A staged-but-uncommitted NEW file (porcelain
+    # 'A ', tagged "modified" by sitelint) is NOT in HEAD and cannot leak; a
+    # committed-then-deleted file is still in HEAD and DOES leak.
+    head_set = set(sitelint._head_paths(Path(path)))
     blocking = [f for f in gate.get("findings", [])
-                if f.get("git_status") in _DEPLOY_BLOCKING_STATUS]
-    # publish preview: the root *.md files the archive (HEAD) will contain.
-    preview = sorted(
-        f["file"] for f in gate.get("findings", []) if f.get("where") == "root")
+                if f.get("file") in head_set]
+    # C-preview: the publish preview is the SAME finding set as the gate (all
+    # scopes, path-qualified), NOT just root *.md — otherwise a blocked man/ or
+    # vignettes/ file prints "(none) will publish" and on --force publishes
+    # silently. Keyed on the path-qualified finding["file"].
+    preview = sorted(f["file"] for f in gate.get("findings", []))
 
     # — 2. hard-abort gate —
     if blocking and not force:
@@ -425,7 +428,7 @@ def _run_deploy(path: str, pkg: dict, *, branch: str = "gh-pages",
                 f"are committed and WOULD be published by pkgdown: {names}.",
                 "Move scratch docs to a gitignored subdir, allowlist them via "
                 ".rforge.yaml site.allowlist, or re-run with --force.",
-                f"Files pkgdown would publish (root .md): {', '.join(preview) or '(none)'}",
+                f"Files pkgdown would publish: {', '.join(preview) or '(none)'}",
             ])
 
     forced = bool(blocking and force)
@@ -436,7 +439,7 @@ def _run_deploy(path: str, pkg: dict, *, branch: str = "gh-pages",
             f"--force: proceeding despite {len(blocking)} non-allowlisted "
             f"committed file(s) that will be published: {names}.")
     pre_messages.append(
-        f"Files pkgdown will publish (root .md): {', '.join(preview) or '(none)'}")
+        f"Files pkgdown will publish: {', '.join(preview) or '(none)'}")
 
     # — 3. clean ref via git worktree (REFUSE on failure; never deploy the worktree) —
     #
@@ -455,47 +458,55 @@ def _run_deploy(path: str, pkg: dict, *, branch: str = "gh-pages",
     # ONE honest caveat: a full end-to-end deploy (a real push) is the final
     # confirmation that deploy_to_branch succeeds from a detached-HEAD linked
     # worktree — the tests here mock the R call and cannot exercise the real push.
+    # E-tmpdir: `mkdtemp` creates `parent`; the worktree lives at parent/head.
+    # Both the worktree-failure early return AND the deploy path must clean up
+    # `parent` (not just the worktree), or an empty rforge-deploy-* dir leaks
+    # into $TMPDIR. The outer try/finally rmtree's `parent` on every path.
     parent = tempfile.mkdtemp(prefix="rforge-deploy-")
     ref_dir = str(Path(parent) / "head")
-    ok, msg = _git_worktree_head(path, Path(ref_dir))
-    if not ok:
-        return _deploy_envelope(
-            "warn", pkg, branch=branch, gate=gate, ref_dir=ref_dir,
-            forced=forced,
-            messages=pre_messages + [
-                msg,
-                "Deploy refused — would not silently build the working directory "
-                "(that path can leak untracked files). Commit your work and retry.",
-            ])
-
-    # — 4. deploy from INSIDE the detached-HEAD worktree (NOT the working dir) —
-    #      Always remove the linked worktree afterwards (try/finally).
     try:
-        snippet = deploy_snippet(ref_dir, branch=branch)
-        stdout, code = _invoke_r(snippet)
-        raw = _parse_json(stdout)
-        if raw is None:
-            raw = console_fallback("deploy", stdout)
-        env = normalize("deploy", raw, code, pkg)
-        env["forced"] = forced
-        env["ref_dir"] = ref_dir
-        env["branch"] = raw.get("branch", branch)
-        env["deployed"] = bool(raw.get("deployed", False))
-        env["gate"] = gate
-        env["blockers"] = blocking if forced else []
-        env["messages"] = pre_messages + list(env.get("messages", []))
-        # pkgdown missing → engine_missing 🟡 (existing OPTIONAL_ENGINES downgrade)
-        for eng in env.get("engine_missing", []):
-            if INSTALL_HINT.get(eng):
-                env.setdefault("messages", []).append(
-                    f"Missing R package — run: {INSTALL_HINT[eng]}")
-            if eng in OPTIONAL_ENGINES and env["status"] == "error":
-                env["status"] = "warn"
-        if forced and env["status"] == "ok":
-            env["status"] = "warn"  # surface that the gate was overridden
-        return env
+        ok, msg = _git_worktree_head(path, Path(ref_dir))
+        if not ok:
+            return _deploy_envelope(
+                "warn", pkg, branch=branch, gate=gate, ref_dir=ref_dir,
+                forced=forced,
+                messages=pre_messages + [
+                    msg,
+                    "Deploy refused — would not silently build the working "
+                    "directory (that path can leak untracked files). Commit "
+                    "your work and retry.",
+                ])
+
+        # — 4. deploy from INSIDE the detached-HEAD worktree (NOT the working dir) —
+        #      Always remove the linked worktree afterwards (try/finally).
+        try:
+            snippet = deploy_snippet(ref_dir, branch=branch)
+            stdout, code = _invoke_r(snippet)
+            raw = _parse_json(stdout)
+            if raw is None:
+                raw = console_fallback("deploy", stdout)
+            env = normalize("deploy", raw, code, pkg)
+            env["forced"] = forced
+            env["ref_dir"] = ref_dir
+            env["branch"] = raw.get("branch", branch)
+            env["deployed"] = bool(raw.get("deployed", False))
+            env["gate"] = gate
+            env["blockers"] = blocking if forced else []
+            env["messages"] = pre_messages + list(env.get("messages", []))
+            # pkgdown missing → engine_missing 🟡 (OPTIONAL_ENGINES downgrade)
+            for eng in env.get("engine_missing", []):
+                if INSTALL_HINT.get(eng):
+                    env.setdefault("messages", []).append(
+                        f"Missing R package — run: {INSTALL_HINT[eng]}")
+                if eng in OPTIONAL_ENGINES and env["status"] == "error":
+                    env["status"] = "warn"
+            if forced and env["status"] == "ok":
+                env["status"] = "warn"  # surface that the gate was overridden
+            return env
+        finally:
+            _git_worktree_cleanup(path, Path(ref_dir))
     finally:
-        _git_worktree_cleanup(path, Path(ref_dir))
+        shutil.rmtree(parent, ignore_errors=True)
 
 
 def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = False,

@@ -32,7 +32,7 @@ def test_cran_prep_includes_tier4_advisory_stages(tmp_path, monkeypatch):
     pkg = _make_pkg(tmp_path, extra_files=("BRAINSTORM.md",))
     env = rcmd._run_cran_prep(str(pkg), no_revdep=True, strict=False)
     kinds = {s["kind"] for s in env["stages"]}
-    assert {"description", "build-hygiene", "docs-consistency"} <= kinds
+    assert {"description", "build-hygiene", "docs-consistency", "site-leaks"} <= kinds
 
 
 def test_tier4_advisory_never_blocks_ready(tmp_path, monkeypatch):

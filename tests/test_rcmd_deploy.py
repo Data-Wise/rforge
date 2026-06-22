@@ -205,6 +205,96 @@ def test_custom_branch_threaded(tmp_path, monkeypatch):
     assert '"docs"' in captured["snippet"]
 
 
+# ─────────── C-preview: preview spans all scopes, not just root ───────────
+
+
+def test_preview_includes_man_vignettes_in_block_and_preview(tmp_path, monkeypatch):
+    # C-preview: a committed scratch file under man/ (or vignettes/articles/)
+    # must appear in BOTH the block reason AND the publish-preview line — the
+    # old where=='root' preview filter printed "(none)" and on --force would
+    # publish it silently.
+    repo = _make_pkg_repo(tmp_path, scratch_tracked=False)  # no root scratch
+    art = repo / "vignettes" / "articles"
+    art.mkdir(parents=True)
+    (art / "SECRET.Rmd").write_text("---\n")
+    _run_git(repo, "add", "vignettes/articles/SECRET.Rmd")
+    _run_git(repo, "commit", "-q", "-m", "add article")
+    calls = _mock_deploy_ok(monkeypatch)
+    env = rcmd.run("deploy", str(repo))
+    assert env["status"] == "blocked"
+    assert calls == []
+    # appears in blockers
+    assert any("vignettes/articles/SECRET.Rmd" in f["file"] for f in env["blockers"])
+    # appears in BOTH the block reason AND the publish-preview message
+    block_reason = next(m for m in env["messages"] if "Refusing" in m)
+    preview_line = next(m for m in env["messages"] if "publish" in m.lower())
+    assert "vignettes/articles/SECRET.Rmd" in block_reason
+    assert "vignettes/articles/SECRET.Rmd" in preview_line
+    assert "(none)" not in preview_line
+
+
+# ─────────── A-gate: block iff in HEAD ───────────
+
+
+def test_staged_new_file_does_not_block(tmp_path, monkeypatch):
+    # A-gate: `git add FOO.md` with NO commit → porcelain 'A ' (sitelint tags
+    # "modified") but NOT in HEAD → cannot reach the worktree → must NOT block.
+    repo = _make_pkg_repo(tmp_path, scratch_tracked=True,
+                          allowlist=["PLAN-scratch.md"])
+    (repo / "FOO.md").write_text("staged new\n")
+    _run_git(repo, "add", "FOO.md")  # staged, never committed
+    calls = _mock_deploy_ok(monkeypatch)
+    env = rcmd.run("deploy", str(repo))
+    assert env["status"] == "ok"
+    assert not any("FOO.md" in f["file"] for f in env["blockers"])
+    assert len(calls) == 1
+
+
+def test_committed_then_deleted_file_blocks(tmp_path, monkeypatch):
+    # A-gate: a file committed (in HEAD) then deleted from the working tree is
+    # re-materialized by `git worktree add --detach HEAD` → DOES block.
+    repo = _make_pkg_repo(tmp_path, scratch_tracked=True,
+                          allowlist=["PLAN-scratch.md"])
+    (repo / "GHOST.md").write_text("committed then deleted\n")
+    _run_git(repo, "add", "GHOST.md")
+    _run_git(repo, "commit", "-q", "-m", "add ghost")
+    (repo / "GHOST.md").unlink()  # delete from working tree only
+    calls = _mock_deploy_ok(monkeypatch)
+    env = rcmd.run("deploy", str(repo))
+    assert env["status"] == "blocked"
+    assert any("GHOST.md" in f["file"] for f in env["blockers"])
+    assert calls == []
+
+
+# ─────────── E-tmpdir: no leftover parent dir ───────────
+
+
+def test_no_leftover_tmpdir_after_deploy(tmp_path, monkeypatch):
+    import tempfile as _tf
+    repo = _make_pkg_repo(tmp_path, scratch_tracked=True,
+                          allowlist=["PLAN-scratch.md"])
+    _mock_deploy_ok(monkeypatch)
+    before = set(Path(_tf.gettempdir()).glob("rforge-deploy-*"))
+    env = rcmd.run("deploy", str(repo))
+    assert env["deployed"] is True
+    after = set(Path(_tf.gettempdir()).glob("rforge-deploy-*"))
+    assert after - before == set(), f"leftover tmpdir: {after - before}"
+
+
+def test_no_leftover_tmpdir_on_worktree_failure(tmp_path, monkeypatch):
+    # The early-return (worktree add fails) path must also clean up `parent`.
+    import tempfile as _tf
+    repo = tmp_path / "nogit"
+    repo.mkdir()
+    (repo / "DESCRIPTION").write_text("Package: demo\nVersion: 0.0.1\n")
+    (repo / "README.md").write_text("# demo\n")
+    _mock_deploy_ok(monkeypatch)
+    before = set(Path(_tf.gettempdir()).glob("rforge-deploy-*"))
+    rcmd.run("deploy", str(repo))
+    after = set(Path(_tf.gettempdir()).glob("rforge-deploy-*"))
+    assert after - before == set(), f"leftover tmpdir: {after - before}"
+
+
 # ───────────────────────── recommend-only / no auto-run ─────────────────────────
 
 

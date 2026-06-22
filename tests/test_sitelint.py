@@ -152,27 +152,31 @@ def test_scope_man_non_rd(tmp_path: Path):
     _run_git(tmp_path, "commit", "-m", "init")
     env = sitelint.check_site_leaks(tmp_path)
     files = _codes(env)
-    assert "SCRATCH.md" in files
-    assert "foo.Rd" not in files
-    assert "logo.png" not in files
-    assert _by_file(env, "SCRATCH.md")["where"] == "man"
+    # Finding C: "file" is now the path-qualified relpath.
+    assert "man/SCRATCH.md" in files
+    assert "man/foo.Rd" not in files
+    assert "man/figures/logo.png" not in files
+    assert _by_file(env, "man/SCRATCH.md")["where"] == "man"
 
 
-def test_scope_vignettes_non_vignette(tmp_path: Path):
+def test_scope_vignettes_toplevel(tmp_path: Path):
+    # Part 1 (USER DECISION — aggressive in articles/ only): a TOP-LEVEL
+    # rendered vignette (.Rmd/.qmd) is auto-trusted (legit vignette, never
+    # flagged); a top-level NON-rendered file (.md) is a candidate.
     vig = tmp_path / "vignettes"
     vig.mkdir()
-    (vig / "intro.Rmd").write_text("---\n")                # legit vignette, skip
-    (vig / "guide.qmd").write_text("---\n")                # legit vignette, skip
-    (vig / "DRAFT.md").write_text("draft\n")               # leak
+    (vig / "intro.Rmd").write_text("---\n")                # rendered → trusted
+    (vig / "guide.qmd").write_text("---\n")                # rendered → trusted
+    (vig / "TODO.md").write_text("todo\n")                 # non-rendered → leak
     _run_git(tmp_path, "init")
     _run_git(tmp_path, "add", ".")
     _run_git(tmp_path, "commit", "-m", "init")
     env = sitelint.check_site_leaks(tmp_path)
     files = _codes(env)
-    assert "DRAFT.md" in files
-    assert "intro.Rmd" not in files
-    assert "guide.qmd" not in files
-    assert _by_file(env, "DRAFT.md")["where"] == "vignettes"
+    assert "vignettes/intro.Rmd" not in files
+    assert "vignettes/guide.qmd" not in files
+    assert "vignettes/TODO.md" in files
+    assert _by_file(env, "vignettes/TODO.md")["where"] == "vignettes"
 
 
 def test_root_where_tag(pkg: Path):
@@ -193,18 +197,55 @@ def test_rforge_yaml_override_clears_tracked_hit(pkg: Path):
 
 
 def test_rforge_yaml_override_clears_vignettes_hit(tmp_path: Path):
-    # Allowlist must apply across all scopes, not just root.
+    # Finding C: allowlist is path-aware. A bare entry scopes to ROOT only;
+    # to clear a vignettes/ hit the entry must be path-qualified.
     vig = tmp_path / "vignettes"
     vig.mkdir()
-    (vig / "intro.Rmd").write_text("---\n")
     (vig / "DRAFT.md").write_text("draft\n")
     (tmp_path / ".rforge.yaml").write_text(
-        "site:\n  allowlist:\n    - DRAFT.md\n")
+        "site:\n  allowlist:\n    - vignettes/DRAFT.md\n")
     _run_git(tmp_path, "init")
     _run_git(tmp_path, "add", ".")
     _run_git(tmp_path, "commit", "-m", "init")
     env = sitelint.check_site_leaks(tmp_path)
-    assert "DRAFT.md" not in _codes(env)
+    assert "vignettes/DRAFT.md" not in _codes(env)
+
+
+def test_bare_allowlist_does_not_clear_subdir_hit(tmp_path: Path):
+    # Finding C: a bare root allowlist entry must NOT clear a same-basename
+    # stray under man/ or vignettes/.
+    man = tmp_path / "man"
+    man.mkdir()
+    (man / "notes.md").write_text("stray\n")
+    (tmp_path / "notes.md").write_text("root notes\n")
+    (tmp_path / ".rforge.yaml").write_text(
+        "site:\n  allowlist:\n    - notes.md\n")
+    _run_git(tmp_path, "init")
+    _run_git(tmp_path, "add", ".")
+    _run_git(tmp_path, "commit", "-m", "init")
+    env = sitelint.check_site_leaks(tmp_path)
+    files = _codes(env)
+    # root notes.md cleared by bare entry; man/notes.md NOT cleared.
+    assert "notes.md" not in files
+    assert "man/notes.md" in files
+
+
+def test_findings_carry_path_qualified_file(tmp_path: Path):
+    # Finding C: man/ and vignettes/ findings carry distinguishable
+    # path-qualified "file" values (not bare basenames).
+    man = tmp_path / "man"
+    man.mkdir()
+    (man / "dup.md").write_text("m\n")
+    vig = tmp_path / "vignettes"
+    vig.mkdir()
+    (vig / "dup.md").write_text("v\n")
+    _run_git(tmp_path, "init")
+    _run_git(tmp_path, "add", ".")
+    _run_git(tmp_path, "commit", "-m", "init")
+    env = sitelint.check_site_leaks(tmp_path)
+    files = _codes(env)
+    assert "man/dup.md" in files
+    assert "vignettes/dup.md" in files
 
 
 def test_rforge_yaml_malformed_falls_back_to_core(pkg: Path):
@@ -215,6 +256,91 @@ def test_rforge_yaml_malformed_falls_back_to_core(pkg: Path):
     assert "PLAN-scratch.md" in _codes(env)
     assert "README.md" not in _codes(env)
     assert any("allowlist" in m.lower() for m in env["messages"])
+
+
+# ───────────────────────── HEAD-sourced candidates (Finding A) ─────────────────────────
+
+
+def test_head_committed_then_deleted_from_disk_is_flagged(pkg: Path):
+    # Finding A: a file committed to HEAD but deleted from disk is re-materialized
+    # by the deploy (it publishes HEAD), so it must still be flagged "tracked".
+    (pkg / "PLAN-secret.md").write_text("secret\n")
+    _run_git(pkg, "add", "PLAN-secret.md")
+    _run_git(pkg, "commit", "-m", "add secret")
+    (pkg / "PLAN-secret.md").unlink()  # delete from working tree only
+    env = sitelint.check_site_leaks(pkg)
+    secret = _by_file(env, "PLAN-secret.md")
+    assert secret["git_status"] == "tracked"
+
+
+def test_head_committed_man_vignettes_deleted_flagged(tmp_path: Path):
+    man = tmp_path / "man"
+    man.mkdir()
+    (man / "GONE.md").write_text("m\n")
+    _run_git(tmp_path, "init")
+    _run_git(tmp_path, "add", ".")
+    _run_git(tmp_path, "commit", "-m", "init")
+    (man / "GONE.md").unlink()
+    env = sitelint.check_site_leaks(tmp_path)
+    assert "man/GONE.md" in _codes(env)
+    assert _by_file(env, "man/GONE.md")["git_status"] == "tracked"
+
+
+# ───────────────────────── vignettes/articles recursion (Finding B) ─────────────────────────
+
+
+def test_vignettes_articles_recursive_flagged(tmp_path: Path):
+    # Finding B: pkgdown renders vignettes/articles/** recursively. A tracked
+    # SECRET.Rmd there must be flagged.
+    art = tmp_path / "vignettes" / "articles"
+    art.mkdir(parents=True)
+    (art / "SECRET.Rmd").write_text("---\n")
+    _run_git(tmp_path, "init")
+    _run_git(tmp_path, "add", ".")
+    _run_git(tmp_path, "commit", "-m", "init")
+    env = sitelint.check_site_leaks(tmp_path)
+    files = _codes(env)
+    assert "vignettes/articles/SECRET.Rmd" in files
+    assert _by_file(env, "vignettes/articles/SECRET.Rmd")["where"] == "vignettes"
+
+
+def test_vignettes_articles_aggressive_toplevel_rmd_trusted(tmp_path: Path):
+    # Part 1: articles/ is aggressive (every file flagged, incl. rendered);
+    # a top-level rendered .Rmd is auto-trusted (accepted gap). A top-level
+    # NON-rendered file is still flagged.
+    art = tmp_path / "vignettes" / "articles"
+    art.mkdir(parents=True)
+    (art / "SECRET.Rmd").write_text("---\n")               # articles/ → flagged
+    (art / "note.md").write_text("note\n")                 # articles/ → flagged
+    (tmp_path / "vignettes" / "SCRATCH.Rmd").write_text("---\n")  # trusted
+    (tmp_path / "vignettes" / "TODO.md").write_text("todo\n")     # flagged
+    _run_git(tmp_path, "init")
+    _run_git(tmp_path, "add", ".")
+    _run_git(tmp_path, "commit", "-m", "init")
+    files = _codes(sitelint.check_site_leaks(tmp_path))
+    assert "vignettes/articles/SECRET.Rmd" in files
+    assert "vignettes/articles/note.md" in files
+    assert "vignettes/SCRATCH.Rmd" not in files
+    assert "vignettes/TODO.md" in files
+
+
+# ───────────────────────── decode-safe git (Finding E) ─────────────────────────
+
+
+def test_git_undecodable_output_does_not_raise(pkg: Path, monkeypatch):
+    # Finding E: a non-UTF-8 tracked filename → UnicodeDecodeError under
+    # text=True. The detector must degrade, never raise.
+    real_run = subprocess.run
+
+    def fake_run(args, *a, **k):
+        if args[:2] == ["git", "ls-files"]:
+            raise UnicodeDecodeError("utf-8", b"\xff", 0, 1, "bad")
+        return real_run(args, *a, **k)
+
+    monkeypatch.setattr(sitelint.subprocess, "run", fake_run)
+    env = sitelint.check_site_leaks(pkg)  # must not raise
+    assert env["kind"] == "site-leaks"
+    assert env["status"] in {"ok", "warn"}
 
 
 # ───────────────────────── git-absent degrade ─────────────────────────

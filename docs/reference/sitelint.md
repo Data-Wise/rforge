@@ -8,8 +8,12 @@ pkgdown stray-file leak detector.
 
 Pure-Python (stdlib + a `git` subprocess, **no R**) preflight that flags scratch
 files which pkgdown would render and publish. pkgdown renders **every** top-level
-``.md`` (not just ``README``/``NEWS``) plus non-``.Rd`` files in ``man/`` and
-non-vignette files in ``vignettes/``; ``.Rbuildignore`` does **not** gate any of
+``.md`` (not just ``README``/``NEWS``) plus non-``.Rd`` files in ``man/``. In
+``vignettes/`` the scope is narrowed (USER DECISION — "aggressive in articles/
+only"): every file under ``vignettes/articles/**`` is a candidate, but a
+top-level rendered vignette (``.Rmd``/``.qmd``/``.Rnw``/``.Rmarkdown``) is
+auto-trusted — only top-level NON-rendered files (``.md``/``.txt``/…) are
+flagged. ``.Rbuildignore`` does **not** gate any of
 this (it only affects ``R CMD build``). So a stray ``PLAN-*.md`` /
 ``ISSUE-*.md`` / ``NOTES.md`` leaks onto the published site — the failure mode
 behind issue #52.

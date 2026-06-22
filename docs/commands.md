@@ -828,7 +828,7 @@ Build the pkgdown website (vignettes → articles) with optional preview.
 - `--articles-only` (optional) - Build only articles/vignettes (reinstalls first)
 - `--devel` (optional) - Fast in-process build via `load_all` (lower fidelity)
 - `--check-leaks` (optional) - Read-only preflight (`lib.sitelint`) that flags stray scratch files pkgdown would publish; no build
-- `--deploy` (optional) - Deploy from a clean ref (`git archive HEAD`) via `pkgdown::deploy_to_branch` — MUTATING + NETWORK, recommend-only (never auto-run)
+- `--deploy` (optional) - Deploy from a clean ref (detached-HEAD `git worktree`) via `pkgdown::deploy_to_branch` — MUTATING + NETWORK, recommend-only (never auto-run)
 - `--branch` (optional) - Target branch for `--deploy` (default `gh-pages`)
 - `--force` (optional) - Override the `--deploy` leak gate — proceed despite non-allowlisted committed files (downgrades block→warn)
 
