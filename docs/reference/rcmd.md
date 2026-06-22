@@ -68,7 +68,7 @@ revdep_env=None when no revdep check was run (package has no dependents).
 ### `run()`
 
 ```python
-def run(kind: 'str', path: 'str' = '.', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False, flavor: 'str | None' = None, incoming: 'bool' = False, platform: 'str' = 'all', platforms: 'list | None' = None, preset: 'str | None' = None, rc_mode: 'bool' = False) -> 'dict'
+def run(kind: 'str', path: 'str' = '.', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False, flavor: 'str | None' = None, incoming: 'bool' = False, platform: 'str' = 'all', platforms: 'list | None' = None, preset: 'str | None' = None, rc_mode: 'bool' = False, branch: 'str' = 'gh-pages', force: 'bool' = False) -> 'dict'
 ```
 
 Run one engine ``kind`` against ``path``; return the normalized envelope.

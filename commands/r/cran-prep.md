@@ -55,6 +55,7 @@ By default the gate runs (in order):
 | `build-hygiene` | Tier 4 — planning/dev docs that would ship in the tarball; emits the exact `.Rbuildignore` regex to add | **no — advisory** |
 | `docs-consistency` | Tier 4 — lightweight advisory staleness/dangling-ref check | **no — advisory** |
 | `test_config` | Tier 4 — warns if `Config/testthat/edition` is absent or set to `"2"` (CI snapshot failures) | **no — advisory** |
+| `site-leaks` | Tier 4 — flags stray scratch files pkgdown would render + publish (root `*.md` + non-`.Rd` `man/` + non-vignette `vignettes/`), minus the allowlist | **no — advisory** |
 | `revdep` | reverse-dependency check (skip with `--no-revdep`) | yes |
 
 Also runs by default: **Tier 1b** — verify the PDF reference manual builds; `warn` (never
@@ -65,10 +66,11 @@ verdict** and appends the blocker `noSuggests/donttest check failed (Suggests us
 unconditionally?)`. Mechanism: `rcmdcheck`'s `env=` named vector — no `devtools`, no
 subprocess-layer change. These are the same passes `/rforge:r:check --strict` runs.
 
-**Tier 4 stages (`description`, `build-hygiene`, `docs-consistency`) are pure-Python,
-advisory, and NEVER block `ready`** — they surface as `warn` only. (A build-hygiene finding
-can still block *indirectly* once R's own "non-standard top-level files" NOTE fires in the
-`check` stage.) Backed by the pure-stdlib `lib/cranlint.py` module.
+**Tier 4 stages (`description`, `build-hygiene`, `docs-consistency`, `test_config`,
+`site-leaks`) are pure-Python, advisory, and NEVER block `ready`** — they surface as `warn`
+only. (A build-hygiene finding can still block *indirectly* once R's own "non-standard
+top-level files" NOTE fires in the `check` stage.) Backed by the pure-stdlib `lib/cranlint.py`
+and `lib/sitelint.py` modules.
 
 !!! warning "Behavior change — a package that is `ready` today can turn `blocked`"
     Because the strict flavor passes now run by default, a package that reports 🟢 `ready`

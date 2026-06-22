@@ -305,6 +305,93 @@ def _read_config_manifest_path(root: Path) -> Optional[str]:
     return _strip_inline_comment(match.group(1)) or None
 
 
+def _read_site_allowlist(root: str | os.PathLike) -> tuple[list[str], bool]:
+    """Read the optional `site.allowlist` list from `<root>/.rforge.yaml`.
+
+    Parses the nested block form::
+
+        site:
+          allowlist:
+            - PLAN-scratch.md
+            - design-notes.md
+
+    Returns ``(entries, malformed)``:
+
+    - key absent (no `site:` or no `allowlist:` under it) → ``([], False)``
+    - `allowlist:` present but **not** a block list (e.g. a scalar or empty) →
+      ``([], True)`` so the caller can warn + fall back to the core allowlist.
+    - `allowlist:` present as a list → ``([items], False)``.
+
+    Stdlib-only (no PyYAML), matching this module's hand-rolled YAML subset.
+    Never raises — an unreadable file degrades to ``([], False)``.
+    """
+    try:
+        text = (Path(root) / ".rforge.yaml").read_text(
+            encoding="utf-8", errors="replace")
+    except OSError:
+        return [], False
+
+    in_site = False
+    in_allowlist = False
+    allowlist_seen = False
+    allowlist_indent = -1
+    inline_value = ""
+    items: list[str] = []
+
+    for raw in text.splitlines():
+        if not raw.strip() or raw.lstrip().startswith("#"):
+            continue
+        indent = len(raw) - len(raw.lstrip())
+        stripped = raw.strip()
+
+        if indent == 0:
+            # A new top-level key ends any site/allowlist context.
+            in_site = stripped.startswith("site:")
+            in_allowlist = False
+            if in_site:
+                # `site: something` inline would be malformed for our purposes,
+                # but the block form `site:` is what we expect.
+                pass
+            continue
+
+        if not in_site:
+            continue
+
+        if not in_allowlist:
+            if stripped.startswith("allowlist:"):
+                allowlist_seen = True
+                in_allowlist = True
+                allowlist_indent = indent
+                inline_value = stripped[len("allowlist:"):].strip()
+            # else: some other key under site: — ignore.
+            continue
+
+        # Inside allowlist: collect deeper-indented `- item` lines.
+        if indent > allowlist_indent and stripped.startswith("- "):
+            item = _strip_inline_comment(stripped[2:].strip())
+            if item:
+                items.append(item)
+        elif indent <= allowlist_indent:
+            in_allowlist = False
+            # Re-evaluate this line as a potential sibling under site:.
+            if indent > 0 and stripped.startswith("allowlist:"):
+                allowlist_seen = True
+                in_allowlist = True
+                allowlist_indent = indent
+                inline_value = stripped[len("allowlist:"):].strip()
+
+    if not allowlist_seen:
+        return [], False
+    if items:
+        return items, False
+    # `allowlist:` was present but yielded no list items.
+    # An inline scalar (`allowlist: foo`) is malformed; an empty block is also
+    # treated as malformed so the caller warns + falls back to core.
+    if inline_value:
+        return [], True
+    return [], True
+
+
 def _enrich_packages(packages: list[Package], manifest: Manifest) -> Drift:
     """Attach manifest metadata to matching packages (by name, case-insensitive)
     and compute the drift between the manifest and what's on disk.

@@ -817,7 +817,7 @@ Build the pkgdown website (vignettes → articles) with optional preview.
 **Usage:**
 
 ```bash
-/rforge:r:site [package] [--preview] [--strict] [--articles-only] [--devel]
+/rforge:r:site [package] [--preview] [--strict] [--articles-only] [--devel] [--check-leaks] [--deploy] [--branch gh-pages] [--force]
 ```
 
 **Parameters:**
@@ -827,6 +827,10 @@ Build the pkgdown website (vignettes → articles) with optional preview.
 - `--strict` (optional) - Fail-fast config check via `check_pkgdown` (useful in CI)
 - `--articles-only` (optional) - Build only articles/vignettes (reinstalls first)
 - `--devel` (optional) - Fast in-process build via `load_all` (lower fidelity)
+- `--check-leaks` (optional) - Read-only preflight (`lib.sitelint`) that flags stray scratch files pkgdown would publish; no build
+- `--deploy` (optional) - Deploy from a clean ref (detached-HEAD `git worktree`) via `pkgdown::deploy_to_branch` — MUTATING + NETWORK, recommend-only (never auto-run)
+- `--branch` (optional) - Target branch for `--deploy` (default `gh-pages`)
+- `--force` (optional) - Override the `--deploy` leak gate — proceed despite non-allowlisted committed files (downgrades block→warn)
 
 **Examples:**
 
@@ -845,6 +849,15 @@ Build the pkgdown website (vignettes → articles) with optional preview.
 
 # Fast dev build (no install)
 /rforge:r:site --devel
+
+# Preflight: flag stray docs pkgdown would publish (no build)
+/rforge:r:site --check-leaks
+
+# Deploy from a clean ref (recommend-only — pushes to gh-pages)
+/rforge:r:site --deploy
+
+# Deploy to a custom branch, overriding the leak gate
+/rforge:r:site --deploy --branch docs --force
 ```
 
 **Executes:**
