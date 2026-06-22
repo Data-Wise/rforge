@@ -40,11 +40,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   leak) plus path-vs-basename allowlist collisions, an incomplete publish preview,
   a missing orchestrator recommend-only boundary (now gate-enforced), a
   decode-safe `git` regression, and temp-dir cleanup.
+- **Deploy worktree uses a NAMED temp branch, not `--detach`** (found by the
+  end-to-end smoke test): `deploy_to_branch` does `checkout --orphan` then returns
+  to `git_current_branch()`, which a detached HEAD lacks → the worktree stayed on
+  `gh-pages` and pkgdown's own worktree-add collided. Cleanup now removes the temp
+  branch too.
 
 ### Note
 
-- A real end-to-end `deploy_to_branch` push (from a detached-HEAD linked worktree)
-  is validated by a manual smoke test; the unit suite mocks the R call.
+- The full end-to-end `deploy_to_branch` path is validated by a manual smoke test
+  (real build + push to a local bare `origin`): the published `gh-pages` contains
+  the site and **excludes the untracked scratch file** — the #52 guarantee holds
+  in a real deploy. The unit suite mocks the R call; a `_git_worktree_head`
+  regression test pins the named-branch invariant.
 
 ---
 

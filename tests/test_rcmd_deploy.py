@@ -5,11 +5,13 @@ so the actual deploy is ALWAYS mocked at the `rcmd._invoke_r` boundary — exact
 how tests/test_rcmd_rhub.py mocks the R call. We never perform a real push.
 
 The load-bearing assertion (the actual proof of #52) is the worktree one:
-after the gate passes, the materialized detached-HEAD worktree contains the
+after the gate passes, the materialized clean-HEAD worktree contains the
 committed scratch file but NOT the untracked one — i.e. untracked files are
 structurally excluded. The worktree (vs `git archive`) is mandatory because
 deploy_to_branch drives the package's own git repo+remote, which an archived
-tempdir lacks.
+tempdir lacks. The worktree is created on a NAMED temp branch (not `--detach`):
+an end-to-end smoke test showed deploy_to_branch's checkout --orphan / return
+juggling needs a named branch to return to, else gh-pages collides.
 """
 import subprocess
 from pathlib import Path
@@ -153,6 +155,32 @@ def test_worktree_excludes_untracked_includes_committed(tmp_path, monkeypatch):
     assert not Path(ref_dir).exists()
 
 
+def test_worktree_uses_named_branch_not_detached_and_cleans_up(tmp_path):
+    """Regression for the smoke-test finding: the clean-ref worktree must be on a
+    NAMED temp branch (deploy_to_branch returns to git_current_branch(); a
+    detached HEAD has no name → gh-pages worktree collision). Cleanup must remove
+    both the worktree AND the temp branch."""
+    import subprocess
+    repo = _make_pkg_repo(tmp_path)
+    parent = tmp_path / "wt"
+    parent.mkdir()
+    dest = parent / "head"
+    ok, _ = rcmd._git_worktree_head(str(repo), dest)
+    assert ok
+    branch = rcmd._deploy_tmp_branch(dest)
+    # the worktree HEAD resolves to the NAMED temp branch, not a detached HEAD
+    head = subprocess.run(["git", "-C", str(dest), "symbolic-ref", "--quiet", "HEAD"],
+                          capture_output=True, text=True)
+    assert head.returncode == 0, "worktree is detached — must be on a named branch"
+    assert branch in head.stdout
+    # cleanup removes the worktree dir AND deletes the temp branch
+    rcmd._git_worktree_cleanup(str(repo), dest)
+    assert not dest.exists()
+    branches = subprocess.run(["git", "-C", str(repo), "branch", "--list", branch],
+                              capture_output=True, text=True)
+    assert branch not in branches.stdout
+
+
 # ───────────────────────── error envelopes ─────────────────────────
 
 
@@ -252,7 +280,7 @@ def test_staged_new_file_does_not_block(tmp_path, monkeypatch):
 
 def test_committed_then_deleted_file_blocks(tmp_path, monkeypatch):
     # A-gate: a file committed (in HEAD) then deleted from the working tree is
-    # re-materialized by `git worktree add --detach HEAD` → DOES block.
+    # re-materialized by the clean HEAD worktree → DOES block.
     repo = _make_pkg_repo(tmp_path, scratch_tracked=True,
                           allowlist=["PLAN-scratch.md"])
     (repo / "GHOST.md").write_text("committed then deleted\n")

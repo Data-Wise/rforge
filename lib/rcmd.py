@@ -337,8 +337,14 @@ def _deploy_envelope(status, pkg, *, branch, gate, ref_dir=None,
     }
 
 
+def _deploy_tmp_branch(dest: Path) -> str:
+    """Deterministic, unique temp branch name for the clean-ref worktree, derived
+    from the unique mkdtemp parent so cleanup can recompute it from `dest` alone."""
+    return f"rforge-deploy-{dest.parent.name}"
+
+
 def _git_worktree_head(repo: str, dest: Path) -> tuple[bool, str]:
-    """Materialize a clean HEAD checkout into `dest` via `git worktree add --detach`.
+    """Materialize a clean HEAD checkout into `dest` via `git worktree add -b <tmp>`.
 
     A linked worktree shares `repo`'s `.git` directory (and therefore its remote),
     so `pkgdown::deploy_to_branch()` — which drives the package's OWN git repo
@@ -346,19 +352,26 @@ def _git_worktree_head(repo: str, dest: Path) -> tuple[bool, str]:
     to, while the checked-out tree contains only committed files (untracked
     working-dir files are structurally excluded — the #52 goal).
 
-    `git worktree add` requires `dest` to not already exist (or be empty), so the
-    caller passes a fresh non-existent subpath.
+    The worktree is created on a NAMED temp branch (not `--detach`): the smoke
+    test showed `deploy_to_branch` does `git checkout --orphan <branch>` then
+    `git checkout <old_branch>` to return — from a detached HEAD there is no name
+    to return to, so the worktree stays on `gh-pages` and pkgdown's own
+    `github_worktree_add(gh-pages)` then collides ("gh-pages is already used by
+    worktree"). A named branch gives `git_current_branch()` a name to return to.
+    The branch is deleted in `_git_worktree_cleanup`.
 
-    Returns (ok, message). On any git failure returns (False, reason) so the
-    caller REFUSES the deploy — we never fall back to building the working dir
-    (that would reintroduce the untracked-file leak this whole path prevents).
+    `git worktree add` requires `dest` to not already exist, so the caller passes
+    a fresh non-existent subpath. Returns (ok, message); on any git failure
+    returns (False, reason) so the caller REFUSES the deploy — we never fall back
+    to building the working dir (that would reintroduce the untracked-file leak).
     """
     git = shutil.which("git")
     if git is None:
         return (False, "git not found on PATH — cannot build a clean ref.")
     try:
         proc = subprocess.run(
-            [git, "-C", repo, "worktree", "add", "--detach", str(dest), "HEAD"],
+            [git, "-C", repo, "worktree", "add", "-b", _deploy_tmp_branch(dest),
+             str(dest), "HEAD"],
             capture_output=True, text=True, timeout=120)
     except (subprocess.TimeoutExpired, OSError) as e:  # pragma: no cover
         return (False, f"git worktree add failed: {e}")
@@ -370,17 +383,19 @@ def _git_worktree_head(repo: str, dest: Path) -> tuple[bool, str]:
 
 
 def _git_worktree_cleanup(repo: str, dest: Path) -> None:
-    """Best-effort removal of the linked worktree at `dest`. Swallows all errors —
-    cleanup must never mask the real deploy outcome."""
+    """Best-effort removal of the linked worktree at `dest` AND its temp branch.
+    Swallows all errors — cleanup must never mask the real deploy outcome."""
     git = shutil.which("git")
     if git is None:
         return
-    try:
-        subprocess.run(
-            [git, "-C", repo, "worktree", "remove", "--force", str(dest)],
-            capture_output=True, text=True, timeout=120)
-    except (subprocess.TimeoutExpired, OSError):  # pragma: no cover
-        pass
+    for argv in (
+        [git, "-C", repo, "worktree", "remove", "--force", str(dest)],
+        [git, "-C", repo, "branch", "-D", _deploy_tmp_branch(dest)],
+    ):
+        try:
+            subprocess.run(argv, capture_output=True, text=True, timeout=120)
+        except (subprocess.TimeoutExpired, OSError):  # pragma: no cover
+            pass
 
 
 def _run_deploy(path: str, pkg: dict, *, branch: str = "gh-pages",
