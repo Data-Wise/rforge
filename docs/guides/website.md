@@ -124,4 +124,4 @@ python3 -m lib.rcmd --kind deploy --path . --branch gh-pages
 ## Related
 
 - `r:cran-prep` — runs the `site-leaks` detector as a Tier-4 advisory stage.
-- [Doc conventions](../../CLAUDE.md) — admonition palette + the version-sync rules these pages follow.
+- Doc conventions — see the repo `CLAUDE.md` (admonition palette + version-sync rules these pages follow).

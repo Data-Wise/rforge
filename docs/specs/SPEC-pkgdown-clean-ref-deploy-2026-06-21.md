@@ -4,7 +4,7 @@
 - **Date:** 2026-06-21
 - **Target version:** v2.16.0
 - **Author:** brainstormed with Claude, grounded in `PROPOSAL-pkgdown-deploy-cleantree-guard.md` (rforge root)
-- **Related:** GitHub issue [#52](https://github.com/Data-Wise/rforge/issues/52), [commands/r/site.md](../../commands/r/site.md)
+- **Related:** GitHub issue [#52](https://github.com/Data-Wise/rforge/issues/52), `commands/r/site.md`
 
 ## Summary
 
