@@ -157,13 +157,20 @@ are the missing piece.
 
 ## Open questions / risks
 
-All design questions resolved 2026-06-21 (see In scope → Resolved design decisions). Remaining
-risks to validate during implementation:
+All design questions resolved 2026-06-21 (see In scope → Resolved design decisions).
 
-- **`git archive` + pkgdown git-metadata:** archiving HEAD strips `.git`, so pkgdown features
-  that read git history (last-modified dates, "edit this page" URLs) may degrade in the
-  deployed site. **Verify against a real pkgdown build**; if material, document the tradeoff or
-  inject the needed metadata. (Fallback: `git worktree add` at HEAD — heavier, preserves `.git`.)
+- **C-RISK — RESOLVED 2026-06-21 (empirical, R 4.6.0 + pkgdown installed):** the clean-ref
+  mechanism is **`git worktree add HEAD`, NOT `git archive`.** Inspecting
+  `pkgdown::deploy_to_branch` source shows it drives the *package's own* git repo —
+  `git_current_branch()`, `git checkout --orphan`, `git remote set-branches`, `git fetch`,
+  `github_worktree_add`, `github_push` (push to `remote`). An archived tempdir has no `.git`
+  and no remote, so deploy would **fail at the first git call** — archive is not a degraded
+  option, it is non-functional. A worktree checked out at `HEAD` satisfies both constraints at
+  once: it shares the main repo's `.git` + remote (so `deploy_to_branch` runs) AND contains
+  only committed files (so untracked working-dir files are structurally excluded — the #52
+  goal). **Action:** rework the `_run_deploy` path from `git archive | tar` to
+  `git worktree add <tempdir> HEAD` with guaranteed `git worktree remove` cleanup (incl. on
+  failure). This supersedes the "Clean ref: git archive" decision above.
 - **`man/` + `vignettes/` lint scope** risks false positives (legitimate non-`.Rd`/non-vignette
   assets). Keep the matcher conservative and cover with fixtures; allowlist absorbs intentional cases.
 - **Behavior change:** none for existing flags — `--deploy`/`--check-leaks`/`--branch`/`--force`

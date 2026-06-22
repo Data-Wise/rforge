@@ -136,6 +136,7 @@ nav:
       - "s7review": reference/s7review.md
       - "changed": reference/changed.md
       - "scaffold": reference/scaffold.md
+      - "sitelint": reference/sitelint.md
   - Project:
     - Architecture: architecture.md
     - Hooks & Skills: hooks-and-skills.md

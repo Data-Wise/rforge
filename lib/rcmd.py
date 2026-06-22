@@ -23,12 +23,14 @@ from pathlib import Path
 
 from . import changed
 from . import cranlint
+from . import sitelint
 # Snippet builders + CRAN env constants live in lib.rsnippets (extracted v2.15.0).
 # Re-exported into this namespace so existing `rcmd.<name>` references stay valid.
 from .rsnippets import (  # noqa: F401  (re-exported for callers/tests)
-    r_snippet, _guard, _r_named_char, _r_version_key,
+    r_snippet, deploy_snippet, _guard, _r_named_char, _r_version_key,
     _CHECK_ENV, _INCOMING_ENV, _CRAN_CHECKS_REGISTRY, _WIN_FN, _PDF_SKIP_RE,
 )
+import tempfile
 
 OPTIONAL_ENGINES = {"covr", "pkgdown", "lintr", "spelling", "urlchecker", "styler",
                     "revdepcheck", "goodpractice", "devtools", "rhub", "S7"}
@@ -129,6 +131,12 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
             return "error"
         probs = [p for p in _as_list(raw.get("problems")) if str(p).strip()]
         return "warn" if probs else "ok"
+    if kind == "deploy":
+        # blocked/warn for the gate are decided in _run_deploy (which builds its
+        # own envelope); this only fires for the actual deploy_to_branch result.
+        if raw.get("engine_missing"):
+            return "error"
+        return "ok" if (exit_code == 0 and raw.get("deployed")) else "error"
     if kind == "coverage":
         return "ok"  # advisory; untested lines surfaced, never "error"
     if kind in _QUALITY_KEY:
@@ -188,6 +196,9 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
         env["site"] = {"checked": raw.get("checked", False),
                        "built": raw.get("built", False),
                        "problems": problems}
+    elif kind == "deploy":
+        env["deploy"] = {"deployed": raw.get("deployed", False),
+                         "branch": raw.get("branch")}
     elif kind == "install":
         env["install"] = {"installed_version": raw.get("installed_version"),
                           "exit": exit_code}
@@ -302,11 +313,197 @@ def _install_package(path: str) -> tuple[dict, int]:
     return ({"installed_version": pkg.get("version")}, proc.returncode)
 
 
+def _deploy_envelope(status, pkg, *, branch, gate, ref_dir=None,
+                     forced=False, deployed=False, messages=None, blockers=None):
+    """House envelope for the clean-ref deploy path (kind='deploy').
+
+    `gate` carries the pre-deploy leak-scan outcome (status + offending files +
+    publish preview); `blockers` lists non-allowlisted tracked/modified files
+    that aborted the deploy (empty once --force is used or none found).
+    """
+    return {
+        "kind": "deploy",
+        "status": status,
+        "package": (pkg or {}).get("package", ""),
+        "version": (pkg or {}).get("version", ""),
+        "branch": branch,
+        "forced": forced,
+        "deployed": deployed,
+        "ref_dir": ref_dir,
+        "gate": gate,
+        "blockers": blockers or [],
+        "engine_missing": [],
+        "messages": messages or [],
+    }
+
+
+def _git_worktree_head(repo: str, dest: Path) -> tuple[bool, str]:
+    """Materialize a clean HEAD checkout into `dest` via `git worktree add --detach`.
+
+    A linked worktree shares `repo`'s `.git` directory (and therefore its remote),
+    so `pkgdown::deploy_to_branch()` — which drives the package's OWN git repo
+    (checkout --orphan / remote / fetch / push) — has a real repo+remote to push
+    to, while the checked-out tree contains only committed files (untracked
+    working-dir files are structurally excluded — the #52 goal).
+
+    `git worktree add` requires `dest` to not already exist (or be empty), so the
+    caller passes a fresh non-existent subpath.
+
+    Returns (ok, message). On any git failure returns (False, reason) so the
+    caller REFUSES the deploy — we never fall back to building the working dir
+    (that would reintroduce the untracked-file leak this whole path prevents).
+    """
+    git = shutil.which("git")
+    if git is None:
+        return (False, "git not found on PATH — cannot build a clean ref.")
+    try:
+        proc = subprocess.run(
+            [git, "-C", repo, "worktree", "add", "--detach", str(dest), "HEAD"],
+            capture_output=True, text=True, timeout=120)
+    except (subprocess.TimeoutExpired, OSError) as e:  # pragma: no cover
+        return (False, f"git worktree add failed: {e}")
+    if proc.returncode != 0:
+        err = proc.stderr.strip()
+        return (False, f"git worktree add HEAD failed "
+                       f"(not a git repo, or no commits?): {err}")
+    return (True, "clean ref materialized from HEAD via git worktree")
+
+
+def _git_worktree_cleanup(repo: str, dest: Path) -> None:
+    """Best-effort removal of the linked worktree at `dest`. Swallows all errors —
+    cleanup must never mask the real deploy outcome."""
+    git = shutil.which("git")
+    if git is None:
+        return
+    try:
+        subprocess.run(
+            [git, "-C", repo, "worktree", "remove", "--force", str(dest)],
+            capture_output=True, text=True, timeout=120)
+    except (subprocess.TimeoutExpired, OSError):  # pragma: no cover
+        pass
+
+
+# Files git_status values that ARE present in the clean HEAD worktree and so would
+# actually publish. `untracked`/`ignored`/None never reach the worktree.
+_DEPLOY_BLOCKING_STATUS = {"tracked", "modified"}
+
+
+def _run_deploy(path: str, pkg: dict, *, branch: str = "gh-pages",
+                force: bool = False) -> dict:
+    """Clean-ref pkgdown deploy (issue #52). MUTATING + NETWORK — recommend-only.
+
+    NEVER auto-run: this pushes to a remote branch via
+    ``pkgdown::deploy_to_branch()``. There is no SAFE_AUTORUN code constant; the
+    boundary is enforced in agents/orchestrator.md (deploy is recommend-only and
+    is deliberately absent from every auto-run enumeration there).
+
+    Flow (SPEC § Architecture):
+      1. run check_site_leaks first;
+      2. HARD-ABORT (blocked) on a non-allowlisted file that is in HEAD
+         (git_status tracked/modified) — `--force` downgrades block→warn + proceeds;
+      3. build a clean ref via `git worktree add --detach <tempdir> HEAD`
+         (NOT the working dir) — refuse the deploy if that fails;
+      4. run deploy_to_branch(branch=…) INSIDE the detached-HEAD worktree;
+      5. include a "files pkgdown will publish" preview in the envelope;
+      6. always remove the linked worktree (try/finally), even on failure.
+    """
+    # — 1. pre-deploy leak scan —
+    gate = sitelint.check_site_leaks(path)
+    blocking = [f for f in gate.get("findings", [])
+                if f.get("git_status") in _DEPLOY_BLOCKING_STATUS]
+    # publish preview: the root *.md files the archive (HEAD) will contain.
+    preview = sorted(
+        f["file"] for f in gate.get("findings", []) if f.get("where") == "root")
+
+    # — 2. hard-abort gate —
+    if blocking and not force:
+        names = ", ".join(sorted(f["file"] for f in blocking))
+        return _deploy_envelope(
+            "blocked", pkg, branch=branch, gate=gate, blockers=blocking,
+            messages=[
+                f"Refusing to deploy: {len(blocking)} non-allowlisted file(s) "
+                f"are committed and WOULD be published by pkgdown: {names}.",
+                "Move scratch docs to a gitignored subdir, allowlist them via "
+                ".rforge.yaml site.allowlist, or re-run with --force.",
+                f"Files pkgdown would publish (root .md): {', '.join(preview) or '(none)'}",
+            ])
+
+    forced = bool(blocking and force)
+    pre_messages: list[str] = []
+    if forced:
+        names = ", ".join(sorted(f["file"] for f in blocking))
+        pre_messages.append(
+            f"--force: proceeding despite {len(blocking)} non-allowlisted "
+            f"committed file(s) that will be published: {names}.")
+    pre_messages.append(
+        f"Files pkgdown will publish (root .md): {', '.join(preview) or '(none)'}")
+
+    # — 3. clean ref via git worktree (REFUSE on failure; never deploy the worktree) —
+    #
+    # RESOLVED (was "C-RISK UNVALIDATED"): `git archive | tar -x` is NON-FUNCTIONAL
+    # for this path — `deploy_to_branch(pkg=…)` does not merely build, it drives the
+    # package's OWN git repo (git_current_branch / checkout --orphan / remote /
+    # fetch / push). An archived tempdir has no `.git` and no remote, so deploy
+    # fails at the first internal git call. `git worktree add --detach <dest> HEAD`
+    # is therefore MANDATORY: a linked worktree shares the main repo's `.git`+remote
+    # (so deploy_to_branch can push) AND contains only committed files (so untracked
+    # working-dir files stay structurally excluded — the #52 goal). The two
+    # requirements converge on the worktree mechanism.
+    #
+    # `git worktree add` needs a non-existent dest, so parent=mkdtemp(), dest=parent/head.
+    #
+    # ONE honest caveat: a full end-to-end deploy (a real push) is the final
+    # confirmation that deploy_to_branch succeeds from a detached-HEAD linked
+    # worktree — the tests here mock the R call and cannot exercise the real push.
+    parent = tempfile.mkdtemp(prefix="rforge-deploy-")
+    ref_dir = str(Path(parent) / "head")
+    ok, msg = _git_worktree_head(path, Path(ref_dir))
+    if not ok:
+        return _deploy_envelope(
+            "warn", pkg, branch=branch, gate=gate, ref_dir=ref_dir,
+            forced=forced,
+            messages=pre_messages + [
+                msg,
+                "Deploy refused — would not silently build the working directory "
+                "(that path can leak untracked files). Commit your work and retry.",
+            ])
+
+    # — 4. deploy from INSIDE the detached-HEAD worktree (NOT the working dir) —
+    #      Always remove the linked worktree afterwards (try/finally).
+    try:
+        snippet = deploy_snippet(ref_dir, branch=branch)
+        stdout, code = _invoke_r(snippet)
+        raw = _parse_json(stdout)
+        if raw is None:
+            raw = console_fallback("deploy", stdout)
+        env = normalize("deploy", raw, code, pkg)
+        env["forced"] = forced
+        env["ref_dir"] = ref_dir
+        env["branch"] = raw.get("branch", branch)
+        env["deployed"] = bool(raw.get("deployed", False))
+        env["gate"] = gate
+        env["blockers"] = blocking if forced else []
+        env["messages"] = pre_messages + list(env.get("messages", []))
+        # pkgdown missing → engine_missing 🟡 (existing OPTIONAL_ENGINES downgrade)
+        for eng in env.get("engine_missing", []):
+            if INSTALL_HINT.get(eng):
+                env.setdefault("messages", []).append(
+                    f"Missing R package — run: {INSTALL_HINT[eng]}")
+            if eng in OPTIONAL_ENGINES and env["status"] == "error":
+                env["status"] = "warn"
+        if forced and env["status"] == "ok":
+            env["status"] = "warn"  # surface that the gate was overridden
+        return env
+    finally:
+        _git_worktree_cleanup(path, Path(ref_dir))
+
+
 def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = False,
         strict: bool = False, articles_only: bool = False, devel: bool = False,
         flavor: str | None = None, incoming: bool = False,
         platform: str = "all", platforms: list | None = None,
-        preset: str | None = None, rc_mode: bool = False) -> dict:
+        preset: str | None = None, rc_mode: bool = False,
+        branch: str = "gh-pages", force: bool = False) -> dict:
     """Run one engine ``kind`` against ``path``; return the normalized envelope.
 
     Threads the check ``flavor`` / ``incoming`` selectors through to ``r_snippet``;
@@ -324,6 +521,9 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
         # rhub imports rsnippets + lazily imports rcmd envelope helpers).
         from lib.rhub import _run_rhub
         return _run_rhub(path, pkg, platforms=platforms, preset=preset, rc_mode=rc_mode)
+    if kind == "deploy":
+        # MUTATING + NETWORK — recommend-only; never auto-run (see _run_deploy).
+        return _run_deploy(path, pkg, branch=branch, force=force)
     if kind == "install":
         raw, code = _install_package(path)
     else:
@@ -639,7 +839,8 @@ def _run_cran_prep(path: str = ".", *, no_revdep: bool = False,
     # via the real R CMD check NOTE once R runs.) Each degrades to `warn` on a
     # missing/unparseable DESCRIPTION/.Rbuildignore rather than raising.
     for tier4 in (cranlint.lint_description, cranlint.check_build_hygiene,
-                  cranlint.check_planning_consistency, cranlint.check_test_config):
+                  cranlint.check_planning_consistency, cranlint.check_test_config,
+                  sitelint.check_site_leaks):
         env = tier4(path)
         stages.append({"kind": env["kind"], "status": env["status"]})
         for finding in env.get("findings", []):
@@ -695,7 +896,7 @@ def main(argv: list[str] | None = None) -> int:
                     choices=["load", "document", "test", "check", "coverage", "build",
                              "install", "site", "cycle", "lint", "spell", "urlcheck", "style",
                              "winbuilder", "rhub", "revdep", "goodpractice", "cran-prep",
-                             "s7runtime"])
+                             "s7runtime", "deploy"])
     ap.add_argument("--path", default=".")
     ap.add_argument("--as-cran", action="store_true")
     ap.add_argument("--preview", action="store_true")
@@ -740,6 +941,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-cache", action="store_true", dest="no_cache",
                     help="--changed: bypass the baseline cache (force a fresh "
                          "merge-base baseline run, and skip writing it)")
+    ap.add_argument("--branch", default="gh-pages",
+                    help="deploy: target branch for pkgdown::deploy_to_branch "
+                         "(default gh-pages)")
+    ap.add_argument("--force", action="store_true",
+                    help="deploy: override the leak gate — proceed despite "
+                         "non-allowlisted committed files (downgrades block→warn)")
     ns = ap.parse_args(argv)
     if ns.kind == "cycle":
         env = _run_cycle(ns.path)
@@ -760,7 +967,8 @@ def main(argv: list[str] | None = None) -> int:
         env = run(ns.kind, ns.path, as_cran=ns.as_cran, preview=ns.preview,
                   strict=ns.strict, articles_only=ns.articles_only, devel=ns.devel,
                   flavor=ns.flavor, incoming=ns.incoming, platform=ns.platform,
-                  platforms=plats, preset=ns.preset, rc_mode=ns.rc_mode)
+                  platforms=plats, preset=ns.preset, rc_mode=ns.rc_mode,
+                  branch=ns.branch, force=ns.force)
     print(json.dumps(env, indent=2))
     # "dispatched" (winbuilder/rhub) is non-error — exits 0 like "ok"/"warn"
     return 0 if env.get("status") not in ("error", "blocked") else 1
