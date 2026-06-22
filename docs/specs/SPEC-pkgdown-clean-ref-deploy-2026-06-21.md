@@ -1,0 +1,183 @@
+# SPEC: pkgdown deploy from a clean ref + stray-root-`.md` guard
+
+- **Status:** In Progress — worktree `feature/pkgdown-deploy-guard` live (design decisions resolved 2026-06-21)
+- **Date:** 2026-06-21
+- **Target version:** v2.16.0
+- **Author:** brainstormed with Claude, grounded in `PROPOSAL-pkgdown-deploy-cleantree-guard.md` (rforge root)
+- **Related:** GitHub issue [#52](https://github.com/Data-Wise/rforge/issues/52), `commands/r/site.md`
+
+## Summary
+
+`r:site` builds + previews the pkgdown site but has no deploy path, so users fall back to
+manual `pkgdown::deploy_to_branch("gh-pages")` — which builds the **working directory** and
+publishes untracked/uncommitted root `.md` files (pkgdown renders *every* root `.md`, not
+just README/NEWS). Add `r:site --deploy` that builds from a **clean ref** (`git archive HEAD`
+into a temp dir), making it structurally impossible to leak untracked files, plus a standalone
+**preflight lint** (`--check-leaks`) that flags stray scratch files — catching *tracked* docs
+too. No new command (41 stays 41); three new flags on `r:site` (`--deploy`, `--check-leaks`,
+`--branch`, plus a `--force` escape hatch) + a new `lib/sitelint.py` module + a new `lib.rcmd`
+deploy path. The leak lint also wires into `r:cran-prep` as a Tier-4 advisory stage.
+
+## Motivation
+
+Observed in the wild (medrobust, 2026-06-21): a scratch `PLAN-website-enhancements-*.md` in
+the package root was rendered to `.html` and force-pushed to public `gh-pages` by a manual
+`deploy_to_branch()`. Two failure modes:
+
+1. **Manual deploy** builds the working dir → publishes **untracked/uncommitted** root files.
+2. **CI deploy** builds the committed tree → publishes any **tracked** scratch doc in root
+   (`PLAN-*.md`, `ISSUE-*.md`, `START-HERE-*.md`).
+
+`.Rbuildignore` does **not** gate pkgdown (common wrong assumption — it only affects
+`R CMD build`). rforge owns the R-package site lifecycle via `r:site`; deploy + guardrails
+are the missing piece.
+
+## Goals
+
+- A first-class deploy path that cannot publish untracked/uncommitted files (clean-ref build).
+- A standalone, deploy-free leak detector usable at build time (catches tracked scratch docs).
+- A documented gotcha in `commands/r/site.md` so the failure mode is discoverable.
+
+## Non-goals
+
+- **Branch-protecting `gh-pages`** (proposal item #6) — out of band; a repo-admin / GitHub
+  policy concern, not plugin tooling.
+- **Auto-moving scratch docs** into a gitignored subdir — that's a per-consumer convention
+  (documented as a hint), not something rforge mutates.
+- **Re-implementing pkgdown deploy mechanics** — we delegate to `pkgdown::deploy_to_branch()`,
+  only changing *what tree* it runs against and *what we check first*.
+
+## Scope
+
+### In scope (decided)
+
+| Kind | Surface | Engine | Tier |
+|------|---------|--------|------|
+| deploy | `r:site --deploy [--branch gh-pages] [--force]` | `pkgdown` (via new `lib.rcmd` deploy path) | mutating + network (recommend-only; never auto-run) |
+| lint | `r:site --check-leaks` | `lib/sitelint.py` (pure-Python, `git`/stdlib, no R) | read-only advisory (auto-runnable) |
+| advisory stage | `r:cran-prep` Tier 4 → `sitelint.check_site_leaks()` | `lib/sitelint.py` | advisory (never blocks `ready`) |
+| docs | `commands/r/site.md` callout | — | — |
+
+**Resolved design decisions (2026-06-21):**
+
+- **Module:** new `lib/sitelint.py` (public; reference page via `gen_lib_reference.py`).
+- **Clean ref:** `git archive HEAD | tar -x` into a tempdir (lightweight, no cleanup).
+- **Allowlist:** fixed core set (`README`, `NEWS`, `LICENSE`/`LICENCE`, `CHANGELOG`,
+  `index`, `cran-comments`) **+ `.rforge.yaml` `site.allowlist` override** (read via `lib.discovery`).
+- **Gate strictness:** hard-abort on a stray non-allowlisted file, with an explicit `--force`
+  escape hatch that proceeds after printing the publish preview.
+- **Lint scope:** root `*.md` (the pkgdown default surface) **+ scratch in `vignettes/` and
+  `man/`** (non-`.Rd`/non-vignette files that pkgdown would still render).
+- **Deploy target:** `--branch` flag, default `gh-pages`.
+
+### Out of scope (YAGNI / deferred)
+
+- `gh-pages` branch protection (#6) — repo policy, not tooling.
+- Detecting intent from `_pkgdown.yml` nav (considered for the allowlist) — deferred in favor
+  of the simpler fixed-set + `.rforge.yaml` override.
+
+## Architecture
+
+- **`lib/sitelint.py`** (new public module, pure-stdlib, no R — archetype: `lib/cranlint.py`):
+  `check_site_leaks(path)` lists candidate scratch files across the pkgdown-rendered surface —
+  root `*.md` plus non-`.Rd` files in `man/` and non-vignette files in `vignettes/` — minus the
+  allowlist (fixed core set ∪ `.rforge.yaml` `site.allowlist`, resolved via `lib.discovery`).
+  Cross-references `git status --porcelain` to tag each hit `tracked` / `untracked` / `modified`.
+  Emits the standard advisory envelope. CLI: `python3 -m lib.sitelint <path>`. Reference page
+  auto-generated by `scripts/gen_lib_reference.py`.
+- **Clean-ref deploy**: `r:site --deploy` runs a new deploy path in `lib.rcmd` against a
+  throwaway checkout produced by `git archive HEAD | tar -x` into a tempdir (no `.git`, nothing
+  to clean up), **not** the working dir — so untracked/uncommitted files are structurally
+  excluded. Runs `check_site_leaks` first; **hard-aborts** on a non-allowlisted **tracked** hit
+  (untracked ones can't reach the archive) and prints a "files pkgdown will publish" preview.
+  `--force` overrides the abort after showing the preview. Deploy target defaults to `gh-pages`,
+  overridable via `--branch`. Delegates the actual push to `pkgdown::deploy_to_branch(branch=…)`
+  run *inside the archived tree*.
+- **`r:cran-prep` Tier 4**: add `check_site_leaks` as an advisory stage (envelope merged into
+  the Tier-4 set; **never blocks `ready`**), mirroring how `cranlint` stages already wire in.
+- **Safety boundary**: `--deploy` is a mutating + network kind → orchestrator/agent must
+  **recommend, never auto-run** (consistent with the SAFE_AUTORUN taxonomy in
+  `reference_rforge_lib_envelopes`). `--check-leaks` and the cran-prep stage are read-only →
+  auto-runnable.
+
+## Dependencies
+
+- `pkgdown` (already optional for `r:site`; same `_guard("pkgdown", …)` + 🟡 degrade).
+- `git` (assumed present; the leak detector degrades to "git unavailable → skip status tags,
+  still lint by filename" if `git` is absent; `--deploy` refuses if `git archive` fails).
+- `lib.discovery` (existing) — reused to read the optional `.rforge.yaml` `site.allowlist` key.
+- No new R packages; no new Python deps (stdlib + `git` subprocess only).
+
+## Error handling
+
+- `--deploy` with a non-allowlisted tracked hit → `blocked` envelope listing the offending
+  files + hint ("move scratch docs to a gitignored subdir, allowlist via .rforge.yaml, or
+  re-run with --force"). `--force` downgrades the block to a `warn` and proceeds.
+- `pkgdown` missing → existing `engine_missing` 🟡 path, unchanged.
+- `git archive` failure (e.g. not a git repo) → `warn`, refuse deploy with a clear message
+  (never silently deploy the working dir).
+- `.rforge.yaml` malformed / `site.allowlist` not a list → `warn`, ignore the override and
+  fall back to the fixed core allowlist (never crash the lint).
+
+## Testing
+
+- `lib/` pytest (`lib.sitelint`): allowlist hits, tracked/untracked/modified tagging,
+  git-absent degrade, `index.md` allowed, case-insensitive `LICENCE`, `man/`+`vignettes/`
+  scope, `.rforge.yaml` `site.allowlist` override (incl. malformed → fallback), `--force`
+  downgrade path.
+- Fixture: a temp pkg dir with `README.md` + `PLAN-scratch.md` (tracked) + an untracked
+  `NOTES.md`; assert the detector flags both non-allowlisted files with correct status tags,
+  and that a `.rforge.yaml` `site.allowlist: [PLAN-scratch.md]` clears the tracked hit.
+- `tests/test-all.sh`: CLI smoke for `python3 -m lib.sitelint`; lib-reference sync for the new
+  module; command-doc sync for the new `r:site` flags.
+- Both gates green (`python3 -m pytest tests/`, `bash tests/test-all.sh`).
+
+## Documentation impact
+
+- `commands/r/site.md` — frontmatter (`--deploy`, `--check-leaks`, `--branch`, `--force` in
+  `arguments:` + `argument-hint`) and a `!!! warning` callout on the leak gotcha.
+- `commands/r/cran-prep.md` — note the new Tier-4 site-leak advisory stage.
+- `CHANGELOG.md` `[Unreleased]`, `.STATUS`, CLAUDE.md (public-module list gains `sitelint`;
+  test-gate counts).
+- Auto-gen reference: add `lib.sitelint` to `scripts/gen_lib_reference.py` public set →
+  `docs/reference/sitelint.md` (CI `--check` gate covers drift).
+- `docs/guides/*` site-family guide + REFCARD flag list.
+
+## Implementation order
+
+1. (docs-only, on `dev`) `commands/r/site.md` gotcha callout — immediate, no code.
+2. (worktree) `lib/sitelint.py` (`check_site_leaks` + CLI) + pytest fixtures (TDD-first):
+   allowlist, status tagging, scope, `.rforge.yaml` override, degrades.
+3. (worktree) Wire `--check-leaks` into `r:site` (read-only, auto-runnable).
+4. (worktree) `--deploy` clean-ref path in `lib.rcmd` (`git archive HEAD | tar -x` → tempdir →
+   `deploy_to_branch`) + leak hard-gate + `--force` override + `--branch` target + publish preview.
+5. (worktree) `r:cran-prep` Tier-4 advisory stage.
+6. (worktree) Doc surfaces, `gen_lib_reference.py` update + regen, version bump, CHANGELOG/.STATUS.
+7. Pre-release adversarial review (per [[feedback_adversarial_review_prose_contracts]]).
+
+## Open questions / risks
+
+All design questions resolved 2026-06-21 (see In scope → Resolved design decisions).
+
+- **C-RISK — RESOLVED 2026-06-21 (empirical, R 4.6.0 + pkgdown installed):** the clean-ref
+  mechanism is **`git worktree add HEAD`, NOT `git archive`.** Inspecting
+  `pkgdown::deploy_to_branch` source shows it drives the *package's own* git repo —
+  `git_current_branch()`, `git checkout --orphan`, `git remote set-branches`, `git fetch`,
+  `github_worktree_add`, `github_push` (push to `remote`). An archived tempdir has no `.git`
+  and no remote, so deploy would **fail at the first git call** — archive is not a degraded
+  option, it is non-functional. A worktree checked out at `HEAD` satisfies both constraints at
+  once: it shares the main repo's `.git` + remote (so `deploy_to_branch` runs) AND contains
+  only committed files (so untracked working-dir files are structurally excluded — the #52
+  goal). **Action:** rework the `_run_deploy` path from `git archive | tar` to
+  `git worktree add <tempdir> HEAD` with guaranteed `git worktree remove` cleanup (incl. on
+  failure). This supersedes the "Clean ref: git archive" decision above.
+- **`man/` + `vignettes/` lint scope** risks false positives (legitimate non-`.Rd`/non-vignette
+  assets). Keep the matcher conservative and cover with fixtures; allowlist absorbs intentional cases.
+- **Behavior change:** none for existing flags — `--deploy`/`--check-leaks`/`--branch`/`--force`
+  are additive. The `r:cran-prep` Tier-4 addition is advisory only (cannot flip a prior `ready`).
+
+## Sources
+
+- [pkgdown — Deploy to GitHub Pages (`deploy_to_branch`)](https://pkgdown.r-lib.org/reference/deploy_to_branch.html)
+- [Writing R Extensions §1.3.6 — `.Rbuildignore` scope (build only)](https://cran.r-project.org/doc/manuals/r-release/R-exts.html)
+- `PROPOSAL-pkgdown-deploy-cleantree-guard.md` (rforge root — driving writeup)

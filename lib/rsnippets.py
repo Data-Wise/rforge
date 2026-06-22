@@ -296,3 +296,40 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             '"s7runtime load/introspection failed:", conditionMessage(e)))); '
             'cat(jsonlite::toJSON(res, auto_unbox=TRUE, null="list"))')
     raise ValueError(f"unknown kind: {kind}")
+
+
+def deploy_snippet(tree_path: str, branch: str = "gh-pages") -> str:
+    """R one-liner for the clean-ref pkgdown deploy (issue #52).
+
+    ``tree_path`` is a **detached-HEAD linked git worktree** created by
+    ``git worktree add --detach <tree_path> HEAD`` (see ``rcmd._run_deploy``),
+    **never** the working dir. A linked worktree gives us both halves of the
+    convergence #52 needs:
+
+      * It shares the main repo's ``.git`` directory and therefore its remote,
+        so ``pkgdown::deploy_to_branch()`` — which drives the package's OWN git
+        repo (``git_current_branch`` → ``git checkout --orphan`` → ``git remote``
+        → ``git fetch`` → ``git push``) — has a real repo + remote to push to.
+        An archived ``git archive`` tempdir has no ``.git`` and no remote, so it
+        fails at the first internal git call; the worktree is therefore
+        mandatory, not optional.
+      * It contains only the committed files at HEAD, so untracked/uncommitted
+        working-dir files are structurally excluded from what pkgdown publishes —
+        the same leak-prevention the archive gave us.
+
+    The snippet ``setwd(tree_path)`` BEFORE calling ``deploy_to_branch(pkg=".")``
+    so deploy_to_branch's internal git calls resolve against the linked
+    worktree's shared repo.
+
+    Honest caveat: a full end-to-end deploy (a real ``git push``) is the final
+    confirmation that ``deploy_to_branch`` succeeds from a detached-HEAD linked
+    worktree. The tests around this path mock the R call and cannot exercise the
+    real push.
+    """
+    p = json.dumps(str(tree_path))
+    b = json.dumps(str(branch))
+    return _guard("pkgdown",
+        f'setwd({p}); '
+        f'pkgdown::deploy_to_branch(pkg=".", branch={b}); '
+        f'cat(jsonlite::toJSON(list(deployed=TRUE, branch={b}), '
+        f'auto_unbox=TRUE, null="list"))')
