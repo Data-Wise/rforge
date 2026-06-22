@@ -119,6 +119,7 @@ nav:
       - "S7 review (--eco/--runtime)": guides/s7-review.md
       - "Diff-aware checks (--changed)": guides/diff-aware.md
       - "CRAN submission": guides/cran-submission.md
+      - "Website + deploy guard (r:site)": guides/website.md
     - 🤖 Orchestrator Agent: orchestrator.md
     - Configuration: configuration.md
     - Lib Modules: lib-modules.md
