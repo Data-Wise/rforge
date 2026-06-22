@@ -491,6 +491,6 @@ MIT
 
 ---
 
-**Version:** 2.15.0
+**Version:** 2.16.0
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+
