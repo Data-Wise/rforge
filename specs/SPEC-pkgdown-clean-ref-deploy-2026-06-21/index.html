@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-diff-aware-baseline-caching-2026-06-13/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/specs/SPEC-pkgdown-clean-ref-deploy-2026-06-21/">
       
       
       
@@ -23,7 +23,7 @@
     
     
       
-        <title>SPEC — diff-aware baseline caching (candidate A) - RForge Plugin</title>
+        <title>SPEC: pkgdown deploy from a clean ref + stray-root-.md guard - RForge Plugin</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#spec-diff-aware-baseline-caching-candidate-a" class="md-skip">
+        <a href="#spec-pkgdown-deploy-from-a-clean-ref-stray-root-md-guard" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              SPEC — diff-aware baseline caching (candidate A)
+              SPEC: pkgdown deploy from a clean ref + stray-root-.md guard
             
           </span>
         </div>
@@ -2443,10 +2443,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#problem" class="md-nav__link">
+  <a href="#summary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Problem
+        Summary
       
     </span>
   </a>
@@ -2454,10 +2454,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#goal" class="md-nav__link">
+  <a href="#motivation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Goal
+        Motivation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goals
       
     </span>
   </a>
@@ -2476,22 +2487,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#design" class="md-nav__link">
+  <a href="#scope" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Design
+        Scope
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Design">
+    <nav class="md-nav" aria-label="Scope">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#decisions-confirmed" class="md-nav__link">
+  <a href="#in-scope-decided" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decisions (confirmed)
+        In scope (decided)
       
     </span>
   </a>
@@ -2499,65 +2510,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#cache-key-per-package" class="md-nav__link">
+  <a href="#out-of-scope-yagni-deferred" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Cache key (per package)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#file-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        File format
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#flow-cached_baseline-per-item-pluggable-scope_check" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Flow: cached_baseline (per item) + pluggable scope_check
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#new-functions-in-libchangedpy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        New functions in lib/changed.py
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#signature-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Signature changes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cli" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CLI
+        Out of scope (YAGNI / deferred)
       
     </span>
   </a>
@@ -2570,10 +2526,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tests-tdd-teststest_changedpy" class="md-nav__link">
+  <a href="#architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tests (TDD, tests/test_changed.py)
+        Architecture
       
     </span>
   </a>
@@ -2581,10 +2537,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gates" class="md-nav__link">
+  <a href="#dependencies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Gates
+        Dependencies
       
     </span>
   </a>
@@ -2592,10 +2548,65 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#rollout" class="md-nav__link">
+  <a href="#error-handling" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rollout
+        Error handling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation impact
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation order
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#open-questions-risks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open questions / risks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources
       
     </span>
   </a>
@@ -2619,7 +2630,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-diff-aware-baseline-caching-2026-06-13.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/specs/SPEC-pkgdown-clean-ref-deploy-2026-06-21.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2627,205 +2638,212 @@
   
 
 
-<h1 id="spec-diff-aware-baseline-caching-candidate-a">SPEC — diff-aware baseline caching (candidate A)<a class="headerlink" href="#spec-diff-aware-baseline-caching-candidate-a" title="Permanent link">&para;</a></h1>
-<p><strong>Date:</strong> 2026-06-13
-<strong>Branch:</strong> <code>feature/diff-aware-baseline-caching</code> (worktree off <code>dev</code>)
-<strong>Status:</strong> approved design (two decisions confirmed via AskUserQuestion)
-<strong>Closes:</strong> the last v2.11.0 diff-aware follow-up (<code>[uncommitted]</code> tagging shipped v2.12.0).</p>
-<h2 id="problem">Problem<a class="headerlink" href="#problem" title="Permanent link">&para;</a></h2>
-<p><code>/rforge:r:check|test|lint --changed</code> runs <code>changed.scope_check</code>, which runs the
-engine <strong>twice</strong>: once against a detached worktree checked out at
-<code>git merge-base(HEAD, base)</code> (the <em>baseline</em>), once against the live HEAD tree.
-The baseline run (<code>changed.run_baseline</code>, <code>lib/changed.py:241</code>) does a
-<code>git worktree add --detach</code> and then runs the engine over the changed package(s)
-— for <code>kind=check</code> that is <code>R CMD check</code> per package, which can take minutes.</p>
-<p>The baseline result is a <strong>pure function</strong> of:</p>
+<h1 id="spec-pkgdown-deploy-from-a-clean-ref-stray-root-md-guard">SPEC: pkgdown deploy from a clean ref + stray-root-<code>.md</code> guard<a class="headerlink" href="#spec-pkgdown-deploy-from-a-clean-ref-stray-root-md-guard" title="Permanent link">&para;</a></h1>
+<ul>
+<li><strong>Status:</strong> In Progress — worktree <code>feature/pkgdown-deploy-guard</code> live (design decisions resolved 2026-06-21)</li>
+<li><strong>Date:</strong> 2026-06-21</li>
+<li><strong>Target version:</strong> v2.16.0</li>
+<li><strong>Author:</strong> brainstormed with Claude, grounded in <code>PROPOSAL-pkgdown-deploy-cleantree-guard.md</code> (rforge root)</li>
+<li><strong>Related:</strong> GitHub issue <a href="https://github.com/Data-Wise/rforge/issues/52">#52</a>, <code>commands/r/site.md</code></li>
+</ul>
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p><code>r:site</code> builds + previews the pkgdown site but has no deploy path, so users fall back to
+manual <code>pkgdown::deploy_to_branch("gh-pages")</code> — which builds the <strong>working directory</strong> and
+publishes untracked/uncommitted root <code>.md</code> files (pkgdown renders <em>every</em> root <code>.md</code>, not
+just README/NEWS). Add <code>r:site --deploy</code> that builds from a <strong>clean ref</strong> (<code>git archive HEAD</code>
+into a temp dir), making it structurally impossible to leak untracked files, plus a standalone
+<strong>preflight lint</strong> (<code>--check-leaks</code>) that flags stray scratch files — catching <em>tracked</em> docs
+too. No new command (41 stays 41); three new flags on <code>r:site</code> (<code>--deploy</code>, <code>--check-leaks</code>,
+<code>--branch</code>, plus a <code>--force</code> escape hatch) + a new <code>lib/sitelint.py</code> module + a new <code>lib.rcmd</code>
+deploy path. The leak lint also wires into <code>r:cran-prep</code> as a Tier-4 advisory stage.</p>
+<h2 id="motivation">Motivation<a class="headerlink" href="#motivation" title="Permanent link">&para;</a></h2>
+<p>Observed in the wild (medrobust, 2026-06-21): a scratch <code>PLAN-website-enhancements-*.md</code> in
+the package root was rendered to <code>.html</code> and force-pushed to public <code>gh-pages</code> by a manual
+<code>deploy_to_branch()</code>. Two failure modes:</p>
 <ol>
-<li>the merge-base <strong>SHA</strong> (the baselined tree is immutable at that commit),</li>
-<li>the <strong>kind</strong> (engine),</li>
-<li>the <strong>changed-package set</strong> evaluated (<code>rel_pkgs</code> in <code>rcmd.run_changed</code>),</li>
-<li>the engine <strong>kwargs</strong> (e.g. <code>--strict</code>, <code>--run-donttest</code> change what is reported).</li>
+<li><strong>Manual deploy</strong> builds the working dir → publishes <strong>untracked/uncommitted</strong> root files.</li>
+<li><strong>CI deploy</strong> builds the committed tree → publishes any <strong>tracked</strong> scratch doc in root
+   (<code>PLAN-*.md</code>, <code>ISSUE-*.md</code>, <code>START-HERE-*.md</code>).</li>
 </ol>
-<p>Yet every <code>--changed</code> invocation re-runs it from scratch, even when nothing on
-<code>base</code> has moved. Repeated checks on a branch pay the full baseline cost each time.</p>
-<h2 id="goal">Goal<a class="headerlink" href="#goal" title="Permanent link">&para;</a></h2>
-<p>Cache the baseline finding list so a repeat <code>--changed</code> run with an unchanged
-merge-base reuses it instead of re-running the worktree+engine. Self-invalidating:
-new <code>base</code> commits → new merge-base SHA → new key → cache miss → re-run.</p>
-<blockquote>
-<p><strong>Update (same branch):</strong> the original design cached the <em>whole</em> baseline run
-keyed by the package set (see the first Non-goal below). After the pre-merge
-adversarial review, the cache was <strong>generalized to per-package granularity</strong> —
-strictly better hit rate and miss cost — so the per-package item is no longer a
-non-goal. Sections below describe the shipped per-package design.</p>
-</blockquote>
+<p><code>.Rbuildignore</code> does <strong>not</strong> gate pkgdown (common wrong assumption — it only affects
+<code>R CMD build</code>). rforge owns the R-package site lifecycle via <code>r:site</code>; deploy + guardrails
+are the missing piece.</p>
+<h2 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h2>
+<ul>
+<li>A first-class deploy path that cannot publish untracked/uncommitted files (clean-ref build).</li>
+<li>A standalone, deploy-free leak detector usable at build time (catches tracked scratch docs).</li>
+<li>A documented gotcha in <code>commands/r/site.md</code> so the failure mode is discoverable.</li>
+</ul>
 <h2 id="non-goals">Non-goals<a class="headerlink" href="#non-goals" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Caching the <strong>HEAD</strong> run (changes on every edit; never cacheable).</li>
-<li>~~Per-package cache granularity~~ — <strong>IMPLEMENTED</strong> (this branch). The baseline
-  is cached per package, not per package-set: a run whose changed-package set
-  <em>grows</em> reuses every already-baselined package and re-runs only the uncached
-  ones. (Original v1 plan cached the whole set; superseded.)</li>
-<li>Cross-engine-version staleness detection. The one staleness vector (user
-  upgrades e.g. <code>lintr</code> so the immutable tree now lints differently) is handled
-  by the <code>--no-cache</code> escape hatch, not by stamping engine versions into the key.</li>
+<li><strong>Branch-protecting <code>gh-pages</code></strong> (proposal item #6) — out of band; a repo-admin / GitHub
+  policy concern, not plugin tooling.</li>
+<li><strong>Auto-moving scratch docs</strong> into a gitignored subdir — that's a per-consumer convention
+  (documented as a hint), not something rforge mutates.</li>
+<li><strong>Re-implementing pkgdown deploy mechanics</strong> — we delegate to <code>pkgdown::deploy_to_branch()</code>,
+  only changing <em>what tree</em> it runs against and <em>what we check first</em>.</li>
 </ul>
-<h2 id="design">Design<a class="headerlink" href="#design" title="Permanent link">&para;</a></h2>
-<h3 id="decisions-confirmed">Decisions (confirmed)<a class="headerlink" href="#decisions-confirmed" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Location:</strong> <code>~/.rforge/baseline-cache/&lt;repo-id&gt;/</code> — user-global, matching the
-  existing <code>~/.rforge/context.json</code> convention (<code>lib.init</code>). Survives across
-  worktrees of the same repo; <code>&lt;repo-id&gt;</code> namespaces repos so there is no
-  cross-repo collision.</li>
-<li><strong>Eviction:</strong> LRU prune to the <strong>20</strong> newest entries per <code>&lt;repo-id&gt;</code> dir (by
-  mtime, on every write) + a <code>--no-cache</code> flag (bypass read AND write) +
-  <code>--clear-cache</code> (remove the cache, exit).</li>
-</ul>
-<h3 id="cache-key-per-package">Cache key (per package)<a class="headerlink" href="#cache-key-per-package" title="Permanent link">&para;</a></h3>
-<p><code>changed.py</code> stays <strong>R-free</strong>: it receives an <strong>opaque <code>cache_key</code> string</strong> per
-item from the caller and owns only the repo-id, SHA, file IO, and prune.</p>
-<ul>
-<li><code>&lt;repo-id&gt;</code> = <code>sha1(git rev-parse --show-toplevel)[:16]</code> (falls back to
-  <code>sha1(abspath(path))</code> when not a git repo — defensive; <code>scope_check</code> only
-  reaches caching after a merge-base resolved, so it is always a repo in
-  practice).</li>
-<li>filename = <code>&lt;base_sha&gt;-&lt;sha1(cache_key)[:16]&gt;.json</code>.</li>
-<li><code>rcmd.run_changed</code> builds <strong>one key per changed package</strong>:
-  <code>f"{kind}|{rel}|{kwargs_token}"</code> (a single package <code>rel</code>, not the joined set),
-  where <code>kwargs_token</code> is <code>json.dumps(run_kwargs, sort_keys=True, default=str)</code>.
-  Per-package keys are what let a <em>growing</em> changed-package set reuse the packages
-  already baselined.</li>
-</ul>
-<h3 id="file-format">File format<a class="headerlink" href="#file-format" title="Permanent link">&para;</a></h3>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;schema&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;base_sha&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;full merge-base sha&gt;&quot;</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;cache_key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;opaque per-package key, stored for debuggability&gt;&quot;</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">&quot;findings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="cm">/* one package&#39;s flat baseline finding list */</span><span class="w"> </span><span class="p">]</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>Findings are already JSON-serializable (dicts for lint, strings for R CMD check)
-because they round-trip through the envelope today.</p>
-<h3 id="flow-cached_baseline-per-item-pluggable-scope_check">Flow: <code>cached_baseline</code> (per item) + pluggable <code>scope_check</code><a class="headerlink" href="#flow-cached_baseline-per-item-pluggable-scope_check" title="Permanent link">&para;</a></h3>
-<p><code>scope_check</code> is <strong>caching-agnostic</strong> — it takes a <code>baseline(path, base_sha) -&gt;
-Optional[list]</code> provider (or, by default, runs one uncached <code>run_baseline</code>). rcmd
-injects a per-package provider backed by <code>cached_baseline</code>:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a># scope_check
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>base_sha = merge_base(HEAD, base)
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>if base_sha is None: return None
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>base_findings = baseline(path, base_sha) if baseline else run_baseline(...)
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>if base_findings is None: return None          # provider says &quot;fall back&quot;
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a># ... unchanged: head_findings = runner(path), tag_findings, [uncommitted] ...
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a># cached_baseline(path, base_sha, items, run_item, key_item, *, use_cache)
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>for item in items:
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    hit = read_baseline_cache(path, base_sha, key_item(item))   # per item
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    if hit is not None: results[item] = hit
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    else: uncached.append(item)
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>if uncached:                                    # ONE worktree, only if needed
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    git worktree add --detach &lt;tmp&gt; &lt;base_sha&gt;
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    for item in uncached:
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>        f = run_item(&lt;tmp&gt;, item); cache it; results[item] = f
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    remove worktree (finally)
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>return flat(results in items order)             # None iff worktree add failed
-</span></code></pre></div>
-<p>When every item hits, <strong>no worktree is created</strong>. A corrupt/unreadable cache file
-is a <strong>miss</strong> (never raises).</p>
-<h3 id="new-functions-in-libchangedpy">New functions in <code>lib/changed.py</code><a class="headerlink" href="#new-functions-in-libchangedpy" title="Permanent link">&para;</a></h3>
+<h2 id="scope">Scope<a class="headerlink" href="#scope" title="Permanent link">&para;</a></h2>
+<h3 id="in-scope-decided">In scope (decided)<a class="headerlink" href="#in-scope-decided" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Function</th>
-<th>Responsibility</th>
+<th>Kind</th>
+<th>Surface</th>
+<th>Engine</th>
+<th>Tier</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>_cache_root() -&gt; Path</code></td>
-<td><code>~/.rforge/baseline-cache</code> — resolved the raise-proof <code>expanduser</code> way (NOT <code>Path.home()</code>, which raises on unresolvable HOME), temp-dir fallback</td>
+<td>deploy</td>
+<td><code>r:site --deploy [--branch gh-pages] [--force]</code></td>
+<td><code>pkgdown</code> (via new <code>lib.rcmd</code> deploy path)</td>
+<td>mutating + network (recommend-only; never auto-run)</td>
 </tr>
 <tr>
-<td><code>_repo_id(path) -&gt; str</code></td>
-<td><code>sha1(toplevel)[:16]</code>, abspath fallback</td>
+<td>lint</td>
+<td><code>r:site --check-leaks</code></td>
+<td><code>lib/sitelint.py</code> (pure-Python, <code>git</code>/stdlib, no R)</td>
+<td>read-only advisory (auto-runnable)</td>
 </tr>
 <tr>
-<td><code>_cache_file(path, base_sha, cache_key) -&gt; Path</code></td>
-<td>resolve the JSON path</td>
+<td>advisory stage</td>
+<td><code>r:cran-prep</code> Tier 4 → <code>sitelint.check_site_leaks()</code></td>
+<td><code>lib/sitelint.py</code></td>
+<td>advisory (never blocks <code>ready</code>)</td>
 </tr>
 <tr>
-<td><code>read_baseline_cache(path, base_sha, cache_key) -&gt; Optional[list]</code></td>
-<td>hit → findings; miss/corrupt → None</td>
-</tr>
-<tr>
-<td><code>write_baseline_cache(path, base_sha, cache_key, findings, *, keep=20)</code></td>
-<td>atomic write (tmp+replace, tmp removed in <code>finally</code>) then <code>_prune</code></td>
-</tr>
-<tr>
-<td><code>_prune(repo_dir, keep)</code></td>
-<td>keep <code>keep</code> newest <code>*.json</code> by mtime; rm rest</td>
-</tr>
-<tr>
-<td><code>clear_baseline_cache(path=None) -&gt; int</code></td>
-<td>rm a repo's cache dir (or whole root if <code>path</code> None); return files removed (counts all files)</td>
-</tr>
-<tr>
-<td><code>cached_baseline(path, base_sha, items, run_item, key_item, *, use_cache=True) -&gt; Optional[list]</code></td>
-<td>per-item baseline: serve cached items, run only uncached ones in one worktree, combine</td>
+<td>docs</td>
+<td><code>commands/r/site.md</code> callout</td>
+<td>—</td>
+<td>—</td>
 </tr>
 </tbody>
 </table>
-<h3 id="signature-changes">Signature changes<a class="headerlink" href="#signature-changes" title="Permanent link">&para;</a></h3>
+<p><strong>Resolved design decisions (2026-06-21):</strong></p>
 <ul>
-<li><code>scope_check(runner, path=".", base="dev", *, baseline=None)</code> — <code>baseline</code> is an
-  optional <code>(path, base_sha) -&gt; Optional[list]</code> provider. Omitted = one uncached
-  <code>run_baseline</code> (the pre-cache behavior, so existing keyless callers/tests are
-  unaffected).</li>
-<li><code>rcmd.run_changed(..., use_cache: bool = True)</code> — factors a <code>_pkg_findings(tree,
-  rel)</code> unit used by both the HEAD <code>runner</code> and the baseline; builds a per-package
-  <code>_pkg_key(rel)</code>; injects <code>baseline = cached_baseline(..., _pkg_findings,
-  _pkg_key, use_cache=use_cache)</code>.</li>
+<li><strong>Module:</strong> new <code>lib/sitelint.py</code> (public; reference page via <code>gen_lib_reference.py</code>).</li>
+<li><strong>Clean ref:</strong> <code>git archive HEAD | tar -x</code> into a tempdir (lightweight, no cleanup).</li>
+<li><strong>Allowlist:</strong> fixed core set (<code>README</code>, <code>NEWS</code>, <code>LICENSE</code>/<code>LICENCE</code>, <code>CHANGELOG</code>,
+  <code>index</code>, <code>cran-comments</code>) <strong>+ <code>.rforge.yaml</code> <code>site.allowlist</code> override</strong> (read via <code>lib.discovery</code>).</li>
+<li><strong>Gate strictness:</strong> hard-abort on a stray non-allowlisted file, with an explicit <code>--force</code>
+  escape hatch that proceeds after printing the publish preview.</li>
+<li><strong>Lint scope:</strong> root <code>*.md</code> (the pkgdown default surface) <strong>+ scratch in <code>vignettes/</code> and
+  <code>man/</code></strong> (non-<code>.Rd</code>/non-vignette files that pkgdown would still render).</li>
+<li><strong>Deploy target:</strong> <code>--branch</code> flag, default <code>gh-pages</code>.</li>
 </ul>
-<h3 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h3>
+<h3 id="out-of-scope-yagni-deferred">Out of scope (YAGNI / deferred)<a class="headerlink" href="#out-of-scope-yagni-deferred" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>python3 -m lib.changed</code>: add <code>--no-cache</code> (sets <code>use_cache=False</code>) and
-  <code>--clear-cache</code> (calls <code>clear_baseline_cache(path)</code>, prints count, exits 0).</li>
-<li><code>commands/r/{check,test,lint}.md</code>: document a <code>--no-cache</code> flag in frontmatter
-  <code>arguments:</code> + <code>## Usage</code> (the v2.12.0 commands-doc sync-gate will FAIL the
-  build until both the frontmatter flag and the <code>docs/commands.md</code> section exist —
-  this is the gate doing its job).</li>
+<li><code>gh-pages</code> branch protection (#6) — repo policy, not tooling.</li>
+<li>Detecting intent from <code>_pkgdown.yml</code> nav (considered for the allowlist) — deferred in favor
+  of the simpler fixed-set + <code>.rforge.yaml</code> override.</li>
 </ul>
-<h2 id="tests-tdd-teststest_changedpy">Tests (TDD, <code>tests/test_changed.py</code>)<a class="headerlink" href="#tests-tdd-teststest_changedpy" title="Permanent link">&para;</a></h2>
-<p>Pure unit tests with a <strong>counting fake runner</strong> (no R), using <code>tmp_path</code> +
-monkeypatched <code>_cache_root</code>/<code>HOME</code>:</p>
+<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><code>lib/sitelint.py</code></strong> (new public module, pure-stdlib, no R — archetype: <code>lib/cranlint.py</code>):
+  <code>check_site_leaks(path)</code> lists candidate scratch files across the pkgdown-rendered surface —
+  root <code>*.md</code> plus non-<code>.Rd</code> files in <code>man/</code> and non-vignette files in <code>vignettes/</code> — minus the
+  allowlist (fixed core set ∪ <code>.rforge.yaml</code> <code>site.allowlist</code>, resolved via <code>lib.discovery</code>).
+  Cross-references <code>git status --porcelain</code> to tag each hit <code>tracked</code> / <code>untracked</code> / <code>modified</code>.
+  Emits the standard advisory envelope. CLI: <code>python3 -m lib.sitelint &lt;path&gt;</code>. Reference page
+  auto-generated by <code>scripts/gen_lib_reference.py</code>.</li>
+<li><strong>Clean-ref deploy</strong>: <code>r:site --deploy</code> runs a new deploy path in <code>lib.rcmd</code> against a
+  throwaway checkout produced by <code>git archive HEAD | tar -x</code> into a tempdir (no <code>.git</code>, nothing
+  to clean up), <strong>not</strong> the working dir — so untracked/uncommitted files are structurally
+  excluded. Runs <code>check_site_leaks</code> first; <strong>hard-aborts</strong> on a non-allowlisted <strong>tracked</strong> hit
+  (untracked ones can't reach the archive) and prints a "files pkgdown will publish" preview.
+  <code>--force</code> overrides the abort after showing the preview. Deploy target defaults to <code>gh-pages</code>,
+  overridable via <code>--branch</code>. Delegates the actual push to <code>pkgdown::deploy_to_branch(branch=…)</code>
+  run <em>inside the archived tree</em>.</li>
+<li><strong><code>r:cran-prep</code> Tier 4</strong>: add <code>check_site_leaks</code> as an advisory stage (envelope merged into
+  the Tier-4 set; <strong>never blocks <code>ready</code></strong>), mirroring how <code>cranlint</code> stages already wire in.</li>
+<li><strong>Safety boundary</strong>: <code>--deploy</code> is a mutating + network kind → orchestrator/agent must
+  <strong>recommend, never auto-run</strong> (consistent with the SAFE_AUTORUN taxonomy in
+  <code>reference_rforge_lib_envelopes</code>). <code>--check-leaks</code> and the cran-prep stage are read-only →
+  auto-runnable.</li>
+</ul>
+<h2 id="dependencies">Dependencies<a class="headerlink" href="#dependencies" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>pkgdown</code> (already optional for <code>r:site</code>; same <code>_guard("pkgdown", …)</code> + 🟡 degrade).</li>
+<li><code>git</code> (assumed present; the leak detector degrades to "git unavailable → skip status tags,
+  still lint by filename" if <code>git</code> is absent; <code>--deploy</code> refuses if <code>git archive</code> fails).</li>
+<li><code>lib.discovery</code> (existing) — reused to read the optional <code>.rforge.yaml</code> <code>site.allowlist</code> key.</li>
+<li>No new R packages; no new Python deps (stdlib + <code>git</code> subprocess only).</li>
+</ul>
+<h2 id="error-handling">Error handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>--deploy</code> with a non-allowlisted tracked hit → <code>blocked</code> envelope listing the offending
+  files + hint ("move scratch docs to a gitignored subdir, allowlist via .rforge.yaml, or
+  re-run with --force"). <code>--force</code> downgrades the block to a <code>warn</code> and proceeds.</li>
+<li><code>pkgdown</code> missing → existing <code>engine_missing</code> 🟡 path, unchanged.</li>
+<li><code>git archive</code> failure (e.g. not a git repo) → <code>warn</code>, refuse deploy with a clear message
+  (never silently deploy the working dir).</li>
+<li><code>.rforge.yaml</code> malformed / <code>site.allowlist</code> not a list → <code>warn</code>, ignore the override and
+  fall back to the fixed core allowlist (never crash the lint).</li>
+</ul>
+<h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>lib/</code> pytest (<code>lib.sitelint</code>): allowlist hits, tracked/untracked/modified tagging,
+  git-absent degrade, <code>index.md</code> allowed, case-insensitive <code>LICENCE</code>, <code>man/</code>+<code>vignettes/</code>
+  scope, <code>.rforge.yaml</code> <code>site.allowlist</code> override (incl. malformed → fallback), <code>--force</code>
+  downgrade path.</li>
+<li>Fixture: a temp pkg dir with <code>README.md</code> + <code>PLAN-scratch.md</code> (tracked) + an untracked
+  <code>NOTES.md</code>; assert the detector flags both non-allowlisted files with correct status tags,
+  and that a <code>.rforge.yaml</code> <code>site.allowlist: [PLAN-scratch.md]</code> clears the tracked hit.</li>
+<li><code>tests/test-all.sh</code>: CLI smoke for <code>python3 -m lib.sitelint</code>; lib-reference sync for the new
+  module; command-doc sync for the new <code>r:site</code> flags.</li>
+<li>Both gates green (<code>python3 -m pytest tests/</code>, <code>bash tests/test-all.sh</code>).</li>
+</ul>
+<h2 id="documentation-impact">Documentation impact<a class="headerlink" href="#documentation-impact" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>commands/r/site.md</code> — frontmatter (<code>--deploy</code>, <code>--check-leaks</code>, <code>--branch</code>, <code>--force</code> in
+  <code>arguments:</code> + <code>argument-hint</code>) and a <code>!!! warning</code> callout on the leak gotcha.</li>
+<li><code>commands/r/cran-prep.md</code> — note the new Tier-4 site-leak advisory stage.</li>
+<li><code>CHANGELOG.md</code> <code>[Unreleased]</code>, <code>.STATUS</code>, CLAUDE.md (public-module list gains <code>sitelint</code>;
+  test-gate counts).</li>
+<li>Auto-gen reference: add <code>lib.sitelint</code> to <code>scripts/gen_lib_reference.py</code> public set →
+  <code>docs/reference/sitelint.md</code> (CI <code>--check</code> gate covers drift).</li>
+<li><code>docs/guides/*</code> site-family guide + REFCARD flag list.</li>
+</ul>
+<h2 id="implementation-order">Implementation order<a class="headerlink" href="#implementation-order" title="Permanent link">&para;</a></h2>
 <ol>
-<li>miss → runner invoked once, cache file written, findings correct.</li>
-<li>hit → second <code>scope_check</code> with same <code>(sha, cache_key)</code> does <strong>not</strong> invoke
-   the runner; findings identical.</li>
-<li>different <code>base_sha</code> → miss (runner re-invoked).</li>
-<li>different <code>cache_key</code> → miss.</li>
-<li><code>use_cache=False</code> → always runs, never writes a file.</li>
-<li>corrupt cache file (write garbage) → treated as miss, no exception.</li>
-<li><code>_prune</code> keeps the 20 newest by mtime, removes older.</li>
-<li><code>clear_baseline_cache</code> removes the repo dir and returns the count.</li>
-<li><code>_repo_id</code> stable across calls for one repo; differs for a different toplevel.</li>
-<li>CLI <code>--no-cache</code> and <code>--clear-cache</code> smoke (argparse wiring).</li>
+<li>(docs-only, on <code>dev</code>) <code>commands/r/site.md</code> gotcha callout — immediate, no code.</li>
+<li>(worktree) <code>lib/sitelint.py</code> (<code>check_site_leaks</code> + CLI) + pytest fixtures (TDD-first):
+   allowlist, status tagging, scope, <code>.rforge.yaml</code> override, degrades.</li>
+<li>(worktree) Wire <code>--check-leaks</code> into <code>r:site</code> (read-only, auto-runnable).</li>
+<li>(worktree) <code>--deploy</code> clean-ref path in <code>lib.rcmd</code> (<code>git archive HEAD | tar -x</code> → tempdir →
+   <code>deploy_to_branch</code>) + leak hard-gate + <code>--force</code> override + <code>--branch</code> target + publish preview.</li>
+<li>(worktree) <code>r:cran-prep</code> Tier-4 advisory stage.</li>
+<li>(worktree) Doc surfaces, <code>gen_lib_reference.py</code> update + regen, version bump, CHANGELOG/.STATUS.</li>
+<li>Pre-release adversarial review (per [[feedback_adversarial_review_prose_contracts]]).</li>
 </ol>
-<p>Plus: existing <code>scope_check</code> tests still pass unchanged (caching defaults to a
-no-op when <code>cache_key</code> is omitted).</p>
-<h2 id="gates">Gates<a class="headerlink" href="#gates" title="Permanent link">&para;</a></h2>
+<h2 id="open-questions-risks">Open questions / risks<a class="headerlink" href="#open-questions-risks" title="Permanent link">&para;</a></h2>
+<p>All design questions resolved 2026-06-21 (see In scope → Resolved design decisions).</p>
 <ul>
-<li><code>python3 -m pytest tests/</code> — new cache cases + all existing green.</li>
-<li><code>bash tests/test-all.sh</code> — incl. the commands-doc sync-gate (will force the
-  <code>--no-cache</code> doc), lib reference sync (<code>gen_lib_reference.py --check</code> — regen
-  <code>docs/reference/changed.md</code>), version/count sync.</li>
-<li>No version bump in this branch — ships in the next release bundle.</li>
+<li><strong>C-RISK — RESOLVED 2026-06-21 (empirical, R 4.6.0 + pkgdown installed):</strong> the clean-ref
+  mechanism is <strong><code>git worktree add HEAD</code>, NOT <code>git archive</code>.</strong> Inspecting
+  <code>pkgdown::deploy_to_branch</code> source shows it drives the <em>package's own</em> git repo —
+  <code>git_current_branch()</code>, <code>git checkout --orphan</code>, <code>git remote set-branches</code>, <code>git fetch</code>,
+  <code>github_worktree_add</code>, <code>github_push</code> (push to <code>remote</code>). An archived tempdir has no <code>.git</code>
+  and no remote, so deploy would <strong>fail at the first git call</strong> — archive is not a degraded
+  option, it is non-functional. A worktree checked out at <code>HEAD</code> satisfies both constraints at
+  once: it shares the main repo's <code>.git</code> + remote (so <code>deploy_to_branch</code> runs) AND contains
+  only committed files (so untracked working-dir files are structurally excluded — the #52
+  goal). <strong>Action:</strong> rework the <code>_run_deploy</code> path from <code>git archive | tar</code> to
+  <code>git worktree add &lt;tempdir&gt; HEAD</code> with guaranteed <code>git worktree remove</code> cleanup (incl. on
+  failure). This supersedes the "Clean ref: git archive" decision above.</li>
+<li><strong><code>man/</code> + <code>vignettes/</code> lint scope</strong> risks false positives (legitimate non-<code>.Rd</code>/non-vignette
+  assets). Keep the matcher conservative and cover with fixtures; allowlist absorbs intentional cases.</li>
+<li><strong>Behavior change:</strong> none for existing flags — <code>--deploy</code>/<code>--check-leaks</code>/<code>--branch</code>/<code>--force</code>
+  are additive. The <code>r:cran-prep</code> Tier-4 addition is advisory only (cannot flip a prior <code>ready</code>).</li>
 </ul>
-<h2 id="rollout">Rollout<a class="headerlink" href="#rollout" title="Permanent link">&para;</a></h2>
-<p>Feature branch → PR to <code>dev</code>. Pre-release adversarial review before any release
-(per the established cadence): focus the skeptics on <strong>cache-key completeness</strong>
-(can any input change the baseline findings without changing the key? → the
-mis-tagging corruption class) and <strong>prune/clear path safety</strong> (never delete
-outside the cache root).</p>
+<h2 id="sources">Sources<a class="headerlink" href="#sources" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://pkgdown.r-lib.org/reference/deploy_to_branch.html">pkgdown — Deploy to GitHub Pages (<code>deploy_to_branch</code>)</a></li>
+<li><a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html">Writing R Extensions §1.3.6 — <code>.Rbuildignore</code> scope (build only)</a></li>
+<li><code>PROPOSAL-pkgdown-deploy-cleantree-guard.md</code> (rforge root — driving writeup)</li>
+</ul>
 
 
 

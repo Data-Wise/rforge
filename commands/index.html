@@ -2120,6 +2120,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/website/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Website + deploy guard (r:site)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2613,6 +2641,34 @@
     
   
     scaffold
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/sitelint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sitelint
   
 
     
@@ -4409,7 +4465,7 @@ auto-applied).</p>
 <h3 id="rforgersite">/rforge:r:site<a class="headerlink" href="#rforgersite" title="Permanent link">&para;</a></h3>
 <p>Build the pkgdown website (vignettes → articles) with optional preview.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>/rforge:r:site<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--preview<span class="o">]</span><span class="w"> </span><span class="o">[</span>--strict<span class="o">]</span><span class="w"> </span><span class="o">[</span>--articles-only<span class="o">]</span><span class="w"> </span><span class="o">[</span>--devel<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>/rforge:r:site<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--preview<span class="o">]</span><span class="w"> </span><span class="o">[</span>--strict<span class="o">]</span><span class="w"> </span><span class="o">[</span>--articles-only<span class="o">]</span><span class="w"> </span><span class="o">[</span>--devel<span class="o">]</span><span class="w"> </span><span class="o">[</span>--check-leaks<span class="o">]</span><span class="w"> </span><span class="o">[</span>--deploy<span class="o">]</span><span class="w"> </span><span class="o">[</span>--branch<span class="w"> </span>gh-pages<span class="o">]</span><span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
@@ -4418,6 +4474,10 @@ auto-applied).</p>
 <li><code>--strict</code> (optional) - Fail-fast config check via <code>check_pkgdown</code> (useful in CI)</li>
 <li><code>--articles-only</code> (optional) - Build only articles/vignettes (reinstalls first)</li>
 <li><code>--devel</code> (optional) - Fast in-process build via <code>load_all</code> (lower fidelity)</li>
+<li><code>--check-leaks</code> (optional) - Read-only preflight (<code>lib.sitelint</code>) that flags stray scratch files pkgdown would publish; no build</li>
+<li><code>--deploy</code> (optional) - Deploy from a clean ref (detached-HEAD <code>git worktree</code>) via <code>pkgdown::deploy_to_branch</code> — MUTATING + NETWORK, recommend-only (never auto-run)</li>
+<li><code>--branch</code> (optional) - Target branch for <code>--deploy</code> (default <code>gh-pages</code>)</li>
+<li><code>--force</code> (optional) - Override the <code>--deploy</code> leak gate — proceed despite non-allowlisted committed files (downgrades block→warn)</li>
 </ul>
 <p><strong>Examples:</strong></p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="c1"># Build site for current package</span>
@@ -4434,6 +4494,15 @@ auto-applied).</p>
 </span><span id="__span-46-12"><a id="__codelineno-46-12" name="__codelineno-46-12" href="#__codelineno-46-12"></a>
 </span><span id="__span-46-13"><a id="__codelineno-46-13" name="__codelineno-46-13" href="#__codelineno-46-13"></a><span class="c1"># Fast dev build (no install)</span>
 </span><span id="__span-46-14"><a id="__codelineno-46-14" name="__codelineno-46-14" href="#__codelineno-46-14"></a>/rforge:r:site<span class="w"> </span>--devel
+</span><span id="__span-46-15"><a id="__codelineno-46-15" name="__codelineno-46-15" href="#__codelineno-46-15"></a>
+</span><span id="__span-46-16"><a id="__codelineno-46-16" name="__codelineno-46-16" href="#__codelineno-46-16"></a><span class="c1"># Preflight: flag stray docs pkgdown would publish (no build)</span>
+</span><span id="__span-46-17"><a id="__codelineno-46-17" name="__codelineno-46-17" href="#__codelineno-46-17"></a>/rforge:r:site<span class="w"> </span>--check-leaks
+</span><span id="__span-46-18"><a id="__codelineno-46-18" name="__codelineno-46-18" href="#__codelineno-46-18"></a>
+</span><span id="__span-46-19"><a id="__codelineno-46-19" name="__codelineno-46-19" href="#__codelineno-46-19"></a><span class="c1"># Deploy from a clean ref (recommend-only — pushes to gh-pages)</span>
+</span><span id="__span-46-20"><a id="__codelineno-46-20" name="__codelineno-46-20" href="#__codelineno-46-20"></a>/rforge:r:site<span class="w"> </span>--deploy
+</span><span id="__span-46-21"><a id="__codelineno-46-21" name="__codelineno-46-21" href="#__codelineno-46-21"></a>
+</span><span id="__span-46-22"><a id="__codelineno-46-22" name="__codelineno-46-22" href="#__codelineno-46-22"></a><span class="c1"># Deploy to a custom branch, overriding the leak gate</span>
+</span><span id="__span-46-23"><a id="__codelineno-46-23" name="__codelineno-46-23" href="#__codelineno-46-23"></a>/rforge:r:site<span class="w"> </span>--deploy<span class="w"> </span>--branch<span class="w"> </span>docs<span class="w"> </span>--force
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
