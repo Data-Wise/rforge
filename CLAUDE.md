@@ -154,7 +154,9 @@ Per the global rules (see `## Pre-PR & Release Checklist` in `~/.claude/CLAUDE.m
 
 - **Docs deploy on push to main is automatic** (`.github/workflows/docs.yml` triggers on `push: branches: [main]`). To force-deploy from `dev` between releases: `gh workflow run docs.yml --ref dev`.
 - **No `bump-version.sh`** — manual 4-source edit per the version-sync section above.
-- **Tap manifest sync** must follow every release per the Homebrew section above.
+- **Tap manifest sync** must follow every release per the Homebrew section above. Three gotchas (v2.16.0, see `reference_homebrew_tap_drift`): (1) the tap repo may be checked out on a *feature branch* — stash → `checkout main` → apply formula+manifest → push → restore the original branch; (2) `brew upgrade` can't run from the agent sandbox (no PTY) — verify via `brew audit` + raw formula + `generate.py --diff IDENTICAL`, then have the user run `brew upgrade` themselves; (3) `generate.py rforge --diff` is **IDENTICAL** again (the old bin.mkpath drift is resolved).
+- **`Closes #N` needs the default branch.** Putting `Closes #N` in a `feature→dev` PR does NOT auto-close the issue (GitHub only auto-closes on merge to `main`). Either repeat the keyword in the `dev→main` release PR, or `gh issue close N` manually post-release — and verify issue state as a release-done check.
+- **End-to-end smoke test for network/deploy paths.** Mocked unit tests validate intent, not integration (see `feedback_smoke_test_mocked_network_paths`). Before shipping a MUTATING+NETWORK path (e.g. `r:site --deploy`), run a real throwaway-repo smoke test (bare repo as origin).
 - **GitHub Pages CDN** propagates in 30–90s for `meta` descriptions and most content; rarely longer.
 
 ## Memory pointers
@@ -162,7 +164,8 @@ Per the global rules (see `## Pre-PR & Release Checklist` in `~/.claude/CLAUDE.m
 For details not in this file, see project memory at `~/.claude/projects/-Users-dt-projects-dev-tools-rforge/memory/`:
 
 - `reference_rforge_doc_conventions.md` — frontmatter standard, admonition palette, doc-gap audit recipe, verification gotchas
-- `reference_homebrew_tap_drift.md` — manifest sync recipe + 6-surface drift inventory
+- `reference_homebrew_tap_drift.md` — manifest sync recipe + 6-surface drift inventory + release-time gotchas (tap-on-feature-branch, no-PTY brew, `Closes #N` auto-close)
+- `feedback_smoke_test_mocked_network_paths.md` — mocks validate intent not integration; smoke-test MUTATING+NETWORK paths against a throwaway repo before done
 - `reference_dotfiles_sync_workflow.md` — chezmoi for `~/.claude/`, flow-cli for `~/.config/zsh/`, `claude-sync` helper
 - `project_rforge_mcp_never_public.md` — historical context for the v1.3.0 absorption
 - `reference_brew_outdated_testing.md` — Cellar-rename trick for testing `brew outdated` UX
