@@ -33,7 +33,7 @@
 - **v2.0.0** — sub-namespacing (`docs:check`, `r:check`, `health`).
 - **v1.3.0** — absorbed `rforge-mcp` into pure-Python `lib/*` (see "rforge-mcp is gone" below).
 
-**Roadmap** (`.STATUS`): craft-parity **COMPLETE**. Open candidates (rforge-native, all low-priority): `contract_drift` (S7 cross-package 3rd family — candidate, deferred from v2.13.0 B1); full R6/S4 convention checking (B2 — parked); issue #9 (rename-ergonomics watch). Cadence: approved spec → TDD → pre-merge adversarial review → release; multi-feature bundles built in one worktree by sequential implementer agents.
+**Roadmap** (`.STATUS`): craft-parity **COMPLETE**; the pkgdown deploy leak guard (#52) shipped in v2.16.0. Open candidates (rforge-native, all low-priority): `contract_drift` (S7 cross-package 3rd family — candidate, deferred from v2.13.0 B1); full R6/S4 convention checking (B2 — parked); R-universe `sensitivity` follow-up (add to `data-wise.r-universe.dev` once public). Issues #9 (rename ergonomics — closed resolved-by-time 2026-06-21) and #46 (CRAN gap-fill — closed, shipped v2.14.0) are done. Cadence: approved spec → TDD → pre-merge adversarial review → end-to-end smoke test for network/deploy paths → release; multi-feature bundles built in one worktree by sequential implementer agents.
 
 ## Branch architecture
 
