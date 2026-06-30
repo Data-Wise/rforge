@@ -22,8 +22,6 @@ Pick one — they're equivalent for v1.3.0+:
 # Or via Homebrew
 brew install data-wise/tap/rforge
 
-# Or via npm
-npm install -g @data-wise/rforge-plugin
 ```
 
 Verify the plugin loaded:

@@ -27,19 +27,6 @@ If your issue isn't covered, file an issue:
 
 ## Install / setup issues
 
-### `npm install -g @data-wise/rforge-plugin` fails with 404 on `rforge-mcp`
-
-You're on a plugin version older than v1.2.0. The peer-dep was removed
-in v1.2.0; upgrade with:
-
-```zsh
-npm install -g @data-wise/rforge-plugin@latest
-```
-
-If you're already on the latest and still seeing this, check
-`package.json` of your local clone — the `peerDependencies` block
-should be absent.
-
 ### `brew install --HEAD data-wise/tap/rforge` succeeds but plugin doesn't load
 
 Two diagnoses:

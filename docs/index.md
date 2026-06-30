@@ -112,10 +112,10 @@ Most work runs through these four; the rest of the {{ rforge.command_count }} co
 
 ## What's new in {{ rforge.version }}
 
-Two diff-aware / ecosystem features — **{{ rforge.command_count }} commands** (no surface change; both add flags and findings, not new commands).
-
-- **Per-package diff-aware baseline caching** — `/rforge:r:check`/`r:test`/`r:lint --changed` now cache the merge-base baseline **per package** under `~/.rforge/baseline-cache/`, so a re-run with an unchanged merge-base re-checks only the packages it hasn't baselined yet (the growing changed-set case). Self-invalidating and LRU-bounded; opt out with `--no-cache` or clear with `python3 -m lib.changed --clear-cache`. See the [diff-aware checks tutorial](tutorials/diff-aware-checks.md).
-- **Cross-package S7 contracts** — `/rforge:r:s7-review --eco` adds a `cross-package-contract` family: it flags a method dispatching on a *sibling* package's S7 class that the method's package never declares as a dependency (`cross_package_undeclared_contract`), or that the owning package defines but never exports (`cross_package_unexported_class`). Re-export-aware and conservative. See the [S7 convention checking tutorial](tutorials/s7-convention-checking.md).
+- 🛡️ **`/rforge:r:cran-prep` tarball-check stage** — builds the source tarball, inspects it for build artifacts, then runs `R CMD check --as-cran` on the tarball. Catches CRAN/win-builder failures that a source-tree check hides. See the [CRAN submission guide](guides/cran-submission.md).
+- 🪟 **`/rforge:r:winbuilder` fallback** — falls back to `devtools::check_win_*()` when the plugin's `lib/` isn't importable, instead of failing silently.
+- 🌐 **`/rforge:r:site --deploy` leak guard** — deploys from a clean worktree so untracked files never leak into `gh-pages`. See the [website guide](guides/website.md).
+- 🧪 **CLI dogfood + e2e tests** — new `tests/cli/` shell suites for plugin structure and fixture-based end-to-end checks.
 
 Full release history: [CHANGELOG.md](https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md).
 
