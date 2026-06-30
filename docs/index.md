@@ -1,9 +1,8 @@
 # RForge Plugin
 
 [![Version](https://img.shields.io/github/package-json/v/Data-Wise/rforge?label=version&color=blue)](https://github.com/Data-Wise/rforge/releases)
-[![npm](https://img.shields.io/npm/v/@data-wise/rforge-plugin?label=npm&color=red)](https://www.npmjs.com/package/@data-wise/rforge-plugin)
 [![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
-[![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
+[![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
 **R package ecosystem orchestrator for Claude Code — {{ rforge.command_count }} commands, R-aware hooks, validation skills.**
 
@@ -20,20 +19,23 @@ Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fu
 ```mermaid
 flowchart LR
     A["usethis<br/>scaffold"] --> B["devtools<br/>document · test · build"]
-    B --> C["rforge<br/>discover · deps · impact · cascade"]
+    B --> C["rforge<br/>discover · deps · impact<br/>check --changed · s7-review<br/>cran-prep · site --deploy"]
     C --> D["CRAN<br/>ordered submission"]
-    style C fill:#5e35b1,color:#fff
+    C -. "diff-aware<br/>feedback loop" .-> B
+
+    style A fill:#00897b,color:#fff,stroke:#00695c
+    style B fill:#00897b,color:#fff,stroke:#00695c
+    style C fill:#ff8f00,color:#fff,stroke:#ff6f00
+    style D fill:#00897b,color:#fff,stroke:#00695c
 ```
 
-!!! abstract "rforge orchestrates an ecosystem; it does not build packages"
-    **They build one package. rforge runs the ecosystem.** rforge sits *alongside* the
-    standard R toolchain, it doesn't replace it.
+!!! abstract "rforge orchestrates your ecosystem and automates your build cycle"
+    **usethis/devtools build one package. rforge automates the whole ecosystem.** rforge
+    wraps the standard R toolchain — it doesn't replace it.
 
     - **`usethis` / `devtools`** scaffold, document, test, and build a *single* package.
-    - **rforge** answers cross-cutting questions: *Which packages exist here? What depends on what? If I change `medfit`, what breaks downstream? In what order do I submit to CRAN?*
-
-    Looking for `create_package()` or `document()`? That's `usethis`/`devtools`. rforge picks
-    up where they leave off — see **[rforge in the R package lifecycle](tutorials/rforge-in-the-r-lifecycle.md)**.
+    - **rforge** wraps those same tools at the ecosystem level: `r:cycle` runs document → test → check across any package in your workspace, `r:check --changed` scopes to what you edited, `r:cran-prep` runs the multi-pass CRAN gate, and `r:build` builds the binary.
+    - rforge also answers the cross-cutting questions usethis/devtools can't: *Which packages exist here? What depends on what? If I change `medfit`, what breaks downstream? In what order do I submit to CRAN?*
 
 ## Where to start
 
@@ -113,10 +115,10 @@ Most work runs through these four; the rest of the {{ rforge.command_count }} co
 
 ## What's new in {{ rforge.version }}
 
-Two diff-aware / ecosystem features — **{{ rforge.command_count }} commands** (no surface change; both add flags and findings, not new commands).
-
-- **Per-package diff-aware baseline caching** — `/rforge:r:check`/`r:test`/`r:lint --changed` now cache the merge-base baseline **per package** under `~/.rforge/baseline-cache/`, so a re-run with an unchanged merge-base re-checks only the packages it hasn't baselined yet (the growing changed-set case). Self-invalidating and LRU-bounded; opt out with `--no-cache` or clear with `python3 -m lib.changed --clear-cache`. See the [diff-aware checks tutorial](tutorials/diff-aware-checks.md).
-- **Cross-package S7 contracts** — `/rforge:r:s7-review --eco` adds a `cross-package-contract` family: it flags a method dispatching on a *sibling* package's S7 class that the method's package never declares as a dependency (`cross_package_undeclared_contract`), or that the owning package defines but never exports (`cross_package_unexported_class`). Re-export-aware and conservative. See the [S7 convention checking tutorial](tutorials/s7-convention-checking.md).
+- 🛡️ **`/rforge:r:cran-prep` tarball-check stage** — builds the source tarball, inspects it for build artifacts, then runs `R CMD check --as-cran` on the tarball. Catches CRAN/win-builder failures that a source-tree check hides. See the [CRAN submission guide](guides/cran-submission.md).
+- 🪟 **`/rforge:r:winbuilder` fallback** — falls back to `devtools::check_win_*()` when the plugin's `lib/` isn't importable, instead of failing silently.
+- 🌐 **`/rforge:r:site --deploy` leak guard** — deploys from a clean worktree so untracked files never leak into `gh-pages`. See the [website guide](guides/website.md).
+- 🧪 **CLI dogfood + e2e tests** — new `tests/cli/` shell suites for plugin structure and fixture-based end-to-end checks.
 
 Full release history: [CHANGELOG.md](https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md).
 
@@ -148,6 +150,30 @@ Results synthesized into an actionable summary
 | **Python 3.10+** on PATH | the `lib/` modules (`discovery`, `deps`, `status`, `init`) |
 | **R 4.0+** (+ optional engines via `lib.rcmd`) | all `r:*` commands and `/rforge:thorough` |
 
+## Which command should I run?
+
+```mermaid
+flowchart TD
+    A["I want to..."] --> B{"Ship to CRAN?"}
+    B -- "yes" --> C[/rforge:r:cran-prep/]
+    B -- "no" --> D{"Check ecosystem health?"}
+    D -- "yes" --> E[/rforge:status/]
+    D -- "no" --> F{"Just changed code?"}
+    F -- "yes" --> G[/rforge:analyze "what changed"/]
+    F -- "no" --> H{"Quick pre-commit sanity?"}
+    H -- "yes" --> I[/rforge:quick/]
+    H -- "no" --> J{"Deep dive / release prep?"}
+    J -- "yes" --> K[/rforge:thorough/]
+    J -- "no" --> L["Browse the REFCARD"]
+    click C "REFCARD.md"
+    click E "REFCARD.md"
+    click G "REFCARD.md"
+    click I "REFCARD.md"
+    click K "REFCARD.md"
+```
+
+→ Not sure yet? Start with [/rforge:quick](REFCARD.md) or the [Quick Start](QUICK-START.md).
+
 ## Installation
 
 ```text
@@ -155,7 +181,7 @@ Results synthesized into an actionable summary
 /plugin install rforge
 ```
 
-Restart Claude Code so the commands register, then verify with `/help` (look for `/rforge:` entries). Homebrew, npm, and from-source options are in [Installation](installation.md).
+Restart Claude Code so the commands register, then verify with `/help` (look for `/rforge:` entries). Homebrew and from-source options are in [Installation](installation.md).
 
 > **Migrating from v1.2.x?** If `~/.claude/settings.json` still has an `mcpServers.rforge` entry, it's no longer needed — remove it. See the [migration guide](migration/rforge-mcp-deprecation.md).
 
@@ -170,11 +196,15 @@ Restart Claude Code so the commands register, then verify with `/help` (look for
 ## More documentation
 
 - **[Reference Card](REFCARD.md)** — all {{ rforge.command_count }} commands on one page
+- **[Quick-Reference Cards](command-cards.md)** — commands grouped by purpose
 - **[Commands](commands.md)** — full per-command reference
+- **[Glossary](glossary.md)** — terminology explained
 - **[Architecture](architecture.md)** — how the `lib/` modules fit together
 - **[Hooks & Skills](hooks-and-skills.md)** — the R-aware `PreToolUse` hook
 - **[Configuration](configuration.md)** — CRAN mirror, vignette engine, R version pin, CLAUDE.md budget
 - **[Troubleshooting](troubleshooting.md)** — when commands misbehave
+- **[Contributing](contributing.md)** — how to help improve rforge
+- **[Changelog](changelog.md)** — version history
 
 ## License
 

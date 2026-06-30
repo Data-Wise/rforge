@@ -94,6 +94,8 @@
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
+> **Accessible version:** The ASCII box above is decorative — all content is also available in the tables below.
+
 ---
 
 ## How It Works (v1.3.0+)

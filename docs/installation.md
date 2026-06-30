@@ -27,18 +27,12 @@ Works on macOS, Linux, and Windows. Updates with `/plugin update rforge`.
 brew install data-wise/tap/rforge
 ```
 
-Stable v2.0.0. Updates automatically with `brew upgrade`.
+Stable v2.17.0. Updates automatically with `brew upgrade`.
 
 To track the development branch instead:
 
 ```zsh
 brew install --HEAD data-wise/tap/rforge
-```
-
-### npm (cross-platform, if you already have Node)
-
-```zsh
-npm install -g @data-wise/rforge-plugin
 ```
 
 ### Manual (any platform)
@@ -103,7 +97,6 @@ the old install. The plugin no longer needs the MCP server as of v1.3.0.
 |---|---|
 | Marketplace | `/plugin remove rforge` |
 | Homebrew | `brew uninstall data-wise/tap/rforge` |
-| npm | `npm uninstall -g @data-wise/rforge-plugin` |
 | Manual | `rm ~/.claude/plugins/rforge` (removes symlink only — the clone stays) |
 
 State files are preserved after uninstall. To remove them too:
@@ -115,12 +108,12 @@ rm -rf ~/.rforge
 ## Troubleshooting install issues
 
 See [Troubleshooting → Install / setup issues](troubleshooting.md#install-setup-issues)
-for fixes to common install errors (npm 404, plugin not loading, symlink
-permission issues on macOS).
+for fixes to common install errors (plugin not loading, symlink permission
+issues on macOS).
 
 ## What you get
 
-- **16 slash commands** for R-package ecosystem analysis (see [REFCARD](REFCARD.md))
+- **{{ rforge.command_count }} slash commands** for R-package ecosystem analysis (see [REFCARD](REFCARD.md))
 - **4 pure-Python `lib/` modules** invokable as `python3 -m lib.<mod>`
 - **R-aware `PreToolUse` hook** that protects roxygen-generated files
 - **`description-sync` validation skill** for pre-CRAN release checks

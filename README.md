@@ -1,80 +1,24 @@
 # RForge Plugin
 
 [![Version](https://img.shields.io/github/package-json/v/Data-Wise/rforge?label=version&color=blue)](https://github.com/Data-Wise/rforge/releases)
-[![npm](https://img.shields.io/npm/v/@data-wise/rforge-plugin?label=npm&color=red)](https://www.npmjs.com/package/@data-wise/rforge-plugin)
 [![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
-[![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
+[![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
 **R package ecosystem orchestrator for Claude Code — 41 commands, R-aware hooks, validation skills.**
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
-## What's new in v2.7.0
+## What's new in v2.17.0
 
-- 🌌 **`r:submit --universe`** — new opt-in flag that adds an **R-universe early-access tier**. R-universe rebuilds your package from its GitHub repo within minutes and serves CRAN-like binaries, so users can install the new version (`install.packages("<pkg>", repos = "https://<owner>.r-universe.dev")`) **while** CRAN's slower human review runs in parallel. The flag auto-detects your universe from the git `origin` remote (`--universe-name <owner>` to override), reads the public R-universe API, and reports per-platform build status. It's **read-only** — R-universe builds on `git push`, so it never uploads — and the status is **advisory** in the CRAN checklist: it never blocks the (still manual, never-automatic) CRAN handoff. Backed by new pure-stdlib `lib/runiverse.py` (`urllib`-only; no `gh`/R); degrades to a `warn` envelope offline/unregistered with one-time setup guidance. Commands unchanged at 35 (a flag, not a new command).
+- 🛡️ **`r:cran-prep` tarball-check stage** — builds the source tarball with `devtools::build()`, inspects it for stray build artifacts (`.quarto/`, `_freeze/`, `.html`, `*_files/`), then runs `rcmdcheck(tarball, --as-cran, --run-donttest)`. Catches the class of failures CRAN and win-builder see but a source-tree `devtools::check()` hides. Blocks `ready` on errors/warnings/real NOTEs.
+- 🪟 **`r:winbuilder` fallback** — detects when the plugin's `lib/` is not on `PYTHONPATH` and falls back to `devtools::check_win_*()` directly in R, instead of failing silently with `ModuleNotFoundError`.
+- 🧪 **CLI dogfood + e2e tests** — new `tests/cli/automated-tests.sh` and `tests/cli/e2e-tests.sh` exercise plugin structure and public `lib/` modules against fixtures.
 
-## What's new in v2.6.0
+## What's new in v2.16.0
 
-- 🚀 **`r:submit`** — new per-package command that wraps the *moment of CRAN submission*. Gates on `r:cran-prep` being `ready`, builds the tarball, and cuts a GitHub **pre-release** (not "Latest") of it with `cran-comments.md` attached, then prints the CRAN submit checklist — it **never auto-submits**. `r:submit --promote` flips the pre-release to a full release once CRAN accepts (`gh release edit --prerelease=false --latest`). Using a *pre-release* promoted in place sidesteps the r-pkgs anti-pattern of tagging a final release before acceptance (resubmissions bump the version). `gh` is a soft dependency with a printed manual-recipe fallback. Backed by pure-Python `lib/ghrelease.py`. Commands 34 → 35.
+- 🌐 **`r:site --deploy` leak guard** — builds the pkgdown site from a clean named temp-branch worktree so untracked working-directory files never leak into the published `gh-pages` branch. `r:site --check-leaks` scans the render surface for stray files.
 
-## What's new in v2.5.0
-
-- 🔗 **`r:deps-sync`** — new pure-Python per-package command that reconciles `DESCRIPTION` against what the code actually uses. Scans `R/`/`tests/`/`vignettes/` + `NAMESPACE` for namespace usage and reports **missing** (used, undeclared → Imports), **misclassified** (in Suggests but used unconditionally in `R/` → Imports), **missing_suggests** (tests/vignettes-only), and **unused** dependencies, plus a suggested `DESCRIPTION` patch. Report-only by default; `--write` applies the unambiguous changes. The `misclassified` finding is the *static* sibling of `r:check --strict`'s noSuggests pass — it catches the medfit/MASS class **before** R runs. *Intra*-package, complementing `/rforge:deps` (the *inter*-package graph). Commands 33 → 34.
-
-## What's new in v2.4.0
-
-- 🧭 **Ecosystem-manifest discovery** (`/rforge:detect`, `/rforge:status`) — discovery can now read an optional **ecosystem manifest** (a curated YAML listing packages with `role`/`repo`/`cran`/`status_file`), located via a new `manifest:` key in the root `.rforge.yaml`. Discovered packages are **enriched** with that metadata (matched by name, case-insensitive), and any mismatch between the manifest and what's on disk surfaces as **drift** (`manifest_only` / `disk_only`). `/rforge:detect` shows a `manifest:` header + per-package `role`; `/rforge:status` adds a conditional `Role` column. Parsed by a vendored YAML-subset reader — `discovery.py` stays stdlib-only (no PyYAML). **Zero behavior change when no manifest is configured.** New public API: `Manifest`, `ManifestEntry`, `Drift`, `parse_manifest`, `read_manifest`.
-
-## What's new in v2.3.0
-
-- 🛡️ **CRAN-incoming hardening for `r:check` + `r:cran-prep`** (no new commands) — the gate now emulates CRAN's *incoming* and post-acceptance flavors. `r:check --strict` runs **both** Suggests-withholding passes as distinct rows (`check (noSuggests)` via `_R_CHECK_DEPENDS_ONLY_`, `check (suggests-only)` via `_R_CHECK_SUGGESTS_ONLY_`), each with `--run-donttest`; `--incoming` implies `--strict` and adds an opt-in `check (incoming)` env-var bundle. `r:cran-prep` runs the strict passes **by default**, and a strict ERROR **blocks** the `ready` verdict (plus a Tier 1b PDF-manual check that warns, never blocks).
-- 🐍 **`lib/cranlint.py`** — new pure-Python (stdlib-only, no R) module backing three **Tier 4 advisory** `cran-prep` stages that **never block `ready`**: `description` (DESCRIPTION incoming nits — non-`Authors@R`, weak `Title`, `Description` prose, stale `Date`), `build-hygiene` (planning/dev docs that would ship in the tarball, with the exact `.Rbuildignore` regex to add), `docs-consistency` (lightweight advisory). Public functions: `lint_description`, `check_build_hygiene`, `check_planning_consistency`, `run_all`; CLI `python3 -m lib.cranlint --path .`.
-- ⚠️ **Behavior change:** a package that is 🟢 `ready` today under `--as-cran` can turn 🔴 once the noSuggests pass catches a `Suggests` package used unconditionally (the medfit 0.2.1 class). Intended — CRAN would bounce it post-acceptance. Fix: move the dependency to `Imports`, or guard with `requireNamespace()` + `skip_if_not_installed()`.
-
-## What's new in v2.2.0
-
-- **5 new `r:` CRAN-submission commands**: `r:revdep`, `r:goodpractice`, `r:winbuilder`, `r:rhub`, `r:cran-prep` — full pre-submission gate that runs document→lint→spell→urlcheck→test→coverage→check(--as-cran)→revdep, generates `cran-comments.md`, and returns a `ready`/`warn`/`blocked` verdict.
-- **`r:check` NOTE classifier**: notes are now classified as `spurious` (expected on CRAN submission) or `real` (needs attention) using `notes_classified` in the envelope.
-- **Total: 28 → 33 commands.**
-
-## What's new in v2.1.0
-
-- 🔬 **12 new `r:` commands** — full R package dev cycle + quality layer: `r:load`, `r:document`, `r:test`, `r:coverage`, `r:build`, `r:install`, `r:site`, `r:cycle`, `r:lint`, `r:spell`, `r:urlcheck`, `r:style`.
-- 🐍 **`lib/rcmd.py`** — new pure-Python module driving each command via lower-level R engines (`rcmdcheck`, `pkgbuild`, `roxygen2`, `testthat`, `pkgload`, `covr`, `pkgdown`, `lintr`, `spelling`, `urlchecker`, `styler`). JSON output, never regex-scraped. Optional engines degrade gracefully to 🟡 + install hint.
-- **Total: 16 → 28 commands.** `r:check` retrofit: now drives its report from `lib.rcmd` rather than raw subprocess.
-
-## What's new in v2.0.0 (BREAKING)
-
-- 🔀 **3 commands renamed** for cleaner namespacing — `/rforge:doc-check` → `/rforge:docs:check`, `/rforge:ecosystem-health` → `/rforge:health`, `/rforge:rpkg-check` → `/rforge:r:check`. The other 13 commands are unchanged. Typing an old name produces a helpful rename-error pointing at the new name — no silent failures. See [`docs/migration/v2.0.0-rename.md`](docs/migration/v2.0.0-rename.md) for the full mapping table and a `sed` recipe to mass-update local scripts.
-
-## What's new in v1.3.0
-
-- 🎯 **MCP absorption complete** — `rforge-mcp` has been absorbed into the plugin. All 7 implemented tools now ship as pure-Python `lib/` modules. The MCP server is no longer required (and is being archived). See [`docs/migration/rforge-mcp-deprecation.md`](docs/migration/rforge-mcp-deprecation.md).
-- 🐍 **`lib/status.py`** — ecosystem health snapshot (`DESCRIPTION` + `.STATUS` parsing). `python3 -m lib.status [--path .] [--format text|json]`.
-- 🌱 **`lib/init.py`** — initialize `~/.rforge/context.json` for cross-package state. `python3 -m lib.init [--quick]`. New `/rforge:init` command.
-- 📦 **No runtime dependencies beyond Python 3.10+** — the plugin works on any system with a modern Python.
-
-## What's new in v1.2.0
-
-- 🛒 **Marketplace install** — one-shot setup via
-  `/plugin marketplace add Data-Wise/rforge` (no clone, no symlinks).
-  See [`docs/configuration.md`](docs/configuration.md) for tunable
-  options (CRAN mirror, vignette engine, R version pin, CLAUDE.md budget).
-- 🪝 **R-aware `PreToolUse` hook** — four rules that fire on every
-  `Write`/`Edit`: blocks hand-edits to roxygen-generated `man/*.Rd`,
-  warns when `R/*.R` edits may need NAMESPACE/DESCRIPTION sync, warns
-  on non-SemVer `DESCRIPTION` Version bumps, warns on writes outside
-  the active worktree. Diagnostic, not adversarial — only the
-  `man/*.Rd` rule blocks. See [`docs/hooks-and-skills.md`](docs/hooks-and-skills.md).
-- 🔍 **`description-sync` validation skill** — pure-shell sanity check
-  that `DESCRIPTION` Version matches the top entry in `NEWS.md` /
-  `CHANGELOG.md`. Catches the most common pre-CRAN release-prep failure.
-  No R required.
-- 📐 **Plugin Surface architecture diagram** — new Mermaid diagram in
-  [`docs/architecture.md`](docs/architecture.md) showing how marketplace,
-  config, commands, agents, hooks, and skills relate.
-
-Full changelog: [`CHANGELOG.md`](CHANGELOG.md).
+Full release history: [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Quick Start
 
@@ -182,16 +126,7 @@ The Homebrew formula automatically:
 - Installs the plugin to `~/.claude/plugins/rforge`
 - Makes it available in Claude Code CLI and Claude Desktop
 
-#### Option 3: npm (When published)
-
-```bash
-# Install from npm (after publishing)
-npm install -g @data-wise/rforge-plugin
-
-# Plugin will auto-install to ~/.claude/plugins/rforge
-```
-
-#### Option 4: Manual Installation (Local Development)
+#### Option 3: Manual Installation (Local Development)
 
 **For Claude Code CLI and Claude Desktop:**
 
@@ -491,6 +426,6 @@ MIT
 
 ---
 
-**Version:** 2.17.0
+**Version:** 2.18.0
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+

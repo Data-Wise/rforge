@@ -1,6 +1,6 @@
 # RForge Plugin - Documentation
 
-> **Complete documentation for the RForge Plugin v2.9.0**
+> **Complete documentation for the RForge Plugin v2.17.0**
 
 ---
 
@@ -54,7 +54,7 @@ Perfect for:
 - One-page printable reference
 
 **Contents:**
-- All commands in tables (28 total)
+- All commands in tables (41 total)
 - Pattern recognition guide
 - `lib/` modules overview
 - Common workflows
@@ -80,14 +80,14 @@ Perfect for:
 ```
 rforge/
 ├── .claude-plugin/            # Claude Code plugin manifest + extras
-│   ├── plugin.json            # Plugin manifest (v2.9.0)
+│   ├── plugin.json            # Plugin manifest (v2.17.0)
 │   ├── marketplace.json       # Marketplace install metadata
 │   ├── config.json            # User-tunable options
 │   ├── hooks/
 │   │   └── pretooluse.py      # R-aware Write/Edit guard
 │   └── skills/
 │       └── validation/        # Autonomous validation skills
-├── commands/                  # 28 slash commands (/rforge:*)
+├── commands/                  # 41 slash commands (/rforge:*)
 ├── agents/                    # Orchestrator agent
 │   └── orchestrator.md        # Pattern recognition + delegation
 ├── docs/                      # 👈 You are here
@@ -97,12 +97,18 @@ rforge/
 │   ├── architecture.md        # Plugin Surface diagram + details
 │   ├── hooks-and-skills.md    # Hook rules + skill reference
 │   └── configuration.md       # config.json options
-├── lib/
-│   └── formatters.py          # Output formatting helpers
-├── tests/                     # Validation suite (test-all.sh)
-├── scripts/                   # Installation scripts
+├── lib/                       # Pure-Python analysis modules
+│   ├── discovery.py
+│   ├── deps.py
+│   ├── status.py
+│   ├── init.py
+│   ├── cranlint.py
+│   ├── rcmd.py
+│   └── ...
+├── tests/                     # Validation suite (pytest + test-all.sh)
+├── scripts/                   # Installation + sync scripts
 ├── README.md                  # Main documentation
-├── package.json               # npm metadata
+├── package.json               # Version source of truth
 └── LICENSE                    # MIT license
 ```
 
@@ -234,7 +240,7 @@ from a previous version, remove it (see
 
 ## 📝 Document Maintenance
 
-**Last Updated:** 2026-06-21
+**Last Updated:** 2026-06-30
 **Plugin Version:** 2.17.0
 **Documentation Version:** 2.17.0
 

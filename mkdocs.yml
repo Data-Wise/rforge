@@ -15,20 +15,25 @@ exclude_docs: |
 theme:
   name: material
   palette:
+    # Auto-switch by system preference; each entry also exposes a header toggle
+    # so users can override manually.
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: blue
-      accent: blue
+      primary: teal
+      accent: amber
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: blue
-      accent: blue
+      primary: teal
+      accent: amber
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
   features:
     - navigation.instant
     - navigation.tracking
@@ -49,7 +54,7 @@ extra_css:
 # scripts/version_sync.py — do not hand-edit version/prev_version/release_date.
 extra:
   rforge:
-    version: "2.17.0"
+    version: "2.18.0"
     prev_version: "2.15.0"
     release_date: "2026-06-21"
     command_count: 41
@@ -57,6 +62,10 @@ extra:
 plugins:
   - search
   - macros
+  - social:
+      cards_layout_options:
+        background_color: "#00897b"
+        color: "#fff"
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -105,8 +114,10 @@ nav:
     - "Scaffolding existing packages": tutorials/scaffolding-existing-packages.md
     - "CRAN release prep": tutorials/cran-release-prep.md
     - "CRAN submission with rforge": tutorials/cran-submission-with-rforge.md
+    - "Win-builder + tarball-check": tutorials/cran-winbuilder-tarball-check.md
     - "R-universe early-access": tutorials/r-universe-early-access.md
     - "Migrating from rforge-mcp": tutorials/migrate-from-mcp.md
+    - "Example sessions": tutorials/example-sessions.md
   - Reference:
     - 📚 Reference Card: REFCARD.md
     - Commands: commands.md
@@ -122,6 +133,8 @@ nav:
     - Configuration: configuration.md
     - Lib Modules: lib-modules.md
     - Troubleshooting: troubleshooting.md
+    - 📖 Glossary: glossary.md
+    - 🃏 Quick-Reference Cards: command-cards.md
     - API:
       - "discovery": reference/discovery.md
       - "deps": reference/deps.md
@@ -143,3 +156,5 @@ nav:
       - "v2.0.0 command rename": migration/v2.0.0-rename.md
       - "rforge-mcp deprecation": migration/rforge-mcp-deprecation.md
       - "v1.3.0 post-merge checklist": migration/v1.3.0-post-merge-checklist.md
+    - 📝 Changelog: changelog.md
+    - 🤝 Contributing: contributing.md

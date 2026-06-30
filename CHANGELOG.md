@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.18.0] - 2026-06-30
+
+> Creative doc enhancements + CI/staleness fixes. **41 commands** (no surface change).
+> New in-site pages: changelog, glossary, command cards, contributor guide, example
+> sessions. CI fix: remove `cache: pip` from `setup-python` (no requirements.txt),
+> add pillow+cairosvg for social card generation. Stale refs cleaned from
+> `install.sh` and `package.json`. pytest 524, test-all 44/44.
+
+### Added
+
+- **In-site changelog** (`docs/changelog.md`) — version history summary with links
+  to the full GitHub CHANGELOG.
+- **Glossary** (`docs/glossary.md`) — A–Z terminology covering all rforge concepts.
+- **Command quick-reference cards** (`docs/command-cards.md`) — commands grouped by
+  purpose in compact tables.
+- **Contributor guide** (`docs/contributing.md`) — setup, testing, PR workflow.
+- **Example session transcripts** (`docs/tutorials/example-sessions.md`) — 5 real
+  transcripts showing rforge in day-to-day use.
+- **Command decision tree** (Mermaid flowchart on `docs/index.md`) — helps users
+  pick the right command.
+- **Tarball-check workflow diagram** (`docs/workflows/index.md`) — visual overview
+  of the v2.17.0 tarball-stage flow.
+- **404 page** (`docs/404.md`) — friendly fallback with nav links.
+- **Social cards** — OG image previews via Material `social` plugin (all pages).
+- **Symptom/fix admonitions** — consistent `!!! warning "Symptom"` / `!!! success "Fix"`
+  pattern across every troubleshooting section.
+
+### Fixed
+
+- **CI: `setup-python` `cache: pip` error** (`ci.yml`, `docs.yml`). The project has
+  no `requirements.txt`/`pyproject.toml`, so the cache key lookup errored. Removed
+  `cache: pip` from all three setup-python steps.
+- **CI: social card deps** (`ci.yml`, `docs.yml`). Added `pillow` + `cairosvg` to
+  docs dependency install — required by the Material social plugin.
+- **Stale MCP ref in `install.sh`** — `scripts/install.sh` still told users to
+  `npx rforge-mcp configure` (deprecated since v1.3.0). Replaced with accurate
+  Python 3.10+ / R 4.0+ requirement hints.
+- **Stale Node.js metadata in `package.json`** — removed non-existent `"main": "index.js"`
+  and misleading `"engines": {"node": ">=18.0.0"}` (zero JS files in the repo).
+- **Admonition accuracy** (`docs/index.md`) — "rforge does not build packages" was
+  false; rforge wraps `r:build` / `r:cycle`. Reworded to "orchestrates and automates
+  your build cycle."
+
+### Changed
+
+- **"Where rforge fits" diagram** (`docs/index.md`) — teal/amber palette matching
+  the site theme; added diff-aware feedback loop; updated feature list to v2.18.0.
+- **REFCARD accessibility note** — added screen-reader hint after the ASCII box.
+
 ## [2.17.0] - 2026-06-30
 
 > Implements `PROPOSAL-winbuilder-fallback-and-tarball-check.md` — two fixes

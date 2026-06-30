@@ -52,9 +52,6 @@ Before installing RForge, ensure you have:
 # Or via Homebrew (macOS)
 brew install data-wise/tap/rforge
 
-# Or via npm
-npm install -g @data-wise/rforge-plugin
-
 # Or from source (development)
 git clone https://github.com/Data-Wise/rforge.git
 cd rforge
