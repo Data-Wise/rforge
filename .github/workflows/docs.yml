@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -18,8 +22,14 @@ jobs:
 
       - uses: actions/setup-python@v6
         with:
-          python-version: 3.x
+          python-version: '3.11'
+          cache: 'pip'
 
-      - run: pip install mkdocs-material mkdocs-macros-plugin
+      - name: Install docs dependencies
+        run: python3 -m pip install mkdocs-material mkdocs-macros-plugin
 
-      - run: mkdocs gh-deploy --force
+      - name: Build docs with strict mode
+        run: mkdocs build --strict
+
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy

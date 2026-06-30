@@ -5,6 +5,11 @@ on:
     branches: [ main, dev ]
   pull_request:
     branches: [ main, dev ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate:
@@ -108,17 +113,23 @@ jobs:
           echo "  - Structure: R package ecosystem management"
 
   test:
-    name: Tests (pytest + test-all)
+    name: Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.11', '3.12', '3.13' ]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
 
       - name: Install test dependencies
         run: |
@@ -136,3 +147,30 @@ jobs:
 
       - name: Run full validation suite (test-all.sh)
         run: bash tests/test-all.sh
+
+      - name: Run CLI dogfood tests
+        run: bash tests/cli/automated-tests.sh
+
+      - name: Run CLI e2e tests
+        run: bash tests/cli/e2e-tests.sh
+
+  docs:
+    name: Docs Build Check
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install docs dependencies
+        run: python3 -m pip install mkdocs-material mkdocs-macros-plugin
+
+      - name: Build docs with strict mode
+        run: mkdocs build --strict
