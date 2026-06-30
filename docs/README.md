@@ -1,6 +1,6 @@
 # RForge Plugin - Documentation
 
-> **Complete documentation for the RForge Plugin v2.9.0**
+> **Complete documentation for the RForge Plugin v2.17.0**
 
 ---
 
