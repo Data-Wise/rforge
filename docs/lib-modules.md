@@ -13,7 +13,7 @@ external dependencies beyond the stdlib).
 > **Background.** As of v1.3.0 the plugin's entire analysis surface lives in
 > `lib/` — four self-contained Python modules (`discovery`, `deps`, `status`,
 > `init`) that replace all 7 implemented `rforge-mcp` tools. See
-> [Path B SPEC](specs/SPEC-mcp-absorb-2026-05-10.md) for the migration plan
+> [Path B SPEC](https://github.com/Data-Wise/rforge/blob/main/archive/specs/SPEC-mcp-absorb-2026-05-10.md) for the migration plan
 > and [reference docs](reference/discovery.md) for auto-generated API listings.
 
 ## Why this exists
@@ -322,6 +322,6 @@ CI stays R-free). Integrated into `tests/test-all.sh` (the full plugin suite).
   [`s7review`](reference/s7review.md) ·
   [`changed`](reference/changed.md) ·
   [`scaffold`](reference/scaffold.md)
-- [SPEC: Absorb rforge-mcp (Path B)](specs/SPEC-mcp-absorb-2026-05-10.md) — full migration plan
+- [SPEC: Absorb rforge-mcp (Path B)](https://github.com/Data-Wise/rforge/blob/main/archive/specs/SPEC-mcp-absorb-2026-05-10.md) — full migration plan
 - [Migration: rforge-mcp deprecation](migration/rforge-mcp-deprecation.md) — old MCP tool → new lib module table
 - [Architecture](architecture.md#path-b-lib-modules) — where lib/ fits in the plugin surface
