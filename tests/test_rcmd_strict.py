@@ -354,3 +354,64 @@ def test_pdf_manual_present_no_advisory():
     env = rcmd.normalize("check", raw, 0, None)
     codes = {f.get("code") for f in env.get("findings", [])}
     assert "pdf_manual_skipped" not in codes
+
+
+# --- Tarball-check integration in cran-prep (v2.17.0) ---
+
+def _fake_run_with_tarball(status="ok", suspicious=None, real_notes=None):
+    def fake_run(kind, path, **kw):
+        base = {"kind": kind, "status": "ok", "engine_missing": [], "messages": []}
+        if kind == "check":
+            base["check"] = {"errors": [], "warnings": [], "notes": [],
+                             "notes_classified": []}
+        if kind == "tarball-check":
+            base["status"] = status
+            base["tarball_check"] = {
+                "tarball": "foo_0.2.0.tar.gz",
+                "tarball_path": "/tmp/foo_0.2.0.tar.gz",
+                "suspicious": suspicious or [],
+                "errors": [], "warnings": [],
+                "notes_classified": [
+                    {"text": n, "kind": "real", "reason": None}
+                    for n in (real_notes or [])
+                ],
+            }
+        if kind == "revdep":
+            base["revdep"] = {"broken": [], "new_problems": []}
+        return base
+    return fake_run
+
+
+def test_cran_prep_runs_tarball_check_stage(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "run", _fake_run_with_tarball())
+    env = rcmd._run_cran_prep(str(tmp_path), no_revdep=True)
+    kinds = [s["kind"] for s in env["stages"]]
+    assert "tarball-check" in kinds
+    assert env["status"] == "ready"
+
+
+def test_cran_prep_tarball_check_error_blocks_ready(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "run", _fake_run_with_tarball(status="error"))
+    env = rcmd._run_cran_prep(str(tmp_path), no_revdep=True)
+    assert env["status"] == "warn"
+    assert any("tarball-check failed" in b for b in env["blockers"])
+
+
+def test_cran_prep_tarball_check_real_note_blocks_ready(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "run",
+                        _fake_run_with_tarball(real_notes=["undefined global f"]))
+    env = rcmd._run_cran_prep(str(tmp_path), no_revdep=True)
+    assert env["status"] == "warn"
+    assert any("real NOTE" in b for b in env["blockers"])
+
+
+def test_cran_prep_tarball_check_suspicious_surfaces_message(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "run",
+                        _fake_run_with_tarball(suspicious=["vignettes/.quarto"]))
+    env = rcmd._run_cran_prep(str(tmp_path), no_revdep=True)
+    assert env["status"] == "ready"
+    assert any("suspicious" in m.lower() for m in env.get("messages", []))

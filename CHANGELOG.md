@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.17.0] - 2026-06-30
+
+> Implements `PROPOSAL-winbuilder-fallback-and-tarball-check.md` — two fixes
+> surfaced during medrobust v0.4.0 CRAN-prep. **41 commands** (no surface change;
+> one new cran-prep stage + winbuilder fallback logic). pytest 524, test-all 44/44.
+
+### Added
+
+- **`r:cran-prep` `tarball-check` stage** (`lib/rcmd.py`, `lib/rsnippets.py`).
+  Builds a source tarball via `devtools::build()`, inspects it for vignette/build
+  artifacts (`.quarto/`, `_freeze/`, `.html`, `*_files/`), then runs
+  `rcmdcheck::rcmdcheck(tarball, --as-cran, --run-donttest)`. Catches the class
+  of failures CRAN and win-builder see but a source-tree `devtools::check()`
+  hides (it pre-builds vignettes into `inst/doc/` before R CMD check runs, masking
+  missing `VignetteBuilder` entries and artifact leaks). **Blocks `ready`** on
+  errors/warnings/real NOTEs; suspicious tarball contents surface as advisory
+  messages.
+- **`check_build_hygiene` tarball inspection** (`lib/cranlint.py`). When
+  `cran-prep` passes the built tarball path, `check_build_hygiene` now also
+  scans the tarball contents (pure-stdlib `tarfile`) for build artifacts that
+  `.Rbuildignore` failed to exclude — the delta between "what the dev thinks is
+  excluded" and "what actually ships." New `tarball_build_artifact` finding code;
+  degrades to `tarball_unreadable` advisory on a corrupt tarball.
+
+### Fixed
+
+- **`r:winbuilder` silent failure when `lib.rcmd` is not importable**
+  (`commands/r/winbuilder.md`). The command previously called
+  `python3 -m lib.rcmd --kind winbuilder` with no fallback; if the plugin's
+  `lib/` was not on `PYTHONPATH` (e.g. invoked from an R package directory), it
+  failed with `ModuleNotFoundError` and produced no useful output. The command
+  now detects `lib.rcmd` availability and falls back to `devtools::check_win_*()`
+  directly in R, with a `🟡` warning that the fallback path was used. Also
+  clarifies that the argument must be a **package directory**, not a `.tar.gz`
+  (devtools rejects tarball paths).
+
+### Changed
+
+- `r:cran-prep` default stage sequence now includes `tarball-check` between the
+  strict/incoming check passes and the Tier-4 advisory stages.
+
+---
+
 ## [2.16.0] - 2026-06-21
 
 > pkgdown deploy leak guard (issue #52), built spec→TDD→adversarial-review.

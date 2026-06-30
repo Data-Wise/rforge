@@ -51,6 +51,7 @@ By default the gate runs (in order):
 | `check (noSuggests)` | strict flavor pass — `_R_CHECK_DEPENDS_ONLY_=true` + `--run-donttest` | **yes** |
 | `check (suggests-only)` | strict flavor pass — `_R_CHECK_SUGGESTS_ONLY_=true` + `--run-donttest` | **yes** |
 | `check (incoming)` | **opt-in (`--incoming`)** — CRAN-incoming `_R_CHECK_*` bundle | yes (only when requested) |
+| `tarball-check` | `devtools::build()` → `tar -tzf` inspect → `rcmdcheck(tarball, --as-cran)` | **yes** |
 | `description` | Tier 4 — DESCRIPTION incoming nits (non-`Authors@R`/no `cph`, weak/echoed `Title`, `Description` not a complete sentence, stale `Date`) | **no — advisory** |
 | `build-hygiene` | Tier 4 — planning/dev docs that would ship in the tarball; emits the exact `.Rbuildignore` regex to add | **no — advisory** |
 | `docs-consistency` | Tier 4 — lightweight advisory staleness/dangling-ref check | **no — advisory** |

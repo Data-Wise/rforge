@@ -326,6 +326,52 @@ def test_run_winbuilder_missing_devtools_warns(tmp_path, monkeypatch):
     assert any("devtools" in m for m in env["messages"])
 
 
+# --- Task 8: tarball-check (v2.17.0) ---
+
+def test_r_snippet_tarball_check_builds_and_checks_tarball():
+    src = rcmd.r_snippet("tarball-check", "/tmp/foo")
+    assert "devtools::build" in src
+    assert "tar -tzf" in src or '"tar"' in src
+    assert "rcmdcheck::rcmdcheck" in src
+    assert "--as-cran" in src
+    assert "--run-donttest" in src
+    assert "suspicious" in src
+
+
+def test_normalize_tarball_check_clean_is_ok():
+    env = rcmd.normalize("tarball-check",
+                         {"tarball": "foo_1.0.tar.gz", "suspicious": [],
+                          "errors": [], "warnings": [], "notes": []}, 0, None)
+    assert env["status"] == "ok"
+    assert env["tarball_check"]["tarball"] == "foo_1.0.tar.gz"
+    assert env["tarball_check"]["notes_classified"] == []
+
+
+def test_normalize_tarball_check_real_note_is_warn():
+    env = rcmd.normalize("tarball-check",
+                         {"tarball": "foo_1.0.tar.gz", "suspicious": [],
+                          "errors": [], "warnings": [], "notes": ["undefined global f"]},
+                         0, None)
+    assert env["status"] == "warn"
+    assert env["tarball_check"]["notes_classified"][0]["kind"] == "real"
+
+
+def test_normalize_tarball_check_error_is_error():
+    env = rcmd.normalize("tarball-check",
+                         {"tarball": "foo_1.0.tar.gz", "suspicious": [],
+                          "errors": ["E"], "warnings": [], "notes": []},
+                         1, None)
+    assert env["status"] == "error"
+
+
+def test_run_tarball_check_missing_devtools_warns(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"engine_missing":["devtools"]}', 0))
+    env = rcmd.run("tarball-check", str(tmp_path))
+    assert env["status"] == "warn"
+    assert any("devtools" in m for m in env["messages"])
+
+
 # --- Task 6: render_cran_comments — pure markdown generator ---
 
 def test_cran_comments_spurious_note_no_revdep():

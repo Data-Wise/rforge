@@ -235,8 +235,8 @@ from a previous version, remove it (see
 ## 📝 Document Maintenance
 
 **Last Updated:** 2026-06-21
-**Plugin Version:** 2.16.0
-**Documentation Version:** 2.16.0
+**Plugin Version:** 2.17.0
+**Documentation Version:** 2.17.0
 
 **Releases:** https://github.com/Data-Wise/rforge/releases
 
