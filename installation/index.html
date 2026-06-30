@@ -48,8 +48,8 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
       
     
     
@@ -61,7 +61,20 @@
 
     
     
-  </head>
+  
+<meta property="og:type" content="website" />
+<meta property="og:title" content="📦 Installation - RForge Plugin" />
+<meta property="og:description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)" />
+<meta property="og:image" content="https://data-wise.github.io/rforge/assets/images/social/installation.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:url" content="https://data-wise.github.io/rforge/installation/" />
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:title" content="📦 Installation - RForge Plugin" />
+<meta property="twitter:description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)" />
+<meta property="twitter:image" content="https://data-wise.github.io/rforge/assets/images/social/installation.png" />
+</head>
   
   
     
@@ -71,7 +84,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="amber">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -127,7 +140,7 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
     
       <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
@@ -137,7 +150,7 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
     
       <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
@@ -543,17 +556,6 @@
     <span class="md-ellipsis">
       
         Homebrew (macOS, recommended for CLI users)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#npm-cross-platform-if-you-already-have-node" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        npm (cross-platform, if you already have Node)
       
     </span>
   </a>
@@ -1219,6 +1221,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../tutorials/cran-winbuilder-tarball-check/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Win-builder + tarball-check
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../tutorials/r-universe-early-access/" class="md-nav__link">
         
   
@@ -1255,6 +1285,34 @@
     
   
     Migrating from rforge-mcp
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/example-sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Example sessions
   
 
     
@@ -1753,6 +1811,62 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📖 Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../command-cards/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🃏 Quick-Reference Cards
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
     
@@ -1765,10 +1879,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
         
           
-          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
             
   
   
@@ -1786,8 +1900,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2424,6 +2538,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📝 Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🤝 Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2485,17 +2655,6 @@
     <span class="md-ellipsis">
       
         Homebrew (macOS, recommended for CLI users)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#npm-cross-platform-if-you-already-have-node" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        npm (cross-platform, if you already have Node)
       
     </span>
   </a>
@@ -2658,25 +2817,22 @@
 <h3 id="homebrew-macos-recommended-for-cli-users">Homebrew (macOS, recommended for CLI users)<a class="headerlink" href="#homebrew-macos-recommended-for-cli-users" title="Permanent link">&para;</a></h3>
 <div class="language-zsh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew<span class="w"> </span>install<span class="w"> </span>data-wise/tap/rforge
 </span></code></pre></div>
-<p>Stable v2.0.0. Updates automatically with <code>brew upgrade</code>.</p>
+<p>Stable v2.17.0. Updates automatically with <code>brew upgrade</code>.</p>
 <p>To track the development branch instead:</p>
 <div class="language-zsh highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew<span class="w"> </span>install<span class="w"> </span>--HEAD<span class="w"> </span>data-wise/tap/rforge
 </span></code></pre></div>
-<h3 id="npm-cross-platform-if-you-already-have-node">npm (cross-platform, if you already have Node)<a class="headerlink" href="#npm-cross-platform-if-you-already-have-node" title="Permanent link">&para;</a></h3>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>@data-wise/rforge-plugin
-</span></code></pre></div>
 <h3 id="manual-any-platform">Manual (any platform)<a class="headerlink" href="#manual-any-platform" title="Permanent link">&para;</a></h3>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Data-Wise/rforge.git
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>ln<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/rforge&quot;</span><span class="w"> </span>~/.claude/plugins/rforge
+<div class="language-zsh highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Data-Wise/rforge.git
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>ln<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/rforge&quot;</span><span class="w"> </span>~/.claude/plugins/rforge
 </span></code></pre></div>
 <h2 id="verify-the-install">Verify the install<a class="headerlink" href="#verify-the-install" title="Permanent link">&para;</a></h2>
 <p>After any method, confirm Claude Code sees the plugin:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>/help
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/help
 </span></code></pre></div>
 <p>Expected: 41 commands prefixed <code>/rforge:</code> appear in the listing. If they
 don't, restart Claude Code and try again.</p>
 <p>A quicker confirmation from the shell:</p>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ls<span class="w"> </span>~/.claude/plugins/rforge/commands/r/
+<div class="language-zsh highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ls<span class="w"> </span>~/.claude/plugins/rforge/commands/r/
 </span></code></pre></div>
 <p>Expected: a list of 17 <code>.md</code> files in <code>commands/r/</code> (check, load, document,
 test, coverage, build, install, site, cycle, lint, spell, urlcheck, style,
@@ -2721,25 +2877,21 @@ the old install. The plugin no longer needs the MCP server as of v1.3.0.</p>
 <td><code>brew uninstall data-wise/tap/rforge</code></td>
 </tr>
 <tr>
-<td>npm</td>
-<td><code>npm uninstall -g @data-wise/rforge-plugin</code></td>
-</tr>
-<tr>
 <td>Manual</td>
 <td><code>rm ~/.claude/plugins/rforge</code> (removes symlink only — the clone stays)</td>
 </tr>
 </tbody>
 </table>
 <p>State files are preserved after uninstall. To remove them too:</p>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>~/.rforge
+<div class="language-zsh highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>~/.rforge
 </span></code></pre></div>
 <h2 id="troubleshooting-install-issues">Troubleshooting install issues<a class="headerlink" href="#troubleshooting-install-issues" title="Permanent link">&para;</a></h2>
 <p>See <a href="../troubleshooting/#install-setup-issues">Troubleshooting → Install / setup issues</a>
-for fixes to common install errors (npm 404, plugin not loading, symlink
-permission issues on macOS).</p>
+for fixes to common install errors (plugin not loading, symlink permission
+issues on macOS).</p>
 <h2 id="what-you-get">What you get<a class="headerlink" href="#what-you-get" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>16 slash commands</strong> for R-package ecosystem analysis (see <a href="../REFCARD/">REFCARD</a>)</li>
+<li><strong>41 slash commands</strong> for R-package ecosystem analysis (see <a href="../REFCARD/">REFCARD</a>)</li>
 <li><strong>4 pure-Python <code>lib/</code> modules</strong> invokable as <code>python3 -m lib.&lt;mod&gt;</code></li>
 <li><strong>R-aware <code>PreToolUse</code> hook</strong> that protects roxygen-generated files</li>
 <li><strong><code>description-sync</code> validation skill</strong> for pre-CRAN release checks</li>

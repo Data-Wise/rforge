@@ -48,8 +48,8 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
       
     
     
@@ -61,7 +61,20 @@
 
     
     
-  </head>
+  
+<meta property="og:type" content="website" />
+<meta property="og:title" content="📊 Visual Workflows - RForge Plugin" />
+<meta property="og:description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)" />
+<meta property="og:image" content="https://data-wise.github.io/rforge/assets/images/social/workflows/index.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:url" content="https://data-wise.github.io/rforge/workflows/" />
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:title" content="📊 Visual Workflows - RForge Plugin" />
+<meta property="twitter:description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)" />
+<meta property="twitter:image" content="https://data-wise.github.io/rforge/assets/images/social/workflows/index.png" />
+</head>
   
   
     
@@ -71,7 +84,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="amber">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -127,7 +140,7 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
     
       <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
@@ -137,7 +150,7 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
     
       <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
@@ -745,6 +758,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#tarball-check-v2170" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📦 Tarball check (v2.17.0+)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#multi-platform-verification-optional" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1185,6 +1209,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../tutorials/cran-winbuilder-tarball-check/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Win-builder + tarball-check
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../tutorials/r-universe-early-access/" class="md-nav__link">
         
   
@@ -1221,6 +1273,34 @@
     
   
     Migrating from rforge-mcp
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/example-sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Example sessions
   
 
     
@@ -1719,6 +1799,62 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📖 Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../command-cards/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🃏 Quick-Reference Cards
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
     
@@ -1731,10 +1867,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
         
           
-          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
             
   
   
@@ -1752,8 +1888,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2390,6 +2526,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📝 Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🤝 Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2505,6 +2697,17 @@
     <span class="md-ellipsis">
       
         📦 CRAN release pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tarball-check-v2170" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📦 Tarball check (v2.17.0+)
       
     </span>
   </a>
@@ -2684,6 +2887,22 @@ tutorial that walks it through in detail.</p>
 <p class="admonition-title">Strict passes block <code>ready</code> (v2.3.0+)</p>
 <p>As of v2.3.0 the gate runs two Suggests-withholding flavor passes — <code>check (noSuggests)</code> and <code>check (suggests-only)</code> — <strong>by default</strong>, each with <code>--run-donttest</code>, and a strict ERROR blocks the <code>ready</code> verdict. A package that was 🟢 <code>ready</code> under <code>--as-cran</code> can now turn 🔴 once the noSuggests pass catches a <code>Suggests</code> package used unconditionally. The Tier 4 stages (<code>description</code>, <code>build-hygiene</code>, <code>docs-consistency</code>, backed by <code>lib/cranlint.py</code>) are advisory and never block on their own. Add <code>--incoming</code> for the opt-in CRAN-incoming <code>_R_CHECK_*</code> pass.</p>
 </div>
+<h2 id="tarball-check-v2170">📦 Tarball check (v2.17.0+)<a class="headerlink" href="#tarball-check-v2170" title="Permanent link">&para;</a></h2>
+<p>Builds a source tarball and runs <code>rcmdcheck</code> on it rather than the source
+tree — catches artifact leaks (<code>.quarto/</code>, <code>_freeze/</code>, <code>.html</code>, <code>*_files/</code>)
+that a source-tree check masks.</p>
+<pre class="mermaid"><code>flowchart TD
+    A["/rforge:r:cran-prep"] --&gt; B["Pass 1: dev cycle"]
+    B --&gt; C["devtools::build()"]
+    C --&gt; D["tar -tzf inspect&lt;br/&gt;(pure-Python tarfile)"]
+    D --&gt; E{"Leaked artifacts?"}
+    E -- "yes" --&gt; F["surface as advisory&lt;br/&gt;(not blocking)"]
+    E -- "no" --&gt; G["rcmdcheck(tarball, --as-cran)"]
+    G --&gt; H{"Errors/Warnings/real NOTEs?"}
+    H -- "yes" --&gt; I["blocking ❌"]
+    H -- "no" --&gt; J["Pass 3: ecosystem → ready ✅"]
+    F --&gt; G</code></pre>
+<p>→ <a href="../tutorials/cran-winbuilder-tarball-check/">Win-builder + tarball-check tutorial</a></p>
 <h2 id="multi-platform-verification-optional">🌐 Multi-platform verification (optional)<a class="headerlink" href="#multi-platform-verification-optional" title="Permanent link">&para;</a></h2>
 <p>Async dispatch to win-builder and R-hub before CRAN submission.</p>
 <pre class="mermaid"><code>flowchart LR

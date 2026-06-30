@@ -5,6 +5,10 @@
          <lastmod>2026-06-30</lastmod>
     </url>
     <url>
+         <loc>https://data-wise.github.io/rforge/404/</loc>
+         <lastmod>2026-06-30</lastmod>
+    </url>
+    <url>
          <loc>https://data-wise.github.io/rforge/QUICK-START/</loc>
          <lastmod>2026-06-30</lastmod>
     </url>
@@ -17,11 +21,27 @@
          <lastmod>2026-06-30</lastmod>
     </url>
     <url>
+         <loc>https://data-wise.github.io/rforge/changelog/</loc>
+         <lastmod>2026-06-30</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/command-cards/</loc>
+         <lastmod>2026-06-30</lastmod>
+    </url>
+    <url>
          <loc>https://data-wise.github.io/rforge/commands/</loc>
          <lastmod>2026-06-30</lastmod>
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/configuration/</loc>
+         <lastmod>2026-06-30</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/contributing/</loc>
+         <lastmod>2026-06-30</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/glossary/</loc>
          <lastmod>2026-06-30</lastmod>
     </url>
     <url>
@@ -157,6 +177,10 @@
          <lastmod>2026-06-30</lastmod>
     </url>
     <url>
+         <loc>https://data-wise.github.io/rforge/tutorials/cran-winbuilder-tarball-check/</loc>
+         <lastmod>2026-06-30</lastmod>
+    </url>
+    <url>
          <loc>https://data-wise.github.io/rforge/tutorials/dependency-reconciliation/</loc>
          <lastmod>2026-06-30</lastmod>
     </url>
@@ -166,6 +190,10 @@
     </url>
     <url>
          <loc>https://data-wise.github.io/rforge/tutorials/ecosystem-orchestration/</loc>
+         <lastmod>2026-06-30</lastmod>
+    </url>
+    <url>
+         <loc>https://data-wise.github.io/rforge/tutorials/example-sessions/</loc>
          <lastmod>2026-06-30</lastmod>
     </url>
     <url>
