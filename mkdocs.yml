@@ -110,6 +110,7 @@ nav:
     - "Scaffolding existing packages": tutorials/scaffolding-existing-packages.md
     - "CRAN release prep": tutorials/cran-release-prep.md
     - "CRAN submission with rforge": tutorials/cran-submission-with-rforge.md
+    - "Win-builder + tarball-check": tutorials/cran-winbuilder-tarball-check.md
     - "R-universe early-access": tutorials/r-universe-early-access.md
     - "Migrating from rforge-mcp": tutorials/migrate-from-mcp.md
   - Reference:

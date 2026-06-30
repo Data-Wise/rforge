@@ -37,9 +37,6 @@ clean, you're already on the new setup — skip to the [verification step](#step
 
 # Or via Homebrew
 brew upgrade data-wise/tap/rforge
-
-# Or via npm
-npm install -g @data-wise/rforge-plugin@latest
 ```
 
 Verify:
