@@ -251,6 +251,24 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
         return _guard("devtools",
             f'{calls}; '
             f'cat(jsonlite::toJSON(list(submitted=TRUE), auto_unbox=TRUE))')
+    if kind == "tarball-check":
+        # Build a source tarball, inspect it for common vignette/build leaks, then
+        # run R CMD check --as-cran ON THE TARBALL (what CRAN/win-builder see).
+        # Source-tree `devtools::check()` pre-builds vignettes into inst/doc/ before
+        # R CMD check runs, so it can hide VignetteBuilder misconfiguration. Checking
+        # the tarball itself catches those leaks.
+        return _guard("devtools",
+            f'tarball <- devtools::build({p}, quiet = TRUE); '
+            f'contents <- system2("tar", c("-tzf", tarball), stdout = TRUE); '
+            f'suspicious <- contents[grep("(\\\\.quarto|_freeze|\\\\.html$|_files/)", '
+            f'contents, value = TRUE)]; '
+            f'r <- rcmdcheck::rcmdcheck(tarball, '
+            f'args = c("--as-cran", "--run-donttest"), '
+            f'quiet = TRUE, error_on = "never"); '
+            f'cat(jsonlite::toJSON(list(tarball = basename(tarball), '
+            f'tarball_path = tarball, suspicious = as.list(suspicious), '
+            f'errors = r$errors, warnings = r$warnings, notes = r$notes), '
+            f'auto_unbox = TRUE, null = "list"))')
     if kind == "rhub":
         # Two modes. rhub.yaml presence is confirmed by _rhub_preflight() before
         # we reach here, so the snippet NEVER calls rhub::rhub_setup() (that would

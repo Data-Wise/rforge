@@ -116,7 +116,7 @@ _QUALITY_KEY = {"lint": "lints", "spell": "misspelled", "urlcheck": "broken"}
 def _status_for(kind: str, raw: dict, exit_code: int) -> str:
     if raw.get("engine_missing"):
         return "error"
-    if kind == "check":
+    if kind in ("check", "tarball-check"):
         if exit_code == 124:
             return "error"
         if raw.get("errors"):
@@ -181,6 +181,15 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
                 "kind": "advisory",
                 "reason": "pdf_manual_skipped",
             })
+    elif kind == "tarball-check":
+        env["tarball_check"] = {
+            "tarball": raw.get("tarball"),
+            "tarball_path": raw.get("tarball_path"),
+            "suspicious": _as_list(raw.get("suspicious")),
+            "errors": _as_list(raw.get("errors")),
+            "warnings": _as_list(raw.get("warnings")),
+            "notes_classified": _classify_notes(raw.get("notes")),
+        }
     elif kind == "test":
         env["tests"] = {k: raw.get(k, 0) for k in
                         ("passed", "failed", "skipped", "warnings")}
@@ -859,6 +868,28 @@ def _run_cran_prep(path: str = ".", *, no_revdep: bool = False,
         if env["status"] == "error":
             blockers.append("CRAN incoming check failed")
 
+    # Tier 3b: tarball-level R CMD check. `devtools::check()` on a source tree
+    # pre-builds vignettes into inst/doc/ before R CMD check sees them, so it
+    # can hide VignetteBuilder misconfiguration and vignette artifact leaks.
+    # CRAN and win-builder check the submitted tarball directly; this stage
+    # reproduces that and BLOCKS `ready` on errors/warnings/real NOTEs.
+    tarball_path: str | None = None
+    tarball_env = stage("tarball-check", label="tarball-check")
+    if tarball_env["status"] == "error":
+        blockers.append("tarball-check failed (errors/warnings)")
+    else:
+        tarball_path = tarball_env.get("tarball_check", {}).get("tarball_path")
+        suspicious = tarball_env.get("tarball_check", {}).get("suspicious", [])
+        if suspicious:
+            messages.append(
+                f"tarball-check: {len(suspicious)} suspicious path(s) in built "
+                f"tarball (build artifacts that may leak to CRAN): "
+                f"{', '.join(str(s) for s in suspicious)}")
+        real_notes = [c for c in tarball_env.get("tarball_check", {}).get(
+            "notes_classified", []) if c.get("kind") == "real"]
+        if real_notes:
+            blockers.append(f"{len(real_notes)} real NOTE(s) from tarball check")
+
     # Tier 4: pure-Python metadata + structure checks (no R). All ADVISORY —
     # they surface findings but never append a blocker, so they cannot flip the
     # `ready` verdict on their own. (Build-hygiene issues still block indirectly
@@ -867,7 +898,10 @@ def _run_cran_prep(path: str = ".", *, no_revdep: bool = False,
     for tier4 in (cranlint.lint_description, cranlint.check_build_hygiene,
                   cranlint.check_planning_consistency, cranlint.check_test_config,
                   sitelint.check_site_leaks):
-        env = tier4(path)
+        if tier4 is cranlint.check_build_hygiene and tarball_path:
+            env = tier4(path, tarball_path=tarball_path)
+        else:
+            env = tier4(path)
         stages.append({"kind": env["kind"], "status": env["status"]})
         for finding in env.get("findings", []):
             msg = finding.get("message")

@@ -28,6 +28,6 @@ Or imported as a Python API:
   without notice. If you need formatting outside the command-prompt
   context, copy the format functions rather than importing them.
 
-See `docs/lib-modules.md` and `docs/specs/SPEC-mcp-absorb-2026-05-10.md`
+See `docs/lib-modules.md` and `archive/specs/SPEC-mcp-absorb-2026-05-10.md`
 for the full migration plan.
 """

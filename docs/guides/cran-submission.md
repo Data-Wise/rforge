@@ -38,7 +38,7 @@ during) CRAN's review. They fall into four tiers:
 |---------|------|---------|--------|
 | `r:revdep` | gate (reverse-dep) | yes — broken downstream | `revdepcheck` via `lib.rcmd` |
 | `r:goodpractice` | advisory | no | `goodpractice` via `lib.rcmd` |
-| `r:winbuilder` | dispatch (async) | no — returns `dispatched` | `devtools::check_win_{devel,release,oldrelease}` / `rhub::rhub_check` via `lib.rcmd` |
+| `r:winbuilder` | dispatch (async) | no — returns `dispatched` | `lib.rcmd` when available; devtools fallback when `lib.rcmd` is not importable |
 | `r:rhub` | dispatch (async) | no — returns `dispatched` | `rhub::rhub_check` via `lib.rcmd` |
 | `r:cran-prep` | gate (full per-package) | yes — strict ERROR blocks `ready` | `lib.rcmd` (`cran-prep`) + `lib.cranlint` (Tier 4) |
 | `r:submit` | handoff | no — **never auto-submits** | `lib.ghrelease` (+ `lib.runiverse` for `--universe`) |
@@ -176,9 +176,16 @@ cross-package ordering).
 
 **Default stage sequence (in order):** `document` → `lint` → `spell` → `urlcheck` → `test` →
 `coverage` → `check` (`--as-cran` + NOTE classifier) → `check (noSuggests)` → `check
-(suggests-only)` → `description` / `build-hygiene` / `docs-consistency` (Tier 4) → `revdep`.
-It also verifies the PDF reference manual builds (Tier 1b) — `warn` (never block) if no
-LaTeX is available.
+(suggests-only)` → `tarball-check` → `description` / `build-hygiene` / `docs-consistency` /
+`test_config` / `site-leaks` (Tier 4) → `revdep`. It also verifies the PDF reference manual
+builds (Tier 1b) — `warn` (never block) if no LaTeX is available.
+
+!!! note "Tarball check catches source-tree blind spots"
+    `tarball-check` builds a source tarball with `devtools::build()` and runs `R CMD check --as-cran`
+    on the tarball itself (what CRAN and win-builder see). Source-tree `devtools::check()`
+    pre-builds vignettes into `inst/doc/` before R CMD check runs, which can hide missing
+    `VignetteBuilder` entries and vignette artifact leaks. The tarball check catches those
+    failures and **blocks `ready`** on errors/warnings/real NOTEs.
 
 !!! note "doi.org 403 handling in `urlcheck`"
     `urlcheck` classifies doi.org URLs that return HTTP 403 separately from real broken
@@ -227,10 +234,13 @@ The result table is one row per stage with its status dot; `🔴 blocked` lists 
     unconditionally. This is intended. **Fix:** move it to `Imports`, or guard with
     `requireNamespace()` in code **and** `skip_if_not_installed()` in tests.
 
-The three **Tier 4** stages (`description`, `build-hygiene`, `docs-consistency`) are
-pure-Python ([`lib.cranlint`](../reference/cranlint.md)), **advisory**, and **never block
-`ready`** — they surface as `warn` only. (A `build-hygiene` finding can still block
-*indirectly* once R's own "non-standard top-level files" NOTE fires in the `check` stage.)
+The **Tier 4** stages (`description`, `build-hygiene`, `docs-consistency`, `test_config`,
+`site-leaks`) are pure-Python ([`lib.cranlint`](../reference/cranlint.md) +
+[`lib.sitelint`](../reference/sitelint.md)), **advisory**, and **never block `ready`** — they
+surface as `warn` only. `build-hygiene` scans both the source tree and, when a tarball was
+built, the tarball itself for planning/dev docs and build artifacts (``.quarto/``, ``_freeze/``,
+``.html``, ``*_files/``) that would ship. (A `build-hygiene` finding can still block *indirectly*
+once R's own "non-standard top-level files" NOTE fires in the `check` stage.)
 
 ## `r:submit` — GitHub pre-release + CRAN submit handoff
 

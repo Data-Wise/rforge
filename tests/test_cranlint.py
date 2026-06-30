@@ -185,6 +185,63 @@ def test_build_hygiene_missing_package_dir_no_exception(tmp_path):
     assert env["engine_missing"] == []
 
 
+# ───────────────────────── 4b-ext: tarball inspection (v2.17.0) ─────────────────────────
+
+def _make_tarball(tmp_path: Path, names: list[str]) -> Path:
+    """Create a minimal gzipped tar archive with the given member names."""
+    tarball = tmp_path / "pkg_1.0.tar.gz"
+    import tarfile
+    with tarfile.open(tarball, "w:gz") as tf:
+        for name in names:
+            # TarInfo with size 0, isfile.
+            info = tarfile.TarInfo(name=name)
+            tf.addfile(info, b"")
+    return tarball
+
+
+def test_build_hygiene_tarball_inspection_flags_quarto(tmp_path):
+    _make_pkg(tmp_path, rbuildignore="^specs$\n^BRAINSTORM.*\\.md$\n^\\.STATUS$\n")
+    tarball = _make_tarball(tmp_path, ["pkg/vignettes/.quarto/_freeze/index.qmd"])
+    env = cranlint.check_build_hygiene(tmp_path, tarball_path=tarball)
+    codes = _finding_codes(env)
+    assert "tarball_build_artifact" in codes
+    assert any(".quarto" in row["message"] for row in env["findings"])
+
+
+def test_build_hygiene_tarball_inspection_flags_html(tmp_path):
+    _make_pkg(tmp_path, rbuildignore="^specs$\n^BRAINSTORM.*\\.md$\n^\\.STATUS$\n")
+    tarball = _make_tarball(tmp_path, ["pkg/vignettes/intro.html"])
+    env = cranlint.check_build_hygiene(tmp_path, tarball_path=tarball)
+    assert "tarball_build_artifact" in _finding_codes(env)
+
+
+def test_build_hygiene_tarball_inspection_clean_is_ok(tmp_path):
+    _make_pkg(tmp_path, rbuildignore="^specs$\n^BRAINSTORM.*\\.md$\n^\\.STATUS$\n")
+    tarball = _make_tarball(tmp_path, ["pkg/DESCRIPTION", "pkg/R/foo.R"])
+    env = cranlint.check_build_hygiene(tmp_path, tarball_path=tarball)
+    assert env["status"] == "ok"
+
+
+def test_build_hygiene_tarball_inspection_degrades_on_bad_tarball(tmp_path):
+    _make_pkg(tmp_path, rbuildignore="^specs$\n^BRAINSTORM.*\\.md$\n^\\.STATUS$\n")
+    bad = tmp_path / "not-a-tarball.tar.gz"
+    bad.write_text("not gzipped tar data")
+    env = cranlint.check_build_hygiene(tmp_path, tarball_path=bad)
+    assert "tarball_unreadable" in _finding_codes(env)
+
+
+def test_build_hygiene_tarball_inspection_dedup(tmp_path):
+    """Multiple files in the same suspicious directory report once (dedup branch)."""
+    _make_pkg(tmp_path, rbuildignore="^specs$\n^BRAINSTORM.*\\.md$\n^\\.STATUS$\n")
+    tarball = _make_tarball(tmp_path, [
+        "pkg/vignettes/.quarto/_freeze/a.qmd",
+        "pkg/vignettes/.quarto/_freeze/b.qmd",
+    ])
+    env = cranlint.check_build_hygiene(tmp_path, tarball_path=tarball)
+    artifacts = [f for f in env["findings"] if f.get("code") == "tarball_build_artifact"]
+    assert len(artifacts) == 1  # dedup: same .quarto/ dir reported once
+
+
 # ───────────────────────── 4c: planning consistency ─────────────────────────
 
 

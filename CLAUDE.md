@@ -4,9 +4,11 @@
 > Follows the global `~/.claude/CLAUDE.md`; this file only captures
 > rforge-specific patterns that don't apply to other dev-tools repos.
 
-## Current state (2026-06-21)
+## Current state (2026-06-30)
 
-**v2.16.0 (merged to `dev`, PR #53 — unreleased, awaiting `dev→main`) — pkgdown deploy leak guard (issue #52):** new public module `lib/sitelint.py` (`check_site_leaks` — scans the pkgdown render surface: root `*.md`, non-`.Rd` `man/`, `vignettes/` aggressively in `articles/**` with top-level rendered vignettes auto-trusted; minus core allowlist ∪ `.rforge.yaml` `site.allowlist`, path-aware; candidates from git HEAD ∪ working tree; advisory, never blocks). Three additive `r:site` flags: `--check-leaks` (read-only lint), `--deploy [--branch] [--force]` (clean-ref pkgdown deploy via `git worktree add -b <tmp> HEAD` — shares `.git`+remote so `deploy_to_branch` works **and** excludes untracked files; recommend-only, MUTATING+NETWORK). `r:cran-prep` gains a Tier-4 `site-leaks` advisory stage. 41 commands (no new command). Built spec→TDD (workflow)→C-RISK resolution (archive non-functional; worktree mandatory)→Phase-5 adversarial review (1 blocker + 3 important + minors, all fixed)→**end-to-end smoke test PASSED** (real build+push to a local bare origin; untracked scratch excluded — caught the `--detach`→named-branch deploy bug). pytest 510, test-all 44/44. Lesson [[feedback_smoke_test_mocked_network_paths]].
+**v2.17.0 (on `dev`, unreleased — awaiting `dev→main`) — winbuilder fallback + tarball-check stage:** implements `PROPOSAL-winbuilder-fallback-and-tarball-check.md` (surfaced during medrobust v0.4.0 CRAN-prep). `r:cran-prep` gains a blocking `tarball-check` stage (`devtools::build()` → `tar -tzf` inspect → `rcmdcheck(tarball, --as-cran)`) that catches vignette/build leaks a source-tree check hides; `check_build_hygiene` now also inspects the built tarball for `.quarto/`/`_freeze/`/`.html`/`*_files/` artifacts. `r:winbuilder` detects `lib.rcmd` availability and falls back to `devtools::check_win_*()` when the plugin's `lib/` isn't on `PYTHONPATH` (was a silent `ModuleNotFoundError`). 41 commands (no surface change). pytest 524, test-all 44/44.
+
+**v2.16.0 — pkgdown deploy leak guard (issue #52):** new public module `lib/sitelint.py` (`check_site_leaks` — scans the pkgdown render surface: root `*.md`, non-`.Rd` `man/`, `vignettes/` aggressively in `articles/**` with top-level rendered vignettes auto-trusted; minus core allowlist ∪ `.rforge.yaml` `site.allowlist`, path-aware; candidates from git HEAD ∪ working tree; advisory, never blocks). Three additive `r:site` flags: `--check-leaks` (read-only lint), `--deploy [--branch] [--force]` (clean-ref pkgdown deploy via `git worktree add -b <tmp> HEAD` — shares `.git`+remote so `deploy_to_branch` works **and** excludes untracked files; recommend-only, MUTATING+NETWORK). `r:cran-prep` gains a Tier-4 `site-leaks` advisory stage. 41 commands (no new command). Built spec→TDD (workflow)→C-RISK resolution (archive non-functional; worktree mandatory)→Phase-5 adversarial review (1 blocker + 3 important + minors, all fixed)→**end-to-end smoke test PASSED** (real build+push to a local bare origin; untracked scratch excluded — caught the `--detach`→named-branch deploy bug). pytest 510, test-all 44/44. Lesson [[feedback_smoke_test_mocked_network_paths]].
 
 **v2.15.0 — `lib/rcmd.py` review remediation (P1–P4):** `--platforms` allow-list validation (closes an R-injection vector), bounded timeouts on the quick `Rscript` calls, `s7runtime` R extracted to a shipped `lib/r/s7runtime.R`, and `rcmd.py` split into internal `rsnippets`/`rhub` modules. No surface change (41 commands); CLI byte-identical. See CHANGELOG `[2.15.0]`.
 
@@ -33,7 +35,7 @@
 - **v2.0.0** — sub-namespacing (`docs:check`, `r:check`, `health`).
 - **v1.3.0** — absorbed `rforge-mcp` into pure-Python `lib/*` (see "rforge-mcp is gone" below).
 
-**Roadmap** (`.STATUS`): craft-parity **COMPLETE**. Open candidates (rforge-native, all low-priority): `contract_drift` (S7 cross-package 3rd family — candidate, deferred from v2.13.0 B1); full R6/S4 convention checking (B2 — parked); issue #9 (rename-ergonomics watch). Cadence: approved spec → TDD → pre-merge adversarial review → release; multi-feature bundles built in one worktree by sequential implementer agents.
+**Roadmap** (`.STATUS`): craft-parity **COMPLETE**; the pkgdown deploy leak guard (#52) shipped in v2.16.0. Open candidates (rforge-native, all low-priority): `contract_drift` (S7 cross-package 3rd family — candidate, deferred from v2.13.0 B1); full R6/S4 convention checking (B2 — parked); R-universe `sensitivity` follow-up (add to `data-wise.r-universe.dev` once public). Issues #9 (rename ergonomics — closed resolved-by-time 2026-06-21) and #46 (CRAN gap-fill — closed, shipped v2.14.0) are done. Cadence: approved spec → TDD → pre-merge adversarial review → end-to-end smoke test for network/deploy paths → release; multi-feature bundles built in one worktree by sequential implementer agents.
 
 ## Branch architecture
 
@@ -146,7 +148,7 @@ Only rule 1 blocks. Hook contract: reads JSON via stdin (NOT env vars). Tested b
 
 The `rforge-mcp` prototype was absorbed into the plugin in v1.3.0 via pure-Python `lib/` modules. It was a local-only working directory at `~/projects/dev-tools/mcp-servers/rforge/` — **never on GitHub, never on npm**. The `npm link` symlink was dropped 2026-05-11 and the source dir was tombstoned with `DEPRECATED.md`.
 
-SPEC documents (e.g., `docs/specs/SPEC-mcp-absorb-2026-05-10.md`) reference `data-wise/rforge-mcp` as if it were public — those are historical artifacts, not action-guidance. See `docs/migration/v1.3.0-post-merge-checklist.md` for the rewritten "what archival actually meant" doc.
+SPEC documents (e.g., `archive/specs/SPEC-mcp-absorb-2026-05-10.md`) reference `data-wise/rforge-mcp` as if it were public — those are historical artifacts, not action-guidance. See `docs/migration/v1.3.0-post-merge-checklist.md` for the rewritten "what archival actually meant" doc.
 
 ## Release pipeline observations
 
@@ -154,7 +156,9 @@ Per the global rules (see `## Pre-PR & Release Checklist` in `~/.claude/CLAUDE.m
 
 - **Docs deploy on push to main is automatic** (`.github/workflows/docs.yml` triggers on `push: branches: [main]`). To force-deploy from `dev` between releases: `gh workflow run docs.yml --ref dev`.
 - **No `bump-version.sh`** — manual 4-source edit per the version-sync section above.
-- **Tap manifest sync** must follow every release per the Homebrew section above.
+- **Tap manifest sync** must follow every release per the Homebrew section above. Three gotchas (v2.16.0, see `reference_homebrew_tap_drift`): (1) the tap repo may be checked out on a *feature branch* — stash → `checkout main` → apply formula+manifest → push → restore the original branch; (2) `brew upgrade` can't run from the agent sandbox (no PTY) — verify via `brew audit` + raw formula + `generate.py --diff IDENTICAL`, then have the user run `brew upgrade` themselves; (3) `generate.py rforge --diff` is **IDENTICAL** again (the old bin.mkpath drift is resolved).
+- **`Closes #N` needs the default branch.** Putting `Closes #N` in a `feature→dev` PR does NOT auto-close the issue (GitHub only auto-closes on merge to `main`). Either repeat the keyword in the `dev→main` release PR, or `gh issue close N` manually post-release — and verify issue state as a release-done check.
+- **End-to-end smoke test for network/deploy paths.** Mocked unit tests validate intent, not integration (see `feedback_smoke_test_mocked_network_paths`). Before shipping a MUTATING+NETWORK path (e.g. `r:site --deploy`), run a real throwaway-repo smoke test (bare repo as origin).
 - **GitHub Pages CDN** propagates in 30–90s for `meta` descriptions and most content; rarely longer.
 
 ## Memory pointers
@@ -162,7 +166,8 @@ Per the global rules (see `## Pre-PR & Release Checklist` in `~/.claude/CLAUDE.m
 For details not in this file, see project memory at `~/.claude/projects/-Users-dt-projects-dev-tools-rforge/memory/`:
 
 - `reference_rforge_doc_conventions.md` — frontmatter standard, admonition palette, doc-gap audit recipe, verification gotchas
-- `reference_homebrew_tap_drift.md` — manifest sync recipe + 6-surface drift inventory
+- `reference_homebrew_tap_drift.md` — manifest sync recipe + 6-surface drift inventory + release-time gotchas (tap-on-feature-branch, no-PTY brew, `Closes #N` auto-close)
+- `feedback_smoke_test_mocked_network_paths.md` — mocks validate intent not integration; smoke-test MUTATING+NETWORK paths against a throwaway repo before done
 - `reference_dotfiles_sync_workflow.md` — chezmoi for `~/.claude/`, flow-cli for `~/.config/zsh/`, `claude-sync` helper
 - `project_rforge_mcp_never_public.md` — historical context for the v1.3.0 absorption
 - `reference_brew_outdated_testing.md` — Cellar-rename trick for testing `brew outdated` UX
