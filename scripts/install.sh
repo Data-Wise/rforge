@@ -72,8 +72,8 @@ echo ""
 
 # Show requirements
 echo -e "${BLUE}=== Requirements ===${NC}"
-echo -e "  ${GREEN}✓${NC} RForge MCP server must be installed and configured"
-echo -e "    Run: ${YELLOW}npx rforge-mcp configure${NC}"
+echo -e "  ${GREEN}✓${NC} Python 3.10+ on PATH"
+echo -e "  ${GREEN}✓${NC} R 4.0+ (for r:* commands)"
 echo ""
 
 if [[ "$DEV_MODE" == true ]]; then
