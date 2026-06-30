@@ -10,7 +10,7 @@ Pure-Python (stdlib-only, **no R subprocess**) checks that emulate the
 *metadata + structure* scrutiny CRAN applies during its incoming-feasibility
 pass — the class of issues a local `R CMD check --as-cran` run does **not**
 reliably surface. Implements Tier 4 of
-`docs/specs/SPEC-cran-incoming-hardening-2026-06-10.md`:
+`archive/specs/SPEC-cran-incoming-hardening-2026-06-10.md` (https://github.com/Data-Wise/rforge/blob/main/archive/specs/SPEC-cran-incoming-hardening-2026-06-10.md):
 
 - **4a — `lint_description()`** — parse the `DESCRIPTION` DCF and emit advisory
   findings (non-`Authors@R` with no copyright holder, weak/echoed `Title`,

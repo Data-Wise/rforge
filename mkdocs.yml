@@ -8,11 +8,9 @@ edit_uri: edit/main/docs/
 
 # docs/README.md is the GitHub-facing folder readme (version refs), not a site
 # page — it conflicts with index.md. Exclude only the root one (leading slash);
-# tutorials/README.md and specs/README.md remain real nav pages.
+# tutorials/README.md remains a real nav page. Specs are archived under archive/.
 exclude_docs: |
   /README.md
-  specs/_TEMPLATE-*.md
-  specs/RESEARCH-*.md
 
 theme:
   name: material
@@ -141,12 +139,6 @@ nav:
   - Project:
     - Architecture: architecture.md
     - Hooks & Skills: hooks-and-skills.md
-    - Specs:
-      - Overview: specs/README.md
-      - "MCP absorb (Path B)": specs/SPEC-mcp-absorb-2026-05-10.md
-      - "Phase 3 namespacing (v2.0.0)": specs/SPEC-phase3-namespacing-2026-05-11.md
-      - "Diff-aware checks & coverage": specs/SPEC-diff-aware-checks-and-coverage-2026-05-31.md
-      - "r: dev-cycle + quality commands (v2.1.0)": specs/SPEC-r-dev-commands-2026-05-31.md
     - Migration:
       - "v2.0.0 command rename": migration/v2.0.0-rename.md
       - "rforge-mcp deprecation": migration/rforge-mcp-deprecation.md

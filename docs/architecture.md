@@ -16,7 +16,7 @@ RForge is a **self-contained Claude Code plugin** for R package ecosystems. Slas
 
 **Key innovation:** Auto-delegation with parallel `lib/` invocations — multiple modules complete in the time it would take to run them sequentially.
 
-> **Historical note:** v1.0–v1.2 of rforge orchestrated an external `rforge-mcp` MCP server. v1.3.0 absorbed those tools as pure-Python `lib/` modules; no MCP server is required at runtime. See [Path B SPEC](specs/SPEC-mcp-absorb-2026-05-10.md) for the migration narrative. This document describes the v1.3.0+ architecture; some legacy sections below retain MCP-era examples where the underlying concept (parallel orchestration, pattern recognition) hasn't changed.
+> **Historical note:** v1.0–v1.2 of rforge orchestrated an external `rforge-mcp` MCP server. v1.3.0 absorbed those tools as pure-Python `lib/` modules; no MCP server is required at runtime. See [Path B SPEC](https://github.com/Data-Wise/rforge/blob/main/archive/specs/SPEC-mcp-absorb-2026-05-10.md) for the migration narrative. This document describes the v1.3.0+ architecture; some legacy sections below retain MCP-era examples where the underlying concept (parallel orchestration, pattern recognition) hasn't changed.
 
 ## Plugin Surface
 
