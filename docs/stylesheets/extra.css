@@ -1,6 +1,54 @@
-/* rforge docs — ADHD-friendly + mobile responsive enhancements.
-   Loaded via mkdocs.yml `extra_css`. Material palette handles colors;
-   this file only adds mobile fixes and touch-target sizing. */
+:root {
+  /* Slightly larger base for readability; Material default is 0.5rem */
+  --adhd-line-height: 1.7;
+  --adhd-paragraph-width: 44rem;
+}
+
+/* --- Base readability: comfortable line height and paragraph measure --- */
+.md-typeset {
+  line-height: var(--adhd-line-height);
+  font-size: 0.7rem;
+}
+
+.md-typeset p,
+.md-typeset li,
+.md-typeset td,
+.md-typeset th {
+  max-width: var(--adhd-paragraph-width);
+}
+
+/* Headings: tighter leading so multi-line headings don't feel floaty */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  line-height: 1.25;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+/* --- Focus visibility for keyboard navigation --- */
+.md-typeset a:focus-visible,
+.md-nav__link:focus-visible,
+.md-tabs__link:focus-visible,
+.md-header__button:focus-visible,
+.md-search__form:focus-visible,
+.md-typeset .md-button:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* --- Respect reduced-motion preferences --- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 /* --- Mermaid: prevent horizontal overflow on narrow screens --- */
 .md-typeset .mermaid {
