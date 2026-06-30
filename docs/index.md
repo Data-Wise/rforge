@@ -19,20 +19,23 @@ Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fu
 ```mermaid
 flowchart LR
     A["usethis<br/>scaffold"] --> B["devtools<br/>document · test · build"]
-    B --> C["rforge<br/>discover · deps · impact · cascade"]
+    B --> C["rforge<br/>discover · deps · impact<br/>check --changed · s7-review<br/>cran-prep · site --deploy"]
     C --> D["CRAN<br/>ordered submission"]
-    style C fill:#5e35b1,color:#fff
+    C -. "diff-aware<br/>feedback loop" .-> B
+
+    style A fill:#00897b,color:#fff,stroke:#00695c
+    style B fill:#00897b,color:#fff,stroke:#00695c
+    style C fill:#ff8f00,color:#fff,stroke:#ff6f00
+    style D fill:#00897b,color:#fff,stroke:#00695c
 ```
 
-!!! abstract "rforge orchestrates an ecosystem; it does not build packages"
-    **They build one package. rforge runs the ecosystem.** rforge sits *alongside* the
-    standard R toolchain, it doesn't replace it.
+!!! abstract "rforge orchestrates your ecosystem and automates your build cycle"
+    **usethis/devtools build one package. rforge automates the whole ecosystem.** rforge
+    wraps the standard R toolchain — it doesn't replace it.
 
     - **`usethis` / `devtools`** scaffold, document, test, and build a *single* package.
-    - **rforge** answers cross-cutting questions: *Which packages exist here? What depends on what? If I change `medfit`, what breaks downstream? In what order do I submit to CRAN?*
-
-    Looking for `create_package()` or `document()`? That's `usethis`/`devtools`. rforge picks
-    up where they leave off — see **[rforge in the R package lifecycle](tutorials/rforge-in-the-r-lifecycle.md)**.
+    - **rforge** wraps those same tools at the ecosystem level: `r:cycle` runs document → test → check across any package in your workspace, `r:check --changed` scopes to what you edited, `r:cran-prep` runs the multi-pass CRAN gate, and `r:build` builds the binary.
+    - rforge also answers the cross-cutting questions usethis/devtools can't: *Which packages exist here? What depends on what? If I change `medfit`, what breaks downstream? In what order do I submit to CRAN?*
 
 ## Where to start
 
