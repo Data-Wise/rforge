@@ -230,6 +230,18 @@ def test_build_hygiene_tarball_inspection_degrades_on_bad_tarball(tmp_path):
     assert "tarball_unreadable" in _finding_codes(env)
 
 
+def test_build_hygiene_tarball_inspection_dedup(tmp_path):
+    """Multiple files in the same suspicious directory report once (dedup branch)."""
+    _make_pkg(tmp_path, rbuildignore="^specs$\n^BRAINSTORM.*\\.md$\n^\\.STATUS$\n")
+    tarball = _make_tarball(tmp_path, [
+        "pkg/vignettes/.quarto/_freeze/a.qmd",
+        "pkg/vignettes/.quarto/_freeze/b.qmd",
+    ])
+    env = cranlint.check_build_hygiene(tmp_path, tarball_path=tarball)
+    artifacts = [f for f in env["findings"] if f.get("code") == "tarball_build_artifact"]
+    assert len(artifacts) == 1  # dedup: same .quarto/ dir reported once
+
+
 # ───────────────────────── 4c: planning consistency ─────────────────────────
 
 
