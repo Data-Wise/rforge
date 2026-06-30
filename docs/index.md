@@ -147,6 +147,30 @@ Results synthesized into an actionable summary
 | **Python 3.10+** on PATH | the `lib/` modules (`discovery`, `deps`, `status`, `init`) |
 | **R 4.0+** (+ optional engines via `lib.rcmd`) | all `r:*` commands and `/rforge:thorough` |
 
+## Which command should I run?
+
+```mermaid
+flowchart TD
+    A["I want to..."] --> B{"Ship to CRAN?"}
+    B -- "yes" --> C[/rforge:r:cran-prep/]
+    B -- "no" --> D{"Check ecosystem health?"}
+    D -- "yes" --> E[/rforge:status/]
+    D -- "no" --> F{"Just changed code?"}
+    F -- "yes" --> G[/rforge:analyze "what changed"/]
+    F -- "no" --> H{"Quick pre-commit sanity?"}
+    H -- "yes" --> I[/rforge:quick/]
+    H -- "no" --> J{"Deep dive / release prep?"}
+    J -- "yes" --> K[/rforge:thorough/]
+    J -- "no" --> L["Browse the REFCARD"]
+    click C "REFCARD.md"
+    click E "REFCARD.md"
+    click G "REFCARD.md"
+    click I "REFCARD.md"
+    click K "REFCARD.md"
+```
+
+→ Not sure yet? Start with [/rforge:quick](REFCARD.md) or the [Quick Start](QUICK-START.md).
+
 ## Installation
 
 ```text
@@ -154,7 +178,7 @@ Results synthesized into an actionable summary
 /plugin install rforge
 ```
 
-Restart Claude Code so the commands register, then verify with `/help` (look for `/rforge:` entries). Homebrew, npm, and from-source options are in [Installation](installation.md).
+Restart Claude Code so the commands register, then verify with `/help` (look for `/rforge:` entries). Homebrew and from-source options are in [Installation](installation.md).
 
 > **Migrating from v1.2.x?** If `~/.claude/settings.json` still has an `mcpServers.rforge` entry, it's no longer needed — remove it. See the [migration guide](migration/rforge-mcp-deprecation.md).
 
@@ -169,11 +193,15 @@ Restart Claude Code so the commands register, then verify with `/help` (look for
 ## More documentation
 
 - **[Reference Card](REFCARD.md)** — all {{ rforge.command_count }} commands on one page
+- **[Quick-Reference Cards](command-cards.md)** — commands grouped by purpose
 - **[Commands](commands.md)** — full per-command reference
+- **[Glossary](glossary.md)** — terminology explained
 - **[Architecture](architecture.md)** — how the `lib/` modules fit together
 - **[Hooks & Skills](hooks-and-skills.md)** — the R-aware `PreToolUse` hook
 - **[Configuration](configuration.md)** — CRAN mirror, vignette engine, R version pin, CLAUDE.md budget
 - **[Troubleshooting](troubleshooting.md)** — when commands misbehave
+- **[Contributing](contributing.md)** — how to help improve rforge
+- **[Changelog](changelog.md)** — version history
 
 ## License
 
