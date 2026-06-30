@@ -29,25 +29,20 @@ If your issue isn't covered, file an issue:
 
 ### `brew install --HEAD data-wise/tap/rforge` succeeds but plugin doesn't load
 
-Two diagnoses:
+!!! warning "Symptom"
+    Brew installs clean but `/help` shows no `/rforge:` commands.
 
-```zsh
-# 1) Did the install script create the plugin symlink?
-ls -la ~/.claude/plugins/rforge
-# Expected: a symlink to /opt/homebrew/opt/rforge/libexec
-
-# 2) Is Claude Code seeing the plugin?
-# In Claude Code: type "/help" and search for "/rforge:"
-```
-
-If the symlink is missing, the post-install script's `ln` step failed
-(usually macOS extended-attribute permissions). Fix manually:
-
-```zsh
-ln -sf "$(brew --prefix)/opt/rforge/libexec" ~/.claude/plugins/rforge
-```
-
-Then restart Claude Code.
+!!! success "Fix"
+    1. Check the symlink:
+       ```zsh
+       ls -la ~/.claude/plugins/rforge
+       # Expected: a symlink to /opt/homebrew/opt/rforge/libexec
+       ```
+    2. If missing, the post-install `ln` step failed. Fix:
+       ```zsh
+       ln -sf "$(brew --prefix)/opt/rforge/libexec" ~/.claude/plugins/rforge
+       ```
+    3. Restart Claude Code.
 
 ---
 
@@ -55,26 +50,29 @@ Then restart Claude Code.
 
 ### `/rforge:*` commands don't appear in `/help`
 
-Most likely Claude Code hasn't picked up the plugin since install. In
-order:
+!!! warning "Symptom"
+    Claude Code doesn't recognize `/rforge:` commands.
 
-1. Restart Claude Code (quit + reopen)
-2. If still missing: `ls ~/.claude/plugins/rforge/commands/` — should
-   list 15 `.md` files
-3. If empty: re-run install (see [Install issues](#install-setup-issues))
+!!! success "Fix"
+    1. Restart Claude Code (quit + reopen)
+    2. If still missing:
+       ```zsh
+       ls ~/.claude/plugins/rforge/commands/
+       ```
+       Should list `.md` files. If empty, re-run install.
+    3. Still missing? See [Install issues](#install-setup-issues).
 
 ### `/rforge:detect` runs but produces no output
 
-The plugin command is a markdown prompt; Claude has to invoke the
-underlying Python module. Check Claude has Bash access (in Claude Code
-permissions) and that `lib/discovery.py` is reachable:
+!!! warning "Symptom"
+    The command runs without error but prints nothing.
 
-```zsh
-python3 -m lib.discovery --path . --format text
-# Run this from your project's repo root (or the plugin install dir)
-```
-
-If Python fails too, see [Path errors](#path-errors-from-lib-modules).
+!!! success "Fix"
+    Check Claude has Bash access (permissions) and the module is reachable:
+    ```zsh
+    python3 -m lib.discovery --path . --format text
+    ```
+    If Python fails too, see [Path errors](#path-errors-from-lib-modules).
 
 ---
 
@@ -82,9 +80,13 @@ If Python fails too, see [Path errors](#path-errors-from-lib-modules).
 
 ### `error: path does not exist: /some/path`
 
-You passed a `--path` that doesn't exist (or has a typo). `discovery`,
-`status`, and `init` all validate the path before doing anything. Fix
-the path or omit `--path` (defaults to current directory).
+!!! warning "Symptom"
+    A command takes a `--path` flag that doesn't exist or has a typo.
+
+!!! success "Fix"
+    Correct the path or omit `--path` (defaults to current directory).
+    `discovery`, `status`, and `init` all validate the path before
+    doing anything.
 
 ### `ImportError: attempted relative import with no known parent package`
 
@@ -103,23 +105,16 @@ This is intentional — it forces the package layout that prevents
 
 ### `ModuleNotFoundError: No module named 'lib'`
 
-You're running from a directory that doesn't contain the plugin's
-`lib/` as a subdirectory. The `-m lib.<module>` form requires
-`lib/` to be on `sys.path`, which Python derives from the current
-working directory.
+!!! warning "Symptom"
+    Running `python3 -m lib.discovery` from outside the plugin directory.
 
-```zsh
-# ❌ from anywhere
-python3 -m lib.discovery
-
-# ✅ from the plugin install dir
-cd "$(brew --prefix)/opt/rforge/libexec"
-python3 -m lib.discovery --path /your/r/package
-```
-
-The plugin commands handle this internally by `cd`-ing to the right
-place before invoking. If you're getting this error from a slash
-command, it's a bug — file an issue.
+!!! success "Fix"
+    Run from the plugin install dir, or let the slash command do it:
+    ```zsh
+    cd "$(brew --prefix)/opt/rforge/libexec"
+    python3 -m lib.discovery --path /your/r/package
+    ```
+    If you get this from a slash command, it's a bug — file an issue.
 
 ---
 
@@ -146,35 +141,29 @@ nothing in v1.3.0 requires R installed.
 
 ### `/rforge:init` says "Already initialized" but I'm in a different package
 
-The `~/.rforge/context.json` file is **per-user, not per-package**. It
-tracks one active context at a time. To re-init for a new package:
+!!! warning "Symptom"
+    `~/.rforge/context.json` is per-user, not per-package — it remembers the
+    last package you initialized.
 
-```text
-/rforge:init    # in the new package directory
-```
-
-The state file gets overwritten with the new package's info. There's no
-"multi-context" mode — by design (matches MCP server semantics so
-migration is transparent).
-
-If you want a clean slate:
-
-```zsh
-rm ~/.rforge/context.json
-```
-
-Then re-init.
+!!! success "Fix"
+    Run `/rforge:init` in the new package directory. The state file gets
+    overwritten. For a clean slate:
+    ```zsh
+    rm ~/.rforge/context.json
+    ```
+    Then re-init.
 
 ### Permission denied writing `~/.rforge/context.json`
 
-The directory permissions are off. Fix:
+!!! warning "Symptom"
+    The plugin can't write to `~/.rforge/context.json`.
 
-```zsh
-mkdir -p ~/.rforge
-chmod 755 ~/.rforge
-```
-
-Then re-run `/rforge:init`.
+!!! success "Fix"
+    ```zsh
+    mkdir -p ~/.rforge
+    chmod 755 ~/.rforge
+    ```
+    Then re-run `/rforge:init`.
 
 ---
 
@@ -182,35 +171,38 @@ Then re-run `/rforge:init`.
 
 ### `npm` warns about an orphaned `rforge-mcp` install
 
-You upgraded the plugin but didn't uninstall the old MCP server.
-Walk through the [migration tutorial](tutorials/migrate-from-mcp.md) —
-Step 3 covers the uninstall.
+!!! warning "Symptom"
+    You upgraded the plugin but didn't uninstall the old MCP server.
+
+!!! success "Fix"
+    Walk through the [migration tutorial](tutorials/migrate-from-mcp.md)
+    — Step 3 covers the uninstall.
 
 ### `~/.claude/settings.json` still has `mcpServers.rforge`
 
-Same fix — see migration tutorial Step 2. The plugin doesn't need this
-entry as of v1.3.0; removing it eliminates a stale config reference.
+!!! warning "Symptom"
+    A stale `settings.json` entry from the pre-v1.3.0 era.
+
+!!! success "Fix"
+    Remove the `mcpServers.rforge` block. The plugin doesn't need this
+    entry as of v1.3.0 — `lib/` modules run in-process via Bash tool.
 
 ### Claude Code logs say "MCP server `rforge` failed to start"
 
-The MCP server config is still in `~/.claude/settings.json` but the
-binary isn't installed (because you uninstalled rforge-mcp, or never
-had it). Remove the config block:
+!!! warning "Symptom"
+    The MCP server config is still in `settings.json` but the binary
+    isn't installed (you uninstalled rforge-mcp, or never had it).
 
-```json
-// Delete this from ~/.claude/settings.json:
-{
-  "mcpServers": {
-    "rforge": { ... }
-  }
-}
-```
-
-The plugin doesn't need this entry as of v1.3.0 — `lib/` modules run
-in-process via the standard Bash tool. There's no rforge MCP server to
-reinstall (`rforge-mcp` was never published; it lived as a local
-working directory during v1.0–v1.2 development and was tombstoned in
-v1.3.0).
+!!! success "Fix"
+    Delete this from `~/.claude/settings.json`:
+    ```json
+    "mcpServers": {
+      "rforge": { ... }
+    }
+    ```
+    The plugin doesn't need an MCP server — there's no rforge MCP server
+    to reinstall (`rforge-mcp` lived as a local working directory during
+    v1.0–v1.2 development and was tombstoned in v1.3.0).
 
 ---
 
@@ -239,23 +231,21 @@ details on the 4 hook rules.
 
 ### Branch-guard blocks my commit on `dev`
 
-You're trying to commit code (not docs/config) directly to `dev`. Use a
-feature worktree:
+!!! warning "Symptom"
+    You're trying to commit code (not docs/config) directly to `dev`.
 
-```zsh
-git worktree add ~/.git-worktrees/rforge/feature-<name> -b feature/<name> dev
-cd ~/.git-worktrees/rforge/feature-<name>
-# do your work here, then PR back to dev
-```
-
-Or, for a one-shot emergency:
-
-```zsh
-touch .claude/allow-once    # bypass expires after 5 minutes
-```
-
-See the global CLAUDE.md "Branch Guard & Git Hooks" section for the
-full protection rules.
+!!! success "Fix"
+    Use a feature worktree:
+    ```zsh
+    git worktree add ~/.git-worktrees/rforge/feature-<name> -b feature/<name> dev
+    cd ~/.git-worktrees/rforge/feature-<name>
+    # do your work here, then PR back to dev
+    ```
+    One-shot emergency bypass:
+    ```zsh
+    touch .claude/allow-once    # expires after 5 minutes
+    ```
+    See the global CLAUDE.md "Branch Guard & Git Hooks" section for full rules.
 
 ---
 
@@ -263,38 +253,40 @@ full protection rules.
 
 ### `bash tests/test-all.sh` reports `Lib: pytest suite ❌`
 
-The `lib/` tests need `pytest`. Install it:
+!!! warning "Symptom"
+    `pytest` is not installed.
 
-```zsh
-pip install pytest
-```
-
-Then re-run. If you don't have pip, install Python's standard build
-(>= 3.10) — the `lib/` modules use type hints that require it.
+!!! success "Fix"
+    ```zsh
+    pip install pytest
+    ```
+    If you don't have pip, install Python >= 3.10 — `lib/` modules use
+    type hints that require it.
 
 ### `Lib: reference docs in sync with source ❌`
 
-You edited a module's docstring but didn't regenerate the reference
-docs. Fix:
+!!! warning "Symptom"
+    You edited a module's docstring but didn't regenerate reference docs.
 
-```zsh
-python3 scripts/gen_lib_reference.py
-```
-
-Then commit the regenerated `docs/reference/*.md` files. The CI check
-(`gen_lib_reference.py --check`) compares the generated output against
-disk; any mismatch is treated as drift.
+!!! success "Fix"
+    ```zsh
+    python3 scripts/gen_lib_reference.py
+    ```
+    Then commit the regenerated `docs/reference/*.md` files. The CI check
+    (`gen_lib_reference.py --check`) treats any mismatch as drift.
 
 ### A specific pytest case fails after my edit
 
-Run it in isolation for the error message:
+!!! warning "Symptom"
+    An edit broke an existing test.
 
-```zsh
-python3 -m pytest tests/test_lib_<module>.py::<test_name> -v
-```
-
-If the failure is a real regression in your edit, the test name tells
-you which contract you broke. If it's a test-only issue, file as a bug.
+!!! success "Fix"
+    Run it in isolation:
+    ```zsh
+    python3 -m pytest tests/test_lib_<module>.py::<test_name> -v
+    ```
+    The test name tells you which contract you broke. If it's a test-only
+    regression (not a code bug), file it.
 
 ---
 

@@ -158,6 +158,28 @@ flowchart TD
 !!! warning "Strict passes block `ready` (v2.3.0+)"
     As of v2.3.0 the gate runs two Suggests-withholding flavor passes — `check (noSuggests)` and `check (suggests-only)` — **by default**, each with `--run-donttest`, and a strict ERROR blocks the `ready` verdict. A package that was 🟢 `ready` under `--as-cran` can now turn 🔴 once the noSuggests pass catches a `Suggests` package used unconditionally. The Tier 4 stages (`description`, `build-hygiene`, `docs-consistency`, backed by `lib/cranlint.py`) are advisory and never block on their own. Add `--incoming` for the opt-in CRAN-incoming `_R_CHECK_*` pass.
 
+## 📦 Tarball check (v2.17.0+)
+
+Builds a source tarball and runs `rcmdcheck` on it rather than the source
+tree — catches artifact leaks (`.quarto/`, `_freeze/`, `.html`, `*_files/`)
+that a source-tree check masks.
+
+```mermaid
+flowchart TD
+    A["/rforge:r:cran-prep"] --> B["Pass 1: dev cycle"]
+    B --> C["devtools::build()"]
+    C --> D["tar -tzf inspect<br/>(pure-Python tarfile)"]
+    D --> E{"Leaked artifacts?"}
+    E -- "yes" --> F["surface as advisory<br/>(not blocking)"]
+    E -- "no" --> G["rcmdcheck(tarball, --as-cran)"]
+    G --> H{"Errors/Warnings/real NOTEs?"}
+    H -- "yes" --> I["blocking ❌"]
+    H -- "no" --> J["Pass 3: ecosystem → ready ✅"]
+    F --> G
+```
+
+→ [Win-builder + tarball-check tutorial](../tutorials/cran-winbuilder-tarball-check.md)
+
 ## 🌐 Multi-platform verification (optional)
 
 Async dispatch to win-builder and R-hub before CRAN submission.

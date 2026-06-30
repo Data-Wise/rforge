@@ -23,10 +23,9 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-          cache: 'pip'
 
       - name: Install docs dependencies
-        run: python3 -m pip install mkdocs-material mkdocs-macros-plugin
+        run: python3 -m pip install mkdocs-material mkdocs-macros-plugin pillow cairosvg
 
       - name: Build docs with strict mode
         run: mkdocs build --strict
