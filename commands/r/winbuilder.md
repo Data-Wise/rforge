@@ -4,11 +4,11 @@ description: Submit to win-builder (devel/release/oldrelease or R-hub) — async
 argument-hint: "[package] [--platform devel|release|oldrelease|all|rhub]"
 arguments:
   - name: package
-    description: Package path (defaults to current directory)
+    description: Package directory path (defaults to current directory; must be a directory, not a .tar.gz)
     required: false
     type: string
   - name: --platform
-    description: "Target platform: devel (default), release, oldrelease, all (all three win-builder flavours), or rhub (dispatches via rhub::rhub_check to GitHub Actions)"
+    description: "Target platform: devel, release, oldrelease, or all (all three win-builder flavours; default). For multi-platform R-hub checks, use /rforge:r:rhub."
     required: false
     type: string
     default: "all"
@@ -39,9 +39,30 @@ install.packages("devtools")
 
 ## Process
 
-```bash
-python3 -m lib.rcmd --kind winbuilder --path "<path>"
-```
+1. Detect whether `lib.rcmd` is importable from the working directory:
+   ```bash
+   python3 -c "import lib.rcmd" 2>/dev/null && echo "lib.rcmd available" || echo "lib.rcmd missing"
+   ```
+
+2. **Primary path** (when `lib.rcmd` is available):
+   ```bash
+   python3 -m lib.rcmd --kind winbuilder --path "<path>" [--platform <platform>]
+   ```
+
+3. **Fallback path** (when `lib.rcmd` is missing — e.g. the plugin's `lib/` is not on `PYTHONPATH`).
+   The argument must be a **package directory**, not a `.tar.gz` tarball.
+   Based on `--platform`:
+   - `devel`: `devtools::check_win_devel("<path>")`
+   - `release`: `devtools::check_win_release("<path>")`
+   - `oldrelease`: `devtools::check_win_oldrelease("<path>")`
+   - `all` (default): run all three sequentially
+
+   Emit a `🟡` warning that the fallback path was used because `lib.rcmd` was unavailable.
+
+4. If `devtools` is also missing, report `🟡` with the install hint:
+   ```r
+   install.packages("devtools")
+   ```
 
 ## Output Format
 

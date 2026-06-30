@@ -44,7 +44,7 @@ Usage (Python API):
 ### `check_build_hygiene()`
 
 ```python
-def check_build_hygiene(path: 'str | os.PathLike' = '.') -> 'dict'
+def check_build_hygiene(path: 'str | os.PathLike' = '.', tarball_path: 'str | os.PathLike | None' = None) -> 'dict'
 ```
 
 Scan a package's top level for planning/dev docs that would ship (Tier 4b).

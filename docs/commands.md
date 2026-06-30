@@ -1176,7 +1176,7 @@ Submit to win-builder (devel/release/oldrelease) — async dispatch.
 
 **Parameters:**
 
-- `package` (optional) - Package path (defaults to current directory)
+- `package` (optional) - Package directory path (defaults to current directory; must be a directory, not a `.tar.gz`)
 - `--platform` (optional) - Target: `devel`, `release`, `oldrelease`, or `all` (default, all three). For multi-platform R-hub checks, use `/rforge:r:rhub`.
 
 **Examples:**
@@ -1190,6 +1190,8 @@ Submit to win-builder (devel/release/oldrelease) — async dispatch.
 
 **Executes:**
 
+- Primary: runs `python3 -m lib.rcmd --kind winbuilder` when the plugin's `lib/` is on `PYTHONPATH`
+- Fallback: if `lib.rcmd` is not importable, dispatches via `devtools::check_win_*()` directly in R (path must be a package directory, not a tarball)
 - Submits the package to [win-builder](https://win-builder.r-project.org/) for a remote Windows check
 - **Async dispatch** — results are emailed to the DESCRIPTION Maintainer; nothing returns synchronously
 - `devtools` is optional — if missing, reports 🟡 with install hint
@@ -1278,10 +1280,11 @@ Per-package CRAN-readiness gate — runs the full pre-submission sequence and ge
 
 **Executes:**
 
-- Full sequence: `document` → `lint` → `spell` → `urlcheck` → `test` → `coverage` → `check` → strict + Tier 4 stages → `revdep`
-- The `check` stage now expands into multiple rows: `check`, `check (noSuggests)`, `check (suggests-only)`, (with `--incoming`) `check (incoming)`, then the Tier 4 advisory stages `description`, `build-hygiene`, and `docs-consistency`
+- Full sequence: `document` → `lint` → `spell` → `urlcheck` → `test` → `coverage` → `check` → strict passes → `tarball-check` → Tier 4 stages → `revdep`
+- The `check` stage expands into multiple rows: `check`, `check (noSuggests)`, `check (suggests-only)`, (with `--incoming`) `check (incoming)`, then `tarball-check`
 - **Strict passes run by default** (v2.3.0): `check (noSuggests)` + `check (suggests-only)`, each with `--run-donttest`. A strict **ERROR blocks the `ready` verdict** (catches the medfit-class Suggests misuse). Plus a Tier 1b PDF-manual check (warns, never blocks if no LaTeX).
-- **Tier 4 (advisory, NEVER blocks `ready`)** — three stages backed by `lib/cranlint.py` (pure Python, no R): `description` (DESCRIPTION incoming nits — non-`Authors@R`, weak `Title`, `Description` prose, stale `Date`), `build-hygiene` (planning/dev docs that would ship in the tarball, with the exact `.Rbuildignore` regex to add), `docs-consistency` (lightweight advisory). Build-hygiene findings still block indirectly via the matching real R CMD check NOTE once R runs.
+- **Tarball check** (v2.17.0): `devtools::build()` → inspect tarball contents → `rcmdcheck::rcmdcheck(tarball, --as-cran)`. Catches vignette/build leaks and `VignetteBuilder` misconfiguration that a source-tree check hides. **Errors/warnings/real NOTEs block `ready`.**
+- **Tier 4 (advisory, NEVER blocks `ready`)** — stages backed by `lib/cranlint.py` and `lib/sitelint.py` (pure Python, no R): `description` (DESCRIPTION incoming nits), `build-hygiene` (planning/dev docs and tarball build artifacts that would ship), `docs-consistency` (lightweight advisory), `test_config`, `site-leaks`. Build-hygiene findings still block indirectly via the matching real R CMD check NOTE once R runs.
 - Generates `cran-comments.md` with a `ready` / `warn` / `blocked` verdict
 - Returns a stage-by-stage status table; lists blockers that must be fixed before submission
 - Composes with `/rforge:release` (this = single-package gate; release = cross-package submission ordering)

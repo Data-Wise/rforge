@@ -43,6 +43,7 @@ import json
 import os
 import re
 import sys
+import tarfile
 from pathlib import Path
 from typing import Optional
 
@@ -379,7 +380,55 @@ def _is_planning_entry(entry: str) -> bool:
     return any(rx.match(entry) for rx, _ in _PLANNING_PATTERNS)
 
 
-def check_build_hygiene(path: str | os.PathLike = ".") -> dict:
+# Build artifacts that should not ship in a source tarball.
+_TARBALL_SUSPICIOUS_RE = re.compile(
+    r"(^|/)(\.quarto|_freeze|[^/]+_files)/|\.html$",
+    re.I,
+)
+
+
+def _inspect_tarball(tarball_path: str | os.PathLike) -> list[dict]:
+    """List suspicious paths inside a built source tarball.
+
+    Mirrors the inspection done by ``r:cran-prep``'s ``tarball-check`` stage:
+    vignette/build artifacts (``.quarto/``, ``_freeze/``, pre-built ``.html``,
+    ``*_files/``) that slip past ``.Rbuildignore`` are advisory findings.
+    """
+    findings: list[dict] = []
+    try:
+        with tarfile.open(tarball_path, "r:gz") as tf:
+            names = [m.name for m in tf.getmembers() if m.isfile() or m.isdir()]
+    except (OSError, tarfile.TarError) as exc:
+        return [{
+            "entry": str(tarball_path),
+            "code": "tarball_unreadable",
+            "severity": "advisory",
+            "suggest": "",
+            "message": f"Could not inspect tarball: {exc}",
+        }]
+    seen: set[str] = set()
+    for name in names:
+        if _TARBALL_SUSPICIOUS_RE.search(name):
+            # Report the directory/file once.
+            key = name if name.endswith("/") else name.rsplit("/", 1)[0] + "/"
+            if key in seen:
+                continue
+            seen.add(key)
+            findings.append({
+                "entry": name,
+                "code": "tarball_build_artifact",
+                "severity": "advisory",
+                "suggest": "",
+                "message": (
+                    f"Tarball contains likely build artifact: '{name}'. "
+                    f"Add to .Rbuildignore or remove before submission."
+                ),
+            })
+    return findings
+
+
+def check_build_hygiene(path: str | os.PathLike = ".",
+                        tarball_path: str | os.PathLike | None = None) -> dict:
     """Scan a package's top level for planning/dev docs that would ship (Tier 4b).
 
     Lists the top-level entries of the package directory, compiles each
@@ -455,6 +504,11 @@ def check_build_hygiene(path: str | os.PathLike = ".") -> dict:
                 f"top-level files' NOTE). Add to .Rbuildignore: "
                 f"{_suggest_regex(entry)}"),
         })
+
+    # If a tarball was built by cran-prep's tarball-check stage, also scan it
+    # for build artifacts that .Rbuildignore failed to exclude.
+    if tarball_path:
+        findings.extend(_inspect_tarball(tarball_path))
 
     status = "warn" if findings else "ok"
     if not findings and not messages:
