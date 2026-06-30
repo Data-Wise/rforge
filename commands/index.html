@@ -2831,7 +2831,7 @@
   <span class="md-ellipsis">
     
   
-    Specs
+    Migration
   
 
     
@@ -2844,204 +2844,6 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Specs
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../specs/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../specs/SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    MCP absorb (Path B)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Phase 3 namespacing (v2.0.0)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../specs/SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Diff-aware checks & coverage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../specs/SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    r: dev-cycle + quality commands (v2.1.0)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_5_4" id="__nav_5_4_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Migration
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4763,7 +4565,7 @@ auto-applied).</p>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
-<li><code>package</code> (optional) - Package path (defaults to current directory)</li>
+<li><code>package</code> (optional) - Package directory path (defaults to current directory; must be a directory, not a <code>.tar.gz</code>)</li>
 <li><code>--platform</code> (optional) - Target: <code>devel</code>, <code>release</code>, <code>oldrelease</code>, or <code>all</code> (default, all three). For multi-platform R-hub checks, use <code>/rforge:r:rhub</code>.</li>
 </ul>
 <p><strong>Examples:</strong></p>
@@ -4774,6 +4576,8 @@ auto-applied).</p>
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
+<li>Primary: runs <code>python3 -m lib.rcmd --kind winbuilder</code> when the plugin's <code>lib/</code> is on <code>PYTHONPATH</code></li>
+<li>Fallback: if <code>lib.rcmd</code> is not importable, dispatches via <code>devtools::check_win_*()</code> directly in R (path must be a package directory, not a tarball)</li>
 <li>Submits the package to <a href="https://win-builder.r-project.org/">win-builder</a> for a remote Windows check</li>
 <li><strong>Async dispatch</strong> — results are emailed to the DESCRIPTION Maintainer; nothing returns synchronously</li>
 <li><code>devtools</code> is optional — if missing, reports 🟡 with install hint</li>
@@ -4842,10 +4646,11 @@ auto-applied).</p>
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
-<li>Full sequence: <code>document</code> → <code>lint</code> → <code>spell</code> → <code>urlcheck</code> → <code>test</code> → <code>coverage</code> → <code>check</code> → strict + Tier 4 stages → <code>revdep</code></li>
-<li>The <code>check</code> stage now expands into multiple rows: <code>check</code>, <code>check (noSuggests)</code>, <code>check (suggests-only)</code>, (with <code>--incoming</code>) <code>check (incoming)</code>, then the Tier 4 advisory stages <code>description</code>, <code>build-hygiene</code>, and <code>docs-consistency</code></li>
+<li>Full sequence: <code>document</code> → <code>lint</code> → <code>spell</code> → <code>urlcheck</code> → <code>test</code> → <code>coverage</code> → <code>check</code> → strict passes → <code>tarball-check</code> → Tier 4 stages → <code>revdep</code></li>
+<li>The <code>check</code> stage expands into multiple rows: <code>check</code>, <code>check (noSuggests)</code>, <code>check (suggests-only)</code>, (with <code>--incoming</code>) <code>check (incoming)</code>, then <code>tarball-check</code></li>
 <li><strong>Strict passes run by default</strong> (v2.3.0): <code>check (noSuggests)</code> + <code>check (suggests-only)</code>, each with <code>--run-donttest</code>. A strict <strong>ERROR blocks the <code>ready</code> verdict</strong> (catches the medfit-class Suggests misuse). Plus a Tier 1b PDF-manual check (warns, never blocks if no LaTeX).</li>
-<li><strong>Tier 4 (advisory, NEVER blocks <code>ready</code>)</strong> — three stages backed by <code>lib/cranlint.py</code> (pure Python, no R): <code>description</code> (DESCRIPTION incoming nits — non-<code>Authors@R</code>, weak <code>Title</code>, <code>Description</code> prose, stale <code>Date</code>), <code>build-hygiene</code> (planning/dev docs that would ship in the tarball, with the exact <code>.Rbuildignore</code> regex to add), <code>docs-consistency</code> (lightweight advisory). Build-hygiene findings still block indirectly via the matching real R CMD check NOTE once R runs.</li>
+<li><strong>Tarball check</strong> (v2.17.0): <code>devtools::build()</code> → inspect tarball contents → <code>rcmdcheck::rcmdcheck(tarball, --as-cran)</code>. Catches vignette/build leaks and <code>VignetteBuilder</code> misconfiguration that a source-tree check hides. <strong>Errors/warnings/real NOTEs block <code>ready</code>.</strong></li>
+<li><strong>Tier 4 (advisory, NEVER blocks <code>ready</code>)</strong> — stages backed by <code>lib/cranlint.py</code> and <code>lib/sitelint.py</code> (pure Python, no R): <code>description</code> (DESCRIPTION incoming nits), <code>build-hygiene</code> (planning/dev docs and tarball build artifacts that would ship), <code>docs-consistency</code> (lightweight advisory), <code>test_config</code>, <code>site-leaks</code>. Build-hygiene findings still block indirectly via the matching real R CMD check NOTE once R runs.</li>
 <li>Generates <code>cran-comments.md</code> with a <code>ready</code> / <code>warn</code> / <code>blocked</code> verdict</li>
 <li>Returns a stage-by-stage status table; lists blockers that must be fixed before submission</li>
 <li>Composes with <code>/rforge:release</code> (this = single-package gate; release = cross-package submission ordering)</li>

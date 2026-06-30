@@ -2267,7 +2267,7 @@
   <span class="md-ellipsis">
     
   
-    Specs
+    Migration
   
 
     
@@ -2280,204 +2280,6 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Specs
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../specs/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../specs/SPEC-mcp-absorb-2026-05-10/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    MCP absorb (Path B)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../specs/SPEC-phase3-namespacing-2026-05-11/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Phase 3 namespacing (v2.0.0)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../specs/SPEC-diff-aware-checks-and-coverage-2026-05-31/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Diff-aware checks & coverage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../specs/SPEC-r-dev-commands-2026-05-31/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    r: dev-cycle + quality commands (v2.1.0)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_5_4" id="__nav_5_4_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Migration
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2810,7 +2612,7 @@ during) CRAN's review. They fall into four tiers:</p>
 <td><code>r:winbuilder</code></td>
 <td>dispatch (async)</td>
 <td>no — returns <code>dispatched</code></td>
-<td><code>devtools::check_win_{devel,release,oldrelease}</code> / <code>rhub::rhub_check</code> via <code>lib.rcmd</code></td>
+<td><code>lib.rcmd</code> when available; devtools fallback when <code>lib.rcmd</code> is not importable</td>
 </tr>
 <tr>
 <td><code>r:rhub</code></td>
@@ -3012,9 +2814,17 @@ passes, the Tier-4 advisory stages, and the reverse-dependency check, and <stron
 cross-package ordering).</p>
 <p><strong>Default stage sequence (in order):</strong> <code>document</code> → <code>lint</code> → <code>spell</code> → <code>urlcheck</code> → <code>test</code> →
 <code>coverage</code> → <code>check</code> (<code>--as-cran</code> + NOTE classifier) → <code>check (noSuggests)</code> → <code>check
-(suggests-only)</code> → <code>description</code> / <code>build-hygiene</code> / <code>docs-consistency</code> (Tier 4) → <code>revdep</code>.
-It also verifies the PDF reference manual builds (Tier 1b) — <code>warn</code> (never block) if no
-LaTeX is available.</p>
+(suggests-only)</code> → <code>tarball-check</code> → <code>description</code> / <code>build-hygiene</code> / <code>docs-consistency</code> /
+<code>test_config</code> / <code>site-leaks</code> (Tier 4) → <code>revdep</code>. It also verifies the PDF reference manual
+builds (Tier 1b) — <code>warn</code> (never block) if no LaTeX is available.</p>
+<div class="admonition note">
+<p class="admonition-title">Tarball check catches source-tree blind spots</p>
+<p><code>tarball-check</code> builds a source tarball with <code>devtools::build()</code> and runs <code>R CMD check --as-cran</code>
+on the tarball itself (what CRAN and win-builder see). Source-tree <code>devtools::check()</code>
+pre-builds vignettes into <code>inst/doc/</code> before R CMD check runs, which can hide missing
+<code>VignetteBuilder</code> entries and vignette artifact leaks. The tarball check catches those
+failures and <strong>blocks <code>ready</code></strong> on errors/warnings/real NOTEs.</p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">doi.org 403 handling in <code>urlcheck</code></p>
 <p><code>urlcheck</code> classifies doi.org URLs that return HTTP 403 separately from real broken
@@ -3111,10 +2921,13 @@ the same passes <code>r:check --strict</code> runs.</p>
 unconditionally. This is intended. <strong>Fix:</strong> move it to <code>Imports</code>, or guard with
 <code>requireNamespace()</code> in code <strong>and</strong> <code>skip_if_not_installed()</code> in tests.</p>
 </div>
-<p>The three <strong>Tier 4</strong> stages (<code>description</code>, <code>build-hygiene</code>, <code>docs-consistency</code>) are
-pure-Python (<a href="../../reference/cranlint/"><code>lib.cranlint</code></a>), <strong>advisory</strong>, and <strong>never block
-<code>ready</code></strong> — they surface as <code>warn</code> only. (A <code>build-hygiene</code> finding can still block
-<em>indirectly</em> once R's own "non-standard top-level files" NOTE fires in the <code>check</code> stage.)</p>
+<p>The <strong>Tier 4</strong> stages (<code>description</code>, <code>build-hygiene</code>, <code>docs-consistency</code>, <code>test_config</code>,
+<code>site-leaks</code>) are pure-Python (<a href="../../reference/cranlint/"><code>lib.cranlint</code></a> +
+<a href="../../reference/sitelint/"><code>lib.sitelint</code></a>), <strong>advisory</strong>, and <strong>never block <code>ready</code></strong> — they
+surface as <code>warn</code> only. <code>build-hygiene</code> scans both the source tree and, when a tarball was
+built, the tarball itself for planning/dev docs and build artifacts (<code>.quarto/</code>, <code>_freeze/</code>,
+<code>.html</code>, <code>*_files/</code>) that would ship. (A <code>build-hygiene</code> finding can still block <em>indirectly</em>
+once R's own "non-standard top-level files" NOTE fires in the <code>check</code> stage.)</p>
 <h2 id="rsubmit-github-pre-release-cran-submit-handoff"><code>r:submit</code> — GitHub pre-release + CRAN submit handoff<a class="headerlink" href="#rsubmit-github-pre-release-cran-submit-handoff" title="Permanent link">&para;</a></h2>
 <p>Wraps the <em>moment of submission</em>: it gates on <code>cran-prep</code>, builds the exact tarball, cuts a
 GitHub <strong>pre-release</strong> of it (not "Latest"), and prints the CRAN submit checklist. A second
