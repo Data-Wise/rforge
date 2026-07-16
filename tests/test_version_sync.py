@@ -133,10 +133,14 @@ def test_write_path_syncs_version_into_targets(synced_tree):
 def test_write_path_syncs_command_count(synced_tree):
     mod, tree = synced_tree
     # Change the canonical count in mkdocs.yml; everything else should follow.
+    # Derive the injected value from the real current count (count + 1) rather
+    # than a hardcoded literal — a literal would silently stop testing drift
+    # the moment the real repo's command_count reached that same number.
     mkdocs_path = tree / "mkdocs.yml"
     text = mkdocs_path.read_text(encoding="utf-8")
     count = mod.read_command_count()
-    text = text.replace(f"command_count: {count}", "command_count: 42")
+    new_count = count + 1
+    text = text.replace(f"command_count: {count}", f"command_count: {new_count}")
     mkdocs_path.write_text(text, encoding="utf-8")
 
     assert mod.main(["--check"]) == 1  # now drifted
@@ -147,10 +151,10 @@ def test_write_path_syncs_command_count(synced_tree):
     readme = (tree / "README.md").read_text(encoding="utf-8")
     claude_md = (tree / "CLAUDE.md").read_text(encoding="utf-8")
 
-    assert "42 commands for R package" in pkg
-    assert "42 commands for R package" in plugin
-    assert "Claude Code — 42 commands," in readme
-    assert "## Command-file conventions (all 42 commands)" in claude_md
+    assert f"{new_count} commands for R package" in pkg
+    assert f"{new_count} commands for R package" in plugin
+    assert f"Claude Code — {new_count} commands," in readme
+    assert f"## Command-file conventions (all {new_count} commands)" in claude_md
     assert mod.main(["--check"]) == 0
 
 

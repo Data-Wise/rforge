@@ -217,6 +217,27 @@ def test_rhub_check_snippet_default_platforms_when_none():
         assert f'"{plat}"' in snippet
 
 
+def test_rhub_check_snippet_uses_setwd_not_positional_path(tmp_path):
+    """Issue #66: rhub::rhub_check()'s first param is gh_url, not path — a local
+    path passed positionally is misinterpreted as a GitHub URL and rejected.
+    The package dir must be set via setwd() instead, with rhub_check() called
+    with only named args."""
+    snippet = rcmd.r_snippet("rhub", str(tmp_path), platforms=["linux"])
+    assert f'setwd({rcmd.json.dumps(str(tmp_path))})' in snippet
+    # No positional first argument before platforms= inside rhub_check(...).
+    call_start = snippet.index("rhub::rhub_check(") + len("rhub::rhub_check(")
+    assert snippet[call_start:call_start + len("platforms=")] == "platforms="
+
+
+def test_rc_submit_snippet_still_passes_path_positionally():
+    """rhub::rc_submit()'s first param IS path (unlike rhub_check) — verified
+    live against rhub::rc_submit's real signature (path=".", platforms=NULL,
+    email=NULL, confirmation=NULL). This branch must NOT get the setwd() fix;
+    it was never broken."""
+    snippet = rcmd.r_snippet("rhub", "/tmp/mypkg", rc_mode=True)
+    assert 'rhub::rc_submit("/tmp/mypkg")' in snippet
+
+
 # ── run() / _run_rhub wire-in ───────────────────────────────────────────────
 
 def _write_desc(path):

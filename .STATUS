@@ -2,31 +2,95 @@ project: rforge
 updated: 2026-07-16
 status: Active
 version: 2.18.0 (released, on main) — dev carries 1 unreleased feature (see in_progress)
-in_progress: 2026-07-16 — UNRELEASED ON DEV: evidence-based 403 triage for `r:urlcheck` (PR #67, squashed to dev). Replaces the hardcoded `"doi.org" in url` heuristic (G4, v2.14.0) with probing: for each 403 probe the site root, then re-probe the URL; classify dead/real_403 (gate) vs bot_blocked/transient (advisory), emitting per-item `evidence`. doi.org keeps a no-network fast path — its root returns 200, so a pure root-probe rule would have REGRESSED it to `real_403`. Origin: medrobust 0.4.0 preflight, where cdc.gov + data.nber.org 403s reported 🔴 error while `R CMD check --as-cran` was 0/0/0. Scope limit: local preflight noise only — CRAN's own URL check uses R's UA and cannot be configured. Touched lib/rcmd.py, tests/test_rcmd.py (+6, TDD), commands/r/urlcheck.md. pytest 529 passed / 2 skipped. NEXT: include in the next release — see pre_release_check below. Design record: PROPOSAL-url-403-triage-2026-07-16.md (option 3).
-pre_release_check: (written 2026-07-16, for the v2.19.0 release of the #67 urlcheck triage)
+in_progress: 2026-07-16 — UNRELEASED ON DEV, THREE bundled changes (scope grew from urlcheck-only — see pre_release_check):
+  (1) evidence-based 403 triage for `r:urlcheck` (PR #67, squashed to dev). Replaces the hardcoded
+      `"doi.org" in url` heuristic (G4, v2.14.0) with probing: for each 403 probe the site root, then
+      re-probe the URL; classify dead/real_403 (gate) vs bot_blocked/transient (advisory), emitting
+      per-item `evidence`. doi.org keeps a no-network fast path. Scope limit: local preflight noise
+      only — CRAN's own URL check uses R's UA and cannot be configured. Touched lib/rcmd.py,
+      tests/test_rcmd.py (+6), commands/r/urlcheck.md. Design record: PROPOSAL-url-403-triage-2026-07-16.md.
+  (2) issue #66 fix — rhub dispatch bug + docs. `rhub::rhub_check()`'s first param is `gh_url`
+      (verified live against installed rhub — no `path` param at all), not the local path the
+      snippet was passing positionally; fixed via `setwd(path); rhub_check(platforms=...)`.
+      `rc_submit()` does NOT have this bug (its first param really is `path` — verified live,
+      corrected an initial wrong assumption of symmetry). Also: `_invoke_r` now folds stderr into
+      the returned text on a non-zero exit (was silently dropped, making failures undebuggable
+      without a manual Rscript re-run). Docs: `r:rhub` now notes `linux` is the slowest preset
+      platform (~20min, R-devel-from-source) vs a fast `ubuntu-latest (devel)` CI matrix entry.
+      Touched lib/rsnippets.py, lib/rcmd.py, tests/test_rcmd.py, tests/test_rcmd_rhub.py,
+      commands/r/rhub.md. Live-verified: reproduced the exact reported gh_url error with the old
+      snippet, confirmed the new snippet doesn't hit it, confirmed real DESCRIPTION/styler mutation
+      via --fix-equivalent smoke tests (see #65 below for the shared machinery).
+  (3) issue #65 feature — `--tidy`/`--set-lintr` on `r:lint` + new `r:tidy` command (41→42 commands).
+      `--tidy` runs the tidyverse lintr preset (`tidyverse_linters()` was removed in lintr 3.x —
+      built explicitly, verified live against lintr 3.4.0) ALONGSIDE the default preset; envelope
+      reports only the tidy-only additions, grouped by file. `r:tidy` composes 4 advisory (never
+      blocking) stages: lint(tidy), tidydesc (usethis::use_tidy_description() preview via a
+      scratch-dir copy, or applied for real with --fix), roxygen_completeness (pure-Python scan for
+      @export'd functions missing @examples/@return/@family — new module lib/tidyaudit.py), and
+      news_header (NEWS.md top-entry format + version-vs-DESCRIPTION check). `--fix` also runs the
+      existing `kind="style"` (styler). SCOPE CUT (deliberate, per issue's own "Optional" marking):
+      the `--tidy-audit` stage on `r:cran-prep` was NOT built — follow-up if wanted later. Live
+      end-to-end smoke test against a real fixture package: --tidy caught real dot.case lints,
+      --fix genuinely reordered DESCRIPTION Imports + restyled a file, --set-lintr wrote/refused-to-
+      overwrite a real .lintr, preview mode left the real DESCRIPTION untouched. New module has a
+      docs/reference page (lib.tidyaudit added to scripts/gen_lib_reference.py MODULES + mkdocs.yml
+      nav). command_count bumped 41→42 in mkdocs.yml + `version_sync.py` re-run (propagates to
+      plugin.json/package.json/README/CLAUDE.md); marketplace.json isn't in version_sync's
+      propagation list, so its two "NN commands" description strings were hand-edited to 42 too
+      (its version field stays 2.18.0 — unreleased, unchanged). Also fixed a pre-existing
+      test_version_sync.py bug: test_write_path_syncs_command_count hardcoded the literal "42" as
+      its synthetic drift value instead of deriving one guaranteed to differ from the real count
+      (count+1) — our legitimate 41→42 bump collided with it and made the test a false-pass no-op.
+  Built on feature/issue-fixes (worktree), all TDD (red→green verified for #66; new tests for #65).
+  pytest 558 passed / 0 failed / 2 skipped (up from 529+2 baseline: +29 new tests). test-all 44/44.
+  NEXT: PR feature/issue-fixes → dev, then release — see pre_release_check below (rewritten for the
+  combined scope; the version-only urlcheck-scoped block below is now WRONG and superseded by this one).
+pre_release_check: (rewritten 2026-07-16 — original block below assumed urlcheck-only/41 commands,
+  now stale; scope is urlcheck triage + issue #66 fix + issue #65 feature, see in_progress above)
+  WHY minor not patch: same reasoning as before (new user-visible classification, additive envelope
+    fields) PLUS a genuinely new command (`r:tidy`) — minor is the only correct choice, not a
+    judgment call. Decide 2.19.0 vs 2.20.0 based on whether this ships as one release or two; either
+    way it's a minor bump, never a patch.
+  VERSION PROCEDURE — do NOT hand-edit version strings:
+    1. Bump `package.json` "version" 2.18.0 → 2.19.0 (or whatever's decided). SINGLE SOURCE OF TRUTH.
+    2. Run `python3 scripts/version_sync.py` — stamps mkdocs.yml, .claude-plugin/plugin.json,
+       package.json description, README.md, CLAUDE.md. `--check` exits 0 when in sync.
+    3. `command_count` is ALREADY 42 in mkdocs.yml (bumped as part of the #65 work, not deferred to
+       release) — do not re-bump; version_sync.py in step 2 only needs to re-stamp the version.
+    4. `.claude-plugin/marketplace.json` — version_sync.py does NOT touch this file (confirmed:
+       not in its propagation list). Hand-edit both "version" fields (metadata + plugins[0]) to
+       match package.json; command-count strings in it are ALREADY 42 (done during #65 work).
+  GATES that must pass before the dev→main PR:
+    - `tests/test-all.sh` 44/44 (incl. "All 4 version sources agree", "mkdocs nav files all exist",
+      "Lib: reference docs in sync" — lib.tidyaudit is now a MODULES entry, must stay in sync)
+    - `python3 -m pytest tests/` — expect 558 passed / 0 failed / 2 skipped. If ~689 or otherwise
+      inflated, check for stray untracked "*(1).py" snapshots being collected (see cruft below).
+  CHANGELOG entry (hand-written): needs THREE `### Added`/`### Fixed` groups — urlcheck triage,
+    rhub bugfix (#66, closes it), r:tidy + --tidy flag (#65, closes it). Record real test counts
+    (558 / test-all 44/44), not an inflated figure. Reference `Closes #65`, `Closes #66` — but per
+    this repo's own convention, `Closes #N` in a feature→dev PR does NOT auto-close (needs the
+    dev→main release PR to main, or `gh issue close N` manually post-release).
+  DO NOT claim in CHANGELOG/CLAUDE.md that the urlcheck triage fixes CRAN URL NOTEs — it does not
+    (CRAN runs its own check with R's UA, not configurable; local-preflight-noise reduction only).
+  DO NOT claim the rhub fix covers rc_submit() too — verified live that rc_submit()'s first param
+    really is `path` (unlike rhub_check()'s `gh_url`), so only the rhub_check() branch was broken
+    and fixed. Don't let a "fixed rhub dispatch" changelog line overstate to "all rhub dispatch
+    modes" when only one had the bug.
+  DO NOT claim `r:tidy --fix` or the DESCRIPTION-normalization preview covers CRAN-incoming
+    consistency — it's a tidyverse-STYLE audit, deliberately separate from and never blocking
+    `r:cran-prep`'s CRAN-readiness gate.
+  CLAUDE.md: its version-history block currently documents v2.18.0 as released; the
+    "## Command-file conventions (all 42 commands)" heading is ALREADY updated (version_sync.py ran
+    during the #65 work) — only the dated release-history bullet needs adding, as part of the release.
+  AFTER MERGE: tag → GitHub release → Homebrew tap formula+manifest sync (Formula/rforge.rb AND
+    homebrew-tap/generator/manifest.json — see reference_homebrew_tap_drift memory) → verify CI green
+    on main (RForge CI + Deploy Documentation) → confirm live docs show the new version + 42 commands.
+_pre_release_check_urlcheck_only_STALE_2026_07_16: (superseded by the block above — kept only as a
+  paper trail of what was originally planned before scope grew to include #66+#65)
   WHY 2.19.0 (minor, not patch): new user-visible classification + two new envelope fields
     (`advisory`, `advisory_count`). `doi_blocked_count` is preserved, so it is additive, not breaking.
-  VERSION PROCEDURE — do NOT hand-edit version strings:
-    1. Bump `package.json` "version" 2.18.0 → 2.19.0. That file is the SINGLE SOURCE OF TRUTH.
-    2. Run `python3 scripts/version_sync.py` — it stamps mkdocs.yml, .claude-plugin/plugin.json,
-       package.json description, README.md, CLAUDE.md. `--check` exits 0 when in sync (verified
-       in sync at 2.18.0 on 2026-07-16). CHANGELOG / "What's new" / historical refs are
-       intentionally NOT stamped — those are written by hand.
-    3. `command_count` is unchanged (41) — no new command, only new behavior in `r:urlcheck`.
-  GATES that must pass before the dev→main PR:
-    - `tests/test-all.sh` — includes "All 4 version sources agree (plugin/marketplace/package)"
-      at line 598; this fails loudly if step 1 is done without step 2.
-    - `python3 -m pytest tests/` — expect 529 passed / 0 failed / 2 skipped. If the number is
-      ~689, stray untracked "*(1).py" snapshots are back and are being collected (see cruft above).
-  CHANGELOG entry (hand-written, follow the 2.18.0 shape): summary blockquote + `### Added`,
-    and record the real test counts (529 / test-all 44/44) — not an inflated figure.
-  DO NOT claim in CHANGELOG/CLAUDE.md that this fixes CRAN URL NOTEs. It does not. CRAN runs its
-    own URL check with R's user agent and cannot be configured; this only reduces LOCAL preflight
-    noise. Overstating scope here would be the one genuinely misleading thing this release could ship.
-  CLAUDE.md: its version-history block currently documents v2.18.0 as released. Add the v2.19.0
-    entry only AS PART OF the release (it was deliberately left untouched while #67 sat unreleased).
-  AFTER MERGE: tag v2.19.0 → GitHub release → Homebrew tap formula+manifest sync → verify CI green
-    on main (RForge CI + Deploy Documentation) → confirm live docs show 2.19.0.
+  command_count was assumed unchanged (41) — WRONG, now 42 (see above).
 cruft: (cleared 2026-07-16) 3 untracked stale test snapshots — "test_cranlint (1).py", "test_rcmd (1).py", "test_rcmd_strict (1).py" — were being collected by pytest and inflating counts (689 vs the true 529). Verified each tracked file was a strict superset (0 unique lines; the copies pre-dated the v2.17.0 tarball tests and the #67 triage tests), then deleted. `pytest tests/` now reports 529 passed / 2 skipped with no --ignore-glob workaround.
 last_release: 2026-06-30 v2.18.0 (PR #63 dev→main merge a2555fe; tag v2.18.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.18.0; CI green on main RForge CI + Deploy Documentation success; tap Data-Wise/homebrew-tap main dda5554 — formula+manifest → v2.18.0, sha256 7683de54…, ruby -c OK, generate.py --diff IDENTICAL; live docs 2.18.0). Creative doc enhancements: in-site changelog, glossary, command cards, contributor guide, example sessions, 404 page, social cards, command decision tree, symptom/fix admonitions. CI fix: cache: pip removed from setup-python@v6. Stale ref cleanup: install.sh (deprecated MCP ref), package.json (main/engines). Diagram: "Where rforge fits" teal/amber palette + diff-aware feedback loop. 41 commands (no surface change). pytest 524, test-all 44/44.
 last_release_prior_v2_17_0: 2026-06-30 v2.17.0 (PR #57 dev→main merge e29a77c; tag v2.17.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.17.0; CI green on main RForge CI + Deploy Documentation success; tap Data-Wise/homebrew-tap main 7a4d5c3 — formula+manifest → v2.17.0, sha256 d1118e67…; live docs 2.17.0). Winbuilder fallback + tarball-check stage (medrobust v0.4.0 CRAN-prep). 41 commands. pytest 524, test-all 44/44.

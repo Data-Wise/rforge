@@ -105,7 +105,8 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
               strict: bool = False, articles_only: bool = False,
               devel: bool = False, flavor: str | None = None,
               incoming: bool = False, platform: str = "all",
-              platforms: list | None = None, rc_mode: bool = False) -> str:
+              platforms: list | None = None, rc_mode: bool = False,
+              tidy: bool = False, apply: bool = False) -> str:
     """Build the R one-liner for engine ``kind``, emitting JSON on stdout.
 
     For ``kind="check"``, ``flavor`` in {None, "depends", "suggests"} selects a
@@ -199,11 +200,53 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             f'cat(jsonlite::toJSON(list(checked=TRUE, built=TRUE, '
             f'problems=as.list({probs})), auto_unbox=TRUE, null="list"))')
     if kind == "lint":
+        lint_fmt = ('lapply(ls, function(x) list(file=x$filename, '
+                    'line=x$line_number, linter=x$linter, message=x$message))')
+        if tidy:
+            # tidyverse_linters() was removed in lintr 3.x — the tidyverse
+            # style preset is now built explicitly (verified live against
+            # lintr 3.4.0, issue #65). Runs the tidy preset ALONGSIDE the
+            # default preset (not instead of) so normalize() can diff which
+            # tidy findings are genuinely additional.
+            tidy_linters = (
+                'lintr::linters_with_defaults('
+                'object_name_linter = lintr::object_name_linter("snake_case"), '
+                'brace_linter = lintr::brace_linter(), '
+                'spaces_inside_linter = lintr::spaces_inside_linter(), '
+                'trailing_whitespace_linter = lintr::trailing_whitespace_linter(), '
+                'semicolon_linter = lintr::semicolon_linter())'
+            )
+            return _guard("lintr",
+                f'ls <- lintr::lint_package({p}); '
+                f'tls <- lintr::lint_package({p}, linters = {tidy_linters}); '
+                f'cat(jsonlite::toJSON(list(lints={lint_fmt}, '
+                f'tidy_lints=lapply(tls, function(x) list(file=x$filename, '
+                f'line=x$line_number, linter=x$linter, message=x$message))), '
+                f'auto_unbox=TRUE, null="list"))')
         return _guard("lintr",
             f'ls <- lintr::lint_package({p}); '
-            f'cat(jsonlite::toJSON(list(lints=lapply(ls, function(x) list('
-            f'file=x$filename, line=x$line_number, linter=x$linter, '
-            f'message=x$message))), auto_unbox=TRUE, null="list"))')
+            f'cat(jsonlite::toJSON(list(lints={lint_fmt}), '
+            f'auto_unbox=TRUE, null="list"))')
+    if kind == "tidydesc":
+        # DESCRIPTION normalization preview (issue #65): usethis::use_tidy_description()
+        # has no dry-run parameter and mutates the active project's DESCRIPTION in
+        # place. Preview mode (apply=False, the default) copies just the
+        # DESCRIPTION into a scratch dir, runs it there, and diffs — the real
+        # package is never touched. apply=True runs it on the real path
+        # (r:tidy --fix).
+        target = p if apply else 'tmp'
+        setup = '' if apply else (
+            f'tmp <- tempfile(); dir.create(tmp); '
+            f'file.copy(file.path({p}, "DESCRIPTION"), file.path(tmp, "DESCRIPTION")); '
+        )
+        return _guard("usethis",
+            f'{setup}'
+            f'before <- readLines(file.path({target}, "DESCRIPTION")); '
+            f'setwd({target}); suppressMessages(usethis::use_tidy_description()); '
+            f'after <- readLines(file.path({target}, "DESCRIPTION")); '
+            f'cat(jsonlite::toJSON(list(changed=!identical(before, after), '
+            f'before=as.list(before), after=as.list(after), applied={"TRUE" if apply else "FALSE"}), '
+            f'auto_unbox=TRUE, null="list"))')
     if kind == "spell":
         return _guard("spelling",
             f'sp <- spelling::spell_check_package({p}); '
@@ -291,8 +334,12 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             platforms = _RHUB_PRESETS["cran-submission"]
         plats = platforms
         plats_r = "c(" + ", ".join(f'"{pl}"' for pl in plats) + ")"
+        # rhub::rhub_check()'s first param is gh_url (an HTTP(S) URL), not a
+        # local path — passing the package dir positionally makes it look like
+        # a bad gh_url and errors (issue #66). setwd() into the package dir
+        # first, matching how rhub_check() auto-detects the repo from cwd.
         return _guard("rhub",
-            f'rhub::rhub_check({p}, platforms={plats_r}); '
+            f'setwd({p}); rhub::rhub_check(platforms={plats_r}); '
             f'cat(jsonlite::toJSON(list(submitted=TRUE, platforms={plats_r}, '
             f'note="Results in GitHub Actions tab"), auto_unbox=TRUE))')
     if kind == "s7runtime":
