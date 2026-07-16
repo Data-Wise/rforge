@@ -90,7 +90,7 @@ The `lib/` directory is a Python package (has `__init__.py`). Modules use relati
 - **Auto-generated reference docs**: `docs/reference/{discovery,deps,status,init,rcmd,cranlint,deps_sync,ghrelease,runiverse,s7review,changed,scaffold}.md` are produced by `scripts/gen_lib_reference.py`
 - **CI gate**: `scripts/gen_lib_reference.py --check` compares regenerated output against committed files; any drift fails CI
 
-## Command-file conventions (all 41 commands)
+## Command-file conventions (all 42 commands)
 
 Every `commands/*.md` has structured frontmatter:
 

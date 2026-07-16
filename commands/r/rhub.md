@@ -77,6 +77,16 @@ python3 -m lib.rcmd --kind rhub --path "<path>" --rc-mode
 
 `clang-asan` is opt-in only (intermittent ASAN linker failures, rhub #645).
 
+!!! tip "`linux` is the slowest platform — reserve the full preset for pre-submission"
+    The `linux` platform builds R-devel from source inside a Docker container
+    (~20+ minutes). A `ubuntu-latest` job on `r-version: 'devel'` via
+    `r-lib/actions/setup-r@v2` in your own `R-CMD-check.yaml` installs from
+    prebuilt nightly binaries instead (~2-3 minutes) and covers the same
+    R-devel smoke-test for routine CI. `linux` isn't redundant — its container
+    is closer to CRAN's own incoming-checks environment — so keep it in the
+    `cran-submission` preset for the final pre-submission pass, but don't
+    default to the full preset on every iteration.
+
 ## Pre-flight checks (automatic, before dispatch)
 
 1. **`.github/workflows/rhub.yaml` missing** → hard-stop (`rhub_yaml_missing`).

@@ -24,6 +24,7 @@ from pathlib import Path
 from . import changed
 from . import cranlint
 from . import sitelint
+from . import tidyaudit
 # Snippet builders + CRAN env constants live in lib.rsnippets (extracted v2.15.0).
 # Re-exported into this namespace so existing `rcmd.<name>` references stay valid.
 from .rsnippets import (  # noqa: F401  (re-exported for callers/tests)
@@ -229,6 +230,10 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
                      or raw.get("methods_undeclared_dependency")
                      or raw.get("nonenforcing_validators"))
         return "warn" if any_issue else "ok"
+    if kind == "tidydesc":
+        if exit_code != 0:
+            return "error"
+        return "warn" if raw.get("changed") else "ok"
     # load, document, install, build, style: success == exit 0
     return "ok" if exit_code == 0 else "error"
 
@@ -289,6 +294,25 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
     elif kind == "lint":
         lints = _as_list(raw.get("lints"))
         env["lint"] = {"count": len(lints), "lints": lints}
+        if "tidy_lints" in raw:
+            # Issue #65: --tidy runs the tidyverse preset ALONGSIDE the default
+            # one; "additions" are tidy findings the default preset didn't
+            # already report (same file+line+linter), grouped by file so a
+            # 500-hit object_name_linter sweep doesn't read as 500 raw lines.
+            tidy_lints = _as_list(raw.get("tidy_lints"))
+            default_keys = {(l.get("file"), l.get("line"), l.get("linter")) for l in lints}
+            additions = [l for l in tidy_lints
+                        if (l.get("file"), l.get("line"), l.get("linter")) not in default_keys]
+            by_file: dict[str, int] = {}
+            for l in additions:
+                by_file[l.get("file", "")] = by_file.get(l.get("file", ""), 0) + 1
+            env["lint"]["tidy"] = {"count": len(additions), "lints": additions,
+                                   "by_file": by_file}
+    elif kind == "tidydesc":
+        env["tidydesc"] = {"changed": raw.get("changed", False),
+                           "before": _as_list(raw.get("before")),
+                           "after": _as_list(raw.get("after")),
+                           "applied": raw.get("applied", False)}
     elif kind == "spell":
         misspelled = _as_list(raw.get("misspelled"))
         env["spell"] = {"count": len(misspelled), "misspelled": misspelled}
@@ -378,6 +402,11 @@ def _invoke_r(snippet: str, *, timeout: float | None = None) -> tuple[str, int]:
     timeout=None (default) keeps the unbounded behavior the long kinds
     (check/test/coverage/revdep) need; quick/dispatch callers pass a bound.
     On subprocess.TimeoutExpired returns ('{"timed_out": true}', 124).
+    On a non-zero exit, stderr is folded into the returned text (issue #66) —
+    otherwise an R error thrown before any cat() leaves stdout empty and the
+    real error text is silently discarded, undebuggable without a manual
+    Rscript re-run. Left untouched on success so harmless startup/package
+    notes on stderr never contaminate a clean JSON stdout.
     """
     rscript = shutil.which("Rscript")
     if rscript is None:
@@ -387,7 +416,10 @@ def _invoke_r(snippet: str, *, timeout: float | None = None) -> tuple[str, int]:
                               capture_output=True, text=True, timeout=timeout)
     except subprocess.TimeoutExpired:
         return ('{"timed_out": true}', 124)
-    return (proc.stdout.strip(), proc.returncode)
+    stdout = proc.stdout.strip()
+    if proc.returncode != 0 and proc.stderr.strip():
+        stdout = (stdout + "\n" + proc.stderr.strip()).strip()
+    return (stdout, proc.returncode)
 
 
 def _install_package(path: str) -> tuple[dict, int]:
@@ -616,13 +648,17 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
         flavor: str | None = None, incoming: bool = False,
         platform: str = "all", platforms: list | None = None,
         preset: str | None = None, rc_mode: bool = False,
-        branch: str = "gh-pages", force: bool = False) -> dict:
+        branch: str = "gh-pages", force: bool = False,
+        tidy: bool = False, apply: bool = False) -> dict:
     """Run one engine ``kind`` against ``path``; return the normalized envelope.
 
     Threads the check ``flavor`` / ``incoming`` selectors through to ``r_snippet``;
     returns an error envelope when no DESCRIPTION is found. For ``kind="rhub"``,
     ``platforms`` (``list[str]``), ``preset`` (``str``) and ``rc_mode`` (``bool``)
     select the R-hub dispatch; a Python-side pre-flight gate runs before any R call.
+    ``tidy`` (kind="lint") also runs the tidyverse linter preset alongside the
+    default one. ``apply`` (kind="tidydesc") writes the normalized DESCRIPTION
+    to the real path instead of a scratch-dir preview.
     """
     pkg = find_package(path)
     if pkg is None:
@@ -637,6 +673,8 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
     if kind == "deploy":
         # MUTATING + NETWORK — recommend-only; never auto-run (see _run_deploy).
         return _run_deploy(path, pkg, branch=branch, force=force)
+    if kind == "tidy":
+        return _run_tidy(path, pkg, apply=apply)
     if kind == "install":
         raw, code = _install_package(path)
     else:
@@ -644,7 +682,8 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
             _install_package(path)  # standalone build_articles renders installed version
         snippet = r_snippet(kind, path, as_cran=as_cran, preview=preview,
                             strict=strict, articles_only=articles_only, devel=devel,
-                            flavor=flavor, incoming=incoming, platform=platform)
+                            flavor=flavor, incoming=incoming, platform=platform,
+                            tidy=tidy, apply=apply)
         stdout, code = _invoke_r(snippet)
         raw = _parse_json(stdout)
         if raw is None:
@@ -1027,6 +1066,83 @@ def _cran_prep_envelope(pkg, status, stages, blockers, dispatched, **extra):
     return env
 
 
+def _run_tidy(path: str, pkg: dict, *, apply: bool = False) -> dict:
+    """Dispatch ``kind="tidy"`` — the ``/rforge:r:tidy`` audit (issue #65).
+
+    Four advisory stages, none of which ever blocks: tidyverse lintr preset,
+    DESCRIPTION normalization preview (or apply with ``--fix``), roxygen tag
+    completeness, and NEWS.md header currency. ``apply=True`` (``--fix``) also
+    runs ``kind="style"`` (styler) and applies the DESCRIPTION normalization
+    to the real file instead of previewing it in a scratch copy.
+    """
+    stages: list[dict] = []
+    messages: list[str] = []
+
+    lint_env = run("lint", path, tidy=True)
+    stages.append({"kind": "lint (tidy)", "status": lint_env["status"]})
+    tidy_lint = lint_env.get("lint", {}).get("tidy", {})
+    if tidy_lint.get("count"):
+        by_file = ", ".join(f"{f} ({n})" for f, n in tidy_lint.get("by_file", {}).items())
+        messages.append(f"[lint] {tidy_lint['count']} tidyverse-only finding(s): {by_file}")
+
+    desc_env = run("tidydesc", path, apply=apply)
+    stages.append({"kind": "tidydesc", "status": desc_env["status"]})
+    if desc_env.get("tidydesc", {}).get("changed"):
+        verb = "applied" if apply else "would normalize"
+        messages.append(f"[tidydesc] DESCRIPTION {verb} (use_tidy_description()).")
+
+    style_env = None
+    if apply:
+        style_env = run("style", path)
+        stages.append({"kind": "style", "status": style_env["status"]})
+        if style_env.get("style", {}).get("count"):
+            messages.append(f"[style] reformatted {style_env['style']['count']} file(s).")
+
+    for tier, checker in (("roxygen_completeness", tidyaudit.check_roxygen_completeness),
+                          ("news_header", tidyaudit.check_news_header)):
+        env = checker(path)
+        stages.append({"kind": env["kind"], "status": env["status"]})
+        for finding in env.get("findings", []):
+            msg = finding.get("message")
+            if msg:
+                messages.append(f"[{env['kind']}] {msg}")
+
+    status = "warn" if any(s["status"] == "warn" for s in stages) else "ok"
+    return {
+        "kind": "tidy", "status": status,
+        "package": pkg.get("package", ""), "version": pkg.get("version", ""),
+        "stages": stages, "messages": messages, "engine_missing": [],
+        "applied": apply,
+    }
+
+
+_LINTR_TIDY_PRESET = '''linters: linters_with_defaults(
+    object_name_linter = object_name_linter("snake_case"),
+    brace_linter = brace_linter(),
+    spaces_inside_linter = spaces_inside_linter(),
+    trailing_whitespace_linter = trailing_whitespace_linter(),
+    semicolon_linter = semicolon_linter()
+  )
+encoding: "UTF-8"
+'''
+
+
+def write_lintr_file(path: str) -> dict:
+    """``r:lint --tidy --set-lintr`` — write a ``.lintr`` activating the
+    tidyverse preset permanently (issue #65). Refuses to overwrite an
+    existing ``.lintr`` — remove it manually first, matching the read-safe
+    default other write ops in this codebase use.
+    """
+    lintr_path = Path(path) / ".lintr"
+    if lintr_path.exists():
+        return {"kind": "lint", "status": "error", "engine_missing": [],
+                "messages": [f"{lintr_path} already exists — remove it first "
+                             "if you want --set-lintr to replace it."]}
+    lintr_path.write_text(_LINTR_TIDY_PRESET)
+    return {"kind": "lint", "status": "ok", "engine_missing": [],
+            "messages": [f"Wrote {lintr_path} (tidyverse linter preset)."]}
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python3 -m lib.rcmd",
                                  description="Run an R dev-cycle/quality engine, emit JSON.")
@@ -1034,7 +1150,7 @@ def main(argv: list[str] | None = None) -> int:
                     choices=["load", "document", "test", "check", "coverage", "build",
                              "install", "site", "cycle", "lint", "spell", "urlcheck", "style",
                              "winbuilder", "rhub", "revdep", "goodpractice", "cran-prep",
-                             "s7runtime", "deploy"])
+                             "s7runtime", "deploy", "tidy", "tidydesc"])
     ap.add_argument("--path", default=".")
     ap.add_argument("--as-cran", action="store_true")
     ap.add_argument("--preview", action="store_true")
@@ -1085,6 +1201,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--force", action="store_true",
                     help="deploy: override the leak gate — proceed despite "
                          "non-allowlisted committed files (downgrades block→warn)")
+    ap.add_argument("--tidy", action="store_true",
+                    help="lint: also run the tidyverse linter preset "
+                         "alongside the default one (issue #65)")
+    ap.add_argument("--set-lintr", action="store_true", dest="set_lintr",
+                    help="lint --tidy: write a .lintr activating the tidy "
+                         "preset permanently (refuses to overwrite an existing one)")
+    ap.add_argument("--fix", action="store_true",
+                    help="tidy: auto-fix what's safe — styler + DESCRIPTION "
+                         "normalization, applied to the real files (MUTATING)")
     ns = ap.parse_args(argv)
     if ns.kind == "cycle":
         env = _run_cycle(ns.path)
@@ -1093,6 +1218,8 @@ def main(argv: list[str] | None = None) -> int:
                              goodpractice=ns.goodpractice,
                              multi_platform=ns.multi_platform,
                              incoming=ns.incoming)
+    elif ns.kind == "lint" and ns.set_lintr:
+        env = write_lintr_file(ns.path)
     elif ns.changed:
         env = run_changed(ns.kind, ns.path, base=ns.base,
                           changed_strict=ns.changed_strict, fail_on=ns.fail_on,
@@ -1106,7 +1233,7 @@ def main(argv: list[str] | None = None) -> int:
                   strict=ns.strict, articles_only=ns.articles_only, devel=ns.devel,
                   flavor=ns.flavor, incoming=ns.incoming, platform=ns.platform,
                   platforms=plats, preset=ns.preset, rc_mode=ns.rc_mode,
-                  branch=ns.branch, force=ns.force)
+                  branch=ns.branch, force=ns.force, tidy=ns.tidy, apply=ns.fix)
     print(json.dumps(env, indent=2))
     # "dispatched" (winbuilder/rhub) is non-error — exits 0 like "ok"/"warn"
     return 0 if env.get("status") not in ("error", "blocked") else 1
