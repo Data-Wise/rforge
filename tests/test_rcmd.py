@@ -65,6 +65,73 @@ def test_normalize_urlcheck_empty_is_ok():
     assert env["urlcheck"]["doi_blocked_count"] == 0
 
 
+# --- evidence-based 403 triage -------------------------------------------------
+
+
+def _no_network(monkeypatch):
+    """Fail loudly if a test probes the network without saying so."""
+    monkeypatch.setattr(
+        rcmd, "_probe_status",
+        lambda url, timeout=None: pytest.fail(f"unexpected network probe: {url}"))
+
+
+def test_doi_403_is_advisory_without_probing(monkeypatch):
+    # doi.org keeps its fast path: advisory, and must not hit the network
+    # (doi.org's root returns 200, so a probe would misclassify it as real).
+    _no_network(monkeypatch)
+    env = rcmd.normalize(
+        "urlcheck", {"broken": [{"url": "https://doi.org/10.1000/xyz", "status": "403"}]},
+        0, None)
+    assert env["status"] == "warn"
+    assert env["urlcheck"]["count"] == 0
+    assert env["urlcheck"]["doi_blocked_count"] == 1
+
+
+def test_403_with_403_root_is_bot_blocked(monkeypatch):
+    # nber.org: file 403 AND site root 403 -> blanket bot-block -> advisory
+    monkeypatch.setattr(rcmd, "_probe_status", lambda url, timeout=None: 403)
+    env = rcmd.normalize(
+        "urlcheck",
+        {"broken": [{"url": "https://data.nber.org/a/b.csv", "status": "403"}]}, 0, None)
+    assert env["status"] == "warn"
+    assert env["urlcheck"]["count"] == 0
+    adv = env["urlcheck"]["advisory"]
+    assert len(adv) == 1
+    assert adv[0]["blocked_class"] == "bot_blocked"
+    assert "root" in adv[0]["evidence"].lower()
+
+
+def test_403_that_reprobes_ok_is_transient(monkeypatch):
+    # cdc.gov: root 200, and re-probing the URL succeeds -> transient, not broken
+    monkeypatch.setattr(rcmd, "_probe_status", lambda url, timeout=None: 200)
+    env = rcmd.normalize(
+        "urlcheck", {"broken": [{"url": "https://www.cdc.gov/nchs/nhanes/", "status": "403"}]},
+        0, None)
+    assert env["status"] == "warn"
+    assert env["urlcheck"]["count"] == 0
+    assert env["urlcheck"]["advisory"][0]["blocked_class"] == "transient"
+
+
+def test_403_with_live_root_and_persistent_403_is_real(monkeypatch):
+    # root reachable, URL still 403 on re-probe -> genuinely refused -> gate
+    def probe(url, timeout=None):
+        return 200 if url.rstrip("/").count("/") == 2 else 403  # root ok, path 403
+    monkeypatch.setattr(rcmd, "_probe_status", probe)
+    env = rcmd.normalize(
+        "urlcheck", {"broken": [{"url": "https://example.com/gone", "status": "403"}]}, 0, None)
+    assert env["status"] == "error"
+    assert env["urlcheck"]["count"] == 1
+
+
+def test_404_is_dead_and_never_probes(monkeypatch):
+    # a real dead link must still gate -- and needs no probing to decide
+    _no_network(monkeypatch)
+    env = rcmd.normalize(
+        "urlcheck", {"broken": [{"url": "https://example.com/x", "status": "404"}]}, 0, None)
+    assert env["status"] == "error"
+    assert env["urlcheck"]["count"] == 1
+
+
 def test_normalize_style_ok_on_exit0():
     assert rcmd.normalize("style", {"changed_files": ["R/a.R"]}, 0, None)["status"] == "ok"
 

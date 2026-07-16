@@ -112,6 +112,81 @@ def find_package(path: str = ".") -> dict | None:
 
 _QUALITY_KEY = {"lint": "lints", "spell": "misspelled", "urlcheck": "broken"}
 
+# --- URL failure triage --------------------------------------------------------
+# A 403 is a refusal, not a missing page (that's 404). WAF-protected hosts
+# (gov/research/publisher) fingerprint the client and refuse R's user agent
+# ("R (4.6.1 ...)"), so urlchecker reports valid links as broken. Classify by
+# probing for evidence rather than trusting the URL's domain name.
+
+_PROBE_TIMEOUT = 8
+_ADVISORY_CLASSES = ("bot_blocked", "transient")
+
+# Hosts whose 403s are known-advisory and must NOT be probed: doi.org's own root
+# returns 200 (the 403 comes from the publisher's redirect target), so a root
+# probe would misclassify it as a genuine refusal.
+_ADVISORY_HOSTS = ("doi.org",)
+
+
+def _probe_status(url: str, timeout: float = _PROBE_TIMEOUT):
+    """HTTP status for *url*, or None if unreachable. Patched out in tests."""
+    import urllib.error
+    import urllib.request
+
+    try:
+        req = urllib.request.Request(url, method="HEAD")
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return resp.status
+    except urllib.error.HTTPError as exc:
+        return exc.code
+    except Exception:
+        return None
+
+
+def _site_root(url: str):
+    from urllib.parse import urlsplit
+
+    parts = urlsplit(url)
+    if not parts.scheme or not parts.netloc:
+        return None
+    return f"{parts.scheme}://{parts.netloc}/"
+
+
+def _classify_url_failure(item):
+    """Classify one urlchecker failure.
+
+    Returns (class, evidence) where class is one of:
+      dead        -- 404/DNS/connection failure; genuinely broken      -> gate
+      real_403    -- refused, but the site itself is reachable         -> gate
+      bot_blocked -- site root refuses too; blanket automation block   -> advisory
+      transient   -- re-probe succeeded; rate-limit or UA misfire      -> advisory
+    """
+    if not isinstance(item, dict):
+        return "dead", ""
+
+    url = str(item.get("url", ""))
+    status_code = str(item.get("status", ""))
+
+    # Only 403s are ambiguous. Everything else (404, DNS, timeout) is dead.
+    if "403" not in status_code:
+        return "dead", f"status {status_code or 'unknown'}"
+
+    for host in _ADVISORY_HOSTS:
+        if host in url:
+            return "bot_blocked", f"{host} refuses automated requests (known advisory host)"
+
+    root = _site_root(url)
+    if root:
+        root_status = _probe_status(root)
+        if root_status == 403:
+            return "bot_blocked", f"site root {root} also returned 403 - blanket bot-block"
+
+    # Root is reachable (or unknown): is the URL itself really refused?
+    again = _probe_status(url)
+    if again is not None and 200 <= again < 400:
+        return "transient", f"re-probe of the URL returned {again} - not reproducible"
+
+    return "real_403", f"403 persists on re-probe while site root returned {root_status if root else 'n/a'}"
+
 
 def _status_for(kind: str, raw: dict, exit_code: int) -> str:
     if raw.get("engine_missing"):
@@ -218,29 +293,32 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
         misspelled = _as_list(raw.get("misspelled"))
         env["spell"] = {"count": len(misspelled), "misspelled": misspelled}
     elif kind == "urlcheck":
-        # G4: classify doi.org 403s as advisory (firewall blocks, not real breakage)
+        # G4: 403 means "refused", not "absent" -- classify by evidence, not by
+        # domain name, so bot-protected hosts don't read as broken links.
         raw_broken = _as_list(raw.get("broken"))
-        doi_blocked = []
+        advisory = []
         real_broken = []
         for item in raw_broken:
-            if isinstance(item, dict):
-                url = str(item.get("url", ""))
-                status_code = str(item.get("status", ""))
-                if "doi.org" in url and "403" in status_code:
-                    doi_blocked.append(item)
-                else:
-                    real_broken.append(item)
+            klass, evidence = _classify_url_failure(item)
+            if klass in _ADVISORY_CLASSES:
+                enriched = dict(item)
+                enriched["blocked_class"] = klass
+                enriched["evidence"] = evidence
+                advisory.append(enriched)
             else:
                 real_broken.append(item)
         env["urlcheck"] = {
             "count": len(real_broken),
             "broken": real_broken,
-            "doi_blocked_count": len(doi_blocked),
+            "advisory": advisory,
+            "advisory_count": len(advisory),
+            # back-compat: the render prompt still reads doi_blocked_count
+            "doi_blocked_count": len(advisory),
         }
         if not raw.get("engine_missing"):
             if real_broken:
                 env["status"] = "error"
-            elif doi_blocked:
+            elif advisory:
                 env["status"] = "warn"
             else:
                 env["status"] = "ok"
