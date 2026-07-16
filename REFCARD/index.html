@@ -2324,6 +2324,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tidyaudit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    tidyaudit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2896,22 +2924,22 @@
 
 <h1 id="rforge-plugin-reference-card">📚 RForge Plugin - Reference Card<a class="headerlink" href="#rforge-plugin-reference-card" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>Version:</strong> 2.18.0 | <strong>Last Updated:</strong> 2026-06-21</p>
+<p><strong>Version:</strong> 2.19.0 | <strong>Last Updated:</strong> 2026-06-21</p>
 </blockquote>
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
-<li><strong>What:</strong> All 41 commands in one page — categorized by use case.</li>
+<li><strong>What:</strong> All 42 commands in one page — categorized by use case.</li>
 <li><strong>Why:</strong> Forget command syntax? Scan the ASCII box below.</li>
 <li><strong>How:</strong> Daily? <code>/rforge:status</code> <code>/rforge:quick</code>. After changes? <code>/rforge:analyze "what?"</code>. Per-package CRAN gate? <code>/rforge:r:cran-prep</code>. Ecosystem rollup? <code>/rforge:thorough</code>.</li>
 <li><strong>Next:</strong> <a href="../commands/">Commands reference</a> for full per-command docs.</li>
 </ul>
 </div>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────────────────────────────────────────────────┐
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  RFORGE PLUGIN REFERENCE                                            v2.18.0  │
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  RFORGE PLUGIN REFERENCE                                            v2.19.0  │
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├─────────────────────────────────────────────────────────────────────────────┤
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│                                                                             │
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  COMMANDS (41)                                                              │
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  COMMANDS (42)                                                              │
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│  ─────────                                                                  │
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│                                                                             │
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│  DAILY                                                                      │
@@ -3297,13 +3325,13 @@ install options.</p>
 <hr />
 <h2 id="file-structure">File Structure<a class="headerlink" href="#file-structure" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>rforge/
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>├── .claude-plugin/        # Plugin manifest + extras (v2.18.0)
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>├── .claude-plugin/        # Plugin manifest + extras (v2.19.0)
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>│   ├── plugin.json
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>│   ├── marketplace.json
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>│   ├── config.json
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>│   ├── hooks/pretooluse.py
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>│   └── skills/validation/description-sync.md
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>├── commands/              # 41 slash commands (/rforge:*)
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>├── commands/              # 42 slash commands (/rforge:*)
 </span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>│   ├── docs/check.md      # /rforge:docs:check (v2.0.0+)
 </span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>│   └── r/                 # /rforge:r:* (v2.0.0+, expanded v2.1.0, v2.2.0)
 </span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>├── agents/                # 1 orchestrator agent

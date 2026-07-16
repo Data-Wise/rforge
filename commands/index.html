@@ -1698,6 +1698,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rforgertidy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:r:tidy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#rforgers7-review" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2807,6 +2818,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tidyaudit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    tidyaudit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3571,6 +3610,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rforgertidy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /rforge:r:tidy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#rforgers7-review" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3870,7 +3920,7 @@
 <li><strong>Next:</strong> <a href="../REFCARD/">REFCARD</a> for the at-a-glance summary.</li>
 </ul>
 </div>
-<p>Complete reference for all <strong>41</strong> RForge commands. Commands are organized by category with usage examples and parameter details.</p>
+<p>Complete reference for all <strong>42</strong> RForge commands. Commands are organized by category with usage examples and parameter details.</p>
 <h2 id="command-categories">Command Categories<a class="headerlink" href="#command-categories" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="#setup-state">Setup &amp; State</a> (1 command)</li>
@@ -4520,11 +4570,13 @@ auto-applied).</p>
 <h3 id="rforgerlint">/rforge:r:lint<a class="headerlink" href="#rforgerlint" title="Permanent link">&para;</a></h3>
 <p>Static analysis of the package via <code>lintr</code> — grouped report of style and code-quality issues.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-49-1"><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>/rforge:r:lint<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--changed<span class="o">]</span><span class="w"> </span><span class="o">[</span>--base<span class="w"> </span>&lt;ref&gt;<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-49-1"><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>/rforge:r:lint<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--tidy<span class="o">]</span><span class="w"> </span><span class="o">[</span>--set-lintr<span class="o">]</span><span class="w"> </span><span class="o">[</span>--changed<span class="o">]</span><span class="w"> </span><span class="o">[</span>--base<span class="w"> </span>&lt;ref&gt;<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
 <li><code>package</code> (optional) - Package path (defaults to current directory)</li>
+<li><code>--tidy</code> (optional, v2.19.0, issue #65) - Also run the tidyverse linter preset (<code>object_name_linter("snake_case")</code>, <code>brace_linter</code>, <code>spaces_inside_linter</code>, <code>trailing_whitespace_linter</code>, <code>semicolon_linter</code> — <code>tidyverse_linters()</code> was removed in lintr 3.x) alongside the default preset; report shows only the additional tidy-only findings, grouped by file (default: false)</li>
+<li><code>--set-lintr</code> (optional, v2.19.0, issue #65) - <code>--tidy</code>: write a <code>.lintr</code> activating the tidy preset permanently; refuses to overwrite an existing <code>.lintr</code> (default: false)</li>
 <li><code>--changed</code> (optional, v2.10.0; tagging v2.11.0; <code>[uncommitted]</code> refinement v2.12.0) - Scope lint to the package(s) changed on this branch and tag findings <code>[introduced]</code>/<code>[pre-existing]</code> via a merge-base baseline run; line-shift-immune identity; an introduced lint in an uncommitted file is refined to <code>[uncommitted]</code> (default: false)</li>
 <li><code>--base &lt;ref&gt;</code> (optional, v2.11.0) - Comparison ref for <code>--changed</code> (default: <code>dev</code>)</li>
 <li><code>--fail-on &lt;introduced|none&gt;</code> (optional, v2.11.0) - Exit non-zero only on <code>[introduced]</code> findings (default: <code>introduced</code>)</li>
@@ -4536,19 +4588,83 @@ auto-applied).</p>
 </span><span id="__span-50-3"><a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a>
 </span><span id="__span-50-4"><a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a><span class="c1"># Lint only packages changed on this branch</span>
 </span><span id="__span-50-5"><a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a>/rforge:r:lint<span class="w"> </span>--changed<span class="w"> </span>--base<span class="w"> </span>dev
+</span><span id="__span-50-6"><a id="__codelineno-50-6" name="__codelineno-50-6" href="#__codelineno-50-6"></a>
+</span><span id="__span-50-7"><a id="__codelineno-50-7" name="__codelineno-50-7" href="#__codelineno-50-7"></a><span class="c1"># Also surface tidyverse-preset-only findings</span>
+</span><span id="__span-50-8"><a id="__codelineno-50-8" name="__codelineno-50-8" href="#__codelineno-50-8"></a>/rforge:r:lint<span class="w"> </span>--tidy
+</span><span id="__span-50-9"><a id="__codelineno-50-9" name="__codelineno-50-9" href="#__codelineno-50-9"></a>
+</span><span id="__span-50-10"><a id="__codelineno-50-10" name="__codelineno-50-10" href="#__codelineno-50-10"></a><span class="c1"># ...and make the tidy preset permanent</span>
+</span><span id="__span-50-11"><a id="__codelineno-50-11" name="__codelineno-50-11" href="#__codelineno-50-11"></a>/rforge:r:lint<span class="w"> </span>--tidy<span class="w"> </span>--set-lintr
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
-<li>Runs <code>lintr::lint_package()</code> (read-only; no files are changed)</li>
+<li>Runs <code>lintr::lint_package()</code> (read-only; no files are changed unless <code>--set-lintr</code>)</li>
 <li>Groups findings by file with line numbers and lint rule names</li>
 <li>If <code>lintr</code> is missing, reports 🟡 with install hint</li>
 </ul>
-<p><strong>Related commands:</strong> <code>/rforge:r:style</code> (auto-format fixes many style lints)</p>
+<p><strong>Related commands:</strong> <code>/rforge:r:style</code> (auto-format fixes many style lints), <code>/rforge:r:tidy</code> (full tidyverse-conventions audit: this preset + DESCRIPTION normalization + roxygen completeness + NEWS.md header)</p>
+<hr />
+<h3 id="rforgertidy">/rforge:r:tidy<a class="headerlink" href="#rforgertidy" title="Permanent link">&para;</a></h3>
+<p>Tidyverse-conventions audit — a "how tidy am I?" report. <strong>All four stages are advisory and never block</strong> (unlike <code>/rforge:r:cran-prep</code>). Read-safe by default: without <code>--fix</code>, nothing on disk is touched.</p>
+<p><strong>Usage:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-51-1"><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>/rforge:r:tidy<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--fix<span class="o">]</span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>package</code> (optional) - Package path (defaults to current directory)</li>
+<li><code>--fix</code> (optional, v2.19.0, issue #65) - Auto-fix what's safe: runs <code>styler::style_pkg()</code> and applies the DESCRIPTION normalization to the real file instead of previewing it. MUTATING (default: false)</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-52-1"><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="c1"># Preview only — nothing written</span>
+</span><span id="__span-52-2"><a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a>/rforge:r:tidy
+</span><span id="__span-52-3"><a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a>
+</span><span id="__span-52-4"><a id="__codelineno-52-4" name="__codelineno-52-4" href="#__codelineno-52-4"></a><span class="c1"># Apply the safe fixes (styler + DESCRIPTION normalization)</span>
+</span><span id="__span-52-5"><a id="__codelineno-52-5" name="__codelineno-52-5" href="#__codelineno-52-5"></a>/rforge:r:tidy<span class="w"> </span>--fix
+</span></code></pre></div>
+<p><strong>Stages:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>What it does</th>
+<th>Writes files?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lint (tidy)</code></td>
+<td>tidyverse lintr preset (same as <code>r:lint --tidy</code>) — additions grouped by file</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>tidydesc</code></td>
+<td><code>usethis::use_tidy_description()</code> preview (scratch-dir diff), or applied with <code>--fix</code></td>
+<td>only with <code>--fix</code></td>
+</tr>
+<tr>
+<td><code>style</code></td>
+<td>only with <code>--fix</code> — <code>styler::style_pkg()</code></td>
+<td>only with <code>--fix</code></td>
+</tr>
+<tr>
+<td><code>roxygen_completeness</code></td>
+<td>exported (<code>@export</code>) functions missing <code>@examples</code>/<code>@return</code>/<code>@family</code></td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>news_header</code></td>
+<td>top <code>NEWS.md</code> entry matches <code>## Package X.Y.Z</code> and its version matches DESCRIPTION</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p><code>roxygen_completeness</code> and <code>news_header</code> are pure-Python static analysis (no R) with no <code>--fix</code> behavior — a missing <code>@examples</code> block or a stale NEWS.md entry needs a human, not an auto-fix.</p>
+<p><strong>Output:</strong> one <code>{kind: "tidy", status: "ok"|"warn", stages: [...], messages: [...]}</code> envelope. Exit 0 always (advisory-only).</p>
+<p><strong>Related commands:</strong> <code>/rforge:r:lint --tidy</code> (just the lint-preset stage), <code>/rforge:r:style</code> (just the styler stage), <code>/rforge:r:cran-prep</code> (the CRAN-readiness gate — blocking, separate from this)</p>
 <hr />
 <h3 id="rforgers7-review">/rforge:r:s7-review<a class="headerlink" href="#rforgers7-review" title="Permanent link">&para;</a></h3>
 <p>Static <strong>S7 OOP convention checker</strong> — scans <code>R/*.R</code> + <code>NAMESPACE</code> and reports advisory convention findings across five static families. <strong>Advisory only, never blocks</strong> (mirrors <code>r:cran-prep</code>'s Tier-4 tone). The static pass is pure Python — no R, no Rscript. An opt-in <code>--runtime</code> pass adds two R-backed families (loads the package and introspects S7 at runtime), and <code>--eco</code> sweeps the static families across the whole ecosystem manifest.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-51-1"><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>/rforge:r:s7-review<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--kind<span class="w"> </span>all<span class="p">|</span>naming<span class="p">|</span>validators<span class="p">|</span>methods<span class="p">|</span>legacy<span class="p">|</span>docs<span class="o">]</span><span class="w"> </span><span class="o">[</span>--eco<span class="o">]</span><span class="w"> </span><span class="o">[</span>--runtime<span class="o">]</span><span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>json<span class="p">|</span>text<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-53-1"><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>/rforge:r:s7-review<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--kind<span class="w"> </span>all<span class="p">|</span>naming<span class="p">|</span>validators<span class="p">|</span>methods<span class="p">|</span>legacy<span class="p">|</span>docs<span class="o">]</span><span class="w"> </span><span class="o">[</span>--eco<span class="o">]</span><span class="w"> </span><span class="o">[</span>--runtime<span class="o">]</span><span class="w"> </span><span class="o">[</span>--format<span class="w"> </span>json<span class="p">|</span>text<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
@@ -4560,20 +4676,20 @@ auto-applied).</p>
 </ul>
 <p>There is <strong>no</strong> <code>--write</code>/<code>--fix</code> — S7 fixes need human judgement.</p>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-52-1"><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="c1"># Review all S7 conventions in the current package</span>
-</span><span id="__span-52-2"><a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a>/rforge:r:s7-review
-</span><span id="__span-52-3"><a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a>
-</span><span id="__span-52-4"><a id="__codelineno-52-4" name="__codelineno-52-4" href="#__codelineno-52-4"></a><span class="c1"># Only the naming family, as text</span>
-</span><span id="__span-52-5"><a id="__codelineno-52-5" name="__codelineno-52-5" href="#__codelineno-52-5"></a>/rforge:r:s7-review<span class="w"> </span>--kind<span class="w"> </span>naming<span class="w"> </span>--format<span class="w"> </span>text
-</span><span id="__span-52-6"><a id="__codelineno-52-6" name="__codelineno-52-6" href="#__codelineno-52-6"></a>
-</span><span id="__span-52-7"><a id="__codelineno-52-7" name="__codelineno-52-7" href="#__codelineno-52-7"></a><span class="c1"># Review a specific package</span>
-</span><span id="__span-52-8"><a id="__codelineno-52-8" name="__codelineno-52-8" href="#__codelineno-52-8"></a>/rforge:r:s7-review<span class="w"> </span>~/projects/mypackage
-</span><span id="__span-52-9"><a id="__codelineno-52-9" name="__codelineno-52-9" href="#__codelineno-52-9"></a>
-</span><span id="__span-52-10"><a id="__codelineno-52-10" name="__codelineno-52-10" href="#__codelineno-52-10"></a><span class="c1"># Sweep the whole ecosystem (static families)</span>
-</span><span id="__span-52-11"><a id="__codelineno-52-11" name="__codelineno-52-11" href="#__codelineno-52-11"></a>/rforge:r:s7-review<span class="w"> </span>--eco
-</span><span id="__span-52-12"><a id="__codelineno-52-12" name="__codelineno-52-12" href="#__codelineno-52-12"></a>
-</span><span id="__span-52-13"><a id="__codelineno-52-13" name="__codelineno-52-13" href="#__codelineno-52-13"></a><span class="c1"># Add the R-backed runtime pass (dead generics + non-enforcing validators)</span>
-</span><span id="__span-52-14"><a id="__codelineno-52-14" name="__codelineno-52-14" href="#__codelineno-52-14"></a>/rforge:r:s7-review<span class="w"> </span>--runtime
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-54-1"><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a><span class="c1"># Review all S7 conventions in the current package</span>
+</span><span id="__span-54-2"><a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a>/rforge:r:s7-review
+</span><span id="__span-54-3"><a id="__codelineno-54-3" name="__codelineno-54-3" href="#__codelineno-54-3"></a>
+</span><span id="__span-54-4"><a id="__codelineno-54-4" name="__codelineno-54-4" href="#__codelineno-54-4"></a><span class="c1"># Only the naming family, as text</span>
+</span><span id="__span-54-5"><a id="__codelineno-54-5" name="__codelineno-54-5" href="#__codelineno-54-5"></a>/rforge:r:s7-review<span class="w"> </span>--kind<span class="w"> </span>naming<span class="w"> </span>--format<span class="w"> </span>text
+</span><span id="__span-54-6"><a id="__codelineno-54-6" name="__codelineno-54-6" href="#__codelineno-54-6"></a>
+</span><span id="__span-54-7"><a id="__codelineno-54-7" name="__codelineno-54-7" href="#__codelineno-54-7"></a><span class="c1"># Review a specific package</span>
+</span><span id="__span-54-8"><a id="__codelineno-54-8" name="__codelineno-54-8" href="#__codelineno-54-8"></a>/rforge:r:s7-review<span class="w"> </span>~/projects/mypackage
+</span><span id="__span-54-9"><a id="__codelineno-54-9" name="__codelineno-54-9" href="#__codelineno-54-9"></a>
+</span><span id="__span-54-10"><a id="__codelineno-54-10" name="__codelineno-54-10" href="#__codelineno-54-10"></a><span class="c1"># Sweep the whole ecosystem (static families)</span>
+</span><span id="__span-54-11"><a id="__codelineno-54-11" name="__codelineno-54-11" href="#__codelineno-54-11"></a>/rforge:r:s7-review<span class="w"> </span>--eco
+</span><span id="__span-54-12"><a id="__codelineno-54-12" name="__codelineno-54-12" href="#__codelineno-54-12"></a>
+</span><span id="__span-54-13"><a id="__codelineno-54-13" name="__codelineno-54-13" href="#__codelineno-54-13"></a><span class="c1"># Add the R-backed runtime pass (dead generics + non-enforcing validators)</span>
+</span><span id="__span-54-14"><a id="__codelineno-54-14" name="__codelineno-54-14" href="#__codelineno-54-14"></a>/rforge:r:s7-review<span class="w"> </span>--runtime
 </span></code></pre></div>
 <p><strong>Convention families:</strong></p>
 <table>
@@ -4629,15 +4745,15 @@ auto-applied).</p>
 <h3 id="rforgerspell">/rforge:r:spell<a class="headerlink" href="#rforgerspell" title="Permanent link">&para;</a></h3>
 <p>Spell-check the package documentation via <code>spelling</code> and triage typos vs. technical terms.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-53-1"><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>/rforge:r:spell<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-55-1"><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>/rforge:r:spell<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
 <li><code>package</code> (optional) - Package path (defaults to current directory)</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-54-1"><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a><span class="c1"># Spell-check current package</span>
-</span><span id="__span-54-2"><a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a>/rforge:r:spell
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-56-1"><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a><span class="c1"># Spell-check current package</span>
+</span><span id="__span-56-2"><a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a>/rforge:r:spell
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
@@ -4651,15 +4767,15 @@ auto-applied).</p>
 <h3 id="rforgerurlcheck">/rforge:r:urlcheck<a class="headerlink" href="#rforgerurlcheck" title="Permanent link">&para;</a></h3>
 <p>Check package URLs for breakage and redirects via <code>urlchecker</code> — a common CRAN rejection cause.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-55-1"><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>/rforge:r:urlcheck<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-57-1"><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>/rforge:r:urlcheck<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
 <li><code>package</code> (optional) - Package path (defaults to current directory)</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-56-1"><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a><span class="c1"># Check URLs in current package</span>
-</span><span id="__span-56-2"><a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a>/rforge:r:urlcheck
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-58-1"><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="c1"># Check URLs in current package</span>
+</span><span id="__span-58-2"><a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a>/rforge:r:urlcheck
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
@@ -4672,15 +4788,15 @@ auto-applied).</p>
 <h3 id="rforgerstyle">/rforge:r:style<a class="headerlink" href="#rforgerstyle" title="Permanent link">&para;</a></h3>
 <p>Auto-format the package source via <code>styler::style_pkg()</code> and show the diff.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-57-1"><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>/rforge:r:style<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-59-1"><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>/rforge:r:style<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
 <li><code>package</code> (optional) - Package path (defaults to current directory)</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-58-1"><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="c1"># Style-format current package</span>
-</span><span id="__span-58-2"><a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a>/rforge:r:style
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-60-1"><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a><span class="c1"># Style-format current package</span>
+</span><span id="__span-60-2"><a id="__codelineno-60-2" name="__codelineno-60-2" href="#__codelineno-60-2"></a>/rforge:r:style
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
@@ -4695,18 +4811,18 @@ auto-applied).</p>
 <h3 id="rforgerrevdep">/rforge:r:revdep<a class="headerlink" href="#rforgerrevdep" title="Permanent link">&para;</a></h3>
 <p>Reverse-dependency check against CRAN downstream packages via <code>revdepcheck</code>.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-59-1"><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>/rforge:r:revdep<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-61-1"><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>/rforge:r:revdep<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
 <li><code>package</code> (optional) - Package path (defaults to current directory)</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-60-1"><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a><span class="c1"># Check reverse dependencies for current package</span>
-</span><span id="__span-60-2"><a id="__codelineno-60-2" name="__codelineno-60-2" href="#__codelineno-60-2"></a>/rforge:r:revdep
-</span><span id="__span-60-3"><a id="__codelineno-60-3" name="__codelineno-60-3" href="#__codelineno-60-3"></a>
-</span><span id="__span-60-4"><a id="__codelineno-60-4" name="__codelineno-60-4" href="#__codelineno-60-4"></a><span class="c1"># Check specific package</span>
-</span><span id="__span-60-5"><a id="__codelineno-60-5" name="__codelineno-60-5" href="#__codelineno-60-5"></a>/rforge:r:revdep<span class="w"> </span>~/projects/medfit
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-62-1"><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a><span class="c1"># Check reverse dependencies for current package</span>
+</span><span id="__span-62-2"><a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a>/rforge:r:revdep
+</span><span id="__span-62-3"><a id="__codelineno-62-3" name="__codelineno-62-3" href="#__codelineno-62-3"></a>
+</span><span id="__span-62-4"><a id="__codelineno-62-4" name="__codelineno-62-4" href="#__codelineno-62-4"></a><span class="c1"># Check specific package</span>
+</span><span id="__span-62-5"><a id="__codelineno-62-5" name="__codelineno-62-5" href="#__codelineno-62-5"></a>/rforge:r:revdep<span class="w"> </span>~/projects/medfit
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
@@ -4720,15 +4836,15 @@ auto-applied).</p>
 <h3 id="rforgergoodpractice">/rforge:r:goodpractice<a class="headerlink" href="#rforgergoodpractice" title="Permanent link">&para;</a></h3>
 <p>Advisory best-practice bundle — goodpractice checks (opt-in, not part of <code>r:cycle</code>).</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-61-1"><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>/rforge:r:goodpractice<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-63-1"><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>/rforge:r:goodpractice<span class="w"> </span><span class="o">[</span>package<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
 <li><code>package</code> (optional) - Package path (defaults to current directory)</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-62-1"><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a><span class="c1"># Run advisory best-practice checks for current package</span>
-</span><span id="__span-62-2"><a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a>/rforge:r:goodpractice
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-64-1"><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a><span class="c1"># Run advisory best-practice checks for current package</span>
+</span><span id="__span-64-2"><a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a>/rforge:r:goodpractice
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
@@ -4742,7 +4858,7 @@ auto-applied).</p>
 <h3 id="rforgerwinbuilder">/rforge:r:winbuilder<a class="headerlink" href="#rforgerwinbuilder" title="Permanent link">&para;</a></h3>
 <p>Submit to win-builder (devel/release/oldrelease) — async dispatch.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-63-1"><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>/rforge:r:winbuilder<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--platform<span class="w"> </span>devel<span class="p">|</span>release<span class="p">|</span>oldrelease<span class="p">|</span>all<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-65-1"><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>/rforge:r:winbuilder<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--platform<span class="w"> </span>devel<span class="p">|</span>release<span class="p">|</span>oldrelease<span class="p">|</span>all<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
@@ -4750,10 +4866,10 @@ auto-applied).</p>
 <li><code>--platform</code> (optional) - Target: <code>devel</code>, <code>release</code>, <code>oldrelease</code>, or <code>all</code> (default, all three). For multi-platform R-hub checks, use <code>/rforge:r:rhub</code>.</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-64-1"><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a><span class="c1"># Dispatch to all three win-builder flavours (default)</span>
-</span><span id="__span-64-2"><a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a>/rforge:r:winbuilder
-</span><span id="__span-64-3"><a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a><span class="c1"># Dispatch only to R-devel win-builder</span>
-</span><span id="__span-64-4"><a id="__codelineno-64-4" name="__codelineno-64-4" href="#__codelineno-64-4"></a>/rforge:r:winbuilder<span class="w"> </span>--platform<span class="w"> </span>devel
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-66-1"><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a><span class="c1"># Dispatch to all three win-builder flavours (default)</span>
+</span><span id="__span-66-2"><a id="__codelineno-66-2" name="__codelineno-66-2" href="#__codelineno-66-2"></a>/rforge:r:winbuilder
+</span><span id="__span-66-3"><a id="__codelineno-66-3" name="__codelineno-66-3" href="#__codelineno-66-3"></a><span class="c1"># Dispatch only to R-devel win-builder</span>
+</span><span id="__span-66-4"><a id="__codelineno-66-4" name="__codelineno-66-4" href="#__codelineno-66-4"></a>/rforge:r:winbuilder<span class="w"> </span>--platform<span class="w"> </span>devel
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
@@ -4769,7 +4885,7 @@ auto-applied).</p>
 <h3 id="rforgerrhub">/rforge:r:rhub<a class="headerlink" href="#rforgerrhub" title="Permanent link">&para;</a></h3>
 <p>Multi-platform checks via R-hub v2 (<code>rhub::rhub_check</code>) — async dispatch via GitHub Actions.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-65-1"><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>/rforge:r:rhub<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--platforms<span class="w"> </span>linux,windows<span class="o">]</span><span class="w"> </span><span class="o">[</span>--preset<span class="w"> </span>cran-submission<span class="o">]</span><span class="w"> </span><span class="o">[</span>--rc-mode<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-67-1"><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>/rforge:r:rhub<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--platforms<span class="w"> </span>linux,windows<span class="o">]</span><span class="w"> </span><span class="o">[</span>--preset<span class="w"> </span>cran-submission<span class="o">]</span><span class="w"> </span><span class="o">[</span>--rc-mode<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
@@ -4779,14 +4895,14 @@ auto-applied).</p>
 <li><code>--rc-mode</code> (optional) - Use RC shared runners via <code>rc_submit()</code> instead of your own GitHub account</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-66-1"><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a><span class="c1"># Default: cran-submission preset (linux, windows, macos-arm64, atlas)</span>
-</span><span id="__span-66-2"><a id="__codelineno-66-2" name="__codelineno-66-2" href="#__codelineno-66-2"></a>/rforge:r:rhub
-</span><span id="__span-66-3"><a id="__codelineno-66-3" name="__codelineno-66-3" href="#__codelineno-66-3"></a><span class="c1"># Named preset (adds clang-asan)</span>
-</span><span id="__span-66-4"><a id="__codelineno-66-4" name="__codelineno-66-4" href="#__codelineno-66-4"></a>/rforge:r:rhub<span class="w"> </span>--preset<span class="w"> </span>cran-submission-strict
-</span><span id="__span-66-5"><a id="__codelineno-66-5" name="__codelineno-66-5" href="#__codelineno-66-5"></a><span class="c1"># Explicit platforms</span>
-</span><span id="__span-66-6"><a id="__codelineno-66-6" name="__codelineno-66-6" href="#__codelineno-66-6"></a>/rforge:r:rhub<span class="w"> </span>--platforms<span class="w"> </span>linux,windows,macos-arm64
-</span><span id="__span-66-7"><a id="__codelineno-66-7" name="__codelineno-66-7" href="#__codelineno-66-7"></a><span class="c1"># RC shared runners</span>
-</span><span id="__span-66-8"><a id="__codelineno-66-8" name="__codelineno-66-8" href="#__codelineno-66-8"></a>/rforge:r:rhub<span class="w"> </span>--rc-mode
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-68-1"><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a><span class="c1"># Default: cran-submission preset (linux, windows, macos-arm64, atlas)</span>
+</span><span id="__span-68-2"><a id="__codelineno-68-2" name="__codelineno-68-2" href="#__codelineno-68-2"></a>/rforge:r:rhub
+</span><span id="__span-68-3"><a id="__codelineno-68-3" name="__codelineno-68-3" href="#__codelineno-68-3"></a><span class="c1"># Named preset (adds clang-asan)</span>
+</span><span id="__span-68-4"><a id="__codelineno-68-4" name="__codelineno-68-4" href="#__codelineno-68-4"></a>/rforge:r:rhub<span class="w"> </span>--preset<span class="w"> </span>cran-submission-strict
+</span><span id="__span-68-5"><a id="__codelineno-68-5" name="__codelineno-68-5" href="#__codelineno-68-5"></a><span class="c1"># Explicit platforms</span>
+</span><span id="__span-68-6"><a id="__codelineno-68-6" name="__codelineno-68-6" href="#__codelineno-68-6"></a>/rforge:r:rhub<span class="w"> </span>--platforms<span class="w"> </span>linux,windows,macos-arm64
+</span><span id="__span-68-7"><a id="__codelineno-68-7" name="__codelineno-68-7" href="#__codelineno-68-7"></a><span class="c1"># RC shared runners</span>
+</span><span id="__span-68-8"><a id="__codelineno-68-8" name="__codelineno-68-8" href="#__codelineno-68-8"></a>/rforge:r:rhub<span class="w"> </span>--rc-mode
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
@@ -4802,7 +4918,7 @@ auto-applied).</p>
 <h3 id="rforgercran-prep">/rforge:r:cran-prep<a class="headerlink" href="#rforgercran-prep" title="Permanent link">&para;</a></h3>
 <p>Per-package CRAN-readiness gate — runs the full pre-submission sequence and generates <code>cran-comments.md</code>.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-67-1"><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>/rforge:r:cran-prep<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--incoming<span class="o">]</span><span class="w"> </span><span class="o">[</span>--goodpractice<span class="o">]</span><span class="w"> </span><span class="o">[</span>--multi-platform<span class="o">]</span><span class="w"> </span><span class="o">[</span>--no-revdep<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-69-1"><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a>/rforge:r:cran-prep<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--incoming<span class="o">]</span><span class="w"> </span><span class="o">[</span>--goodpractice<span class="o">]</span><span class="w"> </span><span class="o">[</span>--multi-platform<span class="o">]</span><span class="w"> </span><span class="o">[</span>--no-revdep<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
@@ -4813,17 +4929,17 @@ auto-applied).</p>
 <li><code>--no-revdep</code> (optional) - Skip the reverse-dependency check (default: false)</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-68-1"><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a><span class="c1"># Full CRAN-prep gate for current package (strict passes run by default)</span>
-</span><span id="__span-68-2"><a id="__codelineno-68-2" name="__codelineno-68-2" href="#__codelineno-68-2"></a>/rforge:r:cran-prep
-</span><span id="__span-68-3"><a id="__codelineno-68-3" name="__codelineno-68-3" href="#__codelineno-68-3"></a>
-</span><span id="__span-68-4"><a id="__codelineno-68-4" name="__codelineno-68-4" href="#__codelineno-68-4"></a><span class="c1"># Add the opt-in incoming env-var pass</span>
-</span><span id="__span-68-5"><a id="__codelineno-68-5" name="__codelineno-68-5" href="#__codelineno-68-5"></a>/rforge:r:cran-prep<span class="w"> </span>--incoming
-</span><span id="__span-68-6"><a id="__codelineno-68-6" name="__codelineno-68-6" href="#__codelineno-68-6"></a>
-</span><span id="__span-68-7"><a id="__codelineno-68-7" name="__codelineno-68-7" href="#__codelineno-68-7"></a><span class="c1"># Include goodpractice advisory and multi-platform checks</span>
-</span><span id="__span-68-8"><a id="__codelineno-68-8" name="__codelineno-68-8" href="#__codelineno-68-8"></a>/rforge:r:cran-prep<span class="w"> </span>--goodpractice<span class="w"> </span>--multi-platform
-</span><span id="__span-68-9"><a id="__codelineno-68-9" name="__codelineno-68-9" href="#__codelineno-68-9"></a>
-</span><span id="__span-68-10"><a id="__codelineno-68-10" name="__codelineno-68-10" href="#__codelineno-68-10"></a><span class="c1"># Skip revdep (e.g., first CRAN submission with no dependents)</span>
-</span><span id="__span-68-11"><a id="__codelineno-68-11" name="__codelineno-68-11" href="#__codelineno-68-11"></a>/rforge:r:cran-prep<span class="w"> </span>--no-revdep
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-70-1"><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a><span class="c1"># Full CRAN-prep gate for current package (strict passes run by default)</span>
+</span><span id="__span-70-2"><a id="__codelineno-70-2" name="__codelineno-70-2" href="#__codelineno-70-2"></a>/rforge:r:cran-prep
+</span><span id="__span-70-3"><a id="__codelineno-70-3" name="__codelineno-70-3" href="#__codelineno-70-3"></a>
+</span><span id="__span-70-4"><a id="__codelineno-70-4" name="__codelineno-70-4" href="#__codelineno-70-4"></a><span class="c1"># Add the opt-in incoming env-var pass</span>
+</span><span id="__span-70-5"><a id="__codelineno-70-5" name="__codelineno-70-5" href="#__codelineno-70-5"></a>/rforge:r:cran-prep<span class="w"> </span>--incoming
+</span><span id="__span-70-6"><a id="__codelineno-70-6" name="__codelineno-70-6" href="#__codelineno-70-6"></a>
+</span><span id="__span-70-7"><a id="__codelineno-70-7" name="__codelineno-70-7" href="#__codelineno-70-7"></a><span class="c1"># Include goodpractice advisory and multi-platform checks</span>
+</span><span id="__span-70-8"><a id="__codelineno-70-8" name="__codelineno-70-8" href="#__codelineno-70-8"></a>/rforge:r:cran-prep<span class="w"> </span>--goodpractice<span class="w"> </span>--multi-platform
+</span><span id="__span-70-9"><a id="__codelineno-70-9" name="__codelineno-70-9" href="#__codelineno-70-9"></a>
+</span><span id="__span-70-10"><a id="__codelineno-70-10" name="__codelineno-70-10" href="#__codelineno-70-10"></a><span class="c1"># Skip revdep (e.g., first CRAN submission with no dependents)</span>
+</span><span id="__span-70-11"><a id="__codelineno-70-11" name="__codelineno-70-11" href="#__codelineno-70-11"></a>/rforge:r:cran-prep<span class="w"> </span>--no-revdep
 </span></code></pre></div>
 <p><strong>Executes:</strong></p>
 <ul>
@@ -4846,7 +4962,7 @@ auto-applied).</p>
 <p>GitHub pre-release of the submitted tarball + CRAN submit <strong>handoff</strong> — fills the gap between
 <code>r:cran-prep</code> (reports <code>ready</code>) and CRAN going live. <strong>Never auto-submits to CRAN.</strong></p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-69-1"><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a>/rforge:r:submit<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--promote<span class="o">]</span><span class="w"> </span><span class="o">[</span>--universe<span class="o">]</span><span class="w"> </span><span class="o">[</span>--universe-name<span class="w"> </span>&lt;owner&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--dry-run<span class="o">]</span><span class="w"> </span><span class="o">[</span>--no-verify<span class="o">]</span><span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-71-1"><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a>/rforge:r:submit<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--promote<span class="o">]</span><span class="w"> </span><span class="o">[</span>--universe<span class="o">]</span><span class="w"> </span><span class="o">[</span>--universe-name<span class="w"> </span>&lt;owner&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--dry-run<span class="o">]</span><span class="w"> </span><span class="o">[</span>--no-verify<span class="o">]</span><span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
@@ -4884,7 +5000,7 @@ prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib
 <h3 id="rforgeruse-test">/rforge:r:use-test<a class="headerlink" href="#rforgeruse-test" title="Permanent link">&para;</a></h3>
 <p>Scaffold <code>tests/testthat/test-&lt;function&gt;.R</code> for an existing function and draft a <code>test_that()</code> block per branch — happy path, one per <code>stop()</code>, one per constrained <code>@param</code>. <strong>No oracle:</strong> assertions are emitted as <code># TODO</code> (the engine never invents expected values).</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-70-1"><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a>/rforge:r:use-test<span class="w"> </span>&lt;<span class="k">function</span>&gt;<span class="w"> </span><span class="o">[</span>--write<span class="o">]</span><span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-72-1"><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>/rforge:r:use-test<span class="w"> </span>&lt;<span class="k">function</span>&gt;<span class="w"> </span><span class="o">[</span>--write<span class="o">]</span><span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
@@ -4893,14 +5009,14 @@ prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib
 <li><code>--force</code> (optional) - Overwrite an existing test file, diff shown first (default: false)</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-71-1"><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a><span class="c1"># Dry-run: print the planned file, write nothing</span>
-</span><span id="__span-71-2"><a id="__codelineno-71-2" name="__codelineno-71-2" href="#__codelineno-71-2"></a>/rforge:r:use-test<span class="w"> </span>my_function
-</span><span id="__span-71-3"><a id="__codelineno-71-3" name="__codelineno-71-3" href="#__codelineno-71-3"></a>
-</span><span id="__span-71-4"><a id="__codelineno-71-4" name="__codelineno-71-4" href="#__codelineno-71-4"></a><span class="c1"># Apply: create the test file</span>
-</span><span id="__span-71-5"><a id="__codelineno-71-5" name="__codelineno-71-5" href="#__codelineno-71-5"></a>/rforge:r:use-test<span class="w"> </span>my_function<span class="w"> </span>--write
-</span><span id="__span-71-6"><a id="__codelineno-71-6" name="__codelineno-71-6" href="#__codelineno-71-6"></a>
-</span><span id="__span-71-7"><a id="__codelineno-71-7" name="__codelineno-71-7" href="#__codelineno-71-7"></a><span class="c1"># Overwrite an existing file</span>
-</span><span id="__span-71-8"><a id="__codelineno-71-8" name="__codelineno-71-8" href="#__codelineno-71-8"></a>/rforge:r:use-test<span class="w"> </span>my_function<span class="w"> </span>--write<span class="w"> </span>--force
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-73-1"><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a><span class="c1"># Dry-run: print the planned file, write nothing</span>
+</span><span id="__span-73-2"><a id="__codelineno-73-2" name="__codelineno-73-2" href="#__codelineno-73-2"></a>/rforge:r:use-test<span class="w"> </span>my_function
+</span><span id="__span-73-3"><a id="__codelineno-73-3" name="__codelineno-73-3" href="#__codelineno-73-3"></a>
+</span><span id="__span-73-4"><a id="__codelineno-73-4" name="__codelineno-73-4" href="#__codelineno-73-4"></a><span class="c1"># Apply: create the test file</span>
+</span><span id="__span-73-5"><a id="__codelineno-73-5" name="__codelineno-73-5" href="#__codelineno-73-5"></a>/rforge:r:use-test<span class="w"> </span>my_function<span class="w"> </span>--write
+</span><span id="__span-73-6"><a id="__codelineno-73-6" name="__codelineno-73-6" href="#__codelineno-73-6"></a>
+</span><span id="__span-73-7"><a id="__codelineno-73-7" name="__codelineno-73-7" href="#__codelineno-73-7"></a><span class="c1"># Overwrite an existing file</span>
+</span><span id="__span-73-8"><a id="__codelineno-73-8" name="__codelineno-73-8" href="#__codelineno-73-8"></a>/rforge:r:use-test<span class="w"> </span>my_function<span class="w"> </span>--write<span class="w"> </span>--force
 </span></code></pre></div>
 <p>After <code>--write</code>, fill each <code># TODO</code> with a real expected value verified against documented behavior, then run <code>/rforge:r:test</code>.</p>
 <p><strong>Related commands:</strong> <code>/rforge:r:test</code>, <code>/rforge:r:coverage</code>, <code>/rforge:r:document</code></p>
@@ -4908,7 +5024,7 @@ prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib
 <h3 id="rforgeruse-package">/rforge:r:use-package<a class="headerlink" href="#rforgeruse-package" title="Permanent link">&para;</a></h3>
 <p>Declare a single dependency for an existing package. The <code>Imports</code>-vs-<code>Suggests</code> decision reuses <code>lib/deps_sync.py</code>'s usage scan (unconditional <code>R/</code> use → <strong>Imports</strong>; tests/vignettes or guarded only → <strong>Suggests</strong>); the <code>DESCRIPTION</code> edit reuses the same DCF writer as <code>/rforge:r:deps-sync</code>. For an Imports dep, an <code>#' @importFrom &lt;pkg&gt; &lt;symbol&gt;</code> is inserted.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-72-1"><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>/rforge:r:use-package<span class="w"> </span>&lt;package&gt;<span class="w"> </span><span class="o">[</span>--write<span class="o">]</span><span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-74-1"><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a>/rforge:r:use-package<span class="w"> </span>&lt;package&gt;<span class="w"> </span><span class="o">[</span>--write<span class="o">]</span><span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
@@ -4917,11 +5033,11 @@ prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib
 <li><code>--force</code> (optional) - Reserved for symmetry with the other <code>use-*</code> commands (default: false)</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-73-1"><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a><span class="c1"># Dry-run: show the field decision + planned DESCRIPTION/@importFrom edits</span>
-</span><span id="__span-73-2"><a id="__codelineno-73-2" name="__codelineno-73-2" href="#__codelineno-73-2"></a>/rforge:r:use-package<span class="w"> </span>rlang
-</span><span id="__span-73-3"><a id="__codelineno-73-3" name="__codelineno-73-3" href="#__codelineno-73-3"></a>
-</span><span id="__span-73-4"><a id="__codelineno-73-4" name="__codelineno-73-4" href="#__codelineno-73-4"></a><span class="c1"># Apply: write DESCRIPTION + insert @importFrom</span>
-</span><span id="__span-73-5"><a id="__codelineno-73-5" name="__codelineno-73-5" href="#__codelineno-73-5"></a>/rforge:r:use-package<span class="w"> </span>rlang<span class="w"> </span>--write
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-75-1"><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a><span class="c1"># Dry-run: show the field decision + planned DESCRIPTION/@importFrom edits</span>
+</span><span id="__span-75-2"><a id="__codelineno-75-2" name="__codelineno-75-2" href="#__codelineno-75-2"></a>/rforge:r:use-package<span class="w"> </span>rlang
+</span><span id="__span-75-3"><a id="__codelineno-75-3" name="__codelineno-75-3" href="#__codelineno-75-3"></a>
+</span><span id="__span-75-4"><a id="__codelineno-75-4" name="__codelineno-75-4" href="#__codelineno-75-4"></a><span class="c1"># Apply: write DESCRIPTION + insert @importFrom</span>
+</span><span id="__span-75-5"><a id="__codelineno-75-5" name="__codelineno-75-5" href="#__codelineno-75-5"></a>/rforge:r:use-package<span class="w"> </span>rlang<span class="w"> </span>--write
 </span></code></pre></div>
 <p>The recommendation + reason is always surfaced so you can override it. After <code>--write</code> on an Imports dep, run <code>/rforge:r:document</code> to regenerate <code>NAMESPACE</code>.</p>
 <p><strong>Related commands:</strong> <code>/rforge:r:deps-sync</code> (reconcile all deps at once), <code>/rforge:r:document</code>, <code>/rforge:r:check --strict</code></p>
@@ -4929,7 +5045,7 @@ prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib
 <h3 id="rforgeruse-vignette">/rforge:r:use-vignette<a class="headerlink" href="#rforgeruse-vignette" title="Permanent link">&para;</a></h3>
 <p>Scaffold <code>vignettes/&lt;name&gt;.Rmd</code> for an existing package: a knitr skeleton (YAML index entry + engine) plus a drafted outline seeded from the package Title/Description. Section bodies are <code># TODO</code>.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-74-1"><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a>/rforge:r:use-vignette<span class="w"> </span>&lt;name&gt;<span class="w"> </span><span class="o">[</span>--article<span class="o">]</span><span class="w"> </span><span class="o">[</span>--write<span class="o">]</span><span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-76-1"><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a>/rforge:r:use-vignette<span class="w"> </span>&lt;name&gt;<span class="w"> </span><span class="o">[</span>--article<span class="o">]</span><span class="w"> </span><span class="o">[</span>--write<span class="o">]</span><span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
@@ -4939,14 +5055,14 @@ prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib
 <li><code>--force</code> (optional) - Overwrite an existing vignette file, diff shown first (default: false)</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-75-1"><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a><span class="c1"># Dry-run: print the planned .Rmd, write nothing</span>
-</span><span id="__span-75-2"><a id="__codelineno-75-2" name="__codelineno-75-2" href="#__codelineno-75-2"></a>/rforge:r:use-vignette<span class="w"> </span>intro
-</span><span id="__span-75-3"><a id="__codelineno-75-3" name="__codelineno-75-3" href="#__codelineno-75-3"></a>
-</span><span id="__span-75-4"><a id="__codelineno-75-4" name="__codelineno-75-4" href="#__codelineno-75-4"></a><span class="c1"># Apply: write the .Rmd, then register the builder</span>
-</span><span id="__span-75-5"><a id="__codelineno-75-5" name="__codelineno-75-5" href="#__codelineno-75-5"></a>/rforge:r:use-vignette<span class="w"> </span>intro<span class="w"> </span>--write
-</span><span id="__span-75-6"><a id="__codelineno-75-6" name="__codelineno-75-6" href="#__codelineno-75-6"></a>
-</span><span id="__span-75-7"><a id="__codelineno-75-7" name="__codelineno-75-7" href="#__codelineno-75-7"></a><span class="c1"># Create a pkgdown-only article instead</span>
-</span><span id="__span-75-8"><a id="__codelineno-75-8" name="__codelineno-75-8" href="#__codelineno-75-8"></a>/rforge:r:use-vignette<span class="w"> </span>advanced<span class="w"> </span>--article<span class="w"> </span>--write
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-77-1"><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a><span class="c1"># Dry-run: print the planned .Rmd, write nothing</span>
+</span><span id="__span-77-2"><a id="__codelineno-77-2" name="__codelineno-77-2" href="#__codelineno-77-2"></a>/rforge:r:use-vignette<span class="w"> </span>intro
+</span><span id="__span-77-3"><a id="__codelineno-77-3" name="__codelineno-77-3" href="#__codelineno-77-3"></a>
+</span><span id="__span-77-4"><a id="__codelineno-77-4" name="__codelineno-77-4" href="#__codelineno-77-4"></a><span class="c1"># Apply: write the .Rmd, then register the builder</span>
+</span><span id="__span-77-5"><a id="__codelineno-77-5" name="__codelineno-77-5" href="#__codelineno-77-5"></a>/rforge:r:use-vignette<span class="w"> </span>intro<span class="w"> </span>--write
+</span><span id="__span-77-6"><a id="__codelineno-77-6" name="__codelineno-77-6" href="#__codelineno-77-6"></a>
+</span><span id="__span-77-7"><a id="__codelineno-77-7" name="__codelineno-77-7" href="#__codelineno-77-7"></a><span class="c1"># Create a pkgdown-only article instead</span>
+</span><span id="__span-77-8"><a id="__codelineno-77-8" name="__codelineno-77-8" href="#__codelineno-77-8"></a>/rforge:r:use-vignette<span class="w"> </span>advanced<span class="w"> </span>--article<span class="w"> </span>--write
 </span></code></pre></div>
 <p>If <code>usethis</code> is absent, a manual <code>usethis::use_vignette()</code> recipe is printed (non-fatal — the <code>.Rmd</code> is still written).</p>
 <p><strong>Related commands:</strong> <code>/rforge:r:site</code> (build vignettes → articles), <code>/rforge:r:check</code></p>
@@ -4954,7 +5070,7 @@ prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib
 <h3 id="rforgeruse-data">/rforge:r:use-data<a class="headerlink" href="#rforgeruse-data" title="Permanent link">&para;</a></h3>
 <p>Document a package dataset for an existing package: appends a roxygen doc stub to <code>R/data.R</code> (<code>@title</code>, <code>@format</code> with a <code>\describe{}</code> skeleton, <code>@source</code>, and the trailing <code>"&lt;name&gt;"</code> documented-data idiom) and patches <code>DESCRIPTION</code> (<code>LazyData: true</code> / <code>Depends: R (&gt;= 2.10)</code>). Never fabricates the <code>.rda</code> — emits a <code>usethis::use_data(&lt;name&gt;)</code> reminder. DESCRIPTION edits preserve existing version constraints.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-76-1"><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a>/rforge:r:use-data<span class="w"> </span>&lt;name&gt;<span class="w"> </span><span class="o">[</span>--write<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-78-1"><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a>/rforge:r:use-data<span class="w"> </span>&lt;name&gt;<span class="w"> </span><span class="o">[</span>--write<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
@@ -4962,11 +5078,11 @@ prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib
 <li><code>--write</code> (optional) - Apply the plan: append to <code>R/data.R</code> (create if absent) + patch DESCRIPTION. Default is dry-run (default: false)</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-77-1"><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a><span class="c1"># Dry-run: print the planned roxygen block + DESCRIPTION delta</span>
-</span><span id="__span-77-2"><a id="__codelineno-77-2" name="__codelineno-77-2" href="#__codelineno-77-2"></a>/rforge:r:use-data<span class="w"> </span>mydata
-</span><span id="__span-77-3"><a id="__codelineno-77-3" name="__codelineno-77-3" href="#__codelineno-77-3"></a>
-</span><span id="__span-77-4"><a id="__codelineno-77-4" name="__codelineno-77-4" href="#__codelineno-77-4"></a><span class="c1"># Apply: append the doc + patch DESCRIPTION</span>
-</span><span id="__span-77-5"><a id="__codelineno-77-5" name="__codelineno-77-5" href="#__codelineno-77-5"></a>/rforge:r:use-data<span class="w"> </span>mydata<span class="w"> </span>--write
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-79-1"><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a><span class="c1"># Dry-run: print the planned roxygen block + DESCRIPTION delta</span>
+</span><span id="__span-79-2"><a id="__codelineno-79-2" name="__codelineno-79-2" href="#__codelineno-79-2"></a>/rforge:r:use-data<span class="w"> </span>mydata
+</span><span id="__span-79-3"><a id="__codelineno-79-3" name="__codelineno-79-3" href="#__codelineno-79-3"></a>
+</span><span id="__span-79-4"><a id="__codelineno-79-4" name="__codelineno-79-4" href="#__codelineno-79-4"></a><span class="c1"># Apply: append the doc + patch DESCRIPTION</span>
+</span><span id="__span-79-5"><a id="__codelineno-79-5" name="__codelineno-79-5" href="#__codelineno-79-5"></a>/rforge:r:use-data<span class="w"> </span>mydata<span class="w"> </span>--write
 </span></code></pre></div>
 <p>A collision guard skips appending if <code>R/data.R</code> already documents the same <code>\name</code> (warns, no duplicate).</p>
 <p><strong>Related commands:</strong> <code>/rforge:r:document</code> (regenerate the Rd), <code>/rforge:r:check</code></p>
@@ -4974,7 +5090,7 @@ prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib
 <h3 id="rforgeruse-citation">/rforge:r:use-citation<a class="headerlink" href="#rforgeruse-citation" title="Permanent link">&para;</a></h3>
 <p>Scaffold <code>inst/CITATION</code> from <code>DESCRIPTION</code>: parses <code>Title</code>, <code>Authors@R</code> (or fallback <code>Author</code>), and <code>Version</code>, and renders a <code>bibentry(bibtype = "Manual", ...)</code> using the package's own <code>person()</code> calls. The year comes from <code>Date:</code> if present, else a <code>&lt;YEAR&gt;</code> TODO — never a wall-clock date (determinism). Unparseable authors degrade to a <code># TODO</code> block + a warning.</p>
 <p><strong>Usage:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-78-1"><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a>/rforge:r:use-citation<span class="w"> </span><span class="o">[</span>--write<span class="o">]</span><span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-80-1"><a id="__codelineno-80-1" name="__codelineno-80-1" href="#__codelineno-80-1"></a>/rforge:r:use-citation<span class="w"> </span><span class="o">[</span>--write<span class="o">]</span><span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
 </span></code></pre></div>
 <p><strong>Parameters:</strong></p>
 <ul>
@@ -4982,14 +5098,14 @@ prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib
 <li><code>--force</code> (optional) - Overwrite an existing <code>inst/CITATION</code> (refused without this flag) (default: false)</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-79-1"><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a><span class="c1"># Dry-run: print the planned inst/CITATION</span>
-</span><span id="__span-79-2"><a id="__codelineno-79-2" name="__codelineno-79-2" href="#__codelineno-79-2"></a>/rforge:r:use-citation
-</span><span id="__span-79-3"><a id="__codelineno-79-3" name="__codelineno-79-3" href="#__codelineno-79-3"></a>
-</span><span id="__span-79-4"><a id="__codelineno-79-4" name="__codelineno-79-4" href="#__codelineno-79-4"></a><span class="c1"># Apply: write inst/CITATION</span>
-</span><span id="__span-79-5"><a id="__codelineno-79-5" name="__codelineno-79-5" href="#__codelineno-79-5"></a>/rforge:r:use-citation<span class="w"> </span>--write
-</span><span id="__span-79-6"><a id="__codelineno-79-6" name="__codelineno-79-6" href="#__codelineno-79-6"></a>
-</span><span id="__span-79-7"><a id="__codelineno-79-7" name="__codelineno-79-7" href="#__codelineno-79-7"></a><span class="c1"># Overwrite an existing inst/CITATION</span>
-</span><span id="__span-79-8"><a id="__codelineno-79-8" name="__codelineno-79-8" href="#__codelineno-79-8"></a>/rforge:r:use-citation<span class="w"> </span>--write<span class="w"> </span>--force
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-81-1"><a id="__codelineno-81-1" name="__codelineno-81-1" href="#__codelineno-81-1"></a><span class="c1"># Dry-run: print the planned inst/CITATION</span>
+</span><span id="__span-81-2"><a id="__codelineno-81-2" name="__codelineno-81-2" href="#__codelineno-81-2"></a>/rforge:r:use-citation
+</span><span id="__span-81-3"><a id="__codelineno-81-3" name="__codelineno-81-3" href="#__codelineno-81-3"></a>
+</span><span id="__span-81-4"><a id="__codelineno-81-4" name="__codelineno-81-4" href="#__codelineno-81-4"></a><span class="c1"># Apply: write inst/CITATION</span>
+</span><span id="__span-81-5"><a id="__codelineno-81-5" name="__codelineno-81-5" href="#__codelineno-81-5"></a>/rforge:r:use-citation<span class="w"> </span>--write
+</span><span id="__span-81-6"><a id="__codelineno-81-6" name="__codelineno-81-6" href="#__codelineno-81-6"></a>
+</span><span id="__span-81-7"><a id="__codelineno-81-7" name="__codelineno-81-7" href="#__codelineno-81-7"></a><span class="c1"># Overwrite an existing inst/CITATION</span>
+</span><span id="__span-81-8"><a id="__codelineno-81-8" name="__codelineno-81-8" href="#__codelineno-81-8"></a>/rforge:r:use-citation<span class="w"> </span>--write<span class="w"> </span>--force
 </span></code></pre></div>
 <p><strong>Related commands:</strong> <code>/rforge:r:check</code> (validates <code>inst/CITATION</code> parses)</p>
 <hr />
@@ -5044,7 +5160,8 @@ prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib
 - <code>/rforge:r:lint</code> - Static analysis (lintr)
 - <code>/rforge:r:spell</code> - Spell-check docs
 - <code>/rforge:r:urlcheck</code> - Validate URLs
-- <code>/rforge:r:style</code> - Auto-format source (styler)</p>
+- <code>/rforge:r:style</code> - Auto-format source (styler)
+- <code>/rforge:r:tidy</code> - Tidyverse-conventions audit (advisory)</p>
 <p><strong>Release Preparation:</strong>
 - <code>/rforge:analyze --mode release</code> - Full audit
 - <code>/rforge:thorough</code> - Comprehensive checks
@@ -5069,7 +5186,7 @@ prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib
 - <code>--format json</code> - Machine-readable with metadata
 - <code>--format markdown</code> - Documentation-ready</p>
 <p><strong>Example:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-80-1"><a id="__codelineno-80-1" name="__codelineno-80-1" href="#__codelineno-80-1"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span>--format<span class="w"> </span>markdown<span class="w"> </span>&gt;<span class="w"> </span>analysis.md
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-82-1"><a id="__codelineno-82-1" name="__codelineno-82-1" href="#__codelineno-82-1"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span>--format<span class="w"> </span>markdown<span class="w"> </span>&gt;<span class="w"> </span>analysis.md
 </span></code></pre></div></p>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
