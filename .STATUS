@@ -2,7 +2,31 @@ project: rforge
 updated: 2026-07-16
 status: Active
 version: 2.18.0 (released, on main) — dev carries 1 unreleased feature (see in_progress)
-in_progress: 2026-07-16 — UNRELEASED ON DEV: evidence-based 403 triage for `r:urlcheck` (PR #67, squashed to dev). Replaces the hardcoded `"doi.org" in url` heuristic (G4, v2.14.0) with probing: for each 403 probe the site root, then re-probe the URL; classify dead/real_403 (gate) vs bot_blocked/transient (advisory), emitting per-item `evidence`. doi.org keeps a no-network fast path — its root returns 200, so a pure root-probe rule would have REGRESSED it to `real_403`. Origin: medrobust 0.4.0 preflight, where cdc.gov + data.nber.org 403s reported 🔴 error while `R CMD check --as-cran` was 0/0/0. Scope limit: local preflight noise only — CRAN's own URL check uses R's UA and cannot be configured. Touched lib/rcmd.py, tests/test_rcmd.py (+6, TDD), commands/r/urlcheck.md. pytest 529 passed / 2 skipped. NEXT: include in the next release (CHANGELOG entry + version bump 2.18.0→2.19.0 across the 6 version files are release-time actions, not yet done). Design record: PROPOSAL-url-403-triage-2026-07-16.md (option 3).
+in_progress: 2026-07-16 — UNRELEASED ON DEV: evidence-based 403 triage for `r:urlcheck` (PR #67, squashed to dev). Replaces the hardcoded `"doi.org" in url` heuristic (G4, v2.14.0) with probing: for each 403 probe the site root, then re-probe the URL; classify dead/real_403 (gate) vs bot_blocked/transient (advisory), emitting per-item `evidence`. doi.org keeps a no-network fast path — its root returns 200, so a pure root-probe rule would have REGRESSED it to `real_403`. Origin: medrobust 0.4.0 preflight, where cdc.gov + data.nber.org 403s reported 🔴 error while `R CMD check --as-cran` was 0/0/0. Scope limit: local preflight noise only — CRAN's own URL check uses R's UA and cannot be configured. Touched lib/rcmd.py, tests/test_rcmd.py (+6, TDD), commands/r/urlcheck.md. pytest 529 passed / 2 skipped. NEXT: include in the next release — see pre_release_check below. Design record: PROPOSAL-url-403-triage-2026-07-16.md (option 3).
+pre_release_check: (written 2026-07-16, for the v2.19.0 release of the #67 urlcheck triage)
+  WHY 2.19.0 (minor, not patch): new user-visible classification + two new envelope fields
+    (`advisory`, `advisory_count`). `doi_blocked_count` is preserved, so it is additive, not breaking.
+  VERSION PROCEDURE — do NOT hand-edit version strings:
+    1. Bump `package.json` "version" 2.18.0 → 2.19.0. That file is the SINGLE SOURCE OF TRUTH.
+    2. Run `python3 scripts/version_sync.py` — it stamps mkdocs.yml, .claude-plugin/plugin.json,
+       package.json description, README.md, CLAUDE.md. `--check` exits 0 when in sync (verified
+       in sync at 2.18.0 on 2026-07-16). CHANGELOG / "What's new" / historical refs are
+       intentionally NOT stamped — those are written by hand.
+    3. `command_count` is unchanged (41) — no new command, only new behavior in `r:urlcheck`.
+  GATES that must pass before the dev→main PR:
+    - `tests/test-all.sh` — includes "All 4 version sources agree (plugin/marketplace/package)"
+      at line 598; this fails loudly if step 1 is done without step 2.
+    - `python3 -m pytest tests/` — expect 529 passed / 0 failed / 2 skipped. If the number is
+      ~689, stray untracked "*(1).py" snapshots are back and are being collected (see cruft above).
+  CHANGELOG entry (hand-written, follow the 2.18.0 shape): summary blockquote + `### Added`,
+    and record the real test counts (529 / test-all 44/44) — not an inflated figure.
+  DO NOT claim in CHANGELOG/CLAUDE.md that this fixes CRAN URL NOTEs. It does not. CRAN runs its
+    own URL check with R's user agent and cannot be configured; this only reduces LOCAL preflight
+    noise. Overstating scope here would be the one genuinely misleading thing this release could ship.
+  CLAUDE.md: its version-history block currently documents v2.18.0 as released. Add the v2.19.0
+    entry only AS PART OF the release (it was deliberately left untouched while #67 sat unreleased).
+  AFTER MERGE: tag v2.19.0 → GitHub release → Homebrew tap formula+manifest sync → verify CI green
+    on main (RForge CI + Deploy Documentation) → confirm live docs show 2.19.0.
 cruft: (cleared 2026-07-16) 3 untracked stale test snapshots — "test_cranlint (1).py", "test_rcmd (1).py", "test_rcmd_strict (1).py" — were being collected by pytest and inflating counts (689 vs the true 529). Verified each tracked file was a strict superset (0 unique lines; the copies pre-dated the v2.17.0 tarball tests and the #67 triage tests), then deleted. `pytest tests/` now reports 529 passed / 2 skipped with no --ignore-glob workaround.
 last_release: 2026-06-30 v2.18.0 (PR #63 dev→main merge a2555fe; tag v2.18.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.18.0; CI green on main RForge CI + Deploy Documentation success; tap Data-Wise/homebrew-tap main dda5554 — formula+manifest → v2.18.0, sha256 7683de54…, ruby -c OK, generate.py --diff IDENTICAL; live docs 2.18.0). Creative doc enhancements: in-site changelog, glossary, command cards, contributor guide, example sessions, 404 page, social cards, command decision tree, symptom/fix admonitions. CI fix: cache: pip removed from setup-python@v6. Stale ref cleanup: install.sh (deprecated MCP ref), package.json (main/engines). Diagram: "Where rforge fits" teal/amber palette + diff-aware feedback loop. 41 commands (no surface change). pytest 524, test-all 44/44.
 last_release_prior_v2_17_0: 2026-06-30 v2.17.0 (PR #57 dev→main merge e29a77c; tag v2.17.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.17.0; CI green on main RForge CI + Deploy Documentation success; tap Data-Wise/homebrew-tap main 7a4d5c3 — formula+manifest → v2.17.0, sha256 d1118e67…; live docs 2.17.0). Winbuilder fallback + tarball-check stage (medrobust v0.4.0 CRAN-prep). 41 commands. pytest 524, test-all 44/44.
