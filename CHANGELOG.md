@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.19.0] - 2026-07-16
+
+> Evidence-based `r:urlcheck` 403 triage + `r:rhub` dispatch bugfix (#66) +
+> tidyverse-conventions audit (#65). **42 commands** (new: `r:tidy`). pytest 558,
+> test-all 44/44.
+
+### Added
+
+- **`r:urlcheck` evidence-based 403 triage** (#67) — replaces the hardcoded
+  `"doi.org" in url` heuristic (G4, v2.14.0) with probing: for each 403, probe
+  the site root, then re-probe the URL; classify `dead`/`real_403` (gate) vs
+  `bot_blocked`/`transient` (advisory), emitting per-item `evidence`. `doi.org`
+  keeps a no-network fast path. New envelope fields `advisory`/`advisory_count`
+  (additive; `doi_blocked_count` preserved for back-compat). Scope limit: this
+  reduces **local preflight noise only** — CRAN's own URL check uses R's user
+  agent and cannot be configured; it does not fix CRAN URL NOTEs.
+- **`--tidy`/`--set-lintr` on `r:lint`** (#65) — runs the tidyverse lintr
+  preset (`object_name_linter("snake_case")`, `brace_linter`,
+  `spaces_inside_linter`, `trailing_whitespace_linter`, `semicolon_linter` —
+  `tidyverse_linters()` was removed in lintr 3.x, verified live against 3.4.0)
+  alongside the default preset; report shows only the additional tidy-only
+  findings, grouped by file. `--set-lintr` writes a `.lintr` activating the
+  preset permanently.
+- **`r:tidy` command** (#65, new — 41→42 commands) — tidyverse-conventions
+  audit, four advisory stages that never block: the tidy lint preset,
+  `tidydesc` (`usethis::use_tidy_description()` preview via a scratch-dir
+  copy, or applied for real with `--fix`), `roxygen_completeness` (new
+  pure-Python `lib/tidyaudit.py` — flags `@export`'d functions missing
+  `@examples`/`@return`/`@family`), and `news_header` (top `NEWS.md` entry
+  format + version-vs-`DESCRIPTION` check). `--fix` also runs the existing
+  `r:style` (styler).
+
+### Fixed
+
+- **`r:rhub` dispatch bug** (#66) — `rhub::rhub_check()`'s first parameter is
+  `gh_url` (verified live against installed rhub — the function has no `path`
+  parameter at all), not the local package path the snippet was passing
+  positionally; every dispatch failed with a `gh_url must be an HTTP or HTTPS
+  URL` error. Fixed via `setwd()` into the package directory instead.
+  `rc_submit()` does **not** have this bug — its first parameter really is
+  `path` (verified live before assuming symmetry with `rhub_check()`).
+- **`r:rhub` swallowed stderr** (#66) — `_invoke_r` now folds stderr into the
+  returned text on a non-zero exit, so a real R error surfaces in the envelope
+  instead of an empty-looking failure that required a manual `Rscript` re-run
+  to diagnose.
+
+### Changed
+
+- **`r:rhub` docs** (#66) — notes that the `linux` preset platform builds
+  R-devel from source (~20+ min) vs. a fast `ubuntu-latest (devel)` entry in
+  a package's own `R-CMD-check.yaml` (~2-3 min); recommends reserving the full
+  preset for the final pre-submission pass.
+
 ## [2.18.0] - 2026-06-30
 
 > Creative doc enhancements + CI/staleness fixes. **41 commands** (no surface change).

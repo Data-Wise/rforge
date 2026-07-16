@@ -4,9 +4,11 @@
 > Follows the global `~/.claude/CLAUDE.md`; this file only captures
 > rforge-specific patterns that don't apply to other dev-tools repos.
 
-## Current state (2026-06-30)
+## Current state (2026-07-16)
 
-**v2.18.0 (released — on `main`) — creative doc enhancements + CI/staleness fixes:** New in-site pages (changelog, glossary, command cards, contributor guide, example sessions, 404 page, decision tree diagram, social cards, symptom/fix admonitions). CI fix: removed `cache: pip` from `setup-python` (no `requirements.txt`); added `pillow`+`cairosvg` for social cards. Stale refs cleaned from `install.sh` and `package.json`. "Where rforge fits" diagram updated to teal/amber palette with diff-aware feedback loop. 41 commands (no surface change). pytest 524, test-all 44/44.
+**v2.19.0 (released — on `main`) — urlcheck 403 triage + rhub bugfix + tidy audit:** Evidence-based `r:urlcheck` 403 triage (#67) replaces the hardcoded `doi.org` heuristic with root-then-URL probing, classifying `dead`/`real_403` (gate) vs `bot_blocked`/`transient` (advisory). `r:rhub` dispatch bugfix (#66) — `rhub::rhub_check()`'s first param is `gh_url`, not a local path (verified live against installed rhub); fixed via `setwd()`; `_invoke_r` now folds stderr into failures instead of silently dropping them. New `r:tidy` command + `r:lint --tidy`/`--set-lintr` (#65) — tidyverse-conventions audit (lint preset, DESCRIPTION normalization preview/`--fix`, roxygen completeness, NEWS.md header currency), new pure-Python `lib/tidyaudit.py`. 41→42 commands. pytest 558, test-all 44/44.
+
+**v2.18.0 — creative doc enhancements + CI/staleness fixes:** New in-site pages (changelog, glossary, command cards, contributor guide, example sessions, 404 page, decision tree diagram, social cards, symptom/fix admonitions). CI fix: removed `cache: pip` from `setup-python` (no `requirements.txt`); added `pillow`+`cairosvg` for social cards. Stale refs cleaned from `install.sh` and `package.json`. "Where rforge fits" diagram updated to teal/amber palette with diff-aware feedback loop. 41 commands (no surface change). pytest 524, test-all 44/44.
 
 **v2.16.0 — pkgdown deploy leak guard (issue #52):** new public module `lib/sitelint.py` (`check_site_leaks` — scans the pkgdown render surface: root `*.md`, non-`.Rd` `man/`, `vignettes/` aggressively in `articles/**` with top-level rendered vignettes auto-trusted; minus core allowlist ∪ `.rforge.yaml` `site.allowlist`, path-aware; candidates from git HEAD ∪ working tree; advisory, never blocks). Three additive `r:site` flags: `--check-leaks` (read-only lint), `--deploy [--branch] [--force]` (clean-ref pkgdown deploy via `git worktree add -b <tmp> HEAD` — shares `.git`+remote so `deploy_to_branch` works **and** excludes untracked files; recommend-only, MUTATING+NETWORK). `r:cran-prep` gains a Tier-4 `site-leaks` advisory stage. 41 commands (no new command). Built spec→TDD (workflow)→C-RISK resolution (archive non-functional; worktree mandatory)→Phase-5 adversarial review (1 blocker + 3 important + minors, all fixed)→**end-to-end smoke test PASSED** (real build+push to a local bare origin; untracked scratch excluded — caught the `--detach`→named-branch deploy bug). pytest 510, test-all 44/44. Lesson [[feedback_smoke_test_mocked_network_paths]].
 
@@ -17,6 +19,7 @@
 
 ### Release history — architecture deltas only (release mechanics live in CHANGELOG + git)
 
+- **v2.19.0** — evidence-based `r:urlcheck` 403 triage (#67); `r:rhub` dispatch bugfix + stderr-capture (#66); `r:tidy` command + `r:lint --tidy`/`--set-lintr` + `lib/tidyaudit.py` (#65). 41→42 commands.
 - **v2.18.0** — creative doc enhancements (changelog, glossary, command cards, contributor guide, example sessions, social cards, decision tree, symptom/fix admonitions, 404) + CI fix (`cache: pip` removed, pillow+cairosvg) + stale ref cleanup.
 - **v2.17.0** — winbuilder fallback + tarball-check stage (medrobust v0.4.0 CRAN-prep).
 - **v2.16.0** — pkgdown deploy leak guard (issue #52), `lib/sitelint.py`, `r:site --check-leaks/--deploy`.
