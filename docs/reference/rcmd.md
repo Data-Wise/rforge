@@ -68,7 +68,7 @@ revdep_env=None when no revdep check was run (package has no dependents).
 ### `run()`
 
 ```python
-def run(kind: 'str', path: 'str' = '.', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False, flavor: 'str | None' = None, incoming: 'bool' = False, platform: 'str' = 'all', platforms: 'list | None' = None, preset: 'str | None' = None, rc_mode: 'bool' = False, branch: 'str' = 'gh-pages', force: 'bool' = False) -> 'dict'
+def run(kind: 'str', path: 'str' = '.', *, as_cran: 'bool' = False, preview: 'bool' = False, strict: 'bool' = False, articles_only: 'bool' = False, devel: 'bool' = False, flavor: 'str | None' = None, incoming: 'bool' = False, platform: 'str' = 'all', platforms: 'list | None' = None, preset: 'str | None' = None, rc_mode: 'bool' = False, branch: 'str' = 'gh-pages', force: 'bool' = False, tidy: 'bool' = False, apply: 'bool' = False) -> 'dict'
 ```
 
 Run one engine ``kind`` against ``path``; return the normalized envelope.
@@ -77,6 +77,9 @@ Threads the check ``flavor`` / ``incoming`` selectors through to ``r_snippet``;
 returns an error envelope when no DESCRIPTION is found. For ``kind="rhub"``,
 ``platforms`` (``list[str]``), ``preset`` (``str``) and ``rc_mode`` (``bool``)
 select the R-hub dispatch; a Python-side pre-flight gate runs before any R call.
+``tidy`` (kind="lint") also runs the tidyverse linter preset alongside the
+default one. ``apply`` (kind="tidydesc") writes the normalized DESCRIPTION
+to the real path instead of a scratch-dir preview.
 
 ### `run_changed()`
 
@@ -108,3 +111,14 @@ Degrades safely (no regression of the v2.10.0 scope-only behavior):
   - merge-base / baseline worktree unavailable (scope_check None) → SCOPE-ONLY:
     run the engine on the changed package(s), surface the REAL status, and warn
     that tagging was unavailable (findings are NOT tagged, status NOT folded).
+
+### `write_lintr_file()`
+
+```python
+def write_lintr_file(path: 'str') -> 'dict'
+```
+
+``r:lint --tidy --set-lintr`` — write a ``.lintr`` activating the
+tidyverse preset permanently (issue #65). Refuses to overwrite an
+existing ``.lintr`` — remove it manually first, matching the read-safe
+default other write ops in this codebase use.

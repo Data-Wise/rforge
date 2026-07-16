@@ -910,12 +910,14 @@ Static analysis of the package via `lintr` — grouped report of style and code-
 **Usage:**
 
 ```bash
-/rforge:r:lint [package] [--changed] [--base <ref>]
+/rforge:r:lint [package] [--tidy] [--set-lintr] [--changed] [--base <ref>]
 ```
 
 **Parameters:**
 
 - `package` (optional) - Package path (defaults to current directory)
+- `--tidy` (optional, v2.19.0, issue #65) - Also run the tidyverse linter preset (`object_name_linter("snake_case")`, `brace_linter`, `spaces_inside_linter`, `trailing_whitespace_linter`, `semicolon_linter` — `tidyverse_linters()` was removed in lintr 3.x) alongside the default preset; report shows only the additional tidy-only findings, grouped by file (default: false)
+- `--set-lintr` (optional, v2.19.0, issue #65) - `--tidy`: write a `.lintr` activating the tidy preset permanently; refuses to overwrite an existing `.lintr` (default: false)
 - `--changed` (optional, v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0) - Scope lint to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; line-shift-immune identity; an introduced lint in an uncommitted file is refined to `[uncommitted]` (default: false)
 - `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed` (default: `dev`)
 - `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on `[introduced]` findings (default: `introduced`)
@@ -929,15 +931,64 @@ Static analysis of the package via `lintr` — grouped report of style and code-
 
 # Lint only packages changed on this branch
 /rforge:r:lint --changed --base dev
+
+# Also surface tidyverse-preset-only findings
+/rforge:r:lint --tidy
+
+# ...and make the tidy preset permanent
+/rforge:r:lint --tidy --set-lintr
 ```
 
 **Executes:**
 
-- Runs `lintr::lint_package()` (read-only; no files are changed)
+- Runs `lintr::lint_package()` (read-only; no files are changed unless `--set-lintr`)
 - Groups findings by file with line numbers and lint rule names
 - If `lintr` is missing, reports 🟡 with install hint
 
-**Related commands:** `/rforge:r:style` (auto-format fixes many style lints)
+**Related commands:** `/rforge:r:style` (auto-format fixes many style lints), `/rforge:r:tidy` (full tidyverse-conventions audit: this preset + DESCRIPTION normalization + roxygen completeness + NEWS.md header)
+
+---
+
+### /rforge:r:tidy
+
+Tidyverse-conventions audit — a "how tidy am I?" report. **All four stages are advisory and never block** (unlike `/rforge:r:cran-prep`). Read-safe by default: without `--fix`, nothing on disk is touched.
+
+**Usage:**
+
+```bash
+/rforge:r:tidy [package] [--fix]
+```
+
+**Parameters:**
+
+- `package` (optional) - Package path (defaults to current directory)
+- `--fix` (optional, v2.19.0, issue #65) - Auto-fix what's safe: runs `styler::style_pkg()` and applies the DESCRIPTION normalization to the real file instead of previewing it. MUTATING (default: false)
+
+**Examples:**
+
+```bash
+# Preview only — nothing written
+/rforge:r:tidy
+
+# Apply the safe fixes (styler + DESCRIPTION normalization)
+/rforge:r:tidy --fix
+```
+
+**Stages:**
+
+| Stage | What it does | Writes files? |
+|-------|--------------|----------------|
+| `lint (tidy)` | tidyverse lintr preset (same as `r:lint --tidy`) — additions grouped by file | no |
+| `tidydesc` | `usethis::use_tidy_description()` preview (scratch-dir diff), or applied with `--fix` | only with `--fix` |
+| `style` | only with `--fix` — `styler::style_pkg()` | only with `--fix` |
+| `roxygen_completeness` | exported (`@export`) functions missing `@examples`/`@return`/`@family` | no |
+| `news_header` | top `NEWS.md` entry matches `## Package X.Y.Z` and its version matches DESCRIPTION | no |
+
+`roxygen_completeness` and `news_header` are pure-Python static analysis (no R) with no `--fix` behavior — a missing `@examples` block or a stale NEWS.md entry needs a human, not an auto-fix.
+
+**Output:** one `{kind: "tidy", status: "ok"|"warn", stages: [...], messages: [...]}` envelope. Exit 0 always (advisory-only).
+
+**Related commands:** `/rforge:r:lint --tidy` (just the lint-preset stage), `/rforge:r:style` (just the styler stage), `/rforge:r:cran-prep` (the CRAN-readiness gate — blocking, separate from this)
 
 ---
 
@@ -1547,6 +1598,7 @@ Scaffold `inst/CITATION` from `DESCRIPTION`: parses `Title`, `Authors@R` (or fal
 - `/rforge:r:spell` - Spell-check docs
 - `/rforge:r:urlcheck` - Validate URLs
 - `/rforge:r:style` - Auto-format source (styler)
+- `/rforge:r:tidy` - Tidyverse-conventions audit (advisory)
 
 **Release Preparation:**
 - `/rforge:analyze --mode release` - Full audit

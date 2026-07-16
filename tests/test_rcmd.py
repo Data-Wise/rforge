@@ -65,6 +65,73 @@ def test_normalize_urlcheck_empty_is_ok():
     assert env["urlcheck"]["doi_blocked_count"] == 0
 
 
+# --- evidence-based 403 triage -------------------------------------------------
+
+
+def _no_network(monkeypatch):
+    """Fail loudly if a test probes the network without saying so."""
+    monkeypatch.setattr(
+        rcmd, "_probe_status",
+        lambda url, timeout=None: pytest.fail(f"unexpected network probe: {url}"))
+
+
+def test_doi_403_is_advisory_without_probing(monkeypatch):
+    # doi.org keeps its fast path: advisory, and must not hit the network
+    # (doi.org's root returns 200, so a probe would misclassify it as real).
+    _no_network(monkeypatch)
+    env = rcmd.normalize(
+        "urlcheck", {"broken": [{"url": "https://doi.org/10.1000/xyz", "status": "403"}]},
+        0, None)
+    assert env["status"] == "warn"
+    assert env["urlcheck"]["count"] == 0
+    assert env["urlcheck"]["doi_blocked_count"] == 1
+
+
+def test_403_with_403_root_is_bot_blocked(monkeypatch):
+    # nber.org: file 403 AND site root 403 -> blanket bot-block -> advisory
+    monkeypatch.setattr(rcmd, "_probe_status", lambda url, timeout=None: 403)
+    env = rcmd.normalize(
+        "urlcheck",
+        {"broken": [{"url": "https://data.nber.org/a/b.csv", "status": "403"}]}, 0, None)
+    assert env["status"] == "warn"
+    assert env["urlcheck"]["count"] == 0
+    adv = env["urlcheck"]["advisory"]
+    assert len(adv) == 1
+    assert adv[0]["blocked_class"] == "bot_blocked"
+    assert "root" in adv[0]["evidence"].lower()
+
+
+def test_403_that_reprobes_ok_is_transient(monkeypatch):
+    # cdc.gov: root 200, and re-probing the URL succeeds -> transient, not broken
+    monkeypatch.setattr(rcmd, "_probe_status", lambda url, timeout=None: 200)
+    env = rcmd.normalize(
+        "urlcheck", {"broken": [{"url": "https://www.cdc.gov/nchs/nhanes/", "status": "403"}]},
+        0, None)
+    assert env["status"] == "warn"
+    assert env["urlcheck"]["count"] == 0
+    assert env["urlcheck"]["advisory"][0]["blocked_class"] == "transient"
+
+
+def test_403_with_live_root_and_persistent_403_is_real(monkeypatch):
+    # root reachable, URL still 403 on re-probe -> genuinely refused -> gate
+    def probe(url, timeout=None):
+        return 200 if url.rstrip("/").count("/") == 2 else 403  # root ok, path 403
+    monkeypatch.setattr(rcmd, "_probe_status", probe)
+    env = rcmd.normalize(
+        "urlcheck", {"broken": [{"url": "https://example.com/gone", "status": "403"}]}, 0, None)
+    assert env["status"] == "error"
+    assert env["urlcheck"]["count"] == 1
+
+
+def test_404_is_dead_and_never_probes(monkeypatch):
+    # a real dead link must still gate -- and needs no probing to decide
+    _no_network(monkeypatch)
+    env = rcmd.normalize(
+        "urlcheck", {"broken": [{"url": "https://example.com/x", "status": "404"}]}, 0, None)
+    assert env["status"] == "error"
+    assert env["urlcheck"]["count"] == 1
+
+
 def test_normalize_style_ok_on_exit0():
     assert rcmd.normalize("style", {"changed_files": ["R/a.R"]}, 0, None)["status"] == "ok"
 
@@ -1176,9 +1243,185 @@ def test_invoke_r_timeout_returns_124(monkeypatch):
     assert code == 124 and '"timed_out"' in out
 
 
+def test_invoke_r_folds_stderr_into_output_on_failure(monkeypatch):
+    """On a non-zero exit with no stdout JSON, stderr must ride along in the
+    returned text so console_fallback surfaces the real R error instead of an
+    empty-looking envelope (issue #66)."""
+    class FakeProc:
+        stdout = ""
+        stderr = ('Error in `rhub::rhub_check(...)`:\n'
+                  '! `gh_url` must be an HTTP or HTTPS URL. You supplied: "/tmp/pkg".\n')
+        returncode = 1
+    monkeypatch.setattr(rcmd.shutil, "which", lambda x: "/usr/bin/Rscript")
+    monkeypatch.setattr(rcmd.subprocess, "run", lambda *a, **k: FakeProc())
+    out, code = rcmd._invoke_r("bad_call()")
+    assert code == 1
+    assert "gh_url` must be an HTTP or HTTPS URL" in out
+
+
+def test_invoke_r_leaves_successful_stdout_untouched(monkeypatch):
+    """On success (exit 0), stderr (e.g. harmless package-load notes) must NOT
+    be folded in — only the failure path does that."""
+    class FakeProc:
+        stdout = '{"submitted":true}'
+        stderr = "some harmless startup message\n"
+        returncode = 0
+    monkeypatch.setattr(rcmd.shutil, "which", lambda x: "/usr/bin/Rscript")
+    monkeypatch.setattr(rcmd.subprocess, "run", lambda *a, **k: FakeProc())
+    out, code = rcmd._invoke_r("ok_call()")
+    assert code == 0
+    assert out == '{"submitted":true}'
+
+
 def test_run_surfaces_timeout_as_error(tmp_path, monkeypatch):
     _write_desc(tmp_path)
     monkeypatch.setattr(rcmd, "_invoke_r", lambda *a, **k: ('{"timed_out": true}', 124))
     env = rcmd.run("check", str(tmp_path))
     assert env["status"] == "error"
     assert any("timed out" in m.lower() for m in env["messages"])
+
+
+# ── Issue #65: --tidy lint preset + r:tidy audit command ────────────────────
+
+def test_r_snippet_lint_tidy_runs_both_presets():
+    snippet = rcmd.r_snippet("lint", ".", tidy=True)
+    assert "lint_package" in snippet
+    assert "tidy_lints" in snippet  # both default AND tidy lists emitted
+    assert "linters_with_defaults" in snippet
+    assert 'object_name_linter("snake_case")' in snippet
+
+
+def test_r_snippet_lint_default_has_no_tidy_lints():
+    snippet = rcmd.r_snippet("lint", ".")
+    assert "tidy_lints" not in snippet
+
+
+def test_normalize_lint_tidy_computes_additions_grouped_by_file():
+    raw = {
+        "lints": [{"file": "a.R", "line": 1, "linter": "object_usage_linter",
+                   "message": "m"}],
+        "tidy_lints": [
+            {"file": "a.R", "line": 1, "linter": "object_usage_linter", "message": "m"},
+            {"file": "a.R", "line": 5, "linter": "object_name_linter", "message": "snake"},
+            {"file": "b.R", "line": 2, "linter": "object_name_linter", "message": "snake"},
+        ],
+    }
+    env = rcmd.normalize("lint", raw, 0, None)
+    tidy = env["lint"]["tidy"]
+    assert tidy["count"] == 2  # the shared a.R:1 finding is NOT double-counted
+    assert tidy["by_file"] == {"a.R": 1, "b.R": 1}
+
+
+def test_normalize_lint_without_tidy_lints_has_no_tidy_key():
+    env = rcmd.normalize("lint", {"lints": []}, 0, None)
+    assert "tidy" not in env["lint"]
+
+
+def test_r_snippet_tidydesc_preview_uses_scratch_copy():
+    snippet = rcmd.r_snippet("tidydesc", "/real/pkg")
+    assert "tempfile()" in snippet
+    assert "file.copy" in snippet
+    assert "use_tidy_description" in snippet
+    assert 'applied=FALSE' in snippet
+
+
+def test_r_snippet_tidydesc_apply_targets_real_path():
+    snippet = rcmd.r_snippet("tidydesc", "/real/pkg", apply=True)
+    assert "tempfile()" not in snippet
+    assert 'setwd("/real/pkg")' in snippet
+    assert 'applied=TRUE' in snippet
+
+
+def test_status_for_tidydesc_ok_when_unchanged():
+    assert rcmd._status_for("tidydesc", {"changed": False}, 0) == "ok"
+
+
+def test_status_for_tidydesc_warn_when_changed():
+    assert rcmd._status_for("tidydesc", {"changed": True}, 0) == "warn"
+
+
+def test_status_for_tidydesc_error_on_nonzero_exit():
+    assert rcmd._status_for("tidydesc", {"changed": False}, 1) == "error"
+
+
+def test_normalize_tidydesc_shape():
+    raw = {"changed": True, "before": ["a"], "after": ["a", "b"], "applied": False}
+    env = rcmd.normalize("tidydesc", raw, 0, None)
+    assert env["tidydesc"] == {"changed": True, "before": ["a"],
+                               "after": ["a", "b"], "applied": False}
+
+
+def test_run_tidy_orchestrates_all_stages_preview_mode(tmp_path, monkeypatch):
+    """kind='tidy' (no --fix) never touches style and reports tidydesc as a preview."""
+    _write_desc(tmp_path)
+
+    def fake_invoke_r(snippet, **kw):
+        if "tidy_lints" in snippet:
+            return ('{"lints":[],"tidy_lints":[]}', 0)
+        if "use_tidy_description" in snippet:
+            return ('{"changed":false,"before":[],"after":[],"applied":false}', 0)
+        raise AssertionError(f"unexpected snippet in preview mode: {snippet[:80]}")
+
+    monkeypatch.setattr(rcmd, "_invoke_r", fake_invoke_r)
+    env = rcmd.run("tidy", str(tmp_path))
+    assert env["kind"] == "tidy"
+    assert env["applied"] is False
+    kinds = [s["kind"] for s in env["stages"]]
+    assert "lint (tidy)" in kinds
+    assert "tidydesc" in kinds
+    assert "style" not in kinds  # --fix not requested
+    assert "roxygen_completeness" in kinds
+    assert "news_header" in kinds
+
+
+def test_run_tidy_fix_mode_also_runs_style(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+
+    def fake_invoke_r(snippet, **kw):
+        if "tidy_lints" in snippet:
+            return ('{"lints":[],"tidy_lints":[]}', 0)
+        if "use_tidy_description" in snippet:
+            return ('{"changed":true,"before":["a"],"after":["b"],"applied":true}', 0)
+        if "style_pkg" in snippet:
+            return ('{"changed_files":["R/foo.R"]}', 0)
+        raise AssertionError(f"unexpected snippet in --fix mode: {snippet[:80]}")
+
+    monkeypatch.setattr(rcmd, "_invoke_r", fake_invoke_r)
+    env = rcmd.run("tidy", str(tmp_path), apply=True)
+    assert env["applied"] is True
+    kinds = [s["kind"] for s in env["stages"]]
+    assert "style" in kinds
+    assert any("reformatted 1 file" in m for m in env["messages"])
+
+
+def test_write_lintr_file_creates_file(tmp_path):
+    env = rcmd.write_lintr_file(str(tmp_path))
+    assert env["status"] == "ok"
+    lintr_path = tmp_path / ".lintr"
+    assert lintr_path.exists()
+    assert "linters_with_defaults" in lintr_path.read_text()
+
+
+def test_write_lintr_file_refuses_to_overwrite(tmp_path):
+    (tmp_path / ".lintr").write_text("# custom user config\n")
+    env = rcmd.write_lintr_file(str(tmp_path))
+    assert env["status"] == "error"
+    assert "already exists" in env["messages"][0]
+    assert (tmp_path / ".lintr").read_text() == "# custom user config\n"  # untouched
+
+
+def test_cli_tidy_kind_wires_through(tmp_path, monkeypatch, capsys):
+    _write_desc(tmp_path)
+
+    def fake_invoke_r(snippet, **kw):
+        if "tidy_lints" in snippet:
+            return ('{"lints":[],"tidy_lints":[]}', 0)
+        if "use_tidy_description" in snippet:
+            return ('{"changed":false,"before":[],"after":[],"applied":false}', 0)
+        raise AssertionError(snippet[:80])
+
+    monkeypatch.setattr(rcmd, "_invoke_r", fake_invoke_r)
+    code = rcmd.main(["--kind", "tidy", "--path", str(tmp_path)])
+    assert code == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["kind"] == "tidy"

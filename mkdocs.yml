@@ -54,10 +54,10 @@ extra_css:
 # scripts/version_sync.py — do not hand-edit version/prev_version/release_date.
 extra:
   rforge:
-    version: "2.18.0"
+    version: "2.19.0"
     prev_version: "2.15.0"
     release_date: "2026-06-21"
-    command_count: 41
+    command_count: 42
 
 plugins:
   - search
@@ -149,6 +149,7 @@ nav:
       - "changed": reference/changed.md
       - "scaffold": reference/scaffold.md
       - "sitelint": reference/sitelint.md
+      - "tidyaudit": reference/tidyaudit.md
   - Project:
     - Architecture: architecture.md
     - Hooks & Skills: hooks-and-skills.md

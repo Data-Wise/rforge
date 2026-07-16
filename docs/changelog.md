@@ -7,6 +7,20 @@ The full changelog lives in the repository:
 
 ---
 
+## 2.19.0 — 2026-07-16
+
+Evidence-based `r:urlcheck` 403 triage (#67) + `r:rhub` dispatch bugfix (#66,
+`rhub::rhub_check()`'s first param is `gh_url`, not a local path) + new
+`r:tidy` tidyverse-conventions audit command and `r:lint --tidy` (#65).
+42 commands.
+
+## 2.18.0 — 2026-06-30
+
+Creative doc enhancements (in-site changelog, glossary, command cards,
+contributor guide, example sessions, 404 page, social cards, command
+decision tree, symptom/fix admonitions) + CI fix (`cache: pip` removed,
+pillow+cairosvg for social cards) + stale ref cleanup. 41 commands.
+
 ## 2.17.0 — 2026-06-30
 
 Winbuilder fallback + tarball-check stage. `r:cran-prep` gains a blocking
