@@ -19,6 +19,8 @@ Or imported as a Python API:
 - `lib.deps` — dependency graph + impact
 - `lib.status` — ecosystem health snapshot
 - `lib.init` — `~/.rforge/context.json` initialization
+- `lib.rstatus` — single R-package session-state reader/differ (backs
+  `/rforge:restore`/`/rforge:finish`)
 
 ## Internal modules (not part of the public API)
 

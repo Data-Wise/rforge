@@ -11,6 +11,7 @@ Complete reference for all **{{ rforge.command_count }}** RForge commands. Comma
 ## Command Categories
 
 - [Setup & State](#setup-state) (1 command)
+- [Session Boundary](#session-boundary) (2 commands)
 - [Status & Analysis](#status-analysis) (4 commands)
 - [Ecosystem Management](#ecosystem-management) (6 commands)
 - [Documentation & Tasks](#documentation-tasks) (4 commands)
@@ -61,6 +62,90 @@ Initialize the active rforge context for the current R package or ecosystem. Wri
 **Time budget:** <5s (`--quick`), <15s (default)
 
 **Underlying module:** `python3 -m lib.init` — see [init API reference](reference/init.md).
+
+---
+
+## Session Boundary
+
+### /rforge:restore
+
+Recap a single R package's state — DESCRIPTION, NEWS.md, git, and `.STATUS` (if present). Read-only.
+
+**Usage:**
+```bash
+/rforge:restore [path] [--format FORMAT]
+```
+
+**Parameters:**
+- `path` (optional) — R package directory to recap (defaults to current directory)
+- `--format` (optional) — Output format: `text` (default) or `json`
+
+**Examples:**
+```bash
+# Recap the current directory
+/rforge:restore
+
+# Recap a specific package
+/rforge:restore /path/to/medfit
+
+# Machine-readable JSON
+/rforge:restore --format json
+```
+
+**What this does:**
+- Reads DESCRIPTION (version, dependencies), NEWS.md's top section, git state (branch/last
+  commit/dirty), and `.STATUS`'s `next:`/`blockers:`/`cran_status:` fields if present
+- Flags version drift when `.STATUS`'s `version:` mirror disagrees with DESCRIPTION's actual `Version`
+- If no `.STATUS` exists, offers (never auto-writes) to scaffold one in the R-package shape
+- Never writes, never commits — read-only, same invariant as craft's `/restore` and savant's `/restore`
+
+**When to run:** Returning to an R package repo after a break; before starting work, to confirm
+current version/CRAN state; precedes `/rforge:finish`.
+
+**Underlying module:** `python3 -m lib.rstatus recap` — see [rstatus API reference](reference/rstatus.md).
+
+---
+
+### /rforge:finish
+
+Sync a single R package's `.STATUS` from its current state. Dry-run by default; `--write` applies.
+
+**Usage:**
+```bash
+/rforge:finish [path] [--write]
+```
+
+**Parameters:**
+- `path` (optional) — R package directory to close out (defaults to current directory)
+- `--write` (optional) — Apply the diffed `.STATUS` changes (default: dry-run, shows the diff only)
+
+**Examples:**
+```bash
+# Dry-run: show what would change, write nothing
+/rforge:finish
+
+# Apply after reviewing the diff
+/rforge:finish --write
+
+# Close out a specific package
+/rforge:finish /path/to/medfit --write
+```
+
+**What this does:**
+- Reads the same state `/rforge:restore` recaps, composes the intended `.STATUS` update
+- **Redundant-edit guard:** a diff that's only an `updated:` timestamp bump (no real content
+  change) is reported "already current" and never written
+- **Version-drift correction:** `.STATUS`'s `version:` mirror is corrected to match DESCRIPTION
+  (DESCRIPTION is always the source of truth, never the reverse)
+- Never commits or pushes — leaves the edit in the working tree plus a suggested commit message
+- If no `.STATUS` exists, proposes scaffolding one (same as `/rforge:restore`); declining means
+  nothing to sync
+
+**When to run:** Closing out a work session on an R package repo — the producer of the state
+`/rforge:restore` and `/rforge:next` read.
+
+**Underlying module:** `python3 -m lib.rstatus` (diff via `lib.rstatus.diff_rstatus`) — see
+[rstatus API reference](reference/rstatus.md).
 
 ---
 
