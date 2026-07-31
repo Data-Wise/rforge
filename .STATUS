@@ -1,7 +1,7 @@
 project: rforge
 updated: 2026-07-31
 status: Active
-version: 2.19.0 (released, on main; dev 1 commit behind main — see 2026-07-31 entry)
+version: 2.19.0 (released, on main; dev merged main's f432a65 back in 2026-07-31, drift resolved)
 last_release: 2026-07-16 v2.19.0 (PR #68 feature/issue-fixes→dev merge e15ec35 [issues #66+#65] +
   PR #64 dependabot actions/checkout bump merged same day; version-bump commit b483765; PR #69
   dev→main merge 5fbb013 — Closes #65, Closes #66, both auto-closed; tag v2.19.0; release
