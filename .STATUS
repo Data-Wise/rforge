@@ -1,7 +1,7 @@
 project: rforge
-updated: 2026-07-16
+updated: 2026-07-31
 status: Active
-version: 2.19.0 (released, on main; dev synced, no unreleased work)
+version: 2.19.0 (released, on main; dev 1 commit behind main — see 2026-07-31 entry)
 last_release: 2026-07-16 v2.19.0 (PR #68 feature/issue-fixes→dev merge e15ec35 [issues #66+#65] +
   PR #64 dependabot actions/checkout bump merged same day; version-bump commit b483765; PR #69
   dev→main merge 5fbb013 — Closes #65, Closes #66, both auto-closed; tag v2.19.0; release
@@ -55,6 +55,17 @@ last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --unive
 #        feature/r-submit-runiverse merged (PR #24) + worktree removed 2026-06-11
 
 recent:
+  - date: 2026-07-31
+    branch: main (direct dependabot merge, no dev involvement)
+    title: "chore(ci)(deps): bump actions/setup-python from 6 to 7 (#70)"
+    note: >-
+      Dependabot opened PR #70 against main (repo default branch) rather than dev; reviewed
+      (mechanical 3-line version bump across ci.yml/docs.yml, no pip-install usage affected by
+      v7's removed input), squash-merged f432a65, branch deleted. CI verified green post-merge:
+      RForge CI + Deploy Documentation both completed/success on f432a65. Left dev untouched
+      per no-unrequested-branch-switch — dev (cd37e40) and main (f432a65) are now 1 commit
+      apart each way; dev needs f432a65 merged/rebased in before its own next PR to avoid the
+      setup-python bump silently reverting on dev's next release.
   - date: 2026-06-10
     branch: feature/cran-incoming
     title: "feat: CRAN-incoming hardening — strict check passes + cranlint Tier 4 (v2.3.0)"
