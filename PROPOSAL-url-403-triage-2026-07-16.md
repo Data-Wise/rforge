@@ -1,6 +1,9 @@
 # PROPOSAL — Evidence-Based 403 Triage for `/rforge:r:urlcheck`
 
-**Date:** 2026-07-16 · **Status:** proposed · **Origin:** medrobust 0.4.0 CRAN preflight
+**Date:** 2026-07-16 · **Status:** ✅ shipped v2.19.0 (2026-07-16) · **Origin:** medrobust 0.4.0 CRAN preflight
+
+> **Closed 2026-07-16** — Option 3 implemented as proposed. Details: `.STATUS` `last_release`
+> (v2.19.0) and `CHANGELOG.md` `[2.19.0]`. Further `r:urlcheck` work opens a new proposal doc.
 
 ## The problem
 

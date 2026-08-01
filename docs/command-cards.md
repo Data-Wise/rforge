@@ -10,6 +10,8 @@ Handy one-line descriptions grouped by purpose.
 | `/rforge:status` | Health snapshot of your R package ecosystem |
 | `/rforge:detect` | Discover R packages in a directory tree |
 | `/rforge:next` | Suggest the next most useful action |
+| `/rforge:restore` | Recap a single R package's state (read-only) |
+| `/rforge:finish` | Sync `.STATUS` from current state (dry-run by default) |
 
 ## Analysis
 

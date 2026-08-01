@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.20.0] - 2026-08-01
+
+> `/rforge:restore` + `/rforge:finish` (R-package session-boundary commands, PR #71).
+> **44 commands** (new: `restore`, `finish`). pytest 592, test-all 44/44.
+
+### Added
+
+- **`/rforge:restore`** — recap a single R package's state (DESCRIPTION, NEWS.md, git,
+  `.STATUS` if present); read-only except an explicitly-confirmed `.STATUS` scaffold offer.
+- **`/rforge:finish`** — sync a single R package's `.STATUS` from its current state;
+  dry-run by default, `--write` applies only after a shown diff + explicit confirmation.
+  Redundant-edit guard refuses a timestamp-only bump; version-drift check corrects
+  `.STATUS`'s `version:` mirror against DESCRIPTION (never the reverse).
+- **`lib/rstatus.py`** — new reader/differ module backing both commands: DESCRIPTION (via
+  `lib.discovery.read_description`), NEWS.md top-section parsing, a dedicated `.STATUS`
+  `key:value` parser (distinct from `lib.status.parse_status_file`'s unrelated emoji-box
+  grammar), git snapshot, and `apply_updates()` — the safe-by-construction way to build a
+  diff's intended state (carries every field forward from current, overrides only what's
+  passed).
+- New "Session Boundary" doc family: `docs/guides/session-boundary.md`,
+  `docs/reference/rstatus.md`, `docs/commands.md` entries.
+
+### Fixed (found via 4-agent adversarial review before merge)
+
+- A critical data-loss bug in `finish.md`'s own usage example — constructing the intended
+  `.STATUS` state as a bare `RStatus(...)` left every unset field at `None`, which
+  `diff_rstatus` reported as a real change (not caught by the redundant-edit guard, since
+  it's not a timestamp-only diff). Fixed at the API level via `apply_updates()`.
+- `parse_rstatus` never reset its continuation scope on a blank line, silently absorbing
+  trailing freeform `.STATUS` prose into the last-matched field.
+- NEWS.md header regex matched newlines in its whitespace class, letting a bare `#` header
+  swallow past blank lines into the next content line.
+
 ## [2.19.0] - 2026-07-16
 
 > Evidence-based `r:urlcheck` 403 triage + `r:rhub` dispatch bugfix (#66) +

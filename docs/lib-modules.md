@@ -1,7 +1,7 @@
 # 🐍 Lib Modules (`lib/`)
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** Pure-Python analysis modules (`discovery`, `deps`, `status`, `init`, `cranlint`, `deps_sync`, `ghrelease`, `runiverse`, `s7review`, `changed`, `scaffold`) — no R, no Node — plus `rcmd` (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the `r:` commands.
+    - **What:** Pure-Python analysis modules (`discovery`, `deps`, `status`, `init`, `cranlint`, `deps_sync`, `ghrelease`, `runiverse`, `s7review`, `changed`, `scaffold`, `sitelint`, `tidyaudit`, `rstatus`) — no R, no Node — plus `rcmd` (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the `r:` commands.
     - **Why:** No MCP server, no Node, no external deps — just `python3 -m lib.<module>`, fast and scriptable.
     - **How:** Each takes `--path` and `--format text|json`; importable as a Python API too.
     - **Next:** [Reference API docs](reference/discovery.md) for signatures, or [Architecture](architecture.md#path-b-lib-modules) for fit.
@@ -48,6 +48,9 @@ flowchart LR
 | `lib/s7review.py` | `check_naming`, `check_validators`, `check_methods`, `check_legacy_oop`, `check_class_docs`, `run_all`, `build_class_registry`, `check_cross_package_contracts`, `run_eco`, `run_all_with_runtime` (v2.10.0 — static S7 convention checker; `--eco` cross-package contracts + `--runtime`) | backs `/rforge:r:s7-review` |
 | `lib/changed.py` | `changed_files`, `uncommitted_files`, `changed_packages`, `tag_findings`, `merge_base`, `run_baseline`, `cached_baseline`, `clear_baseline_cache`, `scope_check` (v2.10.0 diff-aware `--changed`; per-package baseline cache v2.13.0) | `python3 -m lib.changed [--path .] [--base dev] [--clear-cache]` |
 | `lib/scaffold.py` | `parse_function`, `plan_test`, `plan_package`, `plan_vignette`, `scaffold_data`, `scaffold_citation`, `scaffold` (v2.10.0 — `r:use-*` existing-package scaffolding; dry-run default, `--write` applies) | backs `/rforge:r:use-test\|use-package\|use-vignette\|use-data\|use-citation` |
+| `lib/sitelint.py` | `check_site_leaks` (v2.16.0 — scans the pkgdown render surface for leaked planning/dev docs before deploy) | backs `/rforge:r:site --check-leaks` and the `r:cran-prep` Tier 4 `site-leaks` stage |
+| `lib/tidyaudit.py` | `check_roxygen_completeness`, `check_news_header`, `run_all` (v2.19.0 — tidyverse-conventions audit: lint preset, DESCRIPTION normalization, roxygen completeness, NEWS.md header currency) | backs `/rforge:r:tidy` and `r:lint --tidy` |
+| `lib/rstatus.py` | `parse_rstatus`, `read_rstatus`, `apply_updates`, `diff_rstatus`, `parse_news_header`, `git_snapshot`, `build_recap` (v2.20.0 — `.STATUS` reader/differ backing session-boundary recap + sync) | `python3 -m lib.rstatus recap --path . [--format text\|json]` |
 
 > **`cranlint` is a pure-stdlib analysis module** like `discovery`/`deps`/`status`/`init`
 > — it never touches R. It backs the Tier 4 advisory stages of `r:cran-prep` (v2.3.0):

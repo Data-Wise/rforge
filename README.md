@@ -4,19 +4,20 @@
 [![License: MIT](https://img.shields.io/github/license/Data-Wise/rforge?color=green)](https://github.com/Data-Wise/rforge/blob/main/LICENSE)
 [![CI](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Data-Wise/rforge/actions/workflows/ci.yml)
 
-**R package ecosystem orchestrator for Claude Code — 42 commands, R-aware hooks, validation skills.**
+**R package ecosystem orchestrator for Claude Code — 44 commands, R-aware hooks, validation skills.**
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
-## What's new in v2.17.0
+## What's new in v2.20.0
 
-- 🛡️ **`r:cran-prep` tarball-check stage** — builds the source tarball with `devtools::build()`, inspects it for stray build artifacts (`.quarto/`, `_freeze/`, `.html`, `*_files/`), then runs `rcmdcheck(tarball, --as-cran, --run-donttest)`. Catches the class of failures CRAN and win-builder see but a source-tree `devtools::check()` hides. Blocks `ready` on errors/warnings/real NOTEs.
-- 🪟 **`r:winbuilder` fallback** — detects when the plugin's `lib/` is not on `PYTHONPATH` and falls back to `devtools::check_win_*()` directly in R, instead of failing silently with `ModuleNotFoundError`.
-- 🧪 **CLI dogfood + e2e tests** — new `tests/cli/automated-tests.sh` and `tests/cli/e2e-tests.sh` exercise plugin structure and public `lib/` modules against fixtures.
+- 🔖 **`/rforge:restore` + `/rforge:finish`** (PR #71) — R-package session-boundary commands: recap a single package's state (DESCRIPTION/NEWS.md/git/`.STATUS`) and sync `.STATUS` from what actually happened, dry-run by default with a redundant-edit guard and a version-drift check against DESCRIPTION.
+- 🛡️ Backed by a new `lib/rstatus.py` reader/differ, with an `apply_updates()` helper closing a data-loss trap (a bare `RStatus(...)` construction silently defaulted every untouched field to `None`) found in a 4-agent adversarial review before merge.
 
-## What's new in v2.16.0
+## What's new in v2.19.0
 
-- 🌐 **`r:site --deploy` leak guard** — builds the pkgdown site from a clean named temp-branch worktree so untracked working-directory files never leak into the published `gh-pages` branch. `r:site --check-leaks` scans the render surface for stray files.
+- 🔍 **`r:urlcheck` evidence-based 403 triage** (#67) — replaces the hardcoded `doi.org` heuristic with root-then-URL probing, classifying `dead`/`real_403` (gate) vs `bot_blocked`/`transient` (advisory).
+- 🐛 **`r:rhub` dispatch bugfix** (#66) — `rhub::rhub_check()`'s first param is `gh_url`, not a local path; fixed via `setwd()`.
+- 🧹 **`r:tidy` command + `r:lint --tidy`** (#65) — tidyverse-conventions audit: lint preset, DESCRIPTION normalization, roxygen completeness, NEWS.md header currency.
 
 Full release history: [`CHANGELOG.md`](CHANGELOG.md).
 
@@ -383,7 +384,7 @@ Plugin settings in `plugin.json`:
 ```
 ~/.claude/plugins/rforge/
 ├── .claude-plugin/
-│   ├── plugin.json          # Plugin manifest (v2.8.0)
+│   ├── plugin.json          # Plugin manifest (v2.20.0)
 │   ├── marketplace.json     # Marketplace install metadata
 │   ├── config.json          # User-tunable options (CRAN mirror, etc.)
 │   ├── hooks/
@@ -391,7 +392,7 @@ Plugin settings in `plugin.json`:
 │   └── skills/
 │       └── validation/
 │           └── description-sync.md  # DESCRIPTION ↔ NEWS.md drift check
-├── commands/                # 33 slash commands (/rforge:*)
+├── commands/                # 44 slash commands (/rforge:*)
 ├── agents/
 │   └── orchestrator.md      # Pattern recognition + delegation
 ├── lib/                     # Pure-Python analysis modules
@@ -426,6 +427,6 @@ MIT
 
 ---
 
-**Version:** 2.19.0
+**Version:** 2.20.0
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+
