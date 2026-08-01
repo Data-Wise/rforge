@@ -1,8 +1,29 @@
 project: rforge
-updated: 2026-07-31
+updated: 2026-08-01
 status: Active
-version: 2.19.0 (released, on main; dev merged main's f432a65 back in 2026-07-31, drift resolved)
-last_release: 2026-07-16 v2.19.0 (PR #68 feature/issue-fixes→dev merge e15ec35 [issues #66+#65] +
+version: 2.20.0 (released, on main; dev synced 362399d; tap synced)
+last_release: 2026-08-01 v2.20.0 (PR #71 feature/restore-finish→dev merge 8ae55cda — new
+  /rforge:restore + /rforge:finish R-package session-boundary commands: recap a package's state
+  (DESCRIPTION/NEWS.md/git/.STATUS) and sync .STATUS from what actually happened, dry-run by
+  default with a redundant-edit guard and a version-drift check against DESCRIPTION. New
+  lib/rstatus.py reader/differ module; apply_updates() helper added mid-review to close a
+  data-loss trap (a bare RStatus(...) construction would have silently blanked every untouched
+  .STATUS field on --write) — found by a 4-agent adversarial review before merge, along with a
+  bare-# NEWS-header regex bug and missing control-char sanitization (both fixed). 42→44
+  commands. PR #72 dev→main merge 362399d; tag v2.20.0; release
+  https://github.com/Data-Wise/rforge/releases/tag/v2.20.0; CI green on main RForge CI + Deploy
+  Documentation; dev synced back to main; live docs live-verified: 2.20.0. Docs sync bundled in
+  the same release: REFCARD SESSION box section, docs/index.md What's New (was stale at
+  v2.17.0-era content despite the version macro auto-updating — real bug, fixed), CHANGELOG +
+  docs/changelog entries, command-cards/glossary/example-sessions (committed ab510af
+  pre-release), and docs/lib-modules.md gained rows for sitelint/tidyaudit/rstatus — closing
+  pre-existing table drift that had accumulated since v2.16.0/v2.19.0 shipped without updating
+  it. Tap Data-Wise/homebrew-tap PR #197 MERGED b09762f — formula+manifest → v2.20.0, sha256
+  157fa5ba…, generate.py --diff IDENTICAL. pytest 592 passed/2 skipped, test-all 42/44 (2
+  pre-existing local-env-only failures: system python3.9 lacks 3.10+ union syntax, no
+  mkdocs-material installed locally — both verified against dev baseline, unrelated to this
+  release; CI itself is green on the correct Python versions).
+last_release_prior_v2_19_0: 2026-07-16 v2.19.0 (PR #68 feature/issue-fixes→dev merge e15ec35 [issues #66+#65] +
   PR #64 dependabot actions/checkout bump merged same day; version-bump commit b483765; PR #69
   dev→main merge 5fbb013 — Closes #65, Closes #66, both auto-closed; tag v2.19.0; release
   https://github.com/Data-Wise/rforge/releases/tag/v2.19.0; CI green on main RForge CI + Deploy
@@ -55,6 +76,20 @@ last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --unive
 #        feature/r-submit-runiverse merged (PR #24) + worktree removed 2026-06-11
 
 recent:
+  - date: 2026-08-01
+    branch: dev → main (PR #71 then PR #72)
+    title: "Release: v2.20.0 — /rforge:restore + /rforge:finish session-boundary commands"
+    state: MERGED, RELEASED
+    summary: |
+      Full pipeline this session: brainstormed restore/finish against craft/savant's own
+      counterparts → SPEC-restore-finish-commands-2026-07-31.md → feature worktree → lib/rstatus.py
+      + commands/{restore,finish}.md + e2e tests → 4-agent adversarial review (caught the
+      apply_updates() data-loss trap + 2 regex/sanitization bugs, all fixed) → PR #71 merged to dev
+      (8ae55cda) → docs staleness sweep (command counts, version banners, REFCARD SESSION section,
+      docs/index.md What's New, docs/lib-modules.md sitelint/tidyaudit/rstatus rows) → version bump
+      2.19.0→2.20.0 (4 sources) → PR #72 dev→main merged 362399d → tag+release v2.20.0 → tap PR
+      #197 merged (formula+manifest synced, generate.py --diff IDENTICAL) → dev resynced with main.
+      See last_release above for full detail.
   - date: 2026-07-31
     branch: main (direct dependabot merge, no dev involvement)
     title: "chore(ci)(deps): bump actions/setup-python from 6 to 7 (#70)"
@@ -327,6 +362,12 @@ decisions:
 
 ## 🎯 Next Action
 
+✅ **v2.20.0 RELEASED (2026-08-01) — no active task.** dev ≡ main @ v2.20.0 (PR #72 dev→main merge
+362399d; [release](https://github.com/Data-Wise/rforge/releases/tag/v2.20.0); CI green on main;
+tap PR #197 MERGED b09762f → formula+manifest v2.20.0, sha256 157fa5ba…, generate.py --diff
+IDENTICAL). `/rforge:restore` + `/rforge:finish` session-boundary commands (42→44); see
+last_release above. Open candidates below are all low-priority; no blockers.
+
 ✅ **PROPOSAL implemented (2026-06-30)** — `PROPOSAL-winbuilder-fallback-and-tarball-check.md` is now implemented on `dev` (commits cb29b03 + fef0d1a):
   1. `r:winbuilder` fallback: detects `lib.rcmd` availability → falls through to `devtools::check_win_*()` with directory-arg clarification.
   2. `r:cran-prep` `tarball-check` stage: `devtools::build()` → `tar -tzf` inspect → `rcmdcheck(tarball, --as-cran)`; blocks `ready` on errors/warnings/real NOTEs.
@@ -421,6 +462,7 @@ backlog:
     notes: "lib/status.py shipped as a thin faithful port in v1.3.0. The 4-mode contract (default/debug/optimize/release with R subprocess) was descoped pending real-user input on what depth is wanted. Open a new SPEC when there's demand."
 
 shipped:
+  - "v2.20.0 — 2026-08-01 — /rforge:restore + /rforge:finish R-package session-boundary commands (lib/rstatus.py reader/differ + apply_updates() data-loss-trap fix from 4-agent adversarial review); 42→44 commands; PR #71/#72; tap #197; docs drift closed (lib-modules.md sitelint/tidyaudit/rstatus rows, REFCARD SESSION section, docs/index.md What's New); pytest 592, test-all 42/44 (2 pre-existing local-env-only)"
   - "v2.11.0 — 2026-06-13 — bundle: diff-aware [introduced]/[pre-existing] tagging (merge-base detached-worktree baseline, --base/--fail-on, line-shift-immune) + r:s7-review --eco (ecosystem sweep) / --runtime (new lib.rcmd s7runtime engine: dead_generic + validator_not_enforcing) + r:use-data/r:use-citation; 39→41 commands; PR #35/#36; tap #122; 4-dim adversarial review caught 3 BLOCKER+3 IMPORTANT (recurrence of v2.10.0 doc-overclaim + spec-claims-unbuilt classes); pytest 347, test-all 41/41"
   - "v2.10.0 — 2026-06-13 — bundle: #26 r:s7-review (lib/s7review.py, 5 static families) + scaffolding r:use-test/use-package/use-vignette (lib/scaffold.py+usethis_infra.py) + diff-aware --changed (scope-only, lib/changed.py); 35→39 commands; PR #32/#34; tap #121; adversarial review caught diff-aware false-negative + deps_sync constraint-drop + s7review FPs; pytest 298, test-all 41/41"
   - "v2.9.0 — 2026-06-12 — Phase 4 orchestrator rewrite (agents/orchestrator.md → python3 -m lib.* delegation, 7 intents, read-only/recommend-only safety gate) + #20 manifest_order + #26 spec; +3 test-all guards (33→36); 35 commands; PR #29/#31; tap #120; last craft-parity item"
