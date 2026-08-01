@@ -1,6 +1,6 @@
 # SPEC: `/rforge:restore` + `/rforge:finish` (R-package session boundary commands)
 
-- **Status:** Draft — awaiting user review
+- **Status:** ✅ Implemented and shipped in v2.20.0 (2026-08-01) — PR #71 (feature/restore-finish → dev), PR #72 (dev → main), release https://github.com/Data-Wise/rforge/releases/tag/v2.20.0. See `.STATUS` `last_release` for full detail, including the `apply_updates()` fix added during pre-merge adversarial review.
 - **Date:** 2026-07-31
 - **Target version:** next minor (v2.20.0 — 42→44 commands)
 - **Author:** brainstormed with Claude — see `BRAINSTORM-restore-finish-commands-2026-07-31.md`
