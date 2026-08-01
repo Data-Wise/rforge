@@ -43,6 +43,10 @@
 │  SETUP                                                                      │
 │    /rforge:init           Initialize ~/.rforge/context.json                 │
 │                                                                             │
+│  SESSION                                                                    │
+│    /rforge:restore        Recap a single R package state (read-only)        │
+│    /rforge:finish         Sync .STATUS from current state (dry-run default) │
+│                                                                             │
 │  R DEV CYCLE (v2.1.0)                                                       │
 │    /rforge:r:load         Load package namespace (pkgload)                  │
 │    /rforge:r:document     Regenerate Rd docs + NAMESPACE (roxygen2)         │

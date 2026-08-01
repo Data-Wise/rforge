@@ -115,10 +115,13 @@ Most work runs through these four; the rest of the {{ rforge.command_count }} co
 
 ## What's new in {{ rforge.version }}
 
-- 🛡️ **`/rforge:r:cran-prep` tarball-check stage** — builds the source tarball, inspects it for build artifacts, then runs `R CMD check --as-cran` on the tarball. Catches CRAN/win-builder failures that a source-tree check hides. See the [CRAN submission guide](guides/cran-submission.md).
-- 🪟 **`/rforge:r:winbuilder` fallback** — falls back to `devtools::check_win_*()` when the plugin's `lib/` isn't importable, instead of failing silently.
-- 🌐 **`/rforge:r:site --deploy` leak guard** — deploys from a clean worktree so untracked files never leak into `gh-pages`. See the [website guide](guides/website.md).
-- 🧪 **CLI dogfood + e2e tests** — new `tests/cli/` shell suites for plugin structure and fixture-based end-to-end checks.
+- 🔖 **`/rforge:restore` + `/rforge:finish`** — R-package session-boundary commands: recap a
+  single package's state (DESCRIPTION/NEWS.md/git/`.STATUS`) and sync `.STATUS` from what
+  actually happened, dry-run by default with a redundant-edit guard and a version-drift check
+  against DESCRIPTION. See the [session boundary guide](guides/session-boundary.md).
+- 🛡️ Backed by a new `lib/rstatus.py` reader/differ, with an `apply_updates()` helper closing
+  a data-loss trap (a bare `RStatus(...)` construction silently defaulted every untouched
+  field to `None`) found in a 4-agent adversarial review before merge.
 
 Full release history: [CHANGELOG.md](https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md).
 

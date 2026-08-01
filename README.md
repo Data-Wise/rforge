@@ -8,15 +8,16 @@
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
+## What's new in v2.20.0
+
+- 🔖 **`/rforge:restore` + `/rforge:finish`** (PR #71) — R-package session-boundary commands: recap a single package's state (DESCRIPTION/NEWS.md/git/`.STATUS`) and sync `.STATUS` from what actually happened, dry-run by default with a redundant-edit guard and a version-drift check against DESCRIPTION.
+- 🛡️ Backed by a new `lib/rstatus.py` reader/differ, with an `apply_updates()` helper closing a data-loss trap (a bare `RStatus(...)` construction silently defaulted every untouched field to `None`) found in a 4-agent adversarial review before merge.
+
 ## What's new in v2.19.0
 
 - 🔍 **`r:urlcheck` evidence-based 403 triage** (#67) — replaces the hardcoded `doi.org` heuristic with root-then-URL probing, classifying `dead`/`real_403` (gate) vs `bot_blocked`/`transient` (advisory).
 - 🐛 **`r:rhub` dispatch bugfix** (#66) — `rhub::rhub_check()`'s first param is `gh_url`, not a local path; fixed via `setwd()`.
 - 🧹 **`r:tidy` command + `r:lint --tidy`** (#65) — tidyverse-conventions audit: lint preset, DESCRIPTION normalization, roxygen completeness, NEWS.md header currency.
-
-## What's new in v2.18.0
-
-- 📚 **Creative doc enhancements** — in-site changelog, glossary, command cards, contributor guide, example sessions, 404 page, social cards, command decision tree, symptom/fix admonitions.
 
 Full release history: [`CHANGELOG.md`](CHANGELOG.md).
 
@@ -383,7 +384,7 @@ Plugin settings in `plugin.json`:
 ```
 ~/.claude/plugins/rforge/
 ├── .claude-plugin/
-│   ├── plugin.json          # Plugin manifest (v2.19.0)
+│   ├── plugin.json          # Plugin manifest (v2.20.0)
 │   ├── marketplace.json     # Marketplace install metadata
 │   ├── config.json          # User-tunable options (CRAN mirror, etc.)
 │   ├── hooks/
@@ -426,6 +427,6 @@ MIT
 
 ---
 
-**Version:** 2.19.0
+**Version:** 2.20.0
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+

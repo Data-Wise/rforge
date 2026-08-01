@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [2.20.0] - 2026-08-01
 
 > `/rforge:restore` + `/rforge:finish` (R-package session-boundary commands, PR #71).
 > **44 commands** (new: `restore`, `finish`). pytest 592, test-all 44/44.

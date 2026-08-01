@@ -7,6 +7,13 @@ The full changelog lives in the repository:
 
 ---
 
+## 2.20.0 — 2026-08-01
+
+`/rforge:restore` + `/rforge:finish` (PR #71) — R-package session-boundary
+commands: recap a single package's state and sync `.STATUS` from what
+actually happened, dry-run by default. New `lib/rstatus.py` module.
+44 commands.
+
 ## 2.19.0 — 2026-07-16
 
 Evidence-based `r:urlcheck` 403 triage (#67) + `r:rhub` dispatch bugfix (#66,
