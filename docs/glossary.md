@@ -68,6 +68,11 @@ Terms used across the rforge documentation and plugin output.
     no code commits on `main` or `dev`, no force-pushes to protected branches,
     no destructive commands in commit messages.
 
+**guard (redundant-edit)**
+:   The check in `lib.rstatus.diff_rstatus` that `/rforge:finish` uses to refuse writing a
+    `.STATUS` update whose only change is the `updated:` timestamp — a date bump with no
+    real content delta is not a genuine change (the `doc-update-currency-check` discipline).
+
 **guard (site leak)**
 :   The site-leak guard in `lib.sitelint` that scans a pkgdown render surface for
     untracked artifacts (stale `.html`, leaked `_freeze/` directories).

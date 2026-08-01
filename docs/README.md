@@ -1,6 +1,6 @@
 # RForge Plugin - Documentation
 
-> **Complete documentation for the RForge Plugin v2.17.0**
+> **Complete documentation for the RForge Plugin v2.19.0**
 
 ---
 
@@ -54,7 +54,7 @@ Perfect for:
 - One-page printable reference
 
 **Contents:**
-- All commands in tables (41 total)
+- All commands in tables (44 total)
 - Pattern recognition guide
 - `lib/` modules overview
 - Common workflows
@@ -80,14 +80,14 @@ Perfect for:
 ```
 rforge/
 ├── .claude-plugin/            # Claude Code plugin manifest + extras
-│   ├── plugin.json            # Plugin manifest (v2.17.0)
+│   ├── plugin.json            # Plugin manifest (v2.19.0)
 │   ├── marketplace.json       # Marketplace install metadata
 │   ├── config.json            # User-tunable options
 │   ├── hooks/
 │   │   └── pretooluse.py      # R-aware Write/Edit guard
 │   └── skills/
 │       └── validation/        # Autonomous validation skills
-├── commands/                  # 41 slash commands (/rforge:*)
+├── commands/                  # 44 slash commands (/rforge:*)
 ├── agents/                    # Orchestrator agent
 │   └── orchestrator.md        # Pattern recognition + delegation
 ├── docs/                      # 👈 You are here
@@ -240,9 +240,9 @@ from a previous version, remove it (see
 
 ## 📝 Document Maintenance
 
-**Last Updated:** 2026-06-30
-**Plugin Version:** 2.17.0
-**Documentation Version:** 2.17.0
+**Last Updated:** 2026-08-01
+**Plugin Version:** 2.19.0
+**Documentation Version:** 2.19.0
 
 **Releases:** https://github.com/Data-Wise/rforge/releases
 

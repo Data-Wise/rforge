@@ -166,3 +166,45 @@ Checking R-hub availability...
 ```
 
 Async dispatch frees the user to continue working while results arrive.
+
+## Session 6: Opening and closing a work session on one package
+
+```text
+User: /rforge:restore
+
+Claude:
+RECAP: medfit (R package)
+  DESCRIPTION: v0.4.0
+  NEWS.md: [Unreleased], 2 entries
+  git: feature/bootstrap-ci (dirty) — a1b2c3d Add bootstrap interval helper
+  .STATUS: next=—; blockers=none
+
+No .STATUS `next:` set — want me to note what you're working on before you start?
+
+User: yeah, I'm finishing the bootstrap CI vignette section today
+
+Claude:
+Got it — I'll fold that into `.STATUS` when you run `/rforge:finish`.
+
+[... work happens across the session ...]
+
+User: /rforge:finish
+
+Claude:
+Diffing against current .STATUS:
+
+  next:      (unset) → "Finish bootstrap CI vignette section"
+  updated:   2026-07-20 → 2026-07-31
+
+2 fields would change. Apply? [y/N]
+
+User: y
+
+Claude:
+✍️  Wrote .STATUS (next, updated).
+💡 Suggested commit: docs(status): note bootstrap CI vignette in progress
+```
+
+`restore` never wrote anything on its own — it only offered, and `finish` applied the diff
+after an explicit confirm. A same-day re-run of `/rforge:finish` with nothing new to report
+would show "already current" and write nothing (the redundant-edit guard).
