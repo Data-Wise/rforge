@@ -10,31 +10,31 @@
       
       
       
-        <link rel="canonical" href="https://data-wise.github.io/rforge/installation/">
+        <link rel="canonical" href="https://data-wise.github.io/rforge/guides/session-boundary/">
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../../commands/">
       
       
-        <link rel="next" href="../QUICK-START/">
+        <link rel="next" href="../dev-cycle/">
       
       
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
-        <title>📦 Installation - RForge Plugin</title>
+        <title>Session boundary (restore/finish) - RForge Plugin</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,9 +53,9 @@
       
     
     
-      <link rel="stylesheet" href="../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -63,17 +63,17 @@
     
   
 <meta property="og:type" content="website" />
-<meta property="og:title" content="📦 Installation - RForge Plugin" />
+<meta property="og:title" content="Session boundary (restore/finish) - RForge Plugin" />
 <meta property="og:description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)" />
-<meta property="og:image" content="https://data-wise.github.io/rforge/assets/images/social/installation.png" />
+<meta property="og:image" content="https://data-wise.github.io/rforge/assets/images/social/guides/session-boundary.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:url" content="https://data-wise.github.io/rforge/installation/" />
+<meta property="og:url" content="https://data-wise.github.io/rforge/guides/session-boundary/" />
 <meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:title" content="📦 Installation - RForge Plugin" />
+<meta property="twitter:title" content="Session boundary (restore/finish) - RForge Plugin" />
 <meta property="twitter:description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)" />
-<meta property="twitter:image" content="https://data-wise.github.io/rforge/assets/images/social/installation.png" />
+<meta property="twitter:image" content="https://data-wise.github.io/rforge/assets/images/social/guides/session-boundary.png" />
 </head>
   
   
@@ -93,7 +93,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#installation" class="md-skip">
+        <a href="#session-boundary-commands" class="md-skip">
           Skip to content
         </a>
       
@@ -107,7 +107,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="RForge Plugin" class="md-header__button md-logo" aria-label="RForge Plugin" data-md-component="logo">
+    <a href="../.." title="RForge Plugin" class="md-header__button md-logo" aria-label="RForge Plugin" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -127,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              📦 Installation
+              Session boundary (restore/finish)
             
           </span>
         </div>
@@ -240,7 +240,7 @@
   
   
     <li class="md-tabs__item">
-      <a href=".." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -257,13 +257,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../installation/" class="md-tabs__link">
           
   
   
@@ -283,7 +281,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../workflows/" class="md-tabs__link">
+        <a href="../../workflows/" class="md-tabs__link">
           
   
   
@@ -299,11 +297,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../REFCARD/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../REFCARD/" class="md-tabs__link">
           
   
   
@@ -323,7 +323,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../architecture/" class="md-tabs__link">
+        <a href="../../architecture/" class="md-tabs__link">
           
   
   
@@ -357,7 +357,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="RForge Plugin" class="md-nav__button md-logo" aria-label="RForge Plugin" data-md-component="logo">
+    <a href="../.." title="RForge Plugin" class="md-nav__button md-logo" aria-label="RForge Plugin" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -387,7 +387,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -411,29 +411,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
   
@@ -451,7 +446,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -466,37 +461,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    📦 Installation
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../installation/" class="md-nav__link">
         
   
   
@@ -512,170 +480,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#pick-an-install-method" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pick an install method
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Pick an install method">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#claude-code-marketplace-cross-platform-recommended" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Claude Code marketplace (cross-platform, recommended)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#homebrew-macos-recommended-for-cli-users" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Homebrew (macOS, recommended for CLI users)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#manual-any-platform" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Manual (any platform)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#verify-the-install" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Verify the install
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Requirements
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#upgrading" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Upgrading
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Upgrading">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#from-v1x-to-v200-breaking" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        From v1.x to v2.0.0 (BREAKING)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#from-v0x-with-rforge-mcp" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        From v0.x with rforge-mcp
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#uninstall" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Uninstall
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting-install-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting install issues
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-you-get" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What you get
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -688,7 +492,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../QUICK-START/" class="md-nav__link">
+      <a href="../../QUICK-START/" class="md-nav__link">
         
   
   
@@ -716,7 +520,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../quickstart/" class="md-nav__link">
+      <a href="../../quickstart/" class="md-nav__link">
         
   
   
@@ -801,7 +605,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflows/" class="md-nav__link">
+      <a href="../../workflows/" class="md-nav__link">
         
   
   
@@ -829,7 +633,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../package-development-guide/" class="md-nav__link">
+      <a href="../../package-development-guide/" class="md-nav__link">
         
   
   
@@ -857,7 +661,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/" class="md-nav__link">
+      <a href="../../tutorials/" class="md-nav__link">
         
   
   
@@ -885,7 +689,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/getting-started/" class="md-nav__link">
+      <a href="../../tutorials/getting-started/" class="md-nav__link">
         
   
   
@@ -913,7 +717,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
+      <a href="../../tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
         
   
   
@@ -941,7 +745,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/understanding-modes/" class="md-nav__link">
+      <a href="../../tutorials/understanding-modes/" class="md-nav__link">
         
   
   
@@ -969,7 +773,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/ecosystem-orchestration/" class="md-nav__link">
+      <a href="../../tutorials/ecosystem-orchestration/" class="md-nav__link">
         
   
   
@@ -997,7 +801,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/orchestrator-cookbook/" class="md-nav__link">
+      <a href="../../tutorials/orchestrator-cookbook/" class="md-nav__link">
         
   
   
@@ -1025,7 +829,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/r-dev-cycle/" class="md-nav__link">
+      <a href="../../tutorials/r-dev-cycle/" class="md-nav__link">
         
   
   
@@ -1053,7 +857,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/dependency-reconciliation/" class="md-nav__link">
+      <a href="../../tutorials/dependency-reconciliation/" class="md-nav__link">
         
   
   
@@ -1081,7 +885,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/diff-aware-checks/" class="md-nav__link">
+      <a href="../../tutorials/diff-aware-checks/" class="md-nav__link">
         
   
   
@@ -1109,7 +913,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/s7-convention-checking/" class="md-nav__link">
+      <a href="../../tutorials/s7-convention-checking/" class="md-nav__link">
         
   
   
@@ -1137,7 +941,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/scaffolding-existing-packages/" class="md-nav__link">
+      <a href="../../tutorials/scaffolding-existing-packages/" class="md-nav__link">
         
   
   
@@ -1165,7 +969,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/cran-release-prep/" class="md-nav__link">
+      <a href="../../tutorials/cran-release-prep/" class="md-nav__link">
         
   
   
@@ -1193,7 +997,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/cran-submission-with-rforge/" class="md-nav__link">
+      <a href="../../tutorials/cran-submission-with-rforge/" class="md-nav__link">
         
   
   
@@ -1221,7 +1025,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/cran-winbuilder-tarball-check/" class="md-nav__link">
+      <a href="../../tutorials/cran-winbuilder-tarball-check/" class="md-nav__link">
         
   
   
@@ -1249,7 +1053,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/r-universe-early-access/" class="md-nav__link">
+      <a href="../../tutorials/r-universe-early-access/" class="md-nav__link">
         
   
   
@@ -1277,7 +1081,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/migrate-from-mcp/" class="md-nav__link">
+      <a href="../../tutorials/migrate-from-mcp/" class="md-nav__link">
         
   
   
@@ -1305,7 +1109,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/example-sessions/" class="md-nav__link">
+      <a href="../../tutorials/example-sessions/" class="md-nav__link">
         
   
   
@@ -1337,24 +1141,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -1372,7 +1181,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1390,7 +1199,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../REFCARD/" class="md-nav__link">
+      <a href="../../REFCARD/" class="md-nav__link">
         
   
   
@@ -1418,7 +1227,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../commands/" class="md-nav__link">
+      <a href="../../commands/" class="md-nav__link">
         
   
   
@@ -1443,6 +1252,8 @@
                 
   
   
+    
+  
   
   
     
@@ -1453,11 +1264,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" checked>
         
           
           <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
@@ -1478,7 +1289,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1493,10 +1304,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../guides/session-boundary/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Session boundary (restore/finish)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1512,6 +1350,103 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-family-covers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What this family covers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-this-doesnt-collide-with-existing-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why this doesn't collide with existing commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#state-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        State sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-status-shape-for-r-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The .STATUS shape for R packages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-redundant-edit-guard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The redundant-edit guard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1524,7 +1459,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/dev-cycle/" class="md-nav__link">
+      <a href="../dev-cycle/" class="md-nav__link">
         
   
   
@@ -1552,7 +1487,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/quality/" class="md-nav__link">
+      <a href="../quality/" class="md-nav__link">
         
   
   
@@ -1580,7 +1515,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/scaffolding/" class="md-nav__link">
+      <a href="../scaffolding/" class="md-nav__link">
         
   
   
@@ -1608,7 +1543,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/s7-review/" class="md-nav__link">
+      <a href="../s7-review/" class="md-nav__link">
         
   
   
@@ -1636,7 +1571,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/diff-aware/" class="md-nav__link">
+      <a href="../diff-aware/" class="md-nav__link">
         
   
   
@@ -1664,7 +1599,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/cran-submission/" class="md-nav__link">
+      <a href="../cran-submission/" class="md-nav__link">
         
   
   
@@ -1692,7 +1627,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../guides/website/" class="md-nav__link">
+      <a href="../website/" class="md-nav__link">
         
   
   
@@ -1728,7 +1663,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../orchestrator/" class="md-nav__link">
+      <a href="../../orchestrator/" class="md-nav__link">
         
   
   
@@ -1756,7 +1691,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
+      <a href="../../configuration/" class="md-nav__link">
         
   
   
@@ -1784,7 +1719,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../lib-modules/" class="md-nav__link">
+      <a href="../../lib-modules/" class="md-nav__link">
         
   
   
@@ -1812,7 +1747,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../troubleshooting/" class="md-nav__link">
+      <a href="../../troubleshooting/" class="md-nav__link">
         
   
   
@@ -1840,7 +1775,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../glossary/" class="md-nav__link">
+      <a href="../../glossary/" class="md-nav__link">
         
   
   
@@ -1868,7 +1803,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../command-cards/" class="md-nav__link">
+      <a href="../../command-cards/" class="md-nav__link">
         
   
   
@@ -1946,7 +1881,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/discovery/" class="md-nav__link">
+      <a href="../../reference/discovery/" class="md-nav__link">
         
   
   
@@ -1974,7 +1909,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/deps/" class="md-nav__link">
+      <a href="../../reference/deps/" class="md-nav__link">
         
   
   
@@ -2002,7 +1937,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/deps_sync/" class="md-nav__link">
+      <a href="../../reference/deps_sync/" class="md-nav__link">
         
   
   
@@ -2030,7 +1965,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/status/" class="md-nav__link">
+      <a href="../../reference/status/" class="md-nav__link">
         
   
   
@@ -2058,7 +1993,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/init/" class="md-nav__link">
+      <a href="../../reference/init/" class="md-nav__link">
         
   
   
@@ -2086,7 +2021,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/rcmd/" class="md-nav__link">
+      <a href="../../reference/rcmd/" class="md-nav__link">
         
   
   
@@ -2114,7 +2049,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/cranlint/" class="md-nav__link">
+      <a href="../../reference/cranlint/" class="md-nav__link">
         
   
   
@@ -2142,7 +2077,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/ghrelease/" class="md-nav__link">
+      <a href="../../reference/ghrelease/" class="md-nav__link">
         
   
   
@@ -2170,7 +2105,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/runiverse/" class="md-nav__link">
+      <a href="../../reference/runiverse/" class="md-nav__link">
         
   
   
@@ -2198,7 +2133,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/s7review/" class="md-nav__link">
+      <a href="../../reference/s7review/" class="md-nav__link">
         
   
   
@@ -2226,7 +2161,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/changed/" class="md-nav__link">
+      <a href="../../reference/changed/" class="md-nav__link">
         
   
   
@@ -2254,7 +2189,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/scaffold/" class="md-nav__link">
+      <a href="../../reference/scaffold/" class="md-nav__link">
         
   
   
@@ -2282,7 +2217,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/sitelint/" class="md-nav__link">
+      <a href="../../reference/sitelint/" class="md-nav__link">
         
   
   
@@ -2310,7 +2245,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/tidyaudit/" class="md-nav__link">
+      <a href="../../reference/tidyaudit/" class="md-nav__link">
         
   
   
@@ -2338,7 +2273,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/rstatus/" class="md-nav__link">
+      <a href="../../reference/rstatus/" class="md-nav__link">
         
   
   
@@ -2431,7 +2366,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
+      <a href="../../architecture/" class="md-nav__link">
         
   
   
@@ -2459,7 +2394,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../hooks-and-skills/" class="md-nav__link">
+      <a href="../../hooks-and-skills/" class="md-nav__link">
         
   
   
@@ -2537,7 +2472,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/v2.0.0-rename/" class="md-nav__link">
+      <a href="../../migration/v2.0.0-rename/" class="md-nav__link">
         
   
   
@@ -2565,7 +2500,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/rforge-mcp-deprecation/" class="md-nav__link">
+      <a href="../../migration/rforge-mcp-deprecation/" class="md-nav__link">
         
   
   
@@ -2593,7 +2528,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration/v1.3.0-post-merge-checklist/" class="md-nav__link">
+      <a href="../../migration/v1.3.0-post-merge-checklist/" class="md-nav__link">
         
   
   
@@ -2629,7 +2564,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../changelog/" class="md-nav__link">
+      <a href="../../changelog/" class="md-nav__link">
         
   
   
@@ -2657,7 +2592,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../contributing/" class="md-nav__link">
+      <a href="../../contributing/" class="md-nav__link">
         
   
   
@@ -2712,60 +2647,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pick-an-install-method" class="md-nav__link">
+  <a href="#what-this-family-covers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pick an install method
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Pick an install method">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#claude-code-marketplace-cross-platform-recommended" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Claude Code marketplace (cross-platform, recommended)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#homebrew-macos-recommended-for-cli-users" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Homebrew (macOS, recommended for CLI users)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#manual-any-platform" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Manual (any platform)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#verify-the-install" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Verify the install
+        What this family covers
       
     </span>
   </a>
@@ -2773,10 +2658,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
+  <a href="#why-this-doesnt-collide-with-existing-commands" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Requirements
+        Why this doesn't collide with existing commands
       
     </span>
   </a>
@@ -2784,49 +2669,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#upgrading" class="md-nav__link">
+  <a href="#state-sources" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Upgrading
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Upgrading">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#from-v1x-to-v200-breaking" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        From v1.x to v2.0.0 (BREAKING)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#from-v0x-with-rforge-mcp" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        From v0.x with rforge-mcp
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#uninstall" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Uninstall
+        State sources
       
     </span>
   </a>
@@ -2834,10 +2680,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#troubleshooting-install-issues" class="md-nav__link">
+  <a href="#the-status-shape-for-r-packages" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Troubleshooting install issues
+        The .STATUS shape for R packages
       
     </span>
   </a>
@@ -2845,10 +2691,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-you-get" class="md-nav__link">
+  <a href="#the-redundant-edit-guard" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What you get
+        The redundant-edit guard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
       
     </span>
   </a>
@@ -2872,7 +2740,7 @@
 
 
   
-    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/installation.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/Data-Wise/rforge/edit/main/docs/guides/session-boundary.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2880,106 +2748,139 @@
   
 
 
-<h1 id="installation">📦 Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
+<h1 id="session-boundary-commands">🔖 Session boundary commands<a class="headerlink" href="#session-boundary-commands" title="Permanent link">&para;</a></h1>
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
-<li><strong>What:</strong> All install paths for the rforge plugin.</li>
-<li><strong>Why:</strong> macOS users prefer brew; cross-platform users prefer the marketplace.</li>
-<li><strong>How:</strong> Pick one method below — they all install the same thing.</li>
-<li><strong>Next:</strong> <a href="../QUICK-START/">Quick Start</a> to run your first command.</li>
+<li><strong>What:</strong> <code>/rforge:restore</code> (recap where you left off) and <code>/rforge:finish</code> (sync
+  <code>.STATUS</code> to what actually happened) — a single-package pair, not ecosystem-wide.</li>
+<li><strong>Why:</strong> rforge already has ecosystem-wide state commands (<code>status</code>, <code>health</code>, <code>next</code>)
+  and task-scoped ones (<code>capture</code>, <code>complete</code>) — this pair fills the session-<em>boundary</em>
+  slot craft's and savant's own <code>restore</code>/<code>finish</code> fill for their repos.</li>
+<li><strong>The flow:</strong> <code>restore</code> (open, read-only) → do the work → <code>finish</code> (close, diff-gated
+  write).</li>
+<li><strong>Safety:</strong> both are read-only or dry-run by default; <code>finish --write</code> only ever
+  applies after showing the diff, and never commits.</li>
+<li><strong>Next:</strong> <a href="https://github.com/Data-Wise/rforge/blob/dev/SPEC-restore-finish-commands-2026-07-31.md">SPEC-restore-finish-commands-2026-07-31.md</a>
+  for the full design rationale (repo-root working doc, not part of the published docs site).</li>
 </ul>
 </div>
-<p>⏱️ <strong>2 minutes</strong> • 🟢 Beginner • Pick ONE method</p>
-<h2 id="pick-an-install-method">Pick an install method<a class="headerlink" href="#pick-an-install-method" title="Permanent link">&para;</a></h2>
-<h3 id="claude-code-marketplace-cross-platform-recommended">Claude Code marketplace (cross-platform, recommended)<a class="headerlink" href="#claude-code-marketplace-cross-platform-recommended" title="Permanent link">&para;</a></h3>
-<p>From inside Claude Code:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/plugin marketplace add Data-Wise/rforge
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>/plugin install rforge
-</span></code></pre></div>
-<p>Works on macOS, Linux, and Windows. Updates with <code>/plugin update rforge</code>.</p>
-<h3 id="homebrew-macos-recommended-for-cli-users">Homebrew (macOS, recommended for CLI users)<a class="headerlink" href="#homebrew-macos-recommended-for-cli-users" title="Permanent link">&para;</a></h3>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew<span class="w"> </span>install<span class="w"> </span>data-wise/tap/rforge
-</span></code></pre></div>
-<p>Stable v2.17.0. Updates automatically with <code>brew upgrade</code>.</p>
-<p>To track the development branch instead:</p>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew<span class="w"> </span>install<span class="w"> </span>--HEAD<span class="w"> </span>data-wise/tap/rforge
-</span></code></pre></div>
-<h3 id="manual-any-platform">Manual (any platform)<a class="headerlink" href="#manual-any-platform" title="Permanent link">&para;</a></h3>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Data-Wise/rforge.git
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>ln<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/rforge&quot;</span><span class="w"> </span>~/.claude/plugins/rforge
-</span></code></pre></div>
-<h2 id="verify-the-install">Verify the install<a class="headerlink" href="#verify-the-install" title="Permanent link">&para;</a></h2>
-<p>After any method, confirm Claude Code sees the plugin:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/help
-</span></code></pre></div>
-<p>Expected: 44 commands prefixed <code>/rforge:</code> appear in the listing. If they
-don't, restart Claude Code and try again.</p>
-<p>A quicker confirmation from the shell:</p>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ls<span class="w"> </span>~/.claude/plugins/rforge/commands/r/
-</span></code></pre></div>
-<p>Expected: a list of 17 <code>.md</code> files in <code>commands/r/</code> (check, load, document,
-test, coverage, build, install, site, cycle, lint, spell, urlcheck, style,
-revdep, goodpractice, winbuilder, cran-prep) plus <code>commands/rhub.md</code>, and
-the 15 top-level commands in <code>commands/</code> (analyze, capture, cascade,
-complete, deps, detect, health, impact, init, next, quick, release, status,
-thorough, plus <code>docs/check.md</code>).</p>
-<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Claude Code CLI</strong> installed and configured</li>
-<li><strong>Python 3.10+</strong> on <code>PATH</code> (for the <code>lib/</code> modules)</li>
-<li><strong>R 4.0+</strong> — required for all <code>r:*</code> commands and <code>/rforge:thorough</code>
-  workflows. The rest of the plugin runs without R.</li>
-</ul>
-<p>No MCP server or Node.js runtime is required at runtime as of v1.3.0.</p>
-<h2 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h2>
-<h3 id="from-v1x-to-v200-breaking">From v1.x to v2.0.0 (BREAKING)<a class="headerlink" href="#from-v1x-to-v200-breaking" title="Permanent link">&para;</a></h3>
-<p>3 commands were renamed in v2.0.0. After upgrading, typing an old name
-produces a verbatim error message pointing at the new name — no silent
-failures. See the <a href="../migration/v2.0.0-rename/">v2.0.0 migration tutorial</a>
-for the mapping table and a POSIX <code>sed</code> recipe to mass-update local
-scripts.</p>
-<h3 id="from-v0x-with-rforge-mcp">From v0.x with rforge-mcp<a class="headerlink" href="#from-v0x-with-rforge-mcp" title="Permanent link">&para;</a></h3>
-<p>If you still have the deprecated <code>rforge-mcp</code> MCP server, follow the
-<a href="../tutorials/migrate-from-mcp/">migration tutorial</a> (5 min) to clean up
-the old install. The plugin no longer needs the MCP server as of v1.3.0.</p>
-<h2 id="uninstall">Uninstall<a class="headerlink" href="#uninstall" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><strong>For whom:</strong> an R-package maintainer returning to (or wrapping up) a work session on a
+single package repo — medfit, probmed, medrobust, or any CRAN package using rforge.
+<strong>Prior knowledge:</strong> none beyond <code>/rforge:init</code> having been run once on the package.</p>
+</blockquote>
+<hr />
+<h2 id="what-this-family-covers">What this family covers<a class="headerlink" href="#what-this-family-covers" title="Permanent link">&para;</a></h2>
+<p>Two commands, one boundary each:</p>
 <table>
 <thead>
 <tr>
-<th>Install method</th>
-<th>Uninstall command</th>
+<th>Command</th>
+<th>Boundary</th>
+<th>Default mode</th>
+<th>Writes?</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Marketplace</td>
-<td><code>/plugin remove rforge</code></td>
+<td><code>/rforge:restore</code></td>
+<td>Session open</td>
+<td>read-only, always</td>
+<td>never</td>
 </tr>
 <tr>
-<td>Homebrew</td>
-<td><code>brew uninstall data-wise/tap/rforge</code></td>
-</tr>
-<tr>
-<td>Manual</td>
-<td><code>rm ~/.claude/plugins/rforge</code> (removes symlink only — the clone stays)</td>
+<td><code>/rforge:finish</code></td>
+<td>Session close</td>
+<td>dry-run</td>
+<td>only on <code>--write</code>, diff-gated</td>
 </tr>
 </tbody>
 </table>
-<p>State files are preserved after uninstall. To remove them too:</p>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>~/.rforge
-</span></code></pre></div>
-<h2 id="troubleshooting-install-issues">Troubleshooting install issues<a class="headerlink" href="#troubleshooting-install-issues" title="Permanent link">&para;</a></h2>
-<p>See <a href="../troubleshooting/#install-setup-issues">Troubleshooting → Install / setup issues</a>
-for fixes to common install errors (plugin not loading, symlink permission
-issues on macOS).</p>
-<h2 id="what-you-get">What you get<a class="headerlink" href="#what-you-get" title="Permanent link">&para;</a></h2>
+<p>Both operate on <strong>one R package repo</strong> at a time — not the ecosystem. If invoked from an
+ecosystem root without a <code>DESCRIPTION</code> at the target path, they ask which package rather
+than aggregating (same disambiguation <code>/rforge:status</code>/<code>/rforge:detect</code> already use).</p>
+<h2 id="why-this-doesnt-collide-with-existing-commands">Why this doesn't collide with existing commands<a class="headerlink" href="#why-this-doesnt-collide-with-existing-commands" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Existing command</th>
+<th>Axis</th>
+<th>How it differs from restore/finish</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/rforge:status</code></td>
+<td>Ecosystem-wide dashboard</td>
+<td>Multi-package; restore/finish are single-package</td>
+</tr>
+<tr>
+<td><code>/rforge:health</code></td>
+<td>Ecosystem-wide health score</td>
+<td>Same breadth axis as status</td>
+</tr>
+<tr>
+<td><code>/rforge:next</code></td>
+<td>Ecosystem-aware task recommendation</td>
+<td>Generates a new suggestion; <code>restore</code> only surfaces <code>.STATUS</code>'s existing <code>next:</code> field verbatim</td>
+</tr>
+<tr>
+<td><code>/rforge:complete</code></td>
+<td>One task, doc cascade</td>
+<td>Task-scoped; <code>finish</code> is session-scoped (may span several completed tasks, syncs <code>.STATUS</code> wholesale)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="state-sources">State sources<a class="headerlink" href="#state-sources" title="Permanent link">&para;</a></h2>
+<p><code>/rforge:restore</code> grounds its recap in artifacts every R package already has, never assuming
+a <code>.STATUS</code> file exists:</p>
 <ul>
-<li><strong>44 slash commands</strong> for R-package ecosystem analysis (see <a href="../REFCARD/">REFCARD</a>)</li>
-<li><strong>4 pure-Python <code>lib/</code> modules</strong> invokable as <code>python3 -m lib.&lt;mod&gt;</code></li>
-<li><strong>R-aware <code>PreToolUse</code> hook</strong> that protects roxygen-generated files</li>
-<li><strong><code>description-sync</code> validation skill</strong> for pre-CRAN release checks</li>
-<li><strong>Self-contained</strong> — no MCP server, no Node runtime requirement</li>
+<li><strong>DESCRIPTION</strong> — package name, version, dependencies (via <code>lib.discovery.read_description</code>)</li>
+<li><strong>NEWS.md</strong> — top section only (<code>## Unreleased</code> or the latest <code>## Package X.Y.Z</code> header),
+  same convention <code>lib.tidyaudit.check_news_header</code> already established</li>
+<li><strong>git</strong> — branch, last commit, dirty-tree flag</li>
+<li><strong><code>.STATUS</code></strong> (if present) — <code>next:</code>/<code>blockers:</code>/<code>cran_status:</code> layered on top</li>
+</ul>
+<h2 id="the-status-shape-for-r-packages">The <code>.STATUS</code> shape for R packages<a class="headerlink" href="#the-status-shape-for-r-packages" title="Permanent link">&para;</a></h2>
+<p>Distinct from the plugin-repo <code>.STATUS</code> template (which has <code>version:</code>/<code>last_release:</code>
+fields tuned for a <em>tool's</em> release cadence):</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">package</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">medfit</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">updated</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2026-07-31</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Active</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.4.0</span><span class="w">          </span><span class="c1"># read-only mirror of DESCRIPTION&#39;s Version — never hand-edited</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">                         </span><span class="c1"># independently; /rforge:finish flags drift, never reverses it</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nt">cran_status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">not-submitted | on-cran | resubmission-pending</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nt">last_check</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2026-07-28 PASS (R 4.5, --as-cran)</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nt">last_release</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;free-form dated entry&gt;</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nt">next</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;free-form&gt;</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nt">blockers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;free-form&gt;</span>
+</span></code></pre></div>
+<p>Never auto-created — both commands only <strong>propose</strong> scaffolding one when absent, and proceed
+with the R-native-only recap if declined.</p>
+<h2 id="the-redundant-edit-guard">The redundant-edit guard<a class="headerlink" href="#the-redundant-edit-guard" title="Permanent link">&para;</a></h2>
+<p><code>/rforge:finish</code> refuses to write a <code>.STATUS</code> update whose only change is the <code>updated:</code>
+timestamp — a date bump unbacked by real content is worse than no edit (the same
+<code>doc-update-currency-check</code> discipline <code>savant:restore --sync</code> already encodes). Genuine
+content changes (a new <code>next:</code>, a resolved <code>blocker:</code>, a fresh <code>last_check:</code> result) are
+required to trigger a write.</p>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Open a session</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>/rforge:restore
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># ... do the work ...</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1"># Close it out (dry-run first)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>/rforge:finish
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># Review the diff, then apply</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>/rforge:finish<span class="w"> </span>--write
+</span></code></pre></div>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../commands/"><code>/rforge:status</code></a> — ecosystem-wide dashboard</li>
+<li><a href="../../commands/"><code>/rforge:complete</code></a> — single-task completion + doc cascade</li>
+<li><a href="../../reference/rstatus/"><code>rstatus</code> API reference</a> — the underlying <code>lib/rstatus.py</code> module</li>
 </ul>
 
 
@@ -3036,10 +2937,10 @@ issues on macOS).</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

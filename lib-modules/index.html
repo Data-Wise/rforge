@@ -1305,6 +1305,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../guides/session-boundary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Session boundary (restore/finish)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../guides/dev-cycle/" class="md-nav__link">
         
   
@@ -2402,6 +2430,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/rstatus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    rstatus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3026,7 +3082,7 @@
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
-<li><strong>What:</strong> Pure-Python analysis modules (<code>discovery</code>, <code>deps</code>, <code>status</code>, <code>init</code>, <code>cranlint</code>, <code>deps_sync</code>, <code>ghrelease</code>, <code>runiverse</code>, <code>s7review</code>, <code>changed</code>, <code>scaffold</code>) — no R, no Node — plus <code>rcmd</code> (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the <code>r:</code> commands.</li>
+<li><strong>What:</strong> Pure-Python analysis modules (<code>discovery</code>, <code>deps</code>, <code>status</code>, <code>init</code>, <code>cranlint</code>, <code>deps_sync</code>, <code>ghrelease</code>, <code>runiverse</code>, <code>s7review</code>, <code>changed</code>, <code>scaffold</code>, <code>sitelint</code>, <code>tidyaudit</code>, <code>rstatus</code>) — no R, no Node — plus <code>rcmd</code> (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the <code>r:</code> commands.</li>
 <li><strong>Why:</strong> No MCP server, no Node, no external deps — just <code>python3 -m lib.&lt;module&gt;</code>, fast and scriptable.</li>
 <li><strong>How:</strong> Each takes <code>--path</code> and <code>--format text|json</code>; importable as a Python API too.</li>
 <li><strong>Next:</strong> <a href="../reference/discovery/">Reference API docs</a> for signatures, or <a href="../architecture/#path-b-lib-modules">Architecture</a> for fit.</li>
@@ -3122,6 +3178,21 @@ ecosystem health, or initialize per-user state.</p>
 <td><code>lib/scaffold.py</code></td>
 <td><code>parse_function</code>, <code>plan_test</code>, <code>plan_package</code>, <code>plan_vignette</code>, <code>scaffold_data</code>, <code>scaffold_citation</code>, <code>scaffold</code> (v2.10.0 — <code>r:use-*</code> existing-package scaffolding; dry-run default, <code>--write</code> applies)</td>
 <td>backs <code>/rforge:r:use-test\|use-package\|use-vignette\|use-data\|use-citation</code></td>
+</tr>
+<tr>
+<td><code>lib/sitelint.py</code></td>
+<td><code>check_site_leaks</code> (v2.16.0 — scans the pkgdown render surface for leaked planning/dev docs before deploy)</td>
+<td>backs <code>/rforge:r:site --check-leaks</code> and the <code>r:cran-prep</code> Tier 4 <code>site-leaks</code> stage</td>
+</tr>
+<tr>
+<td><code>lib/tidyaudit.py</code></td>
+<td><code>check_roxygen_completeness</code>, <code>check_news_header</code>, <code>run_all</code> (v2.19.0 — tidyverse-conventions audit: lint preset, DESCRIPTION normalization, roxygen completeness, NEWS.md header currency)</td>
+<td>backs <code>/rforge:r:tidy</code> and <code>r:lint --tidy</code></td>
+</tr>
+<tr>
+<td><code>lib/rstatus.py</code></td>
+<td><code>parse_rstatus</code>, <code>read_rstatus</code>, <code>apply_updates</code>, <code>diff_rstatus</code>, <code>parse_news_header</code>, <code>git_snapshot</code>, <code>build_recap</code> (v2.20.0 — <code>.STATUS</code> reader/differ backing session-boundary recap + sync)</td>
+<td><code>python3 -m lib.rstatus recap --path . [--format text\|json]</code></td>
 </tr>
 </tbody>
 </table>

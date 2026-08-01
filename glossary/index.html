@@ -1305,6 +1305,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../guides/session-boundary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Session boundary (restore/finish)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../guides/dev-cycle/" class="md-nav__link">
         
   
@@ -2225,6 +2253,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/rstatus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    rstatus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2720,6 +2776,10 @@
 :   A local git hook (<code>branch-guard.sh</code>) that enforces branch policies —
     no code commits on <code>main</code> or <code>dev</code>, no force-pushes to protected branches,
     no destructive commands in commit messages.</p>
+<p><strong>guard (redundant-edit)</strong>
+:   The check in <code>lib.rstatus.diff_rstatus</code> that <code>/rforge:finish</code> uses to refuse writing a
+    <code>.STATUS</code> update whose only change is the <code>updated:</code> timestamp — a date bump with no
+    real content delta is not a genuine change (the <code>doc-update-currency-check</code> discipline).</p>
 <p><strong>guard (site leak)</strong>
 :   The site-leak guard in <code>lib.sitelint</code> that scans a pkgdown render surface for
     untracked artifacts (stale <code>.html</code>, leaked <code>_freeze/</code> directories).</p>

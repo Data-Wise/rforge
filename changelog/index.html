@@ -1300,6 +1300,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../guides/session-boundary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Session boundary (restore/finish)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../guides/dev-cycle/" class="md-nav__link">
         
   
@@ -2107,6 +2135,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/rstatus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    rstatus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2442,6 +2498,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2200-2026-08-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.20.0 — 2026-08-01
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2190-2026-07-16" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2666,6 +2733,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2200-2026-08-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.20.0 — 2026-08-01
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2190-2026-07-16" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2849,6 +2927,11 @@
 <p>The full changelog lives in the repository:
 <a href="https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md"><code>CHANGELOG.md</code></a>.</p>
 <hr />
+<h2 id="2200-2026-08-01">2.20.0 — 2026-08-01<a class="headerlink" href="#2200-2026-08-01" title="Permanent link">&para;</a></h2>
+<p><code>/rforge:restore</code> + <code>/rforge:finish</code> (PR #71) — R-package session-boundary
+commands: recap a single package's state and sync <code>.STATUS</code> from what
+actually happened, dry-run by default. New <code>lib/rstatus.py</code> module.
+44 commands.</p>
 <h2 id="2190-2026-07-16">2.19.0 — 2026-07-16<a class="headerlink" href="#2190-2026-07-16" title="Permanent link">&para;</a></h2>
 <p>Evidence-based <code>r:urlcheck</code> 403 triage (#67) + <code>r:rhub</code> dispatch bugfix (#66,
 <code>rhub::rhub_check()</code>'s first param is <code>gh_url</code>, not a local path) + new
