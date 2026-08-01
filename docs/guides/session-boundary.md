@@ -10,8 +10,8 @@
       write).
     - **Safety:** both are read-only or dry-run by default; `finish --write` only ever
       applies after showing the diff, and never commits.
-    - **Next:** [SPEC-restore-finish-commands-2026-07-31.md](../../SPEC-restore-finish-commands-2026-07-31.md)
-      for the full design rationale.
+    - **Next:** [SPEC-restore-finish-commands-2026-07-31.md](https://github.com/Data-Wise/rforge/blob/dev/SPEC-restore-finish-commands-2026-07-31.md)
+      for the full design rationale (repo-root working doc, not part of the published docs site).
 
 > **For whom:** an R-package maintainer returning to (or wrapping up) a work session on a
 > single package repo — medfit, probmed, medrobust, or any CRAN package using rforge.
@@ -98,6 +98,6 @@ required to trigger a write.
 
 ## Related
 
-- [`/rforge:status`](../commands.md#rforge-status) — ecosystem-wide dashboard
-- [`/rforge:complete`](../commands.md#rforge-complete) — single-task completion + doc cascade
+- [`/rforge:status`](../commands.md) — ecosystem-wide dashboard
+- [`/rforge:complete`](../commands.md) — single-task completion + doc cascade
 - [`rstatus` API reference](../reference/rstatus.md) — the underlying `lib/rstatus.py` module
