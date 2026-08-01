@@ -51,6 +51,28 @@ Parsed `.STATUS` fields for a single R package.
 
 ## Functions
 
+### `apply_updates()`
+
+```python
+def apply_updates(current: 'Optional[RStatus]', **overrides) -> 'RStatus'
+```
+
+Build an `intended` `RStatus` by carrying every field forward from
+`current` and overriding only what's explicitly passed.
+
+**Always use this instead of constructing `RStatus(...)` directly** when
+building the `intended` argument to `diff_rstatus`. `RStatus` fields
+default to `None`, and `diff_rstatus` cannot distinguish "this field was
+never mentioned this session" from "this field was intentionally
+cleared" — a plain `RStatus(updated=today, version=...)` call silently
+treats every field it *didn't* set as a real change to `None`, which
+`diff_rstatus`'s redundant-edit guard does **not** catch (it only
+filters a diff whose *only* change is `updated`). That is a genuine
+data-loss bug caught during adversarial review of the very code example
+that used to live in `commands/finish.md` — this helper exists so the
+safe pattern is also the path of least resistance, not just documented
+advice a caller has to remember.
+
 ### `build_recap()`
 
 ```python

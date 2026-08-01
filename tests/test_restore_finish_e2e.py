@@ -32,9 +32,15 @@ def _make_r_package_fixture(tmp_path, with_status=True):
         "Title: Fit mediation models\n"
         "Imports: methods, stats\n"
     )
-    # Flat `## PackageName X.Y.Z` header convention (lib.tidyaudit.check_news_header
-    # establishes this as rforge's own expectation) — "## Unreleased" is the
-    # dev-in-progress marker before the next numbered header is stamped in.
+    # NOTE: lib.tidyaudit.check_news_header's regex
+    # (`^#+\s*(\S+)\s+([\d.]+)\s*$`) requires a literal "PackageName X.Y.Z"
+    # header and would flag "## Unreleased" as non-compliant advisory-only —
+    # tidyaudit is a stricter CRAN-facing lint. "## Unreleased" is instead
+    # the common keepachangelog-style dev-in-progress marker this module's
+    # own parse_news_header deliberately recognizes (case-insensitive
+    # substring match on the header text) as a MORE lenient convention than
+    # tidyaudit's, not the same one — corrected after adversarial review
+    # flagged the original comment here as claiming the opposite.
     (tmp_path / "NEWS.md").write_text(
         "## Unreleased\n\n"
         "- Added bootstrap intervals\n"

@@ -42,6 +42,7 @@ __all__ = [
     "parse_rstatus",
     "read_rstatus",
     "parse_news_header",
+    "apply_updates",
     "diff_rstatus",
     "git_snapshot",
     "build_recap",
@@ -106,6 +107,11 @@ def parse_rstatus(content: str) -> RStatus:
             # Continuation line — append to raw, but do not promote into
             # the single-line known-field value (see docstring).
             raw[current_key] = raw[current_key] + "\n" + line
+        elif not line.strip():
+            # Blank line ends the current field's continuation scope — a
+            # trailing freeform notes section below a blank line is not
+            # silently absorbed into whatever field happened to be last.
+            current_key = None
 
     return RStatus(
         package=known.get("package"),
@@ -131,6 +137,29 @@ def read_rstatus(pkg_path: str | Path = ".") -> Optional[RStatus]:
     except OSError:
         return None
     return parse_rstatus(text)
+
+
+def apply_updates(current: Optional[RStatus], **overrides) -> RStatus:
+    """Build an `intended` `RStatus` by carrying every field forward from
+    `current` and overriding only what's explicitly passed.
+
+    **Always use this instead of constructing `RStatus(...)` directly** when
+    building the `intended` argument to `diff_rstatus`. `RStatus` fields
+    default to `None`, and `diff_rstatus` cannot distinguish "this field was
+    never mentioned this session" from "this field was intentionally
+    cleared" — a plain `RStatus(updated=today, version=...)` call silently
+    treats every field it *didn't* set as a real change to `None`, which
+    `diff_rstatus`'s redundant-edit guard does **not** catch (it only
+    filters a diff whose *only* change is `updated`). That is a genuine
+    data-loss bug caught during adversarial review of the very code example
+    that used to live in `commands/finish.md` — this helper exists so the
+    safe pattern is also the path of least resistance, not just documented
+    advice a caller has to remember.
+    """
+    base = asdict(current) if current is not None else {}
+    base.pop("raw_fields", None)
+    base.update(overrides)
+    return RStatus(**{k: base.get(k) for k in _KNOWN_FIELDS}, raw_fields={})
 
 
 def diff_rstatus(current: Optional[RStatus], intended: RStatus) -> list[tuple[str, Optional[str], Optional[str]]]:
@@ -161,7 +190,7 @@ def diff_rstatus(current: Optional[RStatus], intended: RStatus) -> list[tuple[st
 
 # ───────────────────────── NEWS.md ─────────────────────────
 
-_NEWS_HEADER_RE = re.compile(r"^#+\s*(.+)$", re.MULTILINE)
+_NEWS_HEADER_RE = re.compile(r"^#+[ \t]*(.*?)[ \t]*$", re.MULTILINE)
 _UNRELEASED_RE = re.compile(r"unreleased", re.IGNORECASE)
 
 
@@ -270,18 +299,33 @@ def build_recap(pkg_path: str | Path = ".") -> dict:
     }
 
 
+_CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+
+
+def _sanitize(value: Optional[str]) -> Optional[str]:
+    """Strip terminal control characters (ANSI escapes etc.) from repo-
+    controlled text before it's printed. `format_text` interpolates values
+    read straight out of NEWS.md/.STATUS in the target repo — content this
+    module's caller does not control — so a malicious file could otherwise
+    spoof terminal output (overwrite a prior line, fake a status) right
+    before a `/rforge:finish --write` confirmation prompt."""
+    if value is None:
+        return None
+    return _CONTROL_CHAR_RE.sub("", value)
+
+
 def format_text(recap: dict) -> str:
     if not recap["is_r_package"]:
         return "Not an R package (no DESCRIPTION found at this path)."
 
     lines = []
     desc = recap["description"]
-    lines.append(f"RECAP: {desc['package']} (R package)")
-    lines.append(f"  DESCRIPTION: v{desc['version']}")
+    lines.append(f"RECAP: {_sanitize(desc['package'])} (R package)")
+    lines.append(f"  DESCRIPTION: v{_sanitize(desc['version'])}")
 
     news = recap["news"]
     if news["found"]:
-        marker = "[Unreleased]" if news["has_unreleased"] else news["top_header"]
+        marker = "[Unreleased]" if news["has_unreleased"] else _sanitize(news["top_header"])
         lines.append(f"  NEWS.md: {marker}, {len(news['entries'])} entries")
     else:
         lines.append("  NEWS.md: not found")
@@ -289,13 +333,16 @@ def format_text(recap: dict) -> str:
     git = recap["git"]
     if git["available"]:
         dirty = " (dirty)" if git["dirty"] else ""
-        lines.append(f"  git: {git['branch']}{dirty} — {git['last_commit'] or 'no commits'}")
+        lines.append(f"  git: {_sanitize(git['branch'])}{dirty} — {_sanitize(git['last_commit']) or 'no commits'}")
     else:
         lines.append("  git: not a repo, or git unavailable")
 
     rstatus = recap["rstatus"]
     if rstatus is not None:
-        lines.append(f"  .STATUS: next={rstatus['next'] or '—'}; blockers={rstatus['blockers'] or 'none'}")
+        lines.append(
+            f"  .STATUS: next={_sanitize(rstatus['next']) or '—'}; "
+            f"blockers={_sanitize(rstatus['blockers']) or 'none'}"
+        )
     else:
         lines.append("  .STATUS: not found — offer to scaffold one")
 

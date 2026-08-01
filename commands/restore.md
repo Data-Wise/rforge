@@ -1,6 +1,6 @@
 ---
 name: rforge:restore
-description: Recap a single R package's state (DESCRIPTION, NEWS.md, git, .STATUS) — read-only
+description: Recap a single R package's state (DESCRIPTION, NEWS.md, git, .STATUS) — read-only except an explicitly-confirmed .STATUS scaffold offer
 argument-hint: "[path] [--format text|json]"
 arguments:
   - name: path
@@ -18,7 +18,10 @@ arguments:
 
 Recap where a single R package repo stands — the rforge counterpart to craft's
 `/craft:restore` and savant's `/savant:restore`, scoped to one R package instead of a
-generic dev repo or research project. **Read-only.** Never writes, never commits.
+generic dev repo or research project. **Read-only by default, and never commits.** The one
+exception: if no `.STATUS` exists, this command may *offer* to scaffold one — but only ever
+writes it after you explicitly confirm (see "No `.STATUS` found" below). Declining leaves the
+repo untouched.
 
 ## What It Does
 

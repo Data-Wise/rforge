@@ -45,6 +45,30 @@ def test_parse_rstatus_unknown_field_preserved_in_raw_only():
     assert not hasattr(r, "custom_field")
 
 
+def test_parse_rstatus_only_unknown_fields_still_returns_object():
+    r = rstatus.parse_rstatus("custom_a: x\ncustom_b: y\n")
+    assert r.package is None
+    assert r.next is None
+    assert r.raw_fields == {"custom_a": "x", "custom_b": "y"}
+
+
+def test_parse_rstatus_blank_line_resets_continuation_scope():
+    """Regression guard: a blank line must end the previous field's
+    continuation, so trailing freeform prose below a blank line isn't
+    silently absorbed into whatever field happened to be last (caught by
+    adversarial review — the parser used to never clear current_key)."""
+    content = (
+        "package: medfit\n"
+        "next: ship it\n"
+        "\n"
+        "Some unrelated freeform notes a human appended below.\n"
+        "More notes here.\n"
+    )
+    r = rstatus.parse_rstatus(content)
+    assert r.next == "ship it"
+    assert "Some unrelated freeform notes" not in r.raw_fields["next"]
+
+
 def test_parse_rstatus_does_not_match_emoji_box_format():
     """Regression guard for the exact bug found during implementation:
     lib.status.parse_status_file's emoji-box grammar returns empty/None
@@ -100,6 +124,72 @@ def test_diff_rstatus_no_change_at_all():
     assert rstatus.diff_rstatus(current, intended) == []
 
 
+def test_diff_rstatus_multiple_simultaneous_real_changes_all_surface():
+    current = rstatus.RStatus(
+        package="medfit", updated="2026-07-16", next="old next",
+        blockers="old blocker", cran_status="not-submitted",
+    )
+    intended = rstatus.RStatus(
+        package="medfit", updated="2026-07-31", next="new next",
+        blockers="old blocker", cran_status="resubmission-pending",
+    )
+    changes = rstatus.diff_rstatus(current, intended)
+    fields = {c[0] for c in changes}
+    assert fields == {"updated", "next", "cran_status"}
+
+
+def test_diff_rstatus_bare_construction_wipes_untouched_fields_regression_guard():
+    """Documents the exact data-loss bug 3/4 adversarial-review agents caught:
+    constructing `intended` as a bare RStatus(...) (what an earlier draft of
+    commands/finish.md's own example did) leaves every unmentioned field at
+    None, and diff_rstatus reports those as real changes — NOT caught by the
+    redundant-edit guard, since other real fields also changed. This is why
+    apply_updates() exists and commands/finish.md now mandates it."""
+    current = rstatus.RStatus(
+        package="medfit", updated="2026-07-16", version="0.4.0",
+        cran_status="not-submitted", last_check="2026-07-28 PASS",
+        last_release="v0.4.0 shipped", status="Active",
+    )
+    # The dangerous pattern: only updated/version set, everything else at None.
+    intended_bare = rstatus.RStatus(package="medfit", updated="2026-07-31", version="0.4.0")
+    changes = rstatus.diff_rstatus(current, intended_bare)
+    fields = {c[0]: c for c in changes}
+    # cran_status/last_check/last_release/status all silently "change" to None.
+    assert fields["cran_status"] == ("cran_status", "not-submitted", None)
+    assert fields["last_check"] == ("last_check", "2026-07-28 PASS", None)
+
+    # The safe pattern: apply_updates carries everything forward.
+    intended_safe = rstatus.apply_updates(current, updated="2026-07-31")
+    assert rstatus.diff_rstatus(current, intended_safe) == []  # timestamp-only, filtered
+
+
+# ── apply_updates (safe intended-state builder) ─────────────────────────────
+
+def test_apply_updates_from_none_current_uses_only_overrides():
+    intended = rstatus.apply_updates(None, package="medfit", version="0.4.0")
+    assert intended.package == "medfit"
+    assert intended.version == "0.4.0"
+    assert intended.next is None
+
+
+def test_apply_updates_carries_every_field_forward_except_overrides():
+    current = rstatus.RStatus(
+        package="medfit", updated="2026-07-16", version="0.4.0",
+        cran_status="not-submitted", next="old next", blockers="none",
+        last_check="2026-07-28 PASS", last_release="v0.4.0", status="Active",
+    )
+    intended = rstatus.apply_updates(current, updated="2026-07-31", next="new next")
+    assert intended.updated == "2026-07-31"
+    assert intended.next == "new next"
+    # Everything else carried forward verbatim — not silently cleared.
+    assert intended.cran_status == "not-submitted"
+    assert intended.last_check == "2026-07-28 PASS"
+    assert intended.last_release == "v0.4.0"
+    assert intended.status == "Active"
+    assert intended.blockers == "none"
+    assert intended.package == "medfit"
+
+
 # ── parse_news_header ───────────────────────────────────────────────────────
 
 def test_parse_news_header_missing_file(tmp_path):
@@ -132,6 +222,26 @@ def test_parse_news_header_top_section_scope_only(tmp_path):
     result = rstatus.parse_news_header(str(tmp_path))
     assert result["has_unreleased"] is True
     assert result["entries"] == ["New thing"]
+
+
+def test_parse_news_header_bare_hash_with_no_title(tmp_path):
+    """Regression guard: a bare `#` header line (no title text) must still
+    match and be treated as a (empty-titled) header, not silently skipped —
+    the original regex required >=1 char after the `#`, which dropped this
+    case and everything under it from the top-section scope."""
+    (tmp_path / "NEWS.md").write_text("#\n\n- an entry under a titleless header\n")
+    result = rstatus.parse_news_header(str(tmp_path))
+    assert result["found"] is True
+    assert result["top_header"] == ""
+    assert result["entries"] == ["an entry under a titleless header"]
+
+
+def test_parse_news_header_present_with_empty_body(tmp_path):
+    (tmp_path / "NEWS.md").write_text("## Unreleased\n\n")
+    result = rstatus.parse_news_header(str(tmp_path))
+    assert result["found"] is True
+    assert result["has_unreleased"] is True
+    assert result["entries"] == []
 
 
 def test_parse_news_header_no_headers_at_all(tmp_path):
@@ -176,6 +286,17 @@ def test_build_recap_not_an_r_package(tmp_path):
     assert "Not an R package" in rstatus.format_text(recap)
 
 
+def test_build_recap_malformed_description_treated_as_not_a_package(tmp_path):
+    """A DESCRIPTION file present but with no Package: field (garbage/empty)
+    must degrade the same way as a missing DESCRIPTION — lib.discovery's
+    parse_description already returns None in that case; build_recap must
+    not crash or misreport is_r_package."""
+    (tmp_path / "DESCRIPTION").write_text("not a real DCF file\njust prose\n")
+    recap = rstatus.build_recap(str(tmp_path))
+    assert recap["is_r_package"] is False
+    assert recap["description"] is None
+
+
 def test_build_recap_full_r_package(tmp_path):
     (tmp_path / "DESCRIPTION").write_text(
         "Package: medfit\nVersion: 0.4.0\nTitle: Fit things\n"
@@ -206,7 +327,17 @@ def test_build_recap_version_drift_detected(tmp_path):
 
 def test_format_json_round_trips(tmp_path):
     (tmp_path / "DESCRIPTION").write_text("Package: medfit\nVersion: 0.4.0\n")
+    (tmp_path / "NEWS.md").write_text("## Unreleased\n\n- did a thing\n")
+    (tmp_path / ".STATUS").write_text("package: medfit\nversion: 0.4.0\nnext: ship it\n")
+
     recap = rstatus.build_recap(str(tmp_path))
     import json
     parsed = json.loads(rstatus.format_json(recap))
+    # Assert nested values actually survive serialization, not just the
+    # top-level flag — a format_json bug that dropped nested dicts would
+    # still have passed the original single-assertion version of this test.
     assert parsed["is_r_package"] is True
+    assert parsed["description"]["package"] == "medfit"
+    assert parsed["description"]["version"] == "0.4.0"
+    assert parsed["news"]["entries"] == ["did a thing"]
+    assert parsed["rstatus"]["next"] == "ship it"
