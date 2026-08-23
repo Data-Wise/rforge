@@ -102,6 +102,91 @@ def test_parse_status_file_extracts_focus_and_progress():
     assert summary.last_updated == datetime(2026, 5, 9)
 
 
+# ───────────────────── frontmatter dialect ─────────────────────
+
+FRONTMATTER_STATUS = """status: active
+priority: P1
+progress: 100
+kind: package
+updated: 2026-08-22
+next: v0.2.0 RELEASED (S7 + IPW). Next phases (general CRAN toolkit, NOT
+  manuscript-gated): GLM models, MNAR sensitivity.
+done: 2026-07-19 shipped the IPW estimator
+type: r
+
+# demopkg — a package
+
+## Some section
+- a bullet
+"""
+
+
+def test_parse_frontmatter_dialect_extracts_scalar_fields():
+    s = parse_status_file(FRONTMATTER_STATUS)
+    assert s.progress == 100
+    assert s.last_updated == datetime(2026, 8, 22)
+    assert s.current_focus == "active"
+    # the `next:` value folds its indented continuation into one string
+    assert len(s.next_actions) == 1
+    assert "GLM models, MNAR sensitivity." in s.next_actions[0]
+    assert "\n" not in s.next_actions[0]
+    assert s.just_completed == ["2026-07-19 shipped the IPW estimator"]
+
+
+def test_parse_frontmatter_accepts_last_updated_alias():
+    s = parse_status_file("status: active\nlast_updated: 2026-01-02\n")
+    assert s.last_updated == datetime(2026, 1, 2)
+
+
+def test_parse_frontmatter_first_occurrence_of_a_key_wins():
+    # legacy tails repeat keys; the maintained one is the earlier
+    s = parse_status_file(
+        "status: active\nlast_updated: 2026-07-16\nkind: package\nlast_updated: 2026-06-15\n"
+    )
+    assert s.last_updated == datetime(2026, 7, 16)
+
+
+def test_parse_frontmatter_tolerates_dotted_and_hyphenated_keys():
+    s = parse_status_file(
+        "status: active\n"
+        "cran_0.3.1_check: passed\n"
+        "merged-2026-08-17: PR #44\n"
+        "progress: 92\n"
+    )
+    # a key shape it cannot parse would end the block early and lose `progress:`
+    assert s.progress == 92
+
+
+def test_frontmatter_progress_beats_percentages_in_prose():
+    # the emoji path takes max() over every `N%` in the file; status prose
+    # routinely quotes coverage and error rates that are not progress
+    s = parse_status_file(
+        "status: active\nprogress: 92\n\n# pkg\n\nCoverage rose 83.1% to 93.9%.\n"
+    )
+    assert s.progress == 92
+
+
+def test_hybrid_file_falls_back_to_emoji_sections():
+    # frontmatter supplies progress; the ⏰ line still supplies the date
+    s = parse_status_file(
+        "status: active\nprogress: 77\n\n# pkg\n\n⏰ LAST UPDATED 2026-03-04\n"
+    )
+    assert s.progress == 77
+    assert s.last_updated == datetime(2026, 3, 4)
+
+
+def test_emoji_dialect_unaffected_by_frontmatter_support():
+    # a file that does not open with `key: value` must not take the new path
+    s = parse_status_file(
+        "\U0001F3AF CURRENT STATUS\nShipping v2\n\n"
+        "\U0001F4CA PROGRESS\n75%\n\n"
+        "\u23F0 LAST UPDATED 2026-05-09\n"
+    )
+    assert s.current_focus == "Shipping v2"
+    assert s.progress == 75
+    assert s.last_updated == datetime(2026, 5, 9)
+
+
 def test_parse_status_file_empty_returns_default_summary():
     summary = parse_status_file("")
     assert summary.current_focus is None
