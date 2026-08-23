@@ -152,25 +152,114 @@ _NEXT_LEADER_RE = re.compile(r"^[A-Z)\d.\-*\s]+")
 _NEXT_LINE_RE = re.compile(r"^[A-Z]\)|^\d\)|^[-*]")
 
 
+# The mediationverse R packages use a different `.STATUS` dialect: a leading
+# block of `key: value` frontmatter (with indented continuation lines) followed
+# by markdown, instead of the emoji section headers above. Every active package
+# in that ecosystem uses it, so both dialects are supported; frontmatter wins
+# where the two disagree.
+# Keys in the wild carry hyphens, digits and dots -- `merged-2026-08-17`,
+# `cran_0.3.1_check`. Anchoring on a leading letter keeps prose like
+# "1.5.0: ..." from being mistaken for a key.
+_FM_KEY_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_.-]*):\s*(.*)$")
+_FM_FOCUS_RE = re.compile(r"^#{1,6}\s*Focus:\s*(.+)$", re.MULTILINE | re.IGNORECASE)
+_FM_DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
+_FM_INT_RE = re.compile(r"\d+")
+
+
+def _parse_frontmatter(content: str) -> dict[str, str]:
+    """Parse a leading `key: value` block, folding indented continuation lines.
+
+    Returns `{}` unless the very first line is a `key: value` pair, so files in
+    the emoji dialect are never touched by this path. The block ends at the
+    first blank line or the first line that is neither a key nor a continuation.
+    """
+    lines = content.splitlines()
+    if not lines or not _FM_KEY_RE.match(lines[0]):
+        return {}
+
+    fields: dict[str, str] = {}
+    key: Optional[str] = None
+    for line in lines:
+        if not line.strip():
+            break
+        if m := _FM_KEY_RE.match(line):
+            key = m.group(1)
+            # First occurrence wins. These files accumulate legacy tails, so a
+            # repeated key (medrobust carries two `last_updated:`) is almost
+            # always a stale copy below the maintained one, not a correction.
+            fields.setdefault(key, m.group(2).strip())
+        elif key is not None and line[:1].isspace():
+            fields[key] = f"{fields[key]} {line.strip()}".strip()  # fold continuation
+        else:
+            break
+    return fields
+
+
+def _apply_frontmatter(summary: StatusFileSummary, content: str) -> None:
+    """Fill `summary` from frontmatter fields. No-op for the emoji dialect."""
+    fields = _parse_frontmatter(content)
+    if not fields:
+        return
+
+    if (raw := fields.get("progress")) and (m := _FM_INT_RE.search(raw)):
+        summary.progress = int(m.group())
+
+    # `updated:` (missingmed, medsim) and `last_updated:` (medrobust,
+    # mediationverse) are the same field under two names.
+    for name in ("updated", "last_updated"):
+        if (raw := fields.get(name)) and (m := _FM_DATE_RE.search(raw)):
+            try:
+                summary.last_updated = datetime.strptime(m.group(1), "%Y-%m-%d")
+            except ValueError:
+                pass
+            else:
+                break
+
+    if raw := fields.get("next"):
+        summary.next_actions = [raw]
+
+    if raw := fields.get("done"):
+        summary.just_completed = [raw]
+
+    # An explicit `## Focus:` line if the file has one, else the `status:`
+    # value. The markdown title is deliberately NOT used: in practice it is as
+    # often a decorative rule or an archival note ("Below is the original
+    # .STATUS content...") as a real heading, and a confidently wrong focus
+    # line is worse in a dashboard than a terse accurate one.
+    if m := _FM_FOCUS_RE.search(content):
+        summary.current_focus = m.group(1).strip()
+    elif raw := fields.get("status"):
+        summary.current_focus = raw
+
+
 def parse_status_file(content: str) -> StatusFileSummary:
     """Parse a `.STATUS` file's text into a `StatusFileSummary`.
 
-    Section anchors are emoji headers (🎯, 📊, ✅, 📋, ⏰). Order is not
-    significant. Missing sections leave their corresponding fields unset.
+    Two dialects are supported. Files opening with `key: value` frontmatter are
+    read from that block; everything else is read from emoji section anchors
+    (🎯, 📊, ✅, 📋, ⏰). Order is not significant, and a field the active
+    dialect does not supply falls back to the other one rather than staying
+    unset -- hybrid files (frontmatter plus emoji sections) parse fully.
+    Missing fields stay None.
     """
     summary = StatusFileSummary()
+    _apply_frontmatter(summary, content)
 
-    if m := _FOCUS_RE.search(content):
+    if summary.current_focus is None and (m := _FOCUS_RE.search(content)):
         summary.current_focus = m.group(1).strip()
 
-    percentages = [int(m.group(1)) for m in _PROGRESS_RE.finditer(content)]
-    if percentages:
-        summary.progress = max(percentages)
+    # Only scan the prose for `N%` when frontmatter gave no `progress:`. Status
+    # prose routinely quotes unrelated percentages (coverage, error rates), and
+    # max() over those is meaningless as a progress figure.
+    if summary.progress is None:
+        percentages = [int(m.group(1)) for m in _PROGRESS_RE.finditer(content)]
+        if percentages:
+            summary.progress = max(percentages)
 
     if m := _PHASE_RE.search(content):
         summary.phase = m.group(1).strip()
 
-    if m := _COMPLETED_RE.search(content):
+    if not summary.just_completed and (m := _COMPLETED_RE.search(content)):
         items = []
         for line in m.group(1).splitlines():
             if "✅" in line or line.lstrip().startswith(("-", "*")):
@@ -179,7 +268,7 @@ def parse_status_file(content: str) -> StatusFileSummary:
                     items.append(cleaned)
         summary.just_completed = items
 
-    if m := _NEXT_RE.search(content):
+    if not summary.next_actions and (m := _NEXT_RE.search(content)):
         items = []
         for line in m.group(1).splitlines():
             if _NEXT_LINE_RE.match(line):
@@ -188,7 +277,7 @@ def parse_status_file(content: str) -> StatusFileSummary:
                     items.append(cleaned)
         summary.next_actions = items
 
-    if m := _DATE_RE.search(content):
+    if summary.last_updated is None and (m := _DATE_RE.search(content)):
         try:
             summary.last_updated = datetime.strptime(m.group(1), "%Y-%m-%d")
         except ValueError:

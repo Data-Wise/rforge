@@ -130,5 +130,9 @@ def parse_status_file(content: 'str') -> 'StatusFileSummary'
 
 Parse a `.STATUS` file's text into a `StatusFileSummary`.
 
-Section anchors are emoji headers (🎯, 📊, ✅, 📋, ⏰). Order is not
-significant. Missing sections leave their corresponding fields unset.
+Two dialects are supported. Files opening with `key: value` frontmatter are
+read from that block; everything else is read from emoji section anchors
+(🎯, 📊, ✅, 📋, ⏰). Order is not significant, and a field the active
+dialect does not supply falls back to the other one rather than staying
+unset -- hybrid files (frontmatter plus emoji sections) parse fully.
+Missing fields stay None.
