@@ -173,6 +173,116 @@ There is **no** `--write` / `--fix` — S7 fixes need human judgement (like `r:c
 
 ---
 
+## MediationVerse doctrine
+
+!!! note "Package names below are a worked example, not something rforge hardcodes"
+    Everything above this section is generic — `r:s7-review` checks any S7 package. The
+    following is a concrete class-design worked example for the MediationVerse package
+    family (`medfit`/`probmed`/`rmediation`/`medsim`/`mediationverse`), kept here because
+    it's the ecosystem this tool is developed and dogfooded against. See the
+    [CRAN submission guide's MediationVerse doctrine](cran-submission.md) for the release
+    side of the same ecosystem.
+
+S7 is the OOP standard for all new MediationVerse code. Model two layers: a **fitter**
+(configuration + `fit()`) and an immutable **result** (estimates + inference). Give effect
+types a small hierarchy so shared `print`/`confint` logic lives once — this is the shape
+`--kind validators`/`--kind methods` findings are checking your code *against*.
+
+```r
+library(S7)
+
+# --- result base + effect-typed subclasses ---
+MediationResult <- new_class("MediationResult", properties = list(
+  estimand = new_property(class_character),          # "NIE","NDE","CDE"
+  estimate = new_property(class_numeric),
+  se       = new_property(class_numeric, default = NA_real_),
+  vcov     = new_property(class_numeric | NULL, default = NULL),
+  n        = new_property(class_integer),
+  call     = new_property(class_call | NULL, default = NULL)
+), validator = function(self) {
+  if (length(self@estimate) < 1) "@estimate must be non-empty"
+  else if (!is.na(self@se) && self@se < 0) "@se must be >= 0"
+})
+
+NIEResult <- new_class("NIEResult", parent = MediationResult)
+NDEResult <- new_class("NDEResult", parent = MediationResult)
+CDEResult <- new_class("CDEResult", parent = MediationResult,
+  properties = list(m_level = new_property(class_numeric)))   # CDE fixes M=m
+```
+
+- **Validate in the class, not the caller** — the `validator` runs on construction and on
+  `@<-` mutation, so invariants can't drift (this is what `--kind validators`' `missing_validator`
+  finding flags the absence of).
+- **Keep results immutable** — compute everything in the fitter; the result is a value
+  object, making `confint`/`summary` pure functions of it.
+- **Put shared behavior on the parent** (`MediationResult`) and override only where an
+  effect type genuinely differs (e.g. a `CDEResult` print that shows `m_level`).
+
+**Generics + methods** — define package generics with `new_generic()`, and register methods
+for the base generics users reach for (`print`, `summary`, `confint`, `plot`):
+
+```r
+nie <- new_generic("nie", "object")
+method(nie, MediationResult) <- function(object, ...) object@estimate
+
+method(print, MediationResult) <- function(x, ...) {
+  cat(sprintf("<%s> %s = %.4f (SE %.4f, n=%d)\n",
+              S7_class(x)@name, x@estimand, x@estimate, x@se, x@n)); invisible(x)
+}
+method(stats::confint, MediationResult) <- function(object, parm, level = 0.95, ...) {
+  z <- stats::qnorm(1 - (1 - level)/2)
+  c(lower = object@estimate - z*object@se, upper = object@estimate + z*object@se)
+}
+```
+
+**The `.onLoad()` registration-order gotcha** — the single most common "method not found at
+load/check time" bug, and exactly what `--kind methods`' `missing_methods_register` finding
+and the `--runtime` `method-dispatch` family exist to catch. When bridging to S4 (needed for
+some double dispatch / `setMethod` interop), call `S4_register()` **before**
+`methods_register()`:
+
+```r
+.onLoad <- function(libname, pkgname) {
+  S7::S4_register(MediationResult)   # bridge classes to S4 FIRST (if you need S4 interop)
+  S7::S4_register(NIEResult)
+  S7::methods_register()             # THEN register S7 methods
+}
+```
+
+If methods vanish under `R CMD check` but work interactively, it's almost always (a)
+`methods_register()` not called in `.onLoad()`, (b) `S4_register()` called after it, or (c)
+the generic/class not exported.
+
+**S3 ↔ S7 interop:** to make an S7 class work with an existing S3 generic you don't own,
+register an S7 method on it — S7 handles S3 dispatch when the S3 generic calls
+`UseMethod`. For double dispatch (two S7 args, or S7×S4), register via the S4 bridge on both
+classes. Don't mix an S3 `class<-` onto an S7 object; let S7 own the class.
+
+**Migration pattern (S3 → S7, e.g. `medfit`):**
+
+1. Inventory the S3 object's fields → S7 `properties` with types + a `validator` capturing
+   the old invariants.
+2. Replace `structure(list(...), class="x")` constructors with `new_class(...)` + a thin
+   constructor function.
+3. Convert `print.x`/`summary.x`/`confint.x` to `method(<generic>, X)`.
+4. Wire `.onLoad()` registration; export classes/generics.
+5. Keep a temporary back-compat `as.list()`/coercion if downstream code reads `$fields`;
+   deprecate with a `.Deprecated()` note.
+6. Tests (testthat edition 3): construct, mutate-to-invalid (expect validator error),
+   dispatch each generic, `S7_inherits()` checks.
+
+**Common pitfalls beyond what the checker flags:**
+
+- `@` on a non-S7 object → "no applicable method"; you're holding an S3 list, not the S7
+  object.
+- A validator returning `FALSE`/`TRUE` instead of `NULL`/a message string — it must return
+  `NULL` (valid) or a character message (`--kind validators`' `validator_return_shape`
+  catches this statically; `--runtime`'s `validator-runtime` family catches a validator that
+  silently never fires).
+- Heavy compute in constructors — keep constructors cheap; do fitting in `fit()`.
+
+---
+
 ## See also
 
 - [`r:s7-review` in commands](../commands.md) — the terse command-list entry

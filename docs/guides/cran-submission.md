@@ -293,6 +293,46 @@ optionally verifies the version is live on CRAN, then promotes the release in pl
 
 ---
 
+## MediationVerse doctrine
+
+!!! note "Package names below are a worked example, not something rforge hardcodes"
+    Everything above this section is generic — it applies to any R package. The following
+    is CRAN-prep doctrine specific to the MediationVerse package family (`medfit` →
+    `{probmed, rmediation, medsim}` → `mediationverse`; `medrobust` semi-independent),
+    kept here because it's the ecosystem this tool is developed and dogfooded against.
+    Skip it if you're not working on one of these packages.
+
+**Dependency chain (submit upstream → downstream):**
+`medfit → {probmed, rmediation, medsim} → mediationverse`; `medrobust` is semi-independent
+(uses `medfit` optionally).
+
+- **medfit** — P0, CRAN-bound. Known blocker class: **vignette ambiguity** — CRAN rebuilds
+  vignettes from a clean checkout with no network and a time budget. Declare the engine
+  (`VignetteBuilder: knitr` or `quarto` in DESCRIPTION, matching `%\VignetteEngine{…}` /
+  `vignette:` YAML per vignette); avoid heavy compute or network at build time (precompute
+  and load a cached object instead, or `eval=FALSE` with shown results); resolve any
+  `.Rmd`/`.qmd`/built-`.html` ambiguity for the same topic to one source of truth in
+  `vignettes/` and remove stray built artifacts from version control.
+- **rmediation** — already on CRAN; changes must clear `r:revdep` for downstream.
+- OOP standard is **S7** across the ecosystem (see the [S7 review guide](s7-review.md#mediationverse-doctrine)).
+  Estimand notation: VanderWeele (NIE/NDE/CDE, θ, a/b paths).
+
+**Multi-package release coordination:**
+
+1. Freeze versions; bump per semver in DESCRIPTION + `NEWS.md` (user-facing changes only).
+2. Submit **upstream first** (`medfit`), wait for it to land on CRAN, then rebuild/recheck
+   downstream against the released version.
+3. For packages with reverse deps (`rmediation`/`medfit`): `r:revdep` before submitting; if
+   it breaks a downstream, coordinate a simultaneous update and note it in
+   `cran-comments.md`.
+4. Keep a shared `cran-comments.md` template across the ecosystem; reference the test
+   environments and the single explained NOTE.
+
+When working any downstream package, read `medfit`'s shared S7 classes / bootstrap
+interfaces first — they set the contract the rest of the ecosystem depends on.
+
+---
+
 ## Safety model
 
 Everything in this family that **writes a file or reaches the network** is
