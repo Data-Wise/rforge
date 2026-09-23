@@ -25,6 +25,7 @@ TRACKED = [
     ".claude-plugin/plugin.json",
     "README.md",
     "CLAUDE.md",
+    "AGENTS.md",
 ]
 
 
@@ -150,12 +151,28 @@ def test_write_path_syncs_command_count(synced_tree):
     plugin = (tree / ".claude-plugin/plugin.json").read_text(encoding="utf-8")
     readme = (tree / "README.md").read_text(encoding="utf-8")
     claude_md = (tree / "CLAUDE.md").read_text(encoding="utf-8")
+    agents_md = (tree / "AGENTS.md").read_text(encoding="utf-8")
 
     assert f"{new_count} commands for R package" in pkg
     assert f"{new_count} commands for R package" in plugin
     assert f"Claude Code — {new_count} commands," in readme
     assert f"## Command-file conventions (all {new_count} commands)" in claude_md
+    assert f"## Command-file conventions (all {new_count} commands)" in agents_md
     assert mod.main(["--check"]) == 0
+
+
+def test_check_fails_on_agents_md_count_drift(synced_tree):
+    mod, tree = synced_tree
+    # AGENTS.md mirrors CLAUDE.md; a stale heading there must fail --check too.
+    agents = tree / "AGENTS.md"
+    count = mod.read_command_count()
+    text = agents.read_text(encoding="utf-8")
+    text = text.replace(f"(all {count} commands)", "(all 99 commands)")
+    agents.write_text(text, encoding="utf-8")
+
+    assert mod.main(["--check"]) == 1
+    assert mod.main([]) == 0
+    assert f"(all {count} commands)" in agents.read_text(encoding="utf-8")
 
 
 def test_read_version_is_canonical_source(synced_tree):

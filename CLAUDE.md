@@ -72,8 +72,8 @@ After bumping `package.json` `"version"` (the source of truth), run
 `python3 scripts/version_sync.py` to sync the derived surfaces:
 `mkdocs.yml` `extra.rforge.version`, `.claude-plugin/plugin.json` (`version` +
 `NN commands` in `description`), `package.json` description count, `README.md`
-footer + tagline, and the CLAUDE.md `## Command-file conventions (all NN commands)`
-heading. `command_count` lives in `mkdocs.yml extra.rforge.command_count`
+footer + tagline, and the `## Command-file conventions (all NN commands)`
+heading in both CLAUDE.md and AGENTS.md (a mirror of CLAUDE.md — edit CLAUDE.md, then copy). `command_count` lives in `mkdocs.yml extra.rforge.command_count`
 (hardcoded-for-v1, CI-validated). The mkdocs docs (REFCARD, index, installation,
 tutorials, workflows) now render current version/count via `{{ rforge.version }}` /
 `{{ rforge.command_count }}` macros — **do not hand-edit those**; bump the source

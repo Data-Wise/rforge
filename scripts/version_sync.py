@@ -12,6 +12,7 @@ raw (GitHub-rendered) or are build config:
   - package.json                "NN commands" in description (version is the source)
   - README.md                   "**Version:** X.Y.Z" + "— NN commands," tagline
   - CLAUDE.md                   "## Command-file conventions (all NN commands)"
+  - AGENTS.md                   same heading (AGENTS.md mirrors CLAUDE.md)
 
 Historical references — "What's new in vX.Y.Z", CHANGELOG entries, dated
 "released" notes, SPEC/RESEARCH docs, and tree-diagram "(vX.Y.Z)" comments —
@@ -147,6 +148,13 @@ def build_rules(version: str, count: int) -> list[Rule]:
             r"(?P<pre>## Command-file conventions \(all )(?P<val>\d+)(?P<post> commands\))",
             n,
             "CLAUDE.md command-file-conventions heading",
+        ),
+        # --- AGENTS.md mirrors CLAUDE.md, so it carries the same heading ---
+        Rule(
+            REPO_ROOT / "AGENTS.md",
+            r"(?P<pre>## Command-file conventions \(all )(?P<val>\d+)(?P<post> commands\))",
+            n,
+            "AGENTS.md command-file-conventions heading",
         ),
     ]
 
