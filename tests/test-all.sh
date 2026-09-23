@@ -19,7 +19,7 @@ PASS=0
 FAIL=0
 RESULTS=""
 LOG=$(mktemp -t rforge-test-XXXXXX)
-trap 'rm -f "$LOG"' EXIT
+trap 'rm -f "$LOG" "$LOG.claude" "$LOG.agents"' EXIT
 
 # Dev-dependency preflight — warn once, up front, instead of letting the
 # checks below fail with bare tracebacks. Not a counted check: CI installs
@@ -449,6 +449,22 @@ version_sync_in_sync() {
     python3 scripts/version_sync.py --check
 }
 
+# AGENTS.md is a copy of CLAUDE.md for agents that read AGENTS.md (Codex et al.).
+# Only the leading blockquote header may differ; everything from the first
+# "## " heading on must match byte-for-byte. version_sync_in_sync only gates the
+# command-count heading, so without this an edit to CLAUDE.md alone drifts silently.
+agents_md_mirrors_claude_md() {
+    [ -f AGENTS.md ] || { echo "AGENTS.md missing"; return 1; }
+    body() { awk 'f || /^## / { f = 1; print }' "$1"; }
+    body CLAUDE.md > "$LOG.claude"
+    body AGENTS.md > "$LOG.agents"
+    [ -s "$LOG.claude" ] || { echo "no '## ' heading found in CLAUDE.md"; return 1; }
+    if ! diff -u "$LOG.claude" "$LOG.agents"; then
+        echo "AGENTS.md body drifted from CLAUDE.md — edit CLAUDE.md, then copy the body across"
+        return 1
+    fi
+}
+
 # lib.rcmd CLI smoke — with R absent the module emits an engine_missing/error
 # envelope; with R present it runs for real. Either way we assert parseable JSON.
 lib_rcmd_smoke() {
@@ -657,6 +673,7 @@ run "Lib: pytest suite (discovery + deps + status + init)"   lib_pytest
 run "Lib: CLI smoke (discovery + deps + status + init)" lib_cli_smoke
 run "Lib: reference docs in sync with source" lib_reference_in_sync
 run "Docs: version/count strings in sync with package.json" version_sync_in_sync
+run "Docs: AGENTS.md body mirrors CLAUDE.md" agents_md_mirrors_claude_md
 run "Lib: rcmd CLI smoke (R-free — accepts engine_missing envelope)" lib_rcmd_smoke
 run "Lib: s7runtime.R ships + parses (R-optional)" lib_s7runtime_r_ships
 run "Dogfood: lib.cranlint Tier-4 advisory CLI on a fixture package" lib_cranlint_smoke
