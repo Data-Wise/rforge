@@ -24,6 +24,8 @@ The core logic lives in functions returning lists of problem strings so the
 pytest self-test can call them directly on fixtures (proving the gate isn't
 vacuous).
 """
+from __future__ import annotations  # `str | None` hints on Python 3.9
+
 import re
 import sys
 from pathlib import Path

@@ -31,6 +31,12 @@ cd ~/.git-worktrees/rforge/feature-<name>
 
 All `lib/` modules are pure-Python (stdlib-only) — no R, npm, or MCP server
 required for development.
+The test gates need three dev packages (`tests/test-all.sh` warns up front
+when any is missing):
+
+```zsh
+pip install pytest pyyaml mkdocs-material
+```
 
 ## What makes a good PR
 
@@ -52,7 +58,7 @@ required for development.
    ```
 5. **mkdocs builds without warnings.**
    ```zsh
-   pip install -r docs/requirements.txt   # if you have docs deps
+   pip install mkdocs-material mkdocs-macros-plugin pillow cairosvg
    mkdocs build --strict
    ```
 
@@ -85,7 +91,7 @@ required for development.
 # All Python unit tests
 python3 -m pytest tests/ -v
 
-# Full suite (43 checks)
+# Full suite (45 checks)
 bash tests/test-all.sh
 
 # CLI dogfood tests (new configs that may not ship)

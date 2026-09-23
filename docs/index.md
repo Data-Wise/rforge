@@ -115,6 +115,15 @@ Most work runs through these four; the rest of the {{ rforge.command_count }} co
 
 ## What's new in {{ rforge.version }}
 
+- 🐛 **`.STATUS` parsing fixes** — `lib.status` (behind `/rforge:status` and `/rforge:health`)
+  reads the `key: value` frontmatter dialect every mediationverse package uses, and takes
+  `phase` only from a `phase:` key, not from old history lines in the prose.
+- 🐛 **`/rforge:restore` NEWS count** — entries grouped under `##` subsections are counted again.
+- 📚 **MediationVerse doctrine** in the [CRAN submission](guides/cran-submission.md),
+  [dev cycle](guides/dev-cycle.md) and [S7 review](guides/s7-review.md) guides.
+
+### From 2.20.0
+
 - 🔖 **`/rforge:restore` + `/rforge:finish`** — R-package session-boundary commands: recap a
   single package's state (DESCRIPTION/NEWS.md/git/`.STATUS`) and sync `.STATUS` from what
   actually happened, dry-run by default with a redundant-edit guard and a version-drift check

@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.20.1] - 2026-09-23
+
+> `lib.status` reads the frontmatter `.STATUS` dialect and takes `phase` only from
+> a `phase:` key; `/rforge:restore` counts NEWS entries under `##` subsections;
+> MediationVerse doctrine in the Command Guides. No command-surface change (44).
+
+### Added
+
+- MediationVerse doctrine subsections in the Command Guides
+  (`docs/guides/cran-submission.md`, `dev-cycle.md`, `s7-review.md`): the
+  ecosystem-specific CRAN, S7 and testing guidance retired from savant's
+  research-only skills, kept separate from the generic advice (#76).
+
+### Fixed
+
+- `lib.status` now reads the `key: value` frontmatter `.STATUS` dialect every
+  mediationverse R package uses, not only the emoji-section template. Before,
+  none of the 7 packages parsed, and the progress figure was scraped from any
+  `N%` in the prose, so every package reported a wrong number (mediationverse
+  showed 100% while BLOCKED at 92%). Hybrid files parse from both halves; the
+  prose-percentage fallback runs only when there is no `progress:` key (#75).
+- `lib.status` no longer takes `phase` from the prose of a `key: value`
+  `.STATUS`. It used the first `Phase X:` anywhere in the file, which in that
+  dialect is always an old history note (rforge's own `.STATUS` reported
+  "4 orchestrator rewrite (last craft-parity item)"; medfit, medsim and
+  missingmed were affected too). Frontmatter files now take `phase` only from a
+  `phase:` key; the emoji dialect keeps the prose scan (#82).
+- `lib.rstatus.parse_news_header` (used by `/rforge:restore`) reported 0 NEWS
+  entries for R-convention NEWS files that group bullets under `##`
+  subsections (`# pkg 0.4.0` → `## New features`): the top section ended at
+  the first header of any level. It now ends at the next header of the same
+  or higher level, or at a deeper header naming a release (`## [0.3.0]`), so
+  a `# Changelog` wrapper still scopes to nothing rather than the whole
+  history (#78).
+
+### Internal
+
+- `AGENTS.md` added as a copy of `CLAUDE.md` for agents that read `AGENTS.md`.
+  `scripts/version_sync.py` stamps and gates its command-count heading (#77),
+  and a new `test-all.sh` check requires its body to match `CLAUDE.md` (#80;
+  45 checks).
+- `lib.rstatus` docstring (and the generated `docs/reference/rstatus.md`) no
+  longer claims `lib.status` cannot read `key: value` files, which #75 made
+  false; it now says why `rstatus` keeps its own parser (#81).
+
 ## [2.20.0] - 2026-08-01
 
 > `/rforge:restore` + `/rforge:finish` (R-package session-boundary commands, PR #71).

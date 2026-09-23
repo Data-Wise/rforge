@@ -1,8 +1,29 @@
 project: rforge
-updated: 2026-07-31
+updated: 2026-09-23
 status: Active
-version: 2.19.0 (released, on main; dev merged main's f432a65 back in 2026-07-31, drift resolved)
-last_release: 2026-07-16 v2.19.0 (PR #68 feature/issue-fixes→dev merge e15ec35 [issues #66+#65] +
+version: 2.20.0 (released, on main); dev 9f81760 carries unreleased #75–#82 + AGENTS.md (46da634)
+last_release: 2026-08-01 v2.20.0 (PR #71 feature/restore-finish→dev merge 8ae55cda — new
+  /rforge:restore + /rforge:finish R-package session-boundary commands: recap a package's state
+  (DESCRIPTION/NEWS.md/git/.STATUS) and sync .STATUS from what actually happened, dry-run by
+  default with a redundant-edit guard and a version-drift check against DESCRIPTION. New
+  lib/rstatus.py reader/differ module; apply_updates() helper added mid-review to close a
+  data-loss trap (a bare RStatus(...) construction would have silently blanked every untouched
+  .STATUS field on --write) — found by a 4-agent adversarial review before merge, along with a
+  bare-# NEWS-header regex bug and missing control-char sanitization (both fixed). 42→44
+  commands. PR #72 dev→main merge 362399d; tag v2.20.0; release
+  https://github.com/Data-Wise/rforge/releases/tag/v2.20.0; CI green on main RForge CI + Deploy
+  Documentation; dev synced back to main; live docs live-verified: 2.20.0. Docs sync bundled in
+  the same release: REFCARD SESSION box section, docs/index.md What's New (was stale at
+  v2.17.0-era content despite the version macro auto-updating — real bug, fixed), CHANGELOG +
+  docs/changelog entries, command-cards/glossary/example-sessions (committed ab510af
+  pre-release), and docs/lib-modules.md gained rows for sitelint/tidyaudit/rstatus — closing
+  pre-existing table drift that had accumulated since v2.16.0/v2.19.0 shipped without updating
+  it. Tap Data-Wise/homebrew-tap PR #197 MERGED b09762f — formula+manifest → v2.20.0, sha256
+  157fa5ba…, generate.py --diff IDENTICAL. pytest 592 passed/2 skipped, test-all 42/44 (2
+  pre-existing local-env-only failures: system python3.9 lacks 3.10+ union syntax, no
+  mkdocs-material installed locally — both verified against dev baseline, unrelated to this
+  release; CI itself is green on the correct Python versions).
+last_release_prior_v2_19_0: 2026-07-16 v2.19.0 (PR #68 feature/issue-fixes→dev merge e15ec35 [issues #66+#65] +
   PR #64 dependabot actions/checkout bump merged same day; version-bump commit b483765; PR #69
   dev→main merge 5fbb013 — Closes #65, Closes #66, both auto-closed; tag v2.19.0; release
   https://github.com/Data-Wise/rforge/releases/tag/v2.19.0; CI green on main RForge CI + Deploy
@@ -55,6 +76,118 @@ last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --unive
 #        feature/r-submit-runiverse merged (PR #24) + worktree removed 2026-06-11
 
 recent:
+  - date: 2026-09-23
+    branch: dev (direct, docs-only; commits 2990a7e, 9f81760)
+    title: "docs: stale-content sweep before v2.20.1"
+    state: ON dev, UNRELEASED
+    summary: |
+      docs/contributing.md told contributors to `pip install -r docs/requirements.txt`, which does
+      not exist; now lists the real dev deps (test gates: pytest pyyaml mkdocs-material; docs build,
+      matching CI: mkdocs-material mkdocs-macros-plugin pillow cairosvg) (9f81760). CHANGELOG
+      [Unreleased] gained the missing (#78)/(#82) refs and CLAUDE.md/AGENTS.md "Unreleased on dev"
+      now lists #81/#82 (2990a7e). Live site still v2.20.0 (main 362399d); ~280 doc lines on dev
+      (#76 doctrine, status/rstatus reference, contributing) go live with the v2.20.1 dev→main merge —
+      deliberately not force-deployed from dev (would show unreleased content under 2.20.0).
+      mkdocs --strict clean.
+  - date: 2026-09-23
+    branch: feature/status-phase-frontmatter → dev (PR #82, squash 9346070)
+    title: "fix(status): take phase only from a phase: key in frontmatter .STATUS files"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      lib.status took `phase` from the first "Phase X:" line anywhere in the file, so frontmatter
+      .STATUS files (where such lines are history in the prose) reported a stale phase. Now
+      frontmatter files read phase only from a `phase:` key; emoji-section files keep the regex.
+      _apply_frontmatter returns whether frontmatter was found. +2 tests; review fix 18dcb05 names
+      phase as the one field with no prose fallback in the docstring + regenerated
+      docs/reference/status.md. test-all 45/45, pytest 604 passed / 2 skipped; CI 5/5.
+  - date: 2026-09-23
+    branch: feature/rstatus-docstring → dev (PR #81, squash 92db120)
+    title: "docs(rstatus): correct stale claim that lib.status cannot read key: value files"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      lib/rstatus.py docstring (+ docs/reference/rstatus.md) said lib.status could not read the
+      key: value dialect — stale since #75. Now: lib.status reads both formats but fills only the
+      5 dashboard fields; rstatus keeps every field for apply_updates/diff_rstatus, and
+      /rforge:finish does the write. CHANGELOG [Unreleased] entry c76c78f.
+  - date: 2026-09-23
+    branch: feature/agents-md-mirror-check → dev (PR #80, squash 9a91b7c)
+    title: "test(test-all): gate AGENTS.md body against CLAUDE.md"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      New test-all check "Docs: AGENTS.md body mirrors CLAUDE.md": everything from the first
+      "## " heading on must match byte-for-byte (only the leading blockquote header may differ);
+      fails if AGENTS.md is missing. Closes the gap #77 left (it gated only the count heading).
+      test-all 44→45; stale "43 checks" in CLAUDE.md/AGENTS.md/docs/contributing.md → 45.
+      Planted-defect E2E: body drift ❌, missing file ❌, header-only change ✅. With dev deps
+      installed: test-all 45/45, pytest 602 passed / 2 skipped; CI 5/5. Also this session (repo
+      settings, not a PR): "Automatically delete head branches" on + deletion-only ruleset
+      protect-dev-from-deletion (id 23890292) on dev, documented in CLAUDE.md/AGENTS.md (b13e922).
+  - date: 2026-09-23
+    branch: feature/test-all-dep-hints → dev (PR #79, squash 4579fae; medfit session)
+    title: "test(test-all): warn on missing dev deps; stop nav check passing vacuously"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      Test-harness only, no CHANGELOG entry. Preflight banner names missing dev deps (pytest,
+      pyyaml, mkdocs-material) + the pip command. mkdocs_nav_files_exist used to pass when the
+      yaml read failed or nav was empty ("no missing files") — now fails with a hint.
+      _check_commands_doc.py gains `from __future__ import annotations` so it runs on macOS
+      system python3.9. The long-standing "3 pre-existing local test-all failures" were missing
+      local deps, not code; CI gets 44/44.
+  - date: 2026-09-23
+    branch: feature/news-subheader-count → dev (PR #78, squash 4ef44e3; medfit session)
+    title: "fix(rstatus): count NEWS entries under subsection headers"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      parse_news_header ended the top NEWS.md section at the first header of any level, so
+      R-convention files (`# pkg 0.4.0` then `## New features`, e.g. medfit 0.4.0) reported 0
+      entries in /rforge:restore. Now ends at the next header of same-or-higher level, or at a
+      deeper header naming a release (so a `# Changelog` wrapper doesn't merge the whole
+      history). +tests, docs/reference/rstatus.md, CHANGELOG [Unreleased] Fixed entry.
+  - date: 2026-09-23
+    branch: feature/agents-md-sync → dev (PR #77, squash 1c3a4ac)
+    title: "feat(version-sync): stamp and gate the AGENTS.md command-count heading"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      AGENTS.md (46da634, committed straight to dev) is a CLAUDE.md mirror for AGENTS.md-reading
+      agents; version_sync.py now stamps + --check-gates its "## Command-file conventions (all NN
+      commands)" heading. Only the count is gated — full-body mirroring is not checked. TDD (2
+      red→green), pytest 600 passed / 2 skipped, planted-drift E2E exit 1, CI 5/5.
+  - date: 2026-08-29
+    branch: feature/d2-mediationverse-doctrine → dev (PR #76, squash b883c00)
+    title: "docs(guides): fold MediationVerse CRAN/S7/testing doctrine from savant D2"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      savant's D2 skill-disposition phase retired r-package-cran-compliance, s7-oop-for-mediation
+      and statistical-software-qa test-infrastructure (research-only scope) and staged the content
+      for rforge. Landed as labeled "MediationVerse doctrine" subsections in docs/guides/
+      {cran-submission,dev-cycle,s7-review}.md (+253 lines) rather than in the terse command .md
+      bodies; content duplicating rforge's existing generic CRAN/S7 doctrine was trimmed. Docs only.
+  - date: 2026-08-22
+    branch: feature/status-frontmatter → dev (PR #75, squash ac16b0a)
+    title: "fix(status): parse the frontmatter .STATUS dialect used by every R package"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      lib/status.py only parsed the emoji-header template; all 7 mediationverse packages use a
+      key: value frontmatter block, and the progress extractor's max() over every N% in the file
+      reported wrong figures for every package (mediationverse 100% while BLOCKED at 92%, probmed
+      100% while ON HOLD at 90%). New _parse_frontmatter() (continuation folding, hyphen/digit/dot
+      keys, first-occurrence-wins); prose N% scan only when no progress: key; emoji sections stay
+      the fallback so hybrid files parse from both halves. +7 tests; pytest 599 passed / 2 skipped;
+      verified end-to-end against all 7 real packages. docs/reference/status.md updated.
+  - date: 2026-08-01
+    branch: dev → main (PR #71 then PR #72)
+    title: "Release: v2.20.0 — /rforge:restore + /rforge:finish session-boundary commands"
+    state: MERGED, RELEASED
+    summary: |
+      Full pipeline this session: brainstormed restore/finish against craft/savant's own
+      counterparts → SPEC-restore-finish-commands-2026-07-31.md → feature worktree → lib/rstatus.py
+      + commands/{restore,finish}.md + e2e tests → 4-agent adversarial review (caught the
+      apply_updates() data-loss trap + 2 regex/sanitization bugs, all fixed) → PR #71 merged to dev
+      (8ae55cda) → docs staleness sweep (command counts, version banners, REFCARD SESSION section,
+      docs/index.md What's New, docs/lib-modules.md sitelint/tidyaudit/rstatus rows) → version bump
+      2.19.0→2.20.0 (4 sources) → PR #72 dev→main merged 362399d → tag+release v2.20.0 → tap PR
+      #197 merged (formula+manifest synced, generate.py --diff IDENTICAL) → dev resynced with main.
+      See last_release above for full detail.
   - date: 2026-07-31
     branch: main (direct dependabot merge, no dev involvement)
     title: "chore(ci)(deps): bump actions/setup-python from 6 to 7 (#70)"
@@ -327,6 +460,12 @@ decisions:
 
 ## 🎯 Next Action
 
+✅ **v2.20.0 RELEASED (2026-08-01) — no active task.** dev ≡ main @ v2.20.0 (PR #72 dev→main merge
+362399d; [release](https://github.com/Data-Wise/rforge/releases/tag/v2.20.0); CI green on main;
+tap PR #197 MERGED b09762f → formula+manifest v2.20.0, sha256 157fa5ba…, generate.py --diff
+IDENTICAL). `/rforge:restore` + `/rforge:finish` session-boundary commands (42→44); see
+last_release above. Open candidates below are all low-priority; no blockers.
+
 ✅ **PROPOSAL implemented (2026-06-30)** — `PROPOSAL-winbuilder-fallback-and-tarball-check.md` is now implemented on `dev` (commits cb29b03 + fef0d1a):
   1. `r:winbuilder` fallback: detects `lib.rcmd` availability → falls through to `devtools::check_win_*()` with directory-arg clarification.
   2. `r:cran-prep` `tarball-check` stage: `devtools::build()` → `tar -tzf` inspect → `rcmdcheck(tarball, --as-cran)`; blocks `ready` on errors/warnings/real NOTEs.
@@ -421,6 +560,7 @@ backlog:
     notes: "lib/status.py shipped as a thin faithful port in v1.3.0. The 4-mode contract (default/debug/optimize/release with R subprocess) was descoped pending real-user input on what depth is wanted. Open a new SPEC when there's demand."
 
 shipped:
+  - "v2.20.0 — 2026-08-01 — /rforge:restore + /rforge:finish R-package session-boundary commands (lib/rstatus.py reader/differ + apply_updates() data-loss-trap fix from 4-agent adversarial review); 42→44 commands; PR #71/#72; tap #197; docs drift closed (lib-modules.md sitelint/tidyaudit/rstatus rows, REFCARD SESSION section, docs/index.md What's New); pytest 592, test-all 42/44 (2 pre-existing local-env-only)"
   - "v2.11.0 — 2026-06-13 — bundle: diff-aware [introduced]/[pre-existing] tagging (merge-base detached-worktree baseline, --base/--fail-on, line-shift-immune) + r:s7-review --eco (ecosystem sweep) / --runtime (new lib.rcmd s7runtime engine: dead_generic + validator_not_enforcing) + r:use-data/r:use-citation; 39→41 commands; PR #35/#36; tap #122; 4-dim adversarial review caught 3 BLOCKER+3 IMPORTANT (recurrence of v2.10.0 doc-overclaim + spec-claims-unbuilt classes); pytest 347, test-all 41/41"
   - "v2.10.0 — 2026-06-13 — bundle: #26 r:s7-review (lib/s7review.py, 5 static families) + scaffolding r:use-test/use-package/use-vignette (lib/scaffold.py+usethis_infra.py) + diff-aware --changed (scope-only, lib/changed.py); 35→39 commands; PR #32/#34; tap #121; adversarial review caught diff-aware false-negative + deps_sync constraint-drop + s7review FPs; pytest 298, test-all 41/41"
   - "v2.9.0 — 2026-06-12 — Phase 4 orchestrator rewrite (agents/orchestrator.md → python3 -m lib.* delegation, 7 intents, read-only/recommend-only safety gate) + #20 manifest_order + #26 spec; +3 test-all guards (33→36); 35 commands; PR #29/#31; tap #120; last craft-parity item"

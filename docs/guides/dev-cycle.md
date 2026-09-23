@@ -116,6 +116,109 @@ list when there are failures.
     behavior — the merge-base baseline, the `[uncommitted]` refinement, and the per-package
     cache — lives in the [diff-aware guide](diff-aware.md). Plain `r:test` ignores them.
 
+### MediationVerse doctrine
+
+!!! note "Package names below are a worked example, not something rforge hardcodes"
+    Everything above is generic — `r:test`/`r:check`/`r:coverage` work on any package. The
+    following is `testthat` structure and CI doctrine specific to the MediationVerse package
+    family, kept here because it's the ecosystem this tool is developed and dogfooded
+    against. See the [CRAN submission guide's MediationVerse doctrine](cran-submission.md)
+    for the release side of the same ecosystem.
+
+**Performance and memory benchmarks** — `skip_on_cran()` these; they check the estimator's
+runtime/memory footprint, not correctness, and CRAN's check machines aren't a stable enough
+baseline to gate on:
+
+```r
+test_that("meets performance requirements", {
+  skip_on_cran()
+  data <- simulate_mediation(n = 1000)
+  time_point <- system.time({ mediate(data, method = "delta") })["elapsed"]
+  expect_lt(time_point, 0.1)  # < 100ms
+  time_boot <- system.time({ mediate(data, method = "bootstrap", R = 1000) })["elapsed"]
+  expect_lt(time_boot, 10)  # < 10s for 1000 bootstraps
+})
+
+test_that("memory usage is reasonable", {
+  skip_on_cran()
+  data <- simulate_mediation(n = 100000)
+  mem_before <- pryr::mem_used()
+  result <- mediate(data)
+  mem_increase <- as.numeric(pryr::mem_used() - mem_before) / 1e6  # MB
+  expect_lt(mem_increase, 100)
+})
+```
+
+**Recommended `tests/` layout** — one file per estimator/method, numerical-precision and
+edge-case files separated from the main suite, reference results cached rather than
+recomputed:
+
+```text
+tests/
+├── testthat/
+│   ├── test-mediate.R           # Main function tests
+│   ├── test-mediate-bootstrap.R # Bootstrap-specific
+│   ├── test-mediate-delta.R     # Delta method-specific
+│   ├── test-numerical.R         # Numerical precision
+│   ├── test-edge-cases.R        # Edge cases
+│   ├── test-reference.R         # Reference implementation
+│   ├── test-coverage.R          # Statistical coverage
+│   └── helper-simulate.R        # Test helpers
+├── testthat.R
+└── reference-results/           # Saved reference results
+    ├── jobs-example.rds
+    └── known-values.rds
+```
+
+Tag genuinely slow tests (statistical coverage runs, large-n benchmarks) so they opt in
+rather than slow down every `r:test` invocation:
+
+```r
+test_that("coverage probability (slow)", {
+  skip_on_cran()
+  skip_if_not(Sys.getenv("RUN_SLOW_TESTS") == "true")
+  # ... slow coverage test ...
+})
+```
+
+**CI** — a package's own `.github/workflows/R-CMD-check.yaml` (distinct from rforge's own
+CI, which checks *rforge*, not the packages it manages) typically separates the fast
+required gate from an opt-in slow-tests job gated to `main`:
+
+```yaml
+name: R-CMD-check
+on: [push, pull_request]
+jobs:
+  R-CMD-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r-dependencies@v2
+      - uses: r-lib/actions/check-r-package@v2
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r-dependencies@v2
+      - name: Test coverage
+        run: covr::codecov()
+        shell: Rscript {0}
+  slow-tests:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r-dependencies@v2
+      - name: Run slow tests
+        run: |
+          Sys.setenv(RUN_SLOW_TESTS = "true")
+          testthat::test_local()
+        shell: Rscript {0}
+```
+
 ---
 
 ## `r:check` — R CMD check, smartly parsed

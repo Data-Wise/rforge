@@ -7,6 +7,12 @@ The full changelog lives in the repository:
 
 ---
 
+## 2.20.1 — 2026-09-23
+
+`.STATUS` parsing fixes in `lib.status` (frontmatter dialect, `phase:` key
+only) and the `/rforge:restore` NEWS count under `##` subsections;
+MediationVerse doctrine in the Command Guides. 44 commands.
+
 ## 2.20.0 — 2026-08-01
 
 `/rforge:restore` + `/rforge:finish` (PR #71) — R-package session-boundary

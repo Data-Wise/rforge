@@ -1,8 +1,9 @@
 # rforge plugin — project-specific notes
 
-> Local CLAUDE.md for the rforge Claude Code plugin.
-> Follows the global `~/.claude/CLAUDE.md`; this file only captures
-> rforge-specific patterns that don't apply to other dev-tools repos.
+> Local AGENTS.md for the rforge plugin — a copy of `CLAUDE.md` for agents that read
+> `AGENTS.md` (Codex et al.). Keep the two in sync: edit `CLAUDE.md`, then mirror here.
+> Follows the global `~/.claude/CLAUDE.md` (Codex: `~/.codex/AGENTS.md`); this file only
+> captures rforge-specific patterns that don't apply to other dev-tools repos.
 
 ## Current state (2026-09-23)
 
