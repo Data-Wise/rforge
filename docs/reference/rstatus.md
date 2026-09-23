@@ -12,12 +12,12 @@ already parse:
 
 - `lib.discovery.read_description` — DESCRIPTION (Package/Version/deps)
 - this module's own `.STATUS` parser — the `key: value` grammar rforge's
-  own `.STATUS`, craft's, and savant's all use. **Not** the same grammar as
-  `lib.status.parse_status_file`, which targets an unrelated emoji-box
-  format (`📋 NEXT ACTIONS`, `⏰ LAST UPDATED`, `Phase X%`) — verified live
-  against rforge's own `.STATUS` during implementation: that parser returns
-  empty/`None` for every field on a `key: value` file. This module's parser
-  is deliberately separate, not a fork of a working parser.
+  own `.STATUS`, craft's, and savant's all use. `lib.status.parse_status_file`
+  also reads that dialect (since #75, alongside its emoji-section format), but
+  only to fill a few dashboard fields (progress, updated, next, focus). This
+  module parses every field and can write them back unchanged
+  (`apply_updates`/`diff_rstatus`), which `/rforge:finish` needs — so it stays
+  a separate parser rather than a wrapper around `lib.status`.
 
 Pure stdlib, read-only, no R subprocess — same tier as `discovery`/`deps`.
 
