@@ -455,9 +455,9 @@ version_sync_in_sync() {
 # command-count heading, so without this an edit to CLAUDE.md alone drifts silently.
 agents_md_mirrors_claude_md() {
     [ -f AGENTS.md ] || { echo "AGENTS.md missing"; return 1; }
-    body() { awk 'f || /^## / { f = 1; print }' "$1"; }
-    body CLAUDE.md > "$LOG.claude"
-    body AGENTS.md > "$LOG.agents"
+    local from_first_h2='f || /^## / { f = 1; print }'
+    awk "$from_first_h2" CLAUDE.md > "$LOG.claude"
+    awk "$from_first_h2" AGENTS.md > "$LOG.agents"
     [ -s "$LOG.claude" ] || { echo "no '## ' heading found in CLAUDE.md"; return 1; }
     if ! diff -u "$LOG.claude" "$LOG.agents"; then
         echo "AGENTS.md body drifted from CLAUDE.md — edit CLAUDE.md, then copy the body across"
