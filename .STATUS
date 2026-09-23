@@ -1,7 +1,7 @@
 project: rforge
-updated: 2026-08-01
+updated: 2026-09-23
 status: Active
-version: 2.20.0 (released, on main; dev synced 362399d; tap synced)
+version: 2.20.0 (released, on main); dev b883c00 carries 2 unreleased PRs (#75, #76)
 last_release: 2026-08-01 v2.20.0 (PR #71 feature/restore-finish→dev merge 8ae55cda — new
   /rforge:restore + /rforge:finish R-package session-boundary commands: recap a package's state
   (DESCRIPTION/NEWS.md/git/.STATUS) and sync .STATUS from what actually happened, dry-run by
@@ -76,6 +76,28 @@ last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --unive
 #        feature/r-submit-runiverse merged (PR #24) + worktree removed 2026-06-11
 
 recent:
+  - date: 2026-08-29
+    branch: feature/d2-mediationverse-doctrine → dev (PR #76, squash b883c00)
+    title: "docs(guides): fold MediationVerse CRAN/S7/testing doctrine from savant D2"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      savant's D2 skill-disposition phase retired r-package-cran-compliance, s7-oop-for-mediation
+      and statistical-software-qa test-infrastructure (research-only scope) and staged the content
+      for rforge. Landed as labeled "MediationVerse doctrine" subsections in docs/guides/
+      {cran-submission,dev-cycle,s7-review}.md (+253 lines) rather than in the terse command .md
+      bodies; content duplicating rforge's existing generic CRAN/S7 doctrine was trimmed. Docs only.
+  - date: 2026-08-22
+    branch: feature/status-frontmatter → dev (PR #75, squash ac16b0a)
+    title: "fix(status): parse the frontmatter .STATUS dialect used by every R package"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      lib/status.py only parsed the emoji-header template; all 7 mediationverse packages use a
+      key: value frontmatter block, and the progress extractor's max() over every N% in the file
+      reported wrong figures for every package (mediationverse 100% while BLOCKED at 92%, probmed
+      100% while ON HOLD at 90%). New _parse_frontmatter() (continuation folding, hyphen/digit/dot
+      keys, first-occurrence-wins); prose N% scan only when no progress: key; emoji sections stay
+      the fallback so hybrid files parse from both halves. +7 tests; pytest 599 passed / 2 skipped;
+      verified end-to-end against all 7 real packages. docs/reference/status.md updated.
   - date: 2026-08-01
     branch: dev → main (PR #71 then PR #72)
     title: "Release: v2.20.0 — /rforge:restore + /rforge:finish session-boundary commands"
