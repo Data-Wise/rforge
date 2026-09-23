@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [2.20.1] - 2026-09-23
+
+> `lib.status` reads the frontmatter `.STATUS` dialect and takes `phase` only from
+> a `phase:` key; `/rforge:restore` counts NEWS entries under `##` subsections;
+> MediationVerse doctrine in the Command Guides. No command-surface change (44).
 
 ### Added
 

@@ -8,6 +8,12 @@
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
+## What's new in v2.20.1
+
+- 🐛 **`.STATUS` parsing fixes** — `lib.status` (behind `/rforge:status` and `/rforge:health`) now reads the `key: value` frontmatter dialect every mediationverse package uses (#75) and takes `phase` only from a `phase:` key, not from old history lines in the prose (#82).
+- 🐛 **`/rforge:restore` NEWS count** — entries grouped under `##` subsections are counted again (#78).
+- 📚 **MediationVerse doctrine** in the CRAN-submission, dev-cycle and S7-review Command Guides (#76).
+
 ## What's new in v2.20.0
 
 - 🔖 **`/rforge:restore` + `/rforge:finish`** (PR #71) — R-package session-boundary commands: recap a single package's state (DESCRIPTION/NEWS.md/git/`.STATUS`) and sync `.STATUS` from what actually happened, dry-run by default with a redundant-edit guard and a version-drift check against DESCRIPTION.
@@ -384,7 +390,7 @@ Plugin settings in `plugin.json`:
 ```
 ~/.claude/plugins/rforge/
 ├── .claude-plugin/
-│   ├── plugin.json          # Plugin manifest (v2.20.0)
+│   ├── plugin.json          # Plugin manifest (v2.20.1)
 │   ├── marketplace.json     # Marketplace install metadata
 │   ├── config.json          # User-tunable options (CRAN mirror, etc.)
 │   ├── hooks/
@@ -427,6 +433,6 @@ MIT
 
 ---
 
-**Version:** 2.20.0
+**Version:** 2.20.1
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+
