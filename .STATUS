@@ -14,8 +14,9 @@ last_release: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #
   Aggregator: Data-Wise/claude-plugins#66 auto-merged (marketplace rforge 2.20.1). brew upgrade
   2.20.0→2.20.1 run by user; its post_install `claude plugin marketplace update local-plugins`
   failed (no local-plugins marketplace here) and ~/.claude/plugins/rforge is absent — Claude Code
-  loads rforge@data-wise, updated 2.20.0→2.20.1 via `claude plugin update rforge@data-wise` (user, 2026-09-23). Tap formula's
-  local-plugins path is stale — follow-up in homebrew-tap.)
+  loads rforge@data-wise, updated 2.20.0→2.20.1 via `claude plugin update rforge@data-wise` (user, 2026-09-23). Root cause
+  was Homebrew's sandboxed post_install, not the path — fixed in homebrew-tap #229/#231 (formula
+  now 2.20.1_2; `rforge-install` → "Registered rforge@data-wise"); details in the tap's .STATUS.)
 last_release_prior_v2_20_0: 2026-08-01 v2.20.0 (PR #71 feature/restore-finish→dev merge 8ae55cda — new
   /rforge:restore + /rforge:finish R-package session-boundary commands: recap a package's state
   (DESCRIPTION/NEWS.md/git/.STATUS) and sync .STATUS from what actually happened, dry-run by
