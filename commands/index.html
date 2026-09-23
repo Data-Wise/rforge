@@ -4205,16 +4205,16 @@ current version/CRAN state; precedes <code>/rforge:finish</code>.</p>
 - <code>--format</code> (optional) - Output format: <code>terminal</code>, <code>json</code>, <code>markdown</code></p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Balanced analysis</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;Check package health&quot;</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>/rforge:analyze<span class="w"> </span><span class="s2">"Check package health"</span>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Debug mode for investigating issues</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>debug<span class="w"> </span><span class="s2">&quot;Why are tests failing?&quot;</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>debug<span class="w"> </span><span class="s2">"Why are tests failing?"</span>
 </span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
 </span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># Release mode for CRAN preparation</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span><span class="s2">&quot;Prepare for CRAN submission&quot;</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span><span class="s2">"Prepare for CRAN submission"</span>
 </span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
 </span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="c1"># Performance analysis</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>optimize<span class="w"> </span><span class="s2">&quot;Identify bottlenecks&quot;</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>optimize<span class="w"> </span><span class="s2">"Identify bottlenecks"</span>
 </span></code></pre></div></p>
 <p><strong>Performs:</strong>
 - Pattern recognition (CODE_CHANGE, BUG_FIX, CRAN_RELEASE, etc.)
@@ -4236,7 +4236,7 @@ current version/CRAN state; precedes <code>/rforge:finish</code>.</p>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>/rforge:quick
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># Pre-commit validation</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>/rforge:quick<span class="w"> </span><span class="s2">&quot;Before committing changes&quot;</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>/rforge:quick<span class="w"> </span><span class="s2">"Before committing changes"</span>
 </span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
 </span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="c1"># Snapshot a specific package</span>
 </span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>/rforge:quick<span class="w"> </span>--package<span class="w"> </span>/path/to/RMediation
@@ -4257,10 +4257,10 @@ current version/CRAN state; precedes <code>/rforge:finish</code>.</p>
 - <code>description</code> (optional) - Analysis context</p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Full CRAN preparation</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Prepare for CRAN submission&quot;</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>/rforge:thorough<span class="w"> </span><span class="s2">"Prepare for CRAN submission"</span>
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># Deep quality audit</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Pre-release audit&quot;</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>/rforge:thorough<span class="w"> </span><span class="s2">"Pre-release audit"</span>
 </span></code></pre></div></p>
 <p><strong>Includes:</strong>
 - R CMD check execution
@@ -4306,10 +4306,10 @@ is unchanged.</p>
 - <code>--detailed</code> (optional) - Show the full per-package task breakdown</p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Plan update cascade</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>/rforge:cascade<span class="w"> </span><span class="s2">&quot;Update base package dependency from v1 to v2&quot;</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>/rforge:cascade<span class="w"> </span><span class="s2">"Update base package dependency from v1 to v2"</span>
 </span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
 </span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1"># Version bump cascade</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>/rforge:cascade<span class="w"> </span><span class="s2">&quot;Major version bump in core package&quot;</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>/rforge:cascade<span class="w"> </span><span class="s2">"Major version bump in core package"</span>
 </span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>
 </span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="c1"># Detailed cascade plan</span>
 </span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>/rforge:cascade<span class="w"> </span>--detailed
@@ -4323,7 +4323,7 @@ is unchanged.</p>
 <h3 id="rforgeimpact">/rforge:impact<a class="headerlink" href="#rforgeimpact" title="Permanent link">&para;</a></h3>
 <p>Analyze change impact across ecosystem packages.</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>/rforge:impact<span class="w"> </span>--package<span class="w"> </span>PKG<span class="w"> </span><span class="o">[</span>--change-type<span class="w"> </span>TYPE<span class="o">]</span><span class="w"> </span><span class="o">[</span>--affected-exports<span class="w"> </span><span class="s2">&quot;a b c&quot;</span><span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>/rforge:impact<span class="w"> </span>--package<span class="w"> </span>PKG<span class="w"> </span><span class="o">[</span>--change-type<span class="w"> </span>TYPE<span class="o">]</span><span class="w"> </span><span class="o">[</span>--affected-exports<span class="w"> </span><span class="s2">"a b c"</span><span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
 - <code>--package</code> (required) - Package whose change is being analyzed
@@ -4334,7 +4334,7 @@ is unchanged.</p>
 </span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>/rforge:impact<span class="w"> </span>--package<span class="w"> </span>medfit<span class="w"> </span>--change-type<span class="w"> </span>breaking
 </span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
 </span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Feature change with specific affected exports</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>/rforge:impact<span class="w"> </span>--package<span class="w"> </span>medfit<span class="w"> </span>--change-type<span class="w"> </span>feature<span class="w"> </span>--affected-exports<span class="w"> </span><span class="s2">&quot;extract_mediation predict&quot;</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>/rforge:impact<span class="w"> </span>--package<span class="w"> </span>medfit<span class="w"> </span>--change-type<span class="w"> </span>feature<span class="w"> </span>--affected-exports<span class="w"> </span><span class="s2">"extract_mediation predict"</span>
 </span></code></pre></div></p>
 <p><strong>Reports:</strong>
 - Affected packages
@@ -4433,10 +4433,10 @@ auto-applied).</p>
 - <code>--no-cascade</code> (optional) - Skip the documentation cascade detection</p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="c1"># Mark task complete</span>
-</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>/rforge:complete<span class="w"> </span><span class="s2">&quot;Implemented bootstrap CI method&quot;</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>/rforge:complete<span class="w"> </span><span class="s2">"Implemented bootstrap CI method"</span>
 </span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>
 </span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="c1"># Trigger doc cascade</span>
-</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>/rforge:complete<span class="w"> </span><span class="s2">&quot;Fixed critical bug in mediation function&quot;</span>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>/rforge:complete<span class="w"> </span><span class="s2">"Fixed critical bug in mediation function"</span>
 </span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>
 </span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="c1"># Complete without the doc cascade</span>
 </span><span id="__span-28-8"><a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a>/rforge:complete<span class="w"> </span>T-2025-01-15-001<span class="w"> </span>--no-cascade
@@ -4456,10 +4456,10 @@ auto-applied).</p>
 - <code>idea</code> (required) - What to capture</p>
 <p><strong>Examples:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="c1"># Capture feature idea</span>
-</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>/rforge:capture<span class="w"> </span><span class="s2">&quot;Add support for weighted mediation&quot;</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>/rforge:capture<span class="w"> </span><span class="s2">"Add support for weighted mediation"</span>
 </span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>
 </span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="c1"># Capture bug note</span>
-</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>/rforge:capture<span class="w"> </span><span class="s2">&quot;Edge case: NA handling in bootstrap&quot;</span>
+</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>/rforge:capture<span class="w"> </span><span class="s2">"Edge case: NA handling in bootstrap"</span>
 </span></code></pre></div></p>
 <p><strong>Stores:</strong>
 - Idea with timestamp
@@ -4479,7 +4479,7 @@ auto-applied).</p>
 </span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>/rforge:next
 </span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>
 </span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="c1"># Focused on a release context</span>
-</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>/rforge:next<span class="w"> </span>--context<span class="w"> </span><span class="s2">&quot;Before release&quot;</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>/rforge:next<span class="w"> </span>--context<span class="w"> </span><span class="s2">"Before release"</span>
 </span></code></pre></div></p>
 <p><strong>Considers:</strong>
 - Unfinished tasks

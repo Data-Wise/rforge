@@ -2916,12 +2916,13 @@ already parse:</p>
 <ul>
 <li><code>lib.discovery.read_description</code> — DESCRIPTION (Package/Version/deps)</li>
 <li>this module's own <code>.STATUS</code> parser — the <code>key: value</code> grammar rforge's
-  own <code>.STATUS</code>, craft's, and savant's all use. <strong>Not</strong> the same grammar as
-  <code>lib.status.parse_status_file</code>, which targets an unrelated emoji-box
-  format (<code>📋 NEXT ACTIONS</code>, <code>⏰ LAST UPDATED</code>, <code>Phase X%</code>) — verified live
-  against rforge's own <code>.STATUS</code> during implementation: that parser returns
-  empty/<code>None</code> for every field on a <code>key: value</code> file. This module's parser
-  is deliberately separate, not a fork of a working parser.</li>
+  own <code>.STATUS</code>, craft's, and savant's all use. <code>lib.status.parse_status_file</code>
+  also reads that dialect (since #75, alongside its emoji-section format), but
+  only to fill five dashboard fields (progress, updated, next, done, focus).
+  This module keeps every field, so <code>apply_updates</code> can carry untouched ones
+  forward and <code>diff_rstatus</code> can compare them field by field — what
+  <code>/rforge:finish</code> needs before it writes — so it stays a separate parser
+  rather than a wrapper around <code>lib.status</code>.</li>
 </ul>
 <p>Pure stdlib, read-only, no R subprocess — same tier as <code>discovery</code>/<code>deps</code>.</p>
 <p>Usage (CLI, from an R package repo root):
@@ -2997,7 +2998,7 @@ already parse:</p>
 </table>
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
 <h3 id="apply_updates"><code>apply_updates()</code><a class="headerlink" href="#apply_updates" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">apply_updates</span><span class="p">(</span><span class="n">current</span><span class="p">:</span> <span class="s1">&#39;Optional[RStatus]&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;RStatus&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">apply_updates</span><span class="p">(</span><span class="n">current</span><span class="p">:</span> <span class="s1">'Optional[RStatus]'</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'RStatus'</span>
 </span></code></pre></div>
 <p>Build an <code>intended</code> <code>RStatus</code> by carrying every field forward from
 <code>current</code> and overriding only what's explicitly passed.</p>
@@ -3014,13 +3015,13 @@ that used to live in <code>commands/finish.md</code> — this helper exists so t
 safe pattern is also the path of least resistance, not just documented
 advice a caller has to remember.</p>
 <h3 id="build_recap"><code>build_recap()</code><a class="headerlink" href="#build_recap" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">build_recap</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">:</span> <span class="s1">&#39;str | Path&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">build_recap</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">:</span> <span class="s1">'str | Path'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'dict'</span>
 </span></code></pre></div>
 <p>Compose the single-package recap <code>/rforge:restore</code> reports.</p>
 <p>One state read, reused for <code>.STATUS</code> currency diffing by <code>/rforge:finish</code>
 too — never re-derived twice for the same invocation.</p>
 <h3 id="diff_rstatus"><code>diff_rstatus()</code><a class="headerlink" href="#diff_rstatus" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">diff_rstatus</span><span class="p">(</span><span class="n">current</span><span class="p">:</span> <span class="s1">&#39;Optional[RStatus]&#39;</span><span class="p">,</span> <span class="n">intended</span><span class="p">:</span> <span class="s1">&#39;RStatus&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[tuple[str, Optional[str], Optional[str]]]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">diff_rstatus</span><span class="p">(</span><span class="n">current</span><span class="p">:</span> <span class="s1">'Optional[RStatus]'</span><span class="p">,</span> <span class="n">intended</span><span class="p">:</span> <span class="s1">'RStatus'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'list[tuple[str, Optional[str], Optional[str]]]'</span>
 </span></code></pre></div>
 <p>Return <code>(field, old, new)</code> for each field that would actually change.</p>
 <p>The redundant-edit guard: if <code>current</code> is None (no <code>.STATUS</code> file yet),
@@ -3029,31 +3030,33 @@ difference is the <code>updated</code> timestamp with nothing else in the record
 changed is filtered out — a timestamp bump with no real content delta
 is not a genuine change (doc-update-currency-check discipline).</p>
 <h3 id="format_json"><code>format_json()</code><a class="headerlink" href="#format_json" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_json</span><span class="p">(</span><span class="n">recap</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_json</span><span class="p">(</span><span class="n">recap</span><span class="p">:</span> <span class="s1">'dict'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'str'</span>
 </span></code></pre></div>
 <p><em>(no docstring)</em></p>
 <h3 id="format_text"><code>format_text()</code><a class="headerlink" href="#format_text" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_text</span><span class="p">(</span><span class="n">recap</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_text</span><span class="p">(</span><span class="n">recap</span><span class="p">:</span> <span class="s1">'dict'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'str'</span>
 </span></code></pre></div>
 <p><em>(no docstring)</em></p>
 <h3 id="git_snapshot"><code>git_snapshot()</code><a class="headerlink" href="#git_snapshot" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">git_snapshot</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">:</span> <span class="s1">&#39;str | Path&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">git_snapshot</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">:</span> <span class="s1">'str | Path'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'dict'</span>
 </span></code></pre></div>
 <p>Cheap read-only git state: branch, last commit, dirty flag.</p>
 <p>Never raises — any git-subprocess failure (not a repo, git missing)
 degrades to a <code>{"available": False}</code> envelope, same never-block
 posture every other rforge lib module uses for optional signals.</p>
 <h3 id="parse_news_header"><code>parse_news_header()</code><a class="headerlink" href="#parse_news_header" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_news_header</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">:</span> <span class="s1">&#39;str | Path&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_news_header</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">:</span> <span class="s1">'str | Path'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'dict'</span>
 </span></code></pre></div>
 <p>Read the top section of <code>NEWS.md</code>. Read-only; never generates content.</p>
 <p>Returns <code>{"found": bool, "has_unreleased": bool, "top_header": str|None,
 "entries": list[str]}</code>. <code>entries</code> are the bullet lines directly under
-the top header (bare <code>-</code>/<code>*</code> list items), capped at the first blank
-line or next header — the same "top section only" scope <code>savant:restore</code>
+the top header (bare <code>-</code>/<code>*</code> list items), including those under its
+subsection headers (<code>## New features</code>, <code>## Bug fixes</code>). The section ends
+at the next header of the same or higher level, or at a deeper header
+that names a release — the same "top section only" scope <code>savant:restore</code>
 already applies to its own doc-quartet currency checks.</p>
 <h3 id="parse_rstatus"><code>parse_rstatus()</code><a class="headerlink" href="#parse_rstatus" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_rstatus</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;RStatus&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_rstatus</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="s1">'str'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'RStatus'</span>
 </span></code></pre></div>
 <p>Parse <code>.STATUS</code> text (the <code>key: value</code> grammar) into an <code>RStatus</code>.</p>
 <p>Only the first line of a multi-line value is captured — this grammar
@@ -3063,7 +3066,7 @@ value that continues past a single line is treated as raw_fields
 overflow rather than silently truncated: the first line goes into the
 named field, full original text stays available via <code>raw_fields</code>.</p>
 <h3 id="read_rstatus"><code>read_rstatus()</code><a class="headerlink" href="#read_rstatus" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_rstatus</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">:</span> <span class="s1">&#39;str | Path&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[RStatus]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_rstatus</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">:</span> <span class="s1">'str | Path'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'Optional[RStatus]'</span>
 </span></code></pre></div>
 <p>Read and parse <code>&lt;pkg_path&gt;/.STATUS</code>. Returns None if absent/unreadable.</p>
 

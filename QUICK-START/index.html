@@ -3055,12 +3055,12 @@ server into the plugin. See
 <p><strong>What it does:</strong> Runs a fast (~10 sec) health check of your R package.</p>
 <p><strong>Use:</strong> Pre-commit checks, daily development.</p>
 <h3 id="2-analyze-recent-changes">2. Analyze Recent Changes<a class="headerlink" href="#2-analyze-recent-changes" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/rforge:analyze &quot;Updated bootstrap algorithm&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/rforge:analyze "Updated bootstrap algorithm"
 </span></code></pre></div>
 <p><strong>What it does:</strong> Analyzes impact of your changes, runs tests, checks docs (~30 sec).</p>
 <p><strong>Use:</strong> After making code changes.</p>
 <h3 id="3-prepare-for-release">3. Prepare for Release<a class="headerlink" href="#3-prepare-for-release" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/rforge:thorough &quot;CRAN submission&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/rforge:thorough "CRAN submission"
 </span></code></pre></div>
 <p><strong>What it does:</strong> Comprehensive analysis with all tools (2-5 min).</p>
 <p><strong>Use:</strong> Before CRAN releases, major milestones.</p>
@@ -3126,7 +3126,7 @@ server into the plugin. See
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># 1. Implement feature</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="c1"># 2. Analyze impact</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;Added new plotting function&quot;</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>/rforge:analyze<span class="w"> </span><span class="s2">"Added new plotting function"</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c1"># 3. Review results:</span>
 </span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1">#    - Impact on existing code</span>
@@ -3149,7 +3149,7 @@ server into the plugin. See
 </span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="c1">#    package used unconditionally is detected (intended behavior change).</span>
 </span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
 </span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># 3. Ecosystem submission order</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>/rforge:thorough<span class="w"> </span><span class="s2">&quot;Prepare v2.0.0 for CRAN&quot;</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>/rforge:thorough<span class="w"> </span><span class="s2">"Prepare v2.0.0 for CRAN"</span>
 </span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>/rforge:release
 </span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>
 </span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="c1"># 4. Submit via https://cran.r-project.org/submit.html</span>
@@ -3234,7 +3234,7 @@ server into the plugin. See
 </span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>vim<span class="w"> </span>R/bootstrap.R
 </span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>
 </span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="c1"># Analyze impact</span>
-</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;Updated bootstrap algorithm for better performance&quot;</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>/rforge:analyze<span class="w"> </span><span class="s2">"Updated bootstrap algorithm for better performance"</span>
 </span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="c1"># → Impact: Modified 1 function, affects 3 others</span>
 </span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="c1"># → Tests: All pass, coverage maintained</span>
 </span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="c1"># → Docs: Update help file for bootstrap_se()</span>
@@ -3247,7 +3247,7 @@ server into the plugin. See
 </span><span id="__span-10-22"><a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="c1"># → ✅ All clear!</span>
 </span><span id="__span-10-23"><a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>
 </span><span id="__span-10-24"><a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="c1"># Commit</span>
-</span><span id="__span-10-25"><a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: improve bootstrap algorithm performance&quot;</span>
+</span><span id="__span-10-25"><a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"feat: improve bootstrap algorithm performance"</span>
 </span></code></pre></div>
 <hr />
 <p><strong>You're ready!</strong> Try <code>/rforge:quick</code> in your R package directory to get started.</p>

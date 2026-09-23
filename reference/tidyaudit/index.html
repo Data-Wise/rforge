@@ -2741,7 +2741,7 @@ on missing/unparseable input and never raises; nothing here is ever a hard
     print(env["status"], [f["code"] for f in env["findings"]])</p>
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
 <h3 id="check_news_header"><code>check_news_header()</code><a class="headerlink" href="#check_news_header" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_news_header</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_news_header</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">'str'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'dict'</span>
 </span></code></pre></div>
 <p>Advisory check: top <code>NEWS.md</code> entry matches <code>## Package X.Y.Z</code> and
 the version matches DESCRIPTION (issue #65).</p>
@@ -2749,7 +2749,7 @@ the version matches DESCRIPTION (issue #65).</p>
 engine_missing: []}</code>. A missing NEWS.md is advisory, not an error — many
 packages don't keep one.</p>
 <h3 id="check_roxygen_completeness"><code>check_roxygen_completeness()</code><a class="headerlink" href="#check_roxygen_completeness" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_roxygen_completeness</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_roxygen_completeness</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">'str'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'dict'</span>
 </span></code></pre></div>
 <p>Advisory check: exported functions missing <code>@examples</code>/<code>@return</code>/
 <code>@family</code> roxygen tags (issue #65).</p>
@@ -2757,7 +2757,7 @@ packages don't keep one.</p>
 Returns envelope <code>{kind: "roxygen_completeness", status, findings,
 messages, engine_missing: []}</code>.</p>
 <h3 id="run_all"><code>run_all()</code><a class="headerlink" href="#run_all" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_all</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_all</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">'str'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'dict'</span>
 </span></code></pre></div>
 <p>Run both static-analysis stages and roll them into one envelope.</p>
 <p>Returns <code>{kind: "tidyaudit", status, stages, engine_missing: []}</code>.

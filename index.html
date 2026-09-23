@@ -478,13 +478,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-new-in-2200" class="md-nav__link">
+  <a href="#whats-new-in-2201" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's new in 2.20.0
+        What's new in 2.20.1
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="What&#39;s new in 2.20.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-2200" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From 2.20.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2715,13 +2732,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-new-in-2200" class="md-nav__link">
+  <a href="#whats-new-in-2201" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's new in 2.20.0
+        What's new in 2.20.1
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="What&#39;s new in 2.20.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-2200" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From 2.20.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2930,7 +2964,16 @@ wraps the standard R toolchain — it doesn't replace it.</p>
 </li>
 </ul>
 </div>
-<h2 id="whats-new-in-2200">What's new in 2.20.0<a class="headerlink" href="#whats-new-in-2200" title="Permanent link">&para;</a></h2>
+<h2 id="whats-new-in-2201">What's new in 2.20.1<a class="headerlink" href="#whats-new-in-2201" title="Permanent link">&para;</a></h2>
+<ul>
+<li>🐛 <strong><code>.STATUS</code> parsing fixes</strong> — <code>lib.status</code> (behind <code>/rforge:status</code> and <code>/rforge:health</code>)
+  reads the <code>key: value</code> frontmatter dialect every mediationverse package uses, and takes
+  <code>phase</code> only from a <code>phase:</code> key, not from old history lines in the prose.</li>
+<li>🐛 <strong><code>/rforge:restore</code> NEWS count</strong> — entries grouped under <code>##</code> subsections are counted again.</li>
+<li>📚 <strong>MediationVerse doctrine</strong> in the <a href="guides/cran-submission/">CRAN submission</a>,
+  <a href="guides/dev-cycle/">dev cycle</a> and <a href="guides/s7-review/">S7 review</a> guides.</li>
+</ul>
+<h3 id="from-2200">From 2.20.0<a class="headerlink" href="#from-2200" title="Permanent link">&para;</a></h3>
 <ul>
 <li>🔖 <strong><code>/rforge:restore</code> + <code>/rforge:finish</code></strong> — R-package session-boundary commands: recap a
   single package's state (DESCRIPTION/NEWS.md/git/<code>.STATUS</code>) and sync <code>.STATUS</code> from what

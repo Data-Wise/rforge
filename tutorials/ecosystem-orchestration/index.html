@@ -2905,7 +2905,7 @@ turns "I hope this is isolated" into a number you can plan around.</p>
 </div>
 <h2 id="step-3-plan-the-coordinated-update">Step 3: Plan the coordinated update<a class="headerlink" href="#step-3-plan-the-coordinated-update" title="Permanent link">&para;</a></h2>
 <p>You've decided to go ahead with the breaking change. Now plan the rollout:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>/rforge:cascade &quot;medfit 1.0.0 → 2.0.0 breaking&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>/rforge:cascade "medfit 1.0.0 → 2.0.0 breaking"
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>⚠️ CASCADE PLAN: Breaking API change
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
@@ -2931,7 +2931,7 @@ turns "I hope this is isolated" into a number you can plan around.</p>
 </span><span id="__span-11-22"><a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a>Blockers: medfit must reach CRAN before dependents submit
 </span></code></pre></div>
 <p>Add <code>--detailed</code> for the full per-package verification checklist:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>/rforge:cascade &quot;medfit 2.0.0 breaking&quot; --detailed
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>/rforge:cascade "medfit 2.0.0 breaking" --detailed
 </span></code></pre></div>
 <p><strong>The cascade respects the topological order from Step 1</strong> — core first,
 meta last — so you never update a package before its dependencies are ready.</p>

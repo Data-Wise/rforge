@@ -2715,7 +2715,7 @@ and the CLI always exits 0.</p>
     print(env["status"], [f["file"] for f in env["findings"]])</p>
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
 <h3 id="check_site_leaks"><code>check_site_leaks()</code><a class="headerlink" href="#check_site_leaks" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_site_leaks</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;dict&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">check_site_leaks</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">'str | os.PathLike'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'dict'</span>
 </span></code></pre></div>
 <p>Flag stray scratch files pkgdown would render + publish (issue #52).</p>
 <p>Scans the pkgdown-rendered surface of the package at <code>path</code>:</p>

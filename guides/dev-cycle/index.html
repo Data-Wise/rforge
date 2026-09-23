@@ -1436,6 +1436,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="r:test — run the testthat suite">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mediationverse-doctrine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MediationVerse doctrine
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2732,6 +2749,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="r:test — run the testthat suite">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mediationverse-doctrine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MediationVerse doctrine
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3047,6 +3081,97 @@ list when there are failures.</p>
 behavior — the merge-base baseline, the <code>[uncommitted]</code> refinement, and the per-package
 cache — lives in the <a href="../diff-aware/">diff-aware guide</a>. Plain <code>r:test</code> ignores them.</p>
 </div>
+<h3 id="mediationverse-doctrine">MediationVerse doctrine<a class="headerlink" href="#mediationverse-doctrine" title="Permanent link">&para;</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Package names below are a worked example, not something rforge hardcodes</p>
+<p>Everything above is generic — <code>r:test</code>/<code>r:check</code>/<code>r:coverage</code> work on any package. The
+following is <code>testthat</code> structure and CI doctrine specific to the MediationVerse package
+family, kept here because it's the ecosystem this tool is developed and dogfooded
+against. See the <a href="../cran-submission/">CRAN submission guide's MediationVerse doctrine</a>
+for the release side of the same ecosystem.</p>
+</div>
+<p><strong>Performance and memory benchmarks</strong> — <code>skip_on_cran()</code> these; they check the estimator's
+runtime/memory footprint, not correctness, and CRAN's check machines aren't a stable enough
+baseline to gate on:</p>
+<div class="language-r highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nf">test_that</span><span class="p">(</span><span class="s">"meets performance requirements"</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nf">skip_on_cran</span><span class="p">()</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="n">data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">simulate_mediation</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="p">)</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="n">time_point</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">system.time</span><span class="p">({</span><span class="w"> </span><span class="nf">mediate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"delta"</span><span class="p">)</span><span class="w"> </span><span class="p">})[</span><span class="s">"elapsed"</span><span class="p">]</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nf">expect_lt</span><span class="p">(</span><span class="n">time_point</span><span class="p">,</span><span class="w"> </span><span class="m">0.1</span><span class="p">)</span><span class="w">  </span><span class="c1"># &lt; 100ms</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="n">time_boot</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">system.time</span><span class="p">({</span><span class="w"> </span><span class="nf">mediate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"bootstrap"</span><span class="p">,</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1000</span><span class="p">)</span><span class="w"> </span><span class="p">})[</span><span class="s">"elapsed"</span><span class="p">]</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="nf">expect_lt</span><span class="p">(</span><span class="n">time_boot</span><span class="p">,</span><span class="w"> </span><span class="m">10</span><span class="p">)</span><span class="w">  </span><span class="c1"># &lt; 10s for 1000 bootstraps</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">})</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="nf">test_that</span><span class="p">(</span><span class="s">"memory usage is reasonable"</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="nf">skip_on_cran</span><span class="p">()</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="n">data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">simulate_mediation</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">100000</span><span class="p">)</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">  </span><span class="n">mem_before</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">pryr</span><span class="o">::</span><span class="nf">mem_used</span><span class="p">()</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">  </span><span class="n">result</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">mediate</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">  </span><span class="n">mem_increase</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.numeric</span><span class="p">(</span><span class="n">pryr</span><span class="o">::</span><span class="nf">mem_used</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">mem_before</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="m">1e6</span><span class="w">  </span><span class="c1"># MB</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">  </span><span class="nf">expect_lt</span><span class="p">(</span><span class="n">mem_increase</span><span class="p">,</span><span class="w"> </span><span class="m">100</span><span class="p">)</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="p">})</span>
+</span></code></pre></div>
+<p><strong>Recommended <code>tests/</code> layout</strong> — one file per estimator/method, numerical-precision and
+edge-case files separated from the main suite, reference results cached rather than
+recomputed:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>tests/
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>├── testthat/
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>│   ├── test-mediate.R           # Main function tests
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>│   ├── test-mediate-bootstrap.R # Bootstrap-specific
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>│   ├── test-mediate-delta.R     # Delta method-specific
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>│   ├── test-numerical.R         # Numerical precision
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>│   ├── test-edge-cases.R        # Edge cases
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>│   ├── test-reference.R         # Reference implementation
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>│   ├── test-coverage.R          # Statistical coverage
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>│   └── helper-simulate.R        # Test helpers
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>├── testthat.R
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>└── reference-results/           # Saved reference results
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    ├── jobs-example.rds
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>    └── known-values.rds
+</span></code></pre></div>
+<p>Tag genuinely slow tests (statistical coverage runs, large-n benchmarks) so they opt in
+rather than slow down every <code>r:test</code> invocation:</p>
+<div class="language-r highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nf">test_that</span><span class="p">(</span><span class="s">"coverage probability (slow)"</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nf">skip_on_cran</span><span class="p">()</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nf">skip_if_not</span><span class="p">(</span><span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">"RUN_SLOW_TESTS"</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">"true"</span><span class="p">)</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="c1"># ... slow coverage test ...</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">})</span>
+</span></code></pre></div>
+<p><strong>CI</strong> — a package's own <code>.github/workflows/R-CMD-check.yaml</code> (distinct from rforge's own
+CI, which checks <em>rforge</em>, not the packages it manages) typically separates the fast
+required gate from an opt-in slow-tests job gated to <code>main</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">R-CMD-check</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">push</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">pull_request</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nt">jobs</span><span class="p">:</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">R-CMD-check</span><span class="p">:</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v3</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r-lib/actions/setup-r@v2</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r-lib/actions/setup-r-dependencies@v2</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r-lib/actions/check-r-package@v2</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">  </span><span class="nt">coverage</span><span class="p">:</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v3</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r-lib/actions/setup-r@v2</span>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r-lib/actions/setup-r-dependencies@v2</span>
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Test coverage</span>
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">covr::codecov()</span>
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">        </span><span class="nt">shell</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Rscript {0}</span>
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">  </span><span class="nt">slow-tests</span><span class="p">:</span>
+</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="w">    </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.event_name == 'push' &amp;&amp; github.ref == 'refs/heads/main'</span>
+</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v3</span>
+</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r-lib/actions/setup-r@v2</span>
+</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">r-lib/actions/setup-r-dependencies@v2</span>
+</span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Run slow tests</span>
+</span><span id="__span-6-28"><a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+</span><span id="__span-6-29"><a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a><span class="w">          </span><span class="no">Sys.setenv(RUN_SLOW_TESTS = "true")</span>
+</span><span id="__span-6-30"><a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a><span class="w">          </span><span class="no">testthat::test_local()</span>
+</span><span id="__span-6-31"><a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a><span class="w">        </span><span class="nt">shell</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Rscript {0}</span>
+</span></code></pre></div>
 <hr />
 <h2 id="rcheck-r-cmd-check-smartly-parsed"><code>r:check</code> — R CMD check, smartly parsed<a class="headerlink" href="#rcheck-r-cmd-check-smartly-parsed" title="Permanent link">&para;</a></h2>
 <p>Runs <code>R CMD check</code> via <code>rcmdcheck</code> and reports structured errors / warnings / notes. The
@@ -3112,8 +3237,8 @@ and never touches your source.</p>
 </tr>
 </tbody>
 </table>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/rforge:r:check<span class="w">              </span><span class="c1"># single --as-cran pass (the default)</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>/rforge:r:check<span class="w"> </span>--as-cran<span class="w">    </span><span class="c1"># explicit, same thing</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>/rforge:r:check<span class="w">              </span><span class="c1"># single --as-cran pass (the default)</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>/rforge:r:check<span class="w"> </span>--as-cran<span class="w">    </span><span class="c1"># explicit, same thing</span>
 </span></code></pre></div>
 <p>Output shape: error / warning / note counts, then a <strong>NOTE classification</strong> block —
 each NOTE is tagged <code>🟢 expected</code> (spurious) or <code>🔴 needs attention</code> (real) — and recommended
@@ -3154,7 +3279,7 @@ rather than an error.</p>
 </tr>
 </tbody>
 </table>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>/rforge:r:coverage
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/rforge:r:coverage
 </span></code></pre></div>
 <p>Output shape: total <code>%</code>, the <strong>lowest-covered files</strong> (top 5 ascending), and <strong>untested
 lines</strong> as ranges (e.g. <code>R/foo.R:12-18</code>) so you know exactly where to add tests.</p>
@@ -3180,7 +3305,7 @@ artifact on disk.</p>
 </tr>
 </tbody>
 </table>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>/rforge:r:build
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/rforge:r:build
 </span></code></pre></div>
 <p>Output shape: <code>🟢/🔴</code>, the artifact path, and its size in KB.</p>
 <hr />
@@ -3204,7 +3329,7 @@ artifact on disk.</p>
 </tr>
 </tbody>
 </table>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:r:install
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>/rforge:r:install
 </span></code></pre></div>
 <p>Output shape: <code>🟢 exit 0 / 🔴</code>, the installed version, and (on error) surfaced messages such
 as unmet dependencies.</p>
@@ -3261,11 +3386,11 @@ site, turning vignettes into articles. <strong>Mutating</strong> — it writes t
 </tr>
 </tbody>
 </table>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>/rforge:r:site<span class="w">                  </span><span class="c1"># validate + full build</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>/rforge:r:site<span class="w"> </span>--preview<span class="w">        </span><span class="c1"># build, then open it</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>/rforge:r:site<span class="w"> </span>--strict<span class="w">         </span><span class="c1"># fail-fast config check for CI</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>/rforge:r:site<span class="w"> </span>--articles-only<span class="w">  </span><span class="c1"># rebuild just the vignettes (reinstalls first)</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>/rforge:r:site<span class="w"> </span>--devel<span class="w">          </span><span class="c1"># quick in-process build while iterating</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>/rforge:r:site<span class="w">                  </span><span class="c1"># validate + full build</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>/rforge:r:site<span class="w"> </span>--preview<span class="w">        </span><span class="c1"># build, then open it</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>/rforge:r:site<span class="w"> </span>--strict<span class="w">         </span><span class="c1"># fail-fast config check for CI</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>/rforge:r:site<span class="w"> </span>--articles-only<span class="w">  </span><span class="c1"># rebuild just the vignettes (reinstalls first)</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>/rforge:r:site<span class="w"> </span>--devel<span class="w">          </span><span class="c1"># quick in-process build while iterating</span>
 </span></code></pre></div>
 <p>Output shape: <code>🟢 built clean / 🟡 built with problems / 🔴 build failed</code>, what was checked
 vs built, vignette/render errors on failure, and config/index problems (bad URLs,
@@ -3299,7 +3424,7 @@ fast "did I break anything?" sweep. <strong>Mutating</strong> — it includes <c
 </tr>
 </tbody>
 </table>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/rforge:r:cycle
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>/rforge:r:cycle
 </span></code></pre></div>
 <p>Output shape: an overall status plus a per-stage table:</p>
 <table>

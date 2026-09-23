@@ -2874,7 +2874,7 @@ one of three verdicts:</p>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>urlcheck   ok    ✅
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>test       ok    ✅  (187 passed)
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>coverage   ok    ✅  (92%)
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>check      ok    ✅  1 NOTE (classified spurious — &quot;New submission&quot;)
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>check      ok    ✅  1 NOTE (classified spurious — "New submission")
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>revdep     ok    ✅  no broken packages
 </span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
 </span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>Verdict: ready
@@ -2920,7 +2920,7 @@ detects a <code>Suggests</code> package used unconditionally. This is intended.
 <p>See <a href="../cran-submission-with-rforge/">CRAN submission with rforge</a> for the
 full per-package walkthrough.</p>
 <h2 id="step-3-roll-up-the-whole-ecosystem">Step 3: Roll up the whole ecosystem<a class="headerlink" href="#step-3-roll-up-the-whole-ecosystem" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:thorough &quot;Prepare mediationverse for CRAN&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:thorough "Prepare mediationverse for CRAN"
 </span></code></pre></div>
 <p><code>/rforge:thorough</code> runs the status rollup across all packages…</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.status<span class="w"> </span>--path<span class="w"> </span>.<span class="w"> </span>--format<span class="w"> </span>text
@@ -2929,8 +2929,8 @@ full per-package walkthrough.</p>
 not run them — that's Step 2's territory, per package):</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Recommended R-side checks (run in your shell):
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>  R CMD check --as-cran .
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>  Rscript -e &#39;devtools::test()&#39;
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>  Rscript -e &#39;covr::package_coverage()&#39;
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>  Rscript -e 'devtools::test()'
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>  Rscript -e 'covr::package_coverage()'
 </span></code></pre></div>
 <p>Paste the results back and rforge combines them with the lib-status rollup
 into a release-readiness summary.</p>
@@ -2986,7 +2986,7 @@ checks. <code>/rforge:release</code> computes the sequence:</p>
 <p>Most releases are one package, not a whole verse. The condensed flow:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>/rforge:docs:check medfit        # 1. drift check (NEWS, examples)
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>/rforge:r:cran-prep              # 2. full gate: runs all checks + writes cran-comments.md
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a># ... fix anything flagged, re-run until &quot;ready&quot; ...
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a># ... fix anything flagged, re-run until "ready" ...
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>/rforge:release medfit           # 3. confirm ecosystem readiness + submission order
 </span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a># → review cran-comments.md, submit via https://cran.r-project.org/submit.html
 </span></code></pre></div>

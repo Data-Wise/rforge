@@ -1573,6 +1573,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#mediationverse-doctrine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MediationVerse doctrine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2769,6 +2780,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#mediationverse-doctrine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MediationVerse doctrine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3071,6 +3093,105 @@ the correctness traps — dead generics, no-op validators, unreachable methods �
 once S7 is actually loaded. A package that fails to parse during an <code>--eco</code> sweep becomes a
 per-package <code>warn</code> and never aborts the sweep.</p>
 </div>
+<hr />
+<h2 id="mediationverse-doctrine">MediationVerse doctrine<a class="headerlink" href="#mediationverse-doctrine" title="Permanent link">&para;</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Package names below are a worked example, not something rforge hardcodes</p>
+<p>Everything above this section is generic — <code>r:s7-review</code> checks any S7 package. The
+following is a concrete class-design worked example for the MediationVerse package
+family (<code>medfit</code>/<code>probmed</code>/<code>rmediation</code>/<code>medsim</code>/<code>mediationverse</code>), kept here because
+it's the ecosystem this tool is developed and dogfooded against. See the
+<a href="../cran-submission/">CRAN submission guide's MediationVerse doctrine</a> for the release
+side of the same ecosystem.</p>
+</div>
+<p>S7 is the OOP standard for all new MediationVerse code. Model two layers: a <strong>fitter</strong>
+(configuration + <code>fit()</code>) and an immutable <strong>result</strong> (estimates + inference). Give effect
+types a small hierarchy so shared <code>print</code>/<code>confint</code> logic lives once — this is the shape
+<code>--kind validators</code>/<code>--kind methods</code> findings are checking your code <em>against</em>.</p>
+<div class="language-r highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nf">library</span><span class="p">(</span><span class="n">S7</span><span class="p">)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># --- result base + effect-typed subclasses ---</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">MediationResult</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">new_class</span><span class="p">(</span><span class="s">"MediationResult"</span><span class="p">,</span><span class="w"> </span><span class="n">properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="n">estimand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">new_property</span><span class="p">(</span><span class="n">class_character</span><span class="p">),</span><span class="w">          </span><span class="c1"># "NIE","NDE","CDE"</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="n">estimate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">new_property</span><span class="p">(</span><span class="n">class_numeric</span><span class="p">),</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="n">se</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="nf">new_property</span><span class="p">(</span><span class="n">class_numeric</span><span class="p">,</span><span class="w"> </span><span class="n">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">NA_real_</span><span class="p">),</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="n">vcov</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="nf">new_property</span><span class="p">(</span><span class="n">class_numeric</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">NULL</span><span class="p">),</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="n">n</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="nf">new_property</span><span class="p">(</span><span class="n">class_integer</span><span class="p">),</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="n">call</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="nf">new_property</span><span class="p">(</span><span class="n">class_call</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">NULL</span><span class="p">)</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="p">),</span><span class="w"> </span><span class="n">validator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">self</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">self</span><span class="o">@</span><span class="n">estimate</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="s">"@estimate must be non-empty"</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">  </span><span class="kr">else</span><span class="w"> </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">self</span><span class="o">@</span><span class="n">se</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">self</span><span class="o">@</span><span class="n">se</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w"> </span><span class="s">"@se must be &gt;= 0"</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="p">})</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="n">NIEResult</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">new_class</span><span class="p">(</span><span class="s">"NIEResult"</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MediationResult</span><span class="p">)</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="n">NDEResult</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">new_class</span><span class="p">(</span><span class="s">"NDEResult"</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MediationResult</span><span class="p">)</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="n">CDEResult</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">new_class</span><span class="p">(</span><span class="s">"CDEResult"</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MediationResult</span><span class="p">,</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="w">  </span><span class="n">properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">m_level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">new_property</span><span class="p">(</span><span class="n">class_numeric</span><span class="p">)))</span><span class="w">   </span><span class="c1"># CDE fixes M=m</span>
+</span></code></pre></div>
+<ul>
+<li><strong>Validate in the class, not the caller</strong> — the <code>validator</code> runs on construction and on
+  <code>@&lt;-</code> mutation, so invariants can't drift (this is what <code>--kind validators</code>' <code>missing_validator</code>
+  finding flags the absence of).</li>
+<li><strong>Keep results immutable</strong> — compute everything in the fitter; the result is a value
+  object, making <code>confint</code>/<code>summary</code> pure functions of it.</li>
+<li><strong>Put shared behavior on the parent</strong> (<code>MediationResult</code>) and override only where an
+  effect type genuinely differs (e.g. a <code>CDEResult</code> print that shows <code>m_level</code>).</li>
+</ul>
+<p><strong>Generics + methods</strong> — define package generics with <code>new_generic()</code>, and register methods
+for the base generics users reach for (<code>print</code>, <code>summary</code>, <code>confint</code>, <code>plot</code>):</p>
+<div class="language-r highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">nie</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">new_generic</span><span class="p">(</span><span class="s">"nie"</span><span class="p">,</span><span class="w"> </span><span class="s">"object"</span><span class="p">)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nf">method</span><span class="p">(</span><span class="n">nie</span><span class="p">,</span><span class="w"> </span><span class="n">MediationResult</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">object</span><span class="p">,</span><span class="w"> </span><span class="kc">...</span><span class="p">)</span><span class="w"> </span><span class="n">object</span><span class="o">@</span><span class="n">estimate</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nf">method</span><span class="p">(</span><span class="n">print</span><span class="p">,</span><span class="w"> </span><span class="n">MediationResult</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kc">...</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nf">cat</span><span class="p">(</span><span class="nf">sprintf</span><span class="p">(</span><span class="s">"&lt;%s&gt; %s = %.4f (SE %.4f, n=%d)\n"</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">              </span><span class="nf">S7_class</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">@</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">@</span><span class="n">estimand</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">@</span><span class="n">estimate</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">@</span><span class="n">se</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">@</span><span class="n">n</span><span class="p">));</span><span class="w"> </span><span class="nf">invisible</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">}</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nf">method</span><span class="p">(</span><span class="n">stats</span><span class="o">::</span><span class="n">confint</span><span class="p">,</span><span class="w"> </span><span class="n">MediationResult</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">object</span><span class="p">,</span><span class="w"> </span><span class="n">parm</span><span class="p">,</span><span class="w"> </span><span class="n">level</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.95</span><span class="p">,</span><span class="w"> </span><span class="kc">...</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="n">z</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">stats</span><span class="o">::</span><span class="nf">qnorm</span><span class="p">(</span><span class="m">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="m">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">level</span><span class="p">)</span><span class="o">/</span><span class="m">2</span><span class="p">)</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="nf">c</span><span class="p">(</span><span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">object</span><span class="o">@</span><span class="n">estimate</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">z</span><span class="o">*</span><span class="n">object</span><span class="o">@</span><span class="n">se</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">object</span><span class="o">@</span><span class="n">estimate</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">z</span><span class="o">*</span><span class="n">object</span><span class="o">@</span><span class="n">se</span><span class="p">)</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>The <code>.onLoad()</code> registration-order gotcha</strong> — the single most common "method not found at
+load/check time" bug, and exactly what <code>--kind methods</code>' <code>missing_methods_register</code> finding
+and the <code>--runtime</code> <code>method-dispatch</code> family exist to catch. When bridging to S4 (needed for
+some double dispatch / <code>setMethod</code> interop), call <code>S4_register()</code> <strong>before</strong>
+<code>methods_register()</code>:</p>
+<div class="language-r highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">.onLoad</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">libname</span><span class="p">,</span><span class="w"> </span><span class="n">pkgname</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="n">S7</span><span class="o">::</span><span class="nf">S4_register</span><span class="p">(</span><span class="n">MediationResult</span><span class="p">)</span><span class="w">   </span><span class="c1"># bridge classes to S4 FIRST (if you need S4 interop)</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="n">S7</span><span class="o">::</span><span class="nf">S4_register</span><span class="p">(</span><span class="n">NIEResult</span><span class="p">)</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="n">S7</span><span class="o">::</span><span class="nf">methods_register</span><span class="p">()</span><span class="w">             </span><span class="c1"># THEN register S7 methods</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>If methods vanish under <code>R CMD check</code> but work interactively, it's almost always (a)
+<code>methods_register()</code> not called in <code>.onLoad()</code>, (b) <code>S4_register()</code> called after it, or (c)
+the generic/class not exported.</p>
+<p><strong>S3 ↔ S7 interop:</strong> to make an S7 class work with an existing S3 generic you don't own,
+register an S7 method on it — S7 handles S3 dispatch when the S3 generic calls
+<code>UseMethod</code>. For double dispatch (two S7 args, or S7×S4), register via the S4 bridge on both
+classes. Don't mix an S3 <code>class&lt;-</code> onto an S7 object; let S7 own the class.</p>
+<p><strong>Migration pattern (S3 → S7, e.g. <code>medfit</code>):</strong></p>
+<ol>
+<li>Inventory the S3 object's fields → S7 <code>properties</code> with types + a <code>validator</code> capturing
+   the old invariants.</li>
+<li>Replace <code>structure(list(...), class="x")</code> constructors with <code>new_class(...)</code> + a thin
+   constructor function.</li>
+<li>Convert <code>print.x</code>/<code>summary.x</code>/<code>confint.x</code> to <code>method(&lt;generic&gt;, X)</code>.</li>
+<li>Wire <code>.onLoad()</code> registration; export classes/generics.</li>
+<li>Keep a temporary back-compat <code>as.list()</code>/coercion if downstream code reads <code>$fields</code>;
+   deprecate with a <code>.Deprecated()</code> note.</li>
+<li>Tests (testthat edition 3): construct, mutate-to-invalid (expect validator error),
+   dispatch each generic, <code>S7_inherits()</code> checks.</li>
+</ol>
+<p><strong>Common pitfalls beyond what the checker flags:</strong></p>
+<ul>
+<li><code>@</code> on a non-S7 object → "no applicable method"; you're holding an S3 list, not the S7
+  object.</li>
+<li>A validator returning <code>FALSE</code>/<code>TRUE</code> instead of <code>NULL</code>/a message string — it must return
+  <code>NULL</code> (valid) or a character message (<code>--kind validators</code>' <code>validator_return_shape</code>
+  catches this statically; <code>--runtime</code>'s <code>validator-runtime</code> family catches a validator that
+  silently never fires).</li>
+<li>Heavy compute in constructors — keep constructors cheap; do fitting in <code>fit()</code>.</li>
+</ul>
 <hr />
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>

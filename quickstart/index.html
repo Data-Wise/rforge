@@ -3372,10 +3372,10 @@ want the fuller tour (modes, output formats, project-structure detection).</p>
 <li><strong>Required R Packages</strong></li>
 </ol>
 <div class="language-r highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Install in R</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nf">install.packages</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;devtools&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;testthat&quot;</span><span class="p">))</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nf">install.packages</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">"devtools"</span><span class="p">,</span><span class="w"> </span><span class="s">"testthat"</span><span class="p">))</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Optional (for coverage)</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;covr&quot;</span><span class="p">)</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nf">install.packages</span><span class="p">(</span><span class="s">"covr"</span><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
 <blockquote>
@@ -3439,7 +3439,7 @@ distros ship with a compatible Python by default.</p>
 </span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>╰──────────────────────────────────────────╯
 </span></code></pre></div></p>
 <h3 id="analyze-package-30-seconds">Analyze Package (&lt;30 seconds)<a class="headerlink" href="#analyze-package-30-seconds" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;Check package health before CRAN submission&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>/rforge:analyze<span class="w"> </span><span class="s2">"Check package health before CRAN submission"</span>
 </span></code></pre></div>
 <p>This performs:
 - Dependency analysis
@@ -3490,13 +3490,13 @@ distros ship with a compatible Python by default.</p>
 ("debug", "optimize", "CRAN") when you don't pass the flag explicitly.</p>
 <p><strong>Example:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Default mode — fast, balanced (no flag needed)</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;Updated bootstrap algorithm&quot;</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>/rforge:analyze<span class="w"> </span><span class="s2">"Updated bootstrap algorithm"</span>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
 </span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Debug mode for investigating test failures</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>debug<span class="w"> </span><span class="s2">&quot;Why are tests failing on CI?&quot;</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>debug<span class="w"> </span><span class="s2">"Why are tests failing on CI?"</span>
 </span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
 </span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># Release mode for comprehensive CRAN check</span>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span><span class="s2">&quot;Prepare for CRAN submission&quot;</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span><span class="s2">"Prepare for CRAN submission"</span>
 </span></code></pre></div></p>
 <h2 id="common-workflows">Common Workflows<a class="headerlink" href="#common-workflows" title="Permanent link">&para;</a></h2>
 <h3 id="1-daily-development-check">1. Daily Development Check<a class="headerlink" href="#1-daily-development-check" title="Permanent link">&para;</a></h3>
@@ -3504,18 +3504,18 @@ distros ship with a compatible Python by default.</p>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>/rforge:status
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># If issues found</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>debug<span class="w"> </span><span class="s2">&quot;Investigate warnings&quot;</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>debug<span class="w"> </span><span class="s2">"Investigate warnings"</span>
 </span></code></pre></div>
 <h3 id="2-before-committing-code">2. Before Committing Code<a class="headerlink" href="#2-before-committing-code" title="Permanent link">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Quick pre-commit validation</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>/rforge:status
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># Check impact of your changes</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>/rforge:cascade<span class="w"> </span><span class="s2">&quot;Updated base dependency version&quot;</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>/rforge:cascade<span class="w"> </span><span class="s2">"Updated base dependency version"</span>
 </span></code></pre></div>
 <h3 id="3-cran-preparation">3. CRAN Preparation<a class="headerlink" href="#3-cran-preparation" title="Permanent link">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Comprehensive release check</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span><span class="s2">&quot;CRAN submission checklist&quot;</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>/rforge:analyze<span class="w"> </span>--mode<span class="w"> </span>release<span class="w"> </span><span class="s2">"CRAN submission checklist"</span>
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># Plan release sequence (for ecosystems)</span>
 </span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>/rforge:release
@@ -3528,10 +3528,10 @@ distros ship with a compatible Python by default.</p>
 </span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>/rforge:detect
 </span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
 </span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># Analyze cross-package impact</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>/rforge:impact<span class="w"> </span><span class="s2">&quot;Changed API in base package&quot;</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>/rforge:impact<span class="w"> </span><span class="s2">"Changed API in base package"</span>
 </span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
 </span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="c1"># Plan coordinated updates</span>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>/rforge:cascade<span class="w"> </span><span class="s2">&quot;Major version bump in dependency&quot;</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>/rforge:cascade<span class="w"> </span><span class="s2">"Major version bump in dependency"</span>
 </span></code></pre></div>
 <h2 id="output-formats">Output Formats<a class="headerlink" href="#output-formats" title="Permanent link">&para;</a></h2>
 <p>RForge supports 3 output formats:</p>
@@ -3584,11 +3584,11 @@ distros ship with a compatible Python by default.</p>
 </span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># macOS: install via Homebrew</span>
 </span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>brew<span class="w"> </span>install<span class="w"> </span>python@3.12
 </span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>
-</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="c1"># Linux: install via your distro&#39;s package manager</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="c1"># Linux: install via your distro's package manager</span>
 </span></code></pre></div></p>
 <h3 id="not-an-r-package-directory">"Not an R package directory"<a class="headerlink" href="#not-an-r-package-directory" title="Permanent link">&para;</a></h3>
 <p><strong>Solution:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Ensure you&#39;re in a directory with DESCRIPTION file</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Ensure you're in a directory with DESCRIPTION file</span>
 </span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>ls<span class="w"> </span>-la<span class="w"> </span>DESCRIPTION
 </span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
 </span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="c1"># Or specify package path explicitly</span>
@@ -3600,7 +3600,7 @@ distros ship with a compatible Python by default.</p>
 </span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>which<span class="w"> </span>R
 </span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
 </span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="c1"># Add R to PATH if needed (macOS/Linux)</span>
-</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/usr/local/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"/usr/local/bin:</span><span class="nv">$PATH</span><span class="s2">"</span>
 </span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>
 </span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="c1"># Restart Claude Code after updating PATH</span>
 </span></code></pre></div></p>
@@ -3614,7 +3614,7 @@ distros ship with a compatible Python by default.</p>
 <ol>
 <li><strong>Check for large .Rcheck directories:</strong></li>
 </ol>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>find<span class="w"> </span>.<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.Rcheck&quot;</span><span class="w"> </span>-type<span class="w"> </span>d
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>find<span class="w"> </span>.<span class="w"> </span>-name<span class="w"> </span><span class="s2">"*.Rcheck"</span><span class="w"> </span>-type<span class="w"> </span>d
 </span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="c1"># Remove if found</span>
 </span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>rm<span class="w"> </span>-rf<span class="w"> </span>*.Rcheck
 </span></code></pre></div>

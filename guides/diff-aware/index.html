@@ -2939,9 +2939,9 @@ second time). To avoid re-paying it, the baseline is cached <strong>per package<
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.changed<span class="w"> </span>--clear-cache
 </span></code></pre></div>
 <p>A tagged result reads like:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[pre-existing]  NOTE: vignette &#39;intro.Rmd&#39; has long-running examples
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>[introduced]    WARNING: undocumented argument &#39;newparam&#39; in foo()
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>[uncommitted]   object_name_linter: &#39;My_var&#39; should be snake_case  (R/util.R)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[pre-existing]  NOTE: vignette 'intro.Rmd' has long-running examples
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>[introduced]    WARNING: undocumented argument 'newparam' in foo()
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>[uncommitted]   object_name_linter: 'My_var' should be snake_case  (R/util.R)
 </span></code></pre></div>
 <h3 id="wiring-it-into-ci">Wiring it into CI<a class="headerlink" href="#wiring-it-into-ci" title="Permanent link">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Fail the job ONLY if this branch introduced a finding (the default policy).</span>

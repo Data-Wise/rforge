@@ -2840,10 +2840,10 @@ optimize and release shell out to R (profiling / <code>R CMD check</code>).</p>
 <h2 id="you-usually-dont-even-type-the-flag">You usually don't even type the flag<a class="headerlink" href="#you-usually-dont-even-type-the-flag" title="Permanent link">&para;</a></h2>
 <p><code>/rforge:analyze</code> reads your description and <strong>infers</strong> the mode from
 context words. All three of these pick the right mode automatically:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;why are tests failing?&quot;</span><span class="w">        </span><span class="c1"># → infers debug</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;the package loads slowly&quot;</span><span class="w">      </span><span class="c1"># → infers optimize</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;prepare for CRAN submission&quot;</span><span class="w">   </span><span class="c1"># → infers release</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>/rforge:analyze<span class="w"> </span><span class="s2">&quot;updated the bootstrap code&quot;</span><span class="w">    </span><span class="c1"># → stays default</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/rforge:analyze<span class="w"> </span><span class="s2">"why are tests failing?"</span><span class="w">        </span><span class="c1"># → infers debug</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>/rforge:analyze<span class="w"> </span><span class="s2">"the package loads slowly"</span><span class="w">      </span><span class="c1"># → infers optimize</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>/rforge:analyze<span class="w"> </span><span class="s2">"prepare for CRAN submission"</span><span class="w">   </span><span class="c1"># → infers release</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>/rforge:analyze<span class="w"> </span><span class="s2">"updated the bootstrap code"</span><span class="w">    </span><span class="c1"># → stays default</span>
 </span></code></pre></div>
 <p>So in practice: <strong>describe what you're doing in plain words, and let rforge
 choose.</strong> The explicit <code>--mode</code> flag is there for when you want to force a

@@ -3280,7 +3280,7 @@ discovery (<code>find_r_packages</code>), which is the source of truth for versi
 </table>
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
 <h3 id="detect_ecosystem"><code>detect_ecosystem()</code><a class="headerlink" href="#detect_ecosystem" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">detect_ecosystem</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Ecosystem&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">detect_ecosystem</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">'str | os.PathLike'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'Ecosystem'</span>
 </span></code></pre></div>
 <p>Detect R ecosystem at <code>path</code>.</p>
 <p>Returns an <code>Ecosystem</code> describing the layout: the packages found, their
@@ -3290,28 +3290,28 @@ classification (single / ecosystem / hybrid), the MCP-compatible mode
     FileNotFoundError: if <code>path</code> does not exist.
     NotADirectoryError: if <code>path</code> exists but is not a directory.</p>
 <h3 id="find_r_packages"><code>find_r_packages()</code><a class="headerlink" href="#find_r_packages" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">find_r_packages</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;list[Package]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">find_r_packages</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="s1">'str | os.PathLike'</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">:</span> <span class="s1">'int'</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'list[Package]'</span>
 </span></code></pre></div>
 <p>Find all R packages under <code>root</code>, recursing at most <code>max_depth</code> levels.</p>
 <p>Mirrors the MCP server's traversal: if a directory is itself an R package,
 it's recorded and we don't descend into it. Hidden directories (<code>.git</code>,
 <code>.Rproj.user</code>, etc.) are skipped.</p>
 <h3 id="format_json"><code>format_json()</code><a class="headerlink" href="#format_json" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_json</span><span class="p">(</span><span class="n">eco</span><span class="p">:</span> <span class="s1">&#39;Ecosystem&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_json</span><span class="p">(</span><span class="n">eco</span><span class="p">:</span> <span class="s1">'Ecosystem'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'str'</span>
 </span></code></pre></div>
 <p><em>(no docstring)</em></p>
 <h3 id="format_text"><code>format_text()</code><a class="headerlink" href="#format_text" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_text</span><span class="p">(</span><span class="n">eco</span><span class="p">:</span> <span class="s1">&#39;Ecosystem&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_text</span><span class="p">(</span><span class="n">eco</span><span class="p">:</span> <span class="s1">'Ecosystem'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'str'</span>
 </span></code></pre></div>
 <p>Terminal-friendly rendering of an Ecosystem.</p>
 <h3 id="parse_description"><code>parse_description()</code><a class="headerlink" href="#parse_description" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_description</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Description]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_description</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="s1">'str'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'Optional[Description]'</span>
 </span></code></pre></div>
 <p>Parse the content of a DESCRIPTION file.</p>
 <p>DESCRIPTION uses an RFC-822-ish format: <code>Field: value</code> lines, with
 indented continuation lines belonging to the previous field.</p>
 <h3 id="parse_manifest"><code>parse_manifest()</code><a class="headerlink" href="#parse_manifest" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_manifest</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Manifest&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_manifest</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="s1">'str'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'Manifest'</span>
 </span></code></pre></div>
 <p>Parse an ecosystem manifest from a strict YAML <em>subset</em>.</p>
 <p>Deliberately stdlib-only (no PyYAML). Supports exactly what the manifest
@@ -3320,11 +3320,11 @@ list of flat maps. Blank lines and <code>#</code> comment lines are ignored. Any
 fancier than this subset is silently skipped rather than raised — callers
 treat a sparse/empty Manifest as "no usable manifest".</p>
 <h3 id="read_description"><code>read_description()</code><a class="headerlink" href="#read_description" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_description</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Description]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_description</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">'str | os.PathLike'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'Optional[Description]'</span>
 </span></code></pre></div>
 <p>Read and parse a DESCRIPTION file. Returns None on any error.</p>
 <h3 id="read_manifest"><code>read_manifest()</code><a class="headerlink" href="#read_manifest" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_manifest</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Optional[Manifest]&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_manifest</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">'str | os.PathLike'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'Optional[Manifest]'</span>
 </span></code></pre></div>
 <p>Read and parse an ecosystem manifest. Returns None on any read error.</p>
 

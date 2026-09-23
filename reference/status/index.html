@@ -3028,7 +3028,7 @@ distinct from <code>None</code> (not checked).</p>
 </table>
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
 <h3 id="aggregate_status"><code>aggregate_status()</code><a class="headerlink" href="#aggregate_status" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">aggregate_status</span><span class="p">(</span><span class="n">ecosystem_path</span><span class="p">:</span> <span class="s1">&#39;str | os.PathLike&#39;</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;EcosystemStatus&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">aggregate_status</span><span class="p">(</span><span class="n">ecosystem_path</span><span class="p">:</span> <span class="s1">'str | os.PathLike'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'EcosystemStatus'</span>
 </span></code></pre></div>
 <p>Build an <code>EcosystemStatus</code> snapshot for the given path.</p>
 <p>Discovers packages via <code>detect_ecosystem</code>, reads each package's
@@ -3037,7 +3037,7 @@ distinct from <code>None</code> (not checked).</p>
     FileNotFoundError / NotADirectoryError: propagated from
         <code>detect_ecosystem</code> if <code>ecosystem_path</code> is invalid.</p>
 <h3 id="calculate_health_score"><code>calculate_health_score()</code><a class="headerlink" href="#calculate_health_score" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_health_score</span><span class="p">(</span><span class="n">packages</span><span class="p">:</span> <span class="s1">&#39;list[PackageStatus]&#39;</span><span class="p">,</span> <span class="n">now</span><span class="p">:</span> <span class="s1">&#39;Optional[datetime]&#39;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;int&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_health_score</span><span class="p">(</span><span class="n">packages</span><span class="p">:</span> <span class="s1">'list[PackageStatus]'</span><span class="p">,</span> <span class="n">now</span><span class="p">:</span> <span class="s1">'Optional[datetime]'</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'int'</span>
 </span></code></pre></div>
 <p>Compute the 0-100 ecosystem health score.</p>
 <p>Faithful port of the MCP server's algorithm: each package gets a slice
@@ -3047,19 +3047,25 @@ test statuses plus a staleness penalty for <code>.STATUS</code> files older than
 MCP server returned 0 here, which conflated "no data" with "broken";
 the orchestrator chose the saner default for B.2.</p>
 <h3 id="format_json"><code>format_json()</code><a class="headerlink" href="#format_json" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_json</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="s1">&#39;EcosystemStatus&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_json</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="s1">'EcosystemStatus'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'str'</span>
 </span></code></pre></div>
 <p><em>(no docstring)</em></p>
 <h3 id="format_text"><code>format_text()</code><a class="headerlink" href="#format_text" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_text</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="s1">&#39;EcosystemStatus&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;str&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">format_text</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="s1">'EcosystemStatus'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'str'</span>
 </span></code></pre></div>
 <p>Terminal-friendly rendering of an <code>EcosystemStatus</code>.</p>
 <h3 id="parse_status_file"><code>parse_status_file()</code><a class="headerlink" href="#parse_status_file" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_status_file</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;StatusFileSummary&#39;</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_status_file</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="s1">'str'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'StatusFileSummary'</span>
 </span></code></pre></div>
 <p>Parse a <code>.STATUS</code> file's text into a <code>StatusFileSummary</code>.</p>
-<p>Section anchors are emoji headers (🎯, 📊, ✅, 📋, ⏰). Order is not
-significant. Missing sections leave their corresponding fields unset.</p>
+<p>Two dialects are supported. Files opening with <code>key: value</code> frontmatter are
+read from that block; everything else is read from emoji section anchors
+(🎯, 📊, ✅, 📋, ⏰). Order is not significant, and a field the active
+dialect does not supply falls back to the other one rather than staying
+unset -- hybrid files (frontmatter plus emoji sections) parse fully. The
+one exception is <code>phase</code>: frontmatter files take it only from a <code>phase:</code>
+key, never from a <code>Phase X:</code> line in the prose, which in that dialect is
+history. Missing fields stay None.</p>
 
 
 

@@ -3344,7 +3344,7 @@ through to the section that matches what you're seeing.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># Expected: a symlink to /opt/homebrew/opt/rforge/libexec</span>
 </span></code></pre></div></li>
 <li>If missing, the post-install <code>ln</code> step failed. Fix:
-   <div class="language-zsh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ln<span class="w"> </span>-sf<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>brew<span class="w"> </span>--prefix<span class="k">)</span><span class="s2">/opt/rforge/libexec&quot;</span><span class="w"> </span>~/.claude/plugins/rforge
+   <div class="language-zsh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ln<span class="w"> </span>-sf<span class="w"> </span><span class="s2">"</span><span class="k">$(</span>brew<span class="w"> </span>--prefix<span class="k">)</span><span class="s2">/opt/rforge/libexec"</span><span class="w"> </span>~/.claude/plugins/rforge
 </span></code></pre></div></li>
 <li>Restart Claude Code.</li>
 </ol>
@@ -3395,7 +3395,7 @@ doing anything.</p>
 <h3 id="importerror-attempted-relative-import-with-no-known-parent-package"><code>ImportError: attempted relative import with no known parent package</code><a class="headerlink" href="#importerror-attempted-relative-import-with-no-known-parent-package" title="Permanent link">&para;</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">Symptom: running as a script instead of as a package</p>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>lib/deps.py<span class="w">    </span><span class="c1"># ❌ won&#39;t work</span>
+<div class="language-zsh highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>lib/deps.py<span class="w">    </span><span class="c1"># ❌ won't work</span>
 </span></code></pre></div>
 </div>
 <div class="admonition success">
@@ -3413,7 +3413,7 @@ doing anything.</p>
 <div class="admonition success">
 <p class="admonition-title">Fix</p>
 <p>Run from the plugin install dir, or let the slash command do it:
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>brew<span class="w"> </span>--prefix<span class="k">)</span><span class="s2">/opt/rforge/libexec&quot;</span>
+<div class="language-zsh highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span><span class="s2">"</span><span class="k">$(</span>brew<span class="w"> </span>--prefix<span class="k">)</span><span class="s2">/opt/rforge/libexec"</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>python3<span class="w"> </span>-m<span class="w"> </span>lib.discovery<span class="w"> </span>--path<span class="w"> </span>/your/r/package
 </span></code></pre></div>
 If you get this from a slash command, it's a bug — file an issue.</p>
@@ -3492,8 +3492,8 @@ isn't installed (you uninstalled rforge-mcp, or never had it).</p>
 <div class="admonition success">
 <p class="admonition-title">Fix</p>
 <p>Delete this from <code>~/.claude/settings.json</code>:
-<div class="language-json highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">&quot;rforge&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">"mcpServers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">"rforge"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="p">}</span>
 </span></code></pre></div>
 The plugin doesn't need an MCP server — there's no rforge MCP server

@@ -2980,7 +2980,7 @@
 
 <h1 id="rforge-plugin-reference-card">📚 RForge Plugin - Reference Card<a class="headerlink" href="#rforge-plugin-reference-card" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>Version:</strong> 2.20.0 | <strong>Last Updated:</strong> 2026-08-01</p>
+<p><strong>Version:</strong> 2.20.1 | <strong>Last Updated:</strong> 2026-08-01</p>
 </blockquote>
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
@@ -2992,7 +2992,7 @@
 </ul>
 </div>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────────────────────────────────────────────────┐
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  RFORGE PLUGIN REFERENCE                                            v2.20.0  │
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  RFORGE PLUGIN REFERENCE                                            v2.20.1  │
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├─────────────────────────────────────────────────────────────────────────────┤
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│                                                                             │
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  COMMANDS (44)                                                              │
@@ -3374,7 +3374,7 @@ shell, no R required. Runs in <code>release</code> mode pre-CRAN.</p>
 </span></code></pre></div>
 <p><strong>Manual:</strong></p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Data-Wise/rforge.git
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>ln<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/rforge&quot;</span><span class="w"> </span>~/.claude/plugins/rforge
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>ln<span class="w"> </span>-s<span class="w"> </span><span class="s2">"</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/rforge"</span><span class="w"> </span>~/.claude/plugins/rforge
 </span></code></pre></div>
 <p>See the <a href="../#installation">Home page</a> for the full matrix of
 install options.</p>
@@ -3385,7 +3385,7 @@ install options.</p>
 <hr />
 <h2 id="file-structure">File Structure<a class="headerlink" href="#file-structure" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>rforge/
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>├── .claude-plugin/        # Plugin manifest + extras (v2.20.0)
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>├── .claude-plugin/        # Plugin manifest + extras (v2.20.1)
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>│   ├── plugin.json
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>│   ├── marketplace.json
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>│   ├── config.json
@@ -3455,7 +3455,7 @@ install options.</p>
 <hr />
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
 <h3 id="after-code-changes">After Code Changes<a class="headerlink" href="#after-code-changes" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:analyze &quot;Updated bootstrap algorithm in mediate() function&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>/rforge:analyze "Updated bootstrap algorithm in mediate() function"
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>→ Pattern: CODE_CHANGE
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>→ Modules: lib.deps (impact), lib.discovery
@@ -3469,7 +3469,7 @@ install options.</p>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>→ Result: Quick health status + blocking issues
 </span></code></pre></div>
 <h3 id="before-cran-release">Before CRAN Release<a class="headerlink" href="#before-cran-release" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/rforge:thorough &quot;Prepare for CRAN submission&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>/rforge:thorough "Prepare for CRAN submission"
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>→ Pattern: RELEASE_PREP
 </span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>→ Modules: lib.status + R CMD check + description-sync skill

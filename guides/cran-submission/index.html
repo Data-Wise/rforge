@@ -1623,6 +1623,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#mediationverse-doctrine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MediationVerse doctrine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#safety-model" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2768,6 +2779,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#mediationverse-doctrine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MediationVerse doctrine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#safety-model" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3284,6 +3306,44 @@ automatically on <code>git push</code>, so this is <strong>read-only</strong> �
 <strong>advisory</strong>: offline / unregistered → a <code>warn</code> envelope that never blocks the CRAN handoff.
 See the <a href="../../tutorials/r-universe-early-access/">R-universe early-access tutorial</a>.</p>
 </div>
+<hr />
+<h2 id="mediationverse-doctrine">MediationVerse doctrine<a class="headerlink" href="#mediationverse-doctrine" title="Permanent link">&para;</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Package names below are a worked example, not something rforge hardcodes</p>
+<p>Everything above this section is generic — it applies to any R package. The following
+is CRAN-prep doctrine specific to the MediationVerse package family (<code>medfit</code> →
+<code>{probmed, rmediation, medsim}</code> → <code>mediationverse</code>; <code>medrobust</code> semi-independent),
+kept here because it's the ecosystem this tool is developed and dogfooded against.
+Skip it if you're not working on one of these packages.</p>
+</div>
+<p><strong>Dependency chain (submit upstream → downstream):</strong>
+<code>medfit → {probmed, rmediation, medsim} → mediationverse</code>; <code>medrobust</code> is semi-independent
+(uses <code>medfit</code> optionally).</p>
+<ul>
+<li><strong>medfit</strong> — P0, CRAN-bound. Known blocker class: <strong>vignette ambiguity</strong> — CRAN rebuilds
+  vignettes from a clean checkout with no network and a time budget. Declare the engine
+  (<code>VignetteBuilder: knitr</code> or <code>quarto</code> in DESCRIPTION, matching <code>%\VignetteEngine{…}</code> /
+  <code>vignette:</code> YAML per vignette); avoid heavy compute or network at build time (precompute
+  and load a cached object instead, or <code>eval=FALSE</code> with shown results); resolve any
+  <code>.Rmd</code>/<code>.qmd</code>/built-<code>.html</code> ambiguity for the same topic to one source of truth in
+  <code>vignettes/</code> and remove stray built artifacts from version control.</li>
+<li><strong>rmediation</strong> — already on CRAN; changes must clear <code>r:revdep</code> for downstream.</li>
+<li>OOP standard is <strong>S7</strong> across the ecosystem (see the <a href="../s7-review/#mediationverse-doctrine">S7 review guide</a>).
+  Estimand notation: VanderWeele (NIE/NDE/CDE, θ, a/b paths).</li>
+</ul>
+<p><strong>Multi-package release coordination:</strong></p>
+<ol>
+<li>Freeze versions; bump per semver in DESCRIPTION + <code>NEWS.md</code> (user-facing changes only).</li>
+<li>Submit <strong>upstream first</strong> (<code>medfit</code>), wait for it to land on CRAN, then rebuild/recheck
+   downstream against the released version.</li>
+<li>For packages with reverse deps (<code>rmediation</code>/<code>medfit</code>): <code>r:revdep</code> before submitting; if
+   it breaks a downstream, coordinate a simultaneous update and note it in
+   <code>cran-comments.md</code>.</li>
+<li>Keep a shared <code>cran-comments.md</code> template across the ecosystem; reference the test
+   environments and the single explained NOTE.</li>
+</ol>
+<p>When working any downstream package, read <code>medfit</code>'s shared S7 classes / bootstrap
+interfaces first — they set the contract the rest of the ecosystem depends on.</p>
 <hr />
 <h2 id="safety-model">Safety model<a class="headerlink" href="#safety-model" title="Permanent link">&para;</a></h2>
 <p>Everything in this family that <strong>writes a file or reaches the network</strong> is

@@ -3938,10 +3938,10 @@ auto-extracted <a href="../reference/discovery/"><code>reference/</code></a> pag
 - <code>lib.discovery</code> — locate affected packages
 - <code>/rforge:docs:check</code> body — surface docs-drift hints</p>
 <p><strong>Example:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>User: &quot;I updated the bootstrap function in RMediation&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>User: "I updated the bootstrap function in RMediation"
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>→ Pattern: CODE_CHANGE
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>→ Modules: [lib.deps, lib.discovery] + Bash tests
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>→ Output: &quot;3 packages affected, 42 tests passing, docs up-to-date&quot;
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>→ Output: "3 packages affected, 42 tests passing, docs up-to-date"
 </span></code></pre></div></p>
 <h3 id="2-bug_fix">2. BUG_FIX<a class="headerlink" href="#2-bug_fix" title="Permanent link">&para;</a></h3>
 <p><strong>Triggers:</strong> "bug", "error", "fix", "issue"</p>
@@ -3950,10 +3950,10 @@ auto-extracted <a href="../reference/discovery/"><code>reference/</code></a> pag
 - <code>lib.deps</code> — check for downstream regressions in dependent packages
 - <code>lib.status</code> — overall package health snapshot</p>
 <p><strong>Example:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>User: &quot;Fixed edge case in mediation calculation&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>User: "Fixed edge case in mediation calculation"
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>→ Pattern: BUG_FIX
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>→ Modules: [lib.deps, lib.status] + Bash tests
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>→ Output: &quot;Fix verified, no regressions, health score: 85/100&quot;
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>→ Output: "Fix verified, no regressions, health score: 85/100"
 </span></code></pre></div></p>
 <h3 id="3-cran_release">3. CRAN_RELEASE<a class="headerlink" href="#3-cran_release" title="Permanent link">&para;</a></h3>
 <p><strong>Triggers:</strong> "CRAN", "release", "submit", "publish"</p>
@@ -3963,10 +3963,10 @@ auto-extracted <a href="../reference/discovery/"><code>reference/</code></a> pag
 - <code>lib.deps</code> — dependency validation
 - <code>lib.status</code> — overall readiness; <code>description-sync</code> skill verifies CHANGELOG ↔ DESCRIPTION</p>
 <p><strong>Example:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>User: &quot;Prepare for CRAN submission&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>User: "Prepare for CRAN submission"
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>→ Pattern: CRAN_RELEASE
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>→ Modules: [lib.deps, lib.status] + R CMD check + description-sync skill
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>→ Output: &quot;3 warnings to address, docs 95% complete, ready in 1-2 hours&quot;
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>→ Output: "3 warnings to address, docs 95% complete, ready in 1-2 hours"
 </span></code></pre></div></p>
 <h3 id="4-documentation">4. DOCUMENTATION<a class="headerlink" href="#4-documentation" title="Permanent link">&para;</a></h3>
 <p><strong>Triggers:</strong> "document", "docs", "README", "vignette"</p>
@@ -3975,10 +3975,10 @@ auto-extracted <a href="../reference/discovery/"><code>reference/</code></a> pag
 - Bash: <code>Rscript -e 'devtools::check_examples()'</code> — runnable examples
 - <code>description-sync</code> skill — DESCRIPTION ↔ CHANGELOG drift</p>
 <p><strong>Example:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>User: &quot;Update documentation for new features&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>User: "Update documentation for new features"
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>→ Pattern: DOCUMENTATION
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>→ Modules: docs:check prompt + Bash example-runner
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>→ Output: &quot;2 functions undocumented, 3 examples need updating&quot;
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>→ Output: "2 functions undocumented, 3 examples need updating"
 </span></code></pre></div></p>
 <h3 id="5-dependency_update">5. DEPENDENCY_UPDATE<a class="headerlink" href="#5-dependency_update" title="Permanent link">&para;</a></h3>
 <p><strong>Triggers:</strong> "dependency", "upgrade", "version bump", "import"</p>
@@ -3987,10 +3987,10 @@ auto-extracted <a href="../reference/discovery/"><code>reference/</code></a> pag
 - <code>lib.deps</code> (impact) — cross-package impact
 - <code>/rforge:cascade</code> body — update planning prose</p>
 <p><strong>Example:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>User: &quot;Updated ggplot2 dependency to v3.5.0&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>User: "Updated ggplot2 dependency to v3.5.0"
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>→ Pattern: DEPENDENCY_UPDATE
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>→ Modules: [lib.deps] + cascade prompt
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>→ Output: &quot;5 packages affected, update order: base → extension1 → extension2&quot;
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>→ Output: "5 packages affected, update order: base → extension1 → extension2"
 </span></code></pre></div></p>
 <h3 id="6-general_status">6. GENERAL_STATUS<a class="headerlink" href="#6-general_status" title="Permanent link">&para;</a></h3>
 <p><strong>Triggers:</strong> "status", "health", "check", "overview"</p>
@@ -3999,10 +3999,10 @@ auto-extracted <a href="../reference/discovery/"><code>reference/</code></a> pag
 - Bash: <code>git status</code> — repository state
 - Bash: <code>Rscript -e 'devtools::test()'</code> — test summary (when full run requested)</p>
 <p><strong>Example:</strong>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>User: &quot;What&#39;s the current status?&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>User: "What's the current status?"
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>→ Pattern: GENERAL_STATUS
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>→ Modules: [lib.status] + Bash git/test
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>→ Output: &quot;Health: 85/100, main branch clean, 42/45 tests passing&quot;
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>→ Output: "Health: 85/100, main branch clean, 42/45 tests passing"
 </span></code></pre></div></p>
 <h2 id="parallel-execution">Parallel Execution<a class="headerlink" href="#parallel-execution" title="Permanent link">&para;</a></h2>
 <h3 id="why-parallel-execution-matters">Why Parallel Execution Matters<a class="headerlink" href="#why-parallel-execution-matters" title="Permanent link">&para;</a></h3>
@@ -4026,7 +4026,7 @@ auto-extracted <a href="../reference/discovery/"><code>reference/</code></a> pag
 <h3 id="implementation">Implementation<a class="headerlink" href="#implementation" title="Permanent link">&para;</a></h3>
 <p>RForge uses Claude Code's Task tool to launch multiple background agents:</p>
 <div class="language-javascript highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">// Pseudo-code representation</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">tools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">selectTools</span><span class="p">(</span><span class="nx">pattern</span><span class="p">);</span><span class="w">  </span><span class="c1">// [&quot;impact&quot;, &quot;tests&quot;, &quot;docs&quot;]</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">tools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">selectTools</span><span class="p">(</span><span class="nx">pattern</span><span class="p">);</span><span class="w">  </span><span class="c1">// ["impact", "tests", "docs"]</span>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1">// Launch all tools in parallel</span>
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nb">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span>
@@ -4091,11 +4091,11 @@ auto-extracted <a href="../reference/discovery/"><code>reference/</code></a> pag
 <div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>if (userSpecifiedMode) {
 </span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>  use userSpecifiedMode
 </span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>} else if (pattern === CRAN_RELEASE) {
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>  use &#39;release&#39; mode
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>  use 'release' mode
 </span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>} else if (pattern === BUG_FIX &amp;&amp; contextHasFailures) {
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>  use &#39;debug&#39; mode
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>  use 'debug' mode
 </span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>} else {
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>  use &#39;default&#39; mode
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>  use 'default' mode
 </span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>}
 </span></code></pre></div></p>
 <h2 id="result-synthesis">Result Synthesis<a class="headerlink" href="#result-synthesis" title="Permanent link">&para;</a></h2>
@@ -4104,10 +4104,10 @@ auto-extracted <a href="../reference/discovery/"><code>reference/</code></a> pag
 <ol>
 <li><strong>Collect Results</strong></li>
 </ol>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Tool 1 (impact): &quot;3 packages affected&quot;
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>Tool 2 (tests):  &quot;42/45 passing (3 failures)&quot;
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>Tool 3 (docs):   &quot;95% documented&quot;
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>Tool 4 (health): &quot;Score: 85/100&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Tool 1 (impact): "3 packages affected"
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>Tool 2 (tests):  "42/45 passing (3 failures)"
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>Tool 3 (docs):   "95% documented"
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>Tool 4 (health): "Score: 85/100"
 </span></code></pre></div>
 <ol>
 <li><strong>Extract Key Findings</strong></li>
@@ -4135,10 +4135,10 @@ auto-extracted <a href="../reference/discovery/"><code>reference/</code></a> pag
 <h3 id="example-synthesis">Example Synthesis<a class="headerlink" href="#example-synthesis" title="Permanent link">&para;</a></h3>
 <p><strong>Input (4 tool results):</strong>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="p">{</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nt">&quot;impact&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;affected_packages&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;breaking_changes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nt">&quot;tests&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;passing&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;failing&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;coverage&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">78</span><span class="p">},</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nt">&quot;docs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;documented&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">38</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;percentage&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">95</span><span class="p">},</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">  </span><span class="nt">&quot;health&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;score&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;warnings&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;errors&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">}</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nt">"impact"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"affected_packages"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nt">"breaking_changes"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nt">"tests"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"passing"</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="nt">"failing"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nt">"coverage"</span><span class="p">:</span><span class="w"> </span><span class="mi">78</span><span class="p">},</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nt">"docs"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"documented"</span><span class="p">:</span><span class="w"> </span><span class="mi">38</span><span class="p">,</span><span class="w"> </span><span class="nt">"total"</span><span class="p">:</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w"> </span><span class="nt">"percentage"</span><span class="p">:</span><span class="w"> </span><span class="mi">95</span><span class="p">},</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">  </span><span class="nt">"health"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"score"</span><span class="p">:</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w"> </span><span class="nt">"warnings"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nt">"errors"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">}</span>
 </span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="p">}</span>
 </span></code></pre></div></p>
 <p><strong>Output (Terminal):</strong>
@@ -4236,16 +4236,16 @@ CHANGELOG.</p>
 <p>RForge auto-detects three project types:</p>
 <h3 id="detection-algorithm">Detection Algorithm<a class="headerlink" href="#detection-algorithm" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">detect_project_type</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="n">has_description</span> <span class="o">=</span> <span class="n">find_files</span><span class="p">(</span><span class="s2">&quot;DESCRIPTION&quot;</span><span class="p">)</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="n">has_description</span> <span class="o">=</span> <span class="n">find_files</span><span class="p">(</span><span class="s2">"DESCRIPTION"</span><span class="p">)</span>
 </span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
 </span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">has_description</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>        <span class="k">return</span> <span class="s2">&quot;NOT_R_PROJECT&quot;</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>        <span class="k">return</span> <span class="s2">"NOT_R_PROJECT"</span>
 </span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">has_description</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>        <span class="k">return</span> <span class="s2">&quot;SINGLE_PACKAGE&quot;</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>        <span class="k">return</span> <span class="s2">"SINGLE_PACKAGE"</span>
 </span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>    <span class="k">elif</span> <span class="n">all_in_subdirs</span><span class="p">(</span><span class="n">has_description</span><span class="p">):</span>
-</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>        <span class="k">return</span> <span class="s2">&quot;ECOSYSTEM&quot;</span>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>        <span class="k">return</span> <span class="s2">"ECOSYSTEM"</span>
 </span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>        <span class="k">return</span> <span class="s2">&quot;HYBRID&quot;</span>
+</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>        <span class="k">return</span> <span class="s2">"HYBRID"</span>
 </span></code></pre></div>
 <h3 id="ecosystem-detection-benefits">Ecosystem Detection Benefits<a class="headerlink" href="#ecosystem-detection-benefits" title="Permanent link">&para;</a></h3>
 <p>Once RForge knows project type, it can:
@@ -4272,7 +4272,7 @@ CHANGELOG.</p>
 </span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>Tool 4: ✅ Success
 </span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>
 </span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>→ RForge continues with 3 results
-</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>→ Notes &quot;Tool 2 unavailable&quot; in output
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>→ Notes "Tool 2 unavailable" in output
 </span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>→ Still provides actionable summary
 </span></code></pre></div></p>
 <h3 id="graceful-degradation">Graceful Degradation<a class="headerlink" href="#graceful-degradation" title="Permanent link">&para;</a></h3>
@@ -4288,7 +4288,7 @@ CHANGELOG.</p>
 </span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>  }
 </span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>} else if (important_tool_fails) {
 </span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>  continue_without_it
-</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>  note_in_output(&quot;Some data unavailable&quot;)
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>  note_in_output("Some data unavailable")
 </span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>} else {
 </span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>  // optional tool - just skip
 </span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a>}
@@ -4309,12 +4309,12 @@ CHANGELOG.</p>
 <p>Only calls necessary tools:</p>
 <div class="language-javascript highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1">// Skip coverage if no tests changed</span>
 </span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">testsChanged</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span><span class="nx">skip</span><span class="p">(</span><span class="s1">&#39;coverage&#39;</span><span class="p">);</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span><span class="nx">skip</span><span class="p">(</span><span class="s1">'coverage'</span><span class="p">);</span>
 </span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="p">}</span>
 </span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>
 </span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="c1">// Skip docs check if no exported functions changed</span>
 </span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">exportsChanged</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="w">  </span><span class="nx">skip</span><span class="p">(</span><span class="s1">&#39;docs&#39;</span><span class="p">);</span>
+</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="w">  </span><span class="nx">skip</span><span class="p">(</span><span class="s1">'docs'</span><span class="p">);</span>
 </span><span id="__span-24-9"><a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="3-incremental-analysis">3. Incremental Analysis<a class="headerlink" href="#3-incremental-analysis" title="Permanent link">&para;</a></h3>
@@ -4345,8 +4345,8 @@ CHANGELOG.</p>
 </span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">      </span><span class="nx">metadata</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">        </span><span class="nx">timestamp</span><span class="o">:</span><span class="w"> </span><span class="nx">ISO8601</span><span class="p">,</span>
-</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">        </span><span class="nx">version</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
-</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="w">        </span><span class="nx">mode</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;default&quot;</span>
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">        </span><span class="nx">version</span><span class="o">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span>
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="w">        </span><span class="nx">mode</span><span class="o">:</span><span class="w"> </span><span class="s2">"default"</span>
 </span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="w">      </span><span class="p">},</span>
 </span><span id="__span-27-9"><a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="w">      </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="nx">structuredData</span>
 </span><span id="__span-27-10"><a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="w">    </span><span class="p">};</span>
@@ -4358,7 +4358,7 @@ CHANGELOG.</p>
 </span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">  </span><span class="nx">format</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">      </span><span class="nx">headings</span><span class="o">:</span><span class="w"> </span><span class="nx">H1</span><span class="o">/</span><span class="nx">H2</span><span class="o">/</span><span class="nx">H3</span><span class="p">,</span>
-</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">      </span><span class="nx">codeBlocks</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;```&quot;</span><span class="p">,</span>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">      </span><span class="nx">codeBlocks</span><span class="o">:</span><span class="w"> </span><span class="s2">"```"</span><span class="p">,</span>
 </span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="w">      </span><span class="nx">tables</span><span class="o">:</span><span class="w"> </span><span class="nx">markdown</span><span class="p">,</span>
 </span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="w">      </span><span class="nx">links</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span>
 </span><span id="__span-28-8"><a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="w">    </span><span class="p">};</span>
