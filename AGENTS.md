@@ -52,6 +52,13 @@
 
 Multi-branch (craft-style): `main` (PR only) ← `dev` (integration) ← `feature/*` (worktrees for larger work). See global CLAUDE.md for the full pattern — rforge follows it exactly.
 
+**GitHub-side (differs from the global note that `dev` is unprotected):** since 2026-09-23 the
+repo has "Automatically delete head branches" on, and `dev` carries a deletion-only ruleset
+(`protect-dev-from-deletion`, id 23890292 — blocks deletion only, no push/PR/review rules).
+The ruleset is load-bearing, not redundant: release PRs use `dev` as their head, and GitHub
+auto-deletes an unprotected head branch on merge, so removing it would delete `dev` at the next
+`dev→main` release. Merged `feature/*` branches are deleted by GitHub; clean up local ones only.
+
 ## Version sync (4 sources, no bump-version.sh)
 
 Version bumps are manual edits across **4 files**:
