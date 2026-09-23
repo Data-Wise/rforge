@@ -136,8 +136,10 @@ Read the top section of `NEWS.md`. Read-only; never generates content.
 
 Returns `{"found": bool, "has_unreleased": bool, "top_header": str|None,
 "entries": list[str]}`. `entries` are the bullet lines directly under
-the top header (bare `-`/`*` list items), capped at the first blank
-line or next header — the same "top section only" scope `savant:restore`
+the top header (bare `-`/`*` list items), including those under its
+subsection headers (`## New features`, `## Bug fixes`). The section ends
+at the next header of the same or higher level, or at a deeper header
+that names a release — the same "top section only" scope `savant:restore`
 already applies to its own doc-quartet currency checks.
 
 ### `parse_rstatus()`
