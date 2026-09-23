@@ -38,6 +38,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `scripts/version_sync.py` stamps and gates its command-count heading (#77),
   and a new `test-all.sh` check requires its body to match `CLAUDE.md` (#80;
   45 checks).
+- `lib.rstatus` docstring (and the generated `docs/reference/rstatus.md`) no
+  longer claims `lib.status` cannot read `key: value` files, which #75 made
+  false; it now says why `rstatus` keeps its own parser (#81).
 
 ## [2.20.0] - 2026-08-01
 
