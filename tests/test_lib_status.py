@@ -166,6 +166,22 @@ def test_frontmatter_progress_beats_percentages_in_prose():
     assert s.progress == 92
 
 
+def test_frontmatter_phase_ignores_phase_lines_in_prose():
+    # the emoji path takes the first `Phase X:` anywhere in the file; in the
+    # frontmatter dialect that is always a historical note deep in the prose
+    # (rforge's own .STATUS: "Phase 4 orchestrator rewrite (...): stale ...")
+    s = parse_status_file(
+        "status: active\nprogress: 100\n\n# pkg\n\n"
+        "Earlier: Phase 4 orchestrator rewrite (last item): stale agents.\n"
+    )
+    assert s.phase is None
+
+
+def test_frontmatter_phase_key_is_used():
+    s = parse_status_file("status: active\nphase: beta\n\n# pkg\n\nPhase 1 (old): done.\n")
+    assert s.phase == "beta"
+
+
 def test_hybrid_file_falls_back_to_emoji_sections():
     # frontmatter supplies progress; the ⏰ line still supplies the date
     s = parse_status_file(

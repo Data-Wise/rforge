@@ -24,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `N%` in the prose, so every package reported a wrong number (mediationverse
   showed 100% while BLOCKED at 92%). Hybrid files parse from both halves; the
   prose-percentage fallback runs only when there is no `progress:` key (#75).
+- `lib.status` no longer takes `phase` from the prose of a `key: value`
+  `.STATUS`. It used the first `Phase X:` anywhere in the file, which in that
+  dialect is always an old history note (rforge's own `.STATUS` reported
+  "4 orchestrator rewrite (last craft-parity item)"; medfit, medsim and
+  missingmed were affected too). Frontmatter files now take `phase` only from a
+  `phase:` key; the emoji dialect keeps the prose scan.
 - `lib.rstatus.parse_news_header` (used by `/rforge:restore`) reported 0 NEWS
   entries for R-convention NEWS files that group bullets under `##`
   subsections (`# pkg 0.4.0` → `## New features`): the top section ended at

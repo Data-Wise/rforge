@@ -195,11 +195,14 @@ def _parse_frontmatter(content: str) -> dict[str, str]:
     return fields
 
 
-def _apply_frontmatter(summary: StatusFileSummary, content: str) -> None:
-    """Fill `summary` from frontmatter fields. No-op for the emoji dialect."""
+def _apply_frontmatter(summary: StatusFileSummary, content: str) -> bool:
+    """Fill `summary` from frontmatter fields. No-op for the emoji dialect.
+
+    Returns True when the file is in the frontmatter dialect.
+    """
     fields = _parse_frontmatter(content)
     if not fields:
-        return
+        return False
 
     if (raw := fields.get("progress")) and (m := _FM_INT_RE.search(raw)):
         summary.progress = int(m.group())
@@ -221,6 +224,9 @@ def _apply_frontmatter(summary: StatusFileSummary, content: str) -> None:
     if raw := fields.get("done"):
         summary.just_completed = [raw]
 
+    if raw := fields.get("phase"):
+        summary.phase = raw
+
     # An explicit `## Focus:` line if the file has one, else the `status:`
     # value. The markdown title is deliberately NOT used: in practice it is as
     # often a decorative rule or an archival note ("Below is the original
@@ -230,6 +236,7 @@ def _apply_frontmatter(summary: StatusFileSummary, content: str) -> None:
         summary.current_focus = m.group(1).strip()
     elif raw := fields.get("status"):
         summary.current_focus = raw
+    return True
 
 
 def parse_status_file(content: str) -> StatusFileSummary:
@@ -243,7 +250,7 @@ def parse_status_file(content: str) -> StatusFileSummary:
     Missing fields stay None.
     """
     summary = StatusFileSummary()
-    _apply_frontmatter(summary, content)
+    in_frontmatter = _apply_frontmatter(summary, content)
 
     if summary.current_focus is None and (m := _FOCUS_RE.search(content)):
         summary.current_focus = m.group(1).strip()
@@ -256,7 +263,11 @@ def parse_status_file(content: str) -> StatusFileSummary:
         if percentages:
             summary.progress = max(percentages)
 
-    if m := _PHASE_RE.search(content):
+    # Frontmatter files take `phase:` only from the block. Their prose is a
+    # running history, so the first `Phase X:` in it is an old note (rforge's
+    # own .STATUS hit "Phase 4 orchestrator rewrite ..." from June), never the
+    # current phase. The emoji dialect keeps the prose scan.
+    if not in_frontmatter and (m := _PHASE_RE.search(content)):
         summary.phase = m.group(1).strip()
 
     if not summary.just_completed and (m := _COMPLETED_RE.search(content)):
