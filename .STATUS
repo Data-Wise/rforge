@@ -1,7 +1,7 @@
 project: rforge
 updated: 2026-09-23
 status: Active
-version: 2.20.0 (released, on main); dev b883c00 carries 2 unreleased PRs (#75, #76)
+version: 2.20.0 (released, on main); dev 4579fae carries unreleased #75–#79 + AGENTS.md (46da634)
 last_release: 2026-08-01 v2.20.0 (PR #71 feature/restore-finish→dev merge 8ae55cda — new
   /rforge:restore + /rforge:finish R-package session-boundary commands: recap a package's state
   (DESCRIPTION/NEWS.md/git/.STATUS) and sync .STATUS from what actually happened, dry-run by
@@ -76,6 +76,36 @@ last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --unive
 #        feature/r-submit-runiverse merged (PR #24) + worktree removed 2026-06-11
 
 recent:
+  - date: 2026-09-23
+    branch: feature/test-all-dep-hints → dev (PR #79, squash 4579fae; medfit session)
+    title: "test(test-all): warn on missing dev deps; stop nav check passing vacuously"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      Test-harness only, no CHANGELOG entry. Preflight banner names missing dev deps (pytest,
+      pyyaml, mkdocs-material) + the pip command. mkdocs_nav_files_exist used to pass when the
+      yaml read failed or nav was empty ("no missing files") — now fails with a hint.
+      _check_commands_doc.py gains `from __future__ import annotations` so it runs on macOS
+      system python3.9. The long-standing "3 pre-existing local test-all failures" were missing
+      local deps, not code; CI gets 44/44.
+  - date: 2026-09-23
+    branch: feature/news-subheader-count → dev (PR #78, squash 4ef44e3; medfit session)
+    title: "fix(rstatus): count NEWS entries under subsection headers"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      parse_news_header ended the top NEWS.md section at the first header of any level, so
+      R-convention files (`# pkg 0.4.0` then `## New features`, e.g. medfit 0.4.0) reported 0
+      entries in /rforge:restore. Now ends at the next header of same-or-higher level, or at a
+      deeper header naming a release (so a `# Changelog` wrapper doesn't merge the whole
+      history). +tests, docs/reference/rstatus.md, CHANGELOG [Unreleased] Fixed entry.
+  - date: 2026-09-23
+    branch: feature/agents-md-sync → dev (PR #77, squash 1c3a4ac)
+    title: "feat(version-sync): stamp and gate the AGENTS.md command-count heading"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      AGENTS.md (46da634, committed straight to dev) is a CLAUDE.md mirror for AGENTS.md-reading
+      agents; version_sync.py now stamps + --check-gates its "## Command-file conventions (all NN
+      commands)" heading. Only the count is gated — full-body mirroring is not checked. TDD (2
+      red→green), pytest 600 passed / 2 skipped, planted-drift E2E exit 1, CI 5/5.
   - date: 2026-08-29
     branch: feature/d2-mediationverse-doctrine → dev (PR #76, squash b883c00)
     title: "docs(guides): fold MediationVerse CRAN/S7/testing doctrine from savant D2"
