@@ -1,8 +1,22 @@
 project: rforge
 updated: 2026-09-23
 status: Active
-version: 2.20.0 (released, on main); dev 9f81760 carries unreleased #75–#82 + AGENTS.md (46da634)
-last_release: 2026-08-01 v2.20.0 (PR #71 feature/restore-finish→dev merge 8ae55cda — new
+version: 2.20.1 (released, on main 9d0b01a; dev fast-forwarded to main)
+last_release: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
+  9d0b01a; tag v2.20.1; release https://github.com/Data-Wise/rforge/releases/tag/v2.20.1. Ships
+  #75 (lib.status frontmatter dialect), #82 (phase from a phase: key only), #78 (NEWS ## subsection
+  count), #76 (MediationVerse doctrine in Command Guides), #77/#80 (AGENTS.md mirror + gates), #79
+  (test-all dev-dep warning), #81 (rstatus docstring) + contributing.md dev-deps fix. Bump ba7a5c0;
+  pre-flight test-all 45/45, pytest 604 passed / 2 skipped, version_sync/gen_lib_reference --check,
+  claude plugin validate, mkdocs --strict. CI green on main RForge CI + Deploy Documentation; live
+  docs verified 2.20.1 + doctrine + contributing. Tap Data-Wise/homebrew-tap#228 squash cfb8df1 —
+  formula+manifest → v2.20.1, sha256 99877e03…, ruby -c OK, generate.py --diff IDENTICAL.
+  Aggregator: Data-Wise/claude-plugins#66 auto-merged (marketplace rforge 2.20.1). brew upgrade
+  2.20.0→2.20.1 run by user; its post_install `claude plugin marketplace update local-plugins`
+  failed (no local-plugins marketplace here) and ~/.claude/plugins/rforge is absent — Claude Code
+  loads rforge@data-wise, updated 2.20.0→2.20.1 via `claude plugin update rforge@data-wise` (user, 2026-09-23). Tap formula's
+  local-plugins path is stale — follow-up in homebrew-tap.)
+last_release_prior_v2_20_0: 2026-08-01 v2.20.0 (PR #71 feature/restore-finish→dev merge 8ae55cda — new
   /rforge:restore + /rforge:finish R-package session-boundary commands: recap a package's state
   (DESCRIPTION/NEWS.md/git/.STATUS) and sync .STATUS from what actually happened, dry-run by
   default with a redundant-edit guard and a version-drift check against DESCRIPTION. New
@@ -79,7 +93,7 @@ recent:
   - date: 2026-09-23
     branch: dev (direct, docs-only; commits 2990a7e, 9f81760)
     title: "docs: stale-content sweep before v2.20.1"
-    state: ON dev, UNRELEASED
+    state: RELEASED v2.20.1
     summary: |
       docs/contributing.md told contributors to `pip install -r docs/requirements.txt`, which does
       not exist; now lists the real dev deps (test gates: pytest pyyaml mkdocs-material; docs build,
@@ -92,7 +106,7 @@ recent:
   - date: 2026-09-23
     branch: feature/status-phase-frontmatter → dev (PR #82, squash 9346070)
     title: "fix(status): take phase only from a phase: key in frontmatter .STATUS files"
-    state: MERGED to dev, UNRELEASED
+    state: RELEASED v2.20.1
     summary: |
       lib.status took `phase` from the first "Phase X:" line anywhere in the file, so frontmatter
       .STATUS files (where such lines are history in the prose) reported a stale phase. Now
@@ -103,7 +117,7 @@ recent:
   - date: 2026-09-23
     branch: feature/rstatus-docstring → dev (PR #81, squash 92db120)
     title: "docs(rstatus): correct stale claim that lib.status cannot read key: value files"
-    state: MERGED to dev, UNRELEASED
+    state: RELEASED v2.20.1
     summary: |
       lib/rstatus.py docstring (+ docs/reference/rstatus.md) said lib.status could not read the
       key: value dialect — stale since #75. Now: lib.status reads both formats but fills only the
@@ -112,7 +126,7 @@ recent:
   - date: 2026-09-23
     branch: feature/agents-md-mirror-check → dev (PR #80, squash 9a91b7c)
     title: "test(test-all): gate AGENTS.md body against CLAUDE.md"
-    state: MERGED to dev, UNRELEASED
+    state: RELEASED v2.20.1
     summary: |
       New test-all check "Docs: AGENTS.md body mirrors CLAUDE.md": everything from the first
       "## " heading on must match byte-for-byte (only the leading blockquote header may differ);
@@ -125,7 +139,7 @@ recent:
   - date: 2026-09-23
     branch: feature/test-all-dep-hints → dev (PR #79, squash 4579fae; medfit session)
     title: "test(test-all): warn on missing dev deps; stop nav check passing vacuously"
-    state: MERGED to dev, UNRELEASED
+    state: RELEASED v2.20.1
     summary: |
       Test-harness only, no CHANGELOG entry. Preflight banner names missing dev deps (pytest,
       pyyaml, mkdocs-material) + the pip command. mkdocs_nav_files_exist used to pass when the
@@ -136,7 +150,7 @@ recent:
   - date: 2026-09-23
     branch: feature/news-subheader-count → dev (PR #78, squash 4ef44e3; medfit session)
     title: "fix(rstatus): count NEWS entries under subsection headers"
-    state: MERGED to dev, UNRELEASED
+    state: RELEASED v2.20.1
     summary: |
       parse_news_header ended the top NEWS.md section at the first header of any level, so
       R-convention files (`# pkg 0.4.0` then `## New features`, e.g. medfit 0.4.0) reported 0
@@ -146,7 +160,7 @@ recent:
   - date: 2026-09-23
     branch: feature/agents-md-sync → dev (PR #77, squash 1c3a4ac)
     title: "feat(version-sync): stamp and gate the AGENTS.md command-count heading"
-    state: MERGED to dev, UNRELEASED
+    state: RELEASED v2.20.1
     summary: |
       AGENTS.md (46da634, committed straight to dev) is a CLAUDE.md mirror for AGENTS.md-reading
       agents; version_sync.py now stamps + --check-gates its "## Command-file conventions (all NN
@@ -155,7 +169,7 @@ recent:
   - date: 2026-08-29
     branch: feature/d2-mediationverse-doctrine → dev (PR #76, squash b883c00)
     title: "docs(guides): fold MediationVerse CRAN/S7/testing doctrine from savant D2"
-    state: MERGED to dev, UNRELEASED
+    state: RELEASED v2.20.1
     summary: |
       savant's D2 skill-disposition phase retired r-package-cran-compliance, s7-oop-for-mediation
       and statistical-software-qa test-infrastructure (research-only scope) and staged the content
@@ -165,7 +179,7 @@ recent:
   - date: 2026-08-22
     branch: feature/status-frontmatter → dev (PR #75, squash ac16b0a)
     title: "fix(status): parse the frontmatter .STATUS dialect used by every R package"
-    state: MERGED to dev, UNRELEASED
+    state: RELEASED v2.20.1
     summary: |
       lib/status.py only parsed the emoji-header template; all 7 mediationverse packages use a
       key: value frontmatter block, and the progress extractor's max() over every N% in the file
@@ -560,6 +574,7 @@ backlog:
     notes: "lib/status.py shipped as a thin faithful port in v1.3.0. The 4-mode contract (default/debug/optimize/release with R subprocess) was descoped pending real-user input on what depth is wanted. Open a new SPEC when there's demand."
 
 shipped:
+  - "v2.20.1 — 2026-09-23 — patch: lib.status frontmatter dialect + phase:-key-only (#75/#82), NEWS ## subsection count (#78), MediationVerse doctrine (#76), AGENTS.md mirror + gates (#77/#80), test-all dev-dep warning (#79); 44 commands; PR #83; tap #228"
   - "v2.20.0 — 2026-08-01 — /rforge:restore + /rforge:finish R-package session-boundary commands (lib/rstatus.py reader/differ + apply_updates() data-loss-trap fix from 4-agent adversarial review); 42→44 commands; PR #71/#72; tap #197; docs drift closed (lib-modules.md sitelint/tidyaudit/rstatus rows, REFCARD SESSION section, docs/index.md What's New); pytest 592, test-all 42/44 (2 pre-existing local-env-only)"
   - "v2.11.0 — 2026-06-13 — bundle: diff-aware [introduced]/[pre-existing] tagging (merge-base detached-worktree baseline, --base/--fail-on, line-shift-immune) + r:s7-review --eco (ecosystem sweep) / --runtime (new lib.rcmd s7runtime engine: dead_generic + validator_not_enforcing) + r:use-data/r:use-citation; 39→41 commands; PR #35/#36; tap #122; 4-dim adversarial review caught 3 BLOCKER+3 IMPORTANT (recurrence of v2.10.0 doc-overclaim + spec-claims-unbuilt classes); pytest 347, test-all 41/41"
   - "v2.10.0 — 2026-06-13 — bundle: #26 r:s7-review (lib/s7review.py, 5 static families) + scaffolding r:use-test/use-package/use-vignette (lib/scaffold.py+usethis_infra.py) + diff-aware --changed (scope-only, lib/changed.py); 35→39 commands; PR #32/#34; tap #121; adversarial review caught diff-aware false-negative + deps_sync constraint-drop + s7review FPs; pytest 298, test-all 41/41"
