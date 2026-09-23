@@ -7,12 +7,13 @@ already parse:
 
 - `lib.discovery.read_description` — DESCRIPTION (Package/Version/deps)
 - this module's own `.STATUS` parser — the `key: value` grammar rforge's
-  own `.STATUS`, craft's, and savant's all use. **Not** the same grammar as
-  `lib.status.parse_status_file`, which targets an unrelated emoji-box
-  format (`📋 NEXT ACTIONS`, `⏰ LAST UPDATED`, `Phase X%`) — verified live
-  against rforge's own `.STATUS` during implementation: that parser returns
-  empty/`None` for every field on a `key: value` file. This module's parser
-  is deliberately separate, not a fork of a working parser.
+  own `.STATUS`, craft's, and savant's all use. `lib.status.parse_status_file`
+  also reads that dialect (since #75, alongside its emoji-section format), but
+  only to fill five dashboard fields (progress, updated, next, done, focus).
+  This module keeps every field, so `apply_updates` can carry untouched ones
+  forward and `diff_rstatus` can compare them field by field — what
+  `/rforge:finish` needs before it writes — so it stays a separate parser
+  rather than a wrapper around `lib.status`.
 
 Pure stdlib, read-only, no R subprocess — same tier as `discovery`/`deps`.
 
@@ -54,8 +55,8 @@ __all__ = [
 # ───────────────────────── .STATUS (key: value grammar) ─────────────────────
 
 # rforge/craft/savant's shared `.STATUS` convention: top-of-file
-# `field: value` lines (colon-separated, one per line), distinct from
-# lib.status's emoji-box grammar (see module docstring).
+# `field: value` lines (colon-separated, one per line). lib.status reads the
+# same lines for its dashboard; this parser keeps every field (see module docstring).
 _FIELD_RE = re.compile(r"^([a-zA-Z_][a-zA-Z0-9_]*):\s?(.*)$")
 
 # Fields this module recognizes for the R-package `.STATUS` shape
