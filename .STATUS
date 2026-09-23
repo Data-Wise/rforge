@@ -1,7 +1,7 @@
 project: rforge
 updated: 2026-09-23
 status: Active
-version: 2.20.0 (released, on main); dev 9a91b7c carries unreleased #75–#80 + AGENTS.md (46da634)
+version: 2.20.0 (released, on main); dev 9346070 carries unreleased #75–#82 + AGENTS.md (46da634)
 last_release: 2026-08-01 v2.20.0 (PR #71 feature/restore-finish→dev merge 8ae55cda — new
   /rforge:restore + /rforge:finish R-package session-boundary commands: recap a package's state
   (DESCRIPTION/NEWS.md/git/.STATUS) and sync .STATUS from what actually happened, dry-run by
@@ -76,6 +76,26 @@ last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --unive
 #        feature/r-submit-runiverse merged (PR #24) + worktree removed 2026-06-11
 
 recent:
+  - date: 2026-09-23
+    branch: feature/status-phase-frontmatter → dev (PR #82, squash 9346070)
+    title: "fix(status): take phase only from a phase: key in frontmatter .STATUS files"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      lib.status took `phase` from the first "Phase X:" line anywhere in the file, so frontmatter
+      .STATUS files (where such lines are history in the prose) reported a stale phase. Now
+      frontmatter files read phase only from a `phase:` key; emoji-section files keep the regex.
+      _apply_frontmatter returns whether frontmatter was found. +2 tests; review fix 18dcb05 names
+      phase as the one field with no prose fallback in the docstring + regenerated
+      docs/reference/status.md. test-all 45/45, pytest 604 passed / 2 skipped; CI 5/5.
+  - date: 2026-09-23
+    branch: feature/rstatus-docstring → dev (PR #81, squash 92db120)
+    title: "docs(rstatus): correct stale claim that lib.status cannot read key: value files"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      lib/rstatus.py docstring (+ docs/reference/rstatus.md) said lib.status could not read the
+      key: value dialect — stale since #75. Now: lib.status reads both formats but fills only the
+      5 dashboard fields; rstatus keeps every field for apply_updates/diff_rstatus, and
+      /rforge:finish does the write. CHANGELOG [Unreleased] entry c76c78f.
   - date: 2026-09-23
     branch: feature/agents-md-mirror-check → dev (PR #80, squash 9a91b7c)
     title: "test(test-all): gate AGENTS.md body against CLAUDE.md"
