@@ -26,7 +26,7 @@ trap 'rm -f "$LOG"' EXIT
 # these (ci.yml), so a gap here is a local-environment problem, not a bug.
 DEV_DEPS_HINT="pip install pytest pyyaml mkdocs-material"
 dev_deps_missing=$(python3 - <<'PY' 2>/dev/null
-import importlib.util, sys
+import importlib.util
 missing = [m for m, mod in (("pytest", "pytest"), ("pyyaml", "yaml"),
                             ("mkdocs-material", "material"))
            if importlib.util.find_spec(mod) is None]
@@ -158,9 +158,14 @@ print('\n'.join(walk(cfg.get('nav', []))))
 ") || {
         # Without this, a failed parse yields an empty list and the check
         # passes vacuously ("no missing files").
-        echo "could not read nav from mkdocs.yml — run: $DEV_DEPS_HINT" >&2
+        echo "could not read nav from mkdocs.yml (if ModuleNotFoundError, run: $DEV_DEPS_HINT)" >&2
         return 1
     }
+    if [ -z "$files" ]; then
+        # An empty nav would also make the loop below pass vacuously.
+        echo "mkdocs.yml nav lists no .md files — refusing to pass vacuously" >&2
+        return 1
+    fi
     while IFS= read -r f; do
         [ -z "$f" ] && continue
         if [ ! -f "docs/$f" ]; then
