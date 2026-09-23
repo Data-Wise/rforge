@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- `lib.rstatus.parse_news_header` (used by `/rforge:restore`) reported 0 NEWS
+  entries for R-convention NEWS files that group bullets under `##`
+  subsections (`# pkg 0.4.0` → `## New features`): the top section ended at
+  the first header of any level. It now ends at the next header of the same
+  or higher level, or at a deeper header naming a release (`## [0.3.0]`), so
+  a `# Changelog` wrapper still scopes to nothing rather than the whole
+  history.
+
 ## [2.20.0] - 2026-08-01
 
 > `/rforge:restore` + `/rforge:finish` (R-package session-boundary commands, PR #71).
