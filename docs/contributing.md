@@ -85,7 +85,7 @@ required for development.
 # All Python unit tests
 python3 -m pytest tests/ -v
 
-# Full suite (43 checks)
+# Full suite (45 checks)
 bash tests/test-all.sh
 
 # CLI dogfood tests (new configs that may not ship)
