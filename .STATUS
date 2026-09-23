@@ -1,7 +1,7 @@
 project: rforge
 updated: 2026-09-23
 status: Active
-version: 2.20.0 (released, on main); dev 9346070 carries unreleased #75–#82 + AGENTS.md (46da634)
+version: 2.20.0 (released, on main); dev 9f81760 carries unreleased #75–#82 + AGENTS.md (46da634)
 last_release: 2026-08-01 v2.20.0 (PR #71 feature/restore-finish→dev merge 8ae55cda — new
   /rforge:restore + /rforge:finish R-package session-boundary commands: recap a package's state
   (DESCRIPTION/NEWS.md/git/.STATUS) and sync .STATUS from what actually happened, dry-run by
@@ -76,6 +76,19 @@ last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --unive
 #        feature/r-submit-runiverse merged (PR #24) + worktree removed 2026-06-11
 
 recent:
+  - date: 2026-09-23
+    branch: dev (direct, docs-only; commits 2990a7e, 9f81760)
+    title: "docs: stale-content sweep before v2.20.1"
+    state: ON dev, UNRELEASED
+    summary: |
+      docs/contributing.md told contributors to `pip install -r docs/requirements.txt`, which does
+      not exist; now lists the real dev deps (test gates: pytest pyyaml mkdocs-material; docs build,
+      matching CI: mkdocs-material mkdocs-macros-plugin pillow cairosvg) (9f81760). CHANGELOG
+      [Unreleased] gained the missing (#78)/(#82) refs and CLAUDE.md/AGENTS.md "Unreleased on dev"
+      now lists #81/#82 (2990a7e). Live site still v2.20.0 (main 362399d); ~280 doc lines on dev
+      (#76 doctrine, status/rstatus reference, contributing) go live with the v2.20.1 dev→main merge —
+      deliberately not force-deployed from dev (would show unreleased content under 2.20.0).
+      mkdocs --strict clean.
   - date: 2026-09-23
     branch: feature/status-phase-frontmatter → dev (PR #82, squash 9346070)
     title: "fix(status): take phase only from a phase: key in frontmatter .STATUS files"
