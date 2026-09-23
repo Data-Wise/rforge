@@ -246,8 +246,10 @@ def parse_status_file(content: str) -> StatusFileSummary:
     read from that block; everything else is read from emoji section anchors
     (🎯, 📊, ✅, 📋, ⏰). Order is not significant, and a field the active
     dialect does not supply falls back to the other one rather than staying
-    unset -- hybrid files (frontmatter plus emoji sections) parse fully.
-    Missing fields stay None.
+    unset -- hybrid files (frontmatter plus emoji sections) parse fully. The
+    one exception is `phase`: frontmatter files take it only from a `phase:`
+    key, never from a `Phase X:` line in the prose, which in that dialect is
+    history. Missing fields stay None.
     """
     summary = StatusFileSummary()
     in_frontmatter = _apply_frontmatter(summary, content)
