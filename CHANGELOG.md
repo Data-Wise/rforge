@@ -29,14 +29,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dialect is always an old history note (rforge's own `.STATUS` reported
   "4 orchestrator rewrite (last craft-parity item)"; medfit, medsim and
   missingmed were affected too). Frontmatter files now take `phase` only from a
-  `phase:` key; the emoji dialect keeps the prose scan.
+  `phase:` key; the emoji dialect keeps the prose scan (#82).
 - `lib.rstatus.parse_news_header` (used by `/rforge:restore`) reported 0 NEWS
   entries for R-convention NEWS files that group bullets under `##`
   subsections (`# pkg 0.4.0` → `## New features`): the top section ended at
   the first header of any level. It now ends at the next header of the same
   or higher level, or at a deeper header naming a release (`## [0.3.0]`), so
   a `# Changelog` wrapper still scopes to nothing rather than the whole
-  history.
+  history (#78).
 
 ### Internal
 
