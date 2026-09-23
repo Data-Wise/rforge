@@ -190,7 +190,10 @@ def diff_rstatus(current: Optional[RStatus], intended: RStatus) -> list[tuple[st
 
 # ───────────────────────── NEWS.md ─────────────────────────
 
-_NEWS_HEADER_RE = re.compile(r"^#+[ \t]*(.*?)[ \t]*$", re.MULTILINE)
+_NEWS_HEADER_RE = re.compile(r"^(#+)[ \t]*(.*?)[ \t]*$", re.MULTILINE)
+# A deeper header that names a release ("## medfit 0.3.0", "## [Unreleased]")
+# is a sibling version section, not a subsection of the top one.
+_VERSION_HEADER_RE = re.compile(r"\d+\.\d+|unreleased|development version", re.IGNORECASE)
 _UNRELEASED_RE = re.compile(r"unreleased", re.IGNORECASE)
 
 
@@ -199,8 +202,10 @@ def parse_news_header(pkg_path: str | Path = ".") -> dict:
 
     Returns `{"found": bool, "has_unreleased": bool, "top_header": str|None,
     "entries": list[str]}`. `entries` are the bullet lines directly under
-    the top header (bare `-`/`*` list items), capped at the first blank
-    line or next header — the same "top section only" scope `savant:restore`
+    the top header (bare `-`/`*` list items), including those under its
+    subsection headers (`## New features`, `## Bug fixes`). The section ends
+    at the next header of the same or higher level, or at a deeper header
+    that names a release — the same "top section only" scope `savant:restore`
     already applies to its own doc-quartet currency checks.
     """
     p = Path(pkg_path) / "NEWS.md"
@@ -216,8 +221,13 @@ def parse_news_header(pkg_path: str | Path = ".") -> dict:
         return {"found": True, "has_unreleased": False, "top_header": None, "entries": []}
 
     top = headers[0]
-    top_header = top.group(1).strip()
-    body_end = headers[1].start() if len(headers) > 1 else len(text)
+    top_level = len(top.group(1))
+    top_header = top.group(2).strip()
+    body_end = len(text)
+    for h in headers[1:]:
+        if len(h.group(1)) <= top_level or _VERSION_HEADER_RE.search(h.group(2)):
+            body_end = h.start()
+            break
     body = text[top.end():body_end]
 
     entries = []

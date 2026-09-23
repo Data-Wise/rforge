@@ -236,6 +236,40 @@ def test_parse_news_header_bare_hash_with_no_title(tmp_path):
     assert result["entries"] == ["an entry under a titleless header"]
 
 
+def test_parse_news_header_counts_entries_under_subsections(tmp_path):
+    """Regression: R-convention NEWS groups bullets under `##` subsections.
+    The top section previously ended at the first header of any level, so
+    `# medfit 0.4.0` followed by `## New features` reported 0 entries."""
+    (tmp_path / "NEWS.md").write_text(
+        "# medfit 0.4.0\n\n"
+        "## New features\n\n"
+        "* regmedint engine\n"
+        "* engine_args\n\n"
+        "## Bug fixes\n\n"
+        "* validator fix\n\n"
+        "# medfit 0.3.2\n\n"
+        "* Old entry (must not appear)\n"
+    )
+    result = rstatus.parse_news_header(str(tmp_path))
+    assert result["top_header"] == "medfit 0.4.0"
+    assert result["entries"] == ["regmedint engine", "engine_args", "validator fix"]
+
+
+def test_parse_news_header_deeper_version_header_ends_section(tmp_path):
+    """A `# Changelog` wrapper with `##` version headers must not merge the
+    whole history into the top section."""
+    (tmp_path / "NEWS.md").write_text(
+        "# Changelog\n\n"
+        "## [Unreleased]\n\n"
+        "- New thing\n\n"
+        "## [0.3.0]\n\n"
+        "- Old thing\n"
+    )
+    result = rstatus.parse_news_header(str(tmp_path))
+    assert result["top_header"] == "Changelog"
+    assert result["entries"] == []
+
+
 def test_parse_news_header_present_with_empty_body(tmp_path):
     (tmp_path / "NEWS.md").write_text("## Unreleased\n\n")
     result = rstatus.parse_news_header(str(tmp_path))
