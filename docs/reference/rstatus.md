@@ -14,10 +14,11 @@ already parse:
 - this module's own `.STATUS` parser — the `key: value` grammar rforge's
   own `.STATUS`, craft's, and savant's all use. `lib.status.parse_status_file`
   also reads that dialect (since #75, alongside its emoji-section format), but
-  only to fill a few dashboard fields (progress, updated, next, focus). This
-  module parses every field and can write them back unchanged
-  (`apply_updates`/`diff_rstatus`), which `/rforge:finish` needs — so it stays
-  a separate parser rather than a wrapper around `lib.status`.
+  only to fill five dashboard fields (progress, updated, next, done, focus).
+  This module keeps every field, so `apply_updates` can carry untouched ones
+  forward and `diff_rstatus` can compare them field by field — what
+  `/rforge:finish` needs before it writes — so it stays a separate parser
+  rather than a wrapper around `lib.status`.
 
 Pure stdlib, read-only, no R subprocess — same tier as `discovery`/`deps`.
 
