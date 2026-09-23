@@ -1,7 +1,7 @@
 project: rforge
 updated: 2026-09-23
 status: Active
-version: 2.20.0 (released, on main); dev 4579fae carries unreleased #75–#79 + AGENTS.md (46da634)
+version: 2.20.0 (released, on main); dev 9a91b7c carries unreleased #75–#80 + AGENTS.md (46da634)
 last_release: 2026-08-01 v2.20.0 (PR #71 feature/restore-finish→dev merge 8ae55cda — new
   /rforge:restore + /rforge:finish R-package session-boundary commands: recap a package's state
   (DESCRIPTION/NEWS.md/git/.STATUS) and sync .STATUS from what actually happened, dry-run by
@@ -76,6 +76,19 @@ last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --unive
 #        feature/r-submit-runiverse merged (PR #24) + worktree removed 2026-06-11
 
 recent:
+  - date: 2026-09-23
+    branch: feature/agents-md-mirror-check → dev (PR #80, squash 9a91b7c)
+    title: "test(test-all): gate AGENTS.md body against CLAUDE.md"
+    state: MERGED to dev, UNRELEASED
+    summary: |
+      New test-all check "Docs: AGENTS.md body mirrors CLAUDE.md": everything from the first
+      "## " heading on must match byte-for-byte (only the leading blockquote header may differ);
+      fails if AGENTS.md is missing. Closes the gap #77 left (it gated only the count heading).
+      test-all 44→45; stale "43 checks" in CLAUDE.md/AGENTS.md/docs/contributing.md → 45.
+      Planted-defect E2E: body drift ❌, missing file ❌, header-only change ✅. With dev deps
+      installed: test-all 45/45, pytest 602 passed / 2 skipped; CI 5/5. Also this session (repo
+      settings, not a PR): "Automatically delete head branches" on + deletion-only ruleset
+      protect-dev-from-deletion (id 23890292) on dev, documented in CLAUDE.md/AGENTS.md (b13e922).
   - date: 2026-09-23
     branch: feature/test-all-dep-hints → dev (PR #79, squash 4579fae; medfit session)
     title: "test(test-all): warn on missing dev deps; stop nav check passing vacuously"
