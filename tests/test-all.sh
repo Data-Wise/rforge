@@ -21,6 +21,24 @@ RESULTS=""
 LOG=$(mktemp -t rforge-test-XXXXXX)
 trap 'rm -f "$LOG"' EXIT
 
+# Dev-dependency preflight — warn once, up front, instead of letting the
+# checks below fail with bare tracebacks. Not a counted check: CI installs
+# these (ci.yml), so a gap here is a local-environment problem, not a bug.
+DEV_DEPS_HINT="pip install pytest pyyaml mkdocs-material"
+dev_deps_missing=$(python3 - <<'PY' 2>/dev/null
+import importlib.util
+missing = [m for m, mod in (("pytest", "pytest"), ("pyyaml", "yaml"),
+                            ("mkdocs-material", "material"))
+           if importlib.util.find_spec(mod) is None]
+print(" ".join(missing))
+PY
+) || dev_deps_missing="(python3 failed to run)"
+if [ -n "$dev_deps_missing" ]; then
+    echo "⚠️  $(command -v python3) is missing dev deps: $dev_deps_missing"
+    echo "    Several checks below will fail until you run: $DEV_DEPS_HINT"
+    echo
+fi
+
 run() {
     local name="$1"
     shift
@@ -114,7 +132,12 @@ changelog_has_current_version() {
 
 # Docs site checks.
 mkdocs_parses() {
-    python3 -c "import yaml; yaml.unsafe_load(open('mkdocs.yml'))"
+    # unsafe_load imports every `!!python/name:` target, so this also needs
+    # mkdocs-material (pymdownx/material.extensions), not just pyyaml.
+    python3 -c "import yaml; yaml.unsafe_load(open('mkdocs.yml'))" || {
+        echo "hint: if the error is ModuleNotFoundError, run: $DEV_DEPS_HINT" >&2
+        return 1
+    }
 }
 
 mkdocs_nav_files_exist() {
@@ -132,7 +155,17 @@ def walk(node):
     elif isinstance(node, str) and node.endswith('.md'):
         yield node
 print('\n'.join(walk(cfg.get('nav', []))))
-")
+") || {
+        # Without this, a failed parse yields an empty list and the check
+        # passes vacuously ("no missing files").
+        echo "could not read nav from mkdocs.yml (if ModuleNotFoundError, run: $DEV_DEPS_HINT)" >&2
+        return 1
+    }
+    if [ -z "$files" ]; then
+        # An empty nav would also make the loop below pass vacuously.
+        echo "mkdocs.yml nav lists no .md files — refusing to pass vacuously" >&2
+        return 1
+    fi
     while IFS= read -r f; do
         [ -z "$f" ] && continue
         if [ ! -f "docs/$f" ]; then
