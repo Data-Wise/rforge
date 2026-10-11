@@ -1,11 +1,11 @@
-# 📖 RForge Quick Start Guide
+# 📖 RForge Quick Start
 
 Get started with RForge in 5 minutes. This guide walks you through installation, basic usage, and your first analysis.
 
-!!! tip "New here? Start with the 3-minute Quick Start instead"
-    This is the **detailed** quick start. If you just want it working fast,
-    use **[Quick Start](QUICK-START.md)** (3 min). Come back here when you
-    want the fuller tour (modes, output formats, project-structure detection).
+!!! tip "TL;DR (30 seconds)"
+    - **What:** Install rforge, then run your first command in an R-package directory.
+    - **Fast path:** install (Step 1), then `/rforge:quick` (about 10 s), `/rforge:analyze` (about 30 s) or `/rforge:thorough` (2-5 min).
+    - **Next:** the [REFCARD](REFCARD.md) for all {{ rforge.command_count }} commands, or the [tutorials](tutorials/README.md).
 
 ## Prerequisites
 
@@ -387,6 +387,12 @@ The docs audit prints its scope on the first line and `checked N of M` at the en
 /rforge:restore                   # recap of this package (read-only)
 /rforge:finish                    # dry run: the proposed .STATUS update
 /rforge:finish --write            # apply it
+```
+
+## Uninstall
+
+```bash
+brew uninstall rforge
 ```
 
 ## Getting Help

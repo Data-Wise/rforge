@@ -31,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
+- `docs/QUICK-START.md` removed: `quickstart.md` is now the single Quick Start (TL;DR and Uninstall added, nav and
+  all links repointed). The old "How It Works" and "Pattern Recognition" sections were v1 text and were not carried over.
 - Command cards no longer list seven commands that do not exist (`advise`, `docs:workflow`, `site:check`,
   `site:deploy`, `deps-sync`, `deps:graph`, `r:universe`) and now list the seven that were missing (`capture`,
   `complete`, `health`, `r:deps-sync`, `r:install`, `r:site`, `r:tidy`); `r:tidy` added to the REFCARD.

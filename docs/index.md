@@ -10,7 +10,7 @@
     - **What:** R package *ecosystem* analysis from inside Claude Code. {{ rforge.command_count }} slash commands.
     - **Why:** Fast feedback on multi-package R repos — discovery, dependencies, change impact, CRAN cascade planning.
     - **How:** `brew install data-wise/tap/rforge`, then `/rforge:analyze "<what changed>"`.
-    - **Next:** [Quick Start](QUICK-START.md) (3 min) → [Where to start](#where-to-start) below.
+    - **Next:** [Quick Start](quickstart.md) → [Where to start](#where-to-start) below.
 
 Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. **No MCP server, no Node.js** at runtime. The fast ecosystem commands (analysis, deps, status) are pure Python; the `r:*` dev-cycle commands and `/rforge:thorough` shell out to R via `lib/rcmd.py`.
 
@@ -46,7 +46,7 @@ flowchart LR
     ---
     3-minute install + first command.
 
-    [:octicons-arrow-right-24: Quick Start](QUICK-START.md)
+    [:octicons-arrow-right-24: Quick Start](quickstart.md)
 
 -   :material-school: **New, have a package to try**
 
@@ -184,7 +184,7 @@ flowchart TD
     click K "REFCARD.md"
 ```
 
-→ Not sure yet? Start with [/rforge:quick](REFCARD.md) or the [Quick Start](QUICK-START.md).
+→ Not sure yet? Start with [/rforge:quick](REFCARD.md) or the [Quick Start](quickstart.md).
 
 ## Installation
 
