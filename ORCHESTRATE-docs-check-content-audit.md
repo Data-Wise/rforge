@@ -7,6 +7,7 @@
 > **Decision ledger:** `GRILL-docs-content-skills-2026-10-11.md` · **Brainstorm:** `BRAINSTORM-docs-content-skills-2026-10-11.md`
 > **Target version:** v2.21.0 (minor; command count stays 44)
 > **Scope:** A1 only — static checks + the `docs:check` rewrite. **A2** (`--site`, `--run-examples`) is a separate, later plan.
+> **Task order:** superseded by `tasks/plan.md` (vertical slices, replay harness first); `tasks/todo.md` is the live checklist. This file keeps the objective, acceptance criteria and friction prevention; its Phase Overview below is historical.
 
 ## Objective
 
