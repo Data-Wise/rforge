@@ -1,6 +1,6 @@
 # SPEC: `/rforge:docs:check` — content audit backed by `lib/docaudit.py` (release A)
 
-- **Status:** Draft v2.1 — revised after a 4-reviewer adversarial pass and a Codex adversarial review (logs at the end). Decisions D1–D5 were locked by the grill; **D0, D6, D7 and the `--site` auto-run decision were confirmed 2026-10-11** (see "Confirmed decisions") · A1 task breakdown: `tasks/plan.md` (vertical slices, harness first)
+- **Status:** A1 implemented (v2.21.0, unreleased; execution and review record in `TRIAGE-docaudit-signature-gate-2026-10-11.md`); A2 (`--site`, `--run-examples`) not started. Draft v2.1 — revised after a 4-reviewer adversarial pass and a Codex adversarial review (logs at the end). Decisions D1–D5 were locked by the grill; **D0, D6, D7 and the `--site` auto-run decision were confirmed 2026-10-11** (see "Confirmed decisions") · A1 task breakdown: `tasks/plan.md` (vertical slices, harness first)
 - **Date:** 2026-10-11
 - **Target version:** v2.21.0 (minor: new public module + behavior change to an existing command; **command count stays 44**)
 - **Author:** brainstormed with Claude — see `BRAINSTORM-docs-content-skills-2026-10-11.md` and `GRILL-docs-content-skills-2026-10-11.md`
