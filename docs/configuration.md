@@ -129,7 +129,9 @@ equality (`==`) — use `==` only when you have a real reason.
 **Type:** Integer (line count)
 
 Maximum number of lines for `CLAUDE.md` files in your R package.
-`/rforge:docs:check` warns when this threshold is exceeded.
+!!! warning "Not enforced yet"
+    No rforge command reads this setting today. `/rforge:docs:check` audits docs content against
+    the API, not file length; the key is reserved.
 
 CLAUDE.md files at this scale tend to drift into stale documentation —
 600 lines is a reasonable upper bound before they should be split into

@@ -30,7 +30,7 @@
     "claude_md_budget": {
       "type": "integer",
       "default": 600,
-      "description": "Maximum line count for CLAUDE.md files; warned by /rforge:doc-check when exceeded."
+      "description": "Reserved: maximum line count for CLAUDE.md files. Not enforced by any command today."
     }
   }
 }

@@ -4,7 +4,7 @@
     - **What:** All install paths for the rforge plugin.
     - **Why:** macOS users prefer brew; cross-platform users prefer the marketplace.
     - **How:** Pick one method below — they all install the same thing.
-    - **Next:** [Quick Start](QUICK-START.md) to run your first command.
+    - **Next:** [Quick Start](quickstart.md) to run your first command.
 
 ⏱️ **2 minutes** • 🟢 Beginner • Pick ONE method
 

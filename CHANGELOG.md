@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+---
+
+## [2.21.0] - 2026-10-11
+
+> `/rforge:docs:check` is now a deterministic content audit (`lib/docaudit.py`): calls and signatures in
+> README/vignettes against the exports, plus scannability, `--since` coverage and `docs.allowlist`. Docs gap-fill,
+> a merged Quick Start and `/rforge:finish` version fixes. No command-surface change (44); `test-all.sh` 47 checks.
+
+### Changed (behavior)
+
+- **`/rforge:docs:check` is now a deterministic content audit** (`lib/docaudit.py`), not an improvised
+  prompt. It checks the calls and signatures in `README` and `vignettes/` against the exports.
+  Dropped promises, none of which the old prompt could verify: NEWS.md completeness, running examples,
+  cross-package API-contract consistency, vignette cross-references, and the unenforced `claude_md_budget`
+  warning (the key is now documented as reserved).
+- With no argument it audits **the package you are in** (walks up to `DESCRIPTION`), not the whole ecosystem; use
+  `--eco` for the sweep. `--detailed` now means "also print `info` findings".
+
+### Added
+
+- `lib/docaudit.py` (public module, no R): `signature-named-arg` (error), `signature-names` and
+  `signature-arity` (warn), `scannability` (info), `coverage` (warn, with `--since <tag>` only), `--fail-on
+  none|warn|error`, `--eco`, `--detailed`, and `docs.allowlist` in `.rforge.yaml`. The text report states its scope
+  and ends with `INCOMPLETE`/`NOT AUDITED` rather than `no findings` when the audit could not finish. Unrecognized R binding forms are listed under "Known limitations" in the Docs audit guide.
+- Orchestrator `DOCS_AUDIT` intent (read-only auto-run of the default invocation).
+- Dev-only replay harness (`tests/harness/`) measuring recall and precision against real documentation history;
+  `test-all.sh` 45 -> 47 checks.
+
+### Documentation
+
+- `docs/QUICK-START.md` removed: `quickstart.md` is now the single Quick Start (TL;DR and Uninstall added, nav and
+  all links repointed). The old "How It Works" and "Pattern Recognition" sections were v1 text and were not carried over.
+- Command cards no longer list seven commands that do not exist (`advise`, `docs:workflow`, `site:check`,
+  `site:deploy`, `deps-sync`, `deps:graph`, `r:universe`) and now list the seven that were missing (`capture`,
+  `complete`, `health`, `r:deps-sync`, `r:install`, `r:site`, `r:tidy`); `r:tidy` added to the REFCARD.
+- New [Ecosystem analysis](docs/guides/ecosystem-analysis.md) guide, a "Fix a docs:check finding" tutorial, docs-audit
+  and session-boundary workflow diagrams, and daily-loop / session sections in the quickstart.
+
+### Fixed
+
+- `lib.rstatus.build_recap` no longer reports false version drift when `.STATUS`'s `version:`
+  carries annotations after the number (`0.7.0 (released 2026-10-10 …)`): only the leading
+  version token is compared against DESCRIPTION's `Version`, and the drift report shows that
+  token (#84).
+- `/rforge:finish` overrides `.STATUS`'s `version:` only on real drift, so a `--write` no longer
+  strips the annotations from a `version:` line that already matches DESCRIPTION.
+- `/rforge:finish` still adds `version:` from DESCRIPTION when an existing `.STATUS` has none
+  (the drift-only override above had stopped doing so); the rule now lives in
+  `lib.rstatus.version_overrides`.
+
+---
+
 ## [2.20.1] - 2026-09-23
 
 > `lib.status` reads the frontmatter `.STATUS` dialect and takes `phase` only from

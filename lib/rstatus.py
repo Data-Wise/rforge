@@ -282,6 +282,18 @@ def git_snapshot(pkg_path: str | Path = ".") -> dict:
 
 # ───────────────────────── recap composition ─────────────────────────
 
+# `.STATUS`'s `version:` is often the number followed by release annotations
+# ("0.7.0 (released 2026-10-10 on main, tag v0.7.0 ...)"), while DESCRIPTION
+# holds only the number. Compare the leading token, tolerating a "v" prefix.
+_LEADING_VERSION_RE = re.compile(r"\s*v?(\d+(?:[.-]\d+)+)")
+
+
+def _leading_version(value: str) -> str:
+    """Leading version token of a `.STATUS` `version:` value; the whole value
+    (stripped) when no token matches, so non-numeric text still reports as drift."""
+    m = _LEADING_VERSION_RE.match(value)
+    return m.group(1) if m else value.strip()
+
 
 def build_recap(pkg_path: str | Path = ".") -> dict:
     """Compose the single-package recap `/rforge:restore` reports.
@@ -297,8 +309,9 @@ def build_recap(pkg_path: str | Path = ".") -> dict:
 
     version_drift = None
     if description is not None and rstatus is not None and rstatus.version is not None:
-        if rstatus.version != description.version:
-            version_drift = {"status_version": rstatus.version, "description_version": description.version}
+        status_version = _leading_version(rstatus.version)
+        if status_version != description.version:
+            version_drift = {"status_version": status_version, "description_version": description.version}
 
     return {
         "is_r_package": description is not None,
@@ -308,6 +321,23 @@ def build_recap(pkg_path: str | Path = ".") -> dict:
         "git": git,
         "version_drift": version_drift,
     }
+
+
+def version_overrides(recap: dict, current: Optional[RStatus]) -> dict:
+    """`apply_updates` overrides for `version`, for `/rforge:finish`.
+
+    DESCRIPTION's `Version` is written only when `.STATUS`'s mirror is absent
+    or has drifted. A matching-but-annotated `version:` ("0.7.0 (released …)")
+    must be left alone, or `--write` would strip the annotation (#84); an
+    absent one must be filled in, or a `.STATUS` with no `version:` line would
+    diff as timestamp-only and report "already current" forever."""
+    description = recap.get("description")
+    if description is None:
+        return {}
+    absent = current is not None and current.version is None
+    if recap.get("version_drift") or absent:
+        return {"version": description["version"]}
+    return {}
 
 
 _CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")

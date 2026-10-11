@@ -453,3 +453,90 @@ def test_discovery_cli_exits_1_on_missing_path(tmp_path):
     assert result.returncode == 1
     assert "does not exist" in result.stderr
     assert result.stdout == ""  # nothing on stdout
+
+
+# ───────────────────── `.rforge.yaml` allowlist reader ─────────────────────
+#
+# `_read_site_allowlist` is a thin wrapper over `_read_allowlist(root, section)`
+# so `site.allowlist` and `docs.allowlist` share one parser. The cases below are
+# run against both sections; the `site` rows pin the pre-refactor behavior.
+
+
+def _yaml(tmp_path: Path, text: str) -> Path:
+    (tmp_path / ".rforge.yaml").write_text(text, encoding="utf-8", newline="")
+    return tmp_path
+
+
+@pytest.fixture(params=["site", "docs"])
+def section(request):
+    return request.param
+
+
+def _read(root, section):
+    from lib import discovery
+
+    return discovery._read_allowlist(root, section)
+
+
+def test_allowlist_absent_file(tmp_path, section):
+    assert _read(tmp_path, section) == ([], False)
+
+
+def test_allowlist_absent_key(tmp_path, section):
+    _yaml(tmp_path, "manifest:\n  name: x\n")
+    assert _read(tmp_path, section) == ([], False)
+
+
+def test_allowlist_section_without_allowlist_key(tmp_path, section):
+    _yaml(tmp_path, f"{section}:\n  other: 1\n")
+    assert _read(tmp_path, section) == ([], False)
+
+
+def test_allowlist_block_list(tmp_path, section):
+    _yaml(tmp_path, f"{section}:\n  allowlist:\n    - a.md\n    - b/c.md::scannability\n")
+    assert _read(tmp_path, section) == (["a.md", "b/c.md::scannability"], False)
+
+
+def test_allowlist_inline_comments_stripped(tmp_path, section):
+    _yaml(tmp_path, f"{section}:\n  allowlist:\n    - a.md # keep\n    # whole-line comment\n    - b.md\n")
+    assert _read(tmp_path, section) == (["a.md", "b.md"], False)
+
+
+def test_allowlist_scalar_is_malformed(tmp_path, section):
+    _yaml(tmp_path, f"{section}:\n  allowlist: a.md\n")
+    assert _read(tmp_path, section) == ([], True)
+
+
+def test_allowlist_empty_block_is_malformed(tmp_path, section):
+    _yaml(tmp_path, f"{section}:\n  allowlist:\n")
+    assert _read(tmp_path, section) == ([], True)
+
+
+def test_allowlist_crlf(tmp_path, section):
+    _yaml(tmp_path, f"{section}:\r\n  allowlist:\r\n    - a.md\r\n    - b.md\r\n")
+    assert _read(tmp_path, section) == (["a.md", "b.md"], False)
+
+
+def test_allowlist_sections_do_not_bleed(tmp_path):
+    _yaml(tmp_path, "site:\n  allowlist:\n    - s.md\ndocs:\n  allowlist:\n    - d.md\n")
+    assert _read(tmp_path, "site") == (["s.md"], False)
+    assert _read(tmp_path, "docs") == (["d.md"], False)
+
+
+def test_allowlist_sibling_section_key_not_read(tmp_path):
+    # `docs:` has no allowlist; a sibling `site.allowlist` must not leak into it.
+    _yaml(tmp_path, "docs:\n  other: 1\nsite:\n  allowlist:\n    - s.md\n")
+    assert _read(tmp_path, "docs") == ([], False)
+
+
+def test_allowlist_stops_at_sibling_key(tmp_path, section):
+    _yaml(tmp_path, f"{section}:\n  allowlist:\n    - a.md\n  other: 1\n    - not-an-entry\n")
+    assert _read(tmp_path, section) == (["a.md"], False)
+
+
+def test_site_wrapper_matches_helper(tmp_path):
+    from lib import discovery
+
+    _yaml(tmp_path, "site:\n  allowlist:\n    - a.md\n")
+    assert discovery._read_site_allowlist(tmp_path) == discovery._read_allowlist(tmp_path, "site") == (["a.md"], False)
+    assert discovery._read_site_allowlist(tmp_path / "missing") == ([], False)

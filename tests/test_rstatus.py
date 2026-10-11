@@ -359,6 +359,60 @@ def test_build_recap_version_drift_detected(tmp_path):
     assert "drift" in rstatus.format_text(recap)
 
 
+def _drift_for(tmp_path, status_version, description_version):
+    (tmp_path / "DESCRIPTION").write_text(f"Package: medfit\nVersion: {description_version}\n")
+    (tmp_path / ".STATUS").write_text(f"package: medfit\nversion: {status_version}\n")
+    return rstatus.build_recap(str(tmp_path))["version_drift"]
+
+
+def test_version_drift_ignores_annotations_after_version(tmp_path):
+    """#84: `0.7.0 (released ...)` vs DESCRIPTION `0.7.0` is not drift."""
+    status = "0.7.0 (released 2026-10-10 on main/GitHub, tag v0.7.0 at e888947, ...)"
+    assert _drift_for(tmp_path, status, "0.7.0") is None
+
+
+def test_version_drift_reports_leading_token_not_annotated_line(tmp_path):
+    drift = _drift_for(tmp_path, "0.6.0 (notes)", "0.7.0")
+    assert drift == {"status_version": "0.6.0", "description_version": "0.7.0"}
+
+
+def test_version_drift_dev_suffix_still_counts(tmp_path):
+    drift = _drift_for(tmp_path, "0.7.0.9000", "0.7.0")
+    assert drift == {"status_version": "0.7.0.9000", "description_version": "0.7.0"}
+
+
+def test_version_drift_tolerates_v_prefix(tmp_path):
+    assert _drift_for(tmp_path, "v0.7.0", "0.7.0") is None
+
+
+def test_version_drift_non_numeric_status_falls_back_to_whole_string(tmp_path):
+    drift = _drift_for(tmp_path, "unreleased", "0.7.0")
+    assert drift == {"status_version": "unreleased", "description_version": "0.7.0"}
+
+
+def _overrides_for(tmp_path, status_text, description_version="0.7.0"):
+    (tmp_path / "DESCRIPTION").write_text(f"Package: medfit\nVersion: {description_version}\n")
+    (tmp_path / ".STATUS").write_text(status_text)
+    return rstatus.version_overrides(rstatus.build_recap(str(tmp_path)), rstatus.read_rstatus(str(tmp_path)))
+
+
+def test_version_overrides_fills_absent_version(tmp_path):
+    assert _overrides_for(tmp_path, "package: medfit\n") == {"version": "0.7.0"}
+
+
+def test_version_overrides_corrects_drift(tmp_path):
+    assert _overrides_for(tmp_path, "package: medfit\nversion: 0.6.0\n") == {"version": "0.7.0"}
+
+
+def test_version_overrides_leaves_matching_annotated_version(tmp_path):
+    assert _overrides_for(tmp_path, "package: medfit\nversion: 0.7.0 (released 2026-10-10)\n") == {}
+
+
+def test_version_overrides_empty_without_description():
+    recap = {"description": None, "version_drift": None}
+    assert rstatus.version_overrides(recap, rstatus.RStatus(package="x")) == {}
+
+
 def test_format_json_round_trips(tmp_path):
     (tmp_path / "DESCRIPTION").write_text("Package: medfit\nVersion: 0.4.0\n")
     (tmp_path / "NEWS.md").write_text("## Unreleased\n\n- did a thing\n")

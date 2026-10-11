@@ -10,6 +10,8 @@ Handy one-line descriptions grouped by purpose.
 | `/rforge:status` | Health snapshot of your R package ecosystem |
 | `/rforge:detect` | Discover R packages in a directory tree |
 | `/rforge:next` | Suggest the next most useful action |
+| `/rforge:capture` | Capture a task or idea into `.STATUS` |
+| `/rforge:complete` | Mark a task complete and cascade doc updates |
 | `/rforge:restore` | Recap a single R package's state (read-only) |
 | `/rforge:finish` | Sync `.STATUS` from current state (dry-run by default) |
 
@@ -21,7 +23,7 @@ Handy one-line descriptions grouped by purpose.
 | `/rforge:thorough` | Deep multi-package assessment (~2 min) |
 | `/rforge:analyze` | Analyze a specific change or area |
 | `/rforge:impact` | Assess blast radius of a planned change |
-| `/rforge:advise` | Get advisory recommendations |
+| `/rforge:health` | Health metrics across the ecosystem |
 
 ## Orchestration
 
@@ -41,6 +43,7 @@ Handy one-line descriptions grouped by purpose.
 | `/rforge:r:document` | Regenerate documentation via roxygen2 |
 | `/rforge:r:load` | Load the package via pkgload |
 | `/rforge:r:build` | Build the package binary |
+| `/rforge:r:install` | Install the package locally and report the version |
 
 ## Quality
 
@@ -52,6 +55,7 @@ Handy one-line descriptions grouped by purpose.
 | `/rforge:r:urlcheck` | Check URLs in documentation |
 | `/rforge:r:coverage` | Calculate test coverage |
 | `/rforge:r:goodpractice` | Advisory best-practices check |
+| `/rforge:r:tidy` | Tidyverse-conventions audit (advisory, never blocks) |
 
 ## CRAN submission
 
@@ -83,18 +87,16 @@ Handy one-line descriptions grouped by purpose.
 
 | Command | What it does |
 |---------|-------------|
-| `/rforge:docs:check` | Check NEWS.md and API consistency |
-| `/rforge:docs:workflow` | Document workflow steps |
-| `/rforge:site:check` | Check pkgdown site health |
-| `/rforge:site:deploy` | Deploy pkgdown site (with leak guard) |
+| `/rforge:docs:check` | Audit README/vignette calls and signatures against the exports |
+| `/rforge:r:site` | Build the pkgdown site; `--check-leaks` lints the render surface, `--deploy` is recommend-only |
 
 ## Ecosystem
 
 | Command | What it does |
 |---------|-------------|
-| `/rforge:deps-sync` | Reconcile DESCRIPTION vs usage |
-| `/rforge:deps:graph` | Visualize the dependency graph |
-| `/rforge:r:universe` | Check R-universe build status |
+| `/rforge:r:deps-sync` | Reconcile DESCRIPTION vs usage (dry run; `--write` applies) |
+| `/rforge:deps` | Visualize the dependency graph |
+| `/rforge:r:submit --universe` | Check R-universe early-access build status |
 
 ## Scaffolding
 

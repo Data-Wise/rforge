@@ -95,7 +95,8 @@ Recap a single R package's state — DESCRIPTION, NEWS.md, git, and `.STATUS` (i
 **What this does:**
 - Reads DESCRIPTION (version, dependencies), NEWS.md's top section, git state (branch/last
   commit/dirty), and `.STATUS`'s `next:`/`blockers:`/`cran_status:` fields if present
-- Flags version drift when `.STATUS`'s `version:` mirror disagrees with DESCRIPTION's actual `Version`
+- Flags version drift when the leading version token of `.STATUS`'s `version:` mirror (annotations
+  after it are ignored) disagrees with DESCRIPTION's actual `Version`
 - If no `.STATUS` exists, offers (never auto-writes) to scaffold one in the R-package shape
 - Never writes, never commits — read-only, same invariant as craft's `/restore` and savant's `/restore`
 
@@ -135,8 +136,9 @@ Sync a single R package's `.STATUS` from its current state. Dry-run by default; 
 - Reads the same state `/rforge:restore` recaps, composes the intended `.STATUS` update
 - **Redundant-edit guard:** a diff that's only an `updated:` timestamp bump (no real content
   change) is reported "already current" and never written
-- **Version-drift correction:** `.STATUS`'s `version:` mirror is corrected to match DESCRIPTION
-  (DESCRIPTION is always the source of truth, never the reverse)
+- **Version-drift correction:** when the leading version token of `.STATUS`'s `version:` mirror
+  disagrees with DESCRIPTION, it is corrected to match (DESCRIPTION is always the source of
+  truth, never the reverse); with no drift, `version:` and its annotations are left untouched
 - Never commits or pushes — leaves the edit in the working tree plus a suggested commit message
 - If no `.STATUS` exists, proposes scaffolding one (same as `/rforge:restore`); declining means
   nothing to sync
@@ -489,31 +491,30 @@ auto-applied).
 
 ### /rforge:docs:check
 
-Check for documentation drift and inconsistencies across packages.
+Audit documentation content against the package API: calls and signatures in `README` and `vignettes/` that no longer match the exports. Static and read-only (`lib.docaudit`).
 
 **Usage:**
 ```bash
-/rforge:docs:check [package] [--detailed]
+/rforge:docs:check [package] [--detailed] [--eco] [--since <tag>] [--fail-on none|warn|error]
 ```
 
 **Parameters:**
-- `package` (optional) - Package to check (defaults to current directory / ecosystem)
-- `--detailed` (optional) - Show the full per-file documentation drift report
+- `package` (optional) - Package path or name; defaults to the package you are in (walks up to the nearest `DESCRIPTION`)
+- `--detailed` (optional) - Also print `info` findings (scannability)
+- `--eco` (optional) - Force the ecosystem sweep
+- `--since <tag>` (optional) - Add the coverage report, limited to exports added since the tag
+- `--fail-on` (optional) - Exit-code threshold: `none` (default), `warn` or `error`; does not change the report
 
 **Examples:**
 ```bash
-# Check documentation status
+# Audit the current package
 /rforge:docs:check
 
-# Full drift report
-/rforge:docs:check --detailed
+# Whole ecosystem, with info findings
+/rforge:docs:check --eco --detailed
 ```
 
-**Validates:**
-- Exported functions have documentation
-- Examples are runnable
-- NAMESPACE consistency with documentation
-- Version numbers match across files
+**Checks:** `signature-named-arg` (error), `signature-names` and `signature-arity` (warn), `scannability` (info), `coverage` (warn, `--since` only). The first report line states the resolved scope; the summary line states how many exports were checked. Suppress findings with `docs.allowlist` in `.rforge.yaml`.
 
 ---
 
@@ -762,7 +763,7 @@ Regenerate `man/*.Rd` documentation and `NAMESPACE` via `roxygen2::roxygenize()`
 - Runs `roxygen2::roxygenize()` (the blessed regeneration path — hand-edits to `man/*.Rd` are blocked by the PreToolUse hook)
 - Reports success and recommends reviewing `git diff man/ NAMESPACE`
 
-**Related commands:** `/rforge:r:check` (verify after regenerating), `/rforge:docs:check` (detect drift)
+**Related commands:** `/rforge:r:check` (verify after regenerating), `/rforge:docs:check` (audit docs against the API)
 
 ---
 

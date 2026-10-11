@@ -32,4 +32,4 @@ python3 -m lib.rcmd --kind document --path "<path>"
 
 ## Related Commands
 - `/rforge:r:check` — verify docs after regenerating
-- `/rforge:docs:check` — **detect** doc drift across packages (this **regenerates**)
+- `/rforge:docs:check` — **audit** docs against the API (this **regenerates**)

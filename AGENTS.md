@@ -5,7 +5,9 @@
 > Follows the global `~/.claude/CLAUDE.md` (Codex: `~/.codex/AGENTS.md`); this file only
 > captures rforge-specific patterns that don't apply to other dev-tools repos.
 
-## Current state (2026-09-23)
+## Current state (2026-10-11)
+
+**v2.21.0 (released 2026-10-11 — minor, 44 commands, no command-surface change):** `/rforge:docs:check` is now a deterministic content audit (`lib/docaudit.py`, release A1): `signature-named-arg` (error), `signature-names`/`signature-arity` (warn), `scannability` (info), `coverage` (warn, `--since TAG` only); `--eco`, `--detailed`, `--fail-on none|warn|error`, `docs.allowlist` in `.rforge.yaml`; text reports end `INCOMPLETE`/`NOT AUDITED` instead of "no findings" when the audit could not finish. Dev-only replay harness `tests/harness/`; orchestrator `DOCS_AUDIT` row; Docs audit guide. Also #85/#86 (`/rforge:finish` version drift, #84) and a docs gap-fill (#89, #90). `test-all.sh` 47 checks. A2 (`--site`, `--run-examples`) is a separate later plan. Records: `.STATUS`, CHANGELOG `[2.21.0]`.
 
 **v2.20.1 (released 2026-09-23 — patch, no command-surface change):** `lib.status` reads the frontmatter `.STATUS` dialect the R packages use (#75); `lib.rstatus.parse_news_header` counts NEWS entries under `##` subsections (#78); MediationVerse doctrine in the Command Guides (#76); `AGENTS.md` mirror of this file, gated by `version_sync.py` (#77) and a `test-all.sh` body check (#80, 45 checks); `test-all.sh` warns on missing dev deps (#79); `lib.rstatus` docstring no longer says `lib.status` can't read `key: value` files (#81); `lib.status` takes `phase` only from a `phase:` key in frontmatter files (#82). Records: `.STATUS` `recent:`, CHANGELOG `[2.20.1]`.
 
@@ -24,6 +26,7 @@
 
 ### Release history — architecture deltas only (release mechanics live in CHANGELOG + git)
 
+- **v2.21.0** — `/rforge:docs:check` content audit (`lib/docaudit.py`, A1) + dev-only replay harness `tests/harness/`; `/rforge:finish` version-drift fix (#84/#85/#86); docs gap-fill (#89/#90). 44 commands, 47 `test-all.sh` checks.
 - **v2.20.1** — `lib.status` frontmatter dialect + `phase:`-key-only (#75/#82); NEWS `##`-subsection count (#78); MediationVerse doctrine (#76); `AGENTS.md` mirror + gates (#77/#80); test-all dev-dep warning (#79). 44 commands.
 - **v2.20.0** — `/rforge:restore` + `/rforge:finish` session-boundary commands (PR #71/#72); new `lib/rstatus.py`; `apply_updates()` carry-forward helper closing a pre-merge adversarial-review data-loss finding. 42→44 commands.
 - **v2.19.0** — evidence-based `r:urlcheck` 403 triage (#67); `r:rhub` dispatch bugfix + stderr-capture (#66); `r:tidy` command + `r:lint --tidy`/`--set-lintr` + `lib/tidyaudit.py` (#65). 41→42 commands.
@@ -99,7 +102,8 @@ The `lib/` directory is a Python package (has `__init__.py`). Modules use relati
 
 - **Run modules as a package**: `python3 -m lib.<module>` (e.g., `python3 -m lib.discovery`)
 - **Never**: `python3 lib/<module>.py` — breaks relative imports
-- **Public modules** (with `docs/reference/` pages): `discovery`, `deps`, `status`, `init`, `rcmd`, `cranlint`, `deps_sync`, `ghrelease`, `runiverse`, `s7review`, `changed`, `scaffold`, `sitelint`, `tidyaudit`, `rstatus`
+- **Public modules** (with `docs/reference/` pages): `discovery`, `deps`, `status`, `init`, `rcmd`, `cranlint`, `deps_sync`, `ghrelease`, `runiverse`, `s7review`, `changed`, `scaffold`, `sitelint`, `tidyaudit`, `rstatus`, `docaudit`
+- **Adding a public module** touches more than the module: `scripts/gen_lib_reference.py` `MODULES`, the `mkdocs.yml` nav (an orphan `docs/reference/<mod>.md` fails `test-all.sh` and `mkdocs build --strict`), `docs/lib-modules.md`, `tests/cli/automated-tests.sh` `PUBLIC_MODULES`, the list above (copy to `AGENTS.md`), and the hard-coded `test-all.sh` check count in `CLAUDE.md`, `AGENTS.md` and `docs/contributing.md`.
 - **R-universe module** (`runiverse`, v2.7.0): pure-stdlib (`urllib`-only, no R, no `gh`), like the analysis modules. Backs `r:submit --universe` — `verify()` reads the R-universe API and reports per-platform early-access build status; **read-only** (never uploads) and degrades to a `warn` envelope offline/unregistered (never raises).
 - **CRAN-lint module** (`cranlint`, v2.3.0): pure-stdlib (no R), like the analysis modules. `lint_description`/`check_build_hygiene`/`check_planning_consistency`/`check_test_config`/`run_all` emit advisory envelopes; the first three wire into `r:cran-prep` as the `description`/`build-hygiene`/`docs-consistency` Tier 4 stages (never block `ready`); `check_test_config` wires into `r:test` as a pre-flight advisory. CLI: `python3 -m lib.cranlint <lint|build-hygiene|docs-consistency|check_test_config> <path>`. **G7 update protocol:** on each R major.minor release, audit R Internals §8 for new `_R_CHECK_*` env vars and update `_CRAN_CHECKS_REGISTRY` in `lib/rcmd.py` with a new versioned key (e.g. `"R4.6"`).
 - **R-runner module** (`rcmd`, v2.2.0): unlike the analysis modules (pure-stdlib, no R), `rcmd` shells out to `Rscript` running lower-level R engines (`rcmdcheck`/`pkgbuild`/`roxygen2`/`testthat`/`pkgload`/`covr`/`pkgdown`/`lintr`/`spelling`/`urlchecker`/`styler`/`revdepcheck`/`goodpractice`/`rhub`) which emit JSON; it normalizes to one envelope. Backs the `r:` dev-cycle / quality / CRAN-submission commands. The `devtools` engine is used only by `r:winbuilder`.
@@ -126,7 +130,7 @@ arguments:
 ---
 ```
 
-The `arguments:` array is the machine-readable spec; the `## Usage` body is the human equivalent. **Keep them in sync** when adding/removing flags.
+The `arguments:` array is the machine-readable spec; the `## Usage` body is the human equivalent. **Keep them in sync** when adding/removing flags. Frontmatter flag names are hyphenated (`check-leaks`); `tests/_check_commands_doc.py` requires `--<name>` literally in the command's `docs/commands.md` section (`package`, `path`, `name` and similar positionals are exempt).
 
 **v2.0.0 rename-error stubs:** `commands/{doc-check,ecosystem-health,rpkg-check}.md` are stubs that emit a verbatim "Renamed to /rforge:..." message. Slated for removal in v3.0.0. Don't add normal command-file content to them.
 
@@ -134,8 +138,9 @@ The `arguments:` array is the machine-readable spec; the `## Usage` body is the 
 
 Both must pass before any PR:
 
-- `bash tests/test-all.sh` — **45 checks** (versions, hook compile + behavior, manifests parse, skills valid, lib pytest, lib CLI smoke incl. `rcmd`/`cranlint`/`runiverse`/`s7review`/`changed`, lib reference docs in sync, **version/count sync (`version_sync.py --check`)**, **AGENTS.md body mirrors CLAUDE.md**, **commands.md sync (`_check_commands_doc.py`)**, **mkdocs nav integrity (every nav file exists + no orphaned guide/tutorial/reference page)**, rename stubs/targets, command-name uniqueness, migration recipe E2E, **agent guards: no `rforge_` MCP refs / orchestrator frontmatter / real `lib.rcmd` engines**)
+- `bash tests/test-all.sh` — **47 checks** (versions, hook compile + behavior, manifests parse, skills valid, lib pytest, lib CLI smoke incl. `rcmd`/`cranlint`/`runiverse`/`s7review`/`changed`, lib reference docs in sync, **version/count sync (`version_sync.py --check`)**, **AGENTS.md body mirrors CLAUDE.md**, **commands.md sync (`_check_commands_doc.py`)**, **mkdocs nav integrity (every nav file exists + no orphaned guide/tutorial/reference page)**, rename stubs/targets, command-name uniqueness, migration recipe E2E, **agent guards: no `rforge_` MCP refs / orchestrator frontmatter / real `lib.rcmd` engines**)
 - `python3 -m pytest tests/` — **400+ lib/\* cases** (discovery, deps, status, init, rcmd, cranlint, deps_sync, ghrelease, runiverse, s7review, changed, scaffold, **version_sync**)
+- **Python ≥3.10 environment:** system `python3` is 3.9 and fails 3 of 47 `test-all.sh` checks (pytest, mkdocs parse, nav) from environment alone. Use a venv with pytest, pyyaml, mkdocs-material, mkdocs-macros-plugin, pillow and cairosvg (`uv venv ~/.venvs/rforge-dev --python 3.12`). `test-all.sh`'s `lib_pytest` runs only 4 named test files; the rest run under `pytest tests/` in CI.
 
 ## Homebrew tap quirks (rforge-specific)
 
@@ -158,10 +163,11 @@ Diagnostic, not adversarial. Fires on every Write/Edit. 4 rules:
 3. **WARN** on non-SemVer `DESCRIPTION` Version bumps
 4. **WARN** on writes outside the active worktree
 
-Only rule 1 blocks. Hook contract: reads JSON via stdin (NOT env vars). Tested by 7 cases in `tests/test-all.sh`.
+Only rule 1 blocks. Hook contract: reads JSON via stdin (NOT env vars). Tested by 7 cases in `tests/test-all.sh`. Rd test fixtures therefore must be created via Bash or `git show`, not Write/Edit.
 
 ## Docs conventions
 
+- **Specs and plans live at the repo root** (`BRAINSTORM-*.md`, `GRILL-*.md`, `SPEC-*.md`, `PROPOSAL-*.md`; shipped ones move to `archive/specs/`). There is no `docs/specs/`, so craft's `/craft:plan` detection, which searches there, must also look at the root.
 - **Three doc tiers** (v2.13.0+): `docs/commands.md` (terse per-command, gated by `_check_commands_doc.py`) -> `docs/guides/*` (exhaustive per-family **Command Guides**) -> `docs/tutorials/*` (task walkthroughs). `test-all.sh` gates nav-orphans: every `docs/{guides,tutorials,reference}/*` page must appear in `mkdocs.yml` nav.
 - **Material admonitions** for ADHD-friendliness: `!!! tip "TL;DR (30 seconds)"` on major pages; `!!! warning "Symptom"` + `!!! tip "Fix"` for troubleshooting pairs; `!!! note "Expected behavior in vX.Y.Z+"` for clarifying quirks. Don't write custom CSS — the Material palette covers note/tip/warning/danger/success/info/abstract.
 - **Verification trap** when curl-grepping deployed pages: HTML entities + `<code>`-tag fragmentation + box-drawing characters all break naive regexes. If a deploy "looks broken," parse the `<article>` body with `re.sub(r'<[^>]+>', ' ', body)` before searching. Details in `reference_rforge_doc_conventions.md`.

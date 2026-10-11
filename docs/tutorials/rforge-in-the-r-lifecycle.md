@@ -60,7 +60,7 @@ flowchart TD
     E -- "yes" --> G["/rforge:impact<br/>— what breaks downstream?"]
     G --> H["/rforge:cascade<br/>— plan the coordinated update"]
     H --> F
-    F --> I["/rforge:docs:check<br/>— NEWS/doc drift"]
+    F --> I["/rforge:docs:check<br/>— docs vs API audit"]
     I --> J["/rforge:thorough<br/>— pre-release rollup + R CMD check"]
     J --> K["/rforge:release<br/>— CRAN submission order"]
 ```

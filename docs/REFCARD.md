@@ -38,7 +38,7 @@
 │    /rforge:complete       Mark complete (with doc cascade)                  │
 │                                                                             │
 │  CHECKS                                                                     │
-│    /rforge:docs:check     Documentation drift check                         │
+│    /rforge:docs:check     Docs-vs-API content audit                         │
 │                                                                             │
 │  SETUP                                                                      │
 │    /rforge:init           Initialize ~/.rforge/context.json                 │
@@ -76,6 +76,7 @@
 │  CRAN SUBMISSION (v2.2.0)                                                   │
 │    /rforge:r:revdep       Reverse-dep check vs CRAN downstream (revdepcheck)│
 │    /rforge:r:goodpractice Advisory best-practice bundle (goodpractice)      │
+│    /rforge:r:tidy         Tidyverse-conventions audit (advisory)            │
 │    /rforge:r:winbuilder   Dispatch to win-builder R-devel — async           │
 │    /rforge:r:rhub         Multi-platform checks via R-hub v2 — async        │
 │    /rforge:r:cran-prep    Full CRAN gate + strict passes + cran-comments.md │
@@ -377,12 +378,13 @@ rforge/
 | Fixing bug | `/rforge:analyze` | Verify fix, check tests |
 | Daily development | `/rforge:status` + `/rforge:next` | Dashboard + decision |
 | Running R CMD check | `/rforge:r:check` | Single-package deep check |
-| Documentation drift | `/rforge:docs:check` | NEWS.md, API consistency |
+| Docs match the API | `/rforge:docs:check` | README/vignette calls vs exports |
 | CRAN pre-submission gate | `/rforge:r:cran-prep` | Full gate + cran-comments.md |
 | CRAN Windows check | `/rforge:r:winbuilder` | Async R-devel on Windows |
 | CRAN multi-platform | `/rforge:r:rhub` | Async GitHub Actions matrix |
 | Reverse-dep check | `/rforge:r:revdep` | CRAN downstream obligation |
 | Advisory best practices | `/rforge:r:goodpractice` | Pre-submission advisory pass |
+| Tidyverse conventions | `/rforge:r:tidy` | Lint preset, DESCRIPTION, roxygen, NEWS header (advisory) |
 | Check S7 conventions | `/rforge:r:s7-review` | Static, advisory — naming/validators/methods/legacy/docs; `--eco` cross-package contracts, `--runtime` dispatch checks |
 | Check only changed packages | `/rforge:r:check --changed` | Scopes to packages changed vs `--base`; tags findings [introduced]/[pre-existing]/[uncommitted] via a per-package-cached merge-base baseline (`--fail-on introduced` by default; `--no-cache` to skip the cache) |
 | Scaffold a test file | `/rforge:r:use-test` | Draft test_that() blocks (TODO assertions) |

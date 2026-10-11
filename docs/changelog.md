@@ -7,6 +7,15 @@ The full changelog lives in the repository:
 
 ---
 
+## 2.21.0 — 2026-10-11
+
+`/rforge:docs:check` is now a static content audit (`lib/docaudit.py`): calls and
+signatures in README/vignettes are checked against the exports (errors for
+arguments that do not exist, warnings for stale listings and arity),
+with scannability, `--since` coverage, `--eco`, `--fail-on` and a
+`docs.allowlist`. Docs gap-fill (command cards, ecosystem guide, tutorial),
+a single Quick Start, and `/rforge:finish` version-drift fixes (#84). 44 commands.
+
 ## 2.20.1 — 2026-09-23
 
 `.STATUS` parsing fixes in `lib.status` (frontmatter dialect, `phase:` key

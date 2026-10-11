@@ -412,7 +412,7 @@ lib_pytest() {
         echo "pytest not installed — run: pip install pytest" >&2
         return 1
     fi
-    python3 -m pytest tests/test_lib_discovery.py tests/test_lib_deps.py tests/test_lib_status.py tests/test_lib_init.py -q
+    python3 -m pytest tests/test_lib_discovery.py tests/test_lib_deps.py tests/test_lib_status.py tests/test_lib_init.py tests/test_docaudit.py tests/test_docaudit_prose.py tests/test_docaudit_scope.py -q
 }
 
 # Lib CLIs run end-to-end on an empty cwd without error.
@@ -548,6 +548,32 @@ assert d['engine_missing'] == [], 'pure-Python module: engine_missing must be []
 "
 }
 
+# lib.docaudit CLI smoke — pure-Python (no R). The known-answer defect fixture must
+# yield the planted signature-names warnings (and exit 0 under the default
+# --fail-on none); the clean fixture must yield no signature findings; a path
+# outside any package must say audited:false rather than read as clean.
+lib_docaudit_smoke() {
+    local bad clean none
+    bad=$(python3 -m lib.docaudit --path tests/fixtures/docaudit/defect --format json 2>/dev/null) || return 1
+    clean=$(python3 -m lib.docaudit --path tests/fixtures/docaudit/clean --format json 2>/dev/null) || return 1
+    none=$(python3 -m lib.docaudit --path "$(mktemp -d)" --format json 2>/dev/null) || return 1
+    BAD="$bad" CLEAN="$clean" NONE="$none" python3 -c "
+import json, os
+bad, clean, none = (json.loads(os.environ[k]) for k in ('BAD', 'CLEAN', 'NONE'))
+assert bad['kind'] == 'docaudit' and bad['audited'] and not bad['incomplete'], bad['messages']
+assert {f['check'] for f in bad['findings']} == {'signature-names'}, bad['findings']
+assert [f for f in clean['findings'] if f['check'].startswith('signature-')] == [], clean['findings']
+assert none['audited'] is False and none['findings'] == [], none
+"
+}
+
+# Replay harness smoke — the CI-safe half of the recall report. With no local
+# checkouts the real-history rows report unavailable (allowed); a firm row that
+# stopped firing, a mislabeled check id or a crashed audit exits non-zero.
+harness_recall_smoke() {
+    python3 tests/harness/replay.py recall --manifest tests/fixtures/docaudit/defects.json --scope a1 --allow-unavailable >/dev/null
+}
+
 # lib.changed CLI smoke — pure-Python (subprocess git only, no R). Must emit a
 # valid JSON envelope and never traceback, even when run off a git repo. We run
 # against a tmpdir that is not a git repo so the call exercises the warn-degrade
@@ -680,6 +706,8 @@ run "Dogfood: lib.cranlint Tier-4 advisory CLI on a fixture package" lib_cranlin
 run "Dogfood: lib.runiverse CLI smoke (offline → warn envelope)" lib_runiverse_smoke
 run "Dogfood: lib.s7review CLI smoke (advisory S7 convention envelope)" lib_s7review_smoke
 run "Dogfood: lib.changed CLI smoke (JSON envelope, never raises)" lib_changed_smoke
+run "Dogfood: lib.docaudit CLI smoke (known-answer fixtures, unaudited path)" lib_docaudit_smoke
+run "Harness: recall report (firm rows hold, check ids known)" harness_recall_smoke
 run "Scaffolding: use-* commands have frontmatter" scaffold_cmds_frontmatter
 run "Scaffolding: lib.scaffold + usethis_infra smoke" scaffold_lib_smoke
 run "Scaffolding: use-* arguments match Usage" scaffold_args_usage_sync

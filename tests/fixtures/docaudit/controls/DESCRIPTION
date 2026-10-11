@@ -1,0 +1,5 @@
+Package: ctrl
+Version: 0.1.0
+Title: Positive controls for lib.docaudit
+Description: Synthetic package; every call in its docs is valid.
+License: MIT

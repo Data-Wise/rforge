@@ -305,8 +305,8 @@ def _read_config_manifest_path(root: Path) -> Optional[str]:
     return _strip_inline_comment(match.group(1)) or None
 
 
-def _read_site_allowlist(root: str | os.PathLike) -> tuple[list[str], bool]:
-    """Read the optional `site.allowlist` list from `<root>/.rforge.yaml`.
+def _read_allowlist(root: str | os.PathLike, section: str) -> tuple[list[str], bool]:
+    """Read the optional `<section>.allowlist` list from `<root>/.rforge.yaml`.
 
     Parses the nested block form::
 
@@ -317,7 +317,7 @@ def _read_site_allowlist(root: str | os.PathLike) -> tuple[list[str], bool]:
 
     Returns ``(entries, malformed)``:
 
-    - key absent (no `site:` or no `allowlist:` under it) → ``([], False)``
+    - key absent (no `<section>:` or no `allowlist:` under it) → ``([], False)``
     - `allowlist:` present but **not** a block list (e.g. a scalar or empty) →
       ``([], True)`` so the caller can warn + fall back to the core allowlist.
     - `allowlist:` present as a list → ``([items], False)``.
@@ -331,7 +331,7 @@ def _read_site_allowlist(root: str | os.PathLike) -> tuple[list[str], bool]:
     except OSError:
         return [], False
 
-    in_site = False
+    in_section = False
     in_allowlist = False
     allowlist_seen = False
     allowlist_indent = -1
@@ -345,16 +345,12 @@ def _read_site_allowlist(root: str | os.PathLike) -> tuple[list[str], bool]:
         stripped = raw.strip()
 
         if indent == 0:
-            # A new top-level key ends any site/allowlist context.
-            in_site = stripped.startswith("site:")
+            # A new top-level key ends any section/allowlist context.
+            in_section = stripped.startswith(f"{section}:")
             in_allowlist = False
-            if in_site:
-                # `site: something` inline would be malformed for our purposes,
-                # but the block form `site:` is what we expect.
-                pass
             continue
 
-        if not in_site:
+        if not in_section:
             continue
 
         if not in_allowlist:
@@ -363,7 +359,7 @@ def _read_site_allowlist(root: str | os.PathLike) -> tuple[list[str], bool]:
                 in_allowlist = True
                 allowlist_indent = indent
                 inline_value = stripped[len("allowlist:"):].strip()
-            # else: some other key under site: — ignore.
+            # else: some other key under the section — ignore.
             continue
 
         # Inside allowlist: collect deeper-indented `- item` lines.
@@ -373,7 +369,7 @@ def _read_site_allowlist(root: str | os.PathLike) -> tuple[list[str], bool]:
                 items.append(item)
         elif indent <= allowlist_indent:
             in_allowlist = False
-            # Re-evaluate this line as a potential sibling under site:.
+            # Re-evaluate this line as a potential sibling under the section.
             if indent > 0 and stripped.startswith("allowlist:"):
                 allowlist_seen = True
                 in_allowlist = True
@@ -390,6 +386,11 @@ def _read_site_allowlist(root: str | os.PathLike) -> tuple[list[str], bool]:
     if inline_value:
         return [], True
     return [], True
+
+
+def _read_site_allowlist(root: str | os.PathLike) -> tuple[list[str], bool]:
+    """`site.allowlist` from `<root>/.rforge.yaml` (see `_read_allowlist`)."""
+    return _read_allowlist(root, "site")
 
 
 def _enrich_packages(packages: list[Package], manifest: Manifest) -> Drift:

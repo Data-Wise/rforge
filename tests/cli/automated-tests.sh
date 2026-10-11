@@ -118,6 +118,7 @@ PUBLIC_MODULES=(
     lib.changed
     lib.scaffold
     lib.sitelint
+    lib.docaudit
 )
 
 for mod in "${PUBLIC_MODULES[@]}"; do

@@ -1,11 +1,11 @@
-# 📖 RForge Quick Start Guide
+# 📖 RForge Quick Start
 
 Get started with RForge in 5 minutes. This guide walks you through installation, basic usage, and your first analysis.
 
-!!! tip "New here? Start with the 3-minute Quick Start instead"
-    This is the **detailed** quick start. If you just want it working fast,
-    use **[Quick Start](QUICK-START.md)** (3 min). Come back here when you
-    want the fuller tour (modes, output formats, project-structure detection).
+!!! tip "TL;DR (30 seconds)"
+    - **What:** Install rforge, then run your first command in an R-package directory.
+    - **Fast path:** install (Step 1), then `/rforge:quick` (about 10 s), `/rforge:analyze` (about 30 s) or `/rforge:thorough` (2-5 min).
+    - **Next:** the [REFCARD](REFCARD.md) for all {{ rforge.command_count }} commands, or the [tutorials](tutorials/README.md).
 
 ## Prerequisites
 
@@ -354,7 +354,7 @@ Now that you're set up, explore:
 /rforge:deps                      # Visualize dependencies
 
 # Documentation
-/rforge:docs:check                # Check documentation drift
+/rforge:docs:check                # Audit docs against the exports
 /rforge:complete                  # Mark tasks complete
 /rforge:capture                   # Quick capture ideas
 /rforge:next                      # Get next task suggestion
@@ -362,6 +362,37 @@ Now that you're set up, explore:
 # Health checks
 /rforge:health                    # Ecosystem health metrics
 /rforge:r:check                   # R CMD check integration
+```
+
+## Your daily R loop and a docs check
+
+```bash
+# Inner loop on one package
+/rforge:r:cycle                   # document -> test -> check
+/rforge:r:lint                    # static analysis (read-only)
+/rforge:r:tidy                    # tidyverse-conventions audit (advisory)
+
+# Before a release: do the docs still match the API?
+/rforge:docs:check                # README/vignette calls vs exports
+/rforge:docs:check --fail-on error  # exit 1 on an error; 2 if it could not finish
+/rforge:r:cran-prep               # the full CRAN gate
+```
+
+The docs audit prints its scope on the first line and `checked N of M` at the end; a report ending in
+`INCOMPLETE` or `NOT AUDITED` is not clean. See [Fix a docs:check finding](tutorials/fix-a-docs-check-finding.md).
+
+## Session start and end
+
+```bash
+/rforge:restore                   # recap of this package (read-only)
+/rforge:finish                    # dry run: the proposed .STATUS update
+/rforge:finish --write            # apply it
+```
+
+## Uninstall
+
+```bash
+brew uninstall rforge
 ```
 
 ## Getting Help

@@ -165,3 +165,17 @@ def read_rstatus(pkg_path: 'str | Path' = '.') -> 'Optional[RStatus]'
 ```
 
 Read and parse `<pkg_path>/.STATUS`. Returns None if absent/unreadable.
+
+### `version_overrides()`
+
+```python
+def version_overrides(recap: 'dict', current: 'Optional[RStatus]') -> 'dict'
+```
+
+`apply_updates` overrides for `version`, for `/rforge:finish`.
+
+DESCRIPTION's `Version` is written only when `.STATUS`'s mirror is absent
+or has drifted. A matching-but-annotated `version:` ("0.7.0 (released …)")
+must be left alone, or `--write` would strip the annotation (#84); an
+absent one must be filled in, or a `.STATUS` with no `version:` line would
+diff as timestamp-only and report "already current" forever.
