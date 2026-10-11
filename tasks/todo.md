@@ -18,8 +18,8 @@
 
 ## Phase 1 — First vertical slices
 
-- [ ] T5 [M] A wrong named argument is flagged, end to end (`signature-named-arg`, parsers, CLI, envelope)
-- [ ] T6 [M] A refcard listing with non-formal names or bad arity is flagged (`signature-names`, `signature-arity`)
+- [x] T5 [M] A wrong named argument is flagged, end to end (`signature-named-arg`, parsers, CLI, envelope)
+- [x] T6 [M] A refcard listing with non-formal names or bad arity is flagged (`signature-names`, `signature-arity`)
 
 ### Checkpoint B — THE GATE (human; hard stop)
 
