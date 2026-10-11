@@ -5,7 +5,7 @@
 
 ## Phase 0 — Foundation and harness
 
-- [ ] T1 [S] `discovery` allowlist helper refactor — direct tests first; own commit
+- [x] T1 [S] `discovery` allowlist helper refactor — direct tests first; own commit
 - [ ] T2 [M] Defect manifest (18 real medfit defects) + recall runner, red-first, with mutation self-test
 - [ ] T3 [M] Planted-defect injector + committed known-answer pair (Rd fixtures via Bash/`git show`)
 - [ ] T4 [S] History replayer (`replay.py replay`, read-only `git archive`, HOME isolated)
