@@ -492,34 +492,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../QUICK-START/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    🚀 Quick Start (3 min)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../quickstart/" class="md-nav__link">
         
   
@@ -527,7 +499,7 @@
   <span class="md-ellipsis">
     
   
-    📖 Detailed Quick Start
+    🚀 Quick Start
   
 
     
@@ -949,6 +921,34 @@
     
   
     Scaffolding existing packages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/fix-a-docs-check-finding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fix a docs:check finding
   
 
     
@@ -1504,6 +1504,62 @@
     
   
     Website + deploy guard (r:site)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/ecosystem-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ecosystem analysis (analyze/impact/cascade/release)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/docs-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docs audit (docs:check)
   
 
     
@@ -2163,6 +2219,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/docaudit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    docaudit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2498,6 +2582,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2210-2026-10-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.21.0 — 2026-10-11
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2201-2026-09-23" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2744,6 +2839,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2210-2026-10-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.21.0 — 2026-10-11
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2201-2026-09-23" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2949,6 +3055,13 @@
 <p>The full changelog lives in the repository:
 <a href="https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md"><code>CHANGELOG.md</code></a>.</p>
 <hr />
+<h2 id="2210-2026-10-11">2.21.0 — 2026-10-11<a class="headerlink" href="#2210-2026-10-11" title="Permanent link">&para;</a></h2>
+<p><code>/rforge:docs:check</code> is now a static content audit (<code>lib/docaudit.py</code>): calls and
+signatures in README/vignettes are checked against the exports (errors for
+arguments that do not exist, warnings for stale listings and arity),
+with scannability, <code>--since</code> coverage, <code>--eco</code>, <code>--fail-on</code> and a
+<code>docs.allowlist</code>. Docs gap-fill (command cards, ecosystem guide, tutorial),
+a single Quick Start, and <code>/rforge:finish</code> version-drift fixes (#84). 44 commands.</p>
 <h2 id="2201-2026-09-23">2.20.1 — 2026-09-23<a class="headerlink" href="#2201-2026-09-23" title="Permanent link">&para;</a></h2>
 <p><code>.STATUS</code> parsing fixes in <code>lib.status</code> (frontmatter dialect, <code>phase:</code> key
 only) and the <code>/rforge:restore</code> NEWS count under <code>##</code> subsections;

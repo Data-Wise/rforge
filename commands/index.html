@@ -492,34 +492,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../QUICK-START/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    🚀 Quick Start (3 min)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../quickstart/" class="md-nav__link">
         
   
@@ -527,7 +499,7 @@
   <span class="md-ellipsis">
     
   
-    📖 Detailed Quick Start
+    🚀 Quick Start
   
 
     
@@ -949,6 +921,34 @@
     
   
     Scaffolding existing packages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/fix-a-docs-check-finding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fix a docs:check finding
   
 
     
@@ -2295,6 +2295,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/ecosystem-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ecosystem analysis (analyze/impact/cascade/release)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/docs-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docs audit (docs:check)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2928,6 +2984,34 @@
     
   
     rstatus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/docaudit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    docaudit
   
 
     
@@ -4120,7 +4204,8 @@
 <p><strong>What this does:</strong>
 - Reads DESCRIPTION (version, dependencies), NEWS.md's top section, git state (branch/last
   commit/dirty), and <code>.STATUS</code>'s <code>next:</code>/<code>blockers:</code>/<code>cran_status:</code> fields if present
-- Flags version drift when <code>.STATUS</code>'s <code>version:</code> mirror disagrees with DESCRIPTION's actual <code>Version</code>
+- Flags version drift when the leading version token of <code>.STATUS</code>'s <code>version:</code> mirror (annotations
+  after it are ignored) disagrees with DESCRIPTION's actual <code>Version</code>
 - If no <code>.STATUS</code> exists, offers (never auto-writes) to scaffold one in the R-package shape
 - Never writes, never commits — read-only, same invariant as craft's <code>/restore</code> and savant's <code>/restore</code></p>
 <p><strong>When to run:</strong> Returning to an R package repo after a break; before starting work, to confirm
@@ -4149,8 +4234,9 @@ current version/CRAN state; precedes <code>/rforge:finish</code>.</p>
 - Reads the same state <code>/rforge:restore</code> recaps, composes the intended <code>.STATUS</code> update
 - <strong>Redundant-edit guard:</strong> a diff that's only an <code>updated:</code> timestamp bump (no real content
   change) is reported "already current" and never written
-- <strong>Version-drift correction:</strong> <code>.STATUS</code>'s <code>version:</code> mirror is corrected to match DESCRIPTION
-  (DESCRIPTION is always the source of truth, never the reverse)
+- <strong>Version-drift correction:</strong> when the leading version token of <code>.STATUS</code>'s <code>version:</code> mirror
+  disagrees with DESCRIPTION, it is corrected to match (DESCRIPTION is always the source of
+  truth, never the reverse); with no drift, <code>version:</code> and its annotations are left untouched
 - Never commits or pushes — leaves the edit in the working tree plus a suggested commit message
 - If no <code>.STATUS</code> exists, proposes scaffolding one (same as <code>/rforge:restore</code>); declining means
   nothing to sync</p>
@@ -4403,25 +4489,24 @@ auto-applied).</p>
 <hr />
 <h2 id="documentation-tasks">Documentation &amp; Tasks<a class="headerlink" href="#documentation-tasks" title="Permanent link">&para;</a></h2>
 <h3 id="rforgedocscheck">/rforge:docs:check<a class="headerlink" href="#rforgedocscheck" title="Permanent link">&para;</a></h3>
-<p>Check for documentation drift and inconsistencies across packages.</p>
+<p>Audit documentation content against the package API: calls and signatures in <code>README</code> and <code>vignettes/</code> that no longer match the exports. Static and read-only (<code>lib.docaudit</code>).</p>
 <p><strong>Usage:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>/rforge:docs:check<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--detailed<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>/rforge:docs:check<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--detailed<span class="o">]</span><span class="w"> </span><span class="o">[</span>--eco<span class="o">]</span><span class="w"> </span><span class="o">[</span>--since<span class="w"> </span>&lt;tag&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--fail-on<span class="w"> </span>none<span class="p">|</span>warn<span class="p">|</span>error<span class="o">]</span>
 </span></code></pre></div></p>
 <p><strong>Parameters:</strong>
-- <code>package</code> (optional) - Package to check (defaults to current directory / ecosystem)
-- <code>--detailed</code> (optional) - Show the full per-file documentation drift report</p>
+- <code>package</code> (optional) - Package path or name; defaults to the package you are in (walks up to the nearest <code>DESCRIPTION</code>)
+- <code>--detailed</code> (optional) - Also print <code>info</code> findings (scannability)
+- <code>--eco</code> (optional) - Force the ecosystem sweep
+- <code>--since &lt;tag&gt;</code> (optional) - Add the coverage report, limited to exports added since the tag
+- <code>--fail-on</code> (optional) - Exit-code threshold: <code>none</code> (default), <code>warn</code> or <code>error</code>; does not change the report</p>
 <p><strong>Examples:</strong>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1"># Check documentation status</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1"># Audit the current package</span>
 </span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>/rforge:docs:check
 </span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>
-</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="c1"># Full drift report</span>
-</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>/rforge:docs:check<span class="w"> </span>--detailed
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="c1"># Whole ecosystem, with info findings</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>/rforge:docs:check<span class="w"> </span>--eco<span class="w"> </span>--detailed
 </span></code></pre></div></p>
-<p><strong>Validates:</strong>
-- Exported functions have documentation
-- Examples are runnable
-- NAMESPACE consistency with documentation
-- Version numbers match across files</p>
+<p><strong>Checks:</strong> <code>signature-named-arg</code> (error), <code>signature-names</code> and <code>signature-arity</code> (warn), <code>scannability</code> (info), <code>coverage</code> (warn, <code>--since</code> only). The first report line states the resolved scope; the summary line states how many exports were checked. Suppress findings with <code>docs.allowlist</code> in <code>.rforge.yaml</code>.</p>
 <hr />
 <h3 id="rforgecomplete">/rforge:complete<a class="headerlink" href="#rforgecomplete" title="Permanent link">&para;</a></h3>
 <p>Mark tasks complete with automatic documentation cascade.</p>
@@ -4600,7 +4685,7 @@ auto-applied).</p>
 <li>Runs <code>roxygen2::roxygenize()</code> (the blessed regeneration path — hand-edits to <code>man/*.Rd</code> are blocked by the PreToolUse hook)</li>
 <li>Reports success and recommends reviewing <code>git diff man/ NAMESPACE</code></li>
 </ul>
-<p><strong>Related commands:</strong> <code>/rforge:r:check</code> (verify after regenerating), <code>/rforge:docs:check</code> (detect drift)</p>
+<p><strong>Related commands:</strong> <code>/rforge:r:check</code> (verify after regenerating), <code>/rforge:docs:check</code> (audit docs against the API)</p>
 <hr />
 <h3 id="rforgertest">/rforge:r:test<a class="headerlink" href="#rforgertest" title="Permanent link">&para;</a></h3>
 <p>Run package tests via <code>testthat</code> and report pass/fail/skip counts.</p>

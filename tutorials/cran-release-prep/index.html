@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://data-wise.github.io/rforge/tutorials/cran-release-prep/">
       
       
-        <link rel="prev" href="../scaffolding-existing-packages/">
+        <link rel="prev" href="../fix-a-docs-check-finding/">
       
       
         <link rel="next" href="../cran-submission-with-rforge/">
@@ -492,34 +492,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../QUICK-START/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    🚀 Quick Start (3 min)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../quickstart/" class="md-nav__link">
         
   
@@ -527,7 +499,7 @@
   <span class="md-ellipsis">
     
   
-    📖 Detailed Quick Start
+    🚀 Quick Start
   
 
     
@@ -954,6 +926,34 @@
     
   
     Scaffolding existing packages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fix-a-docs-check-finding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fix a docs:check finding
   
 
     
@@ -1657,6 +1657,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/ecosystem-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ecosystem analysis (analyze/impact/cascade/release)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/docs-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docs audit (docs:check)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2303,6 +2359,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/docaudit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    docaudit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2797,7 +2881,7 @@ For ecosystem-level planning (submission order, cross-package deps),
 </div>
 <h2 id="the-release-pipeline-at-a-glance">The release pipeline at a glance<a class="headerlink" href="#the-release-pipeline-at-a-glance" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>flowchart TD
-    A["/rforge:docs:check&lt;br/&gt;NEWS + doc drift"] --&gt; B
+    A["/rforge:docs:check&lt;br/&gt;docs vs API audit"] --&gt; B
 
     subgraph "Per-package gate (v2.2.0+)"
         B["/rforge:r:cran-prep&lt;br/&gt;document→lint→spell→urlcheck&lt;br/&gt;test→coverage→check(--as-cran)→revdep&lt;br/&gt;writes cran-comments.md"]
@@ -2810,26 +2894,17 @@ For ecosystem-level planning (submission order, cross-package deps),
     E --&gt; F["/rforge:release&lt;br/&gt;CRAN submission order"]
     F --&gt; G["Submit via&lt;br/&gt;CRAN web form"]</code></pre>
 <h2 id="step-1-catch-documentation-drift-early">Step 1: Catch documentation drift early<a class="headerlink" href="#step-1-catch-documentation-drift-early" title="Permanent link">&para;</a></h2>
-<p>Documentation problems are the most common avoidable CRAN rejection. Check
-first, while fixes are cheap:</p>
+<p>Documentation problems are the most common avoidable CRAN rejection. Audit
+the docs against the API first, while fixes are cheap:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/rforge:docs:check
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>⚠️ DOCUMENTATION CHECK
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>NEWS.md: ⚠️ Missing 3 recent changes
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  • extract_mediation refactor
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>  • New bootstrap method
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  • Bug fix #234
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>Examples: ⚠️ 2 outdated
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>  • README example uses old API
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>  • Vignette 2 has broken code
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>Recommendations:
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>  1. Update NEWS.md (5 min)
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>  2. Update examples (20 min)
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>  3. Regenerate vignettes (10 min)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>scope: package medfit at /path/to/medfit
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>error signature-named-arg    vignettes/intro.qmd:154  `BootstrapResult()` has no argument `converged` (formals: estimate, ci_lower, ...)
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>warn  signature-names        vignettes/refcard.qmd:13  listing of `joint_effects()` names `theta`, which is not a formal (formals: object, estimates)
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>checked 18 of 22 exported functions (3 no-usage, 1 variadic not checked)
 </span></code></pre></div>
+<p>An <code>error</code> is a call that would fail as written; a <code>warn</code> is a candidate to check by hand.
+It does not check NEWS.md or run examples. See <a href="../../guides/docs-audit/">Docs audit</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">The description-sync skill backs this up automatically</p>
 <p>rforge ships a <code>description-sync</code> validation skill that checks your
@@ -2984,7 +3059,7 @@ checks. <code>/rforge:release</code> computes the sequence:</p>
 <p>That's your signal to loop back to Steps 1–2 for that package.</p>
 <h2 id="a-realistic-single-package-release">A realistic single-package release<a class="headerlink" href="#a-realistic-single-package-release" title="Permanent link">&para;</a></h2>
 <p>Most releases are one package, not a whole verse. The condensed flow:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>/rforge:docs:check medfit        # 1. drift check (NEWS, examples)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>/rforge:docs:check medfit        # 1. docs content audit (README/vignette calls vs exports)
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>/rforge:r:cran-prep              # 2. full gate: runs all checks + writes cran-comments.md
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a># ... fix anything flagged, re-run until "ready" ...
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>/rforge:release medfit           # 3. confirm ecosystem readiness + submission order
@@ -2997,7 +3072,7 @@ checks. <code>/rforge:release</code> computes the sequence:</p>
 </span></code></pre></div>
 <h2 id="pre-submission-checklist">Pre-submission checklist<a class="headerlink" href="#pre-submission-checklist" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[ ] <code>/rforge:docs:check</code> clean (NEWS.md current, examples run)</li>
+<li>[ ] <code>/rforge:docs:check</code> has no errors (the audit does not check NEWS.md or run examples: <code>description-sync</code> and <code>r:check</code> cover those)</li>
 <li>[ ] <code>description-sync</code> passes (DESCRIPTION version == NEWS top entry)</li>
 <li>[ ] DESCRIPTION has <code>Language: en-US</code> (or correct BCP 47 code) if package has <code>man/</code> or <code>vignettes/</code> dirs</li>
 <li>[ ] DOI references in DESCRIPTION use <code>&lt;doi:10.xxx/yyy&gt;</code> angle-bracket format, not bare <code>doi:</code> or raw <code>https://doi.org/</code> URLs</li>

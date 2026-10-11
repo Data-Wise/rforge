@@ -478,15 +478,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-new-in-2201" class="md-nav__link">
+  <a href="#whats-new-in-2210" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's new in 2.20.1
+        What's new in 2.21.0
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="What&#39;s new in 2.20.1">
+    <nav class="md-nav" aria-label="What&#39;s new in 2.21.0">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -675,34 +675,6 @@
   
   
     <li class="md-nav__item">
-      <a href="QUICK-START/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    🚀 Quick Start (3 min)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="quickstart/" class="md-nav__link">
         
   
@@ -710,7 +682,7 @@
   <span class="md-ellipsis">
     
   
-    📖 Detailed Quick Start
+    🚀 Quick Start
   
 
     
@@ -1132,6 +1104,34 @@
     
   
     Scaffolding existing packages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/fix-a-docs-check-finding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fix a docs:check finding
   
 
     
@@ -1687,6 +1687,62 @@
     
   
     Website + deploy guard (r:site)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/ecosystem-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ecosystem analysis (analyze/impact/cascade/release)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/docs-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docs audit (docs:check)
   
 
     
@@ -2346,6 +2402,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reference/docaudit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    docaudit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2732,15 +2816,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-new-in-2201" class="md-nav__link">
+  <a href="#whats-new-in-2210" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's new in 2.20.1
+        What's new in 2.21.0
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="What&#39;s new in 2.20.1">
+    <nav class="md-nav" aria-label="What&#39;s new in 2.21.0">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2872,7 +2956,7 @@
 <li><strong>What:</strong> R package <em>ecosystem</em> analysis from inside Claude Code. 44 slash commands.</li>
 <li><strong>Why:</strong> Fast feedback on multi-package R repos — discovery, dependencies, change impact, CRAN cascade planning.</li>
 <li><strong>How:</strong> <code>brew install data-wise/tap/rforge</code>, then <code>/rforge:analyze "&lt;what changed&gt;"</code>.</li>
-<li><strong>Next:</strong> <a href="QUICK-START/">Quick Start</a> (3 min) → <a href="#where-to-start">Where to start</a> below.</li>
+<li><strong>Next:</strong> <a href="quickstart/">Quick Start</a> → <a href="#where-to-start">Where to start</a> below.</li>
 </ul>
 </div>
 <p>Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python <code>lib/</code> modules handle discovery, dependencies, status, and init. <strong>No MCP server, no Node.js</strong> at runtime. The fast ecosystem commands (analysis, deps, status) are pure Python; the <code>r:*</code> dev-cycle commands and <code>/rforge:thorough</code> shell out to R via <code>lib/rcmd.py</code>.</p>
@@ -2904,7 +2988,7 @@ wraps the standard R toolchain — it doesn't replace it.</p>
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m13.13 22.19-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27zM5.64 12.5l-3.83-1.63 6.1-2.77C7 9.46 6.22 10.93 5.64 12.5M21.61 2.39S16.66.269 11 5.93c-2.19 2.19-3.5 4.6-4.35 6.71-.28.75-.09 1.57.46 2.13l2.13 2.12c.55.56 1.37.74 2.12.46A19.1 19.1 0 0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61m-7.07 7.07c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83s-2.05.78-2.83 0m-5.66 7.07-1.41-1.41zM6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22zM2 22h1.41l4.77-4.76-1.42-1.41L2 20.59zm0-2.83 4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76z"/></svg></span> <strong>Just want it working</strong></p>
 <hr />
 <p>3-minute install + first command.</p>
-<p><a href="QUICK-START/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Quick Start</a></p>
+<p><a href="quickstart/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Quick Start</a></p>
 </li>
 <li>
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17z"/></svg></span> <strong>New, have a package to try</strong></p>
@@ -2964,7 +3048,7 @@ wraps the standard R toolchain — it doesn't replace it.</p>
 </li>
 </ul>
 </div>
-<h2 id="whats-new-in-2201">What's new in 2.20.1<a class="headerlink" href="#whats-new-in-2201" title="Permanent link">&para;</a></h2>
+<h2 id="whats-new-in-2210">What's new in 2.21.0<a class="headerlink" href="#whats-new-in-2210" title="Permanent link">&para;</a></h2>
 <ul>
 <li>🐛 <strong><code>.STATUS</code> parsing fixes</strong> — <code>lib.status</code> (behind <code>/rforge:status</code> and <code>/rforge:health</code>)
   reads the <code>key: value</code> frontmatter dialect every mediationverse package uses, and takes
@@ -3042,7 +3126,7 @@ wraps the standard R toolchain — it doesn't replace it.</p>
     click G "REFCARD.md"
     click I "REFCARD.md"
     click K "REFCARD.md"</code></pre>
-<p>→ Not sure yet? Start with <a href="REFCARD/">/rforge:quick</a> or the <a href="QUICK-START/">Quick Start</a>.</p>
+<p>→ Not sure yet? Start with <a href="REFCARD/">/rforge:quick</a> or the <a href="quickstart/">Quick Start</a>.</p>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>/plugin marketplace add Data-Wise/rforge
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>/plugin install rforge

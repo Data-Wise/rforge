@@ -492,34 +492,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../QUICK-START/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    🚀 Quick Start (3 min)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../quickstart/" class="md-nav__link">
         
   
@@ -527,7 +499,7 @@
   <span class="md-ellipsis">
     
   
-    📖 Detailed Quick Start
+    🚀 Quick Start
   
 
     
@@ -949,6 +921,34 @@
     
   
     Scaffolding existing packages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/fix-a-docs-check-finding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fix a docs:check finding
   
 
     
@@ -1509,6 +1509,62 @@
     
   
     Website + deploy guard (r:site)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/ecosystem-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ecosystem analysis (analyze/impact/cascade/release)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/docs-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docs audit (docs:check)
   
 
     
@@ -2336,6 +2392,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/docaudit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    docaudit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2862,6 +2946,14 @@
 <td>Suggest the next most useful action</td>
 </tr>
 <tr>
+<td><code>/rforge:capture</code></td>
+<td>Capture a task or idea into <code>.STATUS</code></td>
+</tr>
+<tr>
+<td><code>/rforge:complete</code></td>
+<td>Mark a task complete and cascade doc updates</td>
+</tr>
+<tr>
 <td><code>/rforge:restore</code></td>
 <td>Recap a single R package's state (read-only)</td>
 </tr>
@@ -2897,8 +2989,8 @@
 <td>Assess blast radius of a planned change</td>
 </tr>
 <tr>
-<td><code>/rforge:advise</code></td>
-<td>Get advisory recommendations</td>
+<td><code>/rforge:health</code></td>
+<td>Health metrics across the ecosystem</td>
 </tr>
 </tbody>
 </table>
@@ -2958,6 +3050,10 @@
 <td><code>/rforge:r:build</code></td>
 <td>Build the package binary</td>
 </tr>
+<tr>
+<td><code>/rforge:r:install</code></td>
+<td>Install the package locally and report the version</td>
+</tr>
 </tbody>
 </table>
 <h2 id="quality">Quality<a class="headerlink" href="#quality" title="Permanent link">&para;</a></h2>
@@ -2992,6 +3088,10 @@
 <tr>
 <td><code>/rforge:r:goodpractice</code></td>
 <td>Advisory best-practices check</td>
+</tr>
+<tr>
+<td><code>/rforge:r:tidy</code></td>
+<td>Tidyverse-conventions audit (advisory, never blocks)</td>
 </tr>
 </tbody>
 </table>
@@ -3083,19 +3183,11 @@
 <tbody>
 <tr>
 <td><code>/rforge:docs:check</code></td>
-<td>Check NEWS.md and API consistency</td>
+<td>Audit README/vignette calls and signatures against the exports</td>
 </tr>
 <tr>
-<td><code>/rforge:docs:workflow</code></td>
-<td>Document workflow steps</td>
-</tr>
-<tr>
-<td><code>/rforge:site:check</code></td>
-<td>Check pkgdown site health</td>
-</tr>
-<tr>
-<td><code>/rforge:site:deploy</code></td>
-<td>Deploy pkgdown site (with leak guard)</td>
+<td><code>/rforge:r:site</code></td>
+<td>Build the pkgdown site; <code>--check-leaks</code> lints the render surface, <code>--deploy</code> is recommend-only</td>
 </tr>
 </tbody>
 </table>
@@ -3109,16 +3201,16 @@
 </thead>
 <tbody>
 <tr>
-<td><code>/rforge:deps-sync</code></td>
-<td>Reconcile DESCRIPTION vs usage</td>
+<td><code>/rforge:r:deps-sync</code></td>
+<td>Reconcile DESCRIPTION vs usage (dry run; <code>--write</code> applies)</td>
 </tr>
 <tr>
-<td><code>/rforge:deps:graph</code></td>
+<td><code>/rforge:deps</code></td>
 <td>Visualize the dependency graph</td>
 </tr>
 <tr>
-<td><code>/rforge:r:universe</code></td>
-<td>Check R-universe build status</td>
+<td><code>/rforge:r:submit --universe</code></td>
+<td>Check R-universe early-access build status</td>
 </tr>
 </tbody>
 </table>

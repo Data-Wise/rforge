@@ -492,34 +492,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../QUICK-START/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    🚀 Quick Start (3 min)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../quickstart/" class="md-nav__link">
         
   
@@ -527,7 +499,7 @@
   <span class="md-ellipsis">
     
   
-    📖 Detailed Quick Start
+    🚀 Quick Start
   
 
     
@@ -773,6 +745,28 @@
     <span class="md-ellipsis">
       
         🌐 Multi-platform verification (optional)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docs-audit-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📝 Docs audit gate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#session-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔚 Session boundary
       
     </span>
   </a>
@@ -1133,6 +1127,34 @@
     
   
     Scaffolding existing packages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/fix-a-docs-check-finding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fix a docs:check finding
   
 
     
@@ -1688,6 +1710,62 @@
     
   
     Website + deploy guard (r:site)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/ecosystem-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ecosystem analysis (analyze/impact/cascade/release)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/docs-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docs audit (docs:check)
   
 
     
@@ -2347,6 +2425,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/docaudit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    docaudit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2810,6 +2916,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#docs-audit-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📝 Docs audit gate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#session-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔚 Session boundary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#how-rforge-fits-with-rs-own-tools" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2948,7 +3076,7 @@ tutorial that walks it through in detail.</p>
 <h2 id="cran-release-pipeline">📦 CRAN release pipeline<a class="headerlink" href="#cran-release-pipeline" title="Permanent link">&para;</a></h2>
 <p>Per-package gate → ecosystem rollup → submission order.</p>
 <pre class="mermaid"><code>flowchart TD
-    A["/rforge:docs:check\nNEWS + doc drift"] --&gt; B
+    A["/rforge:docs:check\ndocs vs API audit"] --&gt; B
 
     subgraph gate["Per-package gate (v2.2.0+, strict by default v2.3.0+)"]
         B["/rforge:r:cran-prep\ndocument→lint→spell→urlcheck→test→coverage\ncheck → check (noSuggests) → check (suggests-only)\nTier 4: description, build-hygiene, docs-consistency\nrevdep · writes cran-comments.md"]
@@ -2998,6 +3126,26 @@ that a source-tree check masks.</p>
     E --&gt; F
     F --&gt; G["submit to CRAN"]</code></pre>
 <p>→ <a href="../tutorials/cran-submission-with-rforge/">CRAN submission — multi-platform section</a></p>
+<h2 id="docs-audit-gate">📝 Docs audit gate<a class="headerlink" href="#docs-audit-gate" title="Permanent link">&para;</a></h2>
+<p>Check that the docs still describe the API before you build or release.</p>
+<pre class="mermaid"><code>flowchart LR
+    A["/rforge:docs:check"] --&gt; B{"report ends with&lt;br/&gt;INCOMPLETE / NOT AUDITED?"}
+    B -- "yes" --&gt; C["fix the unreadable file&lt;br/&gt;or the unclosed call, re-run"]
+    C --&gt; A
+    B -- "no" --&gt; D{"findings?"}
+    D -- "error / warn" --&gt; E["check the call against&lt;br/&gt;man/*.Rd, fix the docs&lt;br/&gt;or allowlist it"]
+    E --&gt; A
+    D -- "none" --&gt; F["/rforge:r:cran-prep"]</code></pre>
+<p>→ <a href="../tutorials/fix-a-docs-check-finding/">Fix a docs:check finding</a> (~10 min) · <a href="../guides/docs-audit/">Docs audit guide</a></p>
+<h2 id="session-boundary">🔚 Session boundary<a class="headerlink" href="#session-boundary" title="Permanent link">&para;</a></h2>
+<p>Start a session with a recap; end it by syncing <code>.STATUS</code>.</p>
+<pre class="mermaid"><code>flowchart LR
+    A["/rforge:restore&lt;br/&gt;read-only recap"] --&gt; B["work"]
+    B --&gt; C["/rforge:finish&lt;br/&gt;dry run: proposed .STATUS diff"]
+    C --&gt; D{"diff looks right?"}
+    D -- "yes" --&gt; E["/rforge:finish --write"]
+    D -- "no" --&gt; B</code></pre>
+<p>→ <a href="../guides/session-boundary/">Session boundary guide</a></p>
 <h2 id="how-rforge-fits-with-rs-own-tools">How rforge fits with R's own tools<a class="headerlink" href="#how-rforge-fits-with-rs-own-tools" title="Permanent link">&para;</a></h2>
 <p>The boundary in one picture: R tools build a package; rforge orchestrates
 the set.</p>

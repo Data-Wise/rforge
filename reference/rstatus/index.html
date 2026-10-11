@@ -16,7 +16,7 @@
         <link rel="prev" href="../tidyaudit/">
       
       
-        <link rel="next" href="../../architecture/">
+        <link rel="next" href="../docaudit/">
       
       
         
@@ -492,34 +492,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../QUICK-START/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    🚀 Quick Start (3 min)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../quickstart/" class="md-nav__link">
         
   
@@ -527,7 +499,7 @@
   <span class="md-ellipsis">
     
   
-    📖 Detailed Quick Start
+    🚀 Quick Start
   
 
     
@@ -949,6 +921,34 @@
     
   
     Scaffolding existing packages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/fix-a-docs-check-finding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fix a docs:check finding
   
 
     
@@ -1509,6 +1509,62 @@
     
   
     Website + deploy guard (r:site)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/ecosystem-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ecosystem analysis (analyze/impact/cascade/release)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/docs-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docs audit (docs:check)
   
 
     
@@ -2358,6 +2414,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#version_overrides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        version_overrides()
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2367,6 +2434,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docaudit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    docaudit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2874,6 +2969,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#version_overrides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        version_overrides()
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3069,6 +3175,15 @@ named field, full original text stays available via <code>raw_fields</code>.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_rstatus</span><span class="p">(</span><span class="n">pkg_path</span><span class="p">:</span> <span class="s1">'str | Path'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'Optional[RStatus]'</span>
 </span></code></pre></div>
 <p>Read and parse <code>&lt;pkg_path&gt;/.STATUS</code>. Returns None if absent/unreadable.</p>
+<h3 id="version_overrides"><code>version_overrides()</code><a class="headerlink" href="#version_overrides" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">version_overrides</span><span class="p">(</span><span class="n">recap</span><span class="p">:</span> <span class="s1">'dict'</span><span class="p">,</span> <span class="n">current</span><span class="p">:</span> <span class="s1">'Optional[RStatus]'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'dict'</span>
+</span></code></pre></div>
+<p><code>apply_updates</code> overrides for <code>version</code>, for <code>/rforge:finish</code>.</p>
+<p>DESCRIPTION's <code>Version</code> is written only when <code>.STATUS</code>'s mirror is absent
+or has drifted. A matching-but-annotated <code>version:</code> ("0.7.0 (released …)")
+must be left alone, or <code>--write</code> would strip the annotation (#84); an
+absent one must be filled in, or a <code>.STATUS</code> with no <code>version:</code> line would
+diff as timestamp-only and report "already current" forever.</p>
 
 
 
