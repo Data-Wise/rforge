@@ -96,8 +96,7 @@ nav:
   - Home: index.md
   - Get Started:
     - 📦 Installation: installation.md
-    - 🚀 Quick Start (3 min): QUICK-START.md
-    - 📖 Detailed Quick Start: quickstart.md
+    - 🚀 Quick Start: quickstart.md
   - Learn:
     - 📊 Visual Workflows: workflows/index.md
     - "🧰 Package Development Guide": package-development-guide.md

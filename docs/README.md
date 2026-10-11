@@ -10,7 +10,7 @@
 
 | Document | Purpose | Read Time |
 |----------|---------|-----------|
-| **[QUICK-START.md](QUICK-START.md)** | Get running in 3 minutes | 2 min |
+| **[quickstart.md](quickstart.md)** | Install and run your first command | 5 min |
 | **[REFCARD.md](REFCARD.md)** | One-page command reference | 2 min |
 
 ### Detailed Guides
@@ -24,7 +24,7 @@
 
 ## 🚀 Getting Started
 
-**New users:** Start with [QUICK-START.md](QUICK-START.md)
+**New users:** Start with [quickstart.md](quickstart.md)
 
 **Need a reminder:** Check [REFCARD.md](REFCARD.md)
 
@@ -34,18 +34,18 @@
 
 ## 📖 What's What
 
-### QUICK-START.md
+### quickstart.md
 Perfect for:
 - First-time users
 - Getting up and running fast
 - Learning the headline commands (`/rforge:quick`, `analyze`, `thorough`)
 
 **Contents:**
-- Installation (1 minute)
-- Prerequisites
-- First commands to try
+- Prerequisites and installation
+- Basic usage and modes
 - Common workflows
-- Example session
+- Output formats and project-structure detection
+- Troubleshooting
 
 ### REFCARD.md
 Perfect for:
@@ -92,7 +92,7 @@ rforge/
 │   └── orchestrator.md        # Pattern recognition + delegation
 ├── docs/                      # 👈 You are here
 │   ├── README.md              # This file
-│   ├── QUICK-START.md         # 3-minute guide
+│   ├── quickstart.md          # Install + first commands
 │   ├── REFCARD.md             # One-page reference
 │   ├── architecture.md        # Plugin Surface diagram + details
 │   ├── hooks-and-skills.md    # Hook rules + skill reference
@@ -119,7 +119,7 @@ rforge/
 ### I want to...
 
 **Get started quickly**
-→ [QUICK-START.md](QUICK-START.md)
+→ [quickstart.md](quickstart.md)
 
 **Look up a command**
 → [REFCARD.md](REFCARD.md)
@@ -131,13 +131,13 @@ rforge/
 → [REFCARD.md](REFCARD.md#pattern-recognition)
 
 **See example workflows**
-→ [QUICK-START.md](QUICK-START.md#common-workflows) or [REFCARD.md](REFCARD.md#common-workflows)
+→ [quickstart.md](quickstart.md#common-workflows) or [REFCARD.md](REFCARD.md#common-workflows)
 
 **Troubleshoot issues**
-→ [QUICK-START.md](QUICK-START.md#troubleshooting) or [REFCARD.md](REFCARD.md#troubleshooting)
+→ [quickstart.md](quickstart.md#troubleshooting) or [REFCARD.md](REFCARD.md#troubleshooting)
 
 **Installation & setup**
-→ [QUICK-START.md](QUICK-START.md#prerequisites)
+→ [quickstart.md](quickstart.md#prerequisites)
 
 ---
 
@@ -248,4 +248,4 @@ from a previous version, remove it (see
 
 ---
 
-**Need help?** Start with [QUICK-START.md](QUICK-START.md) or check [REFCARD.md](REFCARD.md) for quick answers!
+**Need help?** Start with [quickstart.md](quickstart.md) or check [REFCARD.md](REFCARD.md) for quick answers!
