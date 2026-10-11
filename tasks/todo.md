@@ -66,3 +66,12 @@
 
 - [ ] T17a [M] Version bump to 2.21.0 and PRs (user-gated)
 - [ ] T17b [S] Tag, GitHub release, tap sync (user-gated; ask permission for each write to the tap repo)
+
+## Checkpoint B fixes (Codex review #3; plan: `tasks/plan-checkpoint-b-fixes.md`)
+
+- [ ] F1 R argument matching: exact names first, then partials among remaining formals
+- [ ] F4 linear paren matching, per-region work budget, replay subprocess timeout
+- [ ] F2 failed audits (non-zero exit, bad JSON, `audit_failed`) raise `AuditCrashed`
+- [ ] F3 a `status: firm` row whose check is missing/unimplemented fails (`lost`), never `pending`
+- [ ] Gates, evidence rerun, triage sheet refresh, Codex re-review clean
+
