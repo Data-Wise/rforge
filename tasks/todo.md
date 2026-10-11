@@ -12,9 +12,9 @@
 
 ### Checkpoint A — harness live
 
-- [ ] `pytest tests/harness -q` green
-- [ ] `replay.py recall` shows every row `pending` and counts none as missed
-- [ ] Mutation self-test proves the harness goes red when the audit finds nothing
+- [x] `pytest tests/harness -q` green
+- [x] `replay.py recall` shows every row `pending` and counts none as missed
+- [x] Mutation self-test proves the harness goes red when the audit finds nothing
 
 ## Phase 1 — First vertical slices
 
@@ -23,12 +23,12 @@
 
 ### Checkpoint B — THE GATE (human; hard stop)
 
-- [ ] Adversarial review #2 on the signature logic (multi-agent, read-only)
-- [ ] History replay: ≥60 commits × medfit / medrobust / probmed; hits triaged
-- [ ] `replay.py recall --scope signature` catches every eligible signature row (scannability/site rows not yet eligible)
-- [ ] Planted defects in a scratch copy of the hold-out docs are caught
-- [ ] Hold-out triage by the maintainer (true / false / won't-fix); precision recorded in the SPEC appendix
-- [ ] No `error`-severity false positive (else demote `signature-named-arg` to `warn`, D7)
+- [x] Adversarial review #2 on the signature logic (multi-agent, read-only)
+- [x] History replay: ≥60 commits × medfit / medrobust / probmed; hits triaged
+- [x] `replay.py recall --scope signature` catches every eligible signature row (scannability/site rows not yet eligible)
+- [x] Planted defects in a scratch copy of the hold-out docs are caught
+- [x] Hold-out triage by the maintainer (true / false / won't-fix); precision recorded in the SPEC appendix
+- [x] No `error`-severity false positive (else demote `signature-named-arg` to `warn`, D7)
 
 ## Phase 2 — Remaining checks (parallel-safe after the gate)
 
@@ -38,8 +38,8 @@
 
 ### Checkpoint C
 
-- [ ] All A1 checks green; `replay.py recall --scope a1` catches every `release: A1` row (A2 rows excluded)
-- [ ] `pytest tests/ -q` green
+- [x] All A1 checks green; `replay.py recall --scope a1` catches every `release: A1` row (A2 rows excluded)
+- [x] `pytest tests/ -q` green
 
 ## Phase 3 — User-facing surface
 
@@ -60,7 +60,7 @@
 
 ### Checkpoint E — release gates
 
-- [ ] `pytest tests/ -q`; `bash tests/test-all.sh` (exact count); `gen_lib_reference.py --check`; `version_sync.py --check`; `mkdocs build --strict`
+- [x] `pytest tests/ -q`; `bash tests/test-all.sh` (exact count); `gen_lib_reference.py --check`; `version_sync.py --check`; `mkdocs build --strict` (run 2026-10-11 at af005db: 899 passed, 47/47, mkdocs clean)
 - [ ] Harness recall report archived in the PR body
 - [ ] ORCHESTRATE file and `tasks/` removed from the branch before the merge to `dev`
 
