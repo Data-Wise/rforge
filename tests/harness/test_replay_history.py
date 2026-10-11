@@ -31,7 +31,7 @@ def _history(tmp_path, bodies):
     (r / "man").mkdir()
     (r / "man" / "f.Rd").write_bytes(b"\\name{f}\n\\usage{\nf(a, b)\n}\n")
     for i, body in enumerate(bodies):
-        (r / "README.md").write_text(body)
+        (r / "README.md").write_text(body + f"<!-- {i} -->\n")  # keep every commit non-empty
         _git(r, "add", "-A")
         _git(r, "commit", "-q", "-m", f"c{i}")
     return r

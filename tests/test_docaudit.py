@@ -1,0 +1,269 @@
+"""Unit tests for lib/docaudit.py (signature checks)."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from lib import docaudit
+from lib.docaudit import PackageApi, Region, check_region, extract_regions, parse_namespace, parse_rd_usage, split_args
+
+
+def rd(usage: str) -> str:
+    return "\\name{x}\n\\usage{\n" + usage + "\n}\n"
+
+
+def api(**formals) -> PackageApi:
+    return PackageApi(formals, set(formals), set(), set(), False)
+
+
+def fence(code: str) -> Region:
+    return Region("fence", 10, code)
+
+
+def inline(code: str) -> Region:
+    return Region("inline", 10, code)
+
+
+def run(region: Region, **formals):
+    return check_region(region, "doc.md", "pkg", api(**formals))
+
+
+def kinds(findings):
+    return sorted((f["check"], f["arg"]) for f in findings)
+
+
+# ───────────────────────── Rd usage ─────────────────────────
+
+
+def test_rd_usage_defaults_and_multiline():
+    funcs, _ = parse_rd_usage(rd('f(a, b = c("x", "y"),\n  d = list(1, 2), e = NULL)'))
+    assert funcs == {"f": ["a", "b", "d", "e"]}
+
+
+def test_rd_usage_dots_macro_and_comments():
+    funcs, _ = parse_rd_usage(rd("g(x, \\dots)  % a comment, with commas\nh(y, \\ldots)"))
+    assert funcs == {"g": ["x", "..."], "h": ["y", "..."]}
+
+
+def test_rd_usage_methods_are_recorded_not_parsed_as_functions():
+    funcs, methods = parse_rd_usage(rd("\\method{print}{foo}(x, ...)\n\\S3method{summary}{foo}(object)"))
+    assert funcs == {} and methods == {"print.foo", "summary.foo"}
+
+
+def test_rd_without_usage_or_unbalanced():
+    assert parse_rd_usage("\\name{x}\n") == ({}, set())
+    assert parse_rd_usage("\\usage{\nf(a, b\n}\n")[0] == {}
+
+
+def test_rd_usage_default_with_braces_and_escaped_percent():
+    funcs, _ = parse_rd_usage(rd("f(a = function(x) { x }, b = 100\\%)"))
+    assert funcs == {"f": ["a", "b"]}
+
+
+# ───────────────────────── NAMESPACE ─────────────────────────
+
+
+def test_namespace_exports_comma_lists_quotes_and_comments():
+    ns = 'export(a, b)\nexport("c")\n# export(hidden)\nexport(`d`)\nS3method(print, foo)\nexportClasses(K)\n'
+    assert parse_namespace(ns) == ({"a", "b", "c", "d"}, False)
+
+
+def test_namespace_export_pattern_flag():
+    assert parse_namespace('exportPattern("^[^.]")\nexport(a)') == ({"a"}, True)
+
+
+# ───────────────────────── regions ─────────────────────────
+
+
+def test_regions_r_fences_only():
+    text = "intro `f(a)` here\n```r\nf(a = 1)\n```\n```bash\nf(b = 2)\n```\n```{r, echo=FALSE}\nf(c = 3)\n```\n```\nf(d = 4)\n```\n~~~r\nf(e = 5)\n~~~\n"
+    got = [(r.kind, r.line, r.text) for r in extract_regions(text)]
+    assert ("inline", 1, "f(a)") in got
+    fences = [t for k, _, t in got if k == "fence"]
+    assert fences == ["f(a = 1)", "f(c = 3)", "f(d = 4)", "f(e = 5)"]
+    assert next(line for k, line, t in got if t == "f(a = 1)") == 3
+
+
+def test_regions_inline_inside_fence_are_not_spans():
+    assert [r.kind for r in extract_regions("```r\nx <- `f(a)`\n```\n")] == ["fence"]
+
+
+def test_regions_longer_fence_not_closed_by_shorter():
+    assert extract_regions("````r\nf(a = 1)\n```\nf(b = 2)\n````\n")[0].text == "f(a = 1)\n```\nf(b = 2)"
+
+
+def test_split_args_nests_and_skips_empty():
+    assert split_args("a, f(b, c), [d, e], g = {h, i},") == ["a", "f(b, c)", "[d, e]", "g = {h, i}"]
+
+
+# ───────────────────────── signature-named-arg ─────────────────────────
+
+
+def test_named_arg_not_a_formal_is_an_error():
+    f = run(fence("fixed(alpha = 1, gamma = 2)"), fixed=["alpha", "beta"])
+    assert kinds(f) == [("signature-named-arg", "gamma")] and f[0]["severity"] == "error"
+
+
+def test_named_arg_exact_and_unique_prefix_ok_ambiguous_prefix_flagged():
+    formals = {"fixed": ["alpha", "alpine"]}
+    assert run(fence("fixed(alpha = 1)"), **formals) == []
+    assert kinds(run(fence("fixed(alp = 1)"), **formals)) == [("signature-named-arg", "alp")]
+    assert run(fence("fixed(alpi = 1)"), **formals) == []  # unique prefix of `alpine`
+
+
+def test_variadic_functions_are_exempt_from_every_check():
+    assert run(fence("vari(1, 2, 3, anything = 1)"), vari=["x", "..."]) == []
+    assert run(inline("vari(x, anything)"), vari=["x", "..."]) == []
+
+
+def test_equality_and_nested_names_are_not_named_args():
+    assert run(fence("fixed(alpha == 1, alpha = c(zzz = 1), beta = list(q = 2))"), fixed=["alpha", "beta"]) == []
+
+
+def test_comments_and_strings_are_masked():
+    code = '# fixed(bogus = 1)\nx <- "fixed(bogus = 1)"\nfixed(alpha = "a, bogus = 2")\n'
+    assert run(fence(code), fixed=["alpha"]) == []
+
+
+def test_foreign_namespace_skipped_own_namespace_checked_method_calls_skipped():
+    assert run(fence("stats::fixed(zzz = 1)\nobj$fixed(zzz = 1)\nobj@fixed(zzz = 1)"), fixed=["a"]) == []
+    assert kinds(run(fence("pkg::fixed(zzz = 1)"), fixed=["a"])) == [("signature-named-arg", "zzz")]
+
+
+def test_unexported_or_unknown_function_ignored_and_unbalanced_call_is_safe():
+    assert run(fence("other(zzz = 1)"), fixed=["a"]) == []
+    assert run(fence("fixed(a = 1, b = (2"), fixed=["a"]) == []
+
+
+def test_finding_line_number_points_at_the_call():
+    f = run(Region("fence", 20, "x <- 1\nfixed(zzz = 1)"), fixed=["a"])
+    assert f[0]["line"] == 21 and f[0]["file"] == "doc.md" and f[0]["function"] == "fixed"
+
+
+# ───────────────────────── signature-arity ─────────────────────────
+
+
+def test_arity_too_many_positionals_is_a_warning():
+    f = run(fence('joint(fit, est, "bca")'), joint=["object", "estimates"])
+    assert kinds(f) == [("signature-arity", None)] and f[0]["severity"] == "warn"
+
+
+def test_arity_exact_fewer_and_named_do_not_count():
+    assert run(fence("joint(fit, est)\njoint(fit)\njoint(fit, estimates = e)"), joint=["object", "estimates"]) == []
+
+
+def test_arity_not_judged_when_call_forwards_dots():
+    assert run(fence("joint(a, b, c, ...)"), joint=["object", "estimates"]) == []
+
+
+def test_arity_zero_formals():
+    assert kinds(run(fence("nothing(1)"), nothing=[])) == [("signature-arity", None)]
+    assert run(fence("nothing()"), nothing=[]) == []
+
+
+# ───────────────────────── signature-names ─────────────────────────
+
+
+def test_names_listing_with_non_formals_one_finding_per_name():
+    f = run(inline("joint(x, theta)"), joint=["object", "estimates"])
+    assert kinds(f) == [("signature-names", "theta"), ("signature-names", "x")]
+
+
+def test_names_listing_with_formals_or_non_identifiers_is_clean():
+    assert run(inline("joint(object, estimates)"), joint=["object", "estimates"]) == []
+    assert run(inline('joint(object, "bca")'), joint=["object", "estimates"]) == []
+
+
+def test_names_only_judged_for_inline_spans_that_are_a_single_call():
+    assert run(fence("joint(x, theta)"), joint=["object", "estimates"]) == []
+    assert run(inline("see joint(x, theta) for details"), joint=["object", "estimates"]) == []
+
+
+def test_names_listing_named_arg_reported_by_named_arg_check_only():
+    assert kinds(run(inline("joint(object, bogus = 1)"), joint=["object", "estimates"])) == [("signature-named-arg", "bogus")]
+
+
+# ───────────────────────── whole-package audit ─────────────────────────
+
+
+def make_pkg(tmp_path: Path, *, ns: str, rds: dict, docs: dict) -> Path:
+    (tmp_path / "man").mkdir()
+    (tmp_path / "DESCRIPTION").write_text("Package: pkg\nVersion: 0.1.0\n")
+    if ns is not None:
+        (tmp_path / "NAMESPACE").write_text(ns)
+    for name, usage in rds.items():
+        (tmp_path / "man" / f"{name}.Rd").write_text(rd(usage) if usage is not None else "\\name{x}\n")
+    for rel, text in docs.items():
+        p = tmp_path / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(text if isinstance(text, bytes) else text.encode())
+    return tmp_path
+
+
+def test_not_an_r_package(tmp_path):
+    r = docaudit.audit_package(tmp_path)
+    assert r["findings"] == [] and "not an R package" in r["messages"][0] and r["status"] == "ok"
+
+
+def test_audit_reports_findings_with_envelope_fields(tmp_path):
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a, b)"},
+             docs={"README.md": "```r\nf(a = 1, z = 2)\n```\n", "vignettes/v.qmd": "`f(q)`\n"})
+    r = docaudit.audit_package(tmp_path)
+    assert r["kind"] == "docaudit" and r["status"] == "warn" and r["max_severity"] == "error"
+    assert [(f["file"], f["check"]) for f in r["findings"]] == [("README.md", "signature-named-arg"), ("vignettes/v.qmd", "signature-names")]
+    assert r["engine_missing"] == []
+
+
+def test_clean_package_is_ok_and_max_severity_none(tmp_path):
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)"}, docs={"README.md": "`f(a)`\n"})
+    r = docaudit.audit_package(tmp_path)
+    assert r["status"] == "ok" and r["max_severity"] == "none"
+
+
+def test_only_exported_functions_are_checked(tmp_path):
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)", "g": "g(a)"}, docs={"README.md": "```r\ng(zzz = 1)\n```\n"})
+    assert docaudit.audit_package(tmp_path)["findings"] == []
+
+
+def test_coverage_summary_counts_reasons(tmp_path):
+    make_pkg(tmp_path, ns="export(f, v, nousage, m.cls, re)\n",
+             rds={"f": "f(a)", "v": "v(x, \\dots)", "nousage": None, "m": "\\method{m}{cls}(x)",
+                  "reexports": "\\alias{re}\nre(x)"},
+             docs={})
+    s = docaudit.audit_package(tmp_path)["summary"]
+    assert s == {"exports": 5, "checked": 1, "unchecked": {"no-usage": 1, "method": 1, "re-export": 1, "variadic": 1}}
+
+
+def test_export_pattern_treats_documented_functions_as_exported(tmp_path):
+    make_pkg(tmp_path, ns='exportPattern("^[^.]")\n', rds={"f": "f(a)"}, docs={"README.md": "```r\nf(z = 1)\n```\n"})
+    r = docaudit.audit_package(tmp_path)
+    assert len(r["findings"]) == 1 and "exportPattern" in r["messages"][0]
+
+
+def test_missing_namespace_and_man_do_not_crash(tmp_path):
+    (tmp_path / "DESCRIPTION").write_text("Package: pkg\nVersion: 1\n")
+    (tmp_path / "README.md").write_text("`f(a)`\n")
+    assert docaudit.audit_package(tmp_path)["findings"] == []
+
+
+def test_crlf_and_non_utf8_docs_do_not_crash(tmp_path):
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)"},
+             docs={"README.md": b"```r\r\nf(z = 1)\r\n```\r\n\xff\xfe junk\n"})
+    assert [f["arg"] for f in docaudit.audit_package(tmp_path)["findings"]] == ["z"]
+
+
+def test_duplicate_findings_are_collapsed(tmp_path):
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)"}, docs={"README.md": "```r\nf(z = 1, z = 2)\n```\n"})
+    assert len(docaudit.audit_package(tmp_path)["findings"]) == 1
+
+
+def test_format_text_lists_findings_then_summary(tmp_path):
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)"}, docs={"README.md": "```r\nf(z = 1)\n```\n"})
+    out = docaudit.format_text(docaudit.audit_package(tmp_path)).splitlines()
+    assert out[0].startswith("error") and "README.md:2" in out[0] and out[-1].startswith("checked 1 of 1")
+
+
+def test_implemented_checks_constant():
+    assert docaudit.IMPLEMENTED_CHECKS == {"signature-named-arg", "signature-names", "signature-arity"}

@@ -92,3 +92,12 @@ def test_planted_defect_is_caught(tmp_path, kind):
     assert hit["severity"] == expected["severity"]
     if expected["arg"]:
         assert hit["arg"] == expected["arg"]
+
+
+@needs_audit
+@pytest.mark.skipif(not os.environ.get("RFORGE_MEDFIT_PATH"), reason="RFORGE_MEDFIT_PATH not set")
+def test_committed_manifest_signature_rows_are_caught_on_real_medfit_history():
+    manifest = json.loads((FIX / "defects.json").read_text())
+    s = replay.run_recall(manifest, scope="signature")
+    assert s["ok"], s["failures"]
+    assert s["firm_caught"] >= 1 and all(r["outcome"] == "caught" for r in s["rows"] if r["status"] == "firm")

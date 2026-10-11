@@ -127,7 +127,8 @@ def _resolve_repo(manifest: dict, package: str, overrides: dict) -> Optional[Pat
 
 
 def run_recall(manifest: dict, scope: str = "all", overrides: Optional[dict] = None,
-               audit: Optional[Audit] = None, implemented: Optional[set] = None) -> dict:
+               audit: Optional[Audit] = None, implemented: Optional[set] = None,
+               allow_unavailable: bool = False) -> dict:
     """Replay each in-scope manifest defect. `audit` and `implemented` are injectable
     so the harness can be tested against a stub (the mutation self-test)."""
     overrides = overrides or {}
@@ -170,17 +171,17 @@ def run_recall(manifest: dict, scope: str = "all", overrides: Optional[dict] = N
         hit = any(f.get("check") == d["check"] and (d.get("file") is None or f.get("file") == d["file"])
                   for f in findings)
         row["outcome"] = CAUGHT if hit else MISSED
-    return summarize(rows)
+    return summarize(rows, allow_unavailable)
 
 
-def summarize(rows: list) -> dict:
+def summarize(rows: list, allow_unavailable: bool = False) -> dict:
     firm = [r for r in rows if r["expectation"] == "firm"]
     cond = [r for r in rows if r["expectation"] == "conditional"]
     gated = [r for r in firm if r["outcome"] not in (PENDING, UNAVAILABLE, NO_REF)]
     failures = [r for r in rows if r["outcome"] == CRASHED]
     failures += [r for r in gated if r["outcome"] == MISSED]
     # A row locked as `status: firm` must keep being caught, whatever its expectation.
-    failures += [r for r in rows if r["status"] == "firm" and r["outcome"] in (MISSED, UNAVAILABLE, NO_REF)
+    failures += [r for r in rows if r["status"] == "firm" and r["outcome"] in ((MISSED,) if allow_unavailable else (MISSED, UNAVAILABLE, NO_REF))
                  and r not in failures]
     return {
         "rows": rows,
@@ -238,6 +239,8 @@ def main(argv: Optional[list] = None) -> int:
     rc.add_argument("--manifest", required=True)
     rc.add_argument("--scope", choices=sorted(SCOPES), default="all")
     rc.add_argument("--repo", action="append", default=[], metavar="PKG=PATH")
+    rc.add_argument("--allow-unavailable", action="store_true",
+                    help="a locked row whose checkout is missing is not a failure (CI-style run)")
     rc.add_argument("--format", choices=["text", "json"], default="text")
     hs = sub.add_parser("replay")
     hs.add_argument("--repo", required=True)
@@ -248,7 +251,7 @@ def main(argv: Optional[list] = None) -> int:
     if args.cmd == "recall":
         manifest = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
         overrides = dict(kv.split("=", 1) for kv in args.repo)
-        s = run_recall(manifest, args.scope, overrides)
+        s = run_recall(manifest, args.scope, overrides, allow_unavailable=args.allow_unavailable)
         print(json.dumps(s, indent=2) if args.format == "json" else format_recall(s))
         return 0 if s["ok"] else 1
     if not docaudit_available():

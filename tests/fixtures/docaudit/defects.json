@@ -16,7 +16,7 @@
       "check": "signature-names",
       "release": "A1",
       "expectation": "firm",
-      "status": "pending",
+      "status": "firm",
       "reason": "Refcard lists joint_effects(x, theta); formals are (object, estimates)"
     },
     {

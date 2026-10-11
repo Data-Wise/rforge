@@ -171,7 +171,10 @@ def test_manifest_shape():
         assert r["ref"] is None or len(r["ref"].rstrip("^")) == 7  # SHAs only, never content
 
 
-def test_cli_recall_on_committed_manifest_never_fails_without_checkouts(monkeypatch, capsys):
+def test_cli_recall_on_committed_manifest_without_checkouts(monkeypatch, capsys):
     monkeypatch.delenv("RFORGE_MEDFIT_PATH", raising=False)
-    assert replay.main(["recall", "--manifest", str(MANIFEST)]) == 0
+    # a regression-locked row cannot be verified without its checkout: red by default...
+    assert replay.main(["recall", "--manifest", str(MANIFEST)]) == (1 if replay.docaudit_available() else 0)
+    # ...and tolerated with --allow-unavailable (CI-style run)
+    assert replay.main(["recall", "--manifest", str(MANIFEST), "--allow-unavailable"]) == 0
     assert "firm" in capsys.readouterr().out
