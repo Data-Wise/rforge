@@ -415,6 +415,9 @@ Run against the SPEC and `tasks/plan.md`; verdict `needs-attention`, three findi
 | 43 | signature | MEDIUM | (Codex re-review 2, H4'-H5') Raw strings and comments inside calls produced false errors | Blank raw strings; blank comments before tag parsing |
 | 44 | signature | MEDIUM | (Codex re-review 2, H6') Escaped quoted tags lost an exact match | Fail safe to `warn` when a quoted tag is unparsed |
 | 45 | signature | MEDIUM | (Codex re-review 2, H7'-H8') Quoted formal names; duplicate partials under forwarded `...` | Normalize names; flag identical partials with `...` |
+| 46 | signature | MEDIUM | (Codex re-review 3, I1) Getter/setter usage overwrote the getter formals (false `error`) | Skip replacement usage lines and calls |
+| 47 | completeness | MEDIUM | (Codex re-review 3, I2) Unreadable `vignettes/`/`man/` directories read as clean | `os.walk(onerror)`/`scandir` notes; `incomplete` |
+| 48 | completeness | MEDIUM | (Codex re-review 3, I3) A missing package read as clean | `audited` flag; harness rejects `audited: false` |
 
 ## Appendix
 

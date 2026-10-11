@@ -219,3 +219,18 @@ One regression caught on the way and fixed: my first fail-safe treated any `#` i
 
 R syntax has unbounded corners. From here on a new review finding triggers another fix loop **only if** it is (a) an `error`-severity false positive reproducible on a realistic R call, or (b) a way a failed, skipped or incomplete audit, or a missing regression lock, reads as clean.
 Other edge cases (exotic tokens that are unlikely in package docs) are logged here as known limitations and the check fails safe to `warn`; they do not block Checkpoint B.
+
+## 11. Codex re-review #3 — stop rule applied (2026-10-11)
+
+Three findings, all within the stop rule (one `error` false positive, two ways an audit could read as clean). Each was reproduced on a scratch package first, then fixed red-to-green.
+
+| ID | Finding | Fix | Class |
+|---|---|---|---|
+| I1 | Getter/setter usage (`contrasts(x, how.many) <- value`) overwrote the getter's formals, producing a false `error` on valid calls | Rd usage lines and doc calls followed by an assignment are skipped | false positive, fixed |
+| I2 | `rglob` hid unreadable directories (`vignettes/`, `man/`), so a permission error read as clean | `os.walk(onerror=...)` / `os.scandir`; unreadable directories become notes and the audit is `incomplete` | bypass |
+| I3 | A missing package path reported as a clean audit | envelope carries `audited` (false for not-a-package and audit-failed); the harness raises `AuditCrashed("nothing was audited")` | bypass |
+
+**Gates:** `pytest tests` 791 passed, 4 skipped; `test-all.sh` 45 of 45; `gen_lib_reference.py --check` clean. Five mutation checks (replacement overwrites getter, replacement calls judged, walk errors swallowed, scandir errors swallowed, harness accepts not-audited) each turn a test red.
+**Evidence rerun:** recall 1 of 1; replay over all 7 packages (60 commits each, 200 for medfit) audited every revision with the same findings (medfit refcard x2 and `BootstrapResult`, medrobust `check_compatibility` x4, medsim x7).
+
+**Status:** Checkpoint B awaits your ticks for H2, R3 and R4. A further Codex re-review is optional; under the stop rule it triggers another loop only for an `error` false positive on a realistic call, or a way an incomplete audit reads as clean.

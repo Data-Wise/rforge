@@ -76,4 +76,4 @@
 - [x] Gates, evidence rerun, triage sheet refresh
 - [x] Codex re-review #1 answered (second loop G1-G6, section 9 of the triage sheet)
 - [x] Codex re-review #2 answered (option A, section 10 of the triage sheet; stop rule recorded)
-- [ ] Codex re-review #3 clean (per the stop rule)
+- [x] Codex re-review #3 findings fixed (per the stop rule; commit 30f1757, triage section 11)
