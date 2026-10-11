@@ -426,7 +426,7 @@ def audit_package(path: str | Path = ".") -> dict:
     try:
         findings, api, notes = _audit(root)
     except Exception as exc:  # advisory tool: never raise, whatever the input
-        return {**_envelope([], [f"audit failed: {type(exc).__name__}: {exc}"], {}), "status": "warn"}
+        return {**_envelope([], [f"audit failed: {type(exc).__name__}: {exc}"], {}), "status": "warn", "audit_failed": True}
     seen: set = set()
     unique = []
     for f in sorted(findings, key=lambda f: (f["file"], f["line"], f["check"], f["function"], f["arg"] or "")):

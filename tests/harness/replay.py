@@ -30,9 +30,10 @@ from typing import Callable, Optional
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TREE_PATHS = ["man", "NAMESPACE", "DESCRIPTION", "vignettes", "README.md", "README.Rmd", "README.qmd"]
 
-# Row outcomes. Only `missed` and `crashed` can fail a run.
+# Row outcomes. `missed`, `crashed` and `lost` fail a run; `unavailable`/`ref-not-found` fail it only for locked rows.
 CAUGHT, MISSED, PENDING = "caught", "missed", "pending"
 UNAVAILABLE, NO_REF, CRASHED = "unavailable", "ref-not-found", "crashed"
+LOST = "lost"  # a regression-locked row whose check is no longer implemented (or the module is gone)
 
 SCOPES = {
     "signature": lambda r: (r.get("check") or "").startswith("signature-"),
@@ -100,18 +101,27 @@ def implemented_checks() -> set[str]:
     return set(getattr(docaudit, "IMPLEMENTED_CHECKS", ()))
 
 
-def subprocess_audit(tree: Path) -> list:
+def subprocess_audit(tree: Path, timeout: int = 120) -> list:
     """Run `python -m lib.docaudit` on `tree` with an isolated HOME; return its findings."""
     with tempfile.TemporaryDirectory() as home:
         env = {**os.environ, "HOME": home, "PYTHONDONTWRITEBYTECODE": "1"}
-        proc = subprocess.run(
-            [sys.executable, "-m", "lib.docaudit", "--path", str(tree), "--format", "json"],
-            cwd=REPO_ROOT, env=env, capture_output=True, text=True,
-        )
+        try:
+            proc = subprocess.run(
+                [sys.executable, "-m", "lib.docaudit", "--path", str(tree), "--format", "json"],
+                cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=timeout,
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise AuditCrashed(f"timed out after {timeout}s") from exc
+    if proc.returncode != 0:
+        raise AuditCrashed(f"exit {proc.returncode}: {proc.stderr.strip()[-300:]}")
     try:
-        return json.loads(proc.stdout)["findings"]
+        report = json.loads(proc.stdout)
+        findings = report["findings"]
     except (ValueError, KeyError, TypeError) as exc:
-        raise AuditCrashed(f"exit {proc.returncode}: {proc.stderr.strip()[-300:] or exc}") from exc
+        raise AuditCrashed(f"unusable output: {proc.stderr.strip()[-300:] or exc}") from exc
+    if report.get("audit_failed"):  # an audit that did not complete is not a clean audit
+        raise AuditCrashed("audit failed: " + "; ".join(report.get("messages", [])))
+    return findings
 
 
 # ───────────────────────── recall ─────────────────────────
@@ -132,16 +142,15 @@ def run_recall(manifest: dict, scope: str = "all", overrides: Optional[dict] = N
     """Replay each in-scope manifest defect. `audit` and `implemented` are injectable
     so the harness can be tested against a stub (the mutation self-test)."""
     overrides = overrides or {}
+    broken = ""
     if audit is None:
         audit = subprocess_audit
-        broken = ""
         try:
             implemented = implemented_checks() if docaudit_available() else set()
         except AuditCrashed as exc:
             implemented, broken = {r["check"] for r in manifest["defects"] if r.get("check")}, str(exc)
     elif implemented is None:
         implemented = {r["check"] for r in manifest["defects"] if r.get("check")}
-    broken = locals().get("broken", "")
     in_scope = SCOPES[scope]
     rows = []
     for d in manifest["defects"]:
@@ -151,6 +160,8 @@ def run_recall(manifest: dict, scope: str = "all", overrides: Optional[dict] = N
                "expectation": d["expectation"], "status": d["status"], "outcome": PENDING, "detail": ""}
         rows.append(row)
         if d["check"] not in implemented:
+            if d["status"] == "firm":  # the lock must not be bypassable by removing or misnaming a check
+                row["outcome"], row["detail"] = LOST, "locked row, but its check is not implemented"
             continue
         if broken:
             row["outcome"], row["detail"] = CRASHED, broken
@@ -186,7 +197,7 @@ def summarize(rows: list, allow_unavailable: bool = False) -> dict:
     firm = [r for r in rows if r["expectation"] == "firm"]
     cond = [r for r in rows if r["expectation"] == "conditional"]
     gated = [r for r in firm if r["outcome"] not in (PENDING, UNAVAILABLE, NO_REF)]
-    failures = [r for r in rows if r["outcome"] == CRASHED]
+    failures = [r for r in rows if r["outcome"] in (CRASHED, LOST)]
     failures += [r for r in gated if r["outcome"] == MISSED]
     # A row locked as `status: firm` must keep being caught, whatever its expectation.
     failures += [r for r in rows if r["status"] == "firm" and r["outcome"] in ((MISSED, NO_REF) if allow_unavailable else (MISSED, UNAVAILABLE, NO_REF))

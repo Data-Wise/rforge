@@ -239,3 +239,81 @@ def test_real_audit_path_catches_a_planted_defect_through_the_subprocess(tmp_pat
     fixed = _git(r, "rev-parse", "HEAD")
     assert replay.run_recall(_manifest(fixed, check="signature-named-arg", file="README.md", function="f", arg="zzz"),
                              overrides={"demo": str(r)})["rows"][0]["outcome"] == "missed"
+
+
+# ───────────────────────── Codex review #3: F2 (failed audits) and F3 (the lock) ─────────────────────────
+
+
+@pytest.fixture
+def fake_audit(tmp_path, monkeypatch):
+    """Point `subprocess_audit` at a fake `lib.docaudit` that prints a chosen stdout and exit code."""
+    root = tmp_path / "fakeroot"
+    (root / "lib").mkdir(parents=True)
+    (root / "lib" / "__init__.py").write_text("")
+
+    def make(stdout: str, code: int = 0, sleep: float = 0):
+        (root / "lib" / "docaudit.py").write_text(
+            f"import sys, time\ntime.sleep({sleep})\nprint({stdout!r})\nsys.exit({code})\n")
+        monkeypatch.setattr(replay, "REPO_ROOT", root)
+        return tmp_path
+
+    return make
+
+
+@pytest.mark.parametrize("stdout,code", [
+    ('{"findings": []}', 3),                                           # non-zero exit
+    ("not json", 0),                                                   # malformed output
+    ('{"status": "ok"}', 0),                                           # no findings key
+    ('{"findings": [], "audit_failed": true, "messages": ["boom"]}', 0),  # the catch-all envelope
+])
+def test_subprocess_audit_raises_on_every_failed_audit_shape(fake_audit, stdout, code):
+    tree = fake_audit(stdout, code)
+    with pytest.raises(replay.AuditCrashed):
+        replay.subprocess_audit(tree)
+
+
+def test_subprocess_audit_accepts_a_real_empty_report(fake_audit):
+    assert replay.subprocess_audit(fake_audit('{"findings": [], "status": "ok"}')) == []
+
+
+def test_subprocess_audit_times_out(fake_audit):
+    with pytest.raises(replay.AuditCrashed, match="timed out"):
+        replay.subprocess_audit(fake_audit('{"findings": []}', sleep=5), timeout=1)
+
+
+def test_history_replay_does_not_report_clean_for_a_failed_audit(repo, fake_audit):
+    path, _ = repo
+    fake_audit('{"findings": [], "audit_failed": true, "messages": ["boom"]}')
+    with pytest.raises(replay.AuditCrashed):
+        replay.run_history(path, n=2)
+
+
+def test_audit_failure_envelope_is_marked(tmp_path, monkeypatch):
+    from lib import docaudit
+
+    (tmp_path / "DESCRIPTION").write_text("Package: p\nVersion: 1\n")
+    monkeypatch.setattr(docaudit, "read_api", lambda root: (_ for _ in ()).throw(RuntimeError("boom")))
+    r = docaudit.audit_package(tmp_path)
+    assert r["audit_failed"] is True and r["findings"] == [] and "boom" in r["messages"][0]
+
+
+def test_locked_row_cannot_go_pending_when_its_check_disappears(repo):
+    path, bad = repo
+    locked = _manifest(bad, status="firm")
+    for implemented in (set(), {"some-other-check"}):  # removed, or the manifest check misnamed
+        s = run(locked, path, audit=stub_audit, implemented=implemented)
+        assert s["rows"][0]["outcome"] == "lost" and not s["ok"] and s["failures"] == ["demo-bad"]
+    unlocked = run(_manifest(bad, status="pending"), path, audit=stub_audit, implemented=set())
+    assert unlocked["rows"][0]["outcome"] == "pending" and unlocked["ok"]
+
+
+def test_lock_survives_a_missing_module_on_the_committed_manifest(monkeypatch):
+    monkeypatch.setattr(replay, "docaudit_available", lambda: False)
+    s = replay.run_recall(json.loads(MANIFEST.read_text()), scope="signature")
+    assert not s["ok"] and s["failures"] == ["refcard-joint-effects-args"]
+
+
+def test_mutation_removing_a_check_from_implemented_checks_fails_recall(monkeypatch):
+    monkeypatch.setattr(replay, "docaudit_available", lambda: True)
+    monkeypatch.setattr(replay, "implemented_checks", lambda: set())
+    assert not replay.run_recall(json.loads(MANIFEST.read_text()), scope="signature")["ok"]
