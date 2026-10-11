@@ -317,3 +317,50 @@ def test_mutation_removing_a_check_from_implemented_checks_fails_recall(monkeypa
     monkeypatch.setattr(replay, "docaudit_available", lambda: True)
     monkeypatch.setattr(replay, "implemented_checks", lambda: set())
     assert not replay.run_recall(json.loads(MANIFEST.read_text()), scope="signature")["ok"]
+
+
+# ───────────────────────── Codex re-review: G2 incomplete audits, G4 failed enumeration/extraction ─────────────────────────
+
+
+def test_incomplete_audit_is_not_reported_as_clean(fake_audit):
+    tree = fake_audit('{"findings": [], "incomplete": true, "messages": ["region at README.md:2 skipped"]}')
+    with pytest.raises(replay.AuditCrashed, match="incomplete"):
+        replay.subprocess_audit(tree)
+
+
+def test_history_replay_on_a_missing_repository_is_an_error(tmp_path):
+    with pytest.raises(replay.AuditCrashed, match="rev-list"):
+        replay.run_history(tmp_path / "nope", n=3, audit=lambda tree: [])
+    assert replay.main(["replay", "--repo", str(tmp_path / "nope"), "--n", "3"]) in (1, 2)
+
+
+def test_failed_extraction_is_an_error_not_a_skip(repo, monkeypatch):
+    path, _ = repo
+    real = replay._git
+
+    def failing(repo_, *args, **kw):
+        if args and args[0] == "archive":
+            return subprocess.CompletedProcess(args, 128, stdout=b"", stderr="fatal: boom")
+        return real(repo_, *args, **kw)
+
+    monkeypatch.setattr(replay, "_git", failing)
+    with pytest.raises(replay.AuditCrashed, match="archive"):
+        replay.run_history(path, n=2, audit=stub_audit)
+
+
+def test_revisions_with_no_documentation_paths_are_counted_not_failed(tmp_path):
+    r = tmp_path / "pkg"
+    r.mkdir()
+    _git(r, "init", "-q", "-b", "main")
+    (r / "other.txt").write_text("x\n")
+    _git(r, "add", "-A"); _git(r, "commit", "-q", "-m", "c")
+    stats: dict = {}
+    assert replay.run_history(r, n=5, audit=stub_audit, stats=stats) == []
+    assert stats == {"revisions": 1, "audited": 0, "skipped_empty": 1}
+
+
+def test_history_stats_count_audited_revisions(repo):
+    path, _ = repo
+    stats: dict = {}
+    replay.run_history(path, n=10, audit=stub_audit, stats=stats)
+    assert stats == {"revisions": 2, "audited": 2, "skipped_empty": 0}

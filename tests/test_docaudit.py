@@ -443,3 +443,61 @@ def test_budget_note_reaches_the_envelope(tmp_path, monkeypatch):
     make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)"}, docs={"README.md": "```r\nf(f(f(f(f(zz = 1)))))\n```\n"})
     r = docaudit.audit_package(tmp_path)
     assert any("README.md:2 skipped" in m for m in r["messages"])
+
+
+# ───────────────────────── Codex re-review: G1 tags/dots, G5 whitespace, G6 duplicates, G2/G3 completeness ─────────────────────────
+
+AA = {"f": ["alpha", "alpine"]}
+
+
+@pytest.mark.parametrize("call", ['f("alpha"=1, al=2)', "f(`alpha`=1, al=2)", "f('alpha' = 1, al = 2)", "f(al = 2, `alpha` = 1)"])
+def test_quoted_and_backticked_tags_count_as_exact_matches(call):
+    assert run(fence(call), **AA) == []
+
+
+def test_quoted_unknown_tag_is_still_flagged_by_its_real_name():
+    assert kinds(run(fence('f("zzz" = 1)'), **AA)) == [("signature-named-arg", "zzz")]
+
+
+def test_forwarded_dots_can_supply_exact_matches_so_partials_are_not_judged():
+    assert run(fence("f(..., al = 2)"), **AA) == []
+    assert kinds(run(fence("f(..., zzz = 1)"), **AA)) == [("signature-named-arg", "zzz")]  # no formal starts with it
+
+
+@pytest.mark.parametrize("call", ["other :: f(gamma = 1)", "other\n  ::\n  f(gamma = 1)", "obj$ f(gamma = 1)",
+                                  "obj $ f(gamma = 1)", "obj@\nf(gamma = 1)"])
+def test_whitespace_does_not_defeat_foreign_call_exclusion(call):
+    assert run(fence(call), **AA) == []
+
+
+def test_whitespace_around_the_packages_own_namespace_is_still_checked():
+    assert kinds(run(fence("pkg :: f(gamma = 1)"), **AA)) == [("signature-named-arg", "gamma")]
+
+
+@pytest.mark.parametrize("call,arg", [("f(alpi = 1, alpi = 2)", "alpi"), ("f(alpha = 1, alpha = 2)", "alpha"),
+                                      ("f(alpi = 1, alpin = 2)", "alpin")])
+def test_two_arguments_cannot_claim_the_same_formal(call, arg):
+    found = run(fence(call), **AA)
+    assert kinds(found) == [("signature-named-arg", arg)]
+    assert "more than once" in found[0]["message"]
+
+
+def test_audit_marks_skipped_regions_as_incomplete(tmp_path, monkeypatch):
+    monkeypatch.setattr(docaudit, "_WORK_BUDGET", 50)
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)"}, docs={"README.md": "```r\nf(f(f(f(f(zz = 1)))))\n```\n"})
+    assert docaudit.audit_package(tmp_path)["incomplete"] is True
+    make_pkg_ok = tmp_path / "ok"
+    make_pkg_ok.mkdir()
+    make_pkg(make_pkg_ok, ns="export(f)\n", rds={"f": "f(a)"}, docs={"README.md": "`f(a)`\n"})
+    assert docaudit.audit_package(make_pkg_ok)["incomplete"] is False
+
+
+def test_nested_rd_usage_is_budgeted_and_reported(tmp_path):
+    import time
+    nested = "\\usage{\n" + "f(\n" * 8000 + ")\n" * 8000 + "}\n"
+    make_pkg(tmp_path, ns="export(f)\n", rds={}, docs={"README.md": "`f(a)`\n"})
+    (tmp_path / "man" / "f.Rd").write_text("\\name{f}\n" + nested)
+    t = time.perf_counter()
+    r = docaudit.audit_package(tmp_path)
+    assert time.perf_counter() - t < 3
+    assert r["incomplete"] is True and any("f.Rd" in m and "skipped" in m for m in r["messages"])

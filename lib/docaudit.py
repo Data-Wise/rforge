@@ -30,7 +30,7 @@ import bisect
 import json
 import re
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator, Optional
 
@@ -85,27 +85,42 @@ def paren_map(text: str) -> dict[int, int]:
     return out
 
 
-def split_args(masked: str) -> list[str]:
-    """Split a masked argument list on top-level commas. Empty segments are kept out."""
-    out, depth, cur = [], 0, []
-    for ch in masked:
+def split_spans(masked: str) -> list[tuple[int, int]]:
+    """``(start, end)`` of each top-level comma-separated segment (whitespace-trimmed, empty ones dropped)."""
+    bounds, depth, start = [], 0, 0
+    for i, ch in enumerate(masked):
         if ch in "([{":
             depth += 1
         elif ch in ")]}":
             depth -= 1
-        if ch == "," and depth == 0:
-            out.append("".join(cur).strip())
-            cur = []
-        else:
-            cur.append(ch)
-    out.append("".join(cur).strip())
-    return [a for a in out if a]
+        elif ch == "," and depth == 0:
+            bounds.append((start, i))
+            start = i + 1
+    bounds.append((start, len(masked)))
+    out = []
+    for s, e in bounds:
+        while s < e and masked[s].isspace():
+            s += 1
+        while e > s and masked[e - 1].isspace():
+            e -= 1
+        if s < e:
+            out.append((s, e))
+    return out
+
+
+def split_args(masked: str) -> list[str]:
+    """Split a masked argument list on top-level commas. Empty segments are kept out."""
+    return [masked[s:e] for s, e in split_spans(masked)]
+
+
+_TAG = re.compile(rf"""\s*(?:"(?P<dq>[^"\\]*)"|'(?P<sq>[^'\\]*)'|`(?P<bt>[^`]*)`|(?P<id>{_IDENT}))\s*=(?!=)""")
 
 
 def _named(arg: str) -> Optional[str]:
-    """Argument name when `arg` is ``name = value`` (not ``==``), else None."""
-    m = re.match(rf"({_IDENT})\s*=(?!=)", arg)
-    return m.group(1) if m else None
+    """Argument name when `arg` (raw, unmasked) is ``name = value``, ``"name" = value`` or
+    ```name` = value`` (not ``==``), else None. R accepts quoted and backticked tags."""
+    m = _TAG.match(arg)
+    return next((v for v in m.groups() if v is not None), None) if m else None
 
 
 # ───────────────────────── Rd / NAMESPACE ─────────────────────────
@@ -118,6 +133,7 @@ class PackageApi:
     methods: set[str]  # `generic.class` names documented via \method
     reexports: set[str]
     export_pattern: bool
+    notes: list[str] = field(default_factory=list)  # Rd files skipped for size/work
 
 
 def _usage_block(rd: str) -> Optional[str]:
@@ -152,10 +168,14 @@ def parse_rd_usage(rd: str) -> tuple[dict[str, list[str]], set[str]]:
     masked = _mask_strings_and_comments(block)  # string defaults such as `sep = ")"` must not split or close the call
     funcs: dict[str, list[str]] = {}
     closes = paren_map(masked)
+    budget = _WORK_BUDGET
     for m in re.finditer(rf"(?m)^\s*({_IDENT})\(", masked):
         close = closes.get(m.end() - 1, -1)
         if close == -1:
             continue
+        budget -= close - m.end()
+        if budget < 0:
+            raise _BudgetExceeded
         funcs[m.group(1)] = [a.split("=")[0].strip() for a in split_args(masked[m.end():close])]
     return funcs, methods
 
@@ -172,10 +192,15 @@ def read_api(root: Path) -> PackageApi:
     formals: dict[str, list[str]] = {}
     methods: set[str] = set()
     reexports: set[str] = set()
+    notes: list[str] = []
     man = root / "man"
     for rd in sorted(p for p in man.glob("*.Rd") if p.is_file()) if man.is_dir() else []:
         text = _read(rd)
-        funcs, meths = parse_rd_usage(text)
+        try:
+            funcs, meths = parse_rd_usage(text)
+        except _BudgetExceeded:
+            notes.append(f"man/{rd.name} skipped: too much nested usage text to scan")
+            continue
         formals.update(funcs)
         methods |= meths
         if rd.name == "reexports.Rd":
@@ -184,7 +209,7 @@ def read_api(root: Path) -> PackageApi:
     exports, pattern = parse_namespace(_read(ns)) if ns.is_file() else (set(), False)
     if pattern or not ns.is_file():
         exports |= set(formals)  # exports unknown: treat every documented function as exported
-    return PackageApi({f: v for f, v in formals.items() if f in exports}, exports, methods, reexports, pattern)
+    return PackageApi({f: v for f, v in formals.items() if f in exports}, exports, methods, reexports, pattern, notes)
 
 
 # ───────────────────────── the documentation surface ─────────────────────────
@@ -262,45 +287,71 @@ def local_definitions(regions: list[Region]) -> frozenset:
 # ───────────────────────── the checks ─────────────────────────
 
 
-_CALL = re.compile(rf"(?<![\w.$@:])(?:(?P<ns>{_IDENT})::)?(?P<fn>{_IDENT})\(")
+_CALL = re.compile(rf"(?<![\w.$@:])(?:(?P<ns>{_IDENT})\s*::\s*)?(?P<fn>{_IDENT})\(")
 
 
-def unmatched_named(names: list[str], formals: list[str]) -> list[str]:
-    """Named arguments R would reject for a function without `...`, in call order.
+def unmatched_named(names: list[str], formals: list[str], dots: bool = False) -> list[tuple[str, str]]:
+    """Named arguments R would reject for a function without `...`, as ``(name, reason)`` in call order.
 
     R argument matching: (1) exact names first, across the whole call; (2) each remaining name is
     matched partially against the formals *left over* by step 1 and must have exactly one candidate;
-    (3) two arguments may not claim the same formal. Order of the arguments does not matter."""
+    (3) two arguments may not claim the same formal (reason ``duplicate``, also for repeated exact names).
+    Order of the arguments does not matter. When the call forwards ``...``, the forwarded arguments may
+    supply any exact match, so partial names are only rejected if they prefix no formal at all."""
     exact = {n for n in names if n in formals}
     free = [f for f in formals if f not in exact]
-    claimed: dict[str, str] = {}
-    bad: list[str] = []
+    seen: set[str] = set()
+    claimed: set[str] = set()
+    bad: list[tuple[str, str]] = []
     for n in names:
         if n in exact:
+            if n in seen:
+                bad.append((n, "duplicate"))
+            seen.add(n)
+            continue
+        if dots:
+            if not any(f.startswith(n) for f in formals):
+                bad.append((n, "unknown"))
             continue
         candidates = [f for f in free if f.startswith(n)]
-        if len(candidates) != 1 or claimed.setdefault(candidates[0], n) != n:
-            bad.append(n)
+        if not candidates:
+            bad.append((n, "unknown"))
+        elif len(candidates) > 1:
+            bad.append((n, "ambiguous"))
+        elif candidates[0] in claimed:
+            bad.append((n, "duplicate"))
+        else:
+            claimed.add(candidates[0])
     return bad
 
 
-def _calls(masked: str, pkg: str, api: PackageApi) -> Iterator[tuple[str, int, list[str]]]:
-    """Yield ``(function, offset, args)`` for each call to an exported documented function.
+def _calls(masked: str, raw: str, pkg: str, api: PackageApi) -> Iterator[tuple[str, int, list[str], list[str]]]:
+    """Yield ``(function, offset, masked_args, raw_args)`` for each call to an exported documented function.
 
-    Raises `_BudgetExceeded` once the argument text handed to `split_args` exceeds `_WORK_BUDGET`."""
+    Calls qualified by another namespace (``other::f``) or reached through ``$``/``@`` are skipped, with
+    whitespace allowed around the operators. Raises `_BudgetExceeded` once the argument text handed to
+    `split_spans` exceeds `_WORK_BUDGET`."""
     closes = paren_map(masked)
     budget = _WORK_BUDGET
     for m in _CALL.finditer(masked):
         fn, ns = m.group("fn"), m.group("ns")
         if fn not in api.formals or (ns and ns != pkg):
             continue
+        j = m.start() - 1
+        while j >= 0 and masked[j].isspace():
+            j -= 1
+        if j >= 0 and masked[j] in "$@:":
+            continue  # obj$ f(...), obj@ f(...)
         close = closes.get(m.end() - 1, -1)
         if close == -1:
             continue
         budget -= close - m.end()
         if budget < 0:
             raise _BudgetExceeded
-        yield fn, m.start("fn"), split_args(masked[m.end():close])
+        base = m.end()
+        spans = split_spans(masked[base:close])
+        yield (fn, m.start("fn"), [masked[base + s:base + e] for s, e in spans],
+               [raw[base + s:base + e] for s, e in spans])
 
 
 def _finding(check: str, severity: str, file: str, line: int, function: str, arg: Optional[str], message: str) -> dict:
@@ -320,12 +371,12 @@ def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: fro
     newlines = [i for i, ch in enumerate(masked) if ch == "\n"]
     findings: list[dict] = []
     try:
-        calls = list(_calls(masked, pkg, api))
+        calls = list(_calls(masked, region.text, pkg, api))
     except _BudgetExceeded:
         if notes is not None:
             notes.append(f"region at {where} skipped: too much nested call text to scan")
         return []
-    for fn, off, args in calls:
+    for fn, off, args, raws in calls:
         if fn in local:
             continue
         formals = api.formals[fn]
@@ -336,15 +387,17 @@ def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: fro
         positional = 0
         forwards_dots = any(a == "..." for a in args)
         names = []
-        for a in args:
-            name = _named(a)
+        for a, raw in zip(args, raws):
+            name = _named(raw)
             if name is not None:
                 names.append(name)
             elif a != "...":
                 positional += 1
-        for name in unmatched_named(names, formals):
+        why = {"unknown": "has no argument `{}`", "ambiguous": "argument `{}` matches more than one formal",
+               "duplicate": "argument `{}` is given more than once, or its formal is already matched"}
+        for name, reason in unmatched_named(names, formals, forwards_dots):
             findings.append(_finding("signature-named-arg", "error", rel, line, fn, name,
-                                     f"`{fn}()` has no argument `{name}` (formals: {shown})"))
+                                     f"`{fn}()` {why[reason].format(name)} (formals: {shown})"))
         if not forwards_dots and positional > len(formals):
             findings.append(_finding("signature-arity", "warn", rel, line, fn, None,
                                      f"`{fn}()` takes {len(formals)} argument(s) but the call passes {positional} positionally (formals: {shown})"))
@@ -396,10 +449,11 @@ def _package_name(root: Path) -> str:
     return ""
 
 
-def _envelope(findings: list, messages: list, summary: dict) -> dict:
+def _envelope(findings: list, messages: list, summary: dict, incomplete: bool = False) -> dict:
     top = max((f["severity"] for f in findings), key=_SEVERITY_ORDER.get, default="none")
     return {"kind": "docaudit", "status": "warn" if findings else "ok", "max_severity": top,
-            "findings": findings, "messages": messages, "summary": summary, "engine_missing": []}
+            "findings": findings, "messages": messages, "summary": summary, "incomplete": incomplete,
+            "engine_missing": []}
 
 
 def _audit(root: Path) -> tuple[list, PackageApi, list]:
@@ -416,7 +470,7 @@ def _audit(root: Path) -> tuple[list, PackageApi, list]:
                 if region.bare and finding["severity"] == "error":
                     finding["severity"] = "warn"  # an unlabeled fence may be a console transcript
                 findings.append(finding)
-    return findings, api, notes
+    return findings, api, notes + api.notes
 
 
 def audit_package(path: str | Path = ".") -> dict:
@@ -435,7 +489,7 @@ def audit_package(path: str | Path = ".") -> dict:
             seen.add(key)
             unique.append(f)
     cov = _coverage(api)
-    return _envelope(unique, [_summary_line(cov, api.export_pattern), *notes], cov)
+    return _envelope(unique, [_summary_line(cov, api.export_pattern), *notes], cov, incomplete=bool(notes))
 
 
 def format_text(report: dict) -> str:

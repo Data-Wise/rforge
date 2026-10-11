@@ -62,21 +62,25 @@ def ref_exists(repo: Path, ref: str) -> bool:
 def extract_tree(repo: Path, ref: str, dest: Path) -> bool:
     """Extract the documentation-relevant subset of `ref` into `dest` via `git archive`.
 
-    Paths are intersected with `git ls-tree` first: `git archive` aborts if any
-    named path is absent at that ref."""
+    Returns False only when the ref has none of the paths we audit (nothing to extract). A failing
+    git or tar command raises `AuditCrashed`: it must never read as "nothing to audit".
+    Paths are intersected with `git ls-tree` first: `git archive` aborts if any named path is absent."""
     top = _git(repo, "ls-tree", "--name-only", ref)
     if top.returncode != 0:
-        return False
+        raise AuditCrashed(f"git ls-tree failed at {ref}: {top.stderr.strip()[-200:]}")
     present = set(top.stdout.split())
     paths = [p for p in TREE_PATHS if p in present]
     if not paths:
         return False
     archive = _git(repo, "archive", "--format=tar", ref, "--", *paths, binary=True)
     if archive.returncode != 0:
-        return False
+        err = archive.stderr.decode(errors="replace") if isinstance(archive.stderr, bytes) else archive.stderr
+        raise AuditCrashed(f"git archive failed at {ref}: {err.strip()[-200:]}")
     dest.mkdir(parents=True, exist_ok=True)
     untar = subprocess.run(["tar", "-x", "-C", str(dest)], input=archive.stdout, capture_output=True)
-    return untar.returncode == 0
+    if untar.returncode != 0:
+        raise AuditCrashed(f"tar failed at {ref}: {untar.stderr.decode(errors='replace').strip()[-200:]}")
+    return True
 
 
 # ───────────────────────── the audit under test ─────────────────────────
@@ -121,6 +125,8 @@ def subprocess_audit(tree: Path, timeout: int = 120) -> list:
         raise AuditCrashed(f"unusable output: {proc.stderr.strip()[-300:] or exc}") from exc
     if report.get("audit_failed"):  # an audit that did not complete is not a clean audit
         raise AuditCrashed("audit failed: " + "; ".join(report.get("messages", [])))
+    if report.get("incomplete"):  # a skipped region means "no finding" proves nothing
+        raise AuditCrashed("incomplete audit: " + "; ".join(report.get("messages", [])))
     return findings
 
 
@@ -178,10 +184,10 @@ def run_recall(manifest: dict, scope: str = "all", overrides: Optional[dict] = N
             continue
         with tempfile.TemporaryDirectory() as tmp:
             tree = Path(tmp) / "pkg"
-            if not extract_tree(repo, d["ref"], tree):
-                row["outcome"], row["detail"] = NO_REF, f"nothing extractable at {d['ref']}"
-                continue
             try:
+                if not extract_tree(repo, d["ref"], tree):
+                    row["outcome"], row["detail"] = NO_REF, f"nothing extractable at {d['ref']}"
+                    continue
                 findings = audit(tree)
             except AuditCrashed as exc:
                 row["outcome"], row["detail"] = CRASHED, str(exc)
@@ -229,22 +235,34 @@ def format_recall(s: dict) -> str:
 # ───────────────────────── history replay ─────────────────────────
 
 
-def run_history(repo: Path, n: int = 60, checks: Optional[set] = None, audit: Optional[Audit] = None) -> list:
+def run_history(repo: Path, n: int = 60, checks: Optional[set] = None, audit: Optional[Audit] = None,
+                stats: Optional[dict] = None) -> list:
     """Audit the last `n` first-parent commits; return distinct findings, each tagged
-    with the newest commit it appears in (so a long-lived defect is reported once)."""
+    with the newest commit it appears in (so a long-lived defect is reported once).
+
+    A failed `git rev-list`, a failed extraction or a failed/incomplete audit raises `AuditCrashed`.
+    `stats`, if given, is filled with `revisions`, `audited` and `skipped_empty` counts."""
     audit = audit or subprocess_audit
-    revs = _git(repo, "rev-list", "--first-parent", "-n", str(n), "HEAD").stdout.split()
+    listing = _git(repo, "rev-list", "--first-parent", "-n", str(n), "HEAD")
+    if listing.returncode != 0:
+        raise AuditCrashed(f"git rev-list failed in {repo}: {listing.stderr.strip()[-200:]}")
+    revs = listing.stdout.split()
+    counts = {"revisions": len(revs), "audited": 0, "skipped_empty": 0}
     seen: dict = {}
     for sha in revs:  # newest first
         with tempfile.TemporaryDirectory() as tmp:
             tree = Path(tmp) / "pkg"
             if not extract_tree(repo, sha, tree):
+                counts["skipped_empty"] += 1
                 continue
+            counts["audited"] += 1
             for f in audit(tree):
                 if checks and f.get("check") not in checks:
                     continue
                 key = (f.get("check"), f.get("file"), f.get("function"), f.get("arg"), f.get("message"))
                 seen.setdefault(key, {**f, "first_seen_in": sha, "commits": 0})["commits"] += 1
+    if stats is not None:
+        stats.update(counts)
     return list(seen.values())
 
 
@@ -277,11 +295,14 @@ def main(argv: Optional[list] = None) -> int:
         print("lib.docaudit is not built yet", file=sys.stderr)
         return 2
     checks = {c for c in args.checks.split(",") if c} or None
+    stats: dict = {}
     try:
-        found = run_history(Path(args.repo), args.n, checks)
+        found = run_history(Path(args.repo), args.n, checks, stats=stats)
     except AuditCrashed as exc:
         print(f"audit crashed: {exc}", file=sys.stderr)
         return 1
+    print(f"revisions: {stats['revisions']}, audited: {stats['audited']}, skipped (no docs): {stats['skipped_empty']}",
+          file=sys.stderr)
     print(json.dumps(found, indent=2))
     return 0
 
