@@ -9,7 +9,7 @@ in_progress: 2026-10-11 — two lines of work, no release pending.
   (2) docs:check content audit, release A1 (v2.21.0): planning complete, no code yet. Brainstorm, 8-decision grill,
   SPEC v2 after a 4-reviewer adversarial pass (26 findings), ORCHESTRATE, and a 17-task vertical-slice plan with a
   replay harness built first. Worktree ~/.git-worktrees/rforge/feature-docs-check-content-audit
-  (feature/docs-check-content-audit, 5bd660a, local only; the other two review findings are fixed there: recall gates scoped by
+  (feature/docs-check-content-audit, 774e10f, local only, merged with dev; the other two review findings are fixed there: recall gates scoped by
   checkpoint/release, variadic functions exempt from signature-arity). Docs on dev: BRAINSTORM/GRILL/SPEC-docs-*-2026-10-11.md
   (42e3c1f, 83a4e41; dev pushed, in sync with origin). Plan and checklist: tasks/plan.md, tasks/todo.md on the feature
   branch. A2 (--site, --run-examples) is a separate later plan.
@@ -115,7 +115,7 @@ recent:
       to lib.rstatus.version_overrides (fill when absent, correct on drift, keep matching annotated values); 5 new
       tests, negative control verified, pytest 615 / test-all 45/45. The review's other two findings were in the
       docs:check planning docs (unsatisfiable A1 recall gate; signature-arity flagging variadic functions) and are
-      fixed in the feature worktree (5bd660a).
+      fixed in the feature worktree and logged in the SPEC as review 3 (findings 27-29).
   - date: 2026-10-11
     branch: feature/rstatus-version-drift (PR #85 → dev, merged 99b4171)
     title: "fix(rstatus): compare only the leading version token for .STATUS drift (#84)"
