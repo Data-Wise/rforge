@@ -224,7 +224,7 @@ def test_clean_package_is_ok_and_max_severity_none(tmp_path):
 
 def test_only_exported_functions_are_checked(tmp_path):
     make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)", "g": "g(a)"}, docs={"README.md": "```r\ng(zzz = 1)\n```\n"})
-    assert docaudit.audit_package(tmp_path)["findings"] == []
+    assert [f for f in docaudit.audit_package(tmp_path)["findings"] if f["check"].startswith("signature-")] == []
 
 
 def test_coverage_summary_counts_reasons(tmp_path):
@@ -233,13 +233,13 @@ def test_coverage_summary_counts_reasons(tmp_path):
                   "reexports": "\\alias{re}\nre(x)"},
              docs={})
     s = docaudit.audit_package(tmp_path)["summary"]
-    assert s == {"exports": 5, "checked": 1, "unchecked": {"no-usage": 1, "method": 1, "re-export": 1, "variadic": 1}}
+    assert {k: s[k] for k in ("exports", "checked", "unchecked")} == {"exports": 5, "checked": 1, "unchecked": {"no-usage": 1, "method": 1, "re-export": 1, "variadic": 1}}
 
 
 def test_export_pattern_treats_documented_functions_as_exported(tmp_path):
     make_pkg(tmp_path, ns='exportPattern("^[^.]")\n', rds={"f": "f(a)"}, docs={"README.md": "```r\nf(z = 1)\n```\n"})
     r = docaudit.audit_package(tmp_path)
-    assert len(r["findings"]) == 1 and "exportPattern" in r["messages"][0]
+    assert len([f for f in r["findings"] if f["check"].startswith("signature-")]) == 1 and "exportPattern" in r["messages"][0]
 
 
 def test_missing_namespace_and_man_do_not_crash(tmp_path):
@@ -266,7 +266,7 @@ def test_format_text_lists_findings_then_summary(tmp_path):
 
 
 def test_implemented_checks_constant():
-    assert docaudit.IMPLEMENTED_CHECKS == {"signature-named-arg", "signature-names", "signature-arity"}
+    assert docaudit.IMPLEMENTED_CHECKS == {"signature-named-arg", "signature-names", "signature-arity", "scannability", "coverage"}
 
 
 # ───────────────────────── adversarial review #2 regressions ─────────────────────────

@@ -10,6 +10,13 @@ the package actually exports, which is what a manual doc audit looks for:
   Spans elsewhere are call examples whose identifiers are variables, so they are not judged.
 - ``signature-arity`` (warn): a call passes more positional arguments than the
   function has formals.
+- ``scannability`` (info): a paragraph, an H2 section or a "Next Steps" heading that is hard to scan
+  (thresholds are keyword arguments / CLI flags).
+- ``coverage`` (warn): an export that no README/vignette mentions; ``--since TAG`` restricts the report
+  to exports added since the tag. The export x doc matrix is in ``summary["coverage_matrix"]``.
+
+Findings in a file can be suppressed with ``docs.allowlist`` in ``.rforge.yaml`` (entries ``<relpath>`` or
+``<relpath>::<check-id>``).
 
 All three skip functions whose usage has a ``...`` formal (any name or count is
 valid there). The audit is a candidate generator, not an oracle: it only sees
@@ -30,14 +37,16 @@ import bisect
 import json
 import os
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator, Optional
 
+from .discovery import _read_allowlist
 from .s7review import _mask_strings_and_comments
 
-IMPLEMENTED_CHECKS = frozenset({"signature-named-arg", "signature-names", "signature-arity"})
+IMPLEMENTED_CHECKS = frozenset({"signature-named-arg", "signature-names", "signature-arity", "scannability", "coverage"})
 
 _SEVERITY_ORDER = {"info": 0, "warn": 1, "error": 2}
 _IDENT = r"[A-Za-z.][\w.]*"
@@ -536,6 +545,151 @@ def _summary_line(cov: dict, pattern: bool) -> str:
         line += "; NAMESPACE uses exportPattern(), so every documented function was treated as exported"
     return line
 
+# ───────────────────────── scannability ─────────────────────────
+
+_HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
+_NOT_PROSE = re.compile(r"^\s*(?:\||>|<|:::|[-*+]\s|\d+[.)]\s|\s{2,}\S|\t)")
+_NEXT_STEPS = re.compile(r"next steps?:?")
+
+
+def scan_prose(text: str, rel: str, max_paragraph_words: int = 110, max_section_words: int = 800,
+               min_h3: int = 3) -> list[dict]:
+    """``scannability`` findings (all ``info``): paragraphs over `max_paragraph_words`, H2 sections over
+    `max_section_words` with fewer than `min_h3` H3 headings, and a "Next Steps" H2 that is not the last H2.
+
+    Fenced code, front matter, tables, lists, quotes and indented text are not paragraphs; headings inside
+    fences are not headings. Word counts for a section ignore fenced code."""
+    lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    findings: list[dict] = []
+
+    def add(line: int, message: str) -> None:
+        findings.append(_finding("scannability", "info", rel, line, "", None, message))
+
+    i = 0
+    if lines and lines[0].strip() == "---":
+        for k in range(1, len(lines)):
+            if lines[k].strip() in ("---", "..."):
+                i = k + 1
+                break
+    fence: Optional[str] = None
+    para_start, para_words = 0, 0
+    h2s: list[dict] = []  # {"title", "line", "words", "h3"}
+    section: Optional[dict] = None
+
+    def end_paragraph() -> None:
+        nonlocal para_start, para_words
+        if para_start and para_words > max_paragraph_words:
+            add(para_start, f"paragraph of {para_words} words (over {max_paragraph_words}): consider splitting or using a list")
+        para_start = para_words = 0
+
+    for n in range(i, len(lines)):
+        line, lineno = lines[n], n + 1
+        m = _FENCE_OPEN.match(line)
+        if fence is not None:
+            if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) and not m.group(2).strip():
+                fence = None
+            continue
+        if m:
+            end_paragraph()
+            fence = m.group(1)
+            continue
+        h = _HEADING.match(line)
+        if h:
+            end_paragraph()
+            level = len(h.group(1))
+            if level <= 2:
+                section = None
+            if level == 2:
+                section = {"title": h.group(2).strip(), "line": lineno, "words": 0, "h3": 0}
+                h2s.append(section)
+            elif level == 3 and section is not None:
+                section["h3"] += 1
+            continue
+        if not line.strip():
+            end_paragraph()
+            continue
+        count = len(line.split())
+        if section is not None:
+            section["words"] += count
+        if _NOT_PROSE.match(line) and not para_start:
+            continue
+        if _NOT_PROSE.match(line):  # a list/table/quote line ends the running paragraph
+            end_paragraph()
+            continue
+        if not para_start:
+            para_start = lineno
+        para_words += count
+    end_paragraph()
+    for k, s in enumerate(h2s):
+        if s["words"] > max_section_words and s["h3"] < min_h3:
+            add(s["line"], f"section \"{s['title']}\" is {s['words']} words with {s['h3']} subsection(s) "
+                           f"(over {max_section_words} words needs {min_h3}+ H3 headings)")
+        if _NEXT_STEPS.fullmatch(s["title"].lower()) and k < len(h2s) - 1:
+            add(s["line"], f"\"{s['title']}\" is followed by {len(h2s) - 1 - k} more section(s); put it last")
+    return findings
+
+
+# ───────────────────────── coverage and --since ─────────────────────────
+
+
+_TOKEN = re.compile(r"[A-Za-z.][\w.]*")
+
+
+def mention_matrix(exports: set, doc_texts: dict) -> dict:
+    """export -> sorted files that mention it as a whole identifier (``my.f`` does not mention ``f``)."""
+    matrix: dict[str, list[str]] = {e: [] for e in sorted(exports)}
+    for rel in sorted(doc_texts):
+        tokens = set(_TOKEN.findall(doc_texts[rel]))
+        tokens |= {tok.rstrip(".") for tok in tokens if tok.endswith(".")}  # "call f." at a sentence end
+        for e in matrix:
+            if e in tokens:
+                matrix[e].append(rel)
+    return matrix
+
+
+def _git(root: Path, *args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, timeout=20)
+
+
+def exports_added_since(root: Path, tag: str, current: set) -> tuple[Optional[set], Optional[str]]:
+    """``(added_exports, None)``, or ``(None, reason)`` when the restriction cannot be computed."""
+    if not tag or tag.startswith("-"):
+        return None, "not a valid ref"
+    try:
+        if _git(root, "rev-parse", "--verify", "--quiet", f"{tag}^{{commit}}").returncode != 0:
+            return None, "unknown ref (or not a git repository)"
+        if _git(root, "cat-file", "-e", f"{tag}:./NAMESPACE").returncode != 0:
+            return set(current), None  # NAMESPACE did not exist at the tag: everything is new
+        shown = _git(root, "show", f"{tag}:./NAMESPACE")
+    except (OSError, subprocess.SubprocessError) as exc:
+        return None, f"git failed: {type(exc).__name__}"
+    if shown.returncode != 0:
+        return None, "could not read NAMESPACE at the ref"
+    old, pattern = parse_namespace(shown.stdout)
+    if pattern:
+        return None, "NAMESPACE at the ref uses exportPattern(), so its exports are unknown"
+    return current - old, None
+
+
+def _allowlist(root: Path, notes: list) -> tuple[set, set]:
+    """``(whole_files, {(file, check)})`` from ``docs.allowlist``; malformed config is ignored with a note."""
+    entries, malformed = _read_allowlist(root, "docs")
+    if malformed:
+        notes.append(".rforge.yaml docs.allowlist is malformed (expected a block list); ignored")
+        return set(), set()
+    files: set[str] = set()
+    pairs: set[tuple[str, str]] = set()
+    for entry in entries:
+        path, sep, check = entry.strip().partition("::")
+        path = path.strip().replace("\\", "/")
+        while path.startswith("./"):
+            path = path[2:]
+        if sep:
+            pairs.add((path, check.strip()))
+        else:
+            files.add(path)
+    return files, pairs
+
 
 # ───────────────────────── entry points ─────────────────────────
 
@@ -551,44 +705,68 @@ def _package_name(root: Path, notes: list) -> str:
 
 def _envelope(findings: list, messages: list, summary: dict, incomplete: bool = False, audited: bool = True) -> dict:
     top = max((f["severity"] for f in findings), key=_SEVERITY_ORDER.get, default="none")
-    return {"kind": "docaudit", "status": "warn" if findings else "ok", "max_severity": top,
+    return {"kind": "docaudit", "status": "warn" if top in ("warn", "error") else "ok", "max_severity": top,
             "findings": findings, "messages": messages, "summary": summary, "incomplete": incomplete, "audited": audited,
             "engine_missing": []}
 
 
-def _audit(root: Path) -> tuple[list, PackageApi, list]:
+def _audit(root: Path, scan: dict) -> tuple[list, PackageApi, list, dict]:
     notes: list[str] = []
     pkg = _package_name(root, notes)
     api = read_api(root)
     findings: list[dict] = []
+    texts: dict[str, str] = {}
     for f in doc_files(root, notes):
         rel = f.relative_to(root).as_posix()
-        regions = extract_regions(_read(f, notes, root))
+        texts[rel] = _read(f, notes, root)
+        regions = extract_regions(texts[rel])
         local = local_definitions(regions)
         for region in regions:
             for finding in check_region(region, rel, pkg, api, local, notes):
                 if region.bare and finding["severity"] == "error":
                     finding["severity"] = "warn"  # an unlabeled fence may be a console transcript
                 findings.append(finding)
-    return findings, api, notes + api.notes
+        findings += scan_prose(texts[rel], rel, **scan)
+    return findings, api, notes + api.notes, texts
 
 
-def audit_package(path: str | Path = ".") -> dict:
+def audit_package(path: str | Path = ".", *, since: Optional[str] = None, max_paragraph_words: int = 110,
+                  max_section_words: int = 800, min_h3: int = 3) -> dict:
     root = Path(path)
     if not (root / "DESCRIPTION").is_file():
         return _envelope([], [f"not an R package (no DESCRIPTION at {root})"], {}, audited=False)
     try:
-        findings, api, notes = _audit(root)
+        findings, api, notes, texts = _audit(root, {"max_paragraph_words": max_paragraph_words,
+                                                    "max_section_words": max_section_words, "min_h3": min_h3})
+        covered = api.exports - api.reexports
+        if since is not None:
+            added, why = exports_added_since(root, since, covered)
+            if added is None:
+                notes.append(f"--since {since}: {why}; coverage skipped")
+                covered = set()
+            else:
+                covered = added
+        matrix = mention_matrix(covered, texts)
+        for name, files in matrix.items():
+            if not files:
+                findings.append(_finding("coverage", "warn", "NAMESPACE", 0, name, None,
+                                         f"`{name}` is exported but no README or vignette mentions it"))
+        skip_files, skip_pairs = _allowlist(root, notes)
     except Exception as exc:  # advisory tool: never raise, whatever the input
         return {**_envelope([], [f"audit failed: {type(exc).__name__}: {exc}"], {}, audited=False), "status": "warn", "audit_failed": True}
     seen: set = set()
     unique = []
+    suppressed = 0
     for f in sorted(findings, key=lambda f: (f["file"], f["line"], f["check"], f["function"], f["arg"] or "")):
         key = (f["check"], f["file"], f["line"], f["function"], f["arg"])
-        if key not in seen:
-            seen.add(key)
-            unique.append(f)
-    cov = _coverage(api)
+        if key in seen:
+            continue
+        seen.add(key)
+        if f["file"] in skip_files or (f["file"], f["check"]) in skip_pairs:
+            suppressed += 1
+            continue
+        unique.append(f)
+    cov = {**_coverage(api), "suppressed": suppressed, "coverage_matrix": matrix}
     return _envelope(unique, [_summary_line(cov, api.export_pattern), *notes], cov, incomplete=bool(notes))
 
 
@@ -606,8 +784,13 @@ def main(argv: Optional[list] = None) -> int:
     ap = argparse.ArgumentParser(prog="python3 -m lib.docaudit", description=__doc__.split("\n")[0])
     ap.add_argument("--path", default=".")
     ap.add_argument("--format", choices=["text", "json"], default="text")
+    ap.add_argument("--since", metavar="TAG", help="restrict the coverage report to exports added since TAG")
+    ap.add_argument("--max-paragraph-words", type=int, default=110)
+    ap.add_argument("--max-section-words", type=int, default=800)
+    ap.add_argument("--min-h3", type=int, default=3, help="H3 headings an over-long H2 section needs")
     args = ap.parse_args(argv)
-    report = audit_package(args.path)
+    report = audit_package(args.path, since=args.since, max_paragraph_words=args.max_paragraph_words,
+                           max_section_words=args.max_section_words, min_h3=args.min_h3)
     print(json.dumps(report, indent=2) if args.format == "json" else format_text(report))
     return 0
 

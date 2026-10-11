@@ -102,13 +102,13 @@ appendix. **Blocked by:** red fixture or missed planted defect; any raised excep
 
 ### Phase 2 — Remaining checks (parallel-safe after the gate)
 
-- [ ] **T7 [S] "Scannability findings appear."** *Files:* `lib/docaudit.py`, `tests/test_docaudit.py`. *AC:* paragraph >110 words, H2 >800
+- [x] **T7 [S] "Scannability findings appear."** *Files:* `lib/docaudit.py`, `tests/test_docaudit.py`. *AC:* paragraph >110 words, H2 >800
   words with <3 H3, "Next Steps" not last; `info`, configurable; the `extraction.qmd` Next-Steps row flips `firm`; `methods.qmd`-style
   permanent flag documented as allowlist-able. *Deps:* T6.
-- [ ] **T8 [M] "Coverage report and `--since`."** *Files:* `lib/docaudit.py`, `tests/test_docaudit.py`. *AC:* export × doc matrix (`info`;
+- [x] **T8 [M] "Coverage report and `--since`."** *Files:* `lib/docaudit.py`, `tests/test_docaudit.py`. *AC:* export × doc matrix (`info`;
   `warn` only when an export appears in no doc); `--since TAG` restricts to exports/Rd added since the tag via
   `git diff --name-status TAG..HEAD` on `NAMESPACE`/`man/`; unknown tag → message, no crash; **no engine enumeration**. *Deps:* T6.
-- [ ] **T9 [S] "A finding can be suppressed via `.rforge.yaml`."** *Files:* `lib/docaudit.py`, `tests/test_docaudit.py`. *AC:* `docs.allowlist`
+- [x] **T9 [S] "A finding can be suppressed via `.rforge.yaml`."** *Files:* `lib/docaudit.py`, `tests/test_docaudit.py`. *AC:* `docs.allowlist`
   entries `<relpath>` and `<relpath>::<check-id>` read from the **package root** via T1's helper; malformed → ignore + message.
   *Deps:* T1, T6.
 

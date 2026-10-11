@@ -32,9 +32,9 @@
 
 ## Phase 2 — Remaining checks (parallel-safe after the gate)
 
-- [ ] T7 [S] Scannability findings (`info`, configurable thresholds)
-- [ ] T8 [M] Coverage report and `--since` (no engine enumeration)
-- [ ] T9 [S] `docs.allowlist` suppression end to end (needs T1)
+- [x] T7 [S] Scannability findings (`info`, configurable thresholds)
+- [x] T8 [M] Coverage report and `--since` (no engine enumeration)
+- [x] T9 [S] `docs.allowlist` suppression end to end (needs T1)
 
 ### Checkpoint C
 

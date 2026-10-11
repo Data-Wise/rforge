@@ -48,7 +48,7 @@ gets a regression test and, if it is `error`-severity, the same demotion rule.
 | # | Package | Check | Severity | Location | Finding | Triage |
 |---|---|---|---|---|---|---|
 | H1 | medfit | `signature-names` | warn | `vignettes/articles/model-native.qmd:23` | **Resolved 2026-10-11 by decision A (section 7): no longer reported.** Was:  Listing `fit_sem(syntax, data)` names `syntax`; formals are `(model, data, information, n_starts, control, sampling_weights, se_type)`. **Likely a call example, not a signature** (section 6) | ✅ false (call example), class fixed |
-| H2 | medsim | `signature-named-arg` | **error** | `vignettes/missing-data-mediation.qmd:70, 84, 92` | 7 findings over 4 calls: `medsim_amputate(vars=, rate=)`, `medsim_scenario_missing(rate=, skew=, kurtosis=)`, `medsim_scenario_missing_grid(rates=, skew=)`. Verified against `R/dgm_amputate.R` at `d7b9b75`: the function has no `vars` or `rate` formal | ☐ true ☐ false ☐ won't-fix |
+| H2 | medsim | `signature-named-arg` | **error** | `vignettes/missing-data-mediation.qmd:70, 84, 92` | 7 findings over 4 calls: `medsim_amputate(vars=, rate=)`, `medsim_scenario_missing(rate=, skew=, kurtosis=)`, `medsim_scenario_missing_grid(rates=, skew=)`. Verified against `R/dgm_amputate.R` at `d7b9b75`: the function has no `vars` or `rate` formal | ☑ true ☐ false ☐ won't-fix |
 
 ## 2. History replay (first-parent, checks: `signature-named-arg`, `signature-arity`)
 
@@ -58,8 +58,8 @@ gets a regression test and, if it is `error`-severity, the same demotion rule.
 |---|---|---|---|---|---|
 | R1 | probmed | 60 commits | 0 | — | n/a |
 | R2 | medfit | 60 commits | 0 | — (the SPEC's medfit hit is older than 60 first-parent commits; see R3) | n/a |
-| R3 | medfit | 200 commits | 1 | `introduction.qmd:154` `BootstrapResult(converged = TRUE)`, present in 48 commits, newest `2b05958` (SPEC: introduced in `b40444e`) | ☐ true ☐ false ☐ won't-fix |
-| R4 | medrobust | 60 commits | 4 (one call) | `methodology.qmd:115` `check_compatibility(sn0=, sp0=, psi_sn=, psi_sp=)`; formal is `psi`; present in 51 commits, newest `8ba673d`, fixed since (HEAD clean) | ☐ true ☐ false ☐ won't-fix |
+| R3 | medfit | 200 commits | 1 | `introduction.qmd:154` `BootstrapResult(converged = TRUE)`, present in 48 commits, newest `2b05958` (SPEC: introduced in `b40444e`) | ☑ true ☐ false ☐ won't-fix |
+| R4 | medrobust | 60 commits | 4 (one call) | `methodology.qmd:115` `check_compatibility(sn0=, sp0=, psi_sn=, psi_sp=)`; formal is `psi`; present in 51 commits, newest `8ba673d`, fixed since (HEAD clean) | ☑ true ☐ false ☐ won't-fix |
 
 R3 and R4 reproduce the SPEC's claim ("5 hits, all real"); R1/R2 were not in the SPEC's counts.
 
@@ -234,3 +234,14 @@ Three findings, all within the stop rule (one `error` false positive, two ways a
 **Evidence rerun:** recall 1 of 1; replay over all 7 packages (60 commits each, 200 for medfit) audited every revision with the same findings (medfit refcard x2 and `BootstrapResult`, medrobust `check_compatibility` x4, medsim x7).
 
 **Status:** Checkpoint B awaits your ticks for H2, R3 and R4. A further Codex re-review is optional; under the stop rule it triggers another loop only for an `error` false positive on a realistic call, or a way an incomplete audit reads as clean.
+
+## 12. Checkpoint B closed; T7-T9 built (2026-10-11)
+
+You ticked H2, R3 and R4 as **true**; Checkpoint B is closed. T7-T9 landed in `lib/docaudit.py` with 26 new tests in `tests/test_docaudit_prose.py`.
+
+- **T7 `scannability` (info):** paragraph over 110 words, H2 section over 800 words with fewer than 3 H3s, "Next Steps" not last. Thresholds are keyword arguments and `--max-paragraph-words/--max-section-words/--min-h3`. `info` never flips `status` (it stays `ok`).
+- **T8 `coverage` (warn) and `--since TAG`:** an export no README/vignette mentions. `summary.coverage_matrix` holds the export x file matrix. `--since` restricts to exports added since the tag; an unknown ref, a non-repo or an option-like ref adds a message, skips coverage and marks the audit `incomplete`.
+- **T9 `docs.allowlist`:** `<relpath>` or `<relpath>::<check-id>` from `.rforge.yaml`; malformed is ignored with a message; `summary.suppressed` counts hidden findings.
+- **Recall (`--scope a1`):** 2 of 2 firm caught (refcard row, Next Steps row, now locked `firm`); the two conditional scannability rows are also caught at the default thresholds.
+
+**Open decision (noise):** `coverage` is `warn` per SPEC, so it fires without `--since`. At `HEAD`: medsim 32 of 63 exports unmentioned, probmed 15 of 22, rmediation 8 of 19, medrobust 8 of 23, missingmed 1, medfit 0. Escape hatch: allowlist `NAMESPACE::coverage`. Options: keep as specced, run `coverage` only with `--since`, or demote to `info`.
