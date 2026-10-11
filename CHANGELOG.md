@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- `lib.rstatus.build_recap` no longer reports false version drift when `.STATUS`'s `version:`
+  carries annotations after the number (`0.7.0 (released 2026-10-10 …)`): only the leading
+  version token is compared against DESCRIPTION's `Version`, and the drift report shows that
+  token (#84).
+- `/rforge:finish` overrides `.STATUS`'s `version:` only on real drift, so a `--write` no longer
+  strips the annotations from a `version:` line that already matches DESCRIPTION.
+- `/rforge:finish` still adds `version:` from DESCRIPTION when an existing `.STATUS` has none
+  (the drift-only override above had stopped doing so); the rule now lives in
+  `lib.rstatus.version_overrides`.
+
+---
+
 ## [2.20.1] - 2026-09-23
 
 > `lib.status` reads the frontmatter `.STATUS` dialect and takes `phase` only from
