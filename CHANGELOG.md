@@ -29,6 +29,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dev-only replay harness (`tests/harness/`) measuring recall and precision against real documentation history;
   `test-all.sh` 45 -> 47 checks.
 
+### Documentation
+
+- Command cards no longer list seven commands that do not exist (`advise`, `docs:workflow`, `site:check`,
+  `site:deploy`, `deps-sync`, `deps:graph`, `r:universe`) and now list the seven that were missing (`capture`,
+  `complete`, `health`, `r:deps-sync`, `r:install`, `r:site`, `r:tidy`); `r:tidy` added to the REFCARD.
+- New [Ecosystem analysis](docs/guides/ecosystem-analysis.md) guide, a "Fix a docs:check finding" tutorial, docs-audit
+  and session-boundary workflow diagrams, and daily-loop / session sections in the quickstart.
+
 ### Fixed
 
 - `lib.rstatus.build_recap` no longer reports false version drift when `.STATUS`'s `version:`

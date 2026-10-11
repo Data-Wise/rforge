@@ -197,6 +197,38 @@ flowchart LR
 
 → [CRAN submission — multi-platform section](../tutorials/cran-submission-with-rforge.md)
 
+## 📝 Docs audit gate
+
+Check that the docs still describe the API before you build or release.
+
+```mermaid
+flowchart LR
+    A["/rforge:docs:check"] --> B{"report ends with<br/>INCOMPLETE / NOT AUDITED?"}
+    B -- "yes" --> C["fix the unreadable file<br/>or the unclosed call, re-run"]
+    C --> A
+    B -- "no" --> D{"findings?"}
+    D -- "error / warn" --> E["check the call against<br/>man/*.Rd, fix the docs<br/>or allowlist it"]
+    E --> A
+    D -- "none" --> F["/rforge:r:cran-prep"]
+```
+
+→ [Fix a docs:check finding](../tutorials/fix-a-docs-check-finding.md) (~10 min) · [Docs audit guide](../guides/docs-audit.md)
+
+## 🔚 Session boundary
+
+Start a session with a recap; end it by syncing `.STATUS`.
+
+```mermaid
+flowchart LR
+    A["/rforge:restore<br/>read-only recap"] --> B["work"]
+    B --> C["/rforge:finish<br/>dry run: proposed .STATUS diff"]
+    C --> D{"diff looks right?"}
+    D -- "yes" --> E["/rforge:finish --write"]
+    D -- "no" --> B
+```
+
+→ [Session boundary guide](../guides/session-boundary.md)
+
 ## How rforge fits with R's own tools
 
 The boundary in one picture: R tools build a package; rforge orchestrates
