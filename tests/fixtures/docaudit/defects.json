@@ -17,7 +17,8 @@
       "release": "A1",
       "expectation": "firm",
       "status": "firm",
-      "reason": "Refcard lists joint_effects(x, theta); formals are (object, estimates)"
+      "reason": "Refcard lists joint_effects(x, theta); formals are (object, estimates)",
+      "function": "joint_effects"
     },
     {
       "id": "extraction-next-steps-order",

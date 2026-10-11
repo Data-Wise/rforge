@@ -46,8 +46,30 @@ R3 and R4 reproduce the SPEC's claim ("5 hits, all real"); R1/R2 were not in the
 - [x] History replay ≥60 commits × medfit / medrobust / probmed
 - [x] `replay.py recall --scope signature` caught k of n matches the signature rows (1 of 1 firm eligible)
 - [x] Planted defects in a scratch copy of the hold-out docs are caught
-- [ ] Adversarial review #2 on the signature logic (two read-only agents launched; results pending)
+- [x] Adversarial review #2 on the signature logic (two read-only agents; both had no shell, so their findings were static and re-verified by tests here; see section 5)
 - [ ] Hold-out triage by you (table above)
 - [ ] No `error`-severity false positive (R3/R4 are the only `error` rows; both await your call)
 
 Blocked by: any `error`-severity false positive, an unresolved false-positive class, a red fixture, a raised exception.
+
+## 5. Adversarial review #2 — findings and fixes
+
+Both reviewers read the code without running it. Each item below got a regression test; hold-out, replay and recall results were rerun afterwards and are unchanged
+(probmed 0, medrobust 0, medfit 1 at `HEAD`; same R3/R4 hits; recall 1 of 1).
+
+| # | Finding | Severity | Fix |
+|---|---|---|---|
+| 1 | `implemented_checks()` swallowed an import error, so a broken `lib.docaudit` read as "pending" and `recall` passed | harness false pass | import failure raises `AuditCrashed`; every in-scope row reports `crashed` |
+| 2 | A row counted as caught on matching check + file only | harness weak | manifest rows may pin `function` / `arg`; refcard row pins `joint_effects` |
+| 3 | `README.qmd` not extracted | harness | added to `TREE_PATHS` |
+| 4 | `--allow-unavailable` also forgave a bad ref | harness | forgives only a missing checkout |
+| 5 | Mutation self-test only exercised the stub | harness | added a test through the real `python -m lib.docaudit` subprocess (catch and miss) |
+| 6 | String defaults in Rd usage (`sep = ")"`, `", "`) split or closed the call, giving a false `error` | **false positive (error)** | usage block is masked before splitting |
+| 7 | Directory, dangling symlink or unreadable file named like a doc/Rd raised | contract | `is_file()` filter, `_read()` returns "" on `OSError`, `audit_package` never raises |
+| 8 | Quadratic scan on a huge unclosed region (the test hung) | hang | regions and Rd usage over 200,000 chars are skipped |
+| 9 | Escaped `\{` / `\}` unbalanced the Rd usage block | silent miss | escape-aware brace scan |
+| 10 | Form feed shifted line numbers; unterminated fence at EOF dropped its block | minor | split on `\n` only; EOF fence is audited |
+| 11 | A function defined in the doc itself (`f <- function(q) q; f(zz = 1)`) was checked against the package's formals | **false positive (error)** | per-file local definitions (`<-`, `=`, `<<-`, `\(`, `assign("f", ...)`) are skipped |
+| 12 | Unlabeled fences (console output, error transcripts) were audited as R at `error` | **false positive (error)** | findings from unlabeled fences are downgraded to `warn` |
+
+Not fixed (rare): an S3 generic without `...` whose methods take extra formals (reviewer's weaker candidate); two signatures for one name in one Rd keep the last.

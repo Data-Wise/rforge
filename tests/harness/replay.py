@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Callable, Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-TREE_PATHS = ["man", "NAMESPACE", "DESCRIPTION", "vignettes", "README.md", "README.Rmd"]
+TREE_PATHS = ["man", "NAMESPACE", "DESCRIPTION", "vignettes", "README.md", "README.Rmd", "README.qmd"]
 
 # Row outcomes. Only `missed` and `crashed` can fail a run.
 CAUGHT, MISSED, PENDING = "caught", "missed", "pending"
@@ -95,8 +95,8 @@ def implemented_checks() -> set[str]:
     sys.path.insert(0, str(REPO_ROOT))
     try:
         from lib import docaudit  # type: ignore
-    except ImportError:
-        return set()
+    except Exception as exc:  # present (see docaudit_available) but broken: that is red, not "not built yet"
+        raise AuditCrashed(f"cannot import lib.docaudit: {exc}") from exc
     return set(getattr(docaudit, "IMPLEMENTED_CHECKS", ()))
 
 
@@ -134,10 +134,14 @@ def run_recall(manifest: dict, scope: str = "all", overrides: Optional[dict] = N
     overrides = overrides or {}
     if audit is None:
         audit = subprocess_audit
-        available = docaudit_available()
-        implemented = implemented_checks() if available else set()
+        broken = ""
+        try:
+            implemented = implemented_checks() if docaudit_available() else set()
+        except AuditCrashed as exc:
+            implemented, broken = {r["check"] for r in manifest["defects"] if r.get("check")}, str(exc)
     elif implemented is None:
         implemented = {r["check"] for r in manifest["defects"] if r.get("check")}
+    broken = locals().get("broken", "")
     in_scope = SCOPES[scope]
     rows = []
     for d in manifest["defects"]:
@@ -147,6 +151,9 @@ def run_recall(manifest: dict, scope: str = "all", overrides: Optional[dict] = N
                "expectation": d["expectation"], "status": d["status"], "outcome": PENDING, "detail": ""}
         rows.append(row)
         if d["check"] not in implemented:
+            continue
+        if broken:
+            row["outcome"], row["detail"] = CRASHED, broken
             continue
         repo = _resolve_repo(manifest, d["package"], overrides)
         if d.get("ref") is None:
@@ -168,7 +175,8 @@ def run_recall(manifest: dict, scope: str = "all", overrides: Optional[dict] = N
             except AuditCrashed as exc:
                 row["outcome"], row["detail"] = CRASHED, str(exc)
                 continue
-        hit = any(f.get("check") == d["check"] and (d.get("file") is None or f.get("file") == d["file"])
+        hit = any(f.get("check") == d["check"]
+                  and all(d.get(k) is None or f.get(k) == d[k] for k in ("file", "function", "arg"))
                   for f in findings)
         row["outcome"] = CAUGHT if hit else MISSED
     return summarize(rows, allow_unavailable)
@@ -181,7 +189,7 @@ def summarize(rows: list, allow_unavailable: bool = False) -> dict:
     failures = [r for r in rows if r["outcome"] == CRASHED]
     failures += [r for r in gated if r["outcome"] == MISSED]
     # A row locked as `status: firm` must keep being caught, whatever its expectation.
-    failures += [r for r in rows if r["status"] == "firm" and r["outcome"] in ((MISSED,) if allow_unavailable else (MISSED, UNAVAILABLE, NO_REF))
+    failures += [r for r in rows if r["status"] == "firm" and r["outcome"] in ((MISSED, NO_REF) if allow_unavailable else (MISSED, UNAVAILABLE, NO_REF))
                  and r not in failures]
     return {
         "rows": rows,

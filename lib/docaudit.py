@@ -39,6 +39,15 @@ IMPLEMENTED_CHECKS = frozenset({"signature-named-arg", "signature-names", "signa
 _SEVERITY_ORDER = {"info": 0, "warn": 1, "error": 2}
 _IDENT = r"[A-Za-z.][\w.]*"
 _DOC_SUFFIXES = {".md", ".qmd", ".rmd", ".rmarkdown"}
+_MAX_REGION = 200_000  # chars; larger blocks are skipped (a balanced-paren scan per call is quadratic)
+
+
+def _read(path: Path) -> str:
+    """File text, or "" when unreadable: the audit never raises on a bad file."""
+    try:
+        return path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
 
 
 # ───────────────────────── small parsing helpers ─────────────────────────
@@ -97,8 +106,18 @@ def _usage_block(rd: str) -> Optional[str]:
     if i == -1:
         return None
     start = i + len("\\usage")
-    end = _balanced_close(rd, start, "{", "}")
-    return rd[start + 1:end] if end != -1 else None
+    depth, j = 0, start
+    while j < len(rd):
+        c = rd[j]
+        if c == "\\":
+            j += 2  # `\{` and `\}` are escaped, not braces
+            continue
+        depth += c == "{"
+        depth -= c == "}"
+        if depth == 0:
+            return rd[start + 1:j]
+        j += 1
+    return None
 
 
 def parse_rd_usage(rd: str) -> tuple[dict[str, list[str]], set[str]]:
@@ -108,13 +127,16 @@ def parse_rd_usage(rd: str) -> tuple[dict[str, list[str]], set[str]]:
         return {}, set()
     block = re.sub(r"(?<!\\)%.*", "", block)
     block = block.replace("\\dots", "...").replace("\\ldots", "...")
+    if len(block) > _MAX_REGION:
+        return {}, set()
     methods = {f"{g}.{c}" for g, c in re.findall(r"\\(?:S3)?method\{([^}]*)\}\{([^}]*)\}", block)}
+    masked = _mask_strings_and_comments(block)  # string defaults such as `sep = ")"` must not split or close the call
     funcs: dict[str, list[str]] = {}
-    for m in re.finditer(rf"(?m)^\s*({_IDENT})\(", block):
-        close = _balanced_close(block, m.end() - 1)
+    for m in re.finditer(rf"(?m)^\s*({_IDENT})\(", masked):
+        close = _balanced_close(masked, m.end() - 1)
         if close == -1:
             continue
-        funcs[m.group(1)] = [a.split("=")[0].strip() for a in split_args(block[m.end():close])]
+        funcs[m.group(1)] = [a.split("=")[0].strip() for a in split_args(masked[m.end():close])]
     return funcs, methods
 
 
@@ -131,15 +153,15 @@ def read_api(root: Path) -> PackageApi:
     methods: set[str] = set()
     reexports: set[str] = set()
     man = root / "man"
-    for rd in sorted(man.glob("*.Rd")) if man.is_dir() else []:
-        text = rd.read_text(encoding="utf-8", errors="replace")
+    for rd in sorted(p for p in man.glob("*.Rd") if p.is_file()) if man.is_dir() else []:
+        text = _read(rd)
         funcs, meths = parse_rd_usage(text)
         formals.update(funcs)
         methods |= meths
         if rd.name == "reexports.Rd":
             reexports |= set(re.findall(r"\\alias\{([^}]*)\}", text))
     ns = root / "NAMESPACE"
-    exports, pattern = parse_namespace(ns.read_text(encoding="utf-8", errors="replace")) if ns.is_file() else (set(), False)
+    exports, pattern = parse_namespace(_read(ns)) if ns.is_file() else (set(), False)
     if pattern or not ns.is_file():
         exports |= set(formals)  # exports unknown: treat every documented function as exported
     return PackageApi({f: v for f, v in formals.items() if f in exports}, exports, methods, reexports, pattern)
@@ -153,6 +175,7 @@ class Region:
     kind: str  # "fence" | "inline"
     line: int  # 1-based line of the region's first character
     text: str
+    bare: bool = False  # unlabeled fence: may be console output or a transcript, so findings are warnings
 
 
 def doc_files(root: Path) -> Iterator[Path]:
@@ -176,24 +199,42 @@ def extract_regions(text: str) -> list[Region]:
     """R fenced blocks (``r``, ``{r ...}`` or unlabeled) and inline backtick spans."""
     regions: list[Region] = []
     fence: Optional[str] = None
-    fence_r = False
+    fence_r = bare = False
     buf: list[str] = []
     start = 0
-    for n, line in enumerate(text.splitlines(), 1):
+    # split on \n only: str.splitlines() also breaks on \x0c, \x85 and U+2028, which would shift line numbers
+    for n, line in enumerate(text.replace("\r\n", "\n").replace("\r", "\n").split("\n"), 1):
         m = _FENCE_OPEN.match(line)
         if fence is None:
             if m:
                 fence, fence_r, buf, start = m.group(1), _is_r_fence(m.group(2)), [], n + 1
+                bare = not m.group(2).strip()
                 continue
             for span in re.finditer(r"`([^`\n]+)`", line):
                 regions.append(Region("inline", n, span.group(1)))
         elif m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) and not m.group(2).strip():
             if fence_r:
-                regions.append(Region("fence", start, "\n".join(buf)))
+                regions.append(Region("fence", start, "\n".join(buf), bare))
             fence = None
         else:
             buf.append(line)
+    if fence is not None and fence_r:  # unterminated fence at EOF: audit what is there
+        regions.append(Region("fence", start, "\n".join(buf), bare))
     return regions
+
+
+_LOCAL_DEF = re.compile(rf"(?m)(?<![\w.$@])({_IDENT})\s*(?:<<-|<-|=)\s*(?:function\b|\\\()")
+_ASSIGN_DEF = re.compile(rf"""\bassign\(\s*["'](?P<n>{_IDENT})["']""")
+
+
+def local_definitions(regions: list[Region]) -> frozenset:
+    """Names a doc defines itself (`f <- function(...)`, `assign("f", ...)`); calls to them are not the package's."""
+    names: set[str] = set()
+    for r in regions:
+        if r.kind == "fence" and len(r.text) <= _MAX_REGION:
+            names.update(_LOCAL_DEF.findall(_mask_strings_and_comments(r.text)))
+            names.update(m.group("n") for m in _ASSIGN_DEF.finditer(r.text))
+    return frozenset(names)
 
 
 # ───────────────────────── the checks ─────────────────────────
@@ -225,10 +266,14 @@ def _finding(check: str, severity: str, file: str, line: int, function: str, arg
             "arg": arg, "message": message}
 
 
-def check_region(region: Region, rel: str, pkg: str, api: PackageApi) -> list[dict]:
+def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: frozenset = frozenset()) -> list[dict]:
+    if len(region.text) > _MAX_REGION:
+        return []
     masked = _mask_strings_and_comments(region.text)
     findings: list[dict] = []
     for fn, off, args in _calls(masked, pkg, api):
+        if fn in local:
+            continue
         formals = api.formals[fn]
         if "..." in formals:
             continue  # variadic: any names and any arity are valid
@@ -289,7 +334,7 @@ def _summary_line(cov: dict, pattern: bool) -> str:
 def _package_name(root: Path) -> str:
     desc = root / "DESCRIPTION"
     if desc.is_file():
-        m = re.search(r"(?m)^Package:\s*(\S+)", desc.read_text(encoding="utf-8", errors="replace"))
+        m = re.search(r"(?m)^Package:\s*(\S+)", _read(desc))
         if m:
             return m.group(1)
     return ""
@@ -301,17 +346,30 @@ def _envelope(findings: list, messages: list, summary: dict) -> dict:
             "findings": findings, "messages": messages, "summary": summary, "engine_missing": []}
 
 
-def audit_package(path: str | Path = ".") -> dict:
-    root = Path(path)
-    if not (root / "DESCRIPTION").is_file():
-        return _envelope([], [f"not an R package (no DESCRIPTION at {root})"], {})
+def _audit(root: Path) -> tuple[list, PackageApi]:
     pkg = _package_name(root)
     api = read_api(root)
     findings: list[dict] = []
     for f in doc_files(root):
         rel = f.relative_to(root).as_posix()
-        for region in extract_regions(f.read_text(encoding="utf-8", errors="replace")):
-            findings.extend(check_region(region, rel, pkg, api))
+        regions = extract_regions(_read(f))
+        local = local_definitions(regions)
+        for region in regions:
+            for finding in check_region(region, rel, pkg, api, local):
+                if region.bare and finding["severity"] == "error":
+                    finding["severity"] = "warn"  # an unlabeled fence may be a console transcript
+                findings.append(finding)
+    return findings, api
+
+
+def audit_package(path: str | Path = ".") -> dict:
+    root = Path(path)
+    if not (root / "DESCRIPTION").is_file():
+        return _envelope([], [f"not an R package (no DESCRIPTION at {root})"], {})
+    try:
+        findings, api = _audit(root)
+    except Exception as exc:  # advisory tool: never raise, whatever the input
+        return {**_envelope([], [f"audit failed: {type(exc).__name__}: {exc}"], {}), "status": "warn"}
     seen: set = set()
     unique = []
     for f in sorted(findings, key=lambda f: (f["file"], f["line"], f["check"], f["function"], f["arg"] or "")):

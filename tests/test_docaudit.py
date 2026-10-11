@@ -267,3 +267,86 @@ def test_format_text_lists_findings_then_summary(tmp_path):
 
 def test_implemented_checks_constant():
     assert docaudit.IMPLEMENTED_CHECKS == {"signature-named-arg", "signature-names", "signature-arity"}
+
+
+# ───────────────────────── adversarial review #2 regressions ─────────────────────────
+
+
+def test_rd_usage_string_defaults_do_not_break_formals():
+    funcs, _ = parse_rd_usage(rd('f(x, sep = ", ", open = "(", close = ")", y = 1)'))
+    assert funcs == {"f": ["x", "sep", "open", "close", "y"]}
+
+
+def test_rd_usage_escaped_braces_do_not_unbalance_the_block():
+    funcs, _ = parse_rd_usage(rd('f(x, pat = "a\\{2\\}")'))
+    assert funcs == {"f": ["x", "pat"]}
+
+
+def test_string_default_does_not_cause_false_named_arg_error(tmp_path):
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": 'f(x, sep = ")", y = 1)'}, docs={"README.md": "```r\nf(1, y = 2)\n```\n"})
+    assert docaudit.audit_package(tmp_path)["findings"] == []
+
+
+def test_directory_or_dangling_symlink_named_rd_does_not_raise(tmp_path):
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)"}, docs={"README.md": "`f(a)`\n"})
+    (tmp_path / "man" / "dir.Rd").mkdir()
+    (tmp_path / "man" / "dead.Rd").symlink_to(tmp_path / "nowhere")
+    assert docaudit.audit_package(tmp_path)["findings"] == []
+
+
+def test_unreadable_files_are_skipped_not_raised(tmp_path):
+    import os
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)"}, docs={"README.md": "```r\nf(z = 1)\n```\n"})
+    (tmp_path / "NAMESPACE").chmod(0)
+    try:
+        if os.access(tmp_path / "NAMESPACE", os.R_OK):
+            pytest.skip("running as a user that can read mode-000 files")
+        assert docaudit.audit_package(tmp_path)["status"] in ("ok", "warn")
+    finally:
+        (tmp_path / "NAMESPACE").chmod(0o644)
+
+
+def test_audit_package_never_raises(tmp_path, monkeypatch):
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)"}, docs={})
+    monkeypatch.setattr(docaudit, "read_api", lambda root: (_ for _ in ()).throw(RuntimeError("boom")))
+    r = docaudit.audit_package(tmp_path)
+    assert r["status"] == "warn" and "boom" in r["messages"][0]
+
+
+def test_unterminated_fence_at_eof_is_still_audited():
+    assert [r.text.strip() for r in extract_regions("```r\nfixed(zzz = 1)\n")] == ["fixed(zzz = 1)"]
+
+
+def test_form_feed_does_not_shift_line_numbers():
+    regions = extract_regions("a\x0cb\n`f(a)`\n")
+    assert regions[0].line == 2
+
+
+def test_huge_region_is_skipped_quickly():
+    import time
+    t = time.time()
+    assert run(fence("f(" * 300_000), f=["a"]) == []
+    assert time.time() - t < 2
+
+
+def test_function_defined_in_the_doc_is_not_the_packages():
+    from lib.docaudit import local_definitions
+    regions = [fence("f <- function(q) q\nf(zz = 1)")]
+    assert local_definitions(regions) == {"f"}
+    assert check_region(regions[0], "d.md", "pkg", api(f=["x", "a"]), local_definitions(regions)) == []
+    for code in ('f = function(q) q', 'f <<- \\(q) q', 'assign("f", function(q) q)'):
+        assert local_definitions([fence(code)]) == {"f"}
+    assert local_definitions([fence('x <- "f <- function() 1"')]) == frozenset()  # inside a string
+
+
+def test_unlabeled_fence_findings_are_downgraded_to_warn(tmp_path):
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(x, a = 1)"},
+             docs={"README.md": "```\nError in f(x, foo = 1) : unused argument\n```\n\n```r\nf(x, bar = 1)\n```\n"})
+    sev = {f["arg"]: f["severity"] for f in docaudit.audit_package(tmp_path)["findings"]}
+    assert sev == {"foo": "warn", "bar": "error"}
+
+
+def test_local_definition_in_one_block_covers_the_whole_file(tmp_path):
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(x, a = 1)"},
+             docs={"README.md": "```r\nf <- function(q) q\n```\n\n```r\nf(zz = 1)\n```\n"})
+    assert docaudit.audit_package(tmp_path)["findings"] == []

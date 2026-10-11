@@ -160,8 +160,8 @@ def test_manifest_shape():
     m = json.loads(MANIFEST.read_text())
     rows = m["defects"]
     assert len(rows) == 18 and len({r["id"] for r in rows}) == 18
-    assert {k for r in rows for k in r} == {"id", "package", "ref", "fix", "file", "check", "release",
-                                            "expectation", "status", "reason"}
+    required = {"id", "package", "ref", "fix", "file", "check", "release", "expectation", "status", "reason"}
+    assert required <= {k for r in rows for k in r} <= required | {"function", "arg"}
     assert {r["expectation"] for r in rows} <= {"firm", "conditional", "none"}
     assert {r["status"] for r in rows} <= {"pending", "firm"}
     assert sum(r["expectation"] == "firm" for r in rows) == 3
@@ -178,3 +178,64 @@ def test_cli_recall_on_committed_manifest_without_checkouts(monkeypatch, capsys)
     # ...and tolerated with --allow-unavailable (CI-style run)
     assert replay.main(["recall", "--manifest", str(MANIFEST), "--allow-unavailable"]) == 0
     assert "firm" in capsys.readouterr().out
+
+
+# ───────────────────────── adversarial review #2 regressions ─────────────────────────
+
+
+def test_broken_docaudit_import_is_red_not_pending(repo, monkeypatch):
+    path, bad = repo
+
+    def broken():
+        raise replay.AuditCrashed("cannot import lib.docaudit")
+
+    monkeypatch.setattr(replay, "docaudit_available", lambda: True)
+    monkeypatch.setattr(replay, "implemented_checks", broken)
+    s = replay.run_recall(_manifest(bad), overrides={"demo": str(path)})
+    assert s["rows"][0]["outcome"] == "crashed" and not s["ok"]
+
+
+def test_catch_requires_the_manifest_function_and_arg(repo):
+    path, bad = repo
+    other = lambda tree: [{"check": "signature-names", "file": "vignettes/a.qmd", "function": "other", "arg": "q"}]  # noqa: E731
+    assert run(_manifest(bad, function="f"), path, audit=other)["rows"][0]["outcome"] == "missed"
+    assert run(_manifest(bad), path, audit=other)["rows"][0]["outcome"] == "caught"  # no function pinned: file+check
+    right = lambda tree: [{"check": "signature-names", "file": "vignettes/a.qmd", "function": "f", "arg": "x"}]  # noqa: E731
+    assert run(_manifest(bad, function="f", arg="x"), path, audit=right)["rows"][0]["outcome"] == "caught"
+    assert run(_manifest(bad, function="f", arg="y"), path, audit=right)["rows"][0]["outcome"] == "missed"
+
+
+def test_allow_unavailable_does_not_forgive_a_bad_ref(repo):
+    path, _ = repo
+    m = _manifest("0" * 40, status="firm")
+    assert not run(m, path, audit=stub_audit, allow_unavailable=True)["ok"]
+
+
+def test_readme_qmd_is_extracted(tmp_path):
+    r = tmp_path / "pkg"
+    r.mkdir()
+    _git(r, "init", "-q", "-b", "main")
+    (r / "README.qmd").write_text("x\n")
+    _git(r, "add", "-A"); _git(r, "commit", "-q", "-m", "c")
+    assert replay.extract_tree(r, "HEAD", tmp_path / "out") and (tmp_path / "out" / "README.qmd").exists()
+
+
+def test_real_audit_path_catches_a_planted_defect_through_the_subprocess(tmp_path):
+    """The stub tests prove the plumbing; this one runs the real `python -m lib.docaudit` gate."""
+    r = tmp_path / "pkg"
+    (r / "man").mkdir(parents=True)
+    _git(r, "init", "-q", "-b", "main")
+    (r / "DESCRIPTION").write_text("Package: demo\nVersion: 0.1.0\n")
+    (r / "NAMESPACE").write_text("export(f)\n")
+    (r / "man" / "f.Rd").write_bytes(b"\\name{f}\n\\usage{\nf(a, b)\n}\n")
+    (r / "README.md").write_text("```r\nf(a = 1, zzz = 2)\n```\n")
+    _git(r, "add", "-A"); _git(r, "commit", "-q", "-m", "defect")
+    bad = _git(r, "rev-parse", "HEAD")
+    m = _manifest(bad, check="signature-named-arg", file="README.md", function="f", arg="zzz")
+    s = replay.run_recall(m, overrides={"demo": str(r)})
+    assert s["rows"][0]["outcome"] == "caught" and s["ok"]
+    (r / "README.md").write_text("```r\nf(a = 1)\n```\n")
+    _git(r, "add", "-A"); _git(r, "commit", "-q", "-m", "fix")
+    fixed = _git(r, "rev-parse", "HEAD")
+    assert replay.run_recall(_manifest(fixed, check="signature-named-arg", file="README.md", function="f", arg="zzz"),
+                             overrides={"demo": str(r)})["rows"][0]["outcome"] == "missed"
