@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [2.21.0] - 2026-10-11
+
+> `/rforge:docs:check` is now a deterministic content audit (`lib/docaudit.py`): calls and signatures in
+> README/vignettes against the exports, plus scannability, `--since` coverage and `docs.allowlist`. Docs gap-fill,
+> a merged Quick Start and `/rforge:finish` version fixes. No command-surface change (44); `test-all.sh` 47 checks.
+
 ### Changed (behavior)
 
 - **`/rforge:docs:check` is now a deterministic content audit** (`lib/docaudit.py`), not an improvised
