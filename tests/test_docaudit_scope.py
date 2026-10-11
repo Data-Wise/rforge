@@ -411,3 +411,59 @@ def test_backticked_parameter_with_a_default_shadows_the_export(tmp_path):
 def test_a_differently_named_backticked_parameter_does_not_shadow(tmp_path):
     pkg = mkpkg(tmp_path / "pkg", docs="```r\nh <- function(`g`) f(extra = 1)\n```\n")
     assert [f["arg"] for f in sig(docaudit.audit_package(pkg)["findings"])] == ["extra"]
+
+
+# ───────────────────────── Codex review #6 regressions ─────────────────────────
+
+
+@pytest.mark.parametrize("code", [
+    "f <- base::identity\nf(value = 1)",
+    "f <<- base::identity\nf(value = 1)",
+    "f = base::identity\nf(value = 1)",
+    "base::identity -> f\nf(value = 1)",
+    "base::identity ->> f\nf(value = 1)",
+    'assign ("f", base::identity)\nf(value = 1)',
+    "x <- 1; f <- identity; f(value = 1)",
+])
+def test_rebinding_a_package_name_to_anything_makes_calls_local(tmp_path, code):
+    pkg = mkpkg(tmp_path / "pkg", docs=f"```r\n{code}\n```\n")
+    assert sig(docaudit.audit_package(pkg)["findings"]) == []
+    assert docaudit.main(["--path", str(pkg), "--fail-on", "error"]) == 0
+
+
+def test_a_named_argument_equal_to_an_export_name_is_not_a_rebinding(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\nlist(\n  f = 1,\n  g = 2)\nf(extra = 1)\nh(f = 1)\n```\n")
+    assert [f["arg"] for f in sig(docaudit.audit_package(pkg)["findings"])] == ["extra"]
+
+
+def test_comparison_is_not_a_rebinding(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\nif (f == 1) 2\nf(extra = 1)\n```\n")
+    assert [f["arg"] for f in sig(docaudit.audit_package(pkg)["findings"])] == ["extra"]
+
+
+@pytest.mark.parametrize("code", ['label <- "unfinished\nf(bogus = 1)', "label <- 'unfinished\nf(bogus = 1)",
+                                  'label <- r"(unfinished\nf(bogus = 1)', "x <- `unfinished\nf(bogus = 1)"])
+def test_an_unterminated_literal_makes_the_audit_incomplete(tmp_path, code):
+    pkg = mkpkg(tmp_path / "pkg", docs=f"```r\n{code}\n```\n")
+    r = docaudit.audit_package(pkg)
+    assert r["incomplete"] is True and any("README.md:2" in m and "unterminated" in m for m in r["messages"])
+    assert "INCOMPLETE" in docaudit.format_text(docaudit.audit(pkg))
+    assert docaudit.main(["--path", str(pkg), "--fail-on", "error"]) == 2
+
+
+def test_terminated_multiline_strings_and_comment_apostrophes_are_fine(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\nx <- \"a\nb\"  # don't worry\ny <- 'it''s'\nf(extra = 1)\n```\n")
+    r = docaudit.audit_package(pkg)
+    assert r["incomplete"] is False and [f["arg"] for f in sig(r["findings"])] == ["extra"]
+
+
+def test_an_odd_apostrophe_in_a_console_transcript_does_not_make_the_audit_incomplete(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="```\nError: don't know how to f(x)\n```\n")
+    assert docaudit.audit_package(pkg)["incomplete"] is False
+
+
+def test_markdown_fences_shown_inside_an_r_block_are_not_unterminated_literals(tmp_path):
+    docs = "````r\n```{r setup, include = FALSE}\nknitr::opts_chunk$set(comment = \"#>\")\n```\n````\n"
+    assert docaudit.audit_package(mkpkg(tmp_path / "pkg", docs=docs))["incomplete"] is False
+    docs = "```r\n```{r setup}\nlibrary(x)\n```\n```\n"
+    assert docaudit.audit_package(mkpkg(tmp_path / "pkg2", docs=docs))["incomplete"] is False

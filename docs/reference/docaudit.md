@@ -280,3 +280,13 @@ matched partially against the formals *left over* by step 1 and must have exactl
 (3) two arguments may not claim the same formal (reason ``duplicate``, also for repeated exact names).
 Order of the arguments does not matter. When the call forwards ``...``, the forwarded arguments may
 supply any exact match, so partial names are only rejected if they prefix no formal at all.
+
+### `unterminated_literal()`
+
+```python
+def unterminated_literal(text: 'str') -> 'Optional[str]'
+```
+
+The kind of string literal still open at the end of `text` (``"raw string"``, ``"string"``,
+``"backtick name"``), or None. A literal that never closes swallows everything after it, so the code
+below it was not looked at. Multi-line literals that do close are fine; `#` comments are skipped.

@@ -288,3 +288,16 @@ Verdict needs-attention; three findings, all within the stop rule, each red-to-g
 | K3 | Backticked parameters (`` function(`f`) f(extra = 1) ``) still produced an error against the export `f` | parameter parsing reads comment-blanked raw text and accepts backticked names | false positive |
 
 **Gates:** pytest 877 passed, 2 skipped (with `RFORGE_MEDFIT_PATH`); `test-all.sh` 47/47; reference regenerated. Five mutation checks red. Replay over all 7 packages unchanged and with no new `incomplete` (medfit 1 error + 2 warn, medrobust 4, medsim 7); recall 2 of 2 firm.
+
+## 17. Codex review #6 (2026-10-11)
+
+Verdict needs-attention; two findings, both within the stop rule, each red-to-green.
+
+| ID | Finding | Fix | Class |
+|---|---|---|---|
+| L1 | `fixed <- base::identity; fixed(value = 1)` (and `assign ("fixed", ...)`, `x -> f`) produced an error against the package's `fixed` | any rebinding of a name (`<-`, `<<-`, `->`, `->>`, statement-level `=` at paren depth 0, `assign` with spaces) makes that name local; the right-hand side no longer matters. Named arguments (`list(f = 1)`) and `==` are not rebindings | false positive |
+| L2 | An unterminated string (`"`, `'`, `` ` `` or raw) swallowed the code after it with `status ok`, "no findings", exit 0 | `unterminated_literal` reports it as a note, so the audit is `incomplete` (text `INCOMPLETE`, `--fail-on` exit 2). Unlabeled fences are exempt (transcripts), `#` comments are skipped, and runs of three or more backticks (a markdown fence shown inside a block) are not names | bypass |
+
+**Found by the replay safety net:** the first L2 version flagged rmediation's `_CONVERSION_NOTES.md`, which shows a nested "```{r setup}" fence inside an `r` block; the harness raised on the spurious `incomplete`. The three-backtick exemption fixes it and has its own test. This is the harness doing its job: a check that makes real docs read as incomplete is caught before release.
+
+**Gates:** pytest 892 passed (with `RFORGE_MEDFIT_PATH`); `test-all.sh` 47/47; reference regenerated. Seven mutation checks red. Replay over all 7 packages unchanged with no `incomplete` (medfit 1 error + 2 warn, medrobust 4, medsim 7); recall 2 of 2 firm.

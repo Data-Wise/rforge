@@ -101,6 +101,44 @@ def _mask(text: str) -> str:
     return _mask_strings_and_comments(blank_raw_strings(text))
 
 
+def unterminated_literal(text: str) -> Optional[str]:
+    """The kind of string literal still open at the end of `text` (``"raw string"``, ``"string"``,
+    ``"backtick name"``), or None. A literal that never closes swallows everything after it, so the code
+    below it was not looked at. Multi-line literals that do close are fine; `#` comments are skipped."""
+    pos = 0
+    for m in _RAW_OPEN.finditer(text):
+        if m.start() < pos:
+            continue
+        closer = _RAW_CLOSE[m.group("o")] + m.group("d") + m.group("q")
+        end = text.find(closer, m.end())
+        if end == -1:
+            return "raw string"
+        pos = end + len(closer)
+    scrubbed = blank_raw_strings(text)
+    quote: Optional[str] = None
+    i, n = 0, len(scrubbed)
+    while i < n:
+        c = scrubbed[i]
+        if quote:
+            if c == "\\" and quote != "`":
+                i += 2
+                continue
+            if c == quote:
+                quote = None
+        elif c == "`" and scrubbed.startswith("```", i):  # a markdown fence shown inside the block, not a name
+            while i < n and scrubbed[i] == "`":
+                i += 1
+            continue
+        elif c in "\"'`":
+            quote = c
+        elif c == "#":
+            while i < n and scrubbed[i] != "\n":
+                i += 1
+            continue
+        i += 1
+    return {None: None, '"': "string", "'": "string", "`": "backtick name"}[quote]
+
+
 def blank_comments(text: str) -> str:
     """Blank ``#`` comments (to end of line) outside strings and backticks, keeping string contents.
     Length-preserving, so offsets still line up with the masked view; used so a comment between an
@@ -379,6 +417,10 @@ _LOCAL_DEF = re.compile(rf"(?m)(?<![\w.$@])({_IDENT})\s*(?:<<-|<-|=)\s*(?:functi
 _ASSIGN_DEF = re.compile(rf"""\bassign\(\s*["'](?P<n>{_IDENT})["']""")
 
 
+_REBIND_ARROW = re.compile(rf"(?<![\w.$@])({_IDENT})\s*(?:<<-|<-)")
+_REBIND_RIGHT = re.compile(rf"->>?\s*({_IDENT})(?![\w.(])")
+_REBIND_EQ = re.compile(rf"(?:^|[;\n{{}}])[ \t]*({_IDENT})\s*=(?!=)")
+_ASSIGN_CALL = re.compile(rf"""\bassign\s*\(\s*["'](?P<n>{_IDENT})["']""")
 _FUNC_HEAD = re.compile(r"(?<![\w.$@])(?:function\s*|\\)\(")
 
 
@@ -415,6 +457,18 @@ def local_definitions(regions: list[Region], skipped: Optional[set] = None) -> f
             masked = _mask(r.text)
             names.update(_LOCAL_DEF.findall(masked))
             names.update(m.group("n") for m in _ASSIGN_DEF.finditer(r.text))
+            names.update(m.group("n") for m in _ASSIGN_CALL.finditer(r.text))
+            # Any rebinding of a name (`f <- base::identity`, `x -> f`, a statement-level `f = ...`) means a later
+            # `f(...)` is not the package's: whatever the right-hand side is, only the name matters.
+            names.update(_REBIND_ARROW.findall(masked))
+            names.update(_REBIND_RIGHT.findall(masked))
+            depth, at_top = 0, []
+            for ch in masked:
+                depth += (ch in "([") - (ch in ")]")
+                at_top.append(depth == 0)
+            for m in _REBIND_EQ.finditer(masked):
+                if at_top[m.start(1)]:
+                    names.add(m.group(1))
             try:
                 names |= _parameter_names(masked, blank_comments(blank_raw_strings(r.text)))
             except _BudgetExceeded:
@@ -527,6 +581,10 @@ def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: fro
         if notes is not None:
             notes.append(f"region at {where} skipped: too much nested call text to scan")
         return []
+    if notes is not None and region.kind == "fence" and not region.bare:  # unlabeled fences may be transcripts
+        open_literal = unterminated_literal(region.text)
+        if open_literal:
+            notes.append(f"{where}: unterminated {open_literal} in this code block; the code after it was not checked")
     if notes is not None and region.kind == "fence":  # an inline span like `f(` in prose is just text
         for fn, off in unclosed:
             if fn not in local:

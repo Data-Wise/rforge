@@ -336,7 +336,7 @@ def test_function_defined_in_the_doc_is_not_the_packages():
     assert check_region(regions[0], "d.md", "pkg", api(f=["x", "a"]), local_definitions(regions)) == []
     for code in ('f = function(q) q', 'f <<- \\(q) q', 'assign("f", function(q) q)'):
         assert local_definitions([fence(code)]) == {"f", "q"}
-    assert local_definitions([fence('x <- "f <- function() 1"')]) == frozenset()  # inside a string
+    assert local_definitions([fence('x <- "f <- function() 1"')]) == {"x"}  # `f` inside the string is not a binding
 
 
 def test_unlabeled_fence_findings_are_downgraded_to_warn(tmp_path):
