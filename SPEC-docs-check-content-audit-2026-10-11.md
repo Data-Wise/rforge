@@ -1,6 +1,6 @@
 # SPEC: `/rforge:docs:check` — content audit backed by `lib/docaudit.py` (release A)
 
-- **Status:** Draft v2 — revised after a 4-reviewer adversarial pass (log at the end). Decisions D1–D5 were locked by the grill; **D0, D6, D7 and the `--site` auto-run decision were confirmed 2026-10-11** (see "Confirmed decisions") · A1 task breakdown: `tasks/plan.md` (vertical slices, harness first)
+- **Status:** Draft v2.1 — revised after a 4-reviewer adversarial pass and a Codex adversarial review (logs at the end). Decisions D1–D5 were locked by the grill; **D0, D6, D7 and the `--site` auto-run decision were confirmed 2026-10-11** (see "Confirmed decisions") · A1 task breakdown: `tasks/plan.md` (vertical slices, harness first)
 - **Date:** 2026-10-11
 - **Target version:** v2.21.0 (minor: new public module + behavior change to an existing command; **command count stays 44**)
 - **Author:** brainstormed with Claude — see `BRAINSTORM-docs-content-skills-2026-10-11.md` and `GRILL-docs-content-skills-2026-10-11.md`
@@ -389,6 +389,16 @@ Not needed: `package.json` `files` (already ships all of `lib/`), `version_sync.
 | 24 | coverage | IMPORTANT | D5 a rubber stamp; hold-out vacuous | History + recall replay, planted defects, blocking criteria |
 | 25 | coverage | IMPORTANT | D0 surprises (subdirectory, `active/`, hybrid) | Refined D0 |
 | 26 | coverage | MINOR | Ordering and size | Revised order; A1/A2 split proposed |
+
+### Review 3 — Codex adversarial review (2026-10-11)
+
+Run against the SPEC and `tasks/plan.md`; verdict `needs-attention`, three findings.
+
+| # | Area | Severity | Finding | Resolution |
+|---|---|---|---|---|
+| 27 | acceptance | HIGH | The 3-firm recall gate includes `scannability` (built after Checkpoint B) and `site-missing-page` (A2), so it could never pass at B or for A1 | Manifest rows carry `check` + `release`; `replay.py recall --scope signature\|a1\|all`; B gates signature rows, A1 gates `release: A1` rows, A2 rows stay `pending` and are not counted |
+| 28 | signature | MEDIUM | `signature-arity` lacked the `...` exemption its siblings have, so `f(x, ...)` called as `f(1, 2, 3)` would be flagged | Exempt functions with `...`; variadic positive control in the fixtures |
+| 29 | repo | MEDIUM | Not a SPEC finding: #85's drift-only `version` override stopped `/rforge:finish` adding `version:` to a `.STATUS` that lacks one | Fixed and merged separately (PR #86, `lib.rstatus.version_overrides`) |
 
 ## Appendix
 

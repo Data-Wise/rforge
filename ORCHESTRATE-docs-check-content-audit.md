@@ -163,7 +163,7 @@ uv pip install --python ~/.venvs/rforge-dev/bin/python pytest pyyaml mkdocs-mate
 
 cd ~/.git-worktrees/rforge/feature-docs-check-content-audit
 export PATH="$HOME/.venvs/rforge-dev/bin:$PATH"
-python -m pytest tests/ -q          # baseline before this plan: 610 passed / 2 skipped on the PR #85 branch
+python -m pytest tests/ -q          # baseline before this plan: 615 passed / 2 skipped on `dev` after #85/#86 (test-all 45/45)
 bash tests/test-all.sh              # baseline: 45 checks
 python3 scripts/gen_lib_reference.py --check
 python3 scripts/version_sync.py --check

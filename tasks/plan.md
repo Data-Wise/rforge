@@ -170,7 +170,7 @@ harness recall report archived in the PR body; ORCHESTRATE file removed from the
 ```bash
 cd ~/.git-worktrees/rforge/feature-docs-check-content-audit
 export PATH="$HOME/.venvs/rforge-dev/bin:$PATH"        # Python >=3.10 + pytest, pyyaml, mkdocs-material (recipe in ORCHESTRATE)
-python -m pytest tests/ -q                              # incl. tests/harness; baseline 610 passed / 2 skipped on the PR #85 branch
+python -m pytest tests/ -q                              # incl. tests/harness; baseline 615 passed / 2 skipped on `dev` after #85/#86 (merged into this branch 2026-10-11)
 bash tests/test-all.sh                                  # baseline 45 checks; exact new count stated in the PR
 python3 scripts/gen_lib_reference.py --check && python3 scripts/version_sync.py --check
 python3 tests/harness/replay.py recall --manifest tests/fixtures/docaudit/defects.json
