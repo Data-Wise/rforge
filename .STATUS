@@ -6,15 +6,18 @@ in_progress: 2026-10-11 — two lines of work, no release pending.
   open until release (a feature→dev merge does not auto-close it). Follow-up PR #86 MERGED (squash f7036b4): a Codex
   adversarial review found #85 stopped /rforge:finish adding `version:` to a .STATUS that lacks one; fixed via
   lib.rstatus.version_overrides. Local worktrees feature-rstatus-version-drift and fix-finish-missing-version can be removed.
-  (2) docs:check content audit, release A1 (v2.21.0): planning complete, no code yet. Brainstorm, 8-decision grill,
-  SPEC v2 after a 4-reviewer adversarial pass (26 findings), ORCHESTRATE, and a 17-task vertical-slice plan with a
-  replay harness built first. Worktree ~/.git-worktrees/rforge/feature-docs-check-content-audit
-  (feature/docs-check-content-audit, 5bd660a, local only; the other two review findings are fixed there: recall gates scoped by
-  checkpoint/release, variadic functions exempt from signature-arity). Docs on dev: BRAINSTORM/GRILL/SPEC-docs-*-2026-10-11.md
-  (42e3c1f, 83a4e41; dev pushed, in sync with origin). Plan and checklist: tasks/plan.md, tasks/todo.md on the feature
-  branch. A2 (--site, --run-examples) is a separate later plan.
-next: T1 (discovery allowlist refactor, own commit) and T2 (defect manifest +
-  recall runner) in the feature worktree; schedule the hold-out triage session early, it gates T7-T17.
+  (2) docs:check content audit, release A1 (v2.21.0): BUILT, in review, not merged. T1-T16 done; Checkpoints A-D closed
+  (B ticked by you 2026-10-11). Worktree ~/.git-worktrees/rforge/feature-docs-check-content-audit
+  (feature/docs-check-content-audit, pushed, af005db at last check). /rforge:docs:check is now the lib.docaudit content
+  audit (signature-named-arg error; signature-names/arity warn; scannability info; coverage warn with --since only;
+  --eco, --detailed, --fail-on, docs.allowlist). Seven Codex rounds + a security note fixed under the stop rule (triage
+  sheet sections 5-18); remaining unrecognized R binding forms are documented as known limitations in
+  docs/guides/docs-audit.md. Evidence: recall 2 of 2 firm; replay over 7 packages / 820 revisions, 0 failures, 0
+  incomplete (real defects: medsim 7, medrobust 4, medfit 1 error + 2 warn); fresh-context trial 4/4 (section 14).
+  pytest 899 passed + 4 skipped, test-all 47/47, mkdocs --strict clean. A2 (--site, --run-examples) is a later plan.
+next: Checkpoint E: strip ORCHESTRATE-*.md and tasks/ from the branch, open the feature->dev PR (transcripts from triage
+  sections 12-14 and the recall report in the body; you decide the merge). Then T17 release (v2.21.0) only on your
+  explicit go; tap writes need permission each. Optional first: Codex round 8.
 version: 2.20.1 (released, on main 9d0b01a; dev fast-forwarded to main)
 last_release: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
   9d0b01a; tag v2.20.1; release https://github.com/Data-Wise/rforge/releases/tag/v2.20.1. Ships
@@ -115,7 +118,7 @@ recent:
       to lib.rstatus.version_overrides (fill when absent, correct on drift, keep matching annotated values); 5 new
       tests, negative control verified, pytest 615 / test-all 45/45. The review's other two findings were in the
       docs:check planning docs (unsatisfiable A1 recall gate; signature-arity flagging variadic functions) and are
-      fixed in the feature worktree (5bd660a).
+      fixed in the feature worktree and logged in the SPEC as review 3 (findings 27-29).
   - date: 2026-10-11
     branch: feature/rstatus-version-drift (PR #85 → dev, merged 99b4171)
     title: "fix(rstatus): compare only the leading version token for .STATUS drift (#84)"
