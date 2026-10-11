@@ -48,7 +48,7 @@
 
 ### Checkpoint D — live exercise
 
-- [ ] `/rforge:docs:check` run against the defect and clean fixture packages; transcript quoted for the PR body
+- [x] `/rforge:docs:check` run against the defect and clean fixture packages; transcript quoted for the PR body (triage sheet section 14)
 
 ## Phase 4 — Ship
 
