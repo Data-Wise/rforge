@@ -95,7 +95,8 @@ Recap a single R package's state — DESCRIPTION, NEWS.md, git, and `.STATUS` (i
 **What this does:**
 - Reads DESCRIPTION (version, dependencies), NEWS.md's top section, git state (branch/last
   commit/dirty), and `.STATUS`'s `next:`/`blockers:`/`cran_status:` fields if present
-- Flags version drift when `.STATUS`'s `version:` mirror disagrees with DESCRIPTION's actual `Version`
+- Flags version drift when the leading version token of `.STATUS`'s `version:` mirror (annotations
+  after it are ignored) disagrees with DESCRIPTION's actual `Version`
 - If no `.STATUS` exists, offers (never auto-writes) to scaffold one in the R-package shape
 - Never writes, never commits — read-only, same invariant as craft's `/restore` and savant's `/restore`
 
@@ -135,8 +136,9 @@ Sync a single R package's `.STATUS` from its current state. Dry-run by default; 
 - Reads the same state `/rforge:restore` recaps, composes the intended `.STATUS` update
 - **Redundant-edit guard:** a diff that's only an `updated:` timestamp bump (no real content
   change) is reported "already current" and never written
-- **Version-drift correction:** `.STATUS`'s `version:` mirror is corrected to match DESCRIPTION
-  (DESCRIPTION is always the source of truth, never the reverse)
+- **Version-drift correction:** when the leading version token of `.STATUS`'s `version:` mirror
+  disagrees with DESCRIPTION, it is corrected to match (DESCRIPTION is always the source of
+  truth, never the reverse); with no drift, `version:` and its annotations are left untouched
 - Never commits or pushes — leaves the edit in the working tree plus a suggested commit message
 - If no `.STATUS` exists, proposes scaffolding one (same as `/rforge:restore`); declining means
   nothing to sync
