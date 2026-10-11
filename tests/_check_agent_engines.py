@@ -133,6 +133,17 @@ def main() -> int:
               "recommend-only (a prohibition line mentioning --deploy)")
         failed = True
 
+    # Positive docs-audit assertion: the DOCS_AUDIT intent must auto-run exactly the read-only default invocation
+    # (`lib.docaudit --format json`), and no non-prohibition line may add a flag that executes or fetches.
+    audit_lines = [l for l in text.splitlines() if "lib.docaudit" in l and not _is_prohibition(l)]
+    if not any("| DOCS_AUDIT |" in l and "`python3 -m lib.docaudit --format json`" in l for l in audit_lines):
+        print("FAIL: orchestrator.md needs a DOCS_AUDIT row auto-running `python3 -m lib.docaudit --format json`")
+        failed = True
+    risky = [l for l in audit_lines if re.search(r"--(run-examples|site|ref)\b", l)]
+    if risky:
+        print(f"FAIL: orchestrator.md auto-runs lib.docaudit with an executing/network flag: {risky}")
+        failed = True
+
     if failed:
         return 1
     print(f"ok: {len(used_kinds)} --kind tokens (all valid + safe), "

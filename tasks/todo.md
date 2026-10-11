@@ -44,7 +44,7 @@
 ## Phase 3 — User-facing surface
 
 - [x] T10 [M] CLI complete and scope-correct (D0, `max_severity`, `--fail-on`, `audit_ecosystem`, formatters)
-- [ ] T11 [M] `/rforge:docs:check` rewrite + `commands.md` + orchestrator row and assertion
+- [x] T11 [M] `/rforge:docs:check` rewrite + `commands.md` + orchestrator row and assertion
 
 ### Checkpoint D — live exercise
 

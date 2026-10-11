@@ -122,7 +122,7 @@ appendix. **Blocked by:** red fixture or missed planted defect; any raised excep
   `--detailed`, D0 scope (walk up to `DESCRIPTION`; manifest-or-`--eco` for sweeps; hybrid audits nested; resolved scope is the
   first output line; subdirectory, one-package-ecosystem-root and no-manifest cases tested), `audit_ecosystem`, `format_text`/`format_json`.
   *Deps:* T7, T8, T9.
-- [ ] **T11 [M] "`/rforge:docs:check` runs the audit."** *Files:* `commands/docs/check.md`, `docs/commands.md`, `agents/orchestrator.md`,
+- [x] **T11 [M] "`/rforge:docs:check` runs the audit."** *Files:* `commands/docs/check.md`, `docs/commands.md`, `agents/orchestrator.md`,
   `tests/_check_agent_engines.py`. *AC:* keeps `name: rforge:docs:check`; hyphenated `arguments:` (`package` positional, `detailed`,
   `eco`, `since`, `fail-on`); every flag appears literally in the `docs/commands.md` section; orchestrator read-only recipe row for the default
   invocation plus a positive assertion modeled on `_check_agent_engines.py:100-115`; (`--run-examples` prohibition and Step 3 wording
