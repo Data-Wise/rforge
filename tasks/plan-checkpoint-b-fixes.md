@@ -49,9 +49,10 @@ Only the unmatched names become findings. `...` functions stay exempt (partial m
 (unclosed call ignored; nested balanced call still reports a bad named arg at the right line).
 
 **Fix.**
+
 1. One linear pass per region builds a `paren match` map (stack); `_calls` and `parse_rd_usage` use it instead of `_balanced_close`. Unbalanced `(` map to -1.
 2. `split_args` on nested calls is O(n x depth): add a per-region **work budget** (total characters passed to `split_args`, default 2,000,000). When exceeded, stop checking that region and
-   record one `info`-free message in the envelope (`messages`: "region at <file>:<line> skipped: too large to scan") so a skip is visible, never silent.
+   record one `info`-free message in the envelope (`messages`: "region at `file:line` skipped: too large to scan") so a skip is visible, never silent.
 3. Keep the 200,000-char guard as the cheap first cut.
 4. `tests/harness/replay.py` `subprocess_audit`: `timeout=120` on `subprocess.run`; a timeout raises `AuditCrashed("timed out ...")`.
 
