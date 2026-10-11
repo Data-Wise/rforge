@@ -354,3 +354,60 @@ def test_a_skipped_region_is_not_judged_even_when_it_contains_a_bad_call(tmp_pat
     body = "function(" * 9000 + ")" * 9000 + "\nf(nope = 1)\n"
     pkg = mkpkg(tmp_path / "pkg", docs="```r\n" + body + "```\n")
     assert [f for f in docaudit.audit_package(pkg)["findings"] if f["check"].startswith("signature-")] == []
+
+
+# ───────────────────────── Codex review #5 regressions ─────────────────────────
+
+
+def sig(findings):
+    return [f for f in findings if f["check"].startswith("signature-")]
+
+
+@pytest.mark.parametrize("call", ["f (extra = 1)", "f\t(extra = 1)", "pkg :: f (extra = 1)", "pkg::f (extra = 1)"])
+def test_whitespace_before_the_paren_is_still_a_call(tmp_path, call):
+    pkg = mkpkg(tmp_path / "pkg", docs=f"```r\n{call}\n```\n")
+    assert [f["arg"] for f in sig(docaudit.audit_package(pkg)["findings"])] == ["extra"]
+    assert docaudit.main(["--path", str(pkg), "--fail-on", "error"]) == 1
+
+
+def test_a_newline_before_the_paren_is_two_statements_not_a_call(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\nf\n(extra = 1)\n```\n")
+    assert sig(docaudit.audit_package(pkg)["findings"]) == []
+
+
+def test_whitespace_does_not_make_keywords_or_other_functions_calls(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\nif (extra) 1\nother (extra = 1)\nx$f (extra = 1)\n```\n")
+    assert sig(docaudit.audit_package(pkg)["findings"]) == []
+
+
+def test_an_unclosed_call_in_a_code_block_makes_the_audit_incomplete(tmp_path, capsys):
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\nf(extra = 1\n```\n")
+    r = docaudit.audit_package(pkg)
+    assert r["incomplete"] is True and any("README.md:2" in m and "closing parenthesis" in m for m in r["messages"])
+    assert "INCOMPLETE" in docaudit.format_text(docaudit.audit(pkg))
+    assert docaudit.main(["--path", str(pkg), "--fail-on", "error"]) == 2
+
+
+def test_an_unclosed_call_mentioned_in_prose_is_not_an_incompleteness(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="Start with `f(` and keep going.\n")
+    assert docaudit.audit_package(pkg)["incomplete"] is False
+
+
+def test_a_replacement_call_is_not_reported_as_unclosed(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\nf(x) <- 1\n```\n")
+    assert docaudit.audit_package(pkg)["incomplete"] is False
+
+
+def test_backticked_parameter_names_shadow_exports(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\nwrapper <- function(`f`) f(extra = 1)\nsapply(xs, \\(`f`, y) f(extra = 2))\n```\n")
+    assert sig(docaudit.audit_package(pkg)["findings"]) == []
+
+
+def test_backticked_parameter_with_a_default_shadows_the_export(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\nh <- function(`f` = function() 2) f(extra = 1)\n```\n")
+    assert sig(docaudit.audit_package(pkg)["findings"]) == []
+
+
+def test_a_differently_named_backticked_parameter_does_not_shadow(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\nh <- function(`g`) f(extra = 1)\n```\n")
+    assert [f["arg"] for f in sig(docaudit.audit_package(pkg)["findings"])] == ["extra"]

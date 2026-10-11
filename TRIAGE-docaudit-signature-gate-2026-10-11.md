@@ -276,3 +276,15 @@ Verdict needs-attention; three findings, all within the stop rule. Each fixed re
 **Gates:** pytest 861 passed, 4 skipped; `test-all.sh` 47/47; reference docs regenerated. Eight mutation checks red (one survivor, roll-up discarding scope notes, got its own test). Recall 2 of 2 firm; replay unchanged (medfit 1 error + 2 warn, medrobust 4, medsim 7).
 
 **Security review note (commit `e258b21`, resource-cap bypass):** verified real. The J1 parameter scan split every `function(` head's whole body without the work budget, so 9,000 nested heads took 9.4 s (quadratic; a 200k region far worse). Fixed: the scan shares the `_WORK_BUDGET` accounting; an over-budget region is skipped with a named note and the audit is `incomplete`. Two regression tests (time bound; skipped region not judged), both red under mutation.
+
+## 16. Codex review #5 (2026-10-11)
+
+Verdict needs-attention; three findings, all within the stop rule, each red-to-green.
+
+| ID | Finding | Fix | Class |
+|---|---|---|---|
+| K1 | `f (extra = 1)` (space before the paren) was not seen as a call, so an invalid call passed the gate | call regex allows spaces/tabs before `(` (not a newline: `f` then `(x)` on the next line is two statements); namespace-qualified too | bypass |
+| K2 | An unclosed call in a code block (`f(extra = 1`) was dropped silently: audited, "no findings", exit 0 | recorded as a note (`... has no closing parenthesis; not checked`), audit `incomplete`, `--fail-on` exits 2; inline prose spans like `` `f(` `` and replacement calls are exempt | bypass |
+| K3 | Backticked parameters (`` function(`f`) f(extra = 1) ``) still produced an error against the export `f` | parameter parsing reads comment-blanked raw text and accepts backticked names | false positive |
+
+**Gates:** pytest 877 passed, 2 skipped (with `RFORGE_MEDFIT_PATH`); `test-all.sh` 47/47; reference regenerated. Five mutation checks red. Replay over all 7 packages unchanged and with no new `incomplete` (medfit 1 error + 2 warn, medrobust 4, medsim 7); recall 2 of 2 firm.

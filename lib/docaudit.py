@@ -382,7 +382,10 @@ _ASSIGN_DEF = re.compile(rf"""\bassign\(\s*["'](?P<n>{_IDENT})["']""")
 _FUNC_HEAD = re.compile(r"(?<![\w.$@])(?:function\s*|\\)\(")
 
 
-def _parameter_names(masked: str) -> set[str]:
+_PARAM = re.compile(rf"\s*(?:`(?P<bt>[^`]+)`|(?P<id>{_IDENT}))\s*(?:=|$)")
+
+
+def _parameter_names(masked: str, raw: Optional[str] = None) -> set[str]:
     """Parameter names of every `function(...)` / `\\(...)` in `masked` (they shadow package functions of the same name)."""
     closes = paren_map(masked)
     names: set[str] = set()
@@ -394,10 +397,11 @@ def _parameter_names(masked: str) -> set[str]:
         budget -= close - m.end()  # nested heads re-split their whole body: bound the total, like `_calls`
         if budget < 0:
             raise _BudgetExceeded
-        for arg in split_args(masked[m.end():close]):
-            head = re.match(rf"\s*({_IDENT})\s*(?:=|$)", arg)
+        base = m.end()
+        for s, e in split_spans(masked[base:close]):
+            head = _PARAM.match((raw if raw is not None else masked)[base + s:base + e])  # raw: backticks are masked
             if head:
-                names.add(head.group(1))
+                names.add(head.group("bt") or head.group("id"))
     return names
 
 
@@ -412,7 +416,7 @@ def local_definitions(regions: list[Region], skipped: Optional[set] = None) -> f
             names.update(_LOCAL_DEF.findall(masked))
             names.update(m.group("n") for m in _ASSIGN_DEF.finditer(r.text))
             try:
-                names |= _parameter_names(masked)
+                names |= _parameter_names(masked, blank_comments(blank_raw_strings(r.text)))
             except _BudgetExceeded:
                 if skipped is not None:
                     skipped.add(id(r))  # parameters unknown, so the region cannot be judged reliably
@@ -423,7 +427,7 @@ def local_definitions(regions: list[Region], skipped: Optional[set] = None) -> f
 
 
 _ASSIGNS = re.compile(r"\s*(?:<<-|<-|=(?!=))")  # what follows the `)` of a replacement call
-_CALL = re.compile(rf"(?<![\w.$@:])(?:(?P<ns>{_IDENT})\s*::\s*)?(?P<fn>{_IDENT})\(")
+_CALL = re.compile(rf"(?<![\w.$@:])(?:(?P<ns>{_IDENT})\s*::\s*)?(?P<fn>{_IDENT})[ \t]*\(")
 
 
 def unmatched_named(names: list[str], formals: list[str], dots: bool = False) -> list[tuple[str, str]]:
@@ -465,7 +469,8 @@ def unmatched_named(names: list[str], formals: list[str], dots: bool = False) ->
     return bad
 
 
-def _calls(masked: str, raw: str, pkg: str, api: PackageApi) -> Iterator[tuple[str, int, list[str], list[str], bool]]:
+def _calls(masked: str, raw: str, pkg: str, api: PackageApi,
+           unclosed: Optional[list] = None) -> Iterator[tuple[str, int, list[str], list[str], bool]]:
     """Yield ``(function, offset, masked_args, raw_args)`` for each call to an exported documented function.
 
     Calls qualified by another namespace (``other::f``) or reached through ``$``/``@`` are skipped, with
@@ -483,8 +488,12 @@ def _calls(masked: str, raw: str, pkg: str, api: PackageApi) -> Iterator[tuple[s
         if j >= 0 and masked[j] in "$@:":
             continue  # obj$ f(...), obj@ f(...)
         close = closes.get(m.end() - 1, -1)
-        if close == -1 or _ASSIGNS.match(masked, close + 1):
-            continue  # unclosed, or a replacement call `f(x) <- v` (judged against a different signature)
+        if close == -1:
+            if unclosed is not None:
+                unclosed.append((fn, m.start("fn")))  # truncated or malformed: reported, never silently clean
+            continue
+        if _ASSIGNS.match(masked, close + 1):
+            continue  # a replacement call `f(x) <- v` (judged against a different signature)
         budget -= close - m.end()
         if budget < 0:
             raise _BudgetExceeded
@@ -512,11 +521,17 @@ def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: fro
     newlines = [i for i, ch in enumerate(masked) if ch == "\n"]
     findings: list[dict] = []
     try:
-        calls = list(_calls(masked, blank_comments(blank_raw_strings(region.text)), pkg, api))
+        unclosed: list = []
+        calls = list(_calls(masked, blank_comments(blank_raw_strings(region.text)), pkg, api, unclosed))
     except _BudgetExceeded:
         if notes is not None:
             notes.append(f"region at {where} skipped: too much nested call text to scan")
         return []
+    if notes is not None and region.kind == "fence":  # an inline span like `f(` in prose is just text
+        for fn, off in unclosed:
+            if fn not in local:
+                notes.append(f"call to `{fn}` at {rel}:{region.line + bisect.bisect_left(newlines, off)} has no closing "
+                             f"parenthesis; not checked")
     for fn, off, args, raws, unparsed in calls:
         if fn in local:
             continue
