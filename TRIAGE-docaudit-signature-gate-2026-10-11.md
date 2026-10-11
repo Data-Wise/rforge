@@ -26,7 +26,7 @@ You do not need to run anything: the evidence for each row is below.
 
 | Row | What the doc says | What the code says | My read |
 |---|---|---|---|
-| H1 medfit `model-native.qmd:23` (`warn`, listing) | Routes table: `fit_sem(syntax, data)` | `man/fit_sem.Rd` formals are `(model, data, information, n_starts, control, sampling_weights, se_type)` | Probably **true** but low-stakes: `syntax` reads as a placeholder for the model syntax, yet the argument is called `model`. Warn-level, so it cannot trigger the demotion |
+| H1 medfit `model-native.qmd:23` (`warn`, listing) | Routes table: `fit_sem(syntax, data)` | `man/fit_sem.Rd` formals are `(model, data, information, n_starts, control, sampling_weights, se_type)` | **Probably false** (revised after investigation, section 6): the same table cell continues `fit_mediation(model = syntax, engine = "native")`, so `syntax` is a variable holding the model string and `fit_sem(syntax, data)` is a valid call example, not a signature listing. It is a *class* of false positive (`signature-names` cannot tell a call example from a signature listing), so it blocks the gate until you choose a resolution (section 6), even though it is only `warn` |
 | R3 medfit `introduction.qmd:154` (`error`, history only) | `BootstrapResult(estimate = ..., ci_lower = ..., ..., converged = TRUE)` | `man/BootstrapResult.Rd` formals: `(estimate, ci_lower, ci_upper, ci_level, boot_estimates, n_boot, method, call)`, with no `converged` | **True**: the call would error. Present in 48 of the last 200 commits and already fixed at `HEAD` |
 | R4 medrobust `methodology.qmd:115` (`error`, history only) | `check_compatibility(..., sn0 = 0.90, sp0 = 0.85, psi_sn = 1.5, psi_sp = 1.2)` | `man/check_compatibility.Rd` has a single `psi` formal (no `sn0`, `sp0`, `psi_sn`, `psi_sp`) | **True**: the call would error. Present in 51 of the last 60 commits and already fixed at `HEAD` |
 
@@ -47,7 +47,8 @@ gets a regression test and, if it is `error`-severity, the same demotion rule.
 
 | # | Package | Check | Severity | Location | Finding | Triage |
 |---|---|---|---|---|---|---|
-| H1 | medfit | `signature-names` | warn | `vignettes/articles/model-native.qmd:23` | Listing `fit_sem(syntax, data)` names `syntax`; formals are `(model, data, information, n_starts, control, sampling_weights, se_type)` | ☐ true ☐ false ☐ won't-fix |
+| H1 | medfit | `signature-names` | warn | `vignettes/articles/model-native.qmd:23` | Listing `fit_sem(syntax, data)` names `syntax`; formals are `(model, data, information, n_starts, control, sampling_weights, se_type)`. **Likely a call example, not a signature** (section 6) | ☐ true ☐ false ☐ won't-fix |
+| H2 | medsim | `signature-named-arg` | **error** | `vignettes/missing-data-mediation.qmd:70, 84, 92` | 7 findings over 4 calls: `medsim_amputate(vars=, rate=)`, `medsim_scenario_missing(rate=, skew=, kurtosis=)`, `medsim_scenario_missing_grid(rates=, skew=)`. Verified against `R/dgm_amputate.R` at `d7b9b75`: the function has no `vars` or `rate` formal | ☐ true ☐ false ☐ won't-fix |
 
 ## 2. History replay (first-parent, checks: `signature-named-arg`, `signature-arity`)
 
@@ -80,7 +81,8 @@ R3 and R4 reproduce the SPEC's claim ("5 hits, all real"); R1/R2 were not in the
 - [x] Planted defects in a scratch copy of the hold-out docs are caught
 - [x] Adversarial review #2 on the signature logic (two read-only agents; both had no shell, so their findings were static and re-verified by tests here; see section 5)
 - [ ] Hold-out triage by you (table above)
-- [ ] No `error`-severity false positive (R3/R4 are the only `error` rows; both await your call)
+- [ ] No `error`-severity false positive (R3, R4 and H2 are the `error` rows; all three look true, all await your call)
+- [ ] No unresolved false-positive class (**open: H1**, the call-example-vs-listing class; options in section 6)
 
 Blocked by: any `error`-severity false positive, an unresolved false-positive class, a red fixture, a raised exception.
 
@@ -105,3 +107,45 @@ Both reviewers read the code without running it. Each item below got a regressio
 | 12 | Unlabeled fences (console output, error transcripts) were audited as R at `error` | **false positive (error)** | findings from unlabeled fences are downgraded to `warn` |
 
 Not fixed (rare): an S3 generic without `...` whose methods take extra formals (reviewer's weaker candidate); two signatures for one name in one Rd keep the last.
+
+## 6. Further investigation (2026-10-11, after an advisor review of this sheet)
+
+Three things the first version of the sheet got wrong or left thin.
+
+**6.1 H1 is probably a false positive, and a class.** `signature-names` fires on any backticked single call with bare identifiers that are not
+formals. In the `refcard` that is exactly right (`joint_effects(x, theta)`, the signature). In `model-native.qmd:23` the identifier is a variable
+(`fit_mediation(model = syntax, …)` in the same cell). The two are told apart by context: the refcard span is the **first cell of a table row**
+(a signature column); the `fit_sem` span is inside the *second* cell of a "Routes" row. Measured over 7 packages, 60 first-parent commits each:
+`signature-names` produced 2 distinct findings, one true (refcard) and one likely false (this one), so its observed precision is about 50% on a very small sample.
+
+Options (this changes the SPEC, so it is your decision):
+
+| Option | Effect | Cost |
+|---|---|---|
+| **A (my recommendation): narrow `signature-names` to table first-cell spans** (the prototype's original rule) | Keeps the known-answer refcard catch; removes H1; no new config | Misses listings outside first-cell positions (none seen in the 7 packages) |
+| B: keep as is and allowlist H1 via `docs.allowlist` (T9) | No code change | Every call example with a variable argument needs an allowlist entry: noisy |
+| C: demote `signature-names` to `info` | Cannot mislead | Loses the one firm catch (refcard) as a visible finding; the recall row would need to move |
+
+**6.2 More hold-out.** The sheet had 3 packages. At `HEAD`, all 7 git-tracked R packages in `~/projects/r-packages/active/` (read-only):
+
+| Package | Calls checked | Named args checked | Findings |
+|---|---|---|---|
+| medfit | 74 | 47 | 1 (H1) |
+| mediationverse | 7 | 0 | 0 |
+| medrobust | 71 | 290 | 0 |
+| **medsim** | 78 | 85 | **7 (H2, all `error`)** |
+| missingmed | 82 | 163 | 0 |
+| probmed | 0 | 0 | 0 |
+| rmediation | 14 | 16 | 0 |
+
+`medsim` is new evidence: a package outside the original hold-out where the audit found 4 broken calls in one vignette (checked against the R source),
+with no false positive. Fixing those is a medsim task, not part of this plan.
+
+**6.3 Denominators.** The SPEC's "337 named arguments at HEAD, 0 false positives" reproduces exactly: medfit 47 + medrobust 290 + probmed 0 = 337.
+Across all 7 packages the audit checks **326 calls and 601 named arguments**. Two limits to state plainly:
+(1) **probmed contributes nothing**: its docs contain no call to a checkable (exported, non-variadic, documented) function, so "probmed: 0 findings" says nothing about probmed.
+(2) The SPEC's 20,468 named-argument figure for the 120-commit replay was not recomputed here; the history replay reports distinct findings, not argument counts.
+About half of the exports in each package (variadic, no usage, methods) are not checkable at all, which the "checked N of M" line reports.
+
+**6.4 Process note.** Both adversarial reviewers were `feature-dev:code-reviewer`, which has no shell, so they could only read the code. Any further review should use
+an agent type with Bash so it can run its repro cases.
