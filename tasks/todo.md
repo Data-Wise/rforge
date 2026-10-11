@@ -74,4 +74,5 @@
 - [x] F2 failed audits (non-zero exit, bad JSON, `audit_failed`) raise `AuditCrashed`
 - [x] F3 a `status: firm` row whose check is missing/unimplemented fails (`lost`), never `pending`
 - [x] Gates, evidence rerun, triage sheet refresh
-- [ ] Codex re-review clean
+- [x] Codex re-review #1 answered (second loop G1-G6, section 9 of the triage sheet)
+- [ ] Codex re-review #2 clean

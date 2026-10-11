@@ -177,3 +177,20 @@ Mutation checks: removing the lock (3 tests red), ignoring `audit_failed` (2 red
 **Gates:** `pytest tests` 748 passed, 4 skipped; harness with `RFORGE_MEDFIT_PATH` 46 passed; `test-all.sh` 45 of 45; `gen_lib_reference.py --check` clean.
 
 **Evidence rerun (unchanged):** recall 1 of 1; history replay (60 commits, 200 for medfit) over all 7 packages reported the same findings as before (medfit refcard x2 and `BootstrapResult`, medrobust `check_compatibility` x4, medsim x7), with no audit failures; `HEAD` hold-out: medsim 7, all others 0. F1 removed no finding.
+
+## 9. Codex re-review of the fixes — second loop (2026-10-11)
+
+The re-review of section 8's fixes returned six more medium findings. Each was reproduced on a scratch package before fixing (all six reproduced); each has a red-then-green test and a mutation check.
+
+| ID | Finding | Reproduced | Fix |
+|---|---|---|---|
+| G1 | `f("alpha"=1, al=2)`, ``f(`alpha`=1, al=2)`` and `f(..., al=2)` flagged (quoted/backticked tags lost to masking; forwarded `...` can supply exact matches) | yes | tags read from the raw text (`"x"`, `'x'`, `` `x` ``); with forwarded `...`, a partial is rejected only if it prefixes no formal |
+| G5 | `other :: f(gamma=1)`, `obj$ f(gamma=1)` flagged (whitespace defeated the foreign-call rule) | yes | whitespace allowed around `::`, `$`, `@`; the character before the call is found by skipping whitespace |
+| G6 | `f(alpi=1, alpi=2)` and `f(alpha=1, alpha=2)` passed | yes | claims are tracked by occurrence; a second claim on one formal is flagged ("given more than once") |
+| G2 | Skipped regions reported as `status: ok`; replay dropped the note and returned `[]` | yes | envelope `incomplete: true`; `subprocess_audit` raises `AuditCrashed("incomplete audit ...")` |
+| G3 | Rd usage splitting still quadratic (8,000 nested lines took 4.3 s, 160,010 chars over 3 s) | yes | Rd usage shares the work budget; a skipped Rd file is named in `messages` and sets `incomplete` |
+| G4 | Replay on a nonexistent repo printed `[]`, exit 0; a failed extraction silently skipped the revision | yes | `rev-list`/`ls-tree`/`archive`/`tar` failures raise `AuditCrashed`; "nothing to extract" is a counted, separate case |
+
+**Gates:** `pytest tests` 770 passed, 4 skipped; harness with `RFORGE_MEDFIT_PATH` 51 passed; `test-all.sh` 45 of 45; `gen_lib_reference.py --check` clean.
+**Evidence rerun:** recall 1 of 1; history replay over all 7 packages (820 revisions: 200 medfit + 60 each for the others; **820 audited, 0 skipped, 0 incomplete, 0 audit failures**) found exactly the same defects as before (medfit refcard x2 and `BootstrapResult`, medrobust `check_compatibility` x4, medsim x7).
+Replay now prints `revisions / audited / skipped (no docs)` counts to stderr.

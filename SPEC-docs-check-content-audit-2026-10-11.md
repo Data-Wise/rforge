@@ -403,6 +403,12 @@ Run against the SPEC and `tasks/plan.md`; verdict `needs-attention`, three findi
 | 31 | harness | MEDIUM | (F2) Failed audits read as clean in replay | `audit_failed`; any failed audit shape raises `AuditCrashed`; replay timeout |
 | 32 | harness | MEDIUM | (F3) A locked row could go pending | Outcome `lost` fails recall |
 | 33 | signature | MEDIUM | (F4) Quadratic scans below the size guard; 109-133 s | Linear paren map, work budget, visible skips |
+| 34 | signature | MEDIUM | (Codex re-review, G1) Quoted/backticked tags and forwarded `...` mishandled in matching | Tags from raw text; `...` relaxes partial checks |
+| 35 | signature | MEDIUM | (Codex re-review, G5) Whitespace defeated `pkg::f` / `obj$ f` exclusion | Whitespace-tolerant qualifier scan |
+| 36 | signature | MEDIUM | (Codex re-review, G6) Duplicate arguments could claim one formal | Claims tracked by occurrence |
+| 37 | harness | MEDIUM | (Codex re-review, G2) Skipped regions read as clean in replay | `incomplete` envelope flag; harness raises |
+| 38 | signature | MEDIUM | (Codex re-review, G3) Rd usage splitting still quadratic | Shared work budget; skipped Rd named in messages |
+| 39 | harness | MEDIUM | (Codex re-review, G4) Failed enumeration/extraction read as clean history | Git failures raise; counts reported |
 
 ## Appendix
 
