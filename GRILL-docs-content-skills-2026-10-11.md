@@ -101,3 +101,12 @@ Grill decisions 1-8 stand. Refinements: decision 4 now derives expected pages fr
 decision 5 gains a history replay, recall replay, planted defects and explicit blocking criteria. New decisions awaiting
 confirmation: D0 (scope rule), D6 (split release A into A1 static + rewrite and A2 `--run-examples`/`--site`), D7
 (`signature-named-arg` stays `error`, auto-demoted on any false positive).
+
+## Confirmation round (2026-10-11) — the four open SPEC v2 decisions
+
+| # | Branch | Decision |
+|---|---|---|
+| C1 | D0: default scope of `docs:check` | A: walk up to the nearest `DESCRIPTION`; at a non-package root sweep only if a manifest exists or `--eco` is passed, else print a hint; hybrid roots audit nested packages too; the resolved scope is the first output line. CHANGELOG must state the change from "ecosystem-wide by default". |
+| C2 | D6: one release or split? | A: split. **A1 (v2.21.0)** = static checks (`signature-named-arg`, `signature-names`, `signature-arity`, `coverage`, `scannability`) + `docs:check` rewrite + `--since` + `docs.allowlist` + mechanical gates. **A2 (v2.22.0)** = `--site` (then smoke test) followed by `--run-examples` + `lib/r/docexamples.R`. Moves grill decisions 4 and the examples check one release later; reverses neither. |
+| C3 | D7: severity of `signature-named-arg` | A: `error`, auto-demoted to `warn` before release if the history replay or hold-out shows any `error`-severity false positive. Evidence: 0 false positives over 337 named args at HEAD; 20,468 args replayed over 120 commits gave 5 hits, all real. The envelope never blocks, so `error` only affects the exit code under `--fail-on`. |
+| C4 | Orchestrator auto-run of `docs:check --site` | A: auto-run, read-only, following the `lib.runiverse` precedent (`agents/orchestrator.md:69-71`). The Step 3 wording "network -> recommend" is reconciled to "network writes -> recommend" in the same change; a positive assertion is added in `tests/_check_agent_engines.py`. `--run-examples` stays recommend-only (executes package code). |

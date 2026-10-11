@@ -1,6 +1,6 @@
 # SPEC: `/rforge:docs:check` — content audit backed by `lib/docaudit.py` (release A)
 
-- **Status:** Draft v2 — revised after a 4-reviewer adversarial pass (log at the end). Decisions D1–D5 are locked by the grill; **D0, D6 and D7 are new and need your confirmation** (see "Decisions needing confirmation")
+- **Status:** Draft v2 — revised after a 4-reviewer adversarial pass (log at the end). Decisions D1–D5 were locked by the grill; **D0, D6, D7 and the `--site` auto-run decision were confirmed 2026-10-11** (see "Confirmed decisions")
 - **Date:** 2026-10-11
 - **Target version:** v2.21.0 (minor: new public module + behavior change to an existing command; **command count stays 44**)
 - **Author:** brainstormed with Claude — see `BRAINSTORM-docs-content-skills-2026-10-11.md` and `GRILL-docs-content-skills-2026-10-11.md`
@@ -61,7 +61,7 @@ across 337 named args.
 | D6 | **`--run-examples` and `--site` ship as a follow-on (A2), not in A1** — see below | review (new) |
 | D7 | `signature-named-arg` stays `error`; the check is **demoted to `warn` before release if the hold-out or replay shows any `error`-severity false positive** | review (new) |
 
-### Proposed split (D6, needs confirmation)
+### Release split (D6, confirmed 2026-10-11)
 
 | Release | Contents | Why |
 |---|---|---|
@@ -69,7 +69,7 @@ across 337 named args.
 | **A2 (v2.22.0)** | `--run-examples` (needs `pkgload`, session semantics, normalization) and `--site` (needs deploy-ref derivation, smoke test) | Both contracts had BLOCKER/IMPORTANT holes in review; each adds a dependency class (R, network) and a smoke-test obligation |
 
 This reverses nothing in the grill — D4 and the examples check still ship — but moves them one release later. The
-contracts below are written in full so either shape works; if you decline the split, A1 and A2 merge into v2.21.0.
+contracts below are written in full for both releases.
 
 ### Out of scope
 
@@ -328,12 +328,14 @@ Not needed: `package.json` `files` (already ships all of `lib/`), `version_sync.
 10. **A2:** `--site` (+ smoke test right after) then `--run-examples` + `lib/r/docexamples.R` + dependency tests; review
     and release
 
-## Decisions needing confirmation
+## Confirmed decisions (2026-10-11, grill confirmation round — see ledger C1-C4)
 
-1. **D0** — the refined scope rule (walk up to `DESCRIPTION`; manifest-or-`--eco` for sweeps; hybrid audits nested too).
-2. **D6** — split release A into A1 (static + rewrite) and A2 (`--run-examples`, `--site`).
-3. **D7** — keep `signature-named-arg` at `error` with automatic demotion on any false positive.
-4. `--site` auto-run by the orchestrator (the `runiverse` precedent) vs recommend-only.
+1. **D0** — confirmed as refined: walk up to `DESCRIPTION`; manifest-or-`--eco` for sweeps; hybrid audits nested too;
+   resolved scope is the first output line. The CHANGELOG states the change from "ecosystem-wide by default".
+2. **D6** — confirmed: A1 (v2.21.0) static checks + rewrite; A2 (v2.22.0) `--site` then `--run-examples`.
+3. **D7** — confirmed: `signature-named-arg` is `error`, auto-demoted to `warn` on any `error`-severity false positive.
+4. **`--site` orchestrator auto-run** — confirmed: auto-run, read-only, per the `lib.runiverse` precedent; Step 3
+   wording reconciled to "network writes -> recommend". `--run-examples` stays recommend-only.
 
 ## Open questions / risks
 
