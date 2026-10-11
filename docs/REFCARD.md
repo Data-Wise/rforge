@@ -76,6 +76,7 @@
 │  CRAN SUBMISSION (v2.2.0)                                                   │
 │    /rforge:r:revdep       Reverse-dep check vs CRAN downstream (revdepcheck)│
 │    /rforge:r:goodpractice Advisory best-practice bundle (goodpractice)      │
+│    /rforge:r:tidy         Tidyverse-conventions audit (advisory)            │
 │    /rforge:r:winbuilder   Dispatch to win-builder R-devel — async           │
 │    /rforge:r:rhub         Multi-platform checks via R-hub v2 — async        │
 │    /rforge:r:cran-prep    Full CRAN gate + strict passes + cran-comments.md │
@@ -383,6 +384,7 @@ rforge/
 | CRAN multi-platform | `/rforge:r:rhub` | Async GitHub Actions matrix |
 | Reverse-dep check | `/rforge:r:revdep` | CRAN downstream obligation |
 | Advisory best practices | `/rforge:r:goodpractice` | Pre-submission advisory pass |
+| Tidyverse conventions | `/rforge:r:tidy` | Lint preset, DESCRIPTION, roxygen, NEWS header (advisory) |
 | Check S7 conventions | `/rforge:r:s7-review` | Static, advisory — naming/validators/methods/legacy/docs; `--eco` cross-package contracts, `--runtime` dispatch checks |
 | Check only changed packages | `/rforge:r:check --changed` | Scopes to packages changed vs `--base`; tags findings [introduced]/[pre-existing]/[uncommitted] via a per-package-cached merge-base baseline (`--fail-on introduced` by default; `--no-cache` to skip the cache) |
 | Scaffold a test file | `/rforge:r:use-test` | Draft test_that() blocks (TODO assertions) |

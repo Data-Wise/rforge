@@ -112,6 +112,7 @@ nav:
     - "Diff-aware checks": tutorials/diff-aware-checks.md
     - "S7 convention checking": tutorials/s7-convention-checking.md
     - "Scaffolding existing packages": tutorials/scaffolding-existing-packages.md
+    - "Fix a docs:check finding": tutorials/fix-a-docs-check-finding.md
     - "CRAN release prep": tutorials/cran-release-prep.md
     - "CRAN submission with rforge": tutorials/cran-submission-with-rforge.md
     - "Win-builder + tarball-check": tutorials/cran-winbuilder-tarball-check.md
@@ -130,6 +131,7 @@ nav:
       - "Diff-aware checks (--changed)": guides/diff-aware.md
       - "CRAN submission": guides/cran-submission.md
       - "Website + deploy guard (r:site)": guides/website.md
+      - "Ecosystem analysis (analyze/impact/cascade/release)": guides/ecosystem-analysis.md
       - "Docs audit (docs:check)": guides/docs-audit.md
     - 🤖 Orchestrator Agent: orchestrator.md
     - Configuration: configuration.md

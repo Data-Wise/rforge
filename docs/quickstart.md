@@ -364,6 +364,31 @@ Now that you're set up, explore:
 /rforge:r:check                   # R CMD check integration
 ```
 
+## Your daily R loop and a docs check
+
+```bash
+# Inner loop on one package
+/rforge:r:cycle                   # document -> test -> check
+/rforge:r:lint                    # static analysis (read-only)
+/rforge:r:tidy                    # tidyverse-conventions audit (advisory)
+
+# Before a release: do the docs still match the API?
+/rforge:docs:check                # README/vignette calls vs exports
+/rforge:docs:check --fail-on error  # exit 1 on an error; 2 if it could not finish
+/rforge:r:cran-prep               # the full CRAN gate
+```
+
+The docs audit prints its scope on the first line and `checked N of M` at the end; a report ending in
+`INCOMPLETE` or `NOT AUDITED` is not clean. See [Fix a docs:check finding](tutorials/fix-a-docs-check-finding.md).
+
+## Session start and end
+
+```bash
+/rforge:restore                   # recap of this package (read-only)
+/rforge:finish                    # dry run: the proposed .STATUS update
+/rforge:finish --write            # apply it
+```
+
 ## Getting Help
 
 - **GitHub Issues:** [Data-Wise/rforge/issues](https://github.com/Data-Wise/rforge/issues)

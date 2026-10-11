@@ -68,6 +68,9 @@ flowchart LR
 - **[Scaffolding existing packages](scaffolding-existing-packages.md)** — the
   five `r:use-*` commands (test, package, vignette, data, citation),
   dry-run by default. ~10 min.
+- **[Fix a docs:check finding](fix-a-docs-check-finding.md)** — run the docs
+  audit, triage each finding against `man/*.Rd`, fix or allowlist it, and gate
+  a release with `--fail-on`. ~10 min.
 - **[Orchestrator cookbook](orchestrator-cookbook.md)** — ask the orchestrator
   agent a *goal* ("is this CRAN-ready?") and let it run the right read-only
   analyses. ~10 min.
