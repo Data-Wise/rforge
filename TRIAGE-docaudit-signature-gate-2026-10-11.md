@@ -194,3 +194,28 @@ The re-review of section 8's fixes returned six more medium findings. Each was r
 **Gates:** `pytest tests` 770 passed, 4 skipped; harness with `RFORGE_MEDFIT_PATH` 51 passed; `test-all.sh` 45 of 45; `gen_lib_reference.py --check` clean.
 **Evidence rerun:** recall 1 of 1; history replay over all 7 packages (820 revisions: 200 medfit + 60 each for the others; **820 audited, 0 skipped, 0 incomplete, 0 audit failures**) found exactly the same defects as before (medfit refcard x2 and `BootstrapResult`, medrobust `check_compatibility` x4, medsim x7).
 Replay now prints `revisions / audited / skipped (no docs)` counts to stderr.
+
+## 10. Codex re-review #2 — option A applied (2026-10-11)
+
+Seven more findings. You chose **option A**: fix the completeness and lock bypasses properly, and make call-parsing edge cases **fail safe** instead of chasing every R-syntax corner.
+
+| ID | Finding | Fix | Class |
+|---|---|---|---|
+| H1' | Read failures read as a clean audit | `_read` records a note (`README.md unreadable: ...`) and the audit is `incomplete` | bypass |
+| H2' | Oversized Rd usage skipped silently | now raises the same skip path: `man/f.Rd skipped: usage block too large ...`, `incomplete` | bypass |
+| H3' | Scope filter dropped a misspelled locked row before the lock guard | `KNOWN_CHECKS`; any manifest check id outside it fails recall regardless of scope | bypass |
+| H4' | Raw strings (`r"{... "f(gamma=1)" ...}"`) produced call findings | raw strings (`r"(...)"`, `R"---[...]---"`, any quote) are blanked before masking | false positive, fixed |
+| H5' | Comment between a tag and its `=` hid the exact match | comments are blanked (strings kept) before tag parsing, so such calls parse correctly | false positive, fixed |
+| H6' | Escaped quoted tag (`"al\u0070ha" = 1`) lost the exact match | **fail safe**: a call whose quoted tag cannot be read downgrades `signature-named-arg` to `warn` ("not parsed: check by hand") | false positive, fail-safe |
+| H7' | Quoted formal names kept their delimiters (`` `a b` `` vs `"a b"`) | formal names are normalized (backticks/quotes stripped) | false positive, fixed |
+| H8' | Forwarded `...` disabled the duplicate-partial check | identical names that prefix a formal are flagged even with forwarded `...` | false negative, fixed |
+
+One regression caught on the way and fixed: my first fail-safe treated any `#` in a call as unparsed, which downgraded the real medfit `BootstrapResult(converged = TRUE)` error to `warn` (the call has trailing comments). Comments are now parsed instead of feared, and only an unreadable quoted tag triggers the downgrade; the `BootstrapResult` finding is `error` again.
+
+**Gates:** `pytest tests` 784 passed, 4 skipped; harness with `RFORGE_MEDFIT_PATH` 53 passed; `test-all.sh` 45 of 45; `gen_lib_reference.py --check` clean. Six mutation checks (read failure silent, oversized Rd silent, raw strings, no downgrade, dots duplicates, unknown check ids) each turn a test red; a seventh (comments not blanked) does too.
+**Evidence rerun:** recall 1 of 1; history replay, 820 revisions, 0 incomplete, 0 failures; same defects as before, same severities (medfit refcard x2 `warn`, `BootstrapResult` `error`, medrobust x4 `error`, medsim x7 `error`).
+
+### Stop rule (agreed with option A)
+
+R syntax has unbounded corners. From here on a new review finding triggers another fix loop **only if** it is (a) an `error`-severity false positive reproducible on a realistic R call, or (b) a way a failed, skipped or incomplete audit, or a missing regression lock, reads as clean.
+Other edge cases (exotic tokens that are unlikely in package docs) are logged here as known limitations and the check fails safe to `warn`; they do not block Checkpoint B.

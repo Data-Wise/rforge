@@ -409,6 +409,12 @@ Run against the SPEC and `tasks/plan.md`; verdict `needs-attention`, three findi
 | 37 | harness | MEDIUM | (Codex re-review, G2) Skipped regions read as clean in replay | `incomplete` envelope flag; harness raises |
 | 38 | signature | MEDIUM | (Codex re-review, G3) Rd usage splitting still quadratic | Shared work budget; skipped Rd named in messages |
 | 39 | harness | MEDIUM | (Codex re-review, G4) Failed enumeration/extraction read as clean history | Git failures raise; counts reported |
+| 40 | harness | MEDIUM | (Codex re-review 2, H1') Read failures read as clean | `_read` notes; `incomplete` |
+| 41 | signature | MEDIUM | (Codex re-review 2, H2') Oversized Rd usage skipped silently | Same skip path, reported |
+| 42 | harness | MEDIUM | (Codex re-review 2, H3') Scope filter bypassed the lock via a misspelled check | `KNOWN_CHECKS` validation before scope filtering |
+| 43 | signature | MEDIUM | (Codex re-review 2, H4'-H5') Raw strings and comments inside calls produced false errors | Blank raw strings; blank comments before tag parsing |
+| 44 | signature | MEDIUM | (Codex re-review 2, H6') Escaped quoted tags lost an exact match | Fail safe to `warn` when a quoted tag is unparsed |
+| 45 | signature | MEDIUM | (Codex re-review 2, H7'-H8') Quoted formal names; duplicate partials under forwarded `...` | Normalize names; flag identical partials with `...` |
 
 ## Appendix
 

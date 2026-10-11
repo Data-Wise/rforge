@@ -75,4 +75,5 @@
 - [x] F3 a `status: firm` row whose check is missing/unimplemented fails (`lost`), never `pending`
 - [x] Gates, evidence rerun, triage sheet refresh
 - [x] Codex re-review #1 answered (second loop G1-G6, section 9 of the triage sheet)
-- [ ] Codex re-review #2 clean
+- [x] Codex re-review #2 answered (option A, section 10 of the triage sheet; stop rule recorded)
+- [ ] Codex re-review #3 clean (per the stop rule)

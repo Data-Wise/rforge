@@ -88,6 +88,40 @@ def _mask(text: str) -> str:
     return _mask_strings_and_comments(blank_raw_strings(text))
 
 
+def blank_comments(text: str) -> str:
+    """Blank ``#`` comments (to end of line) outside strings and backticks, keeping string contents.
+    Length-preserving, so offsets still line up with the masked view; used so a comment between an
+    argument's name and its ``=`` cannot hide the tag."""
+    out = list(text)
+    quote: Optional[str] = None
+    i, n = 0, len(text)
+    while i < n:
+        c = text[i]
+        if quote:
+            if c == "\\" and quote != "`":
+                i += 2
+                continue
+            if c == quote:
+                quote = None
+        elif c in "\"'`":
+            quote = c
+        elif c == "#":
+            while i < n and text[i] != "\n":
+                out[i] = " "
+                i += 1
+            continue
+        i += 1
+    return "".join(out)
+
+
+_QUOTED_TAG = re.compile(r"""\s*(["']).*?\1\s*=(?!=)""", re.S)
+
+
+def _unparsed_tag(raw_arg: str) -> bool:
+    """A quoted tag we could not read (for example one with an escape such as ``"al\\u0070ha" = 1``)."""
+    return bool(_QUOTED_TAG.match(raw_arg)) and _named(raw_arg) is None
+
+
 # ───────────────────────── small parsing helpers ─────────────────────────
 
 
@@ -360,9 +394,6 @@ def unmatched_named(names: list[str], formals: list[str], dots: bool = False) ->
     return bad
 
 
-_UNPARSED = re.compile(r"#|\\|\b[rR][\"']")
-
-
 def _calls(masked: str, raw: str, pkg: str, api: PackageApi) -> Iterator[tuple[str, int, list[str], list[str], bool]]:
     """Yield ``(function, offset, masked_args, raw_args)`` for each call to an exported documented function.
 
@@ -388,8 +419,9 @@ def _calls(masked: str, raw: str, pkg: str, api: PackageApi) -> Iterator[tuple[s
             raise _BudgetExceeded
         base = m.end()
         spans = split_spans(masked[base:close])
-        yield (fn, m.start("fn"), [masked[base + s:base + e] for s, e in spans],
-               [raw[base + s:base + e] for s, e in spans], bool(_UNPARSED.search(raw[base:close])))
+        raws = [raw[base + s:base + e] for s, e in spans]
+        yield (fn, m.start("fn"), [masked[base + s:base + e] for s, e in spans], raws,
+               any(_unparsed_tag(r) for r in raws))
 
 
 def _finding(check: str, severity: str, file: str, line: int, function: str, arg: Optional[str], message: str) -> dict:
@@ -409,7 +441,7 @@ def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: fro
     newlines = [i for i, ch in enumerate(masked) if ch == "\n"]
     findings: list[dict] = []
     try:
-        calls = list(_calls(masked, region.text, pkg, api))
+        calls = list(_calls(masked, blank_comments(blank_raw_strings(region.text)), pkg, api))
     except _BudgetExceeded:
         if notes is not None:
             notes.append(f"region at {where} skipped: too much nested call text to scan")
@@ -434,7 +466,7 @@ def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: fro
         why = {"unknown": "has no argument `{}`", "ambiguous": "argument `{}` matches more than one formal",
                "duplicate": "argument `{}` is given more than once, or its formal is already matched"}
         for name, reason in unmatched_named(names, formals, forwards_dots):
-            note = " (call contains unparsed syntax: comments, escapes or raw strings; check by hand)" if unparsed else ""
+            note = " (call contains a quoted argument name with escapes that was not parsed: check by hand)" if unparsed else ""
             findings.append(_finding("signature-named-arg", "warn" if unparsed else "error", rel, line, fn, name,
                                      f"`{fn}()` {why[reason].format(name)} (formals: {shown}){note}"))
         if not forwards_dots and positional > len(formals):

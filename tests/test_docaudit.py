@@ -516,11 +516,21 @@ def test_a_real_call_after_a_raw_string_is_still_checked():
     assert kinds(f) == [("signature-named-arg", "gamma")] and f[0]["severity"] == "error" and f[0]["line"] == 11
 
 
-@pytest.mark.parametrize("call", ["f(alpha # a comment\n  = 1, al = 2)", 'f("al\\u0070ha" = 1, al = 2)', "f(\\(x) x, zzz = 1)"])
-def test_calls_with_comments_escapes_or_lambdas_fail_safe_to_warn(call):
-    found = run(fence(call), **AA)
+def test_a_call_with_an_escaped_quoted_tag_fails_safe_to_warn():
+    found = run(fence('f("al\\u0070ha" = 1, al = 2)'), **AA)
     assert found and {f["severity"] for f in found} == {"warn"}
-    assert "unparsed syntax" in found[0]["message"]
+    assert "not parsed" in found[0]["message"]
+
+
+@pytest.mark.parametrize("call", ["f(alpha # a comment\n  = 1, al = 2)", "f(alpha = 1, # why\n  al = 2) # trailing",
+                                  'f(alpha = "#not a comment", al = 2)'])
+def test_comments_are_parsed_not_feared(call):
+    assert run(fence(call), **AA) == []
+
+
+def test_comments_and_escapes_in_ordinary_args_keep_error_severity():
+    found = run(fence('f(\\(x) x, zzz = 1, w = "a\\nb") # note'), **AA)
+    assert {f["severity"] for f in found} == {"error"}
 
 
 def test_plain_calls_keep_error_severity():
