@@ -332,10 +332,10 @@ def test_huge_region_is_skipped_quickly():
 def test_function_defined_in_the_doc_is_not_the_packages():
     from lib.docaudit import local_definitions
     regions = [fence("f <- function(q) q\nf(zz = 1)")]
-    assert local_definitions(regions) == {"f"}
+    assert local_definitions(regions) == {"f", "q"}  # `q` is a function parameter: it shadows an export of that name
     assert check_region(regions[0], "d.md", "pkg", api(f=["x", "a"]), local_definitions(regions)) == []
     for code in ('f = function(q) q', 'f <<- \\(q) q', 'assign("f", function(q) q)'):
-        assert local_definitions([fence(code)]) == {"f"}
+        assert local_definitions([fence(code)]) == {"f", "q"}
     assert local_definitions([fence('x <- "f <- function() 1"')]) == frozenset()  # inside a string
 
 

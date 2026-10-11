@@ -244,3 +244,95 @@ def test_text_says_no_findings_only_for_a_complete_clean_audit(tmp_path):
 def test_text_for_an_ecosystem_rollup_flags_incomplete_members(tmp_path):
     report = {"findings": [], "messages": [], "audited": True, "incomplete": True}
     assert "INCOMPLETE" in docaudit.format_text(report)
+
+
+# ───────────────────────── Codex review #4 regressions ─────────────────────────
+
+
+def test_callback_parameter_shadowing_an_export_is_not_judged(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\nlapply(xs, function(f) f(zzz = 1))\nsapply(xs, \\(f) f(zzz = 2))\n```\n")
+    assert [f for f in docaudit.audit_package(pkg)["findings"] if f["check"].startswith("signature-")] == []
+
+
+def test_parameter_names_only_exempt_their_own_names(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\nlapply(xs, function(g) g(1))\nf(nope = 1)\n```\n")
+    assert [f["arg"] for f in docaudit.audit_package(pkg)["findings"] if f["check"].startswith("signature-")] == ["nope"]
+
+
+def test_sweep_reports_a_package_whose_description_cannot_be_read(tmp_path):
+    mkpkg(tmp_path / "a", "a")
+    b = mkpkg(tmp_path / "b", "b")
+    real = docaudit.read_description
+    import unittest.mock as mock
+    with mock.patch.object(docaudit, "read_description", lambda path: None if Path(path).parent == b.resolve() else real(path)):
+        r = docaudit.audit_ecosystem(tmp_path)
+    assert r["incomplete"] is True and any("b" in m and "DESCRIPTION" in m for m in r["messages"])
+    assert r["scope"]["packages"] == [str((tmp_path / "a").resolve())]  # b is named as omitted, not silently dropped
+    assert "INCOMPLETE" in docaudit.format_text(r)
+
+
+def test_sweep_reports_an_unlistable_directory(tmp_path):
+    mkpkg(tmp_path / "a", "a")
+    (tmp_path / "locked").mkdir()
+    real = Path.iterdir
+
+    def deny(self):
+        if self.name == "locked":
+            raise PermissionError(13, "denied", str(self))
+        return real(self)
+
+    import unittest.mock as mock
+    with mock.patch.object(Path, "iterdir", deny):
+        r = docaudit.audit_ecosystem(tmp_path)
+    assert r["incomplete"] is True and any("locked" in m for m in r["messages"])
+
+
+def test_hybrid_nested_discovery_failures_are_reported(tmp_path):
+    root = mkpkg(tmp_path / "root", "root")
+    (root / ".rforge.yaml").write_text("kind: hybrid\n")
+    nested = root / "tools" / "inner"
+    nested.mkdir(parents=True)
+    (nested / "DESCRIPTION").write_text("not a description\n")  # present but unparseable
+    r = docaudit.audit(root)
+    assert r["incomplete"] is True and any("inner" in m for m in r["messages"])
+
+
+def test_fail_on_exits_2_when_the_audit_failed(tmp_path, monkeypatch):
+    pkg = mkpkg(tmp_path / "pkg")
+    monkeypatch.setattr(docaudit, "read_api", lambda root: (_ for _ in ()).throw(PermissionError("denied")))
+    assert docaudit.main(["--path", str(pkg), "--fail-on", "error", "--format", "json"]) == 2
+    assert docaudit.main(["--path", str(pkg)]) == 0  # default fail-on none is unchanged
+
+
+def test_fail_on_exits_2_when_nothing_was_audited(tmp_path):
+    assert docaudit.main(["--path", str(tmp_path), "--fail-on", "warn"]) == 2
+    assert docaudit.main(["--path", str(tmp_path)]) == 0
+
+
+def test_fail_on_exits_2_for_an_incomplete_audit_with_no_findings(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="fine\n")
+    assert docaudit.main(["--path", str(pkg), "--fail-on", "error", "--since", "no-such-ref"]) == 2
+
+
+def test_fail_on_finding_severity_still_wins_with_exit_1(tmp_path):
+    assert docaudit.main(["--path", str(mkpkg(tmp_path / "pkg")), "--fail-on", "error"]) == 1
+
+
+def test_ecosystem_rollup_carries_audit_failed(tmp_path, monkeypatch):
+    mkpkg(tmp_path / "a", "a")
+    mkpkg(tmp_path / "b", "b")
+    monkeypatch.setattr(docaudit, "read_api", lambda root: (_ for _ in ()).throw(PermissionError("denied")))
+    r = docaudit.audit_ecosystem(tmp_path)
+    assert r.get("audit_failed") is True and r["audited"] is False
+
+
+def test_rollup_with_two_survivors_is_still_incomplete_when_a_third_is_unreadable(tmp_path):
+    mkpkg(tmp_path / "a", "a")
+    mkpkg(tmp_path / "b", "b")
+    c = mkpkg(tmp_path / "c", "c")
+    real = docaudit.read_description
+    import unittest.mock as mock
+    with mock.patch.object(docaudit, "read_description", lambda path: None if Path(path).parent == c.resolve() else real(path)):
+        r = docaudit.audit_ecosystem(tmp_path)
+    assert [p["name"] for p in r["packages"]] == ["a", "b"] and r["incomplete"] is True
+    assert any("c" in m and "DESCRIPTION" in m for m in r["messages"])

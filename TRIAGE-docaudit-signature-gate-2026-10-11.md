@@ -262,3 +262,15 @@ A clean subagent got only `commands/docs/check.md` (told not to read the module,
 | delta | nothing audited | `scope: none`, `audited: false`; verdict "nothing was audited" | pass |
 
 No invented findings, scope line quoted correctly every time. **One real defect found:** the *text* report printed `no findings` for gamma and delta (only the JSON flagged `incomplete` / `audited: false`), so a user reading text would take them as clean. Fixed: text now ends with `NOT AUDITED` or `INCOMPLETE` in those cases (4 new tests, one red under mutation), and the command file says so and notes that `--path` is needed outside the module root. Re-run after the fix: gamma ends `INCOMPLETE: ... do not read this as clean`; delta ends `NOT AUDITED: nothing was looked at ...`.
+
+## 15. Codex review #4 (whole A1 branch vs `dev`) (2026-10-11)
+
+Verdict needs-attention; three findings, all within the stop rule. Each fixed red-to-green.
+
+| ID | Finding | Fix | Class |
+|---|---|---|---|
+| J1 | `lapply(xs, function(f) f(zzz = 1))` judged `f` against the export `f` (error false positive) | function/`\(...)` parameter names join the document-wide local names (over-broad by design: can only hide a finding) | false positive |
+| J2 | Ecosystem sweep silently dropped packages with an unreadable `DESCRIPTION` or unlistable directory (`status ok`, "no findings") | own `_discover` reports each omission in `scope.notes`/`messages`, audit is `incomplete`; same for hybrid nested packages and the single-package scope | bypass |
+| J3 | `--fail-on error` returned 0 for `audit_failed`, unaudited or incomplete runs | with `--fail-on` set, such runs exit 2 (stderr says why); finding severity still gives exit 1; roll-up carries `audit_failed` | bypass |
+
+**Gates:** pytest 861 passed, 4 skipped; `test-all.sh` 47/47; reference docs regenerated. Eight mutation checks red (one survivor, roll-up discarding scope notes, got its own test). Recall 2 of 2 firm; replay unchanged (medfit 1 error + 2 warn, medrobust 4, medsim 7).

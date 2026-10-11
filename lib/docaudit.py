@@ -46,7 +46,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator, Optional
 
-from .discovery import _KIND_DECL_RE, _read_allowlist, detect_ecosystem, find_r_packages
+from .discovery import _KIND_DECL_RE, _read_allowlist, detect_ecosystem, read_description
 from .s7review import _mask_strings_and_comments
 
 IMPLEMENTED_CHECKS = frozenset({"signature-named-arg", "signature-names", "signature-arity", "scannability", "coverage"})
@@ -379,13 +379,38 @@ _LOCAL_DEF = re.compile(rf"(?m)(?<![\w.$@])({_IDENT})\s*(?:<<-|<-|=)\s*(?:functi
 _ASSIGN_DEF = re.compile(rf"""\bassign\(\s*["'](?P<n>{_IDENT})["']""")
 
 
+_FUNC_HEAD = re.compile(r"(?<![\w.$@])(?:function\s*|\\)\(")
+
+
+def _parameter_names(masked: str) -> set[str]:
+    """Parameter names of every `function(...)` / `\\(...)` in `masked` (they shadow package functions of the same name)."""
+    closes = paren_map(masked)
+    names: set[str] = set()
+    for m in _FUNC_HEAD.finditer(masked):
+        close = closes.get(m.end() - 1, -1)
+        if close == -1:
+            continue
+        for arg in split_args(masked[m.end():close]):
+            head = re.match(rf"\s*({_IDENT})\s*(?:=|$)", arg)
+            if head:
+                names.add(head.group(1))
+    return names
+
+
 def local_definitions(regions: list[Region]) -> frozenset:
-    """Names a doc defines itself (`f <- function(...)`, `assign("f", ...)`); calls to them are not the package's."""
+    """Names a doc defines itself (`f <- function(...)`, `assign("f", ...)`, a `function(f)` parameter); calls to
+    them are not the package's. Deliberately document-wide: a name bound anywhere is skipped everywhere, which can
+    only hide a finding, never invent one."""
     names: set[str] = set()
     for r in regions:
         if r.kind == "fence" and len(r.text) <= _MAX_REGION:
-            names.update(_LOCAL_DEF.findall(_mask(r.text)))
+            masked = _mask(r.text)
+            names.update(_LOCAL_DEF.findall(masked))
             names.update(m.group("n") for m in _ASSIGN_DEF.finditer(r.text))
+            try:
+                names |= _parameter_names(masked)
+            except _BudgetExceeded:
+                pass
     return frozenset(names)
 
 
@@ -781,6 +806,7 @@ class Scope:
     packages: list
     how: str = ""  # why this scope: "walked up from X", "--eco", "manifest", ...
     reason: str = ""  # for mode "none"
+    notes: list = field(default_factory=list)  # discovery problems: packages that may be missing from the scope
 
     def line(self) -> str:
         if self.mode == "none":
@@ -807,24 +833,59 @@ def _nearest_package(start: Path) -> Optional[Path]:
     return None
 
 
-def _hybrid_nested(root: Path) -> list:
+def _discover(base: Path, notes: list, max_depth: int = 2) -> list:
+    """R packages under `base` (like `discovery.find_r_packages`: stops at a package, skips hidden directories),
+    except that a directory that cannot be listed, or a DESCRIPTION that cannot be read, is reported in `notes`
+    instead of silently dropping the package."""
+    found: list[Path] = []
+
+    def scan(path: Path, depth: int) -> None:
+        if depth > max_depth:
+            return
+        if (path / "DESCRIPTION").is_file():
+            if read_description(path / "DESCRIPTION") is None:
+                notes.append(f"{path}: DESCRIPTION unreadable or unparseable; package not audited")
+            else:
+                found.append(path)
+            return
+        try:
+            entries = sorted(path.iterdir())
+        except OSError as exc:
+            notes.append(f"{path}: cannot list directory ({type(exc).__name__}); packages below it not audited")
+            return
+        for entry in entries:
+            try:
+                is_dir = entry.is_dir()
+            except OSError:
+                is_dir = False
+            if is_dir and not entry.name.startswith("."):
+                scan(entry, depth + 1)
+
+    scan(base, 0)
+    return found
+
+
+def _hybrid_nested(root: Path, notes: list) -> list:
     config = root / ".rforge.yaml"
     try:
         if not (config.is_file() and _KIND_DECL_RE.search(config.read_text(encoding="utf-8", errors="replace"))):
             return []
-    except OSError:
+        children = sorted(p for p in root.iterdir() if p.is_dir() and not p.name.startswith("."))
+    except OSError as exc:
+        notes.append(f"{root}: cannot read hybrid layout ({type(exc).__name__})")
         return []
     nested: list[Path] = []
-    for child in sorted(p for p in root.iterdir() if p.is_dir() and not p.name.startswith(".")):
-        nested += [Path(pk.path) for pk in find_r_packages(child, max_depth=2)]
+    for child in children:
+        nested += _discover(child, notes)
     return nested
 
 
 def _sweep(base: Path, how: str) -> Scope:
-    pkgs = [Path(pk.path) for pk in find_r_packages(base)]
+    notes: list[str] = []
+    pkgs = _discover(base, notes)
     if not pkgs:
-        return Scope("none", str(base), [], reason=f"no R packages found under {base}")
-    return Scope("ecosystem", str(base), pkgs, how)
+        return Scope("none", str(base), [], reason=f"no R packages found under {base}", notes=notes)
+    return Scope("ecosystem", str(base), pkgs, how, notes=notes)
 
 
 def resolve_scope(path: str | Path = ".", eco: bool = False) -> Scope:
@@ -833,7 +894,7 @@ def resolve_scope(path: str | Path = ".", eco: bool = False) -> Scope:
     under the cwd. A `kind: hybrid` root also audits its nested packages."""
     given = Path(path)
     if not given.exists():
-        named = [Path(pk.path) for pk in find_r_packages(Path.cwd()) if str(path) in (pk.name, Path(pk.path).name)]
+        named = [p for p in _discover(Path.cwd().resolve(), []) if str(path) in (p.name, _package_name(p, []))]
         if not named:
             return Scope("none", str(given), [], reason=f"no package or path named `{path}`")
         given = named[0]
@@ -843,11 +904,12 @@ def resolve_scope(path: str | Path = ".", eco: bool = False) -> Scope:
         base = pkg.parent if pkg is not None else start
         return _sweep(base, "--eco")
     if pkg is not None:
-        nested = _hybrid_nested(pkg)
+        notes: list[str] = []
+        nested = _hybrid_nested(pkg, notes)
         how = "" if pkg == start else f"walked up from {start}"
         if nested:
-            return Scope("hybrid", str(pkg), [pkg, *nested], how)
-        return Scope("package", str(pkg), [pkg], how)
+            return Scope("hybrid", str(pkg), [pkg, *nested], how, notes=notes)
+        return Scope("package", str(pkg), [pkg], how, notes=notes)
     try:
         has_manifest = detect_ecosystem(start).manifest_path is not None
     except OSError:
@@ -871,14 +933,17 @@ def audit(path: str | Path = ".", *, eco: bool = False, detailed: bool = False, 
     """Audit the package (or packages) D0 resolves `path` to. `info` findings appear only when `detailed`."""
     scope = resolve_scope(path, eco)
     if not scope.packages:
-        return {**_envelope([], [scope.reason], {}, audited=False), "scope": scope.to_dict()}
+        env = _envelope([], [scope.reason, *scope.notes], {}, incomplete=bool(scope.notes), audited=False)
+        return {**env, "scope": scope.to_dict()}
     reports = [(p, audit_package(p, since=since, max_paragraph_words=max_paragraph_words,
                                  max_section_words=max_section_words, min_h3=min_h3)) for p in scope.packages]
     if not detailed:
         reports = [(p, _hide_info(r)) for p, r in reports]
     if len(reports) == 1:
-        return {**reports[0][1], "scope": scope.to_dict()}
-    findings, messages, packages = [], [], []
+        only = reports[0][1]
+        return {**only, "messages": [*only["messages"], *scope.notes], "incomplete": only["incomplete"] or bool(scope.notes),
+                "scope": scope.to_dict()}
+    findings, messages, packages = [], [*scope.notes], []
     for p, r in reports:
         name = _package_name(p, []) or p.name
         findings += [{**f, "package": name} for f in r["findings"]]
@@ -890,8 +955,10 @@ def audit(path: str | Path = ".", *, eco: bool = False, detailed: bool = False, 
                **{k: sum(r["summary"].get(k, 0) for _, r in reports) for k in ("exports", "checked", "suppressed", "info_hidden")}}
     return {"kind": "docaudit", "status": "warn" if top in ("warn", "error") or any(r.get("audit_failed") for _, r in reports) else "ok",
             "max_severity": top, "findings": findings, "messages": messages, "summary": summary,
-            "incomplete": any(r["incomplete"] for _, r in reports), "audited": all(r["audited"] for _, r in reports),
-            "engine_missing": [], "packages": packages, "scope": scope.to_dict()}
+            "incomplete": bool(scope.notes) or any(r["incomplete"] for _, r in reports),
+            "audited": all(r["audited"] for _, r in reports),
+            "engine_missing": [], "packages": packages, "scope": scope.to_dict(),
+            **({"audit_failed": True} if any(r.get("audit_failed") for _, r in reports) else {})}
 
 
 def audit_ecosystem(path: str | Path = ".", **kwargs) -> dict:
@@ -937,7 +1004,12 @@ def main(argv: Optional[list] = None) -> int:
                    max_paragraph_words=args.max_paragraph_words, max_section_words=args.max_section_words,
                    min_h3=args.min_h3)
     print(format_json(report) if args.format == "json" else format_text(report))
-    level = {"none": 99, "warn": 1, "error": 2}[args.fail_on]
+    if args.fail_on == "none":
+        return 0
+    if report.get("audit_failed") or report.get("audited") is False or report.get("incomplete"):
+        print("docaudit: audit failed, incomplete or empty; the result cannot gate a release (exit 2)", file=sys.stderr)
+        return 2
+    level = {"warn": 1, "error": 2}[args.fail_on]
     return 1 if _SEVERITY_ORDER.get(report["max_severity"], -1) >= level else 0
 
 

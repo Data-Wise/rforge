@@ -76,6 +76,7 @@ What `audit` looks at (D0). ``mode``: package | hybrid | ecosystem | none.
 | `packages` | `list` | — |
 | `how` | `str` | `''` |
 | `reason` | `str` | `''` |
+| `notes` | `list` | `list()` |
 
 ## Functions
 
@@ -176,7 +177,9 @@ _(no docstring)_
 def local_definitions(regions: 'list[Region]') -> 'frozenset'
 ```
 
-Names a doc defines itself (`f <- function(...)`, `assign("f", ...)`); calls to them are not the package's.
+Names a doc defines itself (`f <- function(...)`, `assign("f", ...)`, a `function(f)` parameter); calls to
+them are not the package's. Deliberately document-wide: a name bound anywhere is skipped everywhere, which can
+only hide a finding, never invent one.
 
 ### `main()`
 
