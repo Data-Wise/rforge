@@ -1,0 +1,46 @@
+
+## Effects
+
+| Call | Gives |
+|---|---|
+| `nie(x)` | Natural indirect effect |
+| `nde(x)` | Natural direct effect |
+| `te(x)` | Total effect |
+| `pm(x)` | Proportion mediated |
+| `paths(x)` | Path coefficients |
+| `decompose(x)` | Interaction, joint and cluster parts |
+| `nie(x, type = "total")` | Every indirect path (serial) |
+| `joint_effects(object, estimates)` | Joint effects for bootstrapping |
+
+## Tables and intervals
+
+| Call | Gives |
+|---|---|
+| `tidy(x, type = "effects")` | Effects with delta-method SEs |
+| `tidy(x, type = "paths", conf.int = TRUE)` | Paths with intervals |
+| `glance(x)` | One-row summary |
+| `confint(x, parm = "effects")` | Effect intervals |
+| `confint(x, parm = "paths")` | Path intervals |
+| `coef(x)`, `vcov(x)`, `nobs(x)` | Estimates, covariance, sample size |
+
+## Standard errors
+
+| `se_type` | Use |
+|---|---|
+| `"model"` | Default, model-based |
+| `"sandwich"` | Weights, robust (HC3) |
+| `"kr"` | Cluster fits, REML only, t intervals for paths |
+
+## Bootstrap
+
+| Call | Draws |
+|---|---|
+| `bootstrap_mediation(f, "parametric", mediation_data = x)` | From N(estimates, vcov) |
+| `bootstrap_mediation(f, "nonparametric", data = d)` | Resampled rows, refit |
+| `bootstrap_mediation(f, "nonparametric", data = d, cluster = "id")` | Resampled clusters, refit |
+| `bootstrap_mediation(f, "plugin", mediation_data = x)` | Point estimate only |
+
+Every call returns a `BootstrapResult`: use `print()`, `summary()`, `coef()`, `confint()`, `tidy()`.
+
+## Cluster designs (2-1-1)
+
