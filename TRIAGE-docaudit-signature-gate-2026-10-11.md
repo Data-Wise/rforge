@@ -274,3 +274,5 @@ Verdict needs-attention; three findings, all within the stop rule. Each fixed re
 | J3 | `--fail-on error` returned 0 for `audit_failed`, unaudited or incomplete runs | with `--fail-on` set, such runs exit 2 (stderr says why); finding severity still gives exit 1; roll-up carries `audit_failed` | bypass |
 
 **Gates:** pytest 861 passed, 4 skipped; `test-all.sh` 47/47; reference docs regenerated. Eight mutation checks red (one survivor, roll-up discarding scope notes, got its own test). Recall 2 of 2 firm; replay unchanged (medfit 1 error + 2 warn, medrobust 4, medsim 7).
+
+**Security review note (commit `e258b21`, resource-cap bypass):** verified real. The J1 parameter scan split every `function(` head's whole body without the work budget, so 9,000 nested heads took 9.4 s (quadratic; a 200k region far worse). Fixed: the scan shares the `_WORK_BUDGET` accounting; an over-budget region is skipped with a named note and the audit is `incomplete`. Two regression tests (time bound; skipped region not judged), both red under mutation.

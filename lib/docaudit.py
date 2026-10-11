@@ -386,10 +386,14 @@ def _parameter_names(masked: str) -> set[str]:
     """Parameter names of every `function(...)` / `\\(...)` in `masked` (they shadow package functions of the same name)."""
     closes = paren_map(masked)
     names: set[str] = set()
+    budget = _WORK_BUDGET
     for m in _FUNC_HEAD.finditer(masked):
         close = closes.get(m.end() - 1, -1)
         if close == -1:
             continue
+        budget -= close - m.end()  # nested heads re-split their whole body: bound the total, like `_calls`
+        if budget < 0:
+            raise _BudgetExceeded
         for arg in split_args(masked[m.end():close]):
             head = re.match(rf"\s*({_IDENT})\s*(?:=|$)", arg)
             if head:
@@ -397,7 +401,7 @@ def _parameter_names(masked: str) -> set[str]:
     return names
 
 
-def local_definitions(regions: list[Region]) -> frozenset:
+def local_definitions(regions: list[Region], skipped: Optional[set] = None) -> frozenset:
     """Names a doc defines itself (`f <- function(...)`, `assign("f", ...)`, a `function(f)` parameter); calls to
     them are not the package's. Deliberately document-wide: a name bound anywhere is skipped everywhere, which can
     only hide a finding, never invent one."""
@@ -410,7 +414,8 @@ def local_definitions(regions: list[Region]) -> frozenset:
             try:
                 names |= _parameter_names(masked)
             except _BudgetExceeded:
-                pass
+                if skipped is not None:
+                    skipped.add(id(r))  # parameters unknown, so the region cannot be judged reliably
     return frozenset(names)
 
 
@@ -748,8 +753,12 @@ def _audit(root: Path, scan: dict) -> tuple[list, PackageApi, list, dict]:
         rel = f.relative_to(root).as_posix()
         texts[rel] = _read(f, notes, root)
         regions = extract_regions(texts[rel])
-        local = local_definitions(regions)
+        unscannable: set = set()
+        local = local_definitions(regions, unscannable)
         for region in regions:
+            if id(region) in unscannable:
+                notes.append(f"region at {rel}:{region.line} skipped: too much nested function text to scan")
+                continue
             for finding in check_region(region, rel, pkg, api, local, notes):
                 if region.bare and finding["severity"] == "error":
                     finding["severity"] = "warn"  # an unlabeled fence may be a console transcript

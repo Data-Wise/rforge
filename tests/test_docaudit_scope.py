@@ -336,3 +336,21 @@ def test_rollup_with_two_survivors_is_still_incomplete_when_a_third_is_unreadabl
         r = docaudit.audit_ecosystem(tmp_path)
     assert [p["name"] for p in r["packages"]] == ["a", "b"] and r["incomplete"] is True
     assert any("c" in m and "DESCRIPTION" in m for m in r["messages"])
+
+
+# ───────────────────────── resource cap: parameter scan (security review) ─────────────────────────
+
+
+def test_nested_function_heads_cannot_defeat_the_work_budget(tmp_path):
+    import time
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\n" + "function(" * 9000 + ")" * 9000 + "\n```\n")
+    start = time.monotonic()
+    r = docaudit.audit_package(pkg)
+    assert time.monotonic() - start < 3, "parameter scan is quadratic on nested function( heads"
+    assert r["incomplete"] is True and any("skipped" in m and "README.md" in m for m in r["messages"])
+
+
+def test_a_skipped_region_is_not_judged_even_when_it_contains_a_bad_call(tmp_path):
+    body = "function(" * 9000 + ")" * 9000 + "\nf(nope = 1)\n"
+    pkg = mkpkg(tmp_path / "pkg", docs="```r\n" + body + "```\n")
+    assert [f for f in docaudit.audit_package(pkg)["findings"] if f["check"].startswith("signature-")] == []
