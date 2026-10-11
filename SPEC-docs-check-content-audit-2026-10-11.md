@@ -1,10 +1,10 @@
 # SPEC: `/rforge:docs:check` — content audit backed by `lib/docaudit.py` (release A)
 
-- **Status:** Draft v2 — revised after a 4-reviewer adversarial pass (log at the end). Decisions D1–D5 were locked by the grill; **D0, D6, D7 and the `--site` auto-run decision were confirmed 2026-10-11** (see "Confirmed decisions")
+- **Status:** Draft v2 — revised after a 4-reviewer adversarial pass (log at the end). Decisions D1–D5 were locked by the grill; **D0, D6, D7 and the `--site` auto-run decision were confirmed 2026-10-11** (see "Confirmed decisions") · A1 task breakdown: `tasks/plan.md` (vertical slices, harness first)
 - **Date:** 2026-10-11
 - **Target version:** v2.21.0 (minor: new public module + behavior change to an existing command; **command count stays 44**)
 - **Author:** brainstormed with Claude — see `BRAINSTORM-docs-content-skills-2026-10-11.md` and `GRILL-docs-content-skills-2026-10-11.md`
-- **Branch plan:** `feature/docs-check-content-audit` off `dev` (created when implementation starts)
+- **Branch plan:** `feature/docs-check-content-audit` off `dev` (created 2026-10-11 at `~/.git-worktrees/rforge/feature-docs-check-content-audit`)
 
 ## Summary
 
@@ -258,6 +258,7 @@ CI has no medfit checkout, so **committed fixtures are the CI evidence**; real-r
 | dependency (A2) | `--site` offline/malformed → `warn`; `--run-examples` without Rscript or `pkgload` → `engine_missing`; with R present (skipped otherwise) the `0.19`-vs-`0.164` block is flagged and a matching block is not |
 | dogfood | `tests/_check_commands_doc.py` covers every hyphenated flag (the SPEC does **not** claim a generic frontmatter-vs-Usage gate — none exists; `scaffold_args_usage_sync` is hard-coded to 5 `use-*` files); CLI smoke of `python3 -m lib.docaudit`; `lib/r/docexamples.R` parse-check (A2, R-optional; fold into `lib_s7runtime_r_ships` or count it); `AGENTS.md` mirror |
 | local-only | `pytest.mark.skipif` unless `RFORGE_MEDFIT_PATH` is set: the known-answer pair against real history via `git show` (never writes to medfit) |
+| harness (`tests/harness/`) | Dev-only replay harness (plan tasks T2-T4): committed defect manifest `tests/fixtures/docaudit/defects.json` (the 18 real medfit defects; `firm` rows are regression-locked), a read-only `git archive` recall runner printing "caught k of n", a planted-defect injector on a `copytree` of the clean fixture, and a history replayer. A mutation self-test (audit stubbed to find nothing) must turn firm rows red. CI-safe part uses committed fixtures; real-history rows are `skipif`-guarded on `RFORGE_MEDFIT_PATH` / `RFORGE_PROBMED_PATH` / `RFORGE_MEDROBUST_PATH` |
 
 **Check count:** `test-all.sh` is 45 `run` checks today. New `run` lines: the CLI smoke (+1) and, if not folded, the R
 parse (+1) → state the exact number in the PR. The count is hard-coded in `CLAUDE.md:136`, `AGENTS.md:137` **and
@@ -268,6 +269,8 @@ Command run before the PR: `python3 -m pytest tests/` and `bash tests/test-all.s
 environment with pytest, pyyaml and mkdocs-material.
 
 ## Acceptance (D5, strengthened)
+
+Evidence for items 2-4 is produced by the replay harness (`tests/harness/replay.py`, manifest `tests/fixtures/docaudit/defects.json`); see `tasks/plan.md` T2-T4 and Checkpoint B.
 
 All of these before the A1 release PR (and again for A2's checks):
 
@@ -313,6 +316,8 @@ Not needed: `package.json` `files` (already ships all of `lib/`), `version_sync.
 (they assert only `name: rforge:docs:check` plus stub text — keep `name:` intact).
 
 ## Implementation order (revised)
+
+*Superseded for execution by `tasks/plan.md`, which re-slices these steps into vertical tasks and builds the replay harness first. The list below stays the reference for what each step contains.*
 
 1. **`discovery` allowlist refactor alone** — direct unit tests first, then generalize; ships shipped code, so it gets
    its own commit and review
