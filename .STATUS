@@ -6,18 +6,13 @@ in_progress: 2026-10-11 — two lines of work, no release pending.
   open until release (a feature→dev merge does not auto-close it). Follow-up PR #86 MERGED (squash f7036b4): a Codex
   adversarial review found #85 stopped /rforge:finish adding `version:` to a .STATUS that lacks one; fixed via
   lib.rstatus.version_overrides. Local worktrees feature-rstatus-version-drift and fix-finish-missing-version can be removed.
-  (2) docs:check content audit, release A1 (v2.21.0): BUILT, in review, not merged. T1-T16 done; Checkpoints A-D closed
-  (B ticked by you 2026-10-11). Worktree ~/.git-worktrees/rforge/feature-docs-check-content-audit
-  (feature/docs-check-content-audit, pushed, af005db at last check). /rforge:docs:check is now the lib.docaudit content
-  audit (signature-named-arg error; signature-names/arity warn; scannability info; coverage warn with --since only;
-  --eco, --detailed, --fail-on, docs.allowlist). Seven Codex rounds + a security note fixed under the stop rule (triage
-  sheet sections 5-18); remaining unrecognized R binding forms are documented as known limitations in
-  docs/guides/docs-audit.md. Evidence: recall 2 of 2 firm; replay over 7 packages / 820 revisions, 0 failures, 0
-  incomplete (real defects: medsim 7, medrobust 4, medfit 1 error + 2 warn); fresh-context trial 4/4 (section 14).
-  pytest 899 passed + 4 skipped, test-all 47/47, mkdocs --strict clean. A2 (--site, --run-examples) is a later plan.
-next: Checkpoint E: strip ORCHESTRATE-*.md and tasks/ from the branch, open the feature->dev PR (transcripts from triage
-  sections 12-14 and the recall report in the body; you decide the merge). Then T17 release (v2.21.0) only on your
-  explicit go; tap writes need permission each. Optional first: Codex round 8.
+  (2) docs:check content audit, release A1 (v2.21.0): merged to dev via the feature->dev PR (see git log), UNRELEASED.
+  lib.docaudit + /rforge:docs:check rewrite + dev-only replay harness (tests/harness/). SPEC and review record
+  (TRIAGE-docaudit-signature-gate-2026-10-11.md) at the repo root; guide docs/guides/docs-audit.md. Seven Codex rounds under
+  the stop rule; unrecognized R binding forms are documented known limitations. test-all 47/47, 44 commands.
+  A2 (--site, --run-examples) is a separate later plan.
+next: T17 release v2.21.0 only on your explicit go (version bump x4 sources + version_sync, dev->main PR, tag, GitHub release,
+  tap formula + manifest sync with permission per write). Close #84 at release.
 version: 2.20.1 (released, on main 9d0b01a; dev fast-forwarded to main)
 last_release: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
   9d0b01a; tag v2.20.1; release https://github.com/Data-Wise/rforge/releases/tag/v2.20.1. Ships

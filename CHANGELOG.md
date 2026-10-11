@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (behavior)
+
+- **`/rforge:docs:check` is now a deterministic content audit** (`lib/docaudit.py`), not an improvised
+  prompt. It checks the calls and signatures in `README` and `vignettes/` against the exports.
+  Dropped promises, none of which the old prompt could verify: NEWS.md completeness, running examples,
+  cross-package API-contract consistency, vignette cross-references, and the unenforced `claude_md_budget`
+  warning (the key is now documented as reserved).
+- With no argument it audits **the package you are in** (walks up to `DESCRIPTION`), not the whole ecosystem; use
+  `--eco` for the sweep. `--detailed` now means "also print `info` findings".
+
+### Added
+
+- `lib/docaudit.py` (public module, no R): `signature-named-arg` (error), `signature-names` and
+  `signature-arity` (warn), `scannability` (info), `coverage` (warn, with `--since <tag>` only), `--fail-on
+  none|warn|error`, `--eco`, `--detailed`, and `docs.allowlist` in `.rforge.yaml`. The text report states its scope
+  and ends with `INCOMPLETE`/`NOT AUDITED` rather than `no findings` when the audit could not finish. Unrecognized R binding forms are listed under "Known limitations" in the Docs audit guide.
+- Orchestrator `DOCS_AUDIT` intent (read-only auto-run of the default invocation).
+- Dev-only replay harness (`tests/harness/`) measuring recall and precision against real documentation history;
+  `test-all.sh` 45 -> 47 checks.
+
 ### Fixed
 
 - `lib.rstatus.build_recap` no longer reports false version drift when `.STATUS`'s `version:`

@@ -1,10 +1,10 @@
 # SPEC: `/rforge:docs:check` — content audit backed by `lib/docaudit.py` (release A)
 
-- **Status:** Draft v2 — revised after a 4-reviewer adversarial pass (log at the end). Decisions D1–D5 were locked by the grill; **D0, D6, D7 and the `--site` auto-run decision were confirmed 2026-10-11** (see "Confirmed decisions")
+- **Status:** A1 implemented (v2.21.0, unreleased; execution and review record in `TRIAGE-docaudit-signature-gate-2026-10-11.md`); A2 (`--site`, `--run-examples`) not started. Draft v2.1 — revised after a 4-reviewer adversarial pass and a Codex adversarial review (logs at the end). Decisions D1–D5 were locked by the grill; **D0, D6, D7 and the `--site` auto-run decision were confirmed 2026-10-11** (see "Confirmed decisions") · A1 task breakdown: `tasks/plan.md` (vertical slices, harness first)
 - **Date:** 2026-10-11
 - **Target version:** v2.21.0 (minor: new public module + behavior change to an existing command; **command count stays 44**)
 - **Author:** brainstormed with Claude — see `BRAINSTORM-docs-content-skills-2026-10-11.md` and `GRILL-docs-content-skills-2026-10-11.md`
-- **Branch plan:** `feature/docs-check-content-audit` off `dev` (created when implementation starts)
+- **Branch plan:** `feature/docs-check-content-audit` off `dev` (created 2026-10-11 at `~/.git-worktrees/rforge/feature-docs-check-content-audit`)
 
 ## Summary
 
@@ -143,9 +143,9 @@ CLI: `python3 -m lib.docaudit [--path P] [--eco] [--since TAG] [--run-examples] 
 | Tier | Check ID | Severity | Rule |
 |---|---|---|---|
 | B | `signature-named-arg` | error (D7) | Named arg `f(arg = …)` not among the formals, for an exported function **without `...`** in its formals |
-| B | `signature-names` (was `signature-listing`) | warn | For an exported function **without `...`**, a bare-identifier argument in **any backticked `fn(…)` span outside fenced blocks** (table cells, list items, headings, prose) that is not a formal. This flags identifier ≠ formal; it **cannot tell a stale name from a placeholder or user variable** (`joint_effects(x, theta)` defect and `bootstrap_mediation(f, …)` placeholder have the same shape), so it is a candidate generator |
-| B | `signature-arity` | warn | Positional args exceed the non-`...` formals (e.g. `joint_effects(object, estimates, "bca")`). The "ordered subset" rule of v1 of this SPEC is **dropped**: 18 of 645 real calls (2.8%) list named args out of formal order |
-| C | `coverage` | info (warn if an export appears in no doc) | Export × doc matrix, a *report*, not a defect detector; `--since TAG` restricts it to exports/Rd files added since the tag (`git diff --name-status TAG..HEAD` on `NAMESPACE` and `man/`). **No engine enumeration in v1** |
+| B | `signature-names` (was `signature-listing`) | warn | For an exported function **without `...`**, a bare-identifier argument in a backticked `fn(…)` span that is **the whole first cell of a Markdown table row** (a signature column, as in a reference card) and is not a formal. **Narrowed 2026-10-11 (hold-out triage, option A):** the original "any backticked span outside fences" rule flagged call examples such as medfit's `` `fit_sem(syntax, data)` `` in a Routes cell, where `syntax` is a variable (the same cell has `fit_mediation(model = syntax, …)`). Spans elsewhere are call examples and are not judged; `signature-named-arg` and `signature-arity` still cover every call. It still cannot tell a stale name from a placeholder *within* a signature column, so it is a candidate generator |
+| B | `signature-arity` | warn | Positional args exceed the formals (e.g. `joint_effects(object, estimates, "bca")`); **only for functions with no `...` formal** — a variadic `f(x, ...)` accepts `f(1, 2, 3)`, so it is exempt, like the other two signature checks (positive control in the fixtures). The "ordered subset" rule of v1 of this SPEC is **dropped**: 18 of 645 real calls (2.8%) list named args out of formal order |
+| C | `coverage` | warn (per export that appears in no doc); **runs only with `--since TAG`** (decided 2026-10-11: unrestricted it flagged 8-32 exports in 5 of 6 real packages) | Export × doc matrix (`summary.coverage_matrix`), a *report*, not a defect detector; `--since TAG` restricts it to exports/Rd files added since the tag (`git diff --name-status TAG..HEAD` on `NAMESPACE` and `man/`). **No engine enumeration in v1** |
 | D | `scannability` | info | Defaults (all configurable): paragraph over **110 words**; H2 section over **800 words with fewer than 3 H3**; "Next Steps" not last. Known: medfit `methods.qmd` (6 paragraphs over 100 words, max 217) is flagged forever — allowlist it |
 | B (A2) | `examples-output` | error (D7) | See `--run-examples` contract |
 | B (A2) | `examples-error`, `examples-shape` | warn | See contract |
@@ -258,6 +258,7 @@ CI has no medfit checkout, so **committed fixtures are the CI evidence**; real-r
 | dependency (A2) | `--site` offline/malformed → `warn`; `--run-examples` without Rscript or `pkgload` → `engine_missing`; with R present (skipped otherwise) the `0.19`-vs-`0.164` block is flagged and a matching block is not |
 | dogfood | `tests/_check_commands_doc.py` covers every hyphenated flag (the SPEC does **not** claim a generic frontmatter-vs-Usage gate — none exists; `scaffold_args_usage_sync` is hard-coded to 5 `use-*` files); CLI smoke of `python3 -m lib.docaudit`; `lib/r/docexamples.R` parse-check (A2, R-optional; fold into `lib_s7runtime_r_ships` or count it); `AGENTS.md` mirror |
 | local-only | `pytest.mark.skipif` unless `RFORGE_MEDFIT_PATH` is set: the known-answer pair against real history via `git show` (never writes to medfit) |
+| harness (`tests/harness/`) | Dev-only replay harness (plan tasks T2-T4): committed defect manifest `tests/fixtures/docaudit/defects.json` (the 18 real medfit defects; `firm` rows are regression-locked), a read-only `git archive` recall runner printing "caught k of n", a planted-defect injector on a `copytree` of the clean fixture, and a history replayer. A mutation self-test (audit stubbed to find nothing) must turn firm rows red. CI-safe part uses committed fixtures; real-history rows are `skipif`-guarded on `RFORGE_MEDFIT_PATH` / `RFORGE_PROBMED_PATH` / `RFORGE_MEDROBUST_PATH` |
 
 **Check count:** `test-all.sh` is 45 `run` checks today. New `run` lines: the CLI smoke (+1) and, if not folded, the R
 parse (+1) → state the exact number in the PR. The count is hard-coded in `CLAUDE.md:136`, `AGENTS.md:137` **and
@@ -269,13 +270,18 @@ environment with pytest, pyyaml and mkdocs-material.
 
 ## Acceptance (D5, strengthened)
 
+Evidence for items 2-4 is produced by the replay harness (`tests/harness/replay.py`, manifest `tests/fixtures/docaudit/defects.json`); see `tasks/plan.md` T2-T4 and Checkpoint B.
+
 All of these before the A1 release PR (and again for A2's checks):
 
 1. **Known-answer fixtures green**, including the planted-defect control.
 2. **History replay:** run the named-arg and arity checks over ≥60 commits each of medfit, medrobust and probmed
    (read-only, via `git show`); record hits and triage each. (The review's replay: 20,468 args, 5 hits, all real.)
 3. **Recall replay:** re-run the 18-defect table above against the implementation and state **"caught k of n"**; it must
-   match the claim in Motivation.
+   match the claim in Motivation. The claim is scoped by owner: each manifest row carries `check` and `release` (A1|A2).
+   Checkpoint B gates the rows owned by the `signature-*` checks; A1's release gate is every `release: A1` row
+   (adds `scannability`); `release: A2` rows (`site-missing-page`, examples) stay `pending`, are listed but not counted, and
+   gate only A2. A row cannot block a release that does not ship its check.
 4. **Planted defects in a scratch copy** of the hold-out docs (copied to the scratchpad — never edited in place),
    because the hold-out is likely vacuous for `signature-names`: probmed and medrobust README function tables list
    `fn()` with no arguments.
@@ -313,6 +319,8 @@ Not needed: `package.json` `files` (already ships all of `lib/`), `version_sync.
 (they assert only `name: rforge:docs:check` plus stub text — keep `name:` intact).
 
 ## Implementation order (revised)
+
+*Superseded for execution by `tasks/plan.md`, which re-slices these steps into vertical tasks and builds the replay harness first. The list below stays the reference for what each step contains.*
 
 1. **`discovery` allowlist refactor alone** — direct unit tests first, then generalize; ships shipped code, so it gets
    its own commit and review
@@ -381,6 +389,36 @@ Not needed: `package.json` `files` (already ships all of `lib/`), `version_sync.
 | 24 | coverage | IMPORTANT | D5 a rubber stamp; hold-out vacuous | History + recall replay, planted defects, blocking criteria |
 | 25 | coverage | IMPORTANT | D0 surprises (subdirectory, `active/`, hybrid) | Refined D0 |
 | 26 | coverage | MINOR | Ordering and size | Revised order; A1/A2 split proposed |
+
+### Review 3 — Codex adversarial review (2026-10-11)
+
+Run against the SPEC and `tasks/plan.md`; verdict `needs-attention`, three findings.
+
+| # | Area | Severity | Finding | Resolution |
+|---|---|---|---|---|
+| 27 | acceptance | HIGH | The 3-firm recall gate includes `scannability` (built after Checkpoint B) and `site-missing-page` (A2), so it could never pass at B or for A1 | Manifest rows carry `check` + `release`; `replay.py recall --scope signature\|a1\|all`; B gates signature rows, A1 gates `release: A1` rows, A2 rows stay `pending` and are not counted |
+| 28 | signature | MEDIUM | `signature-arity` lacked the `...` exemption its siblings have, so `f(x, ...)` called as `f(1, 2, 3)` would be flagged | Exempt functions with `...`; variadic positive control in the fixtures |
+| 29 | repo | MEDIUM | Not a SPEC finding: #85's drift-only `version` override stopped `/rforge:finish` adding `version:` to a `.STATUS` that lacks one | Fixed and merged separately (PR #86, `lib.rstatus.version_overrides`) |
+| 30 | signature | MEDIUM | (Codex #3, F1) Per-argument partial matching rejected valid R calls | R matching order: exact first, then unique partial among unmatched formals |
+| 31 | harness | MEDIUM | (F2) Failed audits read as clean in replay | `audit_failed`; any failed audit shape raises `AuditCrashed`; replay timeout |
+| 32 | harness | MEDIUM | (F3) A locked row could go pending | Outcome `lost` fails recall |
+| 33 | signature | MEDIUM | (F4) Quadratic scans below the size guard; 109-133 s | Linear paren map, work budget, visible skips |
+| 34 | signature | MEDIUM | (Codex re-review, G1) Quoted/backticked tags and forwarded `...` mishandled in matching | Tags from raw text; `...` relaxes partial checks |
+| 35 | signature | MEDIUM | (Codex re-review, G5) Whitespace defeated `pkg::f` / `obj$ f` exclusion | Whitespace-tolerant qualifier scan |
+| 36 | signature | MEDIUM | (Codex re-review, G6) Duplicate arguments could claim one formal | Claims tracked by occurrence |
+| 37 | harness | MEDIUM | (Codex re-review, G2) Skipped regions read as clean in replay | `incomplete` envelope flag; harness raises |
+| 38 | signature | MEDIUM | (Codex re-review, G3) Rd usage splitting still quadratic | Shared work budget; skipped Rd named in messages |
+| 39 | harness | MEDIUM | (Codex re-review, G4) Failed enumeration/extraction read as clean history | Git failures raise; counts reported |
+| 40 | harness | MEDIUM | (Codex re-review 2, H1') Read failures read as clean | `_read` notes; `incomplete` |
+| 41 | signature | MEDIUM | (Codex re-review 2, H2') Oversized Rd usage skipped silently | Same skip path, reported |
+| 42 | harness | MEDIUM | (Codex re-review 2, H3') Scope filter bypassed the lock via a misspelled check | `KNOWN_CHECKS` validation before scope filtering |
+| 43 | signature | MEDIUM | (Codex re-review 2, H4'-H5') Raw strings and comments inside calls produced false errors | Blank raw strings; blank comments before tag parsing |
+| 44 | signature | MEDIUM | (Codex re-review 2, H6') Escaped quoted tags lost an exact match | Fail safe to `warn` when a quoted tag is unparsed |
+| 45 | signature | MEDIUM | (Codex re-review 2, H7'-H8') Quoted formal names; duplicate partials under forwarded `...` | Normalize names; flag identical partials with `...` |
+| 46 | signature | MEDIUM | (Codex re-review 3, I1) Getter/setter usage overwrote the getter formals (false `error`) | Skip replacement usage lines and calls |
+| 47 | completeness | MEDIUM | (Codex re-review 3, I2) Unreadable `vignettes/`/`man/` directories read as clean | `os.walk(onerror)`/`scandir` notes; `incomplete` |
+| 48 | completeness | MEDIUM | (Codex re-review 3, I3) A missing package read as clean | `audited` flag; harness rejects `audited: false` |
+| 49 | coverage | MEDIUM | (Checkpoint B close) `coverage` warned on 8-32 exports per package without `--since` | Runs only with `--since` |
 
 ## Appendix
 

@@ -223,7 +223,7 @@ RForge recognizes 6 primary task patterns:
 - `lib.deps` (impact) — assess change impact across ecosystem
 - Bash: `Rscript -e 'devtools::test()'` — verify tests still pass
 - `lib.discovery` — locate affected packages
-- `/rforge:docs:check` body — surface docs-drift hints
+- `/rforge:docs:check` (`lib.docaudit`) — docs calls and signatures that no longer match the exports
 
 **Example:**
 ```
@@ -254,7 +254,7 @@ User: "Fixed edge case in mediation calculation"
 
 **Selected modules / tools:**
 - Bash: `R CMD check --as-cran` — full CRAN compliance check
-- `/rforge:docs:check` body — documentation completeness
+- `/rforge:docs:check` (`lib.docaudit`) — docs-vs-API content audit
 - `lib.deps` — dependency validation
 - `lib.status` — overall readiness; `description-sync` skill verifies CHANGELOG ↔ DESCRIPTION
 
@@ -270,7 +270,7 @@ User: "Prepare for CRAN submission"
 **Triggers:** "document", "docs", "README", "vignette"
 
 **Selected modules / tools:**
-- `/rforge:docs:check` body — documentation status (NEWS.md, examples, vignettes)
+- `/rforge:docs:check` (`lib.docaudit`) — docs-vs-API content audit (README, vignettes)
 - Bash: `Rscript -e 'devtools::check_examples()'` — runnable examples
 - `description-sync` skill — DESCRIPTION ↔ CHANGELOG drift
 
@@ -278,8 +278,8 @@ User: "Prepare for CRAN submission"
 ```
 User: "Update documentation for new features"
 → Pattern: DOCUMENTATION
-→ Modules: docs:check prompt + Bash example-runner
-→ Output: "2 functions undocumented, 3 examples need updating"
+→ Modules: lib.docaudit + Bash example-runner
+→ Output: "1 error, 2 warnings in vignettes; 3 of 20 exports unchecked"
 ```
 
 ### 5. DEPENDENCY_UPDATE

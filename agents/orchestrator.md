@@ -42,6 +42,7 @@ Match the request to exactly one intent:
 | QUALITY | "coverage", "lint", "spelling", "code quality" |
 | CRAN_READINESS | "cran-ready", "prep for cran", "submit", "release to cran" |
 | ECOSYSTEM_HEALTH | "status", "health", "overview", "dashboard" |
+| DOCS_AUDIT | "docs", "documentation", "readme", "vignette", "docs drift" |
 
 If the request is ambiguous, state your best-guess intent and the exact commands
 you will run **before** running them, so a wrong guess is visible.
@@ -61,11 +62,14 @@ dir. Pass `--path <pkg>` to `lib.rcmd` when operating on a specific package.
 | DEPS_AUDIT | `python3 -m lib.deps_sync --format json` · `python3 -m lib.deps --format json` |
 | QUALITY | `python3 -m lib.rcmd --kind coverage` · `python3 -m lib.rcmd --kind lint` · `python3 -m lib.rcmd --kind spell` |
 | CRAN_READINESS | `python3 -m lib.rcmd --kind check` · `python3 -m lib.cranlint` · `python3 -m lib.runiverse --format json` |
+| DOCS_AUDIT | `python3 -m lib.docaudit --format json` |
 | ECOSYSTEM_HEALTH | `python3 -m lib.status --format json` · `python3 -m lib.discovery --format json` · `python3 -m lib.deps --format json` |
 
 `lib.deps` takes the top-level `--format json` *before* the `impact` subcommand,
 and `impact` needs `--package <pkg>` — substitute the changed package's name.
 `lib.deps_sync` runs in its dry-run (read-only) form — never pass `--write`.
+`lib.docaudit` (the `DOCS_AUDIT` row) is static and read-only: run only the default invocation above, optionally with
+`--eco`; its `info` findings need `--detailed`, and `status: warn` can hide an `error` (read `max_severity`).
 `lib.runiverse` is read-only and advisory (a network *read* that degrades to a
 `warn` envelope offline; it never uploads).
 
@@ -108,6 +112,8 @@ uniform schema:
 - `lib.deps` → `nodes`, `edges`, `layers`, `circular`; `lib.deps impact`
   reports the affected/downstream packages.
 - `lib.deps_sync` / `lib.runiverse` → `status` + their own detail fields.
+- `lib.docaudit` → `status`, `max_severity`, `findings` (`check`/`severity`/`file`/`line`), `scope`, `incomplete`,
+  `audited`; report the `scope.line` and never call an `incomplete` or unaudited run clean.
 
 Report:
 

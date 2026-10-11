@@ -38,7 +38,7 @@
 │    /rforge:complete       Mark complete (with doc cascade)                  │
 │                                                                             │
 │  CHECKS                                                                     │
-│    /rforge:docs:check     Documentation drift check                         │
+│    /rforge:docs:check     Docs-vs-API content audit                         │
 │                                                                             │
 │  SETUP                                                                      │
 │    /rforge:init           Initialize ~/.rforge/context.json                 │
@@ -377,7 +377,7 @@ rforge/
 | Fixing bug | `/rforge:analyze` | Verify fix, check tests |
 | Daily development | `/rforge:status` + `/rforge:next` | Dashboard + decision |
 | Running R CMD check | `/rforge:r:check` | Single-package deep check |
-| Documentation drift | `/rforge:docs:check` | NEWS.md, API consistency |
+| Docs match the API | `/rforge:docs:check` | README/vignette calls vs exports |
 | CRAN pre-submission gate | `/rforge:r:cran-prep` | Full gate + cran-comments.md |
 | CRAN Windows check | `/rforge:r:winbuilder` | Async R-devel on Windows |
 | CRAN multi-platform | `/rforge:r:rhub` | Async GitHub Actions matrix |

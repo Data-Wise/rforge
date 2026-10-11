@@ -1,0 +1,53 @@
+Package: medfit
+Type: Package
+Title: Infrastructure for Mediation Model Fitting and Extraction
+Version: 0.7.0
+Date: 2026-10-10
+Authors@R: person("Davood", "Tofighi",
+    email = "dtofighi@gmail.com",
+    role = c("aut", "cre", "cph"),
+    comment = c(ORCID = "0000-0001-8523-7776"))
+Description: Provides S7-based infrastructure for fitting mediation models,
+    extracting path coefficients, and performing bootstrap inference. Designed
+    as a foundation package for the mediation analysis ecosystem, supporting
+    'probmed', 'RMediation', and 'medrobust' packages. Implements unified interfaces
+    for model fitting across different engines (generalized linear models, linear
+    mixed models for cluster-randomized designs, and an experimental
+    maximum-likelihood structural equation engine; Bayesian methods are planned),
+    standardized extraction of mediation paths from
+    various model types, and robust bootstrap
+    inference methods. Mediation methods are described in MacKinnon, Lockwood and
+    Williams (2004) <doi:10.1207/s15327906mbr3901_4>, Preacher and Hayes (2008)
+    <doi:10.3758/brm.40.3.879>, Tofighi and MacKinnon (2011)
+    <doi:10.3758/s13428-011-0076-x>, and VanderWeele (2014)
+    <doi:10.1097/EDE.0000000000000121>.
+License: GPL (>= 3)
+URL: https://data-wise.github.io/medfit/, https://github.com/data-wise/medfit
+BugReports: https://github.com/data-wise/medfit/issues
+Depends:
+    R (>= 4.1.0)
+Imports:
+    S7 (>= 0.1.0),
+    stats,
+    methods,
+    checkmate,
+    generics,
+    lifecycle,
+    MASS,
+    nloptr (>= 1.0.4)
+Suggests:
+    lavaan (>= 0.6-0),
+    lme4,
+    OpenMx,
+    pbkrtest,
+    regmedint,
+    sandwich,
+    testthat (>= 3.0.0),
+    tibble
+Encoding: UTF-8
+Language: en-US
+Roxygen: list(markdown = TRUE, roclets = c("rd", "collate", "namespace"))
+Config/testthat/edition: 3
+Config/Needs/website: knitr, rmarkdown, quarto
+Config/roxygen2/version: 8.1.0
+LazyData: true

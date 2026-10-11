@@ -120,4 +120,4 @@ Recommended: Deprecation path + major version bump
 
 - `/rforge:deps` - See dependency structure
 - `/rforge:cascade` - Plan coordinated updates
-- `/rforge:docs:check` - Check documentation impact
+- `/rforge:docs:check` - Audit docs against the exports

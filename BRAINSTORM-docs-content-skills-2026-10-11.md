@@ -1,5 +1,7 @@
 # BRAINSTORM: rforge docs-content skills/commands — stale-content audit, new-feature docs, cookbooks, articles
 
+> **Status (2026-10-11):** superseded in part. The grill and SPEC v2 corrected several recommendations here: impact folded into `--since`; `docs:check` rewritten instead of a new `docs:audit`; deploy-commit-message detection replaced by sitemap comparison; "a seventh class" moved out of v1. Kept as the divergent record; release B items stay parked. Current source of truth: `SPEC-docs-check-content-audit-2026-10-11.md`.
+
 **Date:** 2026-10-11
 **Depth:** default · **Focus:** feat
 **Categories:** req, users, scope, success

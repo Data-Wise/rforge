@@ -91,7 +91,7 @@ pip install pytest pyyaml mkdocs-material
 # All Python unit tests
 python3 -m pytest tests/ -v
 
-# Full suite (45 checks)
+# Full suite (47 checks)
 bash tests/test-all.sh
 
 # CLI dogfood tests (new configs that may not ship)

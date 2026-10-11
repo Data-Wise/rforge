@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "note": "SHAs and paths only. `ref` is the pre-fix commit; `fix` the fixing commit. `expectation` firm|conditional|none = what the SPEC says the rules should catch; `status` pending|firm = whether a caught row is regression-locked (flip to firm once the harness catches it).",
+  "packages": {
+    "medfit": {
+      "env": "RFORGE_MEDFIT_PATH"
+    }
+  },
+  "defects": [
+    {
+      "id": "refcard-joint-effects-args",
+      "package": "medfit",
+      "ref": "17d976d^",
+      "fix": "17d976d",
+      "file": "vignettes/articles/refcard.qmd",
+      "check": "signature-names",
+      "release": "A1",
+      "expectation": "firm",
+      "status": "firm",
+      "reason": "Refcard lists joint_effects(x, theta); formals are (object, estimates)",
+      "function": "joint_effects"
+    },
+    {
+      "id": "extraction-next-steps-order",
+      "package": "medfit",
+      "ref": "8bd8987^",
+      "fix": "8bd8987",
+      "file": "vignettes/articles/extraction.qmd",
+      "check": "scannability",
+      "release": "A1",
+      "expectation": "firm",
+      "status": "firm",
+      "reason": "\"Next Steps\" sits before two later sections"
+    },
+    {
+      "id": "site-missing-models-page",
+      "package": "medfit",
+      "ref": null,
+      "fix": null,
+      "file": null,
+      "check": "site-missing-page",
+      "release": "A2",
+      "expectation": "firm",
+      "status": "pending",
+      "reason": "/articles/models.html absent from the live site; no git ref, needs --site (A2)"
+    },
+    {
+      "id": "readme-nie-output",
+      "package": "medfit",
+      "ref": "b1f307b^",
+      "fix": "b1f307b",
+      "file": "README.md",
+      "check": "examples-output",
+      "release": "A2",
+      "expectation": "conditional",
+      "status": "pending",
+      "reason": "README NIE = 0.19 vs real 0.164; needs block-state sharing (A2)"
+    },
+    {
+      "id": "extraction-long-paragraphs",
+      "package": "medfit",
+      "ref": "8bd8987^",
+      "fix": "8bd8987",
+      "file": "vignettes/articles/extraction.qmd",
+      "check": "scannability",
+      "release": "A1",
+      "expectation": "conditional",
+      "status": "pending",
+      "reason": "113-124 word paragraphs; fires only past the defined threshold"
+    },
+    {
+      "id": "methods-h3-count",
+      "package": "medfit",
+      "ref": "8bd8987^",
+      "fix": "8bd8987",
+      "file": "vignettes/articles/methods.qmd",
+      "check": "scannability",
+      "release": "A1",
+      "expectation": "conditional",
+      "status": "pending",
+      "reason": "methods.qmd H3 count 1; fires only past the defined threshold"
+    },
+    {
+      "id": "getting-started-no-cluster-engine",
+      "package": "medfit",
+      "ref": "6cd95e2^",
+      "fix": "6cd95e2",
+      "file": "vignettes/articles/getting-started.qmd",
+      "check": null,
+      "release": null,
+      "expectation": "none",
+      "status": "pending",
+      "reason": "G1: engines are engine= argument values, not exports"
+    },
+    {
+      "id": "getting-started-no-native-engine",
+      "package": "medfit",
+      "ref": "6cd95e2^",
+      "fix": "6cd95e2",
+      "file": "vignettes/articles/getting-started.qmd",
+      "check": null,
+      "release": null,
+      "expectation": "none",
+      "status": "pending",
+      "reason": "G3: same as G1"
+    },
+    {
+      "id": "extract-mediation-rd-omits-semfit",
+      "package": "medfit",
+      "ref": "6cd95e2^",
+      "fix": "6cd95e2",
+      "file": "man/extract_mediation.Rd",
+      "check": null,
+      "release": null,
+      "expectation": "none",
+      "status": "pending",
+      "reason": "G2: S3 methods and Rd prose; names brms"
+    },
+    {
+      "id": "semfit-rd-no-examples",
+      "package": "medfit",
+      "ref": "6cd95e2^",
+      "fix": "6cd95e2",
+      "file": "man/SEMFit-methods.Rd",
+      "check": null,
+      "release": null,
+      "expectation": "none",
+      "status": "pending",
+      "reason": "G4: no missing-examples check"
+    },
+    {
+      "id": "intro-seventh-class",
+      "package": "medfit",
+      "ref": "17d976d^",
+      "fix": "17d976d",
+      "file": "vignettes/articles/introduction.qmd",
+      "check": null,
+      "release": null,
+      "expectation": "none",
+      "status": "pending",
+      "reason": "Prose count claim (D1)"
+    },
+    {
+      "id": "intro-ecosystem-list",
+      "package": "medfit",
+      "ref": "17d976d^",
+      "fix": "17d976d",
+      "file": "vignettes/articles/introduction.qmd",
+      "check": null,
+      "release": null,
+      "expectation": "none",
+      "status": "pending",
+      "reason": "Ecosystem list omits probmed/medrobust (prose)"
+    },
+    {
+      "id": "readme-1900-tests",
+      "package": "medfit",
+      "ref": "b1f307b^",
+      "fix": "b1f307b",
+      "file": "README.md",
+      "check": null,
+      "release": null,
+      "expectation": "none",
+      "status": "pending",
+      "reason": "Prose count claim (1,900+ tests)"
+    },
+    {
+      "id": "readme-feature-lists",
+      "package": "medfit",
+      "ref": "b1f307b^",
+      "fix": "b1f307b",
+      "file": "README.md",
+      "check": null,
+      "release": null,
+      "expectation": "none",
+      "status": "pending",
+      "reason": "Feature lists omit lmer/SEMFit"
+    },
+    {
+      "id": "extraction-no-route-chooser",
+      "package": "medfit",
+      "ref": "8bd8987^",
+      "fix": "8bd8987",
+      "file": "vignettes/articles/extraction.qmd",
+      "check": null,
+      "release": null,
+      "expectation": "none",
+      "status": "pending",
+      "reason": "Not definable as a check"
+    },
+    {
+      "id": "hc3-survey-weight-inference",
+      "package": "medfit",
+      "ref": "1a86a5d^",
+      "fix": "1a86a5d",
+      "file": null,
+      "check": null,
+      "release": null,
+      "expectation": "none",
+      "status": "pending",
+      "reason": "Semantic/prose; file not pinned (fix commit located by subject, not by diff)"
+    },
+    {
+      "id": "cran-install-listed-first",
+      "package": "medfit",
+      "ref": "1a86a5d^",
+      "fix": "1a86a5d",
+      "file": null,
+      "check": null,
+      "release": null,
+      "expectation": "none",
+      "status": "pending",
+      "reason": "Prose ordering; file not pinned"
+    },
+    {
+      "id": "cookbook-fit-m-reuse",
+      "package": "medfit",
+      "ref": "1a86a5d^",
+      "fix": "1a86a5d",
+      "file": null,
+      "check": null,
+      "release": null,
+      "expectation": "none",
+      "status": "pending",
+      "reason": "Quarto chunks carry no #> output; needs release B's isolated-recipe harness"
+    }
+  ]
+}

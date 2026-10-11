@@ -491,31 +491,30 @@ auto-applied).
 
 ### /rforge:docs:check
 
-Check for documentation drift and inconsistencies across packages.
+Audit documentation content against the package API: calls and signatures in `README` and `vignettes/` that no longer match the exports. Static and read-only (`lib.docaudit`).
 
 **Usage:**
 ```bash
-/rforge:docs:check [package] [--detailed]
+/rforge:docs:check [package] [--detailed] [--eco] [--since <tag>] [--fail-on none|warn|error]
 ```
 
 **Parameters:**
-- `package` (optional) - Package to check (defaults to current directory / ecosystem)
-- `--detailed` (optional) - Show the full per-file documentation drift report
+- `package` (optional) - Package path or name; defaults to the package you are in (walks up to the nearest `DESCRIPTION`)
+- `--detailed` (optional) - Also print `info` findings (scannability)
+- `--eco` (optional) - Force the ecosystem sweep
+- `--since <tag>` (optional) - Add the coverage report, limited to exports added since the tag
+- `--fail-on` (optional) - Exit-code threshold: `none` (default), `warn` or `error`; does not change the report
 
 **Examples:**
 ```bash
-# Check documentation status
+# Audit the current package
 /rforge:docs:check
 
-# Full drift report
-/rforge:docs:check --detailed
+# Whole ecosystem, with info findings
+/rforge:docs:check --eco --detailed
 ```
 
-**Validates:**
-- Exported functions have documentation
-- Examples are runnable
-- NAMESPACE consistency with documentation
-- Version numbers match across files
+**Checks:** `signature-named-arg` (error), `signature-names` and `signature-arity` (warn), `scannability` (info), `coverage` (warn, `--since` only). The first report line states the resolved scope; the summary line states how many exports were checked. Suppress findings with `docs.allowlist` in `.rforge.yaml`.
 
 ---
 
@@ -764,7 +763,7 @@ Regenerate `man/*.Rd` documentation and `NAMESPACE` via `roxygen2::roxygenize()`
 - Runs `roxygen2::roxygenize()` (the blessed regeneration path — hand-edits to `man/*.Rd` are blocked by the PreToolUse hook)
 - Reports success and recommends reviewing `git diff man/ NAMESPACE`
 
-**Related commands:** `/rforge:r:check` (verify after regenerating), `/rforge:docs:check` (detect drift)
+**Related commands:** `/rforge:r:check` (verify after regenerating), `/rforge:docs:check` (audit docs against the API)
 
 ---
 

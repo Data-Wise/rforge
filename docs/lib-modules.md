@@ -1,7 +1,7 @@
 # 🐍 Lib Modules (`lib/`)
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** Pure-Python analysis modules (`discovery`, `deps`, `status`, `init`, `cranlint`, `deps_sync`, `ghrelease`, `runiverse`, `s7review`, `changed`, `scaffold`, `sitelint`, `tidyaudit`, `rstatus`) — no R, no Node — plus `rcmd` (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the `r:` commands.
+    - **What:** Pure-Python analysis modules (`discovery`, `deps`, `status`, `init`, `cranlint`, `deps_sync`, `ghrelease`, `runiverse`, `s7review`, `changed`, `scaffold`, `sitelint`, `tidyaudit`, `rstatus`, `docaudit`) — no R, no Node — plus `rcmd` (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the `r:` commands.
     - **Why:** No MCP server, no Node, no external deps — just `python3 -m lib.<module>`, fast and scriptable.
     - **How:** Each takes `--path` and `--format text|json`; importable as a Python API too.
     - **Next:** [Reference API docs](reference/discovery.md) for signatures, or [Architecture](architecture.md#path-b-lib-modules) for fit.
@@ -51,6 +51,7 @@ flowchart LR
 | `lib/sitelint.py` | `check_site_leaks` (v2.16.0 — scans the pkgdown render surface for leaked planning/dev docs before deploy) | backs `/rforge:r:site --check-leaks` and the `r:cran-prep` Tier 4 `site-leaks` stage |
 | `lib/tidyaudit.py` | `check_roxygen_completeness`, `check_news_header`, `run_all` (v2.19.0 — tidyverse-conventions audit: lint preset, DESCRIPTION normalization, roxygen completeness, NEWS.md header currency) | backs `/rforge:r:tidy` and `r:lint --tidy` |
 | `lib/rstatus.py` | `parse_rstatus`, `read_rstatus`, `apply_updates`, `diff_rstatus`, `parse_news_header`, `git_snapshot`, `build_recap` (v2.20.0 — `.STATUS` reader/differ backing session-boundary recap + sync) | `python3 -m lib.rstatus recap --path . [--format text\|json]` |
+| `lib/docaudit.py` | `audit`, `audit_ecosystem`, `audit_package`, `resolve_scope`, `scan_prose`, `format_text`, `format_json` (v2.21.0 — static documentation-content audit: calls and signatures in README/vignettes vs the exports; scannability; `--since` coverage; `docs.allowlist`) | backs `/rforge:docs:check`; CLI `python3 -m lib.docaudit [--path P] [--eco] [--detailed] [--since TAG] [--fail-on none\|warn\|error]` |
 
 > **`cranlint` is a pure-stdlib analysis module** like `discovery`/`deps`/`status`/`init`
 > — it never touches R. It backs the Tier 4 advisory stages of `r:cran-prep` (v2.3.0):

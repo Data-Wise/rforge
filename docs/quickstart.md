@@ -354,7 +354,7 @@ Now that you're set up, explore:
 /rforge:deps                      # Visualize dependencies
 
 # Documentation
-/rforge:docs:check                # Check documentation drift
+/rforge:docs:check                # Audit docs against the exports
 /rforge:complete                  # Mark tasks complete
 /rforge:capture                   # Quick capture ideas
 /rforge:next                      # Get next task suggestion
