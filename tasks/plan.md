@@ -59,9 +59,9 @@ Parallel-safe: T1 ∥ T2; T7 ∥ T8 ∥ T9; T14 ∥ T15 ∥ T16. Must be sequent
   *Verify:* `pytest tests/test_lib_discovery.py tests/test_sitelint.py tests/test_rcmd_deploy.py -q`. *Deps:* none.
 - [ ] **T2 [M] Defect manifest + recall runner (red-first).** *Files:* `tests/harness/replay.py`, `tests/fixtures/docaudit/defects.json`,
   `tests/harness/test_harness_selftest.py`. *AC:* manifest has the 18 real medfit defects (id, package, class, fix sha, pre-fix ref,
-  file, `expectation`, `status`, reason — SHAs and paths only, no content); `replay.py recall` extracts each pre-fix tree read-only,
-  calls `python3 -m lib.docaudit --path <tmp> --format json`, prints "caught k of n" (module absent → rows `pending`); exit code
-  fails when a `firm` row stops firing; self-test on a synthetic tmp git repo, including the **mutation test** (stubbed audit →
+  file, owning `check`, `release` (A1|A2), `expectation`, `status`, reason — SHAs and paths only, no content); `replay.py recall --scope signature|a1|all` (default `all`) reports eligible rows only, extracts each pre-fix tree read-only,
+  calls `python3 -m lib.docaudit --path <tmp> --format json`, prints "caught k of n eligible (m pending, A2)" (module absent → rows `pending`; `release: A2` rows never count toward A1); exit code
+  fails when an eligible `firm` row stops firing; self-test on a synthetic tmp git repo, including the **mutation test** (stubbed audit →
   firm rows red). *Verify:* `pytest tests/harness -q`; `python3 tests/harness/replay.py recall --manifest tests/fixtures/docaudit/defects.json`.
   *Deps:* none.
 - [ ] **T3 [M] Planted-defect injector + committed known-answer pair.** *Files:* `tests/harness/plant.py`, `tests/harness/test_known_answer.py`,
@@ -75,8 +75,8 @@ Parallel-safe: T1 ∥ T2; T7 ∥ T8 ∥ T9; T14 ∥ T15 ∥ T16. Must be sequent
   (file, call, arg), emits JSON for triage; tested on a synthetic tmp git history with one planted bad commit; local-repo test
   skipif-guarded; HOME isolated. *Verify:* `pytest tests/harness -q`. *Deps:* T2.
 
-**Checkpoint A — harness live (human glance):** `pytest tests/harness -q` green; `replay.py recall` prints "caught 0 of 3 firm
-(pending)"; the mutation self-test proves the harness goes red when it should; nothing under `lib/docaudit.py` yet.
+**Checkpoint A — harness live (human glance):** `pytest tests/harness -q` green; `replay.py recall` prints every row as
+`pending` and counts none as missed; the mutation self-test proves the harness goes red when it should; nothing under `lib/docaudit.py` yet.
 
 ### Phase 1 — First vertical slices
 
@@ -89,13 +89,13 @@ Parallel-safe: T1 ∥ T2; T7 ∥ T8 ∥ T9; T14 ∥ T15 ∥ T16. Must be sequent
   `pytest tests/test_docaudit.py tests/test_docaudit_e2e.py tests/harness -q`. *Deps:* T3 (T1 not needed).
 - [ ] **T6 [M] "A refcard listing with non-formal names or bad arity is flagged."** *Files:* `lib/docaudit.py`, `tests/test_docaudit.py`,
   `tests/test_docaudit_e2e.py`. *AC:* `signature-names` (warn; any backticked span outside fences; `...` functions exempt) and
-  `signature-arity` (warn; positionals > non-`...` formals); unchecked-reason accounting (`no-usage`, `method`, `re-export`)
+  `signature-arity` (warn; positionals > formals, **only for functions with no `...`** — variadic functions exempt, positive control: `f(x, ...)` called as `f(1, 2, 3)` is not flagged); unchecked-reason accounting (`no-usage`, `method`, `re-export`)
   and the `checked N of M` summary line; defect fixture flags `joint_effects(x, theta)`, clean fixture has 0 `error`, the fixed
   refcard does **not** flag `bootstrap_mediation(f, …)`; known-answer test green; manifest `joint_effects` row `firm`. *Verify:* same
   command as T5. *Deps:* T5.
 
 **Checkpoint B — THE GATE (human; hard stop).** Adversarial review #2 on the signature logic (multi-agent, read-only);
-history replay ≥60 commits × medfit/medrobust/probmed (`replay.py replay`); recall report "caught k of n" matching the SPEC claim;
+history replay ≥60 commits × medfit/medrobust/probmed (`replay.py replay`); `replay.py recall --scope signature` caught-k-of-n matching the signature rows of the SPEC claim (scannability and site rows are not eligible yet);
 planted defects in a scratch copy of the hold-out docs; hold-out triage by you (true/false/won't-fix), precision recorded in the SPEC
 appendix. **Blocked by:** red fixture or missed planted defect; any raised exception; any unresolved false-positive class; any
 `error`-severity false positive (→ demote `signature-named-arg` to `warn`, D7). No later slice starts until this passes.
@@ -112,7 +112,7 @@ appendix. **Blocked by:** red fixture or missed planted defect; any raised excep
   entries `<relpath>` and `<relpath>::<check-id>` read from the **package root** via T1's helper; malformed → ignore + message.
   *Deps:* T1, T6.
 
-**Checkpoint C:** all A1 checks green; harness recall report matches the SPEC (3 firm; 3 conditional are A2 rows, marked as such);
+**Checkpoint C:** all A1 checks green; `replay.py recall --scope a1` catches every `release: A1` row (now including `scannability`); `release: A2` rows stay `pending` and are excluded;
 `pytest tests/ -q` green.
 
 ### Phase 3 — User-facing surface
@@ -177,7 +177,7 @@ python3 tests/harness/replay.py recall --manifest tests/fixtures/docaudit/defect
 RFORGE_MEDFIT_PATH=~/projects/r-packages/active/medfit python -m pytest tests/harness -q   # local real-history rows
 ```
 
-Definition of done also requires: the 3-firm recall claim reproduced by the harness; every `error` finding free of false positives on the
+Definition of done also requires: every `release: A1` firm row caught by `replay.py recall --scope a1` (A2 rows excluded); every `error` finding free of false positives on the
 hold-out (else demoted, D7); the Checkpoint D transcript quoted in the PR.
 
 ## Open questions

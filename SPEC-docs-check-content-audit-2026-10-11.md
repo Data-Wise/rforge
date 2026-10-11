@@ -144,7 +144,7 @@ CLI: `python3 -m lib.docaudit [--path P] [--eco] [--since TAG] [--run-examples] 
 |---|---|---|---|
 | B | `signature-named-arg` | error (D7) | Named arg `f(arg = …)` not among the formals, for an exported function **without `...`** in its formals |
 | B | `signature-names` (was `signature-listing`) | warn | For an exported function **without `...`**, a bare-identifier argument in **any backticked `fn(…)` span outside fenced blocks** (table cells, list items, headings, prose) that is not a formal. This flags identifier ≠ formal; it **cannot tell a stale name from a placeholder or user variable** (`joint_effects(x, theta)` defect and `bootstrap_mediation(f, …)` placeholder have the same shape), so it is a candidate generator |
-| B | `signature-arity` | warn | Positional args exceed the non-`...` formals (e.g. `joint_effects(object, estimates, "bca")`). The "ordered subset" rule of v1 of this SPEC is **dropped**: 18 of 645 real calls (2.8%) list named args out of formal order |
+| B | `signature-arity` | warn | Positional args exceed the formals (e.g. `joint_effects(object, estimates, "bca")`); **only for functions with no `...` formal** — a variadic `f(x, ...)` accepts `f(1, 2, 3)`, so it is exempt, like the other two signature checks (positive control in the fixtures). The "ordered subset" rule of v1 of this SPEC is **dropped**: 18 of 645 real calls (2.8%) list named args out of formal order |
 | C | `coverage` | info (warn if an export appears in no doc) | Export × doc matrix, a *report*, not a defect detector; `--since TAG` restricts it to exports/Rd files added since the tag (`git diff --name-status TAG..HEAD` on `NAMESPACE` and `man/`). **No engine enumeration in v1** |
 | D | `scannability` | info | Defaults (all configurable): paragraph over **110 words**; H2 section over **800 words with fewer than 3 H3**; "Next Steps" not last. Known: medfit `methods.qmd` (6 paragraphs over 100 words, max 217) is flagged forever — allowlist it |
 | B (A2) | `examples-output` | error (D7) | See `--run-examples` contract |
@@ -278,7 +278,10 @@ All of these before the A1 release PR (and again for A2's checks):
 2. **History replay:** run the named-arg and arity checks over ≥60 commits each of medfit, medrobust and probmed
    (read-only, via `git show`); record hits and triage each. (The review's replay: 20,468 args, 5 hits, all real.)
 3. **Recall replay:** re-run the 18-defect table above against the implementation and state **"caught k of n"**; it must
-   match the claim in Motivation.
+   match the claim in Motivation. The claim is scoped by owner: each manifest row carries `check` and `release` (A1|A2).
+   Checkpoint B gates the rows owned by the `signature-*` checks; A1's release gate is every `release: A1` row
+   (adds `scannability`); `release: A2` rows (`site-missing-page`, examples) stay `pending`, are listed but not counted, and
+   gate only A2. A row cannot block a release that does not ship its check.
 4. **Planted defects in a scratch copy** of the hold-out docs (copied to the scratchpad — never edited in place),
    because the hold-out is likely vacuous for `signature-names`: probmed and medrobust README function tables list
    `fn()` with no arguments.

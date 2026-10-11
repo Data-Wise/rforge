@@ -13,7 +13,7 @@
 ### Checkpoint A — harness live
 
 - [ ] `pytest tests/harness -q` green
-- [ ] `replay.py recall` prints "caught 0 of 3 firm (pending)"
+- [ ] `replay.py recall` shows every row `pending` and counts none as missed
 - [ ] Mutation self-test proves the harness goes red when the audit finds nothing
 
 ## Phase 1 — First vertical slices
@@ -25,7 +25,7 @@
 
 - [ ] Adversarial review #2 on the signature logic (multi-agent, read-only)
 - [ ] History replay: ≥60 commits × medfit / medrobust / probmed; hits triaged
-- [ ] Recall report "caught k of n" matches the SPEC claim (3 firm of 18)
+- [ ] `replay.py recall --scope signature` catches every eligible signature row (scannability/site rows not yet eligible)
 - [ ] Planted defects in a scratch copy of the hold-out docs are caught
 - [ ] Hold-out triage by the maintainer (true / false / won't-fix); precision recorded in the SPEC appendix
 - [ ] No `error`-severity false positive (else demote `signature-named-arg` to `warn`, D7)
@@ -38,7 +38,7 @@
 
 ### Checkpoint C
 
-- [ ] All A1 checks green; recall report matches the SPEC
+- [ ] All A1 checks green; `replay.py recall --scope a1` catches every `release: A1` row (A2 rows excluded)
 - [ ] `pytest tests/ -q` green
 
 ## Phase 3 — User-facing surface
