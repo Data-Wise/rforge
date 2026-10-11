@@ -75,4 +75,3 @@
 - [x] F3 a `status: firm` row whose check is missing/unimplemented fails (`lost`), never `pending`
 - [x] Gates, evidence rerun, triage sheet refresh
 - [ ] Codex re-review clean
-
