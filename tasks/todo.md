@@ -69,9 +69,10 @@
 
 ## Checkpoint B fixes (Codex review #3; plan: `tasks/plan-checkpoint-b-fixes.md`)
 
-- [ ] F1 R argument matching: exact names first, then partials among remaining formals
-- [ ] F4 linear paren matching, per-region work budget, replay subprocess timeout
-- [ ] F2 failed audits (non-zero exit, bad JSON, `audit_failed`) raise `AuditCrashed`
-- [ ] F3 a `status: firm` row whose check is missing/unimplemented fails (`lost`), never `pending`
-- [ ] Gates, evidence rerun, triage sheet refresh, Codex re-review clean
+- [x] F1 R argument matching: exact names first, then partials among remaining formals
+- [x] F4 linear paren matching, per-region work budget, replay subprocess timeout
+- [x] F2 failed audits (non-zero exit, bad JSON, `audit_failed`) raise `AuditCrashed`
+- [x] F3 a `status: firm` row whose check is missing/unimplemented fails (`lost`), never `pending`
+- [x] Gates, evidence rerun, triage sheet refresh
+- [ ] Codex re-review clean
 

@@ -398,6 +398,10 @@ Run against the SPEC and `tasks/plan.md`; verdict `needs-attention`, three findi
 |---|---|---|---|---|
 | 27 | acceptance | HIGH | The 3-firm recall gate includes `scannability` (built after Checkpoint B) and `site-missing-page` (A2), so it could never pass at B or for A1 | Manifest rows carry `check` + `release`; `replay.py recall --scope signature\|a1\|all`; B gates signature rows, A1 gates `release: A1` rows, A2 rows stay `pending` and are not counted |
 | 28 | signature | MEDIUM | `signature-arity` lacked the `...` exemption its siblings have, so `f(x, ...)` called as `f(1, 2, 3)` would be flagged | Exempt functions with `...`; variadic positive control in the fixtures |
+| 30 | signature | MEDIUM | (Codex #3, F1) Per-argument partial matching rejected valid R calls | R matching order: exact first, then unique partial among unmatched formals |
+| 31 | harness | MEDIUM | (F2) Failed audits read as clean in replay | `audit_failed`; any failed audit shape raises `AuditCrashed`; replay timeout |
+| 32 | harness | MEDIUM | (F3) A locked row could go pending | Outcome `lost` fails recall |
+| 33 | signature | MEDIUM | (F4) Quadratic scans below the size guard; 109-133 s | Linear paren map, work budget, visible skips |
 | 29 | repo | MEDIUM | Not a SPEC finding: #85's drift-only `version` override stopped `/rforge:finish` adding `version:` to a `.STATUS` that lacks one | Fixed and merged separately (PR #86, `lib.rstatus.version_overrides`) |
 
 ## Appendix

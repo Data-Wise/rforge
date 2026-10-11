@@ -160,3 +160,20 @@ You chose option A: `signature-names` now judges only backticked calls that are 
 - **Docs:** SPEC rule row, plan T6 and the ORCHESTRATE item updated with the narrowing and its reason.
 
 **Still yours to tick:** H2 (medsim, `error`, verified true against the R source), R3 and R4 (`error`, history only, true). Then precision is recorded and the gate closes.
+
+## 8. Codex review #3 — verified and fixed (2026-10-11)
+
+Plan: `tasks/plan-checkpoint-b-fixes.md`. Each claim was reproduced by running it before fixing; each fix has a red-then-green test and a mutation check.
+
+| ID | Finding | Reproduced? | Fix | Commit |
+|---|---|---|---|---|
+| F1 | Partial matching rejected valid R calls (`f(alpha = 1, al = 2)` on `(alpha, alpine)`, an `error`-level false positive) | **Yes**, both argument orders flagged | `unmatched_named`: exact names first across the call, then each leftover name needs exactly one candidate among the unmatched formals, and no two args may claim one formal. `f(al = 1)` stays flagged | `7783dae` |
+| F4 | Quadratic scans under the 200,000-char guard; no replay timeout | **Yes, worse than reported**: 109 s (66,000 unclosed `f(`) and 133 s (40,000 nested) | `paren_map` (one pass), a 2,000,000-char work budget per region, bisect line numbers, and skipped regions reported in `messages`; replay subprocess timeout 120 s. Now 0.02 s and 0.06 s | `9b642c8` |
+| F2 | Failed audits read as clean in replay | **Yes** (by the envelope shape and `subprocess_audit` returning only `findings`) | `audit_failed` marker; `subprocess_audit` raises `AuditCrashed` on timeout, non-zero exit, bad JSON, missing `findings` or `audit_failed`; `run_history` propagates it | this commit |
+| F3 | A locked row went `pending` (recall `ok`) when its check was missing or the module absent | **Yes** (`ok=True`, `firm_eligible=0`) | outcome `lost` for a `status: firm` row whose check is not implemented; counts as a failure | this commit |
+
+Mutation checks: removing the lock (3 tests red), ignoring `audit_failed` (2 red), ignoring a non-zero exit (1 red).
+
+**Gates:** `pytest tests` 748 passed, 4 skipped; harness with `RFORGE_MEDFIT_PATH` 46 passed; `test-all.sh` 45 of 45; `gen_lib_reference.py --check` clean.
+
+**Evidence rerun (unchanged):** recall 1 of 1; history replay (60 commits, 200 for medfit) over all 7 packages reported the same findings as before (medfit refcard x2 and `BootstrapResult`, medrobust `check_compatibility` x4, medsim x7), with no audit failures; `HEAD` hold-out: medsim 7, all others 0. F1 removed no finding.
