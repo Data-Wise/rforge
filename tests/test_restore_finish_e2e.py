@@ -142,7 +142,7 @@ def test_e2e_annotated_version_no_drift_and_finish_keeps_annotation(tmp_path):
     assert recap["version_drift"] is None
 
     sys.path.insert(0, REPO_ROOT)
-    from lib.rstatus import build_recap, read_rstatus, apply_updates, diff_rstatus  # noqa: E402
+    from lib.rstatus import build_recap, read_rstatus, apply_updates, diff_rstatus, version_overrides  # noqa: E402
 
     recap = build_recap(str(tmp_path))
     current = read_rstatus(str(tmp_path))
@@ -152,13 +152,33 @@ def test_e2e_annotated_version_no_drift_and_finish_keeps_annotation(tmp_path):
     intended = apply_updates(
         current,
         updated="2026-10-11",
-        **({"version": recap["description"]["version"]} if recap["version_drift"] else {}),
+        **version_overrides(recap, current),
     )
     assert diff_rstatus(current, intended) == []
 
     # The old recipe (unconditional override) is the regression this guards.
     old = apply_updates(current, updated="2026-10-11", version=recap["description"]["version"])
     assert "version" in {c[0] for c in diff_rstatus(current, old)}
+
+
+def test_e2e_finish_adds_version_when_status_has_none(tmp_path):
+    """Codex review of #85: an existing `.STATUS` with no `version:` line must
+    still get one from DESCRIPTION; a drift-only override left it "already
+    current" (the diff was timestamp-only)."""
+    _make_r_package_fixture(tmp_path, with_status=True)
+    status = (tmp_path / ".STATUS").read_text().replace("version: 0.4.0\n", "")
+    assert "version:" not in status
+    (tmp_path / ".STATUS").write_text(status)
+
+    sys.path.insert(0, REPO_ROOT)
+    from lib.rstatus import build_recap, read_rstatus, apply_updates, diff_rstatus, version_overrides  # noqa: E402
+
+    recap = build_recap(str(tmp_path))
+    current = read_rstatus(str(tmp_path))
+    assert current.version is None and recap["version_drift"] is None
+    intended = apply_updates(current, updated="2026-10-11", **version_overrides(recap, current))
+    assert [c[0] for c in diff_rstatus(current, intended) if c[0] != "updated"] == ["version"]
+    assert intended.version == recap["description"]["version"]
 
 
 # ── finish: redundant-edit guard, exercised against real files on disk ─────

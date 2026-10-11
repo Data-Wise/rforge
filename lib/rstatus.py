@@ -323,6 +323,23 @@ def build_recap(pkg_path: str | Path = ".") -> dict:
     }
 
 
+def version_overrides(recap: dict, current: Optional[RStatus]) -> dict:
+    """`apply_updates` overrides for `version`, for `/rforge:finish`.
+
+    DESCRIPTION's `Version` is written only when `.STATUS`'s mirror is absent
+    or has drifted. A matching-but-annotated `version:` ("0.7.0 (released …)")
+    must be left alone, or `--write` would strip the annotation (#84); an
+    absent one must be filled in, or a `.STATUS` with no `version:` line would
+    diff as timestamp-only and report "already current" forever."""
+    description = recap.get("description")
+    if description is None:
+        return {}
+    absent = current is not None and current.version is None
+    if recap.get("version_drift") or absent:
+        return {"version": description["version"]}
+    return {}
+
+
 _CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 
