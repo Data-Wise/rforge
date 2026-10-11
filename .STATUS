@@ -2,16 +2,16 @@ project: rforge
 updated: 2026-10-11
 status: Active
 in_progress: 2026-10-11 — two lines of work, no release pending.
-  (1) PR #85 (fix #84, lib.rstatus leading-version drift + /rforge:finish version override) OPEN, mergeable, 5/5
-  checks green, worktree ~/.git-worktrees/rforge/feature-rstatus-version-drift (96a4542); merge awaits the
-  maintainer's go-ahead; #84 stays open until release (a feature→dev merge does not auto-close it).
+  (1) #84 fix MERGED to dev 2026-10-11 as PR #85 (squash 99b4171; CI 5/5 green; reviewed, nothing to fix). #84 stays
+  open until release (a feature→dev merge does not auto-close it). Local worktree
+  ~/.git-worktrees/rforge/feature-rstatus-version-drift can be removed.
   (2) docs:check content audit, release A1 (v2.21.0): planning complete, no code yet. Brainstorm, 8-decision grill,
   SPEC v2 after a 4-reviewer adversarial pass (26 findings), ORCHESTRATE, and a 17-task vertical-slice plan with a
   replay harness built first. Worktree ~/.git-worktrees/rforge/feature-docs-check-content-audit
-  (feature/docs-check-content-audit, 75bcbf2). Docs on dev: BRAINSTORM/GRILL/SPEC-docs-*-2026-10-11.md (42e3c1f,
-  83a4e41; dev is 2 ahead of origin/dev, unpushed). Plan and checklist: tasks/plan.md, tasks/todo.md on the feature
+  (feature/docs-check-content-audit, ca3b323, local only). Docs on dev: BRAINSTORM/GRILL/SPEC-docs-*-2026-10-11.md
+  (42e3c1f, 83a4e41; dev pushed, in sync with origin). Plan and checklist: tasks/plan.md, tasks/todo.md on the feature
   branch. A2 (--site, --run-examples) is a separate later plan.
-next: Maintainer decides PR #85 merge. Then T1 (discovery allowlist refactor, own commit) and T2 (defect manifest +
+next: T1 (discovery allowlist refactor, own commit) and T2 (defect manifest +
   recall runner) in the feature worktree; schedule the hold-out triage session early, it gates T7-T17.
 version: 2.20.1 (released, on main 9d0b01a; dev fast-forwarded to main)
 last_release: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
@@ -104,9 +104,9 @@ last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --unive
 
 recent:
   - date: 2026-10-11
-    branch: feature/rstatus-version-drift (PR #85 → dev, open)
+    branch: feature/rstatus-version-drift (PR #85 → dev, merged 99b4171)
     title: "fix(rstatus): compare only the leading version token for .STATUS drift (#84)"
-    state: PR OPEN, CI green, awaiting merge decision
+    state: MERGED to dev; unreleased (ships in the next release)
     summary: |
       build_recap compared the whole .STATUS `version:` string to DESCRIPTION, so an annotated line
       ("0.7.0 (released ...)") reported false drift (found on medfit). Now compares the leading token
