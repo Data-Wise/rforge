@@ -62,7 +62,7 @@ change `s7review` behavior.
 **Scope:** the three checks and the fixtures that prove they can fail.
 
 - [ ] 3.1 `signature-named-arg` (error): named arg not among formals, exported function **without `...`**; unique-prefix partial matching is valid
-- [ ] 3.2 `signature-names` (warn): bare-identifier arg in any backticked `fn(…)` span outside fences, function **without `...`** (the `...` exemption is part of the rule — the first prototype hid it)
+- [ ] 3.2 `signature-names` (warn): bare-identifier arg in a backticked `fn(…)` span that is the first cell of a table row (narrowed 2026-10-11), function **without `...`** (the `...` exemption is part of the rule — the first prototype hid it)
 - [ ] 3.3 `signature-arity` (warn): positionals exceed the formals, only for functions with no `...` (variadic exempt); no "ordered subset" rule
 - [ ] 3.4 Fixtures under `tests/fixtures/docaudit/` with a provenance README: `17d976d^` refcard table + `joint_effects.Rd` usage (defect), `17d976d` (clean). **Create Rd fixtures via Bash or `git show` — the PreToolUse hook blocks Write/Edit on `man/*.Rd`**
 - [ ] 3.5 e2e (`tests/test_docaudit_e2e.py`): real `python3 -m lib.docaudit` subprocess on the fixture package; defect → `signature-names`; clean → 0 `error`; **planted defect** (synthetic wrong named arg) is caught

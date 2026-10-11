@@ -22,8 +22,8 @@ def fence(code: str) -> Region:
     return Region("fence", 10, code)
 
 
-def inline(code: str) -> Region:
-    return Region("inline", 10, code)
+def inline(code: str, first_cell: bool = True) -> Region:
+    return Region("inline", 10, code, first_cell=first_cell)
 
 
 def run(region: Region, **formals):
@@ -209,7 +209,7 @@ def test_not_an_r_package(tmp_path):
 
 def test_audit_reports_findings_with_envelope_fields(tmp_path):
     make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a, b)"},
-             docs={"README.md": "```r\nf(a = 1, z = 2)\n```\n", "vignettes/v.qmd": "`f(q)`\n"})
+             docs={"README.md": "```r\nf(a = 1, z = 2)\n```\n", "vignettes/v.qmd": "| `f(q)` | listing |\n"})
     r = docaudit.audit_package(tmp_path)
     assert r["kind"] == "docaudit" and r["status"] == "warn" and r["max_severity"] == "error"
     assert [(f["file"], f["check"]) for f in r["findings"]] == [("README.md", "signature-named-arg"), ("vignettes/v.qmd", "signature-names")]
@@ -350,3 +350,29 @@ def test_local_definition_in_one_block_covers_the_whole_file(tmp_path):
     make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(x, a = 1)"},
              docs={"README.md": "```r\nf <- function(q) q\n```\n\n```r\nf(zz = 1)\n```\n"})
     assert docaudit.audit_package(tmp_path)["findings"] == []
+
+
+# ───────────────────────── signature-names: signature columns only (triage H1) ─────────────────────────
+
+
+def test_names_ignores_call_examples_outside_a_table_first_cell():
+    """`fit_sem(syntax, data)` in a Routes cell: `syntax` is a variable, not a formal (medfit model-native.qmd)."""
+    assert run(inline("fit_sem(syntax, data)", first_cell=False), fit_sem=["model", "data"]) == []
+
+
+def test_extract_regions_marks_only_whole_first_cell_spans():
+    text = ("| `joint(x, theta)` | desc `other(a)` |\n"
+            "| **Routes** | `fit_sem(syntax, data)`, or `g(model = syntax)` |\n"
+            "Prose `prose(x, theta)` here.\n"
+            "|`tight(a)`| no spaces |\n"
+            "| `part(a)` more text | cell |\n")
+    got = {r.text: r.first_cell for r in extract_regions(text)}
+    assert got == {"joint(x, theta)": True, "other(a)": False, "fit_sem(syntax, data)": False,
+                   "g(model = syntax)": False, "prose(x, theta)": False, "tight(a)": True, "part(a)": False}
+
+
+def test_audit_flags_the_refcard_row_but_not_the_routes_row(tmp_path):
+    make_pkg(tmp_path, ns="export(joint, fit_sem)\n", rds={"joint": "joint(object, estimates)", "fit_sem": "fit_sem(model, data)"},
+             docs={"vignettes/refcard.qmd": "| `joint(x, theta)` | Joint effects |\n",
+                   "vignettes/native.qmd": "| **Routes** | `fit_sem(syntax, data)`, or `fit_mediation(model = syntax)` |\n"})
+    assert [(f["file"], f["function"]) for f in docaudit.audit_package(tmp_path)["findings"]] == [("vignettes/refcard.qmd", "joint")] * 2

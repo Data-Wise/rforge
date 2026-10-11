@@ -88,7 +88,7 @@ Parallel-safe: T1 ∥ T2; T7 ∥ T8 ∥ T9; T14 ∥ T15 ∥ T16. Must be sequent
   named-arg rows flip `pending→firm`; local replay reproduces medfit `b40444e` and medrobust `96d97b4`. *Verify:*
   `pytest tests/test_docaudit.py tests/test_docaudit_e2e.py tests/harness -q`. *Deps:* T3 (T1 not needed).
 - [ ] **T6 [M] "A refcard listing with non-formal names or bad arity is flagged."** *Files:* `lib/docaudit.py`, `tests/test_docaudit.py`,
-  `tests/test_docaudit_e2e.py`. *AC:* `signature-names` (warn; any backticked span outside fences; `...` functions exempt) and
+  `tests/test_docaudit_e2e.py`. *AC:* `signature-names` (warn; backticked span that is the whole first cell of a table row; `...` functions exempt) and
   `signature-arity` (warn; positionals > formals, **only for functions with no `...`** — variadic functions exempt, positive control: `f(x, ...)` called as `f(1, 2, 3)` is not flagged); unchecked-reason accounting (`no-usage`, `method`, `re-export`)
   and the `checked N of M` summary line; defect fixture flags `joint_effects(x, theta)`, clean fixture has 0 `error`, the fixed
   refcard does **not** flag `bootstrap_mediation(f, …)`; known-answer test green; manifest `joint_effects` row `firm`. *Verify:* same

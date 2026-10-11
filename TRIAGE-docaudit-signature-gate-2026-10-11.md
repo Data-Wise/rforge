@@ -47,7 +47,7 @@ gets a regression test and, if it is `error`-severity, the same demotion rule.
 
 | # | Package | Check | Severity | Location | Finding | Triage |
 |---|---|---|---|---|---|---|
-| H1 | medfit | `signature-names` | warn | `vignettes/articles/model-native.qmd:23` | Listing `fit_sem(syntax, data)` names `syntax`; formals are `(model, data, information, n_starts, control, sampling_weights, se_type)`. **Likely a call example, not a signature** (section 6) | ☐ true ☐ false ☐ won't-fix |
+| H1 | medfit | `signature-names` | warn | `vignettes/articles/model-native.qmd:23` | **Resolved 2026-10-11 by decision A (section 7): no longer reported.** Was:  Listing `fit_sem(syntax, data)` names `syntax`; formals are `(model, data, information, n_starts, control, sampling_weights, se_type)`. **Likely a call example, not a signature** (section 6) | ✅ false (call example), class fixed |
 | H2 | medsim | `signature-named-arg` | **error** | `vignettes/missing-data-mediation.qmd:70, 84, 92` | 7 findings over 4 calls: `medsim_amputate(vars=, rate=)`, `medsim_scenario_missing(rate=, skew=, kurtosis=)`, `medsim_scenario_missing_grid(rates=, skew=)`. Verified against `R/dgm_amputate.R` at `d7b9b75`: the function has no `vars` or `rate` formal | ☐ true ☐ false ☐ won't-fix |
 
 ## 2. History replay (first-parent, checks: `signature-named-arg`, `signature-arity`)
@@ -82,7 +82,7 @@ R3 and R4 reproduce the SPEC's claim ("5 hits, all real"); R1/R2 were not in the
 - [x] Adversarial review #2 on the signature logic (two read-only agents; both had no shell, so their findings were static and re-verified by tests here; see section 5)
 - [ ] Hold-out triage by you (table above)
 - [ ] No `error`-severity false positive (R3, R4 and H2 are the `error` rows; all three look true, all await your call)
-- [ ] No unresolved false-positive class (**open: H1**, the call-example-vs-listing class; options in section 6)
+- [x] No unresolved false-positive class (H1's class fixed by narrowing `signature-names`, section 7)
 
 Blocked by: any `error`-severity false positive, an unresolved false-positive class, a red fixture, a raised exception.
 
@@ -149,3 +149,14 @@ About half of the exports in each package (variadic, no usage, methods) are not 
 
 **6.4 Process note.** Both adversarial reviewers were `feature-dev:code-reviewer`, which has no shell, so they could only read the code. Any further review should use
 an agent type with Bash so it can run its repro cases.
+
+## 7. Decision A applied (2026-10-11)
+
+You chose option A: `signature-names` now judges only backticked calls that are the whole first cell of a Markdown table row.
+
+- **Code:** `Region.first_cell` set in `extract_regions`; `check_region` requires it for the listing check (`lib/docaudit.py`).
+- **Tests:** call examples outside a first cell are not judged (the `fit_sem(syntax, data)` case); `extract_regions` marks only whole-first-cell spans; an end-to-end package has a refcard row flagged and a Routes row not. `pytest tests` 726 passed, 4 skipped; `test-all.sh` 45 of 45.
+- **Re-measured:** known-answer and `recall --scope signature` unchanged (1 of 1 caught). Over 7 packages at `HEAD`: medfit now 0 findings (was 1), medsim 7 (all `error`, true), the rest 0. `signature-names` history replay on medfit: the two refcard findings only.
+- **Docs:** SPEC rule row, plan T6 and the ORCHESTRATE item updated with the narrowing and its reason.
+
+**Still yours to tick:** H2 (medsim, `error`, verified true against the R source), R3 and R4 (`error`, history only, true). Then precision is recorded and the gate closes.

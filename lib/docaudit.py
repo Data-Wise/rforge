@@ -5,8 +5,9 @@ the package actually exports, which is what a manual doc audit looks for:
 
 - ``signature-named-arg`` (error): a named argument in a documented call to an
   exported function is not one of its formals (e.g. ``BootstrapResult(converged = TRUE)``).
-- ``signature-names`` (warn): a backticked listing such as ``joint_effects(x, theta)``
-  names bare arguments that are not formals.
+- ``signature-names`` (warn): a signature listing, i.e. a backticked call that is the first cell of a
+  Markdown table row (``| `joint_effects(x, theta)` | … |``), names bare arguments that are not formals.
+  Spans elsewhere are call examples whose identifiers are variables, so they are not judged.
 - ``signature-arity`` (warn): a call passes more positional arguments than the
   function has formals.
 
@@ -176,6 +177,7 @@ class Region:
     line: int  # 1-based line of the region's first character
     text: str
     bare: bool = False  # unlabeled fence: may be console output or a transcript, so findings are warnings
+    first_cell: bool = False  # inline span that is the whole first cell of a Markdown table row (a signature column)
 
 
 def doc_files(root: Path) -> Iterator[Path]:
@@ -211,7 +213,8 @@ def extract_regions(text: str) -> list[Region]:
                 bare = not m.group(2).strip()
                 continue
             for span in re.finditer(r"`([^`\n]+)`", line):
-                regions.append(Region("inline", n, span.group(1)))
+                first = bool(re.fullmatch(r"\s*\|\s*", line[:span.start()]) and re.match(r"\s*\|", line[span.end():]))
+                regions.append(Region("inline", n, span.group(1), first_cell=first))
         elif m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) and not m.group(2).strip():
             if fence_r:
                 regions.append(Region("fence", start, "\n".join(buf), bare))
@@ -292,7 +295,7 @@ def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: fro
         if not forwards_dots and positional > len(formals):
             findings.append(_finding("signature-arity", "warn", rel, line, fn, None,
                                      f"`{fn}()` takes {len(formals)} argument(s) but the call passes {positional} positionally (formals: {shown})"))
-        if region.kind == "inline" and re.fullmatch(rf"\s*(?:{_IDENT}::)?{re.escape(fn)}\(.*\)\s*", masked, re.S):
+        if region.kind == "inline" and region.first_cell and re.fullmatch(rf"\s*(?:{_IDENT}::)?{re.escape(fn)}\(.*\)\s*", masked, re.S):
             for a in args:
                 if re.fullmatch(_IDENT, a) and a not in formals:
                     findings.append(_finding("signature-names", "warn", rel, line, fn, a,
