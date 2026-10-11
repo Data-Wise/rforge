@@ -133,9 +133,9 @@ fixture packages and quote the transcript (a run that can fail); record it for t
 
 ### Phase 4 — Ship
 
-- [ ] **T12 [S] Registration gates for the new public module.** *Files:* `scripts/gen_lib_reference.py` (`MODULES`), `mkdocs.yml` (nav), `docs/lib-modules.md`,
+- [x] **T12 [S] Registration gates for the new public module.** *Files:* `scripts/gen_lib_reference.py` (`MODULES`), `mkdocs.yml` (nav), `docs/lib-modules.md`,
   `tests/cli/automated-tests.sh` (`PUBLIC_MODULES`), `docs/reference/docaudit.md` (generated). *Verify:* `python3 scripts/gen_lib_reference.py --check`.
-- [ ] **T13 [S] Test-all, counts and mirror.** *Files:* `tests/test-all.sh` (CLI smoke + harness smoke `run` lines; add `test_docaudit.py` to `lib_pytest`),
+- [x] **T13 [S] Test-all, counts and mirror.** *Files:* `tests/test-all.sh` (CLI smoke + harness smoke `run` lines; add `test_docaudit.py` to `lib_pytest`),
   `CLAUDE.md` (check count at :136 and public-modules list at :101), `AGENTS.md` (mirror), `docs/contributing.md:94`. *AC:* the exact new
   check count is stated and identical in all three places. *Verify:* `bash tests/test-all.sh`; `version_sync.py --check`. *Deps:* T12.
 - [ ] **T14 [S] Docs sweep A — stale "clean docs:check" meaning (1).** *Files:* `docs/command-cards.md:86`, `docs/REFCARD.md:41,380`, `docs/quickstart.md:357`,

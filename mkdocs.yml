@@ -152,6 +152,7 @@ nav:
       - "sitelint": reference/sitelint.md
       - "tidyaudit": reference/tidyaudit.md
       - "rstatus": reference/rstatus.md
+      - "docaudit": reference/docaudit.md
   - Project:
     - Architecture: architecture.md
     - Hooks & Skills: hooks-and-skills.md

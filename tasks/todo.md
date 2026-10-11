@@ -52,8 +52,8 @@
 
 ## Phase 4 — Ship
 
-- [ ] T12 [S] Registration gates for the new public module (`MODULES`, mkdocs nav, `lib-modules.md`, `PUBLIC_MODULES`, reference page)
-- [ ] T13 [S] `test-all.sh` lines + exact check count in `CLAUDE.md`, `AGENTS.md`, `docs/contributing.md`; `lib_pytest` list
+- [x] T12 [S] Registration gates for the new public module (`MODULES`, mkdocs nav, `lib-modules.md`, `PUBLIC_MODULES`, reference page)
+- [x] T13 [S] `test-all.sh` lines + exact check count in `CLAUDE.md`, `AGENTS.md`, `docs/contributing.md`; `lib_pytest` list
 - [ ] T14 [S] Docs sweep A — stale "clean docs:check" meaning (5 files)
 - [ ] T15 [S] Docs sweep B — tutorials, `commands/complete.md`, `description-sync.md`
 - [ ] T16 [M] Guide, remove the unbacked `claude_md_budget` claim, "Validates" list, CHANGELOG `[Unreleased]`
