@@ -174,7 +174,7 @@ _(no docstring)_
 ### `local_definitions()`
 
 ```python
-def local_definitions(regions: 'list[Region]') -> 'frozenset'
+def local_definitions(regions: 'list[Region]', skipped: 'Optional[set]' = None) -> 'frozenset'
 ```
 
 Names a doc defines itself (`f <- function(...)`, `assign("f", ...)`, a `function(f)` parameter); calls to
