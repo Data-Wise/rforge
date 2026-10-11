@@ -41,4 +41,4 @@ def test_controls_are_silent_and_default_path_is_cwd(tmp_path):
 
 def test_non_package_path_reports_and_exits_zero(tmp_path):
     p = cli("--path", str(tmp_path), home=tmp_path)
-    assert p.returncode == 0 and "not an R package" in p.stdout
+    assert p.returncode == 0 and "not inside an R package" in p.stdout

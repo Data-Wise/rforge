@@ -387,3 +387,9 @@ def test_subprocess_audit_rejects_a_report_that_audited_nothing(fake_audit):
     tree = fake_audit('{"findings": [], "audited": false, "messages": ["not an R package (no DESCRIPTION at x)"]}')
     with pytest.raises(replay.AuditCrashed, match="nothing was audited"):
         replay.subprocess_audit(tree)
+
+
+def test_subprocess_audit_rejects_a_report_for_a_different_package(fake_audit):
+    tree = fake_audit('{"findings": [], "audited": true, "scope": {"root": "/somewhere/else"}}')
+    with pytest.raises(replay.AuditCrashed, match="not the extracted tree"):
+        replay.subprocess_audit(tree)

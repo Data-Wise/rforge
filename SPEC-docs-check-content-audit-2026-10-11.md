@@ -145,7 +145,7 @@ CLI: `python3 -m lib.docaudit [--path P] [--eco] [--since TAG] [--run-examples] 
 | B | `signature-named-arg` | error (D7) | Named arg `f(arg = …)` not among the formals, for an exported function **without `...`** in its formals |
 | B | `signature-names` (was `signature-listing`) | warn | For an exported function **without `...`**, a bare-identifier argument in a backticked `fn(…)` span that is **the whole first cell of a Markdown table row** (a signature column, as in a reference card) and is not a formal. **Narrowed 2026-10-11 (hold-out triage, option A):** the original "any backticked span outside fences" rule flagged call examples such as medfit's `` `fit_sem(syntax, data)` `` in a Routes cell, where `syntax` is a variable (the same cell has `fit_mediation(model = syntax, …)`). Spans elsewhere are call examples and are not judged; `signature-named-arg` and `signature-arity` still cover every call. It still cannot tell a stale name from a placeholder *within* a signature column, so it is a candidate generator |
 | B | `signature-arity` | warn | Positional args exceed the formals (e.g. `joint_effects(object, estimates, "bca")`); **only for functions with no `...` formal** — a variadic `f(x, ...)` accepts `f(1, 2, 3)`, so it is exempt, like the other two signature checks (positive control in the fixtures). The "ordered subset" rule of v1 of this SPEC is **dropped**: 18 of 645 real calls (2.8%) list named args out of formal order |
-| C | `coverage` | info (warn if an export appears in no doc) | Export × doc matrix, a *report*, not a defect detector; `--since TAG` restricts it to exports/Rd files added since the tag (`git diff --name-status TAG..HEAD` on `NAMESPACE` and `man/`). **No engine enumeration in v1** |
+| C | `coverage` | warn (per export that appears in no doc); **runs only with `--since TAG`** (decided 2026-10-11: unrestricted it flagged 8-32 exports in 5 of 6 real packages) | Export × doc matrix (`summary.coverage_matrix`), a *report*, not a defect detector; `--since TAG` restricts it to exports/Rd files added since the tag (`git diff --name-status TAG..HEAD` on `NAMESPACE` and `man/`). **No engine enumeration in v1** |
 | D | `scannability` | info | Defaults (all configurable): paragraph over **110 words**; H2 section over **800 words with fewer than 3 H3**; "Next Steps" not last. Known: medfit `methods.qmd` (6 paragraphs over 100 words, max 217) is flagged forever — allowlist it |
 | B (A2) | `examples-output` | error (D7) | See `--run-examples` contract |
 | B (A2) | `examples-error`, `examples-shape` | warn | See contract |
@@ -418,6 +418,7 @@ Run against the SPEC and `tasks/plan.md`; verdict `needs-attention`, three findi
 | 46 | signature | MEDIUM | (Codex re-review 3, I1) Getter/setter usage overwrote the getter formals (false `error`) | Skip replacement usage lines and calls |
 | 47 | completeness | MEDIUM | (Codex re-review 3, I2) Unreadable `vignettes/`/`man/` directories read as clean | `os.walk(onerror)`/`scandir` notes; `incomplete` |
 | 48 | completeness | MEDIUM | (Codex re-review 3, I3) A missing package read as clean | `audited` flag; harness rejects `audited: false` |
+| 49 | coverage | MEDIUM | (Checkpoint B close) `coverage` warned on 8-32 exports per package without `--since` | Runs only with `--since` |
 
 ## Appendix
 

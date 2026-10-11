@@ -117,7 +117,7 @@ appendix. **Blocked by:** red fixture or missed planted defect; any raised excep
 
 ### Phase 3 — User-facing surface
 
-- [ ] **T10 [M] "CLI is complete and scope-correct."** *Files:* `lib/docaudit.py`, `tests/test_docaudit.py`, `tests/test_docaudit_e2e.py`.
+- [x] **T10 [M] "CLI is complete and scope-correct."** *Files:* `lib/docaudit.py`, `tests/test_docaudit.py`, `tests/test_docaudit_e2e.py`.
   *AC:* `max_severity`, `status` = `warn` for any warn/error, `--fail-on none|warn|error` (exit code only), `info` hidden unless
   `--detailed`, D0 scope (walk up to `DESCRIPTION`; manifest-or-`--eco` for sweeps; hybrid audits nested; resolved scope is the
   first output line; subdirectory, one-package-ecosystem-root and no-manifest cases tested), `audit_ecosystem`, `format_text`/`format_json`.

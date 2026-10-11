@@ -245,3 +245,7 @@ You ticked H2, R3 and R4 as **true**; Checkpoint B is closed. T7-T9 landed in `l
 - **Recall (`--scope a1`):** 2 of 2 firm caught (refcard row, Next Steps row, now locked `firm`); the two conditional scannability rows are also caught at the default thresholds.
 
 **Open decision (noise):** `coverage` is `warn` per SPEC, so it fires without `--since`. At `HEAD`: medsim 32 of 63 exports unmentioned, probmed 15 of 22, rmediation 8 of 19, medrobust 8 of 23, missingmed 1, medfit 0. Escape hatch: allowlist `NAMESPACE::coverage`. Options: keep as specced, run `coverage` only with `--since`, or demote to `info`.
+
+## 13. `coverage` only with `--since`; T10 built (2026-10-11)
+
+Decision (yours): `coverage` runs only with `--since`. T10 adds `resolve_scope` (D0: walk-up, manifest-or-`--eco` sweep, hybrid nested, name lookup), `audit`, `audit_ecosystem`, `--fail-on`, `--detailed` (info hidden and counted in `summary.info_hidden`), the scope line as first text output, `format_text`/`format_json`. The harness now passes `--detailed` and rejects a report whose scope root is not the extracted tree (D0 walk-up must never audit a different package). pytest 848 passed; recall 2 of 2 firm; replay unchanged (medfit 1 error + 2 warn, medrobust 4, medsim 7); 10 mutation checks red.

@@ -116,7 +116,7 @@ def subprocess_audit(tree: Path, timeout: int = 120) -> list:
         env = {**os.environ, "HOME": home, "PYTHONDONTWRITEBYTECODE": "1"}
         try:
             proc = subprocess.run(
-                [sys.executable, "-m", "lib.docaudit", "--path", str(tree), "--format", "json"],
+                [sys.executable, "-m", "lib.docaudit", "--path", str(tree), "--format", "json", "--detailed"],
                 cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=timeout,
             )
         except subprocess.TimeoutExpired as exc:
@@ -130,6 +130,9 @@ def subprocess_audit(tree: Path, timeout: int = 120) -> list:
         raise AuditCrashed(f"unusable output: {proc.stderr.strip()[-300:] or exc}") from exc
     if report.get("audit_failed"):  # an audit that did not complete is not a clean audit
         raise AuditCrashed("audit failed: " + "; ".join(report.get("messages", [])))
+    scope = (report.get("scope") or {}).get("root")
+    if scope is not None and Path(scope).resolve() != Path(tree).resolve():  # D0 walked up to a different package
+        raise AuditCrashed(f"audited {scope}, not the extracted tree {tree}")
     if report.get("audited") is False:  # e.g. no DESCRIPTION: nothing was looked at
         raise AuditCrashed("nothing was audited: " + "; ".join(report.get("messages", [])))
     if report.get("incomplete"):  # a skipped region means "no finding" proves nothing

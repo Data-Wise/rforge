@@ -12,8 +12,7 @@ the package actually exports, which is what a manual doc audit looks for:
   function has formals.
 - ``scannability`` (info): a paragraph, an H2 section or a "Next Steps" heading that is hard to scan
   (thresholds are keyword arguments / CLI flags).
-- ``coverage`` (warn): an export that no README/vignette mentions; ``--since TAG`` restricts the report
-  to exports added since the tag. The export x doc matrix is in ``summary["coverage_matrix"]``.
+- ``coverage`` (warn, only with ``--since TAG``): an export added since the tag that no README/vignette mentions. The export x doc matrix is in ``summary["coverage_matrix"]``.
 
 Findings in a file can be suppressed with ``docs.allowlist`` in ``.rforge.yaml`` (entries ``<relpath>`` or
 ``<relpath>::<check-id>``).
@@ -25,7 +24,11 @@ how many exports that covers ("checked N of M").
 
 CLI::
 
-    python3 -m lib.docaudit --path <package-dir> [--format text|json]
+    python3 -m lib.docaudit [--path <package-dir-or-name>] [--eco] [--detailed] [--since TAG]
+        [--fail-on none|warn|error] [--format text|json]
+
+Scope (D0): walks up from --path (default: the cwd) to the nearest DESCRIPTION; with none, sweeps the ecosystem
+only if a .rforge.yaml manifest exists or --eco is given. The first output line states the resolved scope.
 
 Run as a package module (``python3 -m lib.docaudit``), never as a script.
 """
@@ -43,7 +46,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator, Optional
 
-from .discovery import _read_allowlist
+from .discovery import _KIND_DECL_RE, _read_allowlist, detect_ecosystem, find_r_packages
 from .s7review import _mask_strings_and_comments
 
 IMPLEMENTED_CHECKS = frozenset({"signature-named-arg", "signature-names", "signature-arity", "scannability", "coverage"})
@@ -738,12 +741,11 @@ def audit_package(path: str | Path = ".", *, since: Optional[str] = None, max_pa
     try:
         findings, api, notes, texts = _audit(root, {"max_paragraph_words": max_paragraph_words,
                                                     "max_section_words": max_section_words, "min_h3": min_h3})
-        covered = api.exports - api.reexports
+        covered: set = set()  # coverage is a --since report: without a tag it would flag every undocumented export
         if since is not None:
-            added, why = exports_added_since(root, since, covered)
+            added, why = exports_added_since(root, since, api.exports - api.reexports)
             if added is None:
                 notes.append(f"--since {since}: {why}; coverage skipped")
-                covered = set()
             else:
                 covered = added
         matrix = mention_matrix(covered, texts)
@@ -770,11 +772,144 @@ def audit_package(path: str | Path = ".", *, since: Optional[str] = None, max_pa
     return _envelope(unique, [_summary_line(cov, api.export_pattern), *notes], cov, incomplete=bool(notes))
 
 
+@dataclass
+class Scope:
+    """What `audit` looks at (D0). ``mode``: package | hybrid | ecosystem | none."""
+
+    mode: str
+    root: str
+    packages: list
+    how: str = ""  # why this scope: "walked up from X", "--eco", "manifest", ...
+    reason: str = ""  # for mode "none"
+
+    def line(self) -> str:
+        if self.mode == "none":
+            return f"scope: none \u2014 {self.reason}"
+        how = f" ({self.how})" if self.how else ""
+        if self.mode == "package":
+            return f"scope: package {self.packages[0].name} at {self.packages[0]}{how}"
+        if self.mode == "hybrid":
+            return f"scope: hybrid root {self.packages[0].name} + {len(self.packages) - 1} nested package(s) at {self.root}{how}"
+        return f"scope: ecosystem of {len(self.packages)} package(s) under {self.root}{how}"
+
+    def to_dict(self) -> dict:
+        return {"mode": self.mode, "root": self.root, "packages": [str(p) for p in self.packages],
+                "how": self.how, "line": self.line()}
+
+
+_NO_SCOPE = "not inside an R package \u2014 pass a package path or `--eco`"
+
+
+def _nearest_package(start: Path) -> Optional[Path]:
+    for d in (start, *start.parents):
+        if (d / "DESCRIPTION").is_file():
+            return d
+    return None
+
+
+def _hybrid_nested(root: Path) -> list:
+    config = root / ".rforge.yaml"
+    try:
+        if not (config.is_file() and _KIND_DECL_RE.search(config.read_text(encoding="utf-8", errors="replace"))):
+            return []
+    except OSError:
+        return []
+    nested: list[Path] = []
+    for child in sorted(p for p in root.iterdir() if p.is_dir() and not p.name.startswith(".")):
+        nested += [Path(pk.path) for pk in find_r_packages(child, max_depth=2)]
+    return nested
+
+
+def _sweep(base: Path, how: str) -> Scope:
+    pkgs = [Path(pk.path) for pk in find_r_packages(base)]
+    if not pkgs:
+        return Scope("none", str(base), [], reason=f"no R packages found under {base}")
+    return Scope("ecosystem", str(base), pkgs, how)
+
+
+def resolve_scope(path: str | Path = ".", eco: bool = False) -> Scope:
+    """D0: walk up from `path` to the nearest DESCRIPTION and audit that package; with no DESCRIPTION, sweep the
+    ecosystem only if a `.rforge.yaml` manifest exists or `eco` is set. `path` may also be a package name found
+    under the cwd. A `kind: hybrid` root also audits its nested packages."""
+    given = Path(path)
+    if not given.exists():
+        named = [Path(pk.path) for pk in find_r_packages(Path.cwd()) if str(path) in (pk.name, Path(pk.path).name)]
+        if not named:
+            return Scope("none", str(given), [], reason=f"no package or path named `{path}`")
+        given = named[0]
+    start = (given if given.is_dir() else given.parent).resolve()
+    pkg = _nearest_package(start)
+    if eco:
+        base = pkg.parent if pkg is not None else start
+        return _sweep(base, "--eco")
+    if pkg is not None:
+        nested = _hybrid_nested(pkg)
+        how = "" if pkg == start else f"walked up from {start}"
+        if nested:
+            return Scope("hybrid", str(pkg), [pkg, *nested], how)
+        return Scope("package", str(pkg), [pkg], how)
+    try:
+        has_manifest = detect_ecosystem(start).manifest_path is not None
+    except OSError:
+        has_manifest = False
+    if has_manifest:
+        return _sweep(start, "manifest")
+    return Scope("none", str(start), [], reason=_NO_SCOPE)
+
+
+def _hide_info(report: dict) -> dict:
+    """Drop `info` findings (counted in ``summary["info_hidden"]``) and recompute status/max_severity."""
+    shown = [f for f in report["findings"] if f["severity"] != "info"]
+    summary = {**report["summary"], "info_hidden": len(report["findings"]) - len(shown)}
+    top = max((f["severity"] for f in shown), key=_SEVERITY_ORDER.get, default="none")
+    status = report["status"] if report.get("audit_failed") else ("warn" if top in ("warn", "error") else "ok")
+    return {**report, "findings": shown, "summary": summary, "max_severity": top, "status": status}
+
+
+def audit(path: str | Path = ".", *, eco: bool = False, detailed: bool = False, since: Optional[str] = None,
+          max_paragraph_words: int = 110, max_section_words: int = 800, min_h3: int = 3) -> dict:
+    """Audit the package (or packages) D0 resolves `path` to. `info` findings appear only when `detailed`."""
+    scope = resolve_scope(path, eco)
+    if not scope.packages:
+        return {**_envelope([], [scope.reason], {}, audited=False), "scope": scope.to_dict()}
+    reports = [(p, audit_package(p, since=since, max_paragraph_words=max_paragraph_words,
+                                 max_section_words=max_section_words, min_h3=min_h3)) for p in scope.packages]
+    if not detailed:
+        reports = [(p, _hide_info(r)) for p, r in reports]
+    if len(reports) == 1:
+        return {**reports[0][1], "scope": scope.to_dict()}
+    findings, messages, packages = [], [], []
+    for p, r in reports:
+        name = _package_name(p, []) or p.name
+        findings += [{**f, "package": name} for f in r["findings"]]
+        messages += [f"[{name}] {m}" for m in r["messages"]]
+        packages.append({"name": name, "path": str(p), "status": r["status"], "max_severity": r["max_severity"],
+                         "incomplete": r["incomplete"], "audited": r["audited"], "summary": r["summary"]})
+    top = max((f["severity"] for f in findings), key=_SEVERITY_ORDER.get, default="none")
+    summary = {"packages": len(reports),
+               **{k: sum(r["summary"].get(k, 0) for _, r in reports) for k in ("exports", "checked", "suppressed", "info_hidden")}}
+    return {"kind": "docaudit", "status": "warn" if top in ("warn", "error") or any(r.get("audit_failed") for _, r in reports) else "ok",
+            "max_severity": top, "findings": findings, "messages": messages, "summary": summary,
+            "incomplete": any(r["incomplete"] for _, r in reports), "audited": all(r["audited"] for _, r in reports),
+            "engine_missing": [], "packages": packages, "scope": scope.to_dict()}
+
+
+def audit_ecosystem(path: str | Path = ".", **kwargs) -> dict:
+    """`audit` with the ecosystem sweep forced."""
+    return audit(path, eco=True, **kwargs)
+
+
+def format_json(report: dict) -> str:
+    return json.dumps(report, indent=2)
+
+
 def format_text(report: dict) -> str:
-    lines = []
+    lines = [report["scope"]["line"]] if "scope" in report else []
     for f in report["findings"]:
-        lines.append(f"{f['severity']:<5} {f['check']:<20} {f['file']}:{f['line']}  {f['message']}")
-    lines += report["messages"]
+        where = f"{f['package']}/{f['file']}" if "package" in f else f["file"]
+        lines.append(f"{f['severity']:<5} {f['check']:<20} {where}:{f['line']}  {f['message']}")
+    scope_line = report["scope"]["line"] if "scope" in report else ""
+    lines += [m for m in report["messages"] if not scope_line.endswith(m)]
     if not report["findings"]:
         lines.append("no findings")
     return "\n".join(lines)
@@ -782,17 +917,23 @@ def format_text(report: dict) -> str:
 
 def main(argv: Optional[list] = None) -> int:
     ap = argparse.ArgumentParser(prog="python3 -m lib.docaudit", description=__doc__.split("\n")[0])
-    ap.add_argument("--path", default=".")
+    ap.add_argument("--path", default=".", help="package path or name (default: the cwd; walks up to a DESCRIPTION)")
+    ap.add_argument("--eco", action="store_true", help="sweep the whole ecosystem")
+    ap.add_argument("--detailed", action="store_true", help="also print `info` findings")
     ap.add_argument("--format", choices=["text", "json"], default="text")
-    ap.add_argument("--since", metavar="TAG", help="restrict the coverage report to exports added since TAG")
+    ap.add_argument("--fail-on", choices=["none", "warn", "error"], default="none",
+                    help="exit 1 when a finding at or above this severity exists (default: never)")
+    ap.add_argument("--since", metavar="TAG", help="coverage report: exports added since TAG")
     ap.add_argument("--max-paragraph-words", type=int, default=110)
     ap.add_argument("--max-section-words", type=int, default=800)
     ap.add_argument("--min-h3", type=int, default=3, help="H3 headings an over-long H2 section needs")
     args = ap.parse_args(argv)
-    report = audit_package(args.path, since=args.since, max_paragraph_words=args.max_paragraph_words,
-                           max_section_words=args.max_section_words, min_h3=args.min_h3)
-    print(json.dumps(report, indent=2) if args.format == "json" else format_text(report))
-    return 0
+    report = audit(args.path, eco=args.eco, detailed=args.detailed, since=args.since,
+                   max_paragraph_words=args.max_paragraph_words, max_section_words=args.max_section_words,
+                   min_h3=args.min_h3)
+    print(format_json(report) if args.format == "json" else format_text(report))
+    level = {"none": 99, "warn": 1, "error": 2}[args.fail_on]
+    return 1 if _SEVERITY_ORDER.get(report["max_severity"], -1) >= level else 0
 
 
 if __name__ == "__main__":

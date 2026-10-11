@@ -152,27 +152,36 @@ def test_allowlist_normalizes_leading_dot_slash_and_backslashes(tmp_path):
 
 def test_unmentioned_export_is_warn_and_mentioned_is_not(tmp_path):
     pkg = _pkg(tmp_path, docs="Call `f(1)` to start.\n")
-    f = checks(docaudit.audit_package(pkg)["findings"], "coverage")
+    f = checks(docaudit.audit_package(pkg, since=tagged(pkg))["findings"], "coverage")
     assert [(x["function"], x["severity"], x["file"]) for x in f] == [("g", "warn", "NAMESPACE")]
 
 
 def test_mention_is_a_whole_token_not_a_substring(tmp_path):
     pkg = _pkg(tmp_path, exports=("f", "ff"), docs="use ff(1) and my.f here\n")
-    assert [x["function"] for x in checks(docaudit.audit_package(pkg)["findings"], "coverage")] == ["f"]
+    assert [x["function"] for x in checks(docaudit.audit_package(pkg, since=tagged(pkg))["findings"], "coverage")] == ["f"]
 
 
 def test_coverage_matrix_in_summary_lists_files(tmp_path):
     pkg = _pkg(tmp_path, docs="f(1)\n")
     (pkg / "vignettes").mkdir()
     (pkg / "vignettes" / "v.Rmd").write_text("g(1) and f(2)\n")
-    m = docaudit.audit_package(pkg)["summary"]["coverage_matrix"]
+    m = docaudit.audit_package(pkg, since=tagged(pkg))["summary"]["coverage_matrix"]
     assert m == {"f": ["README.md", "vignettes/v.Rmd"], "g": ["vignettes/v.Rmd"]}
 
 
 def test_reexports_and_unexported_are_not_covered(tmp_path):
     pkg = _pkg(tmp_path, docs="nothing\n")
     (pkg / "man" / "reexports.Rd").write_text("\\alias{g}\n")
-    assert [x["function"] for x in checks(docaudit.audit_package(pkg)["findings"], "coverage")] == ["f"]
+    assert [x["function"] for x in checks(docaudit.audit_package(pkg, since=tagged(pkg))["findings"], "coverage")] == ["f"]
+
+
+def tagged(pkg):
+    """Tag a commit that has no NAMESPACE, so every export counts as added since it."""
+    git(pkg, "init", "-q")
+    git(pkg, "add", "DESCRIPTION")
+    git(pkg, "commit", "-qm", "base")
+    git(pkg, "tag", "v0")
+    return "v0"
 
 
 def git(pkg, *a):
@@ -234,7 +243,7 @@ def test_since_rejects_option_like_refs(tmp_path):
 
 def test_cli_since_flag_and_threshold_flags(tmp_path, capsys):
     pkg = _pkg(tmp_path, docs=f"# T\n\n{words(60)}\n")
-    docaudit.main(["--path", str(pkg), "--format", "json", "--max-paragraph-words", "50"])
+    docaudit.main(["--path", str(pkg), "--format", "json", "--detailed", "--max-paragraph-words", "50"])
     out = capsys.readouterr().out
     assert '"scannability"' in out
 
