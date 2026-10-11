@@ -763,7 +763,7 @@ Regenerate `man/*.Rd` documentation and `NAMESPACE` via `roxygen2::roxygenize()`
 - Runs `roxygen2::roxygenize()` (the blessed regeneration path — hand-edits to `man/*.Rd` are blocked by the PreToolUse hook)
 - Reports success and recommends reviewing `git diff man/ NAMESPACE`
 
-**Related commands:** `/rforge:r:check` (verify after regenerating), `/rforge:docs:check` (detect drift)
+**Related commands:** `/rforge:r:check` (verify after regenerating), `/rforge:docs:check` (audit docs against the API)
 
 ---
 
