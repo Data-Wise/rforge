@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   token (#84).
 - `/rforge:finish` overrides `.STATUS`'s `version:` only on real drift, so a `--write` no longer
   strips the annotations from a `version:` line that already matches DESCRIPTION.
+- `/rforge:finish` still adds `version:` from DESCRIPTION when an existing `.STATUS` has none
+  (the drift-only override above had stopped doing so); the rule now lives in
+  `lib.rstatus.version_overrides`.
 
 ---
 

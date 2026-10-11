@@ -43,7 +43,8 @@ current state — the rforge counterpart to craft's `/craft:finish` and savant's
    (annotations like `0.7.0 (released …)` are ignored) disagrees with `DESCRIPTION`'s actual
    `Version`, flag it in the diff — `.STATUS`'s `version:` field is corrected to match
    DESCRIPTION (never the reverse; DESCRIPTION is always the source of truth). When there is
-   no drift, `version:` is left untouched so its annotations survive.
+   no drift, `version:` is left untouched so its annotations survive; when `.STATUS` has no
+   `version:` line at all, it is added from DESCRIPTION.
 6. Show the diff and **wait for the user's explicit reply confirming it** before writing —
    the same "wait for explicit confirmation" gate `/rforge:restore`'s scaffold-offer uses.
    `--write` on the invocation selects write-mode (vs. dry-run); it is not itself the
@@ -71,7 +72,7 @@ above belong in the diff.
 Compute the diff via the Python API before presenting it:
 
 ```python
-from lib.rstatus import build_recap, read_rstatus, apply_updates, diff_rstatus
+from lib.rstatus import build_recap, read_rstatus, apply_updates, diff_rstatus, version_overrides
 
 recap = build_recap(path)
 current = read_rstatus(path)
@@ -85,11 +86,11 @@ current = read_rstatus(path)
 intended = apply_updates(
     current,
     updated=today,
-    # Override `version` ONLY on drift. `current.version` may carry annotations
-    # ("0.7.0 (released …)"); passing DESCRIPTION's bare "0.7.0" unconditionally
-    # would diff as a real change and --write would strip them (same bare-override
-    # trap as above, one field down).
-    **({"version": recap["description"]["version"]} if recap["version_drift"] else {}),
+    # Override `version` only when the mirror is absent or has drifted.
+    # `current.version` may carry annotations ("0.7.0 (released …)"); passing
+    # DESCRIPTION's bare "0.7.0" unconditionally would diff as a real change and
+    # --write would strip them (same bare-override trap as above, one field down).
+    **version_overrides(recap, current),
     # next=..., blockers=..., last_check=..., cran_status=... — only if step 2's
     # grounding rule found something real to report; omit entirely otherwise.
 )
