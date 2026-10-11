@@ -910,7 +910,12 @@ def format_text(report: dict) -> str:
         lines.append(f"{f['severity']:<5} {f['check']:<20} {where}:{f['line']}  {f['message']}")
     scope_line = report["scope"]["line"] if "scope" in report else ""
     lines += [m for m in report["messages"] if not scope_line.endswith(m)]
-    if not report["findings"]:
+    if report.get("audited") is False:
+        lines.append("NOT AUDITED: nothing was looked at, so this is not a clean result")
+    elif report.get("incomplete"):
+        lines.append("INCOMPLETE: part of the package could not be audited (see above); "
+                     + ("the findings listed are a lower bound" if report["findings"] else "do not read this as clean"))
+    elif not report["findings"]:
         lines.append("no findings")
     return "\n".join(lines)
 

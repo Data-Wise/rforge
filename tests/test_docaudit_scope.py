@@ -210,3 +210,37 @@ def test_cli_eco_flag_and_detailed_flag(tmp_path):
 def test_cli_not_in_a_package_exits_zero_with_hint(tmp_path):
     p = run_cli("--path", str(tmp_path), cwd=ROOT, home=tmp_path)
     assert p.returncode == 0 and p.stdout.splitlines()[0].startswith("scope: none")
+
+
+# ───────────────────────── text must not read as clean (Checkpoint D trial) ─────────────────────────
+
+
+def test_text_never_says_no_findings_for_an_unaudited_run(tmp_path):
+    out = docaudit.format_text(docaudit.audit(tmp_path))
+    assert "no findings" not in out and "NOT AUDITED" in out
+
+
+def test_text_never_says_no_findings_for_an_incomplete_audit(tmp_path):
+    pkg = mkpkg(tmp_path / "pkg", docs="fine\n")
+    (pkg / "vignettes").mkdir()
+    real = os.scandir
+
+    def deny(path):
+        if str(path).endswith("vignettes"):
+            raise PermissionError(13, "denied", str(path))
+        return real(path)
+
+    import unittest.mock as mock
+    with mock.patch("os.scandir", deny):
+        out = docaudit.format_text(docaudit.audit(pkg))
+    assert "no findings" not in out and "INCOMPLETE" in out
+
+
+def test_text_says_no_findings_only_for_a_complete_clean_audit(tmp_path):
+    out = docaudit.format_text(docaudit.audit(mkpkg(tmp_path / "pkg", docs="fine\n")))
+    assert "no findings" in out and "INCOMPLETE" not in out and "NOT AUDITED" not in out
+
+
+def test_text_for_an_ecosystem_rollup_flags_incomplete_members(tmp_path):
+    report = {"findings": [], "messages": [], "audited": True, "incomplete": True}
+    assert "INCOMPLETE" in docaudit.format_text(report)

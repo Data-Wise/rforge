@@ -249,3 +249,16 @@ You ticked H2, R3 and R4 as **true**; Checkpoint B is closed. T7-T9 landed in `l
 ## 13. `coverage` only with `--since`; T10 built (2026-10-11)
 
 Decision (yours): `coverage` runs only with `--since`. T10 adds `resolve_scope` (D0: walk-up, manifest-or-`--eco` sweep, hybrid nested, name lookup), `audit`, `audit_ecosystem`, `--fail-on`, `--detailed` (info hidden and counted in `summary.info_hidden`), the scope line as first text output, `format_text`/`format_json`. The harness now passes `--detailed` and rejects a report whose scope root is not the extracted tree (D0 walk-up must never audit a different package). pytest 848 passed; recall 2 of 2 firm; replay unchanged (medfit 1 error + 2 warn, medrobust 4, medsim 7); 10 mutation checks red.
+
+## 14. Checkpoint D: fresh-context behavioral trial (2026-10-11)
+
+A clean subagent got only `commands/docs/check.md` (told not to read the module, tests or specs) and ran the command on four packages with a hidden answer key: **alpha** (3 planted defects: wrong named arg, renamed listing, extra positional), **beta** (clean), **gamma** (clean, `vignettes/` unreadable), **delta** (not a package).
+
+| Target | Expected | Reported | Result |
+|---|---|---|---|
+| alpha | `signature-named-arg` error (`bogus`), `signature-names` warn, `signature-arity` warn | exactly those: error at `refcard.qmd:49`, names warns (`theta`, `x`) at :52, arity warn at :55; verdict "problems, candidates to verify" | pass |
+| beta | no findings | `no findings`; flagged "checked 1 of 22" as weak evidence | pass |
+| gamma | not clean (incomplete) | `incomplete: true` + permission message; verdict "could not be fully audited" | pass |
+| delta | nothing audited | `scope: none`, `audited: false`; verdict "nothing was audited" | pass |
+
+No invented findings, scope line quoted correctly every time. **One real defect found:** the *text* report printed `no findings` for gamma and delta (only the JSON flagged `incomplete` / `audited: false`), so a user reading text would take them as clean. Fixed: text now ends with `NOT AUDITED` or `INCOMPLETE` in those cases (4 new tests, one red under mutation), and the command file says so and notes that `--path` is needed outside the module root. Re-run after the fix: gamma ends `INCOMPLETE: ... do not read this as clean`; delta ends `NOT AUDITED: nothing was looked at ...`.

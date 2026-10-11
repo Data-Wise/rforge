@@ -40,7 +40,7 @@ python3 -m lib.docaudit --path "<package-or-dir>" --format json
 ```
 
 Map the flags straight through: `--detailed` → `--detailed`, `--eco` → `--eco`, `--since <tag>` → `--since <tag>`,
-`--fail-on <level>` → `--fail-on <level>`. Omit `--path` to use the current directory. Read the JSON; render the
+`--fail-on <level>` → `--fail-on <level>`. Omit `--path` to use the current directory (the module itself must be run from the plugin/repo root, so pass `--path` unless you are already there). Read the JSON; render the
 text form with `python3 -m lib.docaudit ...` (no `--format`) when the user wants the plain report.
 
 The first line of the text report is the **resolved scope** (which package, or which ecosystem, was audited).
@@ -65,6 +65,8 @@ with the unchecked ones named by reason (no usage, method, re-export, variadic) 
 
 - `status`: `ok`, or `warn` when any `warn`/`error` finding exists. `max_severity` shows an `error` inside a `warn`
   envelope. Info findings never change `status`.
+- The text report ends with `NOT AUDITED` or `INCOMPLETE` in those two cases instead of `no findings`; the JSON
+  carries `audited` and `incomplete`. `status: ok` does not mean clean when either is set.
 - `incomplete: true` means a file was unreadable or a region too large to scan (named in `messages`): **do not report
   "no findings" as clean**.
 - `audited: false` means nothing was audited (no package found): report the message, not "clean".
