@@ -26,6 +26,7 @@ Run as a package module (``python3 -m lib.docaudit``), never as a script.
 from __future__ import annotations
 
 import argparse
+import bisect
 import json
 import re
 import sys
@@ -40,7 +41,12 @@ IMPLEMENTED_CHECKS = frozenset({"signature-named-arg", "signature-names", "signa
 _SEVERITY_ORDER = {"info": 0, "warn": 1, "error": 2}
 _IDENT = r"[A-Za-z.][\w.]*"
 _DOC_SUFFIXES = {".md", ".qmd", ".rmd", ".rmarkdown"}
-_MAX_REGION = 200_000  # chars; larger blocks are skipped (a balanced-paren scan per call is quadratic)
+_MAX_REGION = 200_000  # chars; larger blocks are skipped
+_WORK_BUDGET = 2_000_000  # chars handed to split_args per region; nested calls rescan their arguments (O(n x depth))
+
+
+class _BudgetExceeded(Exception):
+    pass
 
 
 def _read(path: Path) -> str:
@@ -65,6 +71,18 @@ def _balanced_close(text: str, open_idx: int, open_ch: str = "(", close_ch: str 
             if depth == 0:
                 return i
     return -1
+
+
+def paren_map(text: str) -> dict[int, int]:
+    """Index of each ``(`` -> index of its matching ``)``, in one linear pass. Unmatched ``(`` are absent."""
+    stack: list[int] = []
+    out: dict[int, int] = {}
+    for i, ch in enumerate(text):
+        if ch == "(":
+            stack.append(i)
+        elif ch == ")" and stack:
+            out[stack.pop()] = i
+    return out
 
 
 def split_args(masked: str) -> list[str]:
@@ -133,8 +151,9 @@ def parse_rd_usage(rd: str) -> tuple[dict[str, list[str]], set[str]]:
     methods = {f"{g}.{c}" for g, c in re.findall(r"\\(?:S3)?method\{([^}]*)\}\{([^}]*)\}", block)}
     masked = _mask_strings_and_comments(block)  # string defaults such as `sep = ")"` must not split or close the call
     funcs: dict[str, list[str]] = {}
+    closes = paren_map(masked)
     for m in re.finditer(rf"(?m)^\s*({_IDENT})\(", masked):
-        close = _balanced_close(masked, m.end() - 1)
+        close = closes.get(m.end() - 1, -1)
         if close == -1:
             continue
         funcs[m.group(1)] = [a.split("=")[0].strip() for a in split_args(masked[m.end():close])]
@@ -266,14 +285,21 @@ def unmatched_named(names: list[str], formals: list[str]) -> list[str]:
 
 
 def _calls(masked: str, pkg: str, api: PackageApi) -> Iterator[tuple[str, int, list[str]]]:
-    """Yield ``(function, offset, args)`` for each call to an exported documented function."""
+    """Yield ``(function, offset, args)`` for each call to an exported documented function.
+
+    Raises `_BudgetExceeded` once the argument text handed to `split_args` exceeds `_WORK_BUDGET`."""
+    closes = paren_map(masked)
+    budget = _WORK_BUDGET
     for m in _CALL.finditer(masked):
         fn, ns = m.group("fn"), m.group("ns")
         if fn not in api.formals or (ns and ns != pkg):
             continue
-        close = _balanced_close(masked, m.end() - 1)
+        close = closes.get(m.end() - 1, -1)
         if close == -1:
             continue
+        budget -= close - m.end()
+        if budget < 0:
+            raise _BudgetExceeded
         yield fn, m.start("fn"), split_args(masked[m.end():close])
 
 
@@ -282,18 +308,30 @@ def _finding(check: str, severity: str, file: str, line: int, function: str, arg
             "arg": arg, "message": message}
 
 
-def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: frozenset = frozenset()) -> list[dict]:
+def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: frozenset = frozenset(),
+                 notes: Optional[list] = None) -> list[dict]:
+    """Findings for one region. A region skipped for size or work is reported in `notes`, never silently."""
+    where = f"{rel}:{region.line}"
     if len(region.text) > _MAX_REGION:
+        if notes is not None:
+            notes.append(f"region at {where} skipped: {len(region.text):,} characters is over the {_MAX_REGION:,} limit")
         return []
     masked = _mask_strings_and_comments(region.text)
+    newlines = [i for i, ch in enumerate(masked) if ch == "\n"]
     findings: list[dict] = []
-    for fn, off, args in _calls(masked, pkg, api):
+    try:
+        calls = list(_calls(masked, pkg, api))
+    except _BudgetExceeded:
+        if notes is not None:
+            notes.append(f"region at {where} skipped: too much nested call text to scan")
+        return []
+    for fn, off, args in calls:
         if fn in local:
             continue
         formals = api.formals[fn]
         if "..." in formals:
             continue  # variadic: any names and any arity are valid
-        line = region.line + masked.count("\n", 0, off)
+        line = region.line + bisect.bisect_left(newlines, off)
         shown = ", ".join(formals) or "(none)"
         positional = 0
         forwards_dots = any(a == "..." for a in args)
@@ -364,20 +402,21 @@ def _envelope(findings: list, messages: list, summary: dict) -> dict:
             "findings": findings, "messages": messages, "summary": summary, "engine_missing": []}
 
 
-def _audit(root: Path) -> tuple[list, PackageApi]:
+def _audit(root: Path) -> tuple[list, PackageApi, list]:
     pkg = _package_name(root)
     api = read_api(root)
     findings: list[dict] = []
+    notes: list[str] = []
     for f in doc_files(root):
         rel = f.relative_to(root).as_posix()
         regions = extract_regions(_read(f))
         local = local_definitions(regions)
         for region in regions:
-            for finding in check_region(region, rel, pkg, api, local):
+            for finding in check_region(region, rel, pkg, api, local, notes):
                 if region.bare and finding["severity"] == "error":
                     finding["severity"] = "warn"  # an unlabeled fence may be a console transcript
                 findings.append(finding)
-    return findings, api
+    return findings, api, notes
 
 
 def audit_package(path: str | Path = ".") -> dict:
@@ -385,7 +424,7 @@ def audit_package(path: str | Path = ".") -> dict:
     if not (root / "DESCRIPTION").is_file():
         return _envelope([], [f"not an R package (no DESCRIPTION at {root})"], {})
     try:
-        findings, api = _audit(root)
+        findings, api, notes = _audit(root)
     except Exception as exc:  # advisory tool: never raise, whatever the input
         return {**_envelope([], [f"audit failed: {type(exc).__name__}: {exc}"], {}), "status": "warn"}
     seen: set = set()
@@ -396,7 +435,7 @@ def audit_package(path: str | Path = ".") -> dict:
             seen.add(key)
             unique.append(f)
     cov = _coverage(api)
-    return _envelope(unique, [_summary_line(cov, api.export_pattern)], cov)
+    return _envelope(unique, [_summary_line(cov, api.export_pattern), *notes], cov)
 
 
 def format_text(report: dict) -> str:

@@ -404,3 +404,42 @@ def test_partial_of_an_already_exact_formal_is_flagged():
 
 def test_unique_partial_among_unrelated_formals_still_ok():
     assert run(fence("f(be = 1, alp = 2)"), f=["alpha", "beta"]) == []
+
+
+# ───────────────────────── F4: linear scans and a work budget (Codex review #3) ─────────────────────────
+
+
+def _timed(region, **formals):
+    import time
+    t = time.perf_counter()
+    notes: list = []
+    out = check_region(region, "d.md", "pkg", api(**formals), notes=notes)
+    return out, notes, time.perf_counter() - t
+
+
+def test_many_unclosed_calls_just_under_the_size_limit_are_fast():
+    out, _, secs = _timed(fence("f(" * 99_000), f=["a"])
+    assert out == [] and secs < 3
+
+
+def test_deeply_nested_balanced_calls_hit_the_budget_not_the_clock():
+    out, notes, secs = _timed(fence("f(" * 40_000 + ")" * 40_000), f=["a"])
+    assert secs < 5 and any("too much nested call text" in n for n in notes)
+
+
+def test_oversized_region_is_reported_not_silent():
+    out, notes, _ = _timed(fence("x" * 200_001), f=["a"])
+    assert out == [] and "over the 200,000 limit" in notes[0] and notes[0].startswith("region at d.md:10")
+
+
+def test_small_shapes_stay_correct():
+    assert run(fence("f(a = 1, f("), f=["a"]) == []  # unclosed outer call ignored, inner too
+    f = run(Region("fence", 5, "x <- 1\nf(f(f(zz = 1)))"), f=["a"])
+    assert kinds(f) == [("signature-named-arg", "zz")] and f[0]["line"] == 6
+
+
+def test_budget_note_reaches_the_envelope(tmp_path, monkeypatch):
+    monkeypatch.setattr(docaudit, "_WORK_BUDGET", 50)
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)"}, docs={"README.md": "```r\nf(f(f(f(f(zz = 1)))))\n```\n"})
+    r = docaudit.audit_package(tmp_path)
+    assert any("README.md:2 skipped" in m for m in r["messages"])
