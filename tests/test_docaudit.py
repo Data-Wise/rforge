@@ -570,3 +570,46 @@ def test_oversized_rd_usage_is_reported_not_silent(tmp_path):
     (tmp_path / "man" / "f.Rd").write_text("\\name{f}\n\\usage{\nf(" + "a, " * 100_000 + "b)\n}\n")
     r = docaudit.audit_package(tmp_path)
     assert r["incomplete"] is True and any("f.Rd skipped" in m for m in r["messages"])
+
+
+# ───────────────────────── Codex re-review #3: getter/setter, traversal errors, missing package ─────────────────────────
+
+
+def test_replacement_signature_does_not_overwrite_the_getter():
+    funcs, _ = parse_rd_usage(rd("contrasts(x, contrasts = TRUE, sparse = FALSE)\ncontrasts(x, how.many) <- value"))
+    assert funcs == {"contrasts": ["x", "contrasts", "sparse"]}
+
+
+def test_getter_call_is_checked_and_replacement_call_is_not_judged(tmp_path):
+    make_pkg(tmp_path, ns="export(contrasts)\n",
+             rds={"contrasts": "contrasts(x, contrasts = TRUE, sparse = FALSE)\ncontrasts(x, how.many) <- value"},
+             docs={"README.md": '```r\ncontrasts(f, contrasts = FALSE)\ncontrasts(f, 2) <- m\ncontrasts(f, bogus = 1)\n```\n'})
+    r = docaudit.audit_package(tmp_path)
+    assert [(f["arg"], f["line"]) for f in r["findings"]] == [("bogus", 4)]
+
+
+@pytest.mark.parametrize("sub", ["vignettes", "man"])
+def test_unreadable_directories_mark_the_audit_incomplete(tmp_path, monkeypatch, sub):
+    import os
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)"}, docs={"README.md": "x\n", "vignettes/v.qmd": "```r\nf(z = 1)\n```\n"})
+    real = os.scandir
+
+    def deny(path="."):
+        if str(path).rstrip("/").endswith(sub):
+            raise PermissionError("denied")
+        return real(path)
+
+    monkeypatch.setattr(os, "scandir", deny)
+    r = docaudit.audit_package(tmp_path)
+    assert r["incomplete"] is True and any(sub in m and "unreadable" in m for m in r["messages"])
+
+
+def test_a_missing_package_is_reported_as_not_audited(tmp_path):
+    r = docaudit.audit_package(tmp_path / "nope")
+    assert r["audited"] is False and "not an R package" in r["messages"][0] and r["status"] == "ok"
+    assert docaudit.audit_package(tmp_path)["audited"] is False
+
+
+def test_a_real_audit_is_marked_audited(tmp_path):
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)"}, docs={"README.md": "`f(a)`\n"})
+    assert docaudit.audit_package(tmp_path)["audited"] is True

@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import bisect
 import json
+import os
 import re
 import sys
 from dataclasses import dataclass, field
@@ -241,6 +242,8 @@ def parse_rd_usage(rd: str) -> tuple[dict[str, list[str]], set[str]]:
         budget -= close - m.end()
         if budget < 0:
             raise _BudgetExceeded
+        if _ASSIGNS.match(masked, close + 1):
+            continue  # `f(x, how.many) <- value` is the replacement form, not the getter
         funcs[m.group(1)] = [a.split("=")[0].strip().strip("`'\"") for a in split_args(masked[m.end():close])]
     return funcs, methods
 
@@ -259,7 +262,7 @@ def read_api(root: Path) -> PackageApi:
     reexports: set[str] = set()
     notes: list[str] = []
     man = root / "man"
-    for rd in sorted(p for p in man.glob("*.Rd") if p.is_file()) if man.is_dir() else []:
+    for rd in _list_files(man, lambda p: p.suffix == ".Rd", notes, root):
         text = _read(rd, notes, root)
         try:
             funcs, meths = parse_rd_usage(text)
@@ -289,13 +292,38 @@ class Region:
     first_cell: bool = False  # inline span that is the whole first cell of a Markdown table row (a signature column)
 
 
-def doc_files(root: Path) -> Iterator[Path]:
+def _list_files(top: Path, keep, notes: list, root: Path, recursive: bool = False) -> list[Path]:
+    """Sorted files under `top` that satisfy `keep`. Unlike `Path.glob`/`rglob`, a directory that cannot be
+    listed is **reported** in `notes` (marking the audit incomplete) rather than silently skipped."""
+    if not top.is_dir():
+        return []
+
+    def problem(exc: OSError) -> None:
+        target = Path(getattr(exc, "filename", None) or top)
+        try:
+            shown = target.relative_to(root).as_posix()
+        except ValueError:
+            shown = top.name
+        notes.append(f"{shown} unreadable: {type(exc).__name__}: {exc}")
+
+    found: list[Path] = []
+    if recursive:
+        for dirpath, _dirs, files in os.walk(top, onerror=problem):
+            found += [Path(dirpath) / f for f in files if keep(Path(f))]
+    else:
+        try:
+            with os.scandir(top) as it:
+                found = [Path(e.path) for e in it if e.is_file() and keep(Path(e.name))]
+        except OSError as exc:
+            problem(exc)
+    return sorted(p for p in found if p.is_file())
+
+
+def doc_files(root: Path, notes: list) -> Iterator[Path]:
     for name in ("README.md", "README.Rmd", "README.qmd"):
         if (root / name).is_file():
             yield root / name
-    vig = root / "vignettes"
-    if vig.is_dir():
-        yield from sorted(p for p in vig.rglob("*") if p.is_file() and p.suffix.lower() in _DOC_SUFFIXES)
+    yield from _list_files(root / "vignettes", lambda p: p.suffix.lower() in _DOC_SUFFIXES, notes, root, recursive=True)
 
 
 _FENCE_OPEN = re.compile(r"^\s*(`{3,}|~{3,})\s*(.*)$")
@@ -352,6 +380,7 @@ def local_definitions(regions: list[Region]) -> frozenset:
 # ───────────────────────── the checks ─────────────────────────
 
 
+_ASSIGNS = re.compile(r"\s*(?:<<-|<-|=(?!=))")  # what follows the `)` of a replacement call
 _CALL = re.compile(rf"(?<![\w.$@:])(?:(?P<ns>{_IDENT})\s*::\s*)?(?P<fn>{_IDENT})\(")
 
 
@@ -412,8 +441,8 @@ def _calls(masked: str, raw: str, pkg: str, api: PackageApi) -> Iterator[tuple[s
         if j >= 0 and masked[j] in "$@:":
             continue  # obj$ f(...), obj@ f(...)
         close = closes.get(m.end() - 1, -1)
-        if close == -1:
-            continue
+        if close == -1 or _ASSIGNS.match(masked, close + 1):
+            continue  # unclosed, or a replacement call `f(x) <- v` (judged against a different signature)
         budget -= close - m.end()
         if budget < 0:
             raise _BudgetExceeded
@@ -520,10 +549,10 @@ def _package_name(root: Path, notes: list) -> str:
     return ""
 
 
-def _envelope(findings: list, messages: list, summary: dict, incomplete: bool = False) -> dict:
+def _envelope(findings: list, messages: list, summary: dict, incomplete: bool = False, audited: bool = True) -> dict:
     top = max((f["severity"] for f in findings), key=_SEVERITY_ORDER.get, default="none")
     return {"kind": "docaudit", "status": "warn" if findings else "ok", "max_severity": top,
-            "findings": findings, "messages": messages, "summary": summary, "incomplete": incomplete,
+            "findings": findings, "messages": messages, "summary": summary, "incomplete": incomplete, "audited": audited,
             "engine_missing": []}
 
 
@@ -532,7 +561,7 @@ def _audit(root: Path) -> tuple[list, PackageApi, list]:
     pkg = _package_name(root, notes)
     api = read_api(root)
     findings: list[dict] = []
-    for f in doc_files(root):
+    for f in doc_files(root, notes):
         rel = f.relative_to(root).as_posix()
         regions = extract_regions(_read(f, notes, root))
         local = local_definitions(regions)
@@ -547,11 +576,11 @@ def _audit(root: Path) -> tuple[list, PackageApi, list]:
 def audit_package(path: str | Path = ".") -> dict:
     root = Path(path)
     if not (root / "DESCRIPTION").is_file():
-        return _envelope([], [f"not an R package (no DESCRIPTION at {root})"], {})
+        return _envelope([], [f"not an R package (no DESCRIPTION at {root})"], {}, audited=False)
     try:
         findings, api, notes = _audit(root)
     except Exception as exc:  # advisory tool: never raise, whatever the input
-        return {**_envelope([], [f"audit failed: {type(exc).__name__}: {exc}"], {}), "status": "warn", "audit_failed": True}
+        return {**_envelope([], [f"audit failed: {type(exc).__name__}: {exc}"], {}, audited=False), "status": "warn", "audit_failed": True}
     seen: set = set()
     unique = []
     for f in sorted(findings, key=lambda f: (f["file"], f["line"], f["check"], f["function"], f["arg"] or "")):

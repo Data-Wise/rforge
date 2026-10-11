@@ -381,3 +381,9 @@ def test_misspelled_locked_check_fails_even_when_scope_would_filter_it_out():
 def test_every_manifest_check_id_is_known():
     m = json.loads(MANIFEST.read_text())
     assert {r["check"] for r in m["defects"] if r["check"]} <= replay.KNOWN_CHECKS
+
+
+def test_subprocess_audit_rejects_a_report_that_audited_nothing(fake_audit):
+    tree = fake_audit('{"findings": [], "audited": false, "messages": ["not an R package (no DESCRIPTION at x)"]}')
+    with pytest.raises(replay.AuditCrashed, match="nothing was audited"):
+        replay.subprocess_audit(tree)
