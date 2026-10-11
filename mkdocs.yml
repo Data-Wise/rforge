@@ -130,6 +130,7 @@ nav:
       - "Diff-aware checks (--changed)": guides/diff-aware.md
       - "CRAN submission": guides/cran-submission.md
       - "Website + deploy guard (r:site)": guides/website.md
+      - "Docs audit (docs:check)": guides/docs-audit.md
     - 🤖 Orchestrator Agent: orchestrator.md
     - Configuration: configuration.md
     - Lib Modules: lib-modules.md

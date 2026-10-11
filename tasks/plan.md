@@ -138,11 +138,11 @@ fixture packages and quote the transcript (a run that can fail); record it for t
 - [x] **T13 [S] Test-all, counts and mirror.** *Files:* `tests/test-all.sh` (CLI smoke + harness smoke `run` lines; add `test_docaudit.py` to `lib_pytest`),
   `CLAUDE.md` (check count at :136 and public-modules list at :101), `AGENTS.md` (mirror), `docs/contributing.md:94`. *AC:* the exact new
   check count is stated and identical in all three places. *Verify:* `bash tests/test-all.sh`; `version_sync.py --check`. *Deps:* T12.
-- [ ] **T14 [S] Docs sweep A — stale "clean docs:check" meaning (1).** *Files:* `docs/command-cards.md:86`, `docs/REFCARD.md:41,380`, `docs/quickstart.md:357`,
+- [x] **T14 [S] Docs sweep A — stale "clean docs:check" meaning (1).** *Files:* `docs/command-cards.md:86`, `docs/REFCARD.md:41,380`, `docs/quickstart.md:357`,
   `docs/architecture.md:226,257,273,281`, `docs/workflows/index.md:137`.
-- [ ] **T15 [S] Docs sweep B — stale meaning (2).** *Files:* `docs/tutorials/cran-release-prep.md:7,28,48,259`, `docs/tutorials/rforge-in-the-r-lifecycle.md:63`,
+- [x] **T15 [S] Docs sweep B — stale meaning (2).** *Files:* `docs/tutorials/cran-release-prep.md:7,28,48,259`, `docs/tutorials/rforge-in-the-r-lifecycle.md:63`,
   `commands/complete.md:127`, `.claude-plugin/skills/validation/description-sync.md:112`.
-- [ ] **T16 [M] Guide, config claim, CHANGELOG.** *Files:* relevant `docs/guides/*` page, `docs/configuration.md:132` (remove the unbacked `claude_md_budget` claim),
+- [x] **T16 [M] Guide, config claim, CHANGELOG.** *Files:* relevant `docs/guides/*` page, `docs/configuration.md:132` (remove the unbacked `claude_md_budget` claim),
   `docs/commands.md:490-515` ("Validates" list), `CHANGELOG.md` `[Unreleased]` (behavior change + dropped promises). *AC:* `mkdocs build --strict` clean.
 
 **Checkpoint E — release gates:** `pytest tests/ -q`; `bash tests/test-all.sh` (exact count); `gen_lib_reference.py --check`; `version_sync.py --check`; `mkdocs build --strict`;

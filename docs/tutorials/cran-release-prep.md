@@ -25,7 +25,7 @@
 
 ```mermaid
 flowchart TD
-    A["/rforge:docs:check<br/>NEWS + doc drift"] --> B
+    A["/rforge:docs:check<br/>docs vs API audit"] --> B
 
     subgraph "Per-package gate (v2.2.0+)"
         B["/rforge:r:cran-prep<br/>document→lint→spell→urlcheck<br/>test→coverage→check(--as-cran)→revdep<br/>writes cran-comments.md"]
@@ -41,30 +41,22 @@ flowchart TD
 
 ## Step 1: Catch documentation drift early
 
-Documentation problems are the most common avoidable CRAN rejection. Check
-first, while fixes are cheap:
+Documentation problems are the most common avoidable CRAN rejection. Audit
+the docs against the API first, while fixes are cheap:
 
 ```text
 /rforge:docs:check
 ```
 
 ```text
-⚠️ DOCUMENTATION CHECK
-
-NEWS.md: ⚠️ Missing 3 recent changes
-  • extract_mediation refactor
-  • New bootstrap method
-  • Bug fix #234
-
-Examples: ⚠️ 2 outdated
-  • README example uses old API
-  • Vignette 2 has broken code
-
-Recommendations:
-  1. Update NEWS.md (5 min)
-  2. Update examples (20 min)
-  3. Regenerate vignettes (10 min)
+scope: package medfit at /path/to/medfit
+error signature-named-arg    vignettes/intro.qmd:154  `BootstrapResult()` has no argument `converged` (formals: estimate, ci_lower, ...)
+warn  signature-names        vignettes/refcard.qmd:13  listing of `joint_effects()` names `theta`, which is not a formal (formals: object, estimates)
+checked 18 of 22 exported functions (3 no-usage, 1 variadic not checked)
 ```
+
+An `error` is a call that would fail as written; a `warn` is a candidate to check by hand.
+It does not check NEWS.md or run examples. See [Docs audit](../guides/docs-audit.md).
 
 !!! note "The description-sync skill backs this up automatically"
     rforge ships a `description-sync` validation skill that checks your
@@ -239,7 +231,7 @@ That's your signal to loop back to Steps 1–2 for that package.
 Most releases are one package, not a whole verse. The condensed flow:
 
 ```text
-/rforge:docs:check medfit        # 1. drift check (NEWS, examples)
+/rforge:docs:check medfit        # 1. docs content audit (README/vignette calls vs exports)
 /rforge:r:cran-prep              # 2. full gate: runs all checks + writes cran-comments.md
 # ... fix anything flagged, re-run until "ready" ...
 /rforge:release medfit           # 3. confirm ecosystem readiness + submission order
@@ -256,7 +248,7 @@ For multi-platform verification before submission:
 
 ## Pre-submission checklist
 
-- [ ] `/rforge:docs:check` clean (NEWS.md current, examples run)
+- [ ] `/rforge:docs:check` has no errors (the audit does not check NEWS.md or run examples: `description-sync` and `r:check` cover those)
 - [ ] `description-sync` passes (DESCRIPTION version == NEWS top entry)
 - [ ] DESCRIPTION has `Language: en-US` (or correct BCP 47 code) if package has `man/` or `vignettes/` dirs
 - [ ] DOI references in DESCRIPTION use `<doi:10.xxx/yyy>` angle-bracket format, not bare `doi:` or raw `https://doi.org/` URLs

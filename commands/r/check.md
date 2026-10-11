@@ -163,4 +163,4 @@ If `engine_missing` is non-empty, report 🔴 with the install hint from `messag
 ## Related Commands
 - `/rforge:r:cycle` — document → test → check in one pass
 - `/rforge:thorough` — **ecosystem** rollup incl. R CMD check (this is **single-package**)
-- `/rforge:docs:check` — documentation drift (complements R CMD check)
+- `/rforge:docs:check` — audits README/vignette calls against the exports (complements R CMD check)

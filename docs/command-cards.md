@@ -83,7 +83,7 @@ Handy one-line descriptions grouped by purpose.
 
 | Command | What it does |
 |---------|-------------|
-| `/rforge:docs:check` | Check NEWS.md and API consistency |
+| `/rforge:docs:check` | Audit README/vignette calls and signatures against the exports |
 | `/rforge:docs:workflow` | Document workflow steps |
 | `/rforge:site:check` | Check pkgdown site health |
 | `/rforge:site:deploy` | Deploy pkgdown site (with leak guard) |

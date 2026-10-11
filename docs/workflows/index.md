@@ -134,7 +134,7 @@ Per-package gate → ecosystem rollup → submission order.
 
 ```mermaid
 flowchart TD
-    A["/rforge:docs:check\nNEWS + doc drift"] --> B
+    A["/rforge:docs:check\ndocs vs API audit"] --> B
 
     subgraph gate["Per-package gate (v2.2.0+, strict by default v2.3.0+)"]
         B["/rforge:r:cran-prep\ndocument→lint→spell→urlcheck→test→coverage\ncheck → check (noSuggests) → check (suggests-only)\nTier 4: description, build-hygiene, docs-consistency\nrevdep · writes cran-comments.md"]
