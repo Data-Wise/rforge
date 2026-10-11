@@ -32,8 +32,9 @@ Runs `lib.rstatus.build_recap` to compose, from one state read:
 - **git** — current branch, last commit, dirty-tree flag
 - **`.STATUS`** (if present) — `next:`/`blockers:`/`cran_status:` fields, human- or
   `/rforge:finish`-curated
-- **Version drift** — flags when `.STATUS`'s `version:` mirror disagrees with
-  `DESCRIPTION`'s actual `Version` (DESCRIPTION is always the source of truth)
+- **Version drift** — flags when the leading version token of `.STATUS`'s `version:` mirror
+  (annotations after it are ignored) disagrees with `DESCRIPTION`'s actual `Version`
+  (DESCRIPTION is always the source of truth)
 
 ## Usage
 

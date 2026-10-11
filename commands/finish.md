@@ -39,9 +39,11 @@ current state — the rforge counterpart to craft's `/craft:finish` and savant's
 4. **Redundant-edit guard**: if the diff is a `updated:`-only change (no real content delta),
    report "already current" and stop — do not write a timestamp-only bump. This is the same
    `doc-update-currency-check` discipline `savant:restore --sync` already enforces.
-5. **Version-drift check**: if `.STATUS`'s `version:` mirror disagrees with `DESCRIPTION`'s
-   actual `Version`, flag it in the diff — `.STATUS`'s `version:` field is corrected to match
-   DESCRIPTION (never the reverse; DESCRIPTION is always the source of truth).
+5. **Version-drift check**: if the leading version token of `.STATUS`'s `version:` mirror
+   (annotations like `0.7.0 (released …)` are ignored) disagrees with `DESCRIPTION`'s actual
+   `Version`, flag it in the diff — `.STATUS`'s `version:` field is corrected to match
+   DESCRIPTION (never the reverse; DESCRIPTION is always the source of truth). When there is
+   no drift, `version:` is left untouched so its annotations survive.
 6. Show the diff and **wait for the user's explicit reply confirming it** before writing —
    the same "wait for explicit confirmation" gate `/rforge:restore`'s scaffold-offer uses.
    `--write` on the invocation selects write-mode (vs. dry-run); it is not itself the
@@ -83,7 +85,11 @@ current = read_rstatus(path)
 intended = apply_updates(
     current,
     updated=today,
-    version=recap["description"]["version"],
+    # Override `version` ONLY on drift. `current.version` may carry annotations
+    # ("0.7.0 (released …)"); passing DESCRIPTION's bare "0.7.0" unconditionally
+    # would diff as a real change and --write would strip them (same bare-override
+    # trap as above, one field down).
+    **({"version": recap["description"]["version"]} if recap["version_drift"] else {}),
     # next=..., blockers=..., last_check=..., cran_status=... — only if step 2's
     # grounding rule found something real to report; omit entirely otherwise.
 )

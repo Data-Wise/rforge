@@ -124,6 +124,43 @@ def test_e2e_restore_detects_version_drift(tmp_path):
     assert recap["version_drift"] == {"status_version": "0.4.0", "description_version": "0.5.0"}
 
 
+# ── annotated `version:` (#84): no false drift, and finish must not strip it ──
+
+ANNOTATED = "0.4.0 (released 2026-07-16 on main, tag v0.4.0 at abc1234)"
+
+
+def test_e2e_annotated_version_no_drift_and_finish_keeps_annotation(tmp_path):
+    """#84 end to end: restore reports no drift for an annotated `version:`, and
+    the /rforge:finish recipe (override `version` only on drift) yields no
+    `version` change — an unconditional DESCRIPTION override would diff as a real
+    change and --write would delete the annotation."""
+    _make_r_package_fixture(tmp_path, with_status=True)
+    status = (tmp_path / ".STATUS").read_text().replace("version: 0.4.0", f"version: {ANNOTATED}")
+    (tmp_path / ".STATUS").write_text(status)
+
+    recap = json.loads(_run_recap(str(tmp_path)).stdout)
+    assert recap["version_drift"] is None
+
+    sys.path.insert(0, REPO_ROOT)
+    from lib.rstatus import build_recap, read_rstatus, apply_updates, diff_rstatus  # noqa: E402
+
+    recap = build_recap(str(tmp_path))
+    current = read_rstatus(str(tmp_path))
+    assert current.version == ANNOTATED
+
+    # Exactly the recipe in commands/finish.md.
+    intended = apply_updates(
+        current,
+        updated="2026-10-11",
+        **({"version": recap["description"]["version"]} if recap["version_drift"] else {}),
+    )
+    assert diff_rstatus(current, intended) == []
+
+    # The old recipe (unconditional override) is the regression this guards.
+    old = apply_updates(current, updated="2026-10-11", version=recap["description"]["version"])
+    assert "version" in {c[0] for c in diff_rstatus(current, old)}
+
+
 # ── finish: redundant-edit guard, exercised against real files on disk ─────
 
 def test_e2e_finish_redundant_edit_guard_via_real_files(tmp_path):
