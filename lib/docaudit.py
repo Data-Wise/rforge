@@ -420,6 +420,7 @@ _ASSIGN_DEF = re.compile(rf"""\bassign\(\s*["'](?P<n>{_IDENT})["']""")
 _REBIND_ARROW = re.compile(rf"(?<![\w.$@])({_IDENT})\s*(?:<<-|<-)")
 _REBIND_RIGHT = re.compile(rf"->>?\s*({_IDENT})(?![\w.(])")
 _REBIND_EQ = re.compile(rf"(?:^|[;\n{{}}])[ \t]*({_IDENT})\s*=(?!=)")
+_LOOP_VAR = re.compile(rf"(?<![\w.$@])for\s*\(\s*({_IDENT})\s+in\b")
 _ASSIGN_CALL = re.compile(rf"""\bassign\s*\(\s*["'](?P<n>{_IDENT})["']""")
 _FUNC_HEAD = re.compile(r"(?<![\w.$@])(?:function\s*|\\)\(")
 
@@ -462,12 +463,16 @@ def local_definitions(regions: list[Region], skipped: Optional[set] = None) -> f
             # `f(...)` is not the package's: whatever the right-hand side is, only the name matters.
             names.update(_REBIND_ARROW.findall(masked))
             names.update(_REBIND_RIGHT.findall(masked))
-            depth, at_top = 0, []
+            names.update(_LOOP_VAR.findall(masked))
+            stack, statement_level = [], []  # an `=` binds only at top level or directly inside `{ ... }`
             for ch in masked:
-                depth += (ch in "([") - (ch in ")]")
-                at_top.append(depth == 0)
+                if ch in "([{":
+                    stack.append(ch)
+                elif ch in ")]}" and stack:
+                    stack.pop()
+                statement_level.append(not stack or stack[-1] == "{")
             for m in _REBIND_EQ.finditer(masked):
-                if at_top[m.start(1)]:
+                if statement_level[m.start(1)]:
                     names.add(m.group(1))
             try:
                 names |= _parameter_names(masked, blank_comments(blank_raw_strings(r.text)))

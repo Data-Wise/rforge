@@ -58,6 +58,17 @@ A malformed block is ignored with a message; the suppressed count appears in the
 NEWS completeness (see the `description-sync` skill), whether examples run (`/rforge:r:check`), live-site pages,
 prose claims, wrong default values, reordered arguments, and S3/S4/S7 method signatures behind a generic.
 
+## Known limitations
+
+The audit reads R text, it does not run R. When a document gives a package function's name to something else,
+a later call to that name is skipped rather than judged. It recognizes `f <- ...`, `f <<- ...`, `... -> f`,
+`assign("f", ...)`, a statement-level `f = ...` (top level or directly inside `{ }`), `function(f)` and `\(f)`
+parameters (backticked names too), and `for (f in ...)`. Bindings it does **not** recognize, which can therefore
+still draw a false `error` when the bound name equals an export: `with(list(f = ...), f(...))`, `list2env()`,
+`attach()`, `delayedAssign()`, and formula or lambda shorthands. Suppress such a file with `docs.allowlist`
+(`<relpath>::signature-named-arg`). Calls the scan cannot finish (an unclosed call, an unterminated string, an
+over-large region) make the report `INCOMPLETE` instead of clean.
+
 !!! warning "Symptom"
     `status: ok` but the docs are clearly wrong.
 

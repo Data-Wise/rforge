@@ -467,3 +467,30 @@ def test_markdown_fences_shown_inside_an_r_block_are_not_unterminated_literals(t
     assert docaudit.audit_package(mkpkg(tmp_path / "pkg", docs=docs))["incomplete"] is False
     docs = "```r\n```{r setup}\nlibrary(x)\n```\n```\n"
     assert docaudit.audit_package(mkpkg(tmp_path / "pkg2", docs=docs))["incomplete"] is False
+
+
+# ───────────────────────── Codex review #7 regressions ─────────────────────────
+
+
+@pytest.mark.parametrize("code", [
+    "local({ f = stats::rnorm; f(n = 3) })",
+    "local({\n  f = stats::rnorm\n  f(n = 3)\n})",
+    "lapply(xs, function(i) {\n  f = stats::rnorm\n  f(n = i)\n})",
+    "for (f in list(stats::rnorm)) f(n = 3)",
+    "for(f in fs) {\n  f(n = 3)\n}",
+    "for ( f  in fs ) f(n = 3)",
+])
+def test_braced_bindings_and_loop_variables_make_calls_local(tmp_path, code):
+    pkg = mkpkg(tmp_path / "pkg", docs=f"```r\n{code}\n```\n")
+    assert sig(docaudit.audit_package(pkg)["findings"]) == []
+    assert docaudit.main(["--path", str(pkg), "--fail-on", "error"]) == 0
+
+
+def test_named_arguments_inside_a_call_are_still_not_bindings_even_beside_braces(tmp_path):
+    docs = "```r\nlocal(\n  f = 1,\n  g = { 2 })\nf(extra = 1)\n```\n"
+    assert [f["arg"] for f in sig(docaudit.audit_package(mkpkg(tmp_path / "pkg", docs=docs))["findings"])] == ["extra"]
+
+
+def test_a_call_in_the_for_sequence_is_not_a_loop_variable(tmp_path):
+    docs = "```r\nfor (i in f(extra = 1)) i\n```\n"
+    assert [f["arg"] for f in sig(docaudit.audit_package(mkpkg(tmp_path / "pkg", docs=docs))["findings"])] == ["extra"]

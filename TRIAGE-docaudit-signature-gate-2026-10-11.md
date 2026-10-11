@@ -301,3 +301,16 @@ Verdict needs-attention; two findings, both within the stop rule, each red-to-gr
 **Found by the replay safety net:** the first L2 version flagged rmediation's `_CONVERSION_NOTES.md`, which shows a nested "```{r setup}" fence inside an `r` block; the harness raised on the spurious `incomplete`. The three-backtick exemption fixes it and has its own test. This is the harness doing its job: a check that makes real docs read as incomplete is caught before release.
 
 **Gates:** pytest 892 passed (with `RFORGE_MEDFIT_PATH`); `test-all.sh` 47/47; reference regenerated. Seven mutation checks red. Replay over all 7 packages unchanged with no `incomplete` (medfit 1 error + 2 warn, medrobust 4, medsim 7); recall 2 of 2 firm.
+
+## 18. Codex review #7 (2026-10-11)
+
+Verdict needs-attention; two findings (both error false positives on ordinary code), red-to-green.
+
+| ID | Finding | Fix |
+|---|---|---|
+| M1 | `local({ f = stats::rnorm; f(n = 3) })` and `=` bindings inside `lapply` callbacks: the enclosing `(` hid the `{` block's statement context | delimiter stack: an `=` binds at top level or directly inside `{ }`; directly inside `(` or `[` it is still a named argument |
+| M2 | `for (f in list(stats::rnorm)) f(n = 3)`: loop variables were not bindings | `for (name in` joins the local names; a call inside the sequence expression is still judged |
+
+**Stop-rule decision:** rounds 4-7 each found one or two more *binding forms* (parameters, rebinding, backticks, braces, loops). The rule is now structural, and the forms still unhandled (`with(list(f = ...), f())`, `list2env`, `attach`, `delayedAssign`, formula/lambda shorthand) are documented under "Known limitations" in the Docs audit guide with the `docs.allowlist` escape, instead of chasing each. They fail loud-and-suppressible (an `error` the user can allowlist), not silent.
+
+**Gates:** pytest 901 passed (with `RFORGE_MEDFIT_PATH`); `test-all.sh` 47/47; reference regenerated; `mkdocs --strict` clean. Three mutation checks red. Replay over all 7 packages unchanged, no `incomplete`; recall 2 of 2 firm.
