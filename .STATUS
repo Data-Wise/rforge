@@ -1,6 +1,18 @@
 project: rforge
-updated: 2026-09-23
+updated: 2026-10-11
 status: Active
+in_progress: 2026-10-11 — two lines of work, no release pending.
+  (1) PR #85 (fix #84, lib.rstatus leading-version drift + /rforge:finish version override) OPEN, mergeable, 5/5
+  checks green, worktree ~/.git-worktrees/rforge/feature-rstatus-version-drift (96a4542); merge awaits the
+  maintainer's go-ahead; #84 stays open until release (a feature→dev merge does not auto-close it).
+  (2) docs:check content audit, release A1 (v2.21.0): planning complete, no code yet. Brainstorm, 8-decision grill,
+  SPEC v2 after a 4-reviewer adversarial pass (26 findings), ORCHESTRATE, and a 17-task vertical-slice plan with a
+  replay harness built first. Worktree ~/.git-worktrees/rforge/feature-docs-check-content-audit
+  (feature/docs-check-content-audit, 75bcbf2). Docs on dev: BRAINSTORM/GRILL/SPEC-docs-*-2026-10-11.md (42e3c1f,
+  83a4e41; dev is 2 ahead of origin/dev, unpushed). Plan and checklist: tasks/plan.md, tasks/todo.md on the feature
+  branch. A2 (--site, --run-examples) is a separate later plan.
+next: Maintainer decides PR #85 merge. Then T1 (discovery allowlist refactor, own commit) and T2 (defect manifest +
+  recall runner) in the feature worktree; schedule the hold-out triage session early, it gates T7-T17.
 version: 2.20.1 (released, on main 9d0b01a; dev fast-forwarded to main)
 last_release: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
   9d0b01a; tag v2.20.1; release https://github.com/Data-Wise/rforge/releases/tag/v2.20.1. Ships
@@ -91,6 +103,26 @@ last_release_prior_3: 2026-06-11 v2.7.0 (PR #24/#25; tap #115). r:submit --unive
 #        feature/r-submit-runiverse merged (PR #24) + worktree removed 2026-06-11
 
 recent:
+  - date: 2026-10-11
+    branch: feature/rstatus-version-drift (PR #85 → dev, open)
+    title: "fix(rstatus): compare only the leading version token for .STATUS drift (#84)"
+    state: PR OPEN, CI green, awaiting merge decision
+    summary: |
+      build_recap compared the whole .STATUS `version:` string to DESCRIPTION, so an annotated line
+      ("0.7.0 (released ...)") reported false drift (found on medfit). Now compares the leading token
+      (v-prefix tolerated, 0.7.0.9000 still drift). The /rforge:finish recipe overrode `version` with the
+      bare DESCRIPTION number unconditionally, which would have stripped annotations on --write; it now
+      overrides only on drift. pytest 610 passed / 2 skipped, test-all 45/45, negative control verified.
+  - date: 2026-10-11
+    branch: dev (docs only; commits 42e3c1f, 83a4e41) + feature/docs-check-content-audit (75bcbf2)
+    title: "docs:check content audit (release A1): brainstorm, grill, SPEC v2, plan"
+    state: PLANNED, no code
+    summary: |
+      Rewrites the prompt-only /rforge:docs:check onto a new lib/docaudit.py (command count stays 44).
+      Measured honestly: 3 firm + 3 conditional of 18 real medfit defects; a 120-commit replay found 5 real
+      named-argument defects in 20,468 args. Confirmed decisions D0 (walk-up scope), D6 (A1 static + rewrite,
+      A2 --site/--run-examples), D7 (signature-named-arg error, auto-demoted on any false positive),
+      --site orchestrator auto-run. Specs live at the repo root (no docs/specs/). Details: SPEC, GRILL.
   - date: 2026-09-23
     branch: dev (direct, docs-only; commits 2990a7e, 9f81760)
     title: "docs: stale-content sweep before v2.20.1"
