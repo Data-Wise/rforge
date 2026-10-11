@@ -376,3 +376,31 @@ def test_audit_flags_the_refcard_row_but_not_the_routes_row(tmp_path):
              docs={"vignettes/refcard.qmd": "| `joint(x, theta)` | Joint effects |\n",
                    "vignettes/native.qmd": "| **Routes** | `fit_sem(syntax, data)`, or `fit_mediation(model = syntax)` |\n"})
     assert [(f["file"], f["function"]) for f in docaudit.audit_package(tmp_path)["findings"]] == [("vignettes/refcard.qmd", "joint")] * 2
+
+
+# ───────────────────────── F1: R argument matching (Codex review #3) ─────────────────────────
+
+
+@pytest.mark.parametrize("call", ["f(alpha = 1, al = 2)", "f(al = 2, alpha = 1)"])
+def test_partial_match_uses_the_formal_left_after_exact_matches(call):
+    assert run(fence(call), f=["alpha", "alpine"]) == []
+
+
+def test_genuinely_ambiguous_partial_is_still_flagged():
+    assert kinds(run(fence("f(al = 1)"), f=["alpha", "alpine"])) == [("signature-named-arg", "al")]
+
+
+def test_two_partials_cannot_claim_the_same_formal():
+    assert kinds(run(fence("f(alp = 1, alpi = 2)"), f=["alpha", "alpine"])) == [("signature-named-arg", "alp")]
+    # R matches partials independently of order: `alp` still sees two candidates (alpha, alpine)
+    assert kinds(run(fence("f(alpi = 1, alp = 2)"), f=["alpha", "alpine"])) == [("signature-named-arg", "alp")]
+    # two args whose only candidate is the same formal also clash
+    assert len(run(fence("f(alpi = 1, alpin = 2)"), f=["alpha", "alpine"])) == 1
+
+
+def test_partial_of_an_already_exact_formal_is_flagged():
+    assert kinds(run(fence("f(alpha = 1, alph = 2)"), f=["alpha", "beta"])) == [("signature-named-arg", "alph")]
+
+
+def test_unique_partial_among_unrelated_formals_still_ok():
+    assert run(fence("f(be = 1, alp = 2)"), f=["alpha", "beta"]) == []

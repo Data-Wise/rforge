@@ -246,10 +246,23 @@ def local_definitions(regions: list[Region]) -> frozenset:
 _CALL = re.compile(rf"(?<![\w.$@:])(?:(?P<ns>{_IDENT})::)?(?P<fn>{_IDENT})\(")
 
 
-def _partial_ok(name: str, formals: list[str]) -> bool:
-    if name in formals:
-        return True
-    return sum(f.startswith(name) for f in formals) == 1
+def unmatched_named(names: list[str], formals: list[str]) -> list[str]:
+    """Named arguments R would reject for a function without `...`, in call order.
+
+    R argument matching: (1) exact names first, across the whole call; (2) each remaining name is
+    matched partially against the formals *left over* by step 1 and must have exactly one candidate;
+    (3) two arguments may not claim the same formal. Order of the arguments does not matter."""
+    exact = {n for n in names if n in formals}
+    free = [f for f in formals if f not in exact]
+    claimed: dict[str, str] = {}
+    bad: list[str] = []
+    for n in names:
+        if n in exact:
+            continue
+        candidates = [f for f in free if f.startswith(n)]
+        if len(candidates) != 1 or claimed.setdefault(candidates[0], n) != n:
+            bad.append(n)
+    return bad
 
 
 def _calls(masked: str, pkg: str, api: PackageApi) -> Iterator[tuple[str, int, list[str]]]:
@@ -284,14 +297,16 @@ def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: fro
         shown = ", ".join(formals) or "(none)"
         positional = 0
         forwards_dots = any(a == "..." for a in args)
+        names = []
         for a in args:
             name = _named(a)
             if name is not None:
-                if not _partial_ok(name, formals):
-                    findings.append(_finding("signature-named-arg", "error", rel, line, fn, name,
-                                             f"`{fn}()` has no argument `{name}` (formals: {shown})"))
+                names.append(name)
             elif a != "...":
                 positional += 1
+        for name in unmatched_named(names, formals):
+            findings.append(_finding("signature-named-arg", "error", rel, line, fn, name,
+                                     f"`{fn}()` has no argument `{name}` (formals: {shown})"))
         if not forwards_dots and positional > len(formals):
             findings.append(_finding("signature-arity", "warn", rel, line, fn, None,
                                      f"`{fn}()` takes {len(formals)} argument(s) but the call passes {positional} positionally (formals: {shown})"))
