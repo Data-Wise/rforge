@@ -5,6 +5,38 @@ no checkout, no write into medfit / probmed / medrobust). **Your part: fill the 
 Precision is recorded in the SPEC appendix after you do. Any `error`-severity row marked *false* demotes
 `signature-named-arg` to `warn` (decision D7).
 
+## 0. How to triage (read this first)
+
+**Why this step exists.** The checks passed every test I could write, but I wrote the tests. A hold-out triage is the one place
+a person who knows the packages judges whether each thing the audit reports is a real documentation defect. Its result decides whether
+`signature-named-arg` ships as `error` or `warn` (decision D7), and it is the last open item before T7-T17 can start.
+
+**What you do.** For each of the three rows below, tick one box in its *Triage* cell (sections 1 and 2):
+
+| Verdict | Meaning | Effect |
+|---|---|---|
+| **true** | The doc really is wrong: a reader copying it would hit an error or be misled | Counts toward precision; no action |
+| **false** | The doc is fine and the audit is wrong | A false row of severity `error` demotes `signature-named-arg` to `warn` before release; any false row needs a fix for its false-positive class first |
+| **won't-fix** | The doc is technically off but not worth changing | Counts as true for precision, no action |
+
+Then tell me "triage done" (or paste the ticks); I record precision in the SPEC appendix, tick the gate boxes and start T7.
+You do not need to run anything: the evidence for each row is below.
+
+**Evidence and my reading** (a recommendation only; the call is yours):
+
+| Row | What the doc says | What the code says | My read |
+|---|---|---|---|
+| H1 medfit `model-native.qmd:23` (`warn`, listing) | Routes table: `fit_sem(syntax, data)` | `man/fit_sem.Rd` formals are `(model, data, information, n_starts, control, sampling_weights, se_type)` | Probably **true** but low-stakes: `syntax` reads as a placeholder for the model syntax, yet the argument is called `model`. Warn-level, so it cannot trigger the demotion |
+| R3 medfit `introduction.qmd:154` (`error`, history only) | `BootstrapResult(estimate = ..., ci_lower = ..., ..., converged = TRUE)` | `man/BootstrapResult.Rd` formals: `(estimate, ci_lower, ci_upper, ci_level, boot_estimates, n_boot, method, call)`, with no `converged` | **True**: the call would error. Present in 48 of the last 200 commits and already fixed at `HEAD` |
+| R4 medrobust `methodology.qmd:115` (`error`, history only) | `check_compatibility(..., sn0 = 0.90, sp0 = 0.85, psi_sn = 1.5, psi_sp = 1.2)` | `man/check_compatibility.Rd` has a single `psi` formal (no `sn0`, `sp0`, `psi_sn`, `psi_sp`) | **True**: the call would error. Present in 51 of the last 60 commits and already fixed at `HEAD` |
+
+If you agree with all three, the `error` check has no false positive in the hold-out and keeps its severity.
+R3 and R4 were already confirmed as real defects in the SPEC's own replay; they are listed so the sheet is complete.
+
+**What this does not prove.** The hold-out is small: three packages, one `HEAD` finding, two historical errors. A clean triage means no
+*known* false positive, not none. The adversarial review (section 5) found and fixed three false-positive classes, and any new class that shows up later
+gets a regression test and, if it is `error`-severity, the same demotion rule.
+
 ## 1. Hold-out: current `HEAD` of each package
 
 | Package | Files audited | Coverage line | Findings |
