@@ -35,6 +35,11 @@ CAUGHT, MISSED, PENDING = "caught", "missed", "pending"
 UNAVAILABLE, NO_REF, CRASHED = "unavailable", "ref-not-found", "crashed"
 LOST = "lost"  # a regression-locked row whose check is no longer implemented (or the module is gone)
 
+# Every check id a manifest row may name (SPEC, "In scope"). A misspelling must fail loudly: the
+# scope filter would otherwise drop the row before the lock guard ever sees it.
+KNOWN_CHECKS = frozenset({"signature-named-arg", "signature-names", "signature-arity", "scannability", "coverage",
+                          "site-missing-page", "examples-output", "examples-error", "examples-shape"})
+
 SCOPES = {
     "signature": lambda r: (r.get("check") or "").startswith("signature-"),
     "a1": lambda r: r.get("release") == "A1",
@@ -157,6 +162,8 @@ def run_recall(manifest: dict, scope: str = "all", overrides: Optional[dict] = N
             implemented, broken = {r["check"] for r in manifest["defects"] if r.get("check")}, str(exc)
     elif implemented is None:
         implemented = {r["check"] for r in manifest["defects"] if r.get("check")}
+    problems = [f"manifest: {d['id']}: unknown check id '{d['check']}'" for d in manifest["defects"]
+                if d.get("check") and d["check"] not in KNOWN_CHECKS]
     in_scope = SCOPES[scope]
     rows = []
     for d in manifest["defects"]:
@@ -196,10 +203,10 @@ def run_recall(manifest: dict, scope: str = "all", overrides: Optional[dict] = N
                   and all(d.get(k) is None or f.get(k) == d[k] for k in ("file", "function", "arg"))
                   for f in findings)
         row["outcome"] = CAUGHT if hit else MISSED
-    return summarize(rows, allow_unavailable)
+    return summarize(rows, allow_unavailable, problems)
 
 
-def summarize(rows: list, allow_unavailable: bool = False) -> dict:
+def summarize(rows: list, allow_unavailable: bool = False, problems: Optional[list] = None) -> dict:
     firm = [r for r in rows if r["expectation"] == "firm"]
     cond = [r for r in rows if r["expectation"] == "conditional"]
     gated = [r for r in firm if r["outcome"] not in (PENDING, UNAVAILABLE, NO_REF)]
@@ -215,8 +222,8 @@ def summarize(rows: list, allow_unavailable: bool = False) -> dict:
         "firm_pending": len(firm) - len(gated),
         "conditional_caught": sum(r["outcome"] == CAUGHT for r in cond),
         "conditional_total": len(cond),
-        "failures": [r["id"] for r in failures],
-        "ok": not failures,
+        "failures": [r["id"] for r in failures] + list(problems or []),
+        "ok": not failures and not problems,
     }
 
 

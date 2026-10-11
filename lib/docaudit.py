@@ -49,12 +49,43 @@ class _BudgetExceeded(Exception):
     pass
 
 
-def _read(path: Path) -> str:
-    """File text, or "" when unreadable: the audit never raises on a bad file."""
+def _read(path: Path, notes: list, root: Optional[Path] = None) -> str:
+    """File text. An unreadable file yields "" **and a note** (which marks the audit incomplete):
+    the audit never raises on a bad file, but it must never read as a clean one either."""
     try:
         return path.read_text(encoding="utf-8", errors="replace")
-    except OSError:
+    except OSError as exc:
+        try:
+            shown = path.relative_to(root).as_posix() if root else path.name
+        except ValueError:
+            shown = path.name
+        notes.append(f"{shown} unreadable: {type(exc).__name__}: {exc}")
         return ""
+
+
+_RAW_OPEN = re.compile(r"(?<![\w.])[rR](?P<q>[\"'])(?P<d>-*)(?P<o>[(\[{])")
+_RAW_CLOSE = {"(": ")", "[": "]", "{": "}"}
+
+
+def blank_raw_strings(text: str) -> str:
+    """Blank R raw string constants (``r"(...)"``, ``R"---[...]---"``, any quote): their contents are
+    text, never code, and the string masker would mistake the embedded quotes for string boundaries."""
+    out, pos = [], 0
+    for m in _RAW_OPEN.finditer(text):
+        if m.start() < pos:
+            continue
+        closer = _RAW_CLOSE[m.group("o")] + m.group("d") + m.group("q")
+        end = text.find(closer, m.end())
+        end = len(text) if end == -1 else end + len(closer)
+        out.append(text[pos:m.start()])
+        out.append("".join(c if c == "\n" else " " for c in text[m.start():end]))
+        pos = end
+    out.append(text[pos:])
+    return "".join(out)
+
+
+def _mask(text: str) -> str:
+    return _mask_strings_and_comments(blank_raw_strings(text))
 
 
 # ───────────────────────── small parsing helpers ─────────────────────────
@@ -163,9 +194,9 @@ def parse_rd_usage(rd: str) -> tuple[dict[str, list[str]], set[str]]:
     block = re.sub(r"(?<!\\)%.*", "", block)
     block = block.replace("\\dots", "...").replace("\\ldots", "...")
     if len(block) > _MAX_REGION:
-        return {}, set()
+        raise _BudgetExceeded
     methods = {f"{g}.{c}" for g, c in re.findall(r"\\(?:S3)?method\{([^}]*)\}\{([^}]*)\}", block)}
-    masked = _mask_strings_and_comments(block)  # string defaults such as `sep = ")"` must not split or close the call
+    masked = _mask(block)  # string defaults such as `sep = ")"` must not split or close the call
     funcs: dict[str, list[str]] = {}
     closes = paren_map(masked)
     budget = _WORK_BUDGET
@@ -176,7 +207,7 @@ def parse_rd_usage(rd: str) -> tuple[dict[str, list[str]], set[str]]:
         budget -= close - m.end()
         if budget < 0:
             raise _BudgetExceeded
-        funcs[m.group(1)] = [a.split("=")[0].strip() for a in split_args(masked[m.end():close])]
+        funcs[m.group(1)] = [a.split("=")[0].strip().strip("`'\"") for a in split_args(masked[m.end():close])]
     return funcs, methods
 
 
@@ -195,18 +226,18 @@ def read_api(root: Path) -> PackageApi:
     notes: list[str] = []
     man = root / "man"
     for rd in sorted(p for p in man.glob("*.Rd") if p.is_file()) if man.is_dir() else []:
-        text = _read(rd)
+        text = _read(rd, notes, root)
         try:
             funcs, meths = parse_rd_usage(text)
         except _BudgetExceeded:
-            notes.append(f"man/{rd.name} skipped: too much nested usage text to scan")
+            notes.append(f"man/{rd.name} skipped: usage block too large or too deeply nested to scan")
             continue
         formals.update(funcs)
         methods |= meths
         if rd.name == "reexports.Rd":
             reexports |= set(re.findall(r"\\alias\{([^}]*)\}", text))
     ns = root / "NAMESPACE"
-    exports, pattern = parse_namespace(_read(ns)) if ns.is_file() else (set(), False)
+    exports, pattern = parse_namespace(_read(ns, notes, root)) if ns.is_file() else (set(), False)
     if pattern or not ns.is_file():
         exports |= set(formals)  # exports unknown: treat every documented function as exported
     return PackageApi({f: v for f, v in formals.items() if f in exports}, exports, methods, reexports, pattern, notes)
@@ -279,7 +310,7 @@ def local_definitions(regions: list[Region]) -> frozenset:
     names: set[str] = set()
     for r in regions:
         if r.kind == "fence" and len(r.text) <= _MAX_REGION:
-            names.update(_LOCAL_DEF.findall(_mask_strings_and_comments(r.text)))
+            names.update(_LOCAL_DEF.findall(_mask(r.text)))
             names.update(m.group("n") for m in _ASSIGN_DEF.finditer(r.text))
     return frozenset(names)
 
@@ -301,6 +332,7 @@ def unmatched_named(names: list[str], formals: list[str], dots: bool = False) ->
     exact = {n for n in names if n in formals}
     free = [f for f in formals if f not in exact]
     seen: set[str] = set()
+    seen_dots: set[str] = set()
     claimed: set[str] = set()
     bad: list[tuple[str, str]] = []
     for n in names:
@@ -312,6 +344,9 @@ def unmatched_named(names: list[str], formals: list[str], dots: bool = False) ->
         if dots:
             if not any(f.startswith(n) for f in formals):
                 bad.append((n, "unknown"))
+            elif n in seen_dots:  # the same name twice cannot both be absorbed by a forwarded `...`
+                bad.append((n, "duplicate"))
+            seen_dots.add(n)
             continue
         candidates = [f for f in free if f.startswith(n)]
         if not candidates:
@@ -325,7 +360,10 @@ def unmatched_named(names: list[str], formals: list[str], dots: bool = False) ->
     return bad
 
 
-def _calls(masked: str, raw: str, pkg: str, api: PackageApi) -> Iterator[tuple[str, int, list[str], list[str]]]:
+_UNPARSED = re.compile(r"#|\\|\b[rR][\"']")
+
+
+def _calls(masked: str, raw: str, pkg: str, api: PackageApi) -> Iterator[tuple[str, int, list[str], list[str], bool]]:
     """Yield ``(function, offset, masked_args, raw_args)`` for each call to an exported documented function.
 
     Calls qualified by another namespace (``other::f``) or reached through ``$``/``@`` are skipped, with
@@ -351,7 +389,7 @@ def _calls(masked: str, raw: str, pkg: str, api: PackageApi) -> Iterator[tuple[s
         base = m.end()
         spans = split_spans(masked[base:close])
         yield (fn, m.start("fn"), [masked[base + s:base + e] for s, e in spans],
-               [raw[base + s:base + e] for s, e in spans])
+               [raw[base + s:base + e] for s, e in spans], bool(_UNPARSED.search(raw[base:close])))
 
 
 def _finding(check: str, severity: str, file: str, line: int, function: str, arg: Optional[str], message: str) -> dict:
@@ -367,7 +405,7 @@ def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: fro
         if notes is not None:
             notes.append(f"region at {where} skipped: {len(region.text):,} characters is over the {_MAX_REGION:,} limit")
         return []
-    masked = _mask_strings_and_comments(region.text)
+    masked = _mask(region.text)
     newlines = [i for i, ch in enumerate(masked) if ch == "\n"]
     findings: list[dict] = []
     try:
@@ -376,7 +414,7 @@ def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: fro
         if notes is not None:
             notes.append(f"region at {where} skipped: too much nested call text to scan")
         return []
-    for fn, off, args, raws in calls:
+    for fn, off, args, raws, unparsed in calls:
         if fn in local:
             continue
         formals = api.formals[fn]
@@ -396,8 +434,9 @@ def check_region(region: Region, rel: str, pkg: str, api: PackageApi, local: fro
         why = {"unknown": "has no argument `{}`", "ambiguous": "argument `{}` matches more than one formal",
                "duplicate": "argument `{}` is given more than once, or its formal is already matched"}
         for name, reason in unmatched_named(names, formals, forwards_dots):
-            findings.append(_finding("signature-named-arg", "error", rel, line, fn, name,
-                                     f"`{fn}()` {why[reason].format(name)} (formals: {shown})"))
+            note = " (call contains unparsed syntax: comments, escapes or raw strings; check by hand)" if unparsed else ""
+            findings.append(_finding("signature-named-arg", "warn" if unparsed else "error", rel, line, fn, name,
+                                     f"`{fn}()` {why[reason].format(name)} (formals: {shown}){note}"))
         if not forwards_dots and positional > len(formals):
             findings.append(_finding("signature-arity", "warn", rel, line, fn, None,
                                      f"`{fn}()` takes {len(formals)} argument(s) but the call passes {positional} positionally (formals: {shown})"))
@@ -440,10 +479,10 @@ def _summary_line(cov: dict, pattern: bool) -> str:
 # ───────────────────────── entry points ─────────────────────────
 
 
-def _package_name(root: Path) -> str:
+def _package_name(root: Path, notes: list) -> str:
     desc = root / "DESCRIPTION"
     if desc.is_file():
-        m = re.search(r"(?m)^Package:\s*(\S+)", _read(desc))
+        m = re.search(r"(?m)^Package:\s*(\S+)", _read(desc, notes, root))
         if m:
             return m.group(1)
     return ""
@@ -457,13 +496,13 @@ def _envelope(findings: list, messages: list, summary: dict, incomplete: bool = 
 
 
 def _audit(root: Path) -> tuple[list, PackageApi, list]:
-    pkg = _package_name(root)
+    notes: list[str] = []
+    pkg = _package_name(root, notes)
     api = read_api(root)
     findings: list[dict] = []
-    notes: list[str] = []
     for f in doc_files(root):
         rel = f.relative_to(root).as_posix()
-        regions = extract_regions(_read(f))
+        regions = extract_regions(_read(f, notes, root))
         local = local_definitions(regions)
         for region in regions:
             for finding in check_region(region, rel, pkg, api, local, notes):

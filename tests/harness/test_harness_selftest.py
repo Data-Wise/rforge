@@ -364,3 +364,20 @@ def test_history_stats_count_audited_revisions(repo):
     stats: dict = {}
     replay.run_history(path, n=10, audit=stub_audit, stats=stats)
     assert stats == {"revisions": 2, "audited": 2, "skipped_empty": 0}
+
+
+# ───────────────────────── Codex re-review #2: the lock cannot be bypassed by a misspelled check or the scope filter ─────────────────────────
+
+
+def test_misspelled_locked_check_fails_even_when_scope_would_filter_it_out():
+    m = json.loads(MANIFEST.read_text())
+    for r in m["defects"]:
+        if r["id"] == "refcard-joint-effects-args":
+            r["check"] = "sigature-names"
+    s = replay.run_recall(m, scope="signature", allow_unavailable=True)
+    assert not s["ok"] and any("sigature-names" in f for f in s["failures"])
+
+
+def test_every_manifest_check_id_is_known():
+    m = json.loads(MANIFEST.read_text())
+    assert {r["check"] for r in m["defects"] if r["check"]} <= replay.KNOWN_CHECKS

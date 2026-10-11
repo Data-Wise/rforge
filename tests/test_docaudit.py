@@ -501,3 +501,62 @@ def test_nested_rd_usage_is_budgeted_and_reported(tmp_path):
     r = docaudit.audit_package(tmp_path)
     assert time.perf_counter() - t < 3
     assert r["incomplete"] is True and any("f.Rd" in m and "skipped" in m for m in r["messages"])
+
+
+# ───────────────────────── Codex re-review #2 (option A): fail safe, never read as clean ─────────────────────────
+
+
+def test_raw_strings_are_not_code():
+    assert run(fence('s <- r"{example: "f(gamma = 1)"}"'), **AA) == []
+    assert run(fence('s <- R"---(f(gamma = 1))---"\ns2 <- r\'[f(gamma = 1)]\''), **AA) == []
+
+
+def test_a_real_call_after_a_raw_string_is_still_checked():
+    f = run(fence('s <- r"(text)"\nf(gamma = 1)'), **AA)
+    assert kinds(f) == [("signature-named-arg", "gamma")] and f[0]["severity"] == "error" and f[0]["line"] == 11
+
+
+@pytest.mark.parametrize("call", ["f(alpha # a comment\n  = 1, al = 2)", 'f("al\\u0070ha" = 1, al = 2)', "f(\\(x) x, zzz = 1)"])
+def test_calls_with_comments_escapes_or_lambdas_fail_safe_to_warn(call):
+    found = run(fence(call), **AA)
+    assert found and {f["severity"] for f in found} == {"warn"}
+    assert "unparsed syntax" in found[0]["message"]
+
+
+def test_plain_calls_keep_error_severity():
+    assert {f["severity"] for f in run(fence("f(zzz = 1)"), **AA)} == {"error"}
+
+
+def test_quoted_formal_names_are_normalized():
+    funcs, _ = parse_rd_usage(rd("f(`a b`, `c d` = 1)"))
+    assert funcs == {"f": ["a b", "c d"]}
+    assert run(fence('f("a b" = 1, `c d` = 2)'), f=["a b", "c d"]) == []
+
+
+def test_forwarded_dots_do_not_hide_a_duplicate_partial():
+    assert kinds(run(fence("f(..., alpi = 1, alpi = 2)"), **AA)) == [("signature-named-arg", "alpi")]
+    # an unknown name is an error even with forwarded dots: the callee has no `...` to absorb it
+    assert {a for _, a in kinds(run(fence("f(..., zzz = 1, zzz = 2)"), **AA))} == {"zzz"}
+
+
+def test_unreadable_doc_marks_the_audit_incomplete(tmp_path, monkeypatch):
+    make_pkg(tmp_path, ns="export(f)\n", rds={"f": "f(a)"}, docs={"README.md": "```r\nf(z = 1)\n```\n"})
+    real = Path.read_text
+
+    def flaky(self, *a, **k):
+        if self.name in ("README.md", "NAMESPACE", "f.Rd"):
+            raise PermissionError("denied")
+        return real(self, *a, **k)
+
+    monkeypatch.setattr(Path, "read_text", flaky)
+    r = docaudit.audit_package(tmp_path)
+    assert r["incomplete"] is True
+    for name in ("README.md", "NAMESPACE", "f.Rd"):
+        assert any(name in m and "unreadable" in m for m in r["messages"]), name
+
+
+def test_oversized_rd_usage_is_reported_not_silent(tmp_path):
+    make_pkg(tmp_path, ns="export(f)\n", rds={}, docs={"README.md": "`f(a)`\n"})
+    (tmp_path / "man" / "f.Rd").write_text("\\name{f}\n\\usage{\nf(" + "a, " * 100_000 + "b)\n}\n")
+    r = docaudit.audit_package(tmp_path)
+    assert r["incomplete"] is True and any("f.Rd skipped" in m for m in r["messages"])
