@@ -109,3 +109,9 @@ Handy one-line descriptions grouped by purpose.
 | `/rforge:r:use-citation` | Scaffold a CITATION file |
 
 → See the [full Reference Card](REFCARD.md) for detailed descriptions and flags.
+
+Optional docs audit: `--site URL` plus optional local `--ref REF`;
+`--run-examples --examples-budget-seconds N` for supervised root README replay.
+Default remains static. Inspect stage coverage; unpaired rendered assertions and
+unsupported options are incomplete. Complete A2 warnings gate warn, incomplete
+stages gate warn/error. No site build/deploy/fetch; example replay is opt-in.

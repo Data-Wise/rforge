@@ -1,0 +1,73 @@
+name: A2 release evidence
+on:
+  workflow_dispatch:
+    inputs:
+      acceptance-observations:
+        description: Candidate-bound JSON observations collected after the candidate commit; missing data blocks aggregate acceptance.
+        type: string
+        required: false
+        default: ''
+permissions:
+  contents: read
+jobs:
+  a2-release:
+    name: A2 required evidence (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Read exact R lock
+        id: lock
+        run: python -c 'import json,os; f=open(os.environ["GITHUB_OUTPUT"],"a"); print("R="+json.load(open("tests/a2/fixture-lock.json"))["R"],file=f)'
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ steps.lock.outputs.R }}
+      - name: Provision locked fixture dependencies
+        run: Rscript --vanilla scripts/provision_a2.R
+      - name: Install Python and build dependencies
+        run: python -m pip install pytest pyyaml mkdocs-material mkdocs-macros-plugin pillow cairosvg
+      - name: Run required collection and execution
+        env:
+          A2_PLATFORM: ${{ matrix.os }}
+        run: python scripts/run_a2_release.py --output a2-release-evidence
+      - name: Upload evidence including failure records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-release-evidence-${{ matrix.os }}
+          path: a2-release-evidence/
+          if-no-files-found: error
+  aggregate:
+    name: Verify both retrieved A2 artifacts
+    needs: a2-release
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: a2-release-evidence-*
+          path: retrieved-a2-evidence
+      - name: Read candidate-bound observation input as data
+        env:
+          A2_OBSERVATIONS: ${{ inputs.acceptance-observations }}
+        run: |
+          python - <<'PYOBS'
+          import json, os
+          from pathlib import Path
+          value = json.loads(os.environ.get("A2_OBSERVATIONS") or "{}")
+          if not isinstance(value, dict) or not value:
+              raise SystemExit("Completed candidate-bound observations are required for aggregate acceptance")
+          Path("a2-acceptance-observations.json").write_text(json.dumps(value))
+          PYOBS
+      - name: Verify source-bound artifacts and actual completed observations
+        run: python scripts/verify_a2_aggregate.py --artifacts retrieved-a2-evidence --observations a2-acceptance-observations.json --candidate-sha "$GITHUB_SHA"

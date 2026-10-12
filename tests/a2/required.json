@@ -1,0 +1,862 @@
+{
+  "spec_sha256": "b202409f690b478fcb3fe6473afb4021930a1e271e8ae2a90ec0370bebe65b51",
+  "status": "pending",
+  "groups": [
+    {
+      "id": "C01",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_a1_default_unchanged",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_a1_default_unchanged"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "C02",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_cli_scope_validation",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_cli_scope_validation[args0]",
+        "tests/a2/test_reporting.py::test_cli_scope_validation[args1]",
+        "tests/a2/test_reporting.py::test_cli_scope_validation[args2]",
+        "tests/a2/test_reporting.py::test_cli_scope_validation[args3]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "C03",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_stage_state_preserves_static_findings",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_stage_state_preserves_static_findings"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "C04",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_threshold_matrix",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_threshold_matrix[none-True-warn-0]",
+        "tests/a2/test_reporting.py::test_threshold_matrix[warn-True-warn-2]",
+        "tests/a2/test_reporting.py::test_threshold_matrix[error-True-warn-2]",
+        "tests/a2/test_reporting.py::test_threshold_matrix[warn-False-warn-1]",
+        "tests/a2/test_reporting.py::test_threshold_matrix[error-False-warn-0]",
+        "tests/a2/test_reporting.py::test_threshold_matrix[error-False-error-1]",
+        "tests/a2/test_reporting.py::test_threshold_matrix[warn-False-none-0]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "C05",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_text_json_diagnostics",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_text_json_diagnostics"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "C06",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_engine_union_and_package_reasons",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_engine_union_and_package_reasons"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "C07",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_allowlist_preserves_incomplete",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_allowlist_preserves_incomplete"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "S01",
+      "task": "T03",
+      "proposed_node": "tests/a2/test_site_refs.py::test_explicit_ref_immutable_tree",
+      "nodes": [
+        "tests/a2/test_site_refs.py::test_explicit_ref_immutable_tree"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "S02",
+      "task": "T03",
+      "proposed_node": "tests/a2/test_site_refs.py::test_workflow_inference_and_fallback",
+      "nodes": [
+        "tests/a2/test_site_refs.py::test_workflow_inference_and_fallback"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "S03",
+      "task": "T03",
+      "proposed_node": "tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref",
+      "nodes": [
+        "tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref[[main, dev]]",
+        "tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref[['*']]",
+        "tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref[['${{ github.ref }}']]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "S04",
+      "task": "T03",
+      "proposed_node": "tests/a2/test_site_refs.py::test_yaml_reader_missing",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "S05",
+      "task": "T04",
+      "proposed_node": "tests/a2/test_site_routes.py::test_rd_routes_keep_internal_topics",
+      "nodes": [
+        "tests/a2/test_site_routes.py::test_rd_routes_keep_internal_topics"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "S06",
+      "task": "T04",
+      "proposed_node": "tests/a2/test_site_routes.py::test_pinned_pkgdown_article_routes",
+      "nodes": [
+        "tests/a2/test_site_routes.py::test_pinned_pkgdown_article_routes"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "S07",
+      "task": "T04",
+      "proposed_node": "tests/a2/test_site_routes.py::test_route_collisions_and_custom_layout",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "S08",
+      "task": "T04",
+      "proposed_node": "tests/a2/test_site_routes.py::test_release_mode_and_destination",
+      "nodes": [
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config0-True]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config1-True]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config2-True]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config3-False]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config4-False]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config5-False]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config6-False]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config7-False]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "S09",
+      "task": "T05",
+      "proposed_node": "tests/a2/test_site_http.py::test_base_url_validation_normalization",
+      "nodes": [
+        "tests/a2/test_site_http.py::test_base_url_validation_normalization[https://EXAMPLE.org:443/pkg-https://example.org/pkg/]",
+        "tests/a2/test_site_http.py::test_base_url_validation_normalization[http://example.org:80/pkg/-http://example.org/pkg/]",
+        "tests/a2/test_site_http.py::test_base_url_validation_normalization[https://example.org/Pkg%2fslice/-https://example.org/Pkg%2Fslice/]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "S10",
+      "task": "T05",
+      "proposed_node": "tests/a2/test_site_http.py::test_same_origin_redirect_policy",
+      "nodes": [
+        "tests/a2/test_site_http.py::test_same_origin_redirect_policy[1-True]",
+        "tests/a2/test_site_http.py::test_same_origin_redirect_policy[3-True]",
+        "tests/a2/test_site_http.py::test_same_origin_redirect_policy[4-False]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "S11",
+      "task": "T05",
+      "proposed_node": "tests/a2/test_site_http.py::test_sitemap_shape_and_bounds",
+      "nodes": [
+        "tests/a2/test_site_http.py::test_sitemap_shape_and_bounds"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "S12",
+      "task": "T05",
+      "proposed_node": "tests/a2/test_site_http.py::test_foreign_and_zero_inbase_entries",
+      "nodes": [
+        "tests/a2/test_site_http.py::test_foreign_and_zero_inbase_entries"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "S13",
+      "task": "T06",
+      "proposed_node": "tests/a2/test_site_integration.py::test_missing_extra_and_unreleased_severity",
+      "nodes": [
+        "tests/a2/test_site_integration.py::test_missing_extra_and_unreleased_severity"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "S14",
+      "task": "T06",
+      "proposed_node": "tests/a2/test_site_integration.py::test_site_cli_thresholds",
+      "nodes": [
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[none-clean]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[none-missing]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[none-offline]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[none-unsupported]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[warn-clean]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[warn-missing]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[warn-offline]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[warn-unsupported]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[error-clean]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[error-missing]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[error-offline]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[error-unsupported]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "S15",
+      "task": "T06",
+      "proposed_node": "tests/a2/test_site_integration.py::test_no_build_crawl_fetch_or_deploy",
+      "nodes": [
+        "tests/a2/test_site_integration.py::test_no_build_crawl_fetch_or_deploy"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "G01",
+      "task": "T07",
+      "proposed_node": "tests/a2/test_guardian.py::test_handshake_before_package_code",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_handshake_before_package_code"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "G02",
+      "task": "T07",
+      "proposed_node": "tests/a2/test_guardian.py::test_phase_arm_ack_sequence",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_phase_arm_ack_sequence"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "G03",
+      "task": "T07",
+      "proposed_node": "tests/a2/test_guardian.py::test_heartbeat_age_and_stale_records",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_heartbeat_age_and_stale_records[0.25-deadline]",
+        "tests/a2/test_guardian.py::test_heartbeat_age_and_stale_records[6-parent-loss]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "G04",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_single_termination_owner_idempotence",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_single_termination_owner_idempotence"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "G05",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_deadline_completion_collision",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_deadline_completion_collision"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "G06",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_term_kill_cleanup_observations",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "G07",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_parent_loss_preserves_deadline",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_parent_loss_preserves_deadline"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "G08",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_guardian_failure_emergency_cleanup",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_guardian_failure_emergency_cleanup"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "G09",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_detached_child_and_total_host_loss",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_detached_child_and_total_host_loss"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "G10",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_monotonic_clock_and_scheduler_delay",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_monotonic_clock_and_scheduler_delay"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "I01",
+      "task": "T09",
+      "proposed_node": "tests/a2/test_stdio.py::test_native_output_does_not_deadlock",
+      "nodes": [
+        "tests/a2/test_stdio.py::test_native_output_does_not_deadlock"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "I02",
+      "task": "T09",
+      "proposed_node": "tests/a2/test_stdio.py::test_shared_text_output_threshold",
+      "nodes": [
+        "tests/a2/test_stdio.py::test_shared_text_output_threshold"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "I03",
+      "task": "T09",
+      "proposed_node": "tests/a2/test_stdio.py::test_output_overshoot_with_parent_loss",
+      "nodes": [
+        "tests/a2/test_stdio.py::test_output_overshoot_with_parent_loss"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "I04",
+      "task": "T09",
+      "proposed_node": "tests/a2/test_stdio.py::test_checkpoint_and_marker_integrity",
+      "nodes": [
+        "tests/a2/test_stdio.py::test_checkpoint_and_marker_integrity"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "I05",
+      "task": "T09",
+      "proposed_node": "tests/a2/test_stdio.py::test_bounded_finalization_and_artifacts",
+      "nodes": [
+        "tests/a2/test_stdio.py::test_bounded_finalization_and_artifacts"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "E01",
+      "task": "T10",
+      "proposed_node": "tests/a2/test_readme.py::test_source_selection_and_ambiguity",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "E02",
+      "task": "T10",
+      "proposed_node": "tests/a2/test_readme.py::test_rendered_unpaired_counts",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "E03",
+      "task": "T10",
+      "proposed_node": "tests/a2/test_readme.py::test_explicit_closed_fence_extraction",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "E04",
+      "task": "T10",
+      "proposed_node": "tests/a2/test_readme.py::test_pasted_output_and_skip_marker_location",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "E05",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_literal_defaults_precedence",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "E06",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_supported_visibility_options",
+      "nodes": [
+        "tests/a2/test_readme.py::test_supported_visibility_options[warning-warning=FALSE-Warning: hidden]",
+        "tests/a2/test_readme.py::test_supported_visibility_options[message-message=FALSE-Message: hidden]",
+        "tests/a2/test_readme.py::test_supported_visibility_options[stdout-results=\"hide\"-[1] 1]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "E07",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_unsupported_options_fail_preflight",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "E08",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_installation_token_filter",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "E09",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_coverage_partition_and_exclusions",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "E10",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_no_eligible_assertions_no_setup",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "E11",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_real_readme_shape_regressions",
+      "nodes": [
+        "tests/a2/test_readme.py::test_real_readme_shape_regressions"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "N01",
+      "task": "T12",
+      "proposed_node": "tests/a2/test_comparison.py::test_documented_precision_cases",
+      "nodes": [
+        "tests/a2/test_comparison.py::test_documented_precision_cases[0.19-0.20-match]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[0.19-0.20001-output]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[1e-04-2e-04-match]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[1.00e-04-1.02e-04-output]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[-0.19--0.20-match]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[55%-36 %-output]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[55%-0.55-shape]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[1,234-1234-shape]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[NA-NaN-output]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[Inf--Inf-output]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[label [1] 1-other [1] 1-shape]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[[1] 1 2-[1] 1-shape]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "N02",
+      "task": "T12",
+      "proposed_node": "tests/a2/test_comparison.py::test_labeled_inequality_cases",
+      "nodes": [
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-p = 0.001-output]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p <= 0.001-p = 0.001-match]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-p < 2e-16-match]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-p < 0.01-unverified]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-p > 0.01-unverified]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-<2e-16-shape]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[<2e-16-<2e-16-shape]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-p < .-shape]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "N03",
+      "task": "T12",
+      "proposed_node": "tests/a2/test_comparison.py::test_expression_subsequence_no_reuse",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "N04",
+      "task": "T12",
+      "proposed_node": "tests/a2/test_comparison.py::test_rng_and_unstable_fields",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "N05",
+      "task": "T12",
+      "proposed_node": "tests/a2/test_comparison.py::test_warn_only_and_complete_mismatch",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "R01",
+      "task": "T13",
+      "proposed_node": "tests/a2/test_examples_r.py::test_fresh_ordered_hidden_setup",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_fresh_ordered_hidden_setup"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "R02",
+      "task": "T13",
+      "proposed_node": "tests/a2/test_examples_r.py::test_working_tree_load_identity",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_working_tree_load_identity"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "R03",
+      "task": "T13",
+      "proposed_node": "tests/a2/test_examples_r.py::test_dependency_preflight_no_install",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_dependency_preflight_no_install"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "R04",
+      "task": "T13",
+      "proposed_node": "tests/a2/test_examples_r.py::test_visibility_and_conditions_channels",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_visibility_and_conditions_channels"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "R05",
+      "task": "T13",
+      "proposed_node": "tests/a2/test_examples_r.py::test_one_upstream_failure",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "R06",
+      "task": "T13",
+      "proposed_node": "tests/a2/test_examples_r.py::test_clean_and_planted_stale_output",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_clean_and_planted_stale_output[0.19-complete]",
+        "tests/a2/test_examples_r.py::test_clean_and_planted_stale_output[0.80-complete]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "R07",
+      "task": "T14",
+      "proposed_node": "tests/a2/test_examples_cli.py::test_native_chunk_deadline",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_native_chunk_deadline"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "R08",
+      "task": "T14",
+      "proposed_node": "tests/a2/test_examples_cli.py::test_file_loading_deadline",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_file_loading_deadline"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "R09",
+      "task": "T14",
+      "proposed_node": "tests/a2/test_examples_cli.py::test_global_budget_across_packages",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_global_budget_across_packages"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "R10",
+      "task": "T14",
+      "proposed_node": "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[none-0-json]",
+        "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[none-0-text]",
+        "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[warn-2-json]",
+        "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[warn-2-text]",
+        "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[error-2-json]",
+        "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[error-2-text]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "R11",
+      "task": "T14",
+      "proposed_node": "tests/a2/test_examples_cli.py::test_wrapper_lifetime_and_interruption",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_wrapper_lifetime_and_interruption"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "R12",
+      "task": "T14",
+      "proposed_node": "tests/a2/test_examples_cli.py::test_combined_stage_and_eco_partial_results",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_combined_stage_and_eco_partial_results[site]",
+        "tests/a2/test_examples_cli.py::test_combined_stage_and_eco_partial_results[examples]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "A01",
+      "task": "T15",
+      "proposed_node": "tests/a2/test_agent.py::test_default_recipe_stays_static",
+      "nodes": [
+        "tests/a2/test_agent.py::test_default_recipe_stays_static"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "A02",
+      "task": "T15",
+      "proposed_node": "tests/a2/test_agent.py::test_human_versus_imported_url",
+      "nodes": [
+        "tests/a2/test_agent.py::test_human_versus_imported_url[human-https://example.org/pkg/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[human-http://127.0.0.1/private/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[file-https://example.org/pkg/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[file-http://127.0.0.1/private/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[tool-https://example.org/pkg/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[tool-http://127.0.0.1/private/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[absent-https://example.org/pkg/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[absent-http://127.0.0.1/private/]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "A03",
+      "task": "T15",
+      "proposed_node": "tests/a2/test_agent.py::test_examples_always_recommend_only",
+      "nodes": [
+        "tests/a2/test_agent.py::test_examples_always_recommend_only[argv0]",
+        "tests/a2/test_agent.py::test_examples_always_recommend_only[argv1]",
+        "tests/a2/test_agent.py::test_examples_always_recommend_only[argv2]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "A04",
+      "task": "T15",
+      "proposed_node": "tests/a2/test_agent.py::test_recipe_parse_uses_stubs",
+      "nodes": [
+        "tests/a2/test_agent.py::test_recipe_parse_uses_stubs"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "D01",
+      "task": "T16",
+      "proposed_node": "tests/a2/test_shipping.py::test_r_script_packaged_and_parses",
+      "nodes": [
+        "tests/a2/test_shipping.py::test_r_script_packaged_and_parses"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "D02",
+      "task": "T16",
+      "proposed_node": "tests/a2/test_shipping.py::test_no_new_public_module_dependency",
+      "nodes": [
+        "tests/a2/test_shipping.py::test_no_new_public_module_dependency"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "D03",
+      "task": "T17",
+      "proposed_node": "tests/a2/test_docs.py::test_command_flags_and_reference_sync",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "D04",
+      "task": "T18",
+      "proposed_node": "tests/a2/test_docs.py::test_walkthroughs_and_site_content",
+      "nodes": [
+        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/guides/docs-audit.md-terms0]",
+        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/tutorials/fix-a-docs-check-finding.md-terms1]",
+        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/workflows/index.md-terms2]",
+        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/quickstart.md-terms3]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "D05",
+      "task": "T19",
+      "proposed_node": "tests/a2/test_docs.py::test_status_guidance_count_sync",
+      "nodes": [],
+      "status": "pending"
+    },
+    {
+      "id": "V01",
+      "task": "T20",
+      "proposed_node": "tests/a2/test_release_verifier.py::test_manifest_mapping_and_collection",
+      "nodes": [
+        "tests/a2/test_release_verifier.py::test_manifest_mapping_and_collection"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "V02",
+      "task": "T20",
+      "proposed_node": "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass",
+      "nodes": [
+        "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[None]",
+        "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[skipped]",
+        "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[xfailed]",
+        "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[xpassed]",
+        "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[failed]",
+        "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[deselected]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "V03",
+      "task": "T20",
+      "proposed_node": "tests/a2/test_release_verifier.py::test_expected_findings_exactness",
+      "nodes": [
+        "tests/a2/test_release_verifier.py::test_expected_findings_exactness"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "V04",
+      "task": "T20",
+      "proposed_node": "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions",
+      "nodes": [
+        "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[candidate_sha]",
+        "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[lock_hash]",
+        "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[manifest_hash]",
+        "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[collection_run_id]",
+        "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[reported_r_checked]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "V08",
+      "task": "T20",
+      "proposed_node": "tests/a2/test_release_verifier.py::test_developer_and_release_modes",
+      "nodes": [
+        "tests/a2/test_release_verifier.py::test_developer_and_release_modes"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "V05",
+      "task": "T21",
+      "proposed_node": "tests/a2/test_release_ci.py::test_both_platforms_locked_runtime",
+      "nodes": [
+        "tests/a2/test_release_ci.py::test_both_platforms_locked_runtime"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "V06",
+      "task": "T21",
+      "proposed_node": "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance",
+      "nodes": [
+        "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance[missing]",
+        "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance[upload-failed]",
+        "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance[stale]",
+        "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance[unretrieved]",
+        "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance[unverified]",
+        "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance[duplicate]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "V07",
+      "task": "T21",
+      "proposed_node": "tests/a2/test_release_ci.py::test_unsupported_platform_diagnostic",
+      "nodes": [
+        "tests/a2/test_release_ci.py::test_unsupported_platform_diagnostic"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "H01",
+      "task": "T22",
+      "proposed_node": "tests/a2/test_evidence.py::test_committed_defect_replay",
+      "nodes": [
+        "tests/a2/test_evidence.py::test_committed_defect_replay"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "H02",
+      "task": "T22",
+      "proposed_node": "tests/a2/test_evidence.py::test_package_coverage_triage",
+      "nodes": [
+        "tests/a2/test_evidence.py::test_package_coverage_triage"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "H03",
+      "task": "T22",
+      "proposed_node": "tests/a2/test_evidence.py::test_live_site_smoke_evidence",
+      "nodes": [
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[failed-live_smoke]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[failed-package_triage]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[incomplete-live_smoke]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[incomplete-package_triage]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[unavailable-live_smoke]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[unavailable-package_triage]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[pending-live_smoke]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[pending-package_triage]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "F01",
+      "task": "T23",
+      "proposed_node": "tests/a2/test_final_gates.py::test_gate_record_validation",
+      "nodes": [
+        "tests/a2/test_final_gates.py::test_gate_record_validation[missing-full_gates]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[missing-rendered_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[missing-adversarial_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[missing-requirement_mapping]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[failed-full_gates]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[failed-rendered_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[failed-adversarial_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[failed-requirement_mapping]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[stale-full_gates]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[stale-rendered_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[stale-adversarial_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[stale-requirement_mapping]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[no-provenance-full_gates]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[no-provenance-rendered_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[no-provenance-adversarial_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[no-provenance-requirement_mapping]"
+      ],
+      "status": "coverage-review-pending"
+    },
+    {
+      "id": "F02",
+      "task": "T23",
+      "proposed_node": "tests/a2/test_final_gates.py::test_review_record_validation",
+      "nodes": [
+        "tests/a2/test_final_gates.py::test_review_record_validation"
+      ],
+      "status": "coverage-review-pending"
+    }
+  ]
+}

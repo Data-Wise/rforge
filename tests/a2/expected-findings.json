@@ -1,0 +1,9 @@
+{
+  "status": "ready",
+  "fixtures": {
+    "examples-clean": {"assertion_ids": ["README.md:4"], "findings": []},
+    "examples-planted": {"assertion_ids": ["README.md:4"], "findings": [{"check":"examples-output","severity":"warn","file":"README.md","assertion_id":"README.md:4"}]},
+    "site-clean": {"routes": ["articles/foo.html","reference/private.html"], "findings": []},
+    "site-planted": {"routes": ["articles/foo.html","reference/private.html"], "findings": [{"check":"site-missing-page","severity":"warn","file":"man/private.Rd"}]}
+  }
+}

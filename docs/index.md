@@ -221,3 +221,12 @@ Restart Claude Code so the commands register, then verify with `/help` (look for
 ## License
 
 MIT. Source: <https://github.com/Data-Wise/rforge>
+
+## Optional documentation checks
+
+`/rforge:docs:check` keeps its static, offline default. Use `--site URL --ref REF`
+for a bounded sitemap comparison against a local source ref, or `--run-examples`
+for partial README replay. Execution runs package code and needs a host lifetime
+longer than the example budget plus 15 seconds; use the terminal when that limit
+is unknown. A2 discrepancies are warnings, while incomplete coverage exits 2
+with either enabled severity gate. See the [Docs audit guide](guides/docs-audit.md).

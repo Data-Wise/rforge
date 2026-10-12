@@ -83,7 +83,7 @@ What `audit` looks at (D0). ``mode``: package | hybrid | ecosystem | none.
 ### `audit()`
 
 ```python
-def audit(path: 'str | Path' = '.', *, eco: 'bool' = False, detailed: 'bool' = False, since: 'Optional[str]' = None, max_paragraph_words: 'int' = 110, max_section_words: 'int' = 800, min_h3: 'int' = 3) -> 'dict'
+def audit(path: 'str | Path' = '.', *, eco: 'bool' = False, detailed: 'bool' = False, since: 'Optional[str]' = None, max_paragraph_words: 'int' = 110, max_section_words: 'int' = 800, min_h3: 'int' = 3, site: 'Optional[str]' = None, ref: 'Optional[str]' = None, run_examples: 'bool' = False, examples_budget_seconds: 'int' = 300) -> 'dict'
 ```
 
 Audit the package (or packages) D0 resolves `path` to. `info` findings appear only when `detailed`.
@@ -138,6 +138,14 @@ def doc_files(root: 'Path', notes: 'list') -> 'Iterator[Path]'
 ```
 
 _(no docstring)_
+
+### `exit_code()`
+
+```python
+def exit_code(report: 'dict', threshold: 'str') -> 'int'
+```
+
+Incomplete scope takes precedence over severity; default remains diagnostic.
 
 ### `exports_added_since()`
 

@@ -1,0 +1,95 @@
+{
+  "status": "actual-local-integration-observation",
+  "release_verified": false,
+  "expected_scope": "Supported selected-ref reference routes checked; Quarto source routes remain incomplete by contract",
+  "report": {
+    "state": "incomplete",
+    "counts": {
+      "checked": 55,
+      "missing": 0,
+      "extra": 8,
+      "unreleased": 0,
+      "excluded": 22,
+      "unsupported": 8,
+      "foreign": 0
+    },
+    "provenance": {
+      "ref": "origin/main",
+      "sha": "61d0afb9f1af996887c0f65b8319ceb29d760af4",
+      "timestamp": "2026-09-25T23:53:41-06:00",
+      "selection": "explicit local ref",
+      "local_ref": true,
+      "workflow_snapshot": "current local checkout; remote freshness unverified",
+      "requested_base": "https://data-wise.github.io/medrobust/"
+    },
+    "reasons": [
+      "unsupported article source: vignettes/articles/gesthtn-bounds.qmd",
+      "unsupported article source: vignettes/articles/grid-search-algorithms.qmd",
+      "unsupported article source: vignettes/articles/heals-synthetic-data.qmd",
+      "unsupported article source: vignettes/articles/identification-math.qmd",
+      "unsupported article source: vignettes/articles/introduction.qmd",
+      "unsupported article source: vignettes/articles/methodology.qmd",
+      "unsupported article source: vignettes/articles/nhanes_pa-bounds.qmd",
+      "unsupported article source: vignettes/articles/s7-documentation.qmd"
+    ],
+    "engine_missing": [],
+    "findings": [
+      {
+        "check": "site-extra-page",
+        "severity": "info",
+        "file": "",
+        "line": 1,
+        "message": "extra supported-surface sitemap route: https://data-wise.github.io/medrobust/articles/gesthtn-bounds.html"
+      },
+      {
+        "check": "site-extra-page",
+        "severity": "info",
+        "file": "",
+        "line": 1,
+        "message": "extra supported-surface sitemap route: https://data-wise.github.io/medrobust/articles/grid-search-algorithms.html"
+      },
+      {
+        "check": "site-extra-page",
+        "severity": "info",
+        "file": "",
+        "line": 1,
+        "message": "extra supported-surface sitemap route: https://data-wise.github.io/medrobust/articles/heals-synthetic-data.html"
+      },
+      {
+        "check": "site-extra-page",
+        "severity": "info",
+        "file": "",
+        "line": 1,
+        "message": "extra supported-surface sitemap route: https://data-wise.github.io/medrobust/articles/identification-math.html"
+      },
+      {
+        "check": "site-extra-page",
+        "severity": "info",
+        "file": "",
+        "line": 1,
+        "message": "extra supported-surface sitemap route: https://data-wise.github.io/medrobust/articles/introduction.html"
+      },
+      {
+        "check": "site-extra-page",
+        "severity": "info",
+        "file": "",
+        "line": 1,
+        "message": "extra supported-surface sitemap route: https://data-wise.github.io/medrobust/articles/methodology.html"
+      },
+      {
+        "check": "site-extra-page",
+        "severity": "info",
+        "file": "",
+        "line": 1,
+        "message": "extra supported-surface sitemap route: https://data-wise.github.io/medrobust/articles/nhanes_pa-bounds.html"
+      },
+      {
+        "check": "site-extra-page",
+        "severity": "info",
+        "file": "",
+        "line": 1,
+        "message": "extra supported-surface sitemap route: https://data-wise.github.io/medrobust/articles/s7-documentation.html"
+      }
+    ]
+  }
+}

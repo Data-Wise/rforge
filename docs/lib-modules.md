@@ -329,3 +329,9 @@ CI stays R-free). Integrated into `tests/test-all.sh` (the full plugin suite).
 - [SPEC: Absorb rforge-mcp (Path B)](https://github.com/Data-Wise/rforge/blob/main/archive/specs/SPEC-mcp-absorb-2026-05-10.md) — full migration plan
 - [Migration: rforge-mcp deprecation](migration/rforge-mcp-deprecation.md) — old MCP tool → new lib module table
 - [Architecture](architecture.md#path-b-lib-modules) — where lib/ fits in the plugin surface
+
+Optional docs audit: `--site URL` plus optional local `--ref REF`;
+`--run-examples --examples-budget-seconds N` for supervised root README replay.
+Default remains static. Inspect stage coverage; unpaired rendered assertions and
+unsupported options are incomplete. Complete A2 warnings gate warn, incomplete
+stages gate warn/error. No site build/deploy/fetch; example replay is opt-in.

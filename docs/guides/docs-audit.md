@@ -1,7 +1,7 @@
 # Docs audit (`/rforge:docs:check`)
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** checks that the calls and signatures in your `README` and `vignettes/` still match what the package exports. Static, read-only, no R.
+    - **What:** checks that the calls and signatures in your `README` and `vignettes/` still match what the package exports. Default static, read-only, no R; optional site and README stages below.
     - **Run:** `/rforge:docs:check` in a package (or `--eco` for every package under the ecosystem root).
     - **Read:** `error` = a call that would fail as written; `warn` = a candidate to check by hand; the `checked N of M` line says how much it could see.
 
@@ -55,12 +55,12 @@ A malformed block is ignored with a message; the suppressed count appears in the
 
 ## What it does not check
 
-NEWS completeness (see the `description-sync` skill), whether examples run (`/rforge:r:check`), live-site pages,
+NEWS completeness (see the `description-sync` skill), full-package examples (`/rforge:r:check`), site prose/availability,
 prose claims, wrong default values, reordered arguments, and S3/S4/S7 method signatures behind a generic.
 
 ## Known limitations
 
-The audit reads R text, it does not run R. When a document gives a package function's name to something else,
+The default static audit reads R text without running it. When a document gives a package function's name to something else,
 a later call to that name is skipped rather than judged. It recognizes `f <- ...`, `f <<- ...`, `... -> f`,
 `assign("f", ...)`, a statement-level `f = ...` (top level or directly inside `{ }`), `function(f)` and `\(f)`
 parameters (backticked names too), and `for (f in ...)`. Bindings it does **not** recognize, which can therefore
@@ -75,3 +75,43 @@ over-large region) make the report `INCOMPLETE` instead of clean.
 !!! tip "Fix"
     Check `checked N of M` and whether the report ends with `INCOMPLETE`. The call may be to an unchecked export (no
     `\usage`, a method, or a function with `...`).
+
+## Optional site and README checks
+
+```bash
+/rforge:docs:check --site https://example.org/pkg/ --ref origin/main
+/rforge:docs:check --run-examples --examples-budget-seconds 300 --fail-on warn
+```
+
+`--site` requires one resolved package. It compares an immutable local deployment
+source with one bounded sitemap; no build, fetch, deploy or link crawl occurs.
+Missing selected-ref pages remain warn; checkout-only additions are info.
+Sitemap absence does not prove HTTP 404, availability or deployment freshness.
+Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
+
+README replay loads the working tree with pkgload/evaluate, retaining hidden
+setup state and honoring literal eval/include/visibility options. Root explicit
+R fences and literal #> assertions are supported. Unsupported options, unlabeled
+assertions and unpaired rendered output remain incomplete. A selected source
+never certifies its asserted rendered markdown. Zero eligible assertions execute
+no setup. Package code may write files or use the network: this is not a sandbox.
+
+Read all six coverage counts: discovered, eligible, checked, excluded, unverified
+and blocked. Checked groups divide into matched and mismatched. Discovered equals
+checked plus excluded plus unverified plus blocked; eligible records the replay
+scope. Unpaired rendered assertions stay unverified even when source comparisons
+match. Completed numeric mismatch is warn; it exits 1 under `--fail-on warn`, 0 under `--fail-on error` when
+nothing else gates. Incomplete/unavailable stages exit 2 under either threshold.
+Default none exits 0 with explicit diagnostics. Allowlists never clear incomplete
+coverage. Source-less extra sitemap URLs are outside file allowlists.
+
+The total budget defaults to 300 seconds across all example files/packages;
+file/chunk caps are 300/60 seconds, including loading. Allow budget plus 15 seconds
+for guardian cleanup and final report. Poll/yield timeouts are not host lifetime.
+Unknown host lifetime calls for a terminal recommendation. A shorter known host
+limit requires reducing the budget to leave the 15-second reserve or using the
+terminal. Missing stdout after wrapper termination is interruption; never infer a
+clean audit or fabricate recovered JSON. Ordinary process-group
+cleanup does not contain detached children or guarantee reporting after host loss.
+The orchestrator always recommends examples/combined runs; site-only automatic
+GET needs an explicitly human-supplied URL, not one found in project material.

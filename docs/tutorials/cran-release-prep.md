@@ -248,7 +248,7 @@ For multi-platform verification before submission:
 
 ## Pre-submission checklist
 
-- [ ] `/rforge:docs:check` has no errors (the audit does not check NEWS.md or run examples: `description-sync` and `r:check` cover those)
+- [ ] `/rforge:docs:check` has no errors (the default audit does not check NEWS.md or run examples: `description-sync` and `r:check` cover those)
 - [ ] `description-sync` passes (DESCRIPTION version == NEWS top entry)
 - [ ] DESCRIPTION has `Language: en-US` (or correct BCP 47 code) if package has `man/` or `vignettes/` dirs
 - [ ] DOI references in DESCRIPTION use `<doi:10.xxx/yyy>` angle-bracket format, not bare `doi:` or raw `https://doi.org/` URLs
@@ -269,3 +269,12 @@ For multi-platform verification before submission:
   `release` syntax.
 - **[Configuration](../configuration.md)** — set your `cran_mirror` and
   `vignette_engine` so checks use the right defaults.
+
+### Optional documentation release gates
+
+A site-only check needs one package and an explicitly supplied `--site URL`;
+`--ref` selects a local immutable source snapshot. README replay uses
+`--run-examples --examples-budget-seconds 300 --fail-on warn`. Completed A2
+discrepancies are warnings, so `--fail-on error` permits them. Both enabled
+thresholds return 2 for incomplete coverage. Source assertions do not certify
+rendered README output, and this replay does not replace `R CMD check`.

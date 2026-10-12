@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (A2 implementation in progress)
+
+- Opt-in docs audit site/source comparison and supervised README replay. Release acceptance and both-platform evidence remain pending.
+
 ---
 
 ## [2.21.0] - 2026-10-11

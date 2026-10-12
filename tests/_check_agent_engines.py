@@ -28,6 +28,24 @@ AGENT = ROOT / "agents" / "orchestrator.md"
 SAFE_AUTORUN = {"load", "test", "check", "coverage", "lint", "spell", "s7runtime"}
 
 
+def docs_audit_auto_run(argv, *, human_site_url=None, package_count=1):
+    """Admission model for recipe fixtures; human provenance remains a manual review."""
+    argv=[part for argument in argv for part in (argument.split("=",1) if argument.startswith("--") and "=" in argument else [argument])]
+    allowed={"--path","--eco","--detailed","--format","--fail-on","--since","--site","--ref","--run-examples","--examples-budget-seconds"}
+    if any(argument.startswith("--") and argument not in allowed for argument in argv):return False
+    if argv.count("--site")>1:return False
+    if "--run-examples" in argv or "--examples-budget-seconds" in argv:
+        return False
+    def value(flag):
+        try:return argv[argv.index(flag)+1]
+        except (ValueError,IndexError):return None
+    site=value("--site")
+    if "--ref" in argv and not site:return False
+    if "--site" in argv:
+        return bool(site and site==human_site_url and package_count==1)
+    return True
+
+
 def rcmd_kinds() -> set[str]:
     out = subprocess.run(
         [sys.executable, "-m", "lib.rcmd", "--help"],
@@ -142,6 +160,10 @@ def main() -> int:
     risky = [l for l in audit_lines if re.search(r"--(run-examples|site|ref)\b", l)]
     if risky:
         print(f"FAIL: orchestrator.md auto-runs lib.docaudit with an executing/network flag: {risky}")
+        failed = True
+
+    if "**Never auto-run** `--run-examples`" not in text:
+        print("FAIL: orchestrator must prohibit every examples/combined auto-run")
         failed = True
 
     if failed:

@@ -77,3 +77,12 @@ vouch for a release.
 
 - [Docs audit guide](../guides/docs-audit.md): every check, scope rules and known limitations.
 - [CRAN release prep](cran-release-prep.md): where the audit sits before `r:cran-prep`.
+
+## Optional follow-up checks
+
+Use `--site URL --ref REF` for a single package's deployment-source sitemap check.
+Use `--run-examples --examples-budget-seconds 300 --fail-on warn` for supported
+README replay. Hidden setup stays ordered; source/render pairing and figure
+options remain unsupported. Check stage counts and INCOMPLETE before changing
+published examples. A warning is a candidate; an incomplete replay is not proof
+that the document is broken. Run replay in a terminal when host lifetime is unknown.

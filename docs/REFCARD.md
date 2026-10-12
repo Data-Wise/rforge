@@ -396,3 +396,9 @@ rforge/
 ---
 
 **Quick Start:** `/rforge:status` → Get instant health snapshot of your R package ecosystem!
+
+Optional docs audit: `--site URL` plus optional local `--ref REF`;
+`--run-examples --examples-budget-seconds N` for supervised root README replay.
+Default remains static. Inspect stage coverage; unpaired rendered assertions and
+unsupported options are incomplete. Complete A2 warnings gate warn, incomplete
+stages gate warn/error. No site build/deploy/fetch; example replay is opt-in.
