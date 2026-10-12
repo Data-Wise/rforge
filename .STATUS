@@ -8,7 +8,7 @@ in_progress: none — v2.21.0 released 2026-10-11. Shipped in it (kept for the r
   lib.rstatus.version_overrides. Local worktrees feature-rstatus-version-drift and fix-finish-missing-version can be removed.
   (2) docs:check content audit, release A1 (v2.21.0): merged to dev via the feature->dev PR (see git log), UNRELEASED.
   lib.docaudit + /rforge:docs:check rewrite + dev-only replay harness (tests/harness/). SPEC and review record
-  (TRIAGE-docaudit-signature-gate-2026-10-11.md) at the repo root; guide docs/guides/docs-audit.md. Seven Codex rounds under
+  (TRIAGE-docaudit-signature-gate-2026-10-11.md) in archive/specs/; guide docs/guides/docs-audit.md. Seven Codex rounds under
   the stop rule; unrecognized R binding forms are documented known limitations. test-all 47/47, 44 commands.
   A2 (--site, --run-examples) is a separate later plan.
 next: A2 plan (docs:check --site, --run-examples) — separate, not started. Open low-priority candidates in CLAUDE.md Roadmap.
