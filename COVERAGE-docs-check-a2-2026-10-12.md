@@ -2,47 +2,17 @@
 
 Approved spec revision 7 remains unchanged. Mapping review is complete; release coverage is not complete.
 
-Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 306 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 39 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
+Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 319 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 34 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
 
 The immutable requirement ledger records exact source text/hash/anchor/ordinal plus inventory ownership. Test source hashes bind this review snapshot. Header, historical validation and approval paragraphs are contextual documentation obligations, not invented runtime tests. Actual external evidence is separate from portable validators.
 
 ## Remaining coverage work
-
-### S02 / T03
-
-Mapped: `tests/a2/test_site_refs.py::test_workflow_inference_and_fallback`.
-
-- Remote-tracking ref preference and no-candidate origin/main fallback are not explicitly exercised.
-
-### S03 / T03
-
-Mapped: `tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref[[main, dev]]`, `tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref[['*']]`, `tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref[['${{ github.ref }}']]`.
-
-- Alternate checkout, reusable workflow, multiple candidate files, missing git/ref cases missing.
-
-### S04 / T03
-
-Mapped: `tests/a2/test_site_refs.py::test_missing_yaml_reader_requires_explicit_ref`.
-
-- Reader absence tests workflow inference; selected-ref route configuration without YAML reader needs separate case.
 
 ### S06 / T04
 
 Mapped: `tests/a2/test_site_routes.py::test_pinned_pkgdown_article_routes`.
 
 - Pinned build proves three supported paths; exclusions are tested statically, not in that build; recorded build provenance is limited to asserted version.
-
-### S07 / T04
-
-Mapped: `tests/a2/test_site_integration.py::test_routes_and_collisions`, `tests/a2/test_site_integration.py::test_custom_article_frontmatter_not_invented[output: custom::format]`, `tests/a2/test_site_integration.py::test_custom_article_frontmatter_not_invented[pkgdown:\n  as_is: true]`.
-
-- Quarto/custom-extension and overlay config need direct incomplete integration cases retaining other checked routes.
-
-### S08 / T04
-
-Mapped: `tests/a2/test_site_routes.py::test_release_mode_and_destination[config0-True]`, `tests/a2/test_site_routes.py::test_release_mode_and_destination[config1-True]`, `tests/a2/test_site_routes.py::test_release_mode_and_destination[config2-True]`, `tests/a2/test_site_routes.py::test_release_mode_and_destination[config3-False]`, `tests/a2/test_site_routes.py::test_release_mode_and_destination[config4-False]`, `tests/a2/test_site_routes.py::test_release_mode_and_destination[config5-False]`, `tests/a2/test_site_routes.py::test_release_mode_and_destination[config6-False]`, `tests/a2/test_site_routes.py::test_release_mode_and_destination[config7-False]`.
-
-- Top-level destination and workflow PKGDOWN_DEV_MODE require direct integration assertions.
 
 ### S09 / T05
 
@@ -246,8 +216,12 @@ Mapped: `tests/a2/test_final_gates.py::test_review_record_validation`, `tests/a2
 
 Close the listed fixture/validator gaps and review their oracles before making required.json ready. Reconcile the independent ledger with the unchanged approved spec. Then commit a stable candidate, run the actual locked acceptance collection on Ubuntu 24.04 and macOS 14, retrieve both artifacts, and produce candidate/run-bound live, triage, full-gate, rendered-review and finalized adversarial-review observations. Only then can the aggregate gate certify acceptance. No CI dispatch, source publication, or release has occurred.
 
-## Closed reporting coverage
+## Closed coverage slices
 
-C02–C06 now cover ambiguous package scope and negative-budget no-execution checks, all four stage states preserving a planted Rd/NAMESPACE signature error, all 18 severity/threshold/completeness combinations, mixed completed warnings and incomplete stages, text/JSON info visibility, missing-Rscript diagnostics through the real optional-stage dispatcher, and mixed successful/unavailable package aggregation. These are portable reporting checks; they do not establish native runtime or platform acceptance.
+C02–C06: misuse before execution, all stage states retaining a planted static finding, complete severity gates, CLI diagnostic visibility and mixed package aggregation (33 added cases).
 
-Verification: 51 reporting cases passed; full suite 1205 passed with 4 existing skips; test-all 47/47. Exact-spec ledger and all 306 collected-node ownership checks passed; pending manifest rejection remains verified.
+S02/S03/S04/S07/S08: remote-tracking priority with distinct local/remote commits for inferred and fallback refs; alternate checkout, reusable/multiple workflows, unavailable ref/git before network; selected immutable config without YAML reader; Quarto/custom extension/overlay scopes preserving checked routes; local destination without URL suffix; workflow development override before comparison (13 added cases).
+
+Targeted source/route integration: 44 passed. All 319 collected A2 nodes have exactly one owner. The unchanged-spec ledger validates and the pending manifest is rejected. Native/platform/release acceptance remains pending.
+
+Full repository validation: 1218 passed, 4 existing skips; test-all 47/47. Release manifest remains pending.

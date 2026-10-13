@@ -163,8 +163,8 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "648781037a75287d974fd9217b1c1454ad2574a36425a70d7822ff25eb472d2e",
-        "tests/a2/test_site_refs.py": "fb5c8938059c7e86f444cd80087cb0043c7f4eb61be18a497f10ba3b4da5dd48"
+        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e",
+        "tests/a2/test_site_refs.py": "5a3346a29fadb6da059475918f285f1e87683a6547d06b2d0a947a362ecf24ac"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -173,15 +173,15 @@
       "task": "T03",
       "proposed_node": "tests/a2/test_site_refs.py::test_workflow_inference_and_fallback",
       "nodes": [
-        "tests/a2/test_site_refs.py::test_workflow_inference_and_fallback"
+        "tests/a2/test_site_refs.py::test_workflow_inference_and_fallback",
+        "tests/a2/test_site_refs.py::test_remote_tracking_ref_preferred[False]",
+        "tests/a2/test_site_refs.py::test_remote_tracking_ref_preferred[True]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Remote-tracking ref preference and no-candidate origin/main fallback are not explicitly exercised."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_refs.py": "fb5c8938059c7e86f444cd80087cb0043c7f4eb61be18a497f10ba3b4da5dd48"
+        "tests/a2/test_site_refs.py": "5a3346a29fadb6da059475918f285f1e87683a6547d06b2d0a947a362ecf24ac"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -192,15 +192,18 @@
       "nodes": [
         "tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref[[main, dev]]",
         "tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref[['*']]",
-        "tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref[['${{ github.ref }}']]"
+        "tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref[['${{ github.ref }}']]",
+        "tests/a2/test_site_refs.py::test_unsupported_source_selection_no_network[checkout]",
+        "tests/a2/test_site_refs.py::test_unsupported_source_selection_no_network[reusable]",
+        "tests/a2/test_site_refs.py::test_unsupported_source_selection_no_network[multiple]",
+        "tests/a2/test_site_refs.py::test_unsupported_source_selection_no_network[missing-ref]",
+        "tests/a2/test_site_refs.py::test_unsupported_source_selection_no_network[missing-git]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Alternate checkout, reusable workflow, multiple candidate files, missing git/ref cases missing."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_refs.py": "fb5c8938059c7e86f444cd80087cb0043c7f4eb61be18a497f10ba3b4da5dd48"
+        "tests/a2/test_site_refs.py": "5a3346a29fadb6da059475918f285f1e87683a6547d06b2d0a947a362ecf24ac"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -209,15 +212,15 @@
       "task": "T03",
       "proposed_node": "tests/a2/test_site_refs.py::test_yaml_reader_missing",
       "nodes": [
+        "tests/a2/test_site_integration.py::test_selected_ref_config_requires_yaml_reader",
         "tests/a2/test_site_refs.py::test_missing_yaml_reader_requires_explicit_ref"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Reader absence tests workflow inference; selected-ref route configuration without YAML reader needs separate case."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_refs.py": "fb5c8938059c7e86f444cd80087cb0043c7f4eb61be18a497f10ba3b4da5dd48"
+        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e",
+        "tests/a2/test_site_refs.py": "5a3346a29fadb6da059475918f285f1e87683a6547d06b2d0a947a362ecf24ac"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -260,15 +263,16 @@
       "nodes": [
         "tests/a2/test_site_integration.py::test_routes_and_collisions",
         "tests/a2/test_site_integration.py::test_custom_article_frontmatter_not_invented[output: custom::format]",
-        "tests/a2/test_site_integration.py::test_custom_article_frontmatter_not_invented[pkgdown:\\n  as_is: true]"
+        "tests/a2/test_site_integration.py::test_custom_article_frontmatter_not_invented[pkgdown:\\n  as_is: true]",
+        "tests/a2/test_site_integration.py::test_unsupported_layout_retains_supported_routes[quarto]",
+        "tests/a2/test_site_integration.py::test_unsupported_layout_retains_supported_routes[extension]",
+        "tests/a2/test_site_integration.py::test_unsupported_layout_retains_supported_routes[overlay]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Quarto/custom-extension and overlay config need direct incomplete integration cases retaining other checked routes."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "648781037a75287d974fd9217b1c1454ad2574a36425a70d7822ff25eb472d2e"
+        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -277,6 +281,8 @@
       "task": "T04",
       "proposed_node": "tests/a2/test_site_routes.py::test_release_mode_and_destination",
       "nodes": [
+        "tests/a2/test_site_integration.py::test_destination_and_workflow_mode_integration[destination]",
+        "tests/a2/test_site_integration.py::test_destination_and_workflow_mode_integration[workflow-dev]",
         "tests/a2/test_site_routes.py::test_release_mode_and_destination[config0-True]",
         "tests/a2/test_site_routes.py::test_release_mode_and_destination[config1-True]",
         "tests/a2/test_site_routes.py::test_release_mode_and_destination[config2-True]",
@@ -286,12 +292,11 @@
         "tests/a2/test_site_routes.py::test_release_mode_and_destination[config6-False]",
         "tests/a2/test_site_routes.py::test_release_mode_and_destination[config7-False]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Top-level destination and workflow PKGDOWN_DEV_MODE require direct integration assertions."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
+        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e",
         "tests/a2/test_site_routes.py": "0cf1455c14dc5b5638981d321abb90e3c299fb48f5074a0fe3d67be0a7ca657a"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
@@ -316,7 +321,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_site_http.py": "47d2d73113631010dad905561dd4d6a72363a59ebf39b8173c9de6aa21aa5295",
-        "tests/a2/test_site_integration.py": "648781037a75287d974fd9217b1c1454ad2574a36425a70d7822ff25eb472d2e"
+        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -357,7 +362,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_site_http.py": "47d2d73113631010dad905561dd4d6a72363a59ebf39b8173c9de6aa21aa5295",
-        "tests/a2/test_site_integration.py": "648781037a75287d974fd9217b1c1454ad2574a36425a70d7822ff25eb472d2e"
+        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -387,7 +392,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "648781037a75287d974fd9217b1c1454ad2574a36425a70d7822ff25eb472d2e"
+        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -413,7 +418,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "648781037a75287d974fd9217b1c1454ad2574a36425a70d7822ff25eb472d2e"
+        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -428,7 +433,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "648781037a75287d974fd9217b1c1454ad2574a36425a70d7822ff25eb472d2e"
+        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1613,8 +1618,8 @@
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 306,
-  "review_candidate": "6bf0e5b plus reporting acceptance additions",
+  "collected_nodes": 319,
+  "review_candidate": "f6d457b plus site acceptance additions",
   "platforms": [
     "ubuntu-24.04",
     "macos-14"

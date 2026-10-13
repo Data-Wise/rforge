@@ -358,7 +358,7 @@
         "S03"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -371,7 +371,7 @@
         "S02"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -425,7 +425,7 @@
         "S07"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -438,7 +438,7 @@
         "S07"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -493,7 +493,7 @@
         "S08"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -2257,5 +2257,5 @@
     }
   ],
   "coverage_status": "pending",
-  "review_candidate": "6bf0e5b plus reporting acceptance additions"
+  "review_candidate": "f6d457b plus site acceptance additions"
 }

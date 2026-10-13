@@ -149,3 +149,55 @@ def test_no_build_crawl_fetch_or_deploy(tmp_path, monkeypatch):
         srv.shutdown(); srv.server_close(); thread.join()
     assert report['state']=='complete' and calls
     assert requests == ['/pkg/sitemap.xml']
+
+
+def test_selected_ref_config_requires_yaml_reader(tmp_path,monkeypatch):
+    import builtins
+    pkg,_=fixture(tmp_path)
+    (pkg/'_pkgdown.yml').write_text('development:\n  mode: release\n')
+    git(pkg,'add','.');git(pkg,'commit','-m','config')
+    original=builtins.__import__
+    def without_yaml(name,*a,**kw):
+        if name=='yaml':raise ImportError('unavailable')
+        return original(name,*a,**kw)
+    monkeypatch.setattr(builtins,'__import__',without_yaml)
+    monkeypatch.setattr(site,'sitemap',lambda *a:pytest.fail('missing config reader requested network'))
+    r=site.audit(pkg,url='https://example.org/pkg/',ref='main')
+    assert r['state']=='incomplete' and r['counts']['checked']==0 and not r['findings']
+    assert any('YAML reader unavailable' in reason for reason in r['reasons'])
+    assert r['provenance']['sha']==git(pkg,'rev-parse','HEAD')
+
+
+@pytest.mark.parametrize('case',['quarto','extension','overlay'])
+def test_unsupported_layout_retains_supported_routes(tmp_path,case):
+    pkg,web=fixture(tmp_path)
+    if case in ('quarto','extension'):
+        (pkg/'vignettes'/('custom.qmd' if case=='quarto' else 'custom.Rmarkdown')).write_text('# unsupported')
+    else:
+        (pkg/'_pkgdown.yml').write_text('development:\n  mode: release\n')
+        (pkg/'pkgdown').mkdir();(pkg/'pkgdown'/'extra.yml').write_text('template:\n  bootstrap: 5\n')
+    git(pkg,'add','.');git(pkg,'commit','-m','unsupported layout')
+    (web/'pkg'/'sitemap.xml').write_text('<urlset/>')
+    with server(web) as url:r=site.audit(pkg,url=url,ref='main')
+    assert r['state']=='incomplete' and r['counts']['checked']==2 and r['counts']['missing']==2
+    assert {f['file'] for f in r['findings'] if f['check']=='site-missing-page'}=={'man/internal.Rd','vignettes/pizza/slice.Rmd'}
+    assert any(('overlays' if case=='overlay' else 'unsupported article source') in reason for reason in r['reasons'])
+
+
+@pytest.mark.parametrize('case',['destination','workflow-dev'])
+def test_destination_and_workflow_mode_integration(tmp_path,monkeypatch,case):
+    pkg,web=fixture(tmp_path)
+    if case=='destination':
+        (pkg/'_pkgdown.yml').write_text('destination: public-output\n')
+        git(pkg,'add','.');git(pkg,'commit','-m','local destination')
+        with server(web) as url:
+            (web/'pkg'/'sitemap.xml').write_text('<urlset>'+''.join(f'<url><loc>{url}{p}</loc></url>' for p in ['reference/internal.html','articles/pizza/slice.html'])+'</urlset>')
+            r=site.audit(pkg,url=url,ref='main')
+        assert r['state']=='complete' and r['counts']['checked']==2 and r['counts']['missing']==0 and not r['findings']
+    else:
+        (pkg/'.github/workflows').mkdir(parents=True)
+        (pkg/'.github/workflows/pkgdown.yml').write_text('env:\n  PKGDOWN_DEV_MODE: devel\n')
+        monkeypatch.setattr(site,'sitemap',lambda *a:pytest.fail('development transform requested comparison'))
+        r=site.audit(pkg,url='https://example.org/pkg/',ref='main')
+        assert r['state']=='incomplete' and r['counts']['checked']==0 and not r['findings']
+        assert any('PKGDOWN_DEV_MODE' in reason for reason in r['reasons'])
