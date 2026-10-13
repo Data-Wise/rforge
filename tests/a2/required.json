@@ -449,7 +449,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_group_pin.py": "cd5128c9b25df5b520c088bf8c387fce19055088a08f7169c6f6a73939f4e659",
+        "tests/a2/test_group_pin.py": "b9cab5ede0ec057af4cd2879fe63b7b6f18133b0dacc002988233fa84341d736",
         "tests/a2/test_guardian.py": "772b3642ca919e406b6a955ec5bfa6fac28227065ce7066666eb737ef042399b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
@@ -520,7 +520,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_group_pin.py": "cd5128c9b25df5b520c088bf8c387fce19055088a08f7169c6f6a73939f4e659",
+        "tests/a2/test_group_pin.py": "b9cab5ede0ec057af4cd2879fe63b7b6f18133b0dacc002988233fa84341d736",
         "tests/a2/test_guardian.py": "772b3642ca919e406b6a955ec5bfa6fac28227065ce7066666eb737ef042399b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
@@ -584,7 +584,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_group_pin.py": "cd5128c9b25df5b520c088bf8c387fce19055088a08f7169c6f6a73939f4e659",
+        "tests/a2/test_group_pin.py": "b9cab5ede0ec057af4cd2879fe63b7b6f18133b0dacc002988233fa84341d736",
         "tests/a2/test_guardian.py": "772b3642ca919e406b6a955ec5bfa6fac28227065ce7066666eb737ef042399b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."

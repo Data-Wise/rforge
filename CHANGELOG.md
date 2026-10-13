@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Keep generated dataclass reference defaults stable on Python 3.15 by comparing against the public `dataclasses.MISSING` sentinel, preserving compatibility with earlier Python versions.
+
 - Reserve README replay process-group identity with a parent-owned, unreaped pin through the final possible group signal. The guardian still launches/reaps R and owns normal termination; emergency cleanup no longer trusts checkpoint PIDs. Assign workload membership atomically with POSIX spawn and use an isolated bootstrap to prevent project-local launcher replacement or delayed group-join deadline escapes. Mask launch interruptions until child ownership is assigned. Add native before/after-reap crash, corrupt-PID, parent-loss, interruption, and pin lifetime regressions. Both-platform acceptance remains pending.
 
 - Bound emitted UTF-8 diagnostic tails to 1 MiB even for malformed bytes; verify mixed checkpoint preservation and duplicate rejection. Normal CI and release evidence now share the locked A2 Ubuntu/macOS platform workflow; aggregate acceptance stays separate and fail closed.

@@ -163,24 +163,8 @@ def pin(directory, run_id, parent_pid, previous=()):
         time.sleep(.02)
 
 
-def join(pgid, command, directory=None, run_id=None):
-    # Runs in the new, single-threaded child before exec; no preexec_fn in caller.
-    try:
-        os.setpgid(0, pgid)
-        os.execvpe(command[0], command, os.environ)
-    except OSError as exc:
-        if directory is not None:
-            atomic(Path(directory) / "launch-error.json", {"run_id": run_id, "error": str(exc)})
-        raise SystemExit(126)
-
-
 if __name__ == "__main__":
     if sys.argv[1] == "pin":
         pin(sys.argv[2], sys.argv[3], int(sys.argv[4]), json.loads(sys.argv[5]) if len(sys.argv)>5 else ())
-    elif sys.argv[1] == "join":
-        if sys.argv[3] == "--record":
-            join(int(sys.argv[2]), sys.argv[6:], sys.argv[4], sys.argv[5])
-        else:
-            join(int(sys.argv[2]), sys.argv[3:])
     else:
-        raise SystemExit("expected pin or join")
+        raise SystemExit("expected pin")

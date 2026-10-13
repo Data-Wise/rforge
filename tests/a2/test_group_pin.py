@@ -9,14 +9,16 @@ from pathlib import Path
 
 import pytest
 from lib import _docguardian as guardian
-from lib._docgroup_pin import GroupPin
+from lib._docgroup_pin import GroupPin, spawn_in_group
 
 ROOT = Path(guardian.__file__).resolve().parents[1]
 
 
 def launch(group, code):
-    return subprocess.Popen([sys.executable, '-m', 'lib._docgroup_pin', 'join',
-                             str(group.pgid), sys.executable, '-c', code], cwd=ROOT)
+    with open(os.devnull, 'wb') as output:
+        return spawn_in_group(group.pgid, [sys.executable, '-c', code], group.directory,
+                              group.run_id, time.monotonic_ns()+30*guardian.NS,
+                              ROOT, dict(os.environ), output, output)
 
 
 def await_file(path, seconds=3):
@@ -88,7 +90,10 @@ def test_guardian_crash_uses_owned_pin(tmp_path,reaped):
     marker=tmp_path/'guardian-crash.json'
     code=f"""import os,signal,subprocess,sys,json
 from pathlib import Path
-child=subprocess.Popen([sys.executable,'-m','lib._docgroup_pin','join',{str(group.pgid)!r},sys.executable,'-c',{'pass' if reaped else 'import time;time.sleep(30)'!r}])
+from lib._docgroup_pin import spawn_in_group
+import time
+with open(os.devnull,'wb') as output:
+ child=spawn_in_group({group.pgid},[sys.executable,'-c',{'pass' if reaped else 'import time;time.sleep(30)'!r}],{str(tmp_path)!r},{group.run_id!r},time.monotonic_ns()+30_000_000_000,os.getcwd(),dict(os.environ),output,output)
 if {reaped!r}:child.wait(timeout=3)
 Path({str(marker)!r}).write_text(json.dumps({{'child_pid':child.pid,'reaped':{reaped!r}}}))
 os.kill(os.getpid(),signal.SIGKILL)
@@ -100,6 +105,9 @@ os.kill(os.getpid(),signal.SIGKILL)
         assert group.process.returncode is None
         group.signal_group(signal.SIGKILL)
         group.finish()
+        # Orphan workload death is asynchronous; observe it within a bound.
+        until=time.monotonic()+2
+        while guardian.live_group_members(group.pgid) and time.monotonic()<until:time.sleep(.02)
         assert not guardian.live_group_members(group.pgid)
         assert time.monotonic()-started<5
     finally:
@@ -131,8 +139,8 @@ def test_expired_pin_never_releases_workload(tmp_path):
 def prototype_supervise(directory,pgid,deadline,heartbeat_deadline):
     """Isolated guardian fixture: retain workload until the last group signal."""
     directory=Path(directory)
-    child=subprocess.Popen([sys.executable,'-m','lib._docgroup_pin','join',str(pgid),
-                            sys.executable,'-c','import signal,time;signal.signal(signal.SIGTERM,signal.SIG_IGN);time.sleep(30)'],cwd=ROOT)
+    with open(os.devnull,'wb') as output:
+        child=spawn_in_group(pgid,[sys.executable,'-c','import signal,time;signal.signal(signal.SIGTERM,signal.SIG_IGN);time.sleep(30)'],directory,'prototype',deadline,ROOT,dict(os.environ),output,output)
     guardian.atomic(directory/'prototype-armed.json',{'child_pid':child.pid,'guardian_pid':os.getpid(),'pgid':pgid,'deadline':deadline})
     try:
         while time.monotonic_ns()<min(deadline,heartbeat_deadline):time.sleep(.02)

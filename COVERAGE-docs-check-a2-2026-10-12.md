@@ -85,3 +85,18 @@ focused mapping/guardian/pin 65 passed; launcher/interruption regression subset
 4 passed; test-all 47/47; mkdocs strict passed. The unchanged approved spec hash
 is `b202409f690b478fcb3fe6473afb4021930a1e271e8ae2a90ec0370bebe65b51`.
 These local checks do not replace the seven pending acceptance groups.
+
+
+## Supplemental Python 3.15 compatibility
+
+The new local development interpreter does not replace the approved Python 3.12
+acceptance pin or either required platform artifact. The reference generator now
+uses public `dataclasses.MISSING` identity, preserving byte-identical generated
+references across 3.12 and 3.15. Fault-injection fixtures now use the production
+atomic spawn rather than the retired delayed-join launcher, and observe orphan
+workload death within a bound instead of assuming instantaneous SIGKILL delivery.
+The test-source hashes were refreshed; all 403 concrete node IDs are unchanged.
+Python 3.12 focused lifecycle/mapping checks: 65 passed. Python 3.15 repository
+gates: 47/47; strict docs build passed with Homebrew Cairo available.
+
+Final Python 3.15 full-suite result: 1302 passed / 4 existing skipped.
