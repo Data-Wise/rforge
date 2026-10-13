@@ -105,3 +105,32 @@ def test_warn_only_and_complete_mismatch(tmp_path,threshold,expected):
     assert [f['check'] for f in stage['findings']]==['examples-output']
     assert all(f['severity']=='warn' for f in stage['findings'])
     assert docaudit.exit_code(report,threshold)==expected
+
+
+def test_distinct_chunk_deadline_retains_checkpoint(tmp_path,monkeypatch):
+    from lib import _docexamples as examples
+    original=examples.guardian.run
+    def shorter(command,directory,deadline,**kwargs):return original(command,directory,deadline,chunk_budget=.4,**kwargs)
+    monkeypatch.setattr(examples.guardian,'run',shorter)
+    p=fixture(tmp_path,'```r\nprint(1)\n#> [1] 1\n```\n```r\nSys.sleep(30)\nprint(2)\n#> [1] 2\n```')
+    r=docaudit.audit(p,run_examples=True,examples_budget_seconds=15)['stages']['examples']
+    life=r['provenance']['lifecycle']
+    assert r['state']=='incomplete' and r['counts']['matched']==1 and r['counts']['blocked']==1
+    assert life['reason']=='deadline' and life['effective_deadline_ns']<life['global_deadline_ns']
+
+
+def test_distinct_file_deadline_and_defaults(tmp_path,monkeypatch):
+    import inspect
+    from lib import _docexamples as examples
+    assert inspect.signature(examples.guardian.run).parameters['file_budget'].default==300
+    assert inspect.signature(examples.guardian.run).parameters['chunk_budget'].default==60
+    assert inspect.signature(docaudit.audit).parameters['examples_budget_seconds'].default==300
+    original=examples.guardian.run
+    def shorter(command,directory,deadline,**kwargs):return original(command,directory,deadline,file_budget=1,**kwargs)
+    monkeypatch.setattr(examples.guardian,'run',shorter)
+    p=fixture(tmp_path,'```r\nprint(1)\n#> [1] 1\n```')
+    (p/'R'/'load.R').write_text('.onLoad <- function(libname,pkgname) Sys.sleep(30)\n')
+    r=docaudit.audit(p,run_examples=True,examples_budget_seconds=15)['stages']['examples']
+    life=r['provenance']['lifecycle']
+    assert r['state']=='incomplete' and r['counts']['checked']==0
+    assert life['reason']=='deadline' and life['effective_deadline_ns']<life['global_deadline_ns']

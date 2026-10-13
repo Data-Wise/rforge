@@ -170,3 +170,45 @@ def test_evaluate_spool_counts_text_once(tmp_path):
     report = examples.audit(p, deadline=time.monotonic_ns()+20_000_000_000)
     assert report['state'] == 'complete' and report['counts']['checked'] == 1, report
     assert not report['findings']
+
+
+def test_source_hidden_state_and_rendered_assertion(tmp_path):
+    p=fixture(tmp_path,'```r\nprint(hidden)\n#> [1] 7\n```')
+    (p/'README.Rmd').write_text('```{r include=FALSE}\nhidden <- 7\n```\n```r\nprint(hidden)\n#> [1] 7\n```')
+    r=examples.audit(p,deadline=time.monotonic_ns()+20_000_000_000)
+    assert r['state']=='incomplete' and r['counts']['matched']==r['counts']['checked']==1 and r['counts']['unverified']==1
+    assert r['provenance']['source']=='README.Rmd' and 'rendered-unpaired' in r['reasons']
+
+
+def test_repeated_expected_line_cannot_reuse_output(tmp_path):
+    p=fixture(tmp_path,'```r\nprint(1)\n#> [1] 1\n#> [1] 1\n```')
+    r=examples.audit(p,deadline=time.monotonic_ns()+20_000_000_000)
+    assert r['state']=='incomplete' and r['counts']['checked']==0 and r['counts']['unverified']==1
+    assert [f['check'] for f in r['findings']]==['examples-shape']
+
+
+@pytest.mark.parametrize('seed_before',[False,True])
+def test_seed_order_does_not_retroactively_verify(tmp_path,seed_before):
+    setup='```{r include=FALSE}\nset.seed(1)\n```\n'
+    assertion='```r\nprint(runif(1))\n#> [1] 0.2655087\n```\n'
+    p=fixture(tmp_path,(setup+assertion) if seed_before else (assertion+setup))
+    r=examples.audit(p,deadline=time.monotonic_ns()+20_000_000_000)
+    assert r['counts']['checked']==int(seed_before) and r['counts']['unverified']==int(not seed_before)
+
+
+def test_excluded_only_has_no_side_effect(tmp_path):
+    sentinel=tmp_path/'forbidden'
+    p=fixture(tmp_path,f'```{{r eval=FALSE}}\nwriteLines("bad", "{sentinel}")\n#> ignored\n```')
+    r=examples.audit(p,deadline=time.monotonic_ns()+20_000_000_000)
+    assert r['state']=='not-applicable' and r['counts']['excluded']==1 and r['counts']['checked']==0
+    assert not sentinel.exists() and 'lifecycle' not in r['provenance']
+
+
+def test_package_sessions_and_eval_false_isolation(tmp_path):
+    p=fixture(tmp_path/'first','```{r include=FALSE}\nshared <- 9\n```\n```r\nprint(shared)\n#> [1] 9\n```')
+    q=fixture(tmp_path/'second','```{r eval=FALSE}\nshared <- 8\n#> [1] 8\n```\n```r\nprint(exists("shared", envir=.GlobalEnv))\n#> [1] FALSE\n```')
+    first=examples.audit(p,deadline=time.monotonic_ns()+20_000_000_000)
+    second=examples.audit(q,deadline=time.monotonic_ns()+20_000_000_000)
+    assert first['counts']['matched']==second['counts']['matched']==1
+    assert first['provenance']['lifecycle']['child_pid']!=second['provenance']['lifecycle']['child_pid']
+    assert second['counts']['excluded']==1 and second['state']=='complete'

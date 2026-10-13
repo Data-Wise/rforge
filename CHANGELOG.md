@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fail closed on malformed README replay checkpoint records instead of raising `KeyError`; reject duplicate assertion identities. Expanded acceptance covers README selection/options, native session isolation, distinct deadlines, exact combined output accounting, guardian death, and verifier inventory/runtime binding. Release evidence remains pending.
+
 - Correct A2 site route filtering to exclude underscore-prefixed article filenames rather than parent directories; pinned pkgdown 2.2.1 build verifies nested routes and exclusions.
 
 ### Added (A2 implementation in progress)

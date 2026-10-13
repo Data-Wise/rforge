@@ -321,3 +321,29 @@ def test_simultaneous_heartbeat_and_deadline_expiry(tmp_path,monkeypatch):
     assert result['reason']=='deadline' and result['direct_child_reaped']
     assert result['global_deadline_ns']==result['effective_deadline_ns']==5*guardian.NS
     assert result['enforcement_delay_ns']==0
+
+
+def test_live_guardian_death_emergency_owner(tmp_path,monkeypatch):
+    import signal
+    original_read=guardian.read;original_killpg=guardian.os.killpg
+    killed=[];signals=[]
+    def lose_guardian(path):
+        record=original_read(path)
+        if path.name=='armed.json' and record and record.get('child_pid') and not killed:
+            os.kill(record['guardian_pid'],signal.SIGKILL);killed.append(record)
+        return record
+    def emergency(pid,number):
+        assert killed and pid==killed[0]['child_pid'] and number==signal.SIGKILL
+        # run() has reaped its guardian before emergency group signalling.
+        import subprocess
+        probe=subprocess.run(['ps','-o','stat=','-p',str(killed[0]['guardian_pid'])],capture_output=True,text=True)
+        assert not probe.stdout.strip()
+        signals.append(pid);return original_killpg(pid,number)
+    monkeypatch.setattr(guardian,'read',lose_guardian)
+    monkeypatch.setattr(guardian.os,'killpg',emergency)
+    result=guardian.run([sys.executable,'-c','import time;time.sleep(30)'],tmp_path,time.monotonic_ns()+3*guardian.NS,cwd=tmp_path)
+    assert result['reason']=='guardian-failure' and not result.get('direct_child_reaped')
+    assert signals==[killed[0]['child_pid']]
+    until=time.monotonic()+2
+    while guardian.live_group_members(signals[0]) and time.monotonic()<until:time.sleep(.02)
+    assert not guardian.live_group_members(signals[0])

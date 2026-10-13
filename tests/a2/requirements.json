@@ -78,7 +78,7 @@
         "S13"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -95,7 +95,7 @@
         "S13"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -112,7 +112,7 @@
         "S13"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -510,7 +510,7 @@
         "R01"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -527,7 +527,7 @@
         "R01"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -551,7 +551,7 @@
         "R03"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -575,7 +575,7 @@
         "R03"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -599,7 +599,7 @@
         "R03"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -623,7 +623,7 @@
         "R03"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -647,7 +647,7 @@
         "R03"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -671,7 +671,7 @@
         "R03"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -695,7 +695,7 @@
         "R03"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -719,7 +719,7 @@
         "R03"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -735,7 +735,7 @@
         "R04"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -751,7 +751,7 @@
         "R04"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -769,7 +769,7 @@
         "R04"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -787,7 +787,7 @@
         "R04"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -805,7 +805,7 @@
         "R04"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -823,7 +823,7 @@
         "R04"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -841,7 +841,7 @@
         "R04"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -854,7 +854,7 @@
         "N01"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -867,7 +867,7 @@
         "N01"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -880,7 +880,7 @@
         "N01"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -893,7 +893,7 @@
         "N01"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -906,7 +906,7 @@
         "N01"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -919,7 +919,7 @@
         "N01"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -958,7 +958,7 @@
         "N01"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -971,7 +971,7 @@
         "N01"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -984,7 +984,7 @@
         "N01"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -997,7 +997,7 @@
         "N01"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -1015,7 +1015,7 @@
         "R04"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -1033,7 +1033,7 @@
         "R04"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -1050,7 +1050,7 @@
         "E11"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -1067,7 +1067,7 @@
         "E11"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -1458,7 +1458,7 @@
         "R09"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -2257,5 +2257,5 @@
     }
   ],
   "coverage_status": "pending",
-  "review_candidate": "d4cf8e2 plus guardian protocol acceptance additions"
+  "review_candidate": "ae1f1c9 plus consolidated acceptance additions"
 }

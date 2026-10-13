@@ -232,7 +232,21 @@ def audit(root:Path, *, deadline):
         print(f"docaudit: replay {root} / {selected.name}; remaining budget {max(0,(deadline-time.monotonic_ns())/1_000_000_000):.1f}s; file 300s, chunk 60s; executable package code, not a sandbox", file=sys.stderr)
         terminal=guardian.run([rscript,"--vanilla",str(script),str(directory)],directory,deadline,cwd=directory)
         final_started=time.monotonic_ns()
-        result=guardian.read(directory/"result.json") or {}
+        result=guardian.read(directory/"result.json")
+        checkpoint_invalid = result is not None and not isinstance(result, dict)
+        result = result if isinstance(result, dict) else {}
+        raw_records = result.get("records", [])
+        if not isinstance(raw_records, list):
+            checkpoint_invalid = True; raw_records = []
+        records = {}; duplicates = set()
+        for record in raw_records:
+            if not isinstance(record, dict) or not isinstance(record.get("id"), str) or not isinstance(record.get("text"), list) or not all(isinstance(line, str) for line in record["text"]) or record.get("error") is not None and not isinstance(record["error"], str):
+                checkpoint_invalid = True; continue
+            if record["id"] in records:
+                duplicates.add(record["id"]); checkpoint_invalid = True
+            records[record["id"]] = record
+        for identity in duplicates: records.pop(identity, None)
+        if checkpoint_invalid: stage["reasons"].append("invalid checkpoint records ignored")
         stage["provenance"].update(lifecycle=terminal,versions=result.get("versions",{}),package=result.get("package",{}))
         for stream in ("stdout","stderr"):
             if (directory/stream).exists():
@@ -240,8 +254,7 @@ def audit(root:Path, *, deadline):
                     diagnostic.seek(max(0,(directory/stream).stat().st_size-1024*1024))
                     stage["provenance"][stream]=diagnostic.read(1024*1024).decode("utf-8",errors="replace")
         stage["engine_missing"]=sorted(result.get("engine_missing",[]))
-        records={r["id"]:r for r in result.get("records",[])}
-        failed=False
+        failed=checkpoint_invalid
         eligible_unverified=0
         seeded=False
         for seg in segments:

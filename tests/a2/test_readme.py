@@ -144,3 +144,58 @@ def test_coverage_partition_and_exclusions(tmp_path,monkeypatch,excluded_only):
     assert c['checked']==c['eligible']==int(not excluded_only) and c['excluded']==5
     assert c['discovered']==sum(c[k] for k in ('checked','excluded','unverified','blocked'))
     assert len(report['provenance']['exclusions'])==5
+
+
+@pytest.mark.parametrize('fence',['```','```python','```r'])
+def test_unsupported_or_unterminated_fences_never_execute(tmp_path,monkeypatch,fence):
+    p=package(tmp_path,fence+'\nstop("forbidden")\n#> expected\n'+('' if fence=='```r' else '```'))
+    (p/'vignettes').mkdir();(p/'vignettes/example.Rmd').write_text('```r\nstop("vignette forbidden")\n#> expected\n```')
+    monkeypatch.setattr(e.guardian,'run',lambda *a,**k:pytest.fail('unsupported README executed'))
+    r=e.audit(p,deadline=time.monotonic_ns()+10**9)
+    assert r['state']=='incomplete' and r['counts']['discovered']==r['counts']['unverified']==1 and r['counts']['checked']==0
+
+
+@pytest.mark.parametrize('between',['\n','\nintervening prose\n'])
+def test_html_skip_prior_nonblank_boundary(tmp_path,between):
+    p=package(tmp_path,'<!-- docs-check: skip -->\n'+between+'```r\nprint(1)\n#> [1] 1\n```')
+    segments,reasons,_,_=e.extract(p/'README.md')
+    assert not reasons and segments[0]['execute']==('prose' in between)
+
+
+@pytest.mark.parametrize('source,defaults',[('README.Rmd','```r\nknitr::opts_chunk$set(eval=TRUE, include=TRUE, echo=FALSE, warning=FALSE, message=FALSE, results="markup", comment="#>", error=FALSE, engine="R")\n```\n'),('README.qmd','---\nexecute:\n  eval: true\n  echo: false\n  warning: false\n  message: false\n---\n')])
+def test_literal_global_defaults_and_supported_options(tmp_path,source,defaults):
+    p=tmp_path/source;p.write_text(defaults+'```r\nprint(1)\n#> [1] 1\n```')
+    segments,reasons,_,_=e.extract(p);assert not reasons
+    s=next(s for s in segments if s['expected'])
+    assert s['execute'] and s['visible'] and s['stdout'] and s['warning'] is False and s['message'] is False
+
+
+@pytest.mark.parametrize('option',['error=1','eval=variable','fig.path="x"','child="x.Rmd"','results="asis"','engine=FALSE','template="x"'])
+def test_unsupported_family_never_replays(tmp_path,monkeypatch,option):
+    p=package(tmp_path,'```{r '+option+'}\nprint(1)\n#> [1] 1\n```')
+    monkeypatch.setattr(e.guardian,'run',lambda *a,**k:pytest.fail('unsupported option replayed'))
+    r=e.audit(p,deadline=time.monotonic_ns()+10**9)
+    assert r['state']=='incomplete' and r['counts']['unverified']==1 and r['counts']['checked']==0 and r['reasons']
+
+
+@pytest.mark.parametrize('text',['```r\nknitr::opts_chunk$set(eval=variable)\n```\n','---\nexecute: "{{ dynamic }}"\n---\n'])
+def test_dynamic_defaults_never_replay(tmp_path,monkeypatch,text):
+    p=package(tmp_path);(p/'README.qmd').write_text(text+'```r\nprint(1)\n#> [1] 1\n```')
+    monkeypatch.setattr(e.guardian,'run',lambda *a,**k:pytest.fail('dynamic defaults replayed'))
+    r=e.audit(p,deadline=time.monotonic_ns()+10**9)
+    assert r['state']=='incomplete' and r['counts']['checked']==0 and r['reasons']
+
+
+@pytest.mark.parametrize('missing',['pkgload','evaluate','knitr'])
+def test_engine_preflight_exact_missing_list(tmp_path,monkeypatch,missing):
+    text=('```r\nknitr::opts_chunk$set(eval=TRUE)\n```\n' if missing=='knitr' else '')+'```r\nprint(1)\n#> [1] 1\n```'
+    p=package(tmp_path,text)
+    def replay(command,directory,deadline,**kwargs):
+        import json
+        incoming=json.loads((directory/'input.json').read_text())
+        assert incoming['dependencies']==(['knitr'] if missing=='knitr' else [])
+        e.guardian.atomic(directory/'result.json',{'records':[],'engine_missing':[missing],'error':'required engine unavailable'})
+        return {'reason':'completed'}
+    monkeypatch.setattr(e.guardian,'run',replay);monkeypatch.setattr(e.shutil,'which',lambda *a:'/fixture/Rscript')
+    r=e.audit(p,deadline=time.monotonic_ns()+10**9)
+    assert r['state']=='unavailable' and r['engine_missing']==[missing] and r['counts']['blocked']==1 and not r['findings']

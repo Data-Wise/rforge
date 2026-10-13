@@ -447,7 +447,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
+        "tests/a2/test_guardian.py": "89c082eb7e65ba3879a24a93f6c0a50064098048cb038f66dba782a7ec450f5e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -466,7 +466,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
+        "tests/a2/test_guardian.py": "89c082eb7e65ba3879a24a93f6c0a50064098048cb038f66dba782a7ec450f5e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -484,7 +484,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
+        "tests/a2/test_guardian.py": "89c082eb7e65ba3879a24a93f6c0a50064098048cb038f66dba782a7ec450f5e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -500,7 +500,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
+        "tests/a2/test_guardian.py": "89c082eb7e65ba3879a24a93f6c0a50064098048cb038f66dba782a7ec450f5e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -515,7 +515,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
+        "tests/a2/test_guardian.py": "89c082eb7e65ba3879a24a93f6c0a50064098048cb038f66dba782a7ec450f5e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -531,7 +531,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
+        "tests/a2/test_guardian.py": "89c082eb7e65ba3879a24a93f6c0a50064098048cb038f66dba782a7ec450f5e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -546,7 +546,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
+        "tests/a2/test_guardian.py": "89c082eb7e65ba3879a24a93f6c0a50064098048cb038f66dba782a7ec450f5e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -556,15 +556,16 @@
       "proposed_node": "tests/a2/test_guardian.py::test_guardian_failure_emergency_cleanup",
       "nodes": [
         "tests/a2/test_guardian.py::test_guardian_failure_emergency_cleanup",
-        "tests/a2/test_guardian.py::test_no_exception_signal_after_direct_child_reap"
+        "tests/a2/test_guardian.py::test_no_exception_signal_after_direct_child_reap",
+        "tests/a2/test_guardian.py::test_live_guardian_death_emergency_owner"
       ],
       "status": "coverage-gap",
       "coverage_gaps": [
-        "Existing guardian failure occurs before child launch or after reap; live guardian death with a launched child and emergency ownership are not reproduced; PID reuse hypothesis unresolved."
+        "Live guardian death and emergency group ownership are now reproduced; PID reuse safety remains unresolved."
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
+        "tests/a2/test_guardian.py": "89c082eb7e65ba3879a24a93f6c0a50064098048cb038f66dba782a7ec450f5e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -579,7 +580,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
+        "tests/a2/test_guardian.py": "89c082eb7e65ba3879a24a93f6c0a50064098048cb038f66dba782a7ec450f5e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -596,7 +597,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
+        "tests/a2/test_guardian.py": "89c082eb7e65ba3879a24a93f6c0a50064098048cb038f66dba782a7ec450f5e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -605,15 +606,16 @@
       "task": "T09",
       "proposed_node": "tests/a2/test_stdio.py::test_native_output_does_not_deadlock",
       "nodes": [
-        "tests/a2/test_stdio.py::test_native_output_does_not_deadlock"
+        "tests/a2/test_stdio.py::test_native_output_does_not_deadlock",
+        "tests/a2/test_stdio.py::test_public_diagnostics_bounded_and_json_isolated"
       ],
       "status": "coverage-gap",
       "coverage_gaps": [
-        "Large native capture covered; diagnostic tail <=1MiB and child/native JSON contamination need direct public report cases."
+        "Public JSON isolation and ASCII diagnostic tails are covered; multibyte UTF-8 tail byte bounds remain unverified."
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_stdio.py": "1096fb448896ba59462ab92c1719da84008debecf2938553cf20540f27d06517"
+        "tests/a2/test_stdio.py": "0b3da953083be0b6376b3d66b941564c3c1e48f18037c74522b8d99362741ba9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -624,16 +626,15 @@
       "nodes": [
         "tests/a2/test_examples_r.py::test_running_evaluate_output_limit",
         "tests/a2/test_examples_r.py::test_evaluate_spool_counts_text_once",
-        "tests/a2/test_stdio.py::test_shared_text_output_threshold"
+        "tests/a2/test_stdio.py::test_shared_text_output_threshold",
+        "tests/a2/test_stdio.py::test_combined_output_exact_byte_accounting"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Native sum and live evaluate single-count tests covered; combined stdout/stderr/condition/evaluate exact-byte budget case still missing."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_r.py": "6c69ae60e0d36d8258db20620c9b8af733ea6788cc7c40f6d16118a12aaa96ab",
-        "tests/a2/test_stdio.py": "1096fb448896ba59462ab92c1719da84008debecf2938553cf20540f27d06517"
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4",
+        "tests/a2/test_stdio.py": "0b3da953083be0b6376b3d66b941564c3c1e48f18037c74522b8d99362741ba9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -648,7 +649,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_stdio.py": "1096fb448896ba59462ab92c1719da84008debecf2938553cf20540f27d06517"
+        "tests/a2/test_stdio.py": "0b3da953083be0b6376b3d66b941564c3c1e48f18037c74522b8d99362741ba9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -657,15 +658,22 @@
       "task": "T09",
       "proposed_node": "tests/a2/test_stdio.py::test_checkpoint_and_marker_integrity",
       "nodes": [
-        "tests/a2/test_stdio.py::test_checkpoint_and_marker_integrity"
+        "tests/a2/test_stdio.py::test_checkpoint_and_marker_integrity",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[None]",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{]",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[[]]",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[[{}]]",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{\"records\":[{}]}]",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{\"records\":{}}]",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{\"records\":[{\"id\":\"README.md:3\",\"text\":[1]}]}]"
       ],
       "status": "coverage-gap",
       "coverage_gaps": [
-        "Valid earlier checkpoint retained; malformed/partial/missing checkpoint variants need explicit no-match regressions."
+        "Malformed/partial/missing checkpoint no-match regressions pass; mixed valid/malformed and duplicate-record preservation need direct cases."
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_stdio.py": "1096fb448896ba59462ab92c1719da84008debecf2938553cf20540f27d06517"
+        "tests/a2/test_stdio.py": "0b3da953083be0b6376b3d66b941564c3c1e48f18037c74522b8d99362741ba9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -680,7 +688,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_stdio.py": "1096fb448896ba59462ab92c1719da84008debecf2938553cf20540f27d06517"
+        "tests/a2/test_stdio.py": "0b3da953083be0b6376b3d66b941564c3c1e48f18037c74522b8d99362741ba9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -689,18 +697,18 @@
       "task": "T10",
       "proposed_node": "tests/a2/test_readme.py::test_source_selection_and_ambiguity",
       "nodes": [
+        "tests/a2/test_examples_r.py::test_source_hidden_state_and_rendered_assertion",
         "tests/a2/test_readme.py::test_source_selection_and_ambiguity[README.Rmd]",
         "tests/a2/test_readme.py::test_source_selection_and_ambiguity[README.qmd]",
         "tests/a2/test_readme.py::test_source_selection_and_ambiguity[both]",
         "tests/a2/test_readme.py::test_source_selection_and_ambiguity[md-only]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Selection/no-source cases now covered; selected-source hidden state plus asserted rendered md needs combined real-R control."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "c0b6c67afbb12f5f9dcc5e7bbc2b4d5ec18ed6a6d44977d0337d59372a722679"
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4",
+        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -719,7 +727,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_r.py": "6c69ae60e0d36d8258db20620c9b8af733ea6788cc7c40f6d16118a12aaa96ab"
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -731,15 +739,16 @@
         "tests/a2/test_readme.py::test_explicit_closed_fences[```r]",
         "tests/a2/test_readme.py::test_explicit_closed_fences[~~~r]",
         "tests/a2/test_readme.py::test_explicit_closed_fences[```{r label, eval=FALSE}]",
-        "tests/a2/test_readme.py::test_explicit_closed_fences[```{r label, include=FALSE}]"
+        "tests/a2/test_readme.py::test_explicit_closed_fences[```{r label, include=FALSE}]",
+        "tests/a2/test_readme.py::test_unsupported_or_unterminated_fences_never_execute[```]",
+        "tests/a2/test_readme.py::test_unsupported_or_unterminated_fences_never_execute[```python]",
+        "tests/a2/test_readme.py::test_unsupported_or_unterminated_fences_never_execute[```r]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Closed recognized fences covered; unterminated and unlabeled/Python/vignette execution exclusion need direct cases."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "c0b6c67afbb12f5f9dcc5e7bbc2b4d5ec18ed6a6d44977d0337d59372a722679"
+        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -751,15 +760,15 @@
         "tests/a2/test_readme.py::test_all_located_skip_markers[# docs-check: skip]",
         "tests/a2/test_readme.py::test_all_located_skip_markers[#| docs-check: skip]",
         "tests/a2/test_readme.py::test_all_located_skip_markers[<!-- docs-check: skip -->]",
-        "tests/a2/test_readme.py::test_multiline_string_is_not_pasted_output"
+        "tests/a2/test_readme.py::test_multiline_string_is_not_pasted_output",
+        "tests/a2/test_readme.py::test_html_skip_prior_nonblank_boundary[\\n]",
+        "tests/a2/test_readme.py::test_html_skip_prior_nonblank_boundary[\\nintervening prose\\n]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Markers and quoted multiline #> covered; immediate prior nonblank HTML marker boundary missing."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "c0b6c67afbb12f5f9dcc5e7bbc2b4d5ec18ed6a6d44977d0337d59372a722679"
+        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -769,15 +778,15 @@
       "proposed_node": "tests/a2/test_readme.py::test_literal_defaults_precedence",
       "nodes": [
         "tests/a2/test_readme.py::test_body_precedence_and_conflicts",
-        "tests/a2/test_readme.py::test_conflicting_global_defaults_fail_preflight"
+        "tests/a2/test_readme.py::test_conflicting_global_defaults_fail_preflight",
+        "tests/a2/test_readme.py::test_dynamic_defaults_never_replay[```r\\nknitr::opts_chunk$set(eval=variable)\\n```\\n]",
+        "tests/a2/test_readme.py::test_dynamic_defaults_never_replay[---\\nexecute: \"{{ dynamic }}\"\\n---\\n]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Body precedence and conflicting globals covered; supported literal knitr/Quarto defaults and dynamic global/template cases missing."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "c0b6c67afbb12f5f9dcc5e7bbc2b4d5ec18ed6a6d44977d0337d59372a722679"
+        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -788,15 +797,15 @@
       "nodes": [
         "tests/a2/test_readme.py::test_supported_visibility_options[warning-warning=FALSE-Warning: hidden]",
         "tests/a2/test_readme.py::test_supported_visibility_options[message-message=FALSE-Message: hidden]",
-        "tests/a2/test_readme.py::test_supported_visibility_options[stdout-results=\"hide\"-[1] 1]"
+        "tests/a2/test_readme.py::test_supported_visibility_options[stdout-results=\"hide\"-[1] 1]",
+        "tests/a2/test_readme.py::test_literal_global_defaults_and_supported_options[README.Rmd-```r\\nknitr::opts_chunk$set(eval=TRUE, include=TRUE, echo=FALSE, warning=FALSE, message=FALSE, results=\"markup\", comment=\"#>\", error=FALSE, engine=\"R\")\\n```\\n]",
+        "tests/a2/test_readme.py::test_literal_global_defaults_and_supported_options[README.qmd----\\nexecute:\\n  eval: true\\n  echo: false\\n  warning: false\\n  message: false\\n---\\n]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Warning/message/results exclusions covered; full supported option subset and boolean engine metadata need direct cases."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "c0b6c67afbb12f5f9dcc5e7bbc2b4d5ec18ed6a6d44977d0337d59372a722679"
+        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -811,15 +820,20 @@
         "tests/a2/test_readme.py::test_unsupported_options_preflight[child='x.Rmd']",
         "tests/a2/test_readme.py::test_unsupported_options_preflight[results='asis']",
         "tests/a2/test_readme.py::test_all_unsupported_options_are_reported",
-        "tests/a2/test_readme.py::test_quarto_defaults_report_all_unsupported_options"
+        "tests/a2/test_readme.py::test_quarto_defaults_report_all_unsupported_options",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[error=1]",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[eval=variable]",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[fig.path=\"x\"]",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[child=\"x.Rmd\"]",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[results=\"asis\"]",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[engine=FALSE]",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[template=\"x\"]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "All-options reporting covered; numeric error option and no-runtime preflight sentinel for every unsupported family need cases."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "c0b6c67afbb12f5f9dcc5e7bbc2b4d5ec18ed6a6d44977d0337d59372a722679"
+        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -834,7 +848,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "c0b6c67afbb12f5f9dcc5e7bbc2b4d5ec18ed6a6d44977d0337d59372a722679"
+        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -843,17 +857,17 @@
       "task": "T11",
       "proposed_node": "tests/a2/test_readme.py::test_coverage_partition_and_exclusions",
       "nodes": [
+        "tests/a2/test_examples_r.py::test_excluded_only_has_no_side_effect",
         "tests/a2/test_readme.py::test_unsupported_assertions_preserve_supported_comparison",
         "tests/a2/test_readme.py::test_coverage_partition_and_exclusions[False]",
         "tests/a2/test_readme.py::test_coverage_partition_and_exclusions[True]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "One checked/five excluded and excluded-only now covered with portable replay fixture; real-R exclusion-only side-effect sentinel still missing."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "c0b6c67afbb12f5f9dcc5e7bbc2b4d5ec18ed6a6d44977d0337d59372a722679"
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4",
+        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -869,7 +883,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_r.py": "6c69ae60e0d36d8258db20620c9b8af733ea6788cc7c40f6d16118a12aaa96ab"
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -885,8 +899,8 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_r.py": "6c69ae60e0d36d8258db20620c9b8af733ea6788cc7c40f6d16118a12aaa96ab",
-        "tests/a2/test_readme.py": "c0b6c67afbb12f5f9dcc5e7bbc2b4d5ec18ed6a6d44977d0337d59372a722679"
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4",
+        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -907,6 +921,10 @@
         "tests/a2/test_comparison.py::test_documented_precision_cases[Inf--Inf-output]",
         "tests/a2/test_comparison.py::test_documented_precision_cases[label [1] 1-other [1] 1-shape]",
         "tests/a2/test_comparison.py::test_documented_precision_cases[[1] 1 2-[1] 1-shape]",
+        "tests/a2/test_comparison.py::test_remaining_normative_precision_rows[0.1900-0.1901-match]",
+        "tests/a2/test_comparison.py::test_remaining_normative_precision_rows[0.1900-0.1902-output]",
+        "tests/a2/test_comparison.py::test_remaining_normative_precision_rows[0.164-0.1648-match]",
+        "tests/a2/test_comparison.py::test_remaining_normative_precision_rows[0.19-0.164-output]",
         "tests/a2/test_examples_r.py::test_normative_precision[0.19-0.20-match]",
         "tests/a2/test_examples_r.py::test_normative_precision[0.19-0.2001-output]",
         "tests/a2/test_examples_r.py::test_normative_precision[1e-04-0.0001-match]",
@@ -917,14 +935,12 @@
         "tests/a2/test_examples_r.py::test_normative_precision[1,234-1234-shape]",
         "tests/a2/test_examples_r.py::test_normative_precision[NA-NA-match]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Not every approved comparison table row is independently present: 0.1900, 0.1648 and 0.19 versus 0.164 need exact parameter rows."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_comparison.py": "09ed31c451693e35f78e3c14c6d89bf7421b36ac431b262d4d8e787b0dfed5fd",
-        "tests/a2/test_examples_r.py": "6c69ae60e0d36d8258db20620c9b8af733ea6788cc7c40f6d16118a12aaa96ab"
+        "tests/a2/test_comparison.py": "5f3eabff15d204d3d2542108f1d9cb88fbcfb01a5e020f9a7d2cb91b956cfb02",
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -946,7 +962,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_comparison.py": "09ed31c451693e35f78e3c14c6d89bf7421b36ac431b262d4d8e787b0dfed5fd"
+        "tests/a2/test_comparison.py": "5f3eabff15d204d3d2542108f1d9cb88fbcfb01a5e020f9a7d2cb91b956cfb02"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -955,15 +971,14 @@
       "task": "T12",
       "proposed_node": "tests/a2/test_comparison.py::test_expression_subsequence_no_reuse",
       "nodes": [
-        "tests/a2/test_examples_r.py::test_expression_subsequence_no_reuse"
+        "tests/a2/test_examples_r.py::test_expression_subsequence_no_reuse",
+        "tests/a2/test_examples_r.py::test_repeated_expected_line_cannot_reuse_output"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Undocumented earlier expression cannot match documented later expression; repeated documented lines cannot reuse one actual line needs explicit test."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_r.py": "6c69ae60e0d36d8258db20620c9b8af733ea6788cc7c40f6d16118a12aaa96ab"
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -974,15 +989,15 @@
       "nodes": [
         "tests/a2/test_examples_r.py::test_unstable_output_remains_unverified[packageVersion(\"evaluate\")-[1] 999]",
         "tests/a2/test_examples_r.py::test_unstable_output_remains_unverified[Sys.Date()-[1] \"1900-01-01\"]",
-        "tests/a2/test_examples_r.py::test_unstable_output_remains_unverified[runif(1)-[1] 999]"
+        "tests/a2/test_examples_r.py::test_unstable_output_remains_unverified[runif(1)-[1] 999]",
+        "tests/a2/test_examples_r.py::test_seed_order_does_not_retroactively_verify[False]",
+        "tests/a2/test_examples_r.py::test_seed_order_does_not_retroactively_verify[True]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Unseeded and unstable fields covered; earlier explicit seed versus later seed needs native cases."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_r.py": "6c69ae60e0d36d8258db20620c9b8af733ea6788cc7c40f6d16118a12aaa96ab"
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -999,7 +1014,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "f3c367549b4064643d231c1aaeb7d654c235f8390cc5081afae3b6ff60b63a29"
+        "tests/a2/test_examples_cli.py": "f1c8270becbc646bd46a4ef2c315b65e197d8c713c9bf19b925329e9921c1263"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1008,15 +1023,14 @@
       "task": "T13",
       "proposed_node": "tests/a2/test_examples_r.py::test_fresh_ordered_hidden_setup",
       "nodes": [
-        "tests/a2/test_examples_r.py::test_fresh_ordered_hidden_setup"
+        "tests/a2/test_examples_r.py::test_fresh_ordered_hidden_setup",
+        "tests/a2/test_examples_r.py::test_package_sessions_and_eval_false_isolation"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Fresh ordered hidden setup covered; eval-false side-effect and independent package/file session isolation need native sentinels."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_r.py": "6c69ae60e0d36d8258db20620c9b8af733ea6788cc7c40f6d16118a12aaa96ab"
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1031,7 +1045,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_r.py": "6c69ae60e0d36d8258db20620c9b8af733ea6788cc7c40f6d16118a12aaa96ab"
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1040,15 +1054,17 @@
       "task": "T13",
       "proposed_node": "tests/a2/test_examples_r.py::test_dependency_preflight_no_install",
       "nodes": [
-        "tests/a2/test_examples_r.py::test_dependency_preflight_no_install"
+        "tests/a2/test_examples_r.py::test_dependency_preflight_no_install",
+        "tests/a2/test_readme.py::test_engine_preflight_exact_missing_list[pkgload]",
+        "tests/a2/test_readme.py::test_engine_preflight_exact_missing_list[evaluate]",
+        "tests/a2/test_readme.py::test_engine_preflight_exact_missing_list[knitr]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Missing package dependency covered; portable missing Rscript/pkgload/evaluate/required knitr variants need exact engine-list assertions."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_r.py": "6c69ae60e0d36d8258db20620c9b8af733ea6788cc7c40f6d16118a12aaa96ab"
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4",
+        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1064,7 +1080,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_r.py": "6c69ae60e0d36d8258db20620c9b8af733ea6788cc7c40f6d16118a12aaa96ab"
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1080,8 +1096,8 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "f3c367549b4064643d231c1aaeb7d654c235f8390cc5081afae3b6ff60b63a29",
-        "tests/a2/test_examples_r.py": "6c69ae60e0d36d8258db20620c9b8af733ea6788cc7c40f6d16118a12aaa96ab"
+        "tests/a2/test_examples_cli.py": "f1c8270becbc646bd46a4ef2c315b65e197d8c713c9bf19b925329e9921c1263",
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1097,7 +1113,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_r.py": "6c69ae60e0d36d8258db20620c9b8af733ea6788cc7c40f6d16118a12aaa96ab"
+        "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1106,15 +1122,14 @@
       "task": "T14",
       "proposed_node": "tests/a2/test_examples_cli.py::test_native_chunk_deadline",
       "nodes": [
-        "tests/a2/test_examples_cli.py::test_native_chunk_deadline"
+        "tests/a2/test_examples_cli.py::test_native_chunk_deadline",
+        "tests/a2/test_examples_cli.py::test_distinct_chunk_deadline_retains_checkpoint"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Native deadline uses one-second global budget; separately limiting chunk deadline and retaining earlier native result need focused case."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "f3c367549b4064643d231c1aaeb7d654c235f8390cc5081afae3b6ff60b63a29"
+        "tests/a2/test_examples_cli.py": "f1c8270becbc646bd46a4ef2c315b65e197d8c713c9bf19b925329e9921c1263"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1123,15 +1138,14 @@
       "task": "T14",
       "proposed_node": "tests/a2/test_examples_cli.py::test_file_loading_deadline",
       "nodes": [
-        "tests/a2/test_examples_cli.py::test_file_loading_deadline"
+        "tests/a2/test_examples_cli.py::test_file_loading_deadline",
+        "tests/a2/test_examples_cli.py::test_distinct_file_deadline_and_defaults"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Loading/global limit exercised; distinct file budget and default public-limit configuration not asserted."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "f3c367549b4064643d231c1aaeb7d654c235f8390cc5081afae3b6ff60b63a29"
+        "tests/a2/test_examples_cli.py": "f1c8270becbc646bd46a4ef2c315b65e197d8c713c9bf19b925329e9921c1263"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1146,7 +1160,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "f3c367549b4064643d231c1aaeb7d654c235f8390cc5081afae3b6ff60b63a29"
+        "tests/a2/test_examples_cli.py": "f1c8270becbc646bd46a4ef2c315b65e197d8c713c9bf19b925329e9921c1263"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1166,7 +1180,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "f3c367549b4064643d231c1aaeb7d654c235f8390cc5081afae3b6ff60b63a29"
+        "tests/a2/test_examples_cli.py": "f1c8270becbc646bd46a4ef2c315b65e197d8c713c9bf19b925329e9921c1263"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1181,7 +1195,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "f3c367549b4064643d231c1aaeb7d654c235f8390cc5081afae3b6ff60b63a29"
+        "tests/a2/test_examples_cli.py": "f1c8270becbc646bd46a4ef2c315b65e197d8c713c9bf19b925329e9921c1263"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1197,7 +1211,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "f3c367549b4064643d231c1aaeb7d654c235f8390cc5081afae3b6ff60b63a29"
+        "tests/a2/test_examples_cli.py": "f1c8270becbc646bd46a4ef2c315b65e197d8c713c9bf19b925329e9921c1263"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1310,6 +1324,8 @@
         "tests/a2/test_docs.py::test_optional_flags_documented[docs/commands.md]",
         "tests/a2/test_docs.py::test_optional_flags_documented[docs/guides/docs-audit.md]",
         "tests/a2/test_docs.py::test_optional_flags_documented[docs/tutorials/fix-a-docs-check-finding.md]",
+        "tests/a2/test_docs.py::test_optional_flags_documented[docs/REFCARD.md]",
+        "tests/a2/test_docs.py::test_optional_flags_documented[docs/command-cards.md]",
         "tests/a2/test_docs.py::test_command_sync",
         "tests/a2/test_docs.py::test_generated_reference_sync"
       ],
@@ -1317,7 +1333,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "497174d6114e705eb53e2a57da9f8bee4d9ac491e06a510c52b76261ea5dc8cf"
+        "tests/a2/test_docs.py": "60f94d86d5dc29339f8c9efe8e887695dc5123792e13d9e38f401b9e71263c9b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1337,7 +1353,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "497174d6114e705eb53e2a57da9f8bee4d9ac491e06a510c52b76261ea5dc8cf"
+        "tests/a2/test_docs.py": "60f94d86d5dc29339f8c9efe8e887695dc5123792e13d9e38f401b9e71263c9b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1354,7 +1370,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "497174d6114e705eb53e2a57da9f8bee4d9ac491e06a510c52b76261ea5dc8cf"
+        "tests/a2/test_docs.py": "60f94d86d5dc29339f8c9efe8e887695dc5123792e13d9e38f401b9e71263c9b"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1364,15 +1380,14 @@
       "proposed_node": "tests/a2/test_release_verifier.py::test_manifest_mapping_and_collection",
       "nodes": [
         "tests/a2/test_release_verifier.py::test_manifest_mapping_and_collection",
-        "tests/a2/test_release_verifier.py::test_removed_normative_paragraph_or_table_row_rejected"
+        "tests/a2/test_release_verifier.py::test_removed_normative_paragraph_or_table_row_rejected",
+        "tests/a2/test_release_verifier.py::test_removed_inventory_group_even_with_rewritten_ledger"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Ledger omission cases covered; verifier does not independently detect removed inventory row if ledger mapping is rewritten; source-to-inventory reconciliation must be bound."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_verifier.py": "aa7e63cd6a41aef91798434f3bd2d1d8cef233cc60048c9eac972f8c4dd7f334"
+        "tests/a2/test_release_verifier.py": "b4a588634fb6532b2bbb8b074c20c950b3198c29c9b7c075a706c00329ee195d"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1392,7 +1407,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_verifier.py": "aa7e63cd6a41aef91798434f3bd2d1d8cef233cc60048c9eac972f8c4dd7f334"
+        "tests/a2/test_release_verifier.py": "b4a588634fb6532b2bbb8b074c20c950b3198c29c9b7c075a706c00329ee195d"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1407,7 +1422,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_verifier.py": "aa7e63cd6a41aef91798434f3bd2d1d8cef233cc60048c9eac972f8c4dd7f334"
+        "tests/a2/test_release_verifier.py": "b4a588634fb6532b2bbb8b074c20c950b3198c29c9b7c075a706c00329ee195d"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1420,15 +1435,21 @@
         "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[lock_hash]",
         "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[manifest_hash]",
         "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[collection_run_id]",
-        "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[reported_r_checked]"
+        "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[reported_r_checked]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[none]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[R]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[packages]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[platform]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[source-hash]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[expected-hash]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[missing-fixture]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[duplicate-fixture]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Identity API cases do not validate main entry runtime/platform/fixture hashes comprehensively."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_verifier.py": "aa7e63cd6a41aef91798434f3bd2d1d8cef233cc60048c9eac972f8c4dd7f334"
+        "tests/a2/test_release_verifier.py": "b4a588634fb6532b2bbb8b074c20c950b3198c29c9b7c075a706c00329ee195d"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1443,7 +1464,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_verifier.py": "aa7e63cd6a41aef91798434f3bd2d1d8cef233cc60048c9eac972f8c4dd7f334"
+        "tests/a2/test_release_verifier.py": "b4a588634fb6532b2bbb8b074c20c950b3198c29c9b7c075a706c00329ee195d"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1615,8 +1636,8 @@
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 330,
-  "review_candidate": "d4cf8e2 plus guardian protocol acceptance additions",
+  "collected_nodes": 382,
+  "review_candidate": "ae1f1c9 plus consolidated acceptance additions",
   "platforms": [
     "ubuntu-24.04",
     "macos-14"

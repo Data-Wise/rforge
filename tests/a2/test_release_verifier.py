@@ -65,3 +65,45 @@ def test_developer_and_release_modes(monkeypatch):
     assert item.markers and item.markers[0].name=='skip'
     with pytest.raises(pytest.UsageError,match='exact fixture-lock'):
         conftest.pytest_collection_modifyitems(Config(True),[Item()])
+
+
+def test_removed_inventory_group_even_with_rewritten_ledger():
+    source='## Contract\n\nMust verify all scope.\n'
+    obligations=v.spec_obligations(source)
+    ledger={'review':'complete','requirements':[{**r,'review':'complete','inventory_ids':['C01','C02']} for r in obligations]}
+    manifest={'groups':[{'id':'C01'},{'id':'C02'}]}
+    inventory='| C01 / T02 | first |\n| C02 / T02 | second |\n'
+    v.validate_requirements(ledger,manifest,source,inventory)
+    manifest['groups'].pop()
+    for r in ledger['requirements']:r['inventory_ids']=['C01']
+    with pytest.raises(v.VerificationError,match='inventory group'):v.validate_requirements(ledger,manifest,source,inventory)
+
+
+@pytest.mark.parametrize('defect',['none','R','packages','platform','source-hash','expected-hash','missing-fixture','duplicate-fixture'])
+def test_main_runtime_platform_fixture_binding(tmp_path,capsys,defect):
+    import json,hashlib
+    m,e=records();m['groups'][0]['id']='F01'
+    source='## Contract\n\nVerify fixtures.\n'
+    sha=hashlib.sha256(source.encode()).hexdigest();m['spec_sha256']=sha
+    ledger={'review':'complete','spec_sha256':sha,'requirements':[{**r,'review':'complete','inventory_ids':['F01']} for r in v.spec_obligations(source)]}
+    expected={'status':'ready','fixtures':{}}
+    for index,execution in enumerate(e['fixture_executions']):
+        execution.update(fixture=str(index),source_hash='0'*64)
+        expected['fixtures'][str(index)]={'findings':[], 'assertion_ids':execution.get('observed_assertion_ids',[]),'routes':execution.get('observed_routes',[])}
+    lock={'platforms':['macos-14','ubuntu-24.04'],'R':'4.6.1','R_packages':{'evaluate':'1.0.5'}}
+    e.update(R=lock['R'],R_packages=lock['R_packages'],platform='macos-14')
+    files={'manifest':m,'requirements':ledger,'expected':expected,'lock':lock}
+    for name,data in files.items():(tmp_path/name).write_text(json.dumps(data))
+    (tmp_path/'spec').write_text(source);(tmp_path/'inventory').write_text('| F01 / T23 | required |\n')
+    e.update(lock_hash=v.digest(tmp_path/'lock'),manifest_hash=v.digest(tmp_path/'manifest'),expected_findings_hash=v.digest(tmp_path/'expected'))
+    if defect=='R':e['R']='wrong'
+    elif defect=='packages':e['R_packages']={}
+    elif defect=='platform':e['platform']='windows'
+    elif defect=='source-hash':e['fixture_executions'][0]['source_hash']='bad'
+    elif defect=='expected-hash':e['expected_findings_hash']='wrong'
+    elif defect=='missing-fixture':e['fixture_executions'].pop()
+    elif defect=='duplicate-fixture':e['fixture_executions'].append(deepcopy(e['fixture_executions'][0]))
+    (tmp_path/'evidence').write_text(json.dumps(e))
+    args=[argument for name in (*files,'spec','inventory','evidence') for argument in ('--'+name,str(tmp_path/name))]+['--candidate-sha','sha']
+    assert v.main(args)==(0 if defect=='none' else 2)
+    assert json.loads(capsys.readouterr().out)['verified']==(defect=='none')

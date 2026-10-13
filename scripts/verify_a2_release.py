@@ -38,12 +38,16 @@ def spec_obligations(text):
     return obligations
 
 
-def validate_requirements(ledger, manifest, spec_text):
+def validate_requirements(ledger, manifest, spec_text, inventory_text=None):
     require(ledger.get("review")=="complete","requirement ledger review pending")
     source=spec_obligations(spec_text)
     entries=ledger.get("requirements",[])
     require(len(entries)==len(source),"missing/extra approved spec obligation")
     groups={g['id'] for g in manifest.get('groups',[])}
+    if inventory_text is not None:
+        inventory_ids=re.findall(r'^\| ([A-Z]+[0-9]+) /',inventory_text,re.M)
+        require(bool(inventory_ids) and len(inventory_ids)==len(set(inventory_ids)), 'empty/duplicate acceptance inventory')
+        require(groups==set(inventory_ids), 'removed/extra acceptance inventory group')
     for expected,actual in zip(source,entries):
         require(all(actual.get(k)==v for k,v in expected.items()),"altered/unmapped paragraph or table row")
         require(actual.get("review")=="complete" and bool(actual.get("inventory_ids")),"unmapped/unreviewed spec requirement")
@@ -131,6 +135,7 @@ def main(argv=None):
     ap.add_argument("--lock", type=Path, default=Path("tests/a2/fixture-lock.json"))
     ap.add_argument("--requirements", type=Path, default=Path("tests/a2/requirements.json"))
     ap.add_argument("--spec", type=Path, default=Path("SPEC-docs-check-a2-2026-10-12.md"))
+    ap.add_argument("--inventory", type=Path, default=Path("ACCEPTANCE-docs-check-a2-2026-10-12.md"))
     ap.add_argument("--expected", type=Path, default=Path("tests/a2/expected-findings.json"))
     ap.add_argument("--evidence", type=Path, required=True)
     ap.add_argument("--candidate-sha", required=True)
@@ -139,7 +144,7 @@ def main(argv=None):
         ledger = json.loads(args.requirements.read_text())
         manifest = json.loads(args.manifest.read_text())
         require(digest(args.spec)==ledger.get("spec_sha256")==manifest.get("spec_sha256"),"approved spec hash mismatch")
-        validate_requirements(ledger,manifest,args.spec.read_text())
+        validate_requirements(ledger,manifest,args.spec.read_text(),args.inventory.read_text())
         evidence = json.loads(args.evidence.read_text())
         result = validate_run(manifest, evidence, candidate_sha=args.candidate_sha, lock_hash=digest(args.lock), manifest_hash=digest(args.manifest))
         expected=json.loads(args.expected.read_text())

@@ -6,6 +6,10 @@ from pathlib import Path
 import pytest
 
 R_FUNCTIONS = {
+    "test_distinct_chunk_deadline_retains_checkpoint", "test_distinct_file_deadline_and_defaults",
+    "test_source_hidden_state_and_rendered_assertion", "test_repeated_expected_line_cannot_reuse_output",
+    "test_seed_order_does_not_retroactively_verify", "test_excluded_only_has_no_side_effect",
+    "test_package_sessions_and_eval_false_isolation",
     "test_warn_only_and_complete_mismatch",
     "test_running_evaluate_output_limit", "test_evaluate_spool_counts_text_once",
     'test_clean_and_planted_stale_output', 'test_fresh_ordered_hidden_setup',

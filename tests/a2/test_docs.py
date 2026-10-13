@@ -7,7 +7,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 
 
-@pytest.mark.parametrize('path', ['commands/docs/check.md', 'docs/commands.md', 'docs/guides/docs-audit.md', 'docs/tutorials/fix-a-docs-check-finding.md'])
+@pytest.mark.parametrize('path', ['commands/docs/check.md', 'docs/commands.md', 'docs/guides/docs-audit.md', 'docs/tutorials/fix-a-docs-check-finding.md', 'docs/REFCARD.md', 'docs/command-cards.md'])
 def test_optional_flags_documented(path):
     text = (ROOT / path).read_text()
     assert '--site' in text and '--run-examples' in text

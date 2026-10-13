@@ -2,7 +2,7 @@
 
 Approved spec revision 7 remains unchanged. Mapping review is complete; release coverage is not complete.
 
-Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 330 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 27 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
+Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 382 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 10 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
 
 The immutable requirement ledger records exact source text/hash/anchor/ordinal plus inventory ownership. Test source hashes bind this review snapshot. Header, historical validation and approval paragraphs are contextual documentation obligations, not invented runtime tests. Actual external evidence is separate from portable validators.
 
@@ -10,111 +10,21 @@ The immutable requirement ledger records exact source text/hash/anchor/ordinal p
 
 ### G08 / T08
 
-Mapped: `tests/a2/test_guardian.py::test_guardian_failure_emergency_cleanup`, `tests/a2/test_guardian.py::test_no_exception_signal_after_direct_child_reap`.
+Mapped: `tests/a2/test_guardian.py::test_guardian_failure_emergency_cleanup`, `tests/a2/test_guardian.py::test_no_exception_signal_after_direct_child_reap`, `tests/a2/test_guardian.py::test_live_guardian_death_emergency_owner`.
 
-- Existing guardian failure occurs before child launch or after reap; live guardian death with a launched child and emergency ownership are not reproduced; PID reuse hypothesis unresolved.
+- Live guardian death and emergency group ownership are now reproduced; PID reuse safety remains unresolved.
 
 ### I01 / T09
 
-Mapped: `tests/a2/test_stdio.py::test_native_output_does_not_deadlock`.
+Mapped: `tests/a2/test_stdio.py::test_native_output_does_not_deadlock`, `tests/a2/test_stdio.py::test_public_diagnostics_bounded_and_json_isolated`.
 
-- Large native capture covered; diagnostic tail <=1MiB and child/native JSON contamination need direct public report cases.
-
-### I02 / T09
-
-Mapped: `tests/a2/test_examples_r.py::test_running_evaluate_output_limit`, `tests/a2/test_examples_r.py::test_evaluate_spool_counts_text_once`, `tests/a2/test_stdio.py::test_shared_text_output_threshold`.
-
-- Native sum and live evaluate single-count tests covered; combined stdout/stderr/condition/evaluate exact-byte budget case still missing.
+- Public JSON isolation and ASCII diagnostic tails are covered; multibyte UTF-8 tail byte bounds remain unverified.
 
 ### I04 / T09
 
-Mapped: `tests/a2/test_stdio.py::test_checkpoint_and_marker_integrity`.
+Mapped: `tests/a2/test_stdio.py::test_checkpoint_and_marker_integrity`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[None]`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{]`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[[]]`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[[{}]]`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{"records":[{}]}]`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{"records":{}}]`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{"records":[{"id":"README.md:3","text":[1]}]}]`.
 
-- Valid earlier checkpoint retained; malformed/partial/missing checkpoint variants need explicit no-match regressions.
-
-### E01 / T10
-
-Mapped: `tests/a2/test_readme.py::test_source_selection_and_ambiguity[README.Rmd]`, `tests/a2/test_readme.py::test_source_selection_and_ambiguity[README.qmd]`, `tests/a2/test_readme.py::test_source_selection_and_ambiguity[both]`, `tests/a2/test_readme.py::test_source_selection_and_ambiguity[md-only]`.
-
-- Selection/no-source cases now covered; selected-source hidden state plus asserted rendered md needs combined real-R control.
-
-### E03 / T10
-
-Mapped: `tests/a2/test_readme.py::test_explicit_closed_fences[```r]`, `tests/a2/test_readme.py::test_explicit_closed_fences[~~~r]`, `tests/a2/test_readme.py::test_explicit_closed_fences[```{r label, eval=FALSE}]`, `tests/a2/test_readme.py::test_explicit_closed_fences[```{r label, include=FALSE}]`.
-
-- Closed recognized fences covered; unterminated and unlabeled/Python/vignette execution exclusion need direct cases.
-
-### E04 / T10
-
-Mapped: `tests/a2/test_readme.py::test_all_located_skip_markers[# docs-check: skip]`, `tests/a2/test_readme.py::test_all_located_skip_markers[#| docs-check: skip]`, `tests/a2/test_readme.py::test_all_located_skip_markers[<!-- docs-check: skip -->]`, `tests/a2/test_readme.py::test_multiline_string_is_not_pasted_output`.
-
-- Markers and quoted multiline #> covered; immediate prior nonblank HTML marker boundary missing.
-
-### E05 / T11
-
-Mapped: `tests/a2/test_readme.py::test_body_precedence_and_conflicts`, `tests/a2/test_readme.py::test_conflicting_global_defaults_fail_preflight`.
-
-- Body precedence and conflicting globals covered; supported literal knitr/Quarto defaults and dynamic global/template cases missing.
-
-### E06 / T11
-
-Mapped: `tests/a2/test_readme.py::test_supported_visibility_options[warning-warning=FALSE-Warning: hidden]`, `tests/a2/test_readme.py::test_supported_visibility_options[message-message=FALSE-Message: hidden]`, `tests/a2/test_readme.py::test_supported_visibility_options[stdout-results="hide"-[1] 1]`.
-
-- Warning/message/results exclusions covered; full supported option subset and boolean engine metadata need direct cases.
-
-### E07 / T11
-
-Mapped: `tests/a2/test_readme.py::test_unsupported_options_preflight[error=TRUE]`, `tests/a2/test_readme.py::test_unsupported_options_preflight[fig.path='plots/']`, `tests/a2/test_readme.py::test_unsupported_options_preflight[eval=variable]`, `tests/a2/test_readme.py::test_unsupported_options_preflight[child='x.Rmd']`, `tests/a2/test_readme.py::test_unsupported_options_preflight[results='asis']`, `tests/a2/test_readme.py::test_all_unsupported_options_are_reported`, `tests/a2/test_readme.py::test_quarto_defaults_report_all_unsupported_options`.
-
-- All-options reporting covered; numeric error option and no-runtime preflight sentinel for every unsupported family need cases.
-
-### E09 / T11
-
-Mapped: `tests/a2/test_readme.py::test_unsupported_assertions_preserve_supported_comparison`, `tests/a2/test_readme.py::test_coverage_partition_and_exclusions[False]`, `tests/a2/test_readme.py::test_coverage_partition_and_exclusions[True]`.
-
-- One checked/five excluded and excluded-only now covered with portable replay fixture; real-R exclusion-only side-effect sentinel still missing.
-
-### N01 / T12
-
-Mapped: `tests/a2/test_comparison.py::test_documented_precision_cases[0.19-0.20-match]`, `tests/a2/test_comparison.py::test_documented_precision_cases[0.19-0.20001-output]`, `tests/a2/test_comparison.py::test_documented_precision_cases[1e-04-2e-04-match]`, `tests/a2/test_comparison.py::test_documented_precision_cases[1.00e-04-1.02e-04-output]`, `tests/a2/test_comparison.py::test_documented_precision_cases[-0.19--0.20-match]`, `tests/a2/test_comparison.py::test_documented_precision_cases[55%-36 %-output]`, `tests/a2/test_comparison.py::test_documented_precision_cases[55%-0.55-shape]`, `tests/a2/test_comparison.py::test_documented_precision_cases[1,234-1234-shape]`, `tests/a2/test_comparison.py::test_documented_precision_cases[NA-NaN-output]`, `tests/a2/test_comparison.py::test_documented_precision_cases[Inf--Inf-output]`, `tests/a2/test_comparison.py::test_documented_precision_cases[label [1] 1-other [1] 1-shape]`, `tests/a2/test_comparison.py::test_documented_precision_cases[[1] 1 2-[1] 1-shape]`, `tests/a2/test_examples_r.py::test_normative_precision[0.19-0.20-match]`, `tests/a2/test_examples_r.py::test_normative_precision[0.19-0.2001-output]`, `tests/a2/test_examples_r.py::test_normative_precision[1e-04-0.0001-match]`, `tests/a2/test_examples_r.py::test_normative_precision[p < 0.001-p = 2.2e-16-match]`, `tests/a2/test_examples_r.py::test_normative_precision[p < 0.001-p = 0.002-output]`, `tests/a2/test_examples_r.py::test_normative_precision[55%-36 %-output]`, `tests/a2/test_examples_r.py::test_normative_precision[55%-0.55-shape]`, `tests/a2/test_examples_r.py::test_normative_precision[1,234-1234-shape]`, `tests/a2/test_examples_r.py::test_normative_precision[NA-NA-match]`.
-
-- Not every approved comparison table row is independently present: 0.1900, 0.1648 and 0.19 versus 0.164 need exact parameter rows.
-
-### N03 / T12
-
-Mapped: `tests/a2/test_examples_r.py::test_expression_subsequence_no_reuse`.
-
-- Undocumented earlier expression cannot match documented later expression; repeated documented lines cannot reuse one actual line needs explicit test.
-
-### N04 / T12
-
-Mapped: `tests/a2/test_examples_r.py::test_unstable_output_remains_unverified[packageVersion("evaluate")-[1] 999]`, `tests/a2/test_examples_r.py::test_unstable_output_remains_unverified[Sys.Date()-[1] "1900-01-01"]`, `tests/a2/test_examples_r.py::test_unstable_output_remains_unverified[runif(1)-[1] 999]`.
-
-- Unseeded and unstable fields covered; earlier explicit seed versus later seed needs native cases.
-
-### R01 / T13
-
-Mapped: `tests/a2/test_examples_r.py::test_fresh_ordered_hidden_setup`.
-
-- Fresh ordered hidden setup covered; eval-false side-effect and independent package/file session isolation need native sentinels.
-
-### R03 / T13
-
-Mapped: `tests/a2/test_examples_r.py::test_dependency_preflight_no_install`.
-
-- Missing package dependency covered; portable missing Rscript/pkgload/evaluate/required knitr variants need exact engine-list assertions.
-
-### R07 / T14
-
-Mapped: `tests/a2/test_examples_cli.py::test_native_chunk_deadline`.
-
-- Native deadline uses one-second global budget; separately limiting chunk deadline and retaining earlier native result need focused case.
-
-### R08 / T14
-
-Mapped: `tests/a2/test_examples_cli.py::test_file_loading_deadline`.
-
-- Loading/global limit exercised; distinct file budget and default public-limit configuration not asserted.
+- Malformed/partial/missing checkpoint no-match regressions pass; mixed valid/malformed and duplicate-record preservation need direct cases.
 
 ### D04 / T18
 
@@ -127,18 +37,6 @@ Mapped: `tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/guides/d
 Mapped: `tests/a2/test_docs.py::test_version_and_agent_mirror`.
 
 - Version and mirror gates covered; status/count accuracy and boundary prohibitions need explicit assertions.
-
-### V01 / T20
-
-Mapped: `tests/a2/test_release_verifier.py::test_manifest_mapping_and_collection`, `tests/a2/test_release_verifier.py::test_removed_normative_paragraph_or_table_row_rejected`.
-
-- Ledger omission cases covered; verifier does not independently detect removed inventory row if ledger mapping is rewritten; source-to-inventory reconciliation must be bound.
-
-### V04 / T20
-
-Mapped: `tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[candidate_sha]`, `tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[lock_hash]`, `tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[manifest_hash]`, `tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[collection_run_id]`, `tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[reported_r_checked]`.
-
-- Identity API cases do not validate main entry runtime/platform/fixture hashes comprehensively.
 
 ### V05 / T21
 
@@ -174,12 +72,6 @@ Mapped: `tests/a2/test_final_gates.py::test_review_record_validation`, `tests/a2
 
 Close the listed fixture/validator gaps and review their oracles before making required.json ready. Reconcile the independent ledger with the unchanged approved spec. Then commit a stable candidate, run the actual locked acceptance collection on Ubuntu 24.04 and macOS 14, retrieve both artifacts, and produce candidate/run-bound live, triage, full-gate, rendered-review and finalized adversarial-review observations. Only then can the aggregate gate certify acceptance. No CI dispatch, source publication, or release has occurred.
 
-## Closed coverage slices
+## Consolidated local validation
 
-Previously closed: C02–C06 reporting; S02/S03/S04/S06/S07/S08/S09/S11 source selection, pinned routes and bounded sitemap behavior. The pinned build also fixed underscore directory exclusion; see CHANGELOG.
-
-G02: same-run wrong-sequence acknowledgments block both first execution and rapid second transition, preserving the earlier valid side effect. G03: actual heartbeat sequence/cadence observations and deterministic simultaneous heartbeat/global expiry with deadline precedence. G04: a repeated-request burst yields one TERM; instrumentation verifies the termination record exists with the child PID and termination ID before signaling. G10: wall-clock access is forbidden and delayed polls cannot reset the original monotonic deadline. Seven expanded cases added; targeted guardian suite: 23 passed.
-
-These are local POSIX protocol observations. Live guardian-death emergency ownership, PID reuse and actual both-platform release evidence remain pending. All 330 collected nodes have exactly one owner; exact-spec ledger validation and pending manifest rejection passed.
-
-Full repository validation: 1229 passed, 4 existing skips; test-all 47/47. No runtime change or both-platform release acceptance is claimed.
+382 expanded A2 nodes collected. Full repository suite: 1281 passed, four existing skips. Repository gate: 47/47. Strict documentation build passed. The live guardian-death case exercises emergency cleanup but does not prove PID-reuse safety. Malformed checkpoint input no longer raises KeyError; mixed-record preservation and UTF-8 tail byte bounds remain explicit gaps. No release readiness, platform CI, finalized review, or rendered visual inspection is claimed.

@@ -21,3 +21,8 @@ def test_documented_precision_cases(expected,actual,verdict):
 ])
 def test_labeled_inequality_cases(expected,actual,verdict):
     assert examples.compare(expected,actual)==verdict
+
+
+@pytest.mark.parametrize('expected,actual,verdict',[('0.1900','0.1901','match'),('0.1900','0.1902','output'),('0.164','0.1648','match'),('0.19','0.164','output')])
+def test_remaining_normative_precision_rows(expected,actual,verdict):
+    assert examples.compare(expected,actual)==verdict
