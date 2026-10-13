@@ -34,3 +34,5 @@ Focused follow-up recommendation: {"profile": "standard", "focus": ["Pre-spawn k
 No automatic resume, chained review, expanded budget or fallback occurred.
 
 Next: validate the five findings against revision-7 lifecycle/deadline contracts and native fault tests, starting with pre-spawn signaling when no workload exists. Obtain actual Ubuntu/macOS evidence before acceptance. No implementation changes or release authorization follows from this report.
+
+Validated follow-up: [contract disposition and reproducible probes](REVIEW-docs-check-a2-ownership-repairs-validation-2026-10-12.md). Original review findings are preserved above.
