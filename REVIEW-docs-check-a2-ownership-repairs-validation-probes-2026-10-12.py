@@ -1,4 +1,4 @@
-"""Reproduce review boundaries without production edits or actual PGID reuse."""
+"""Review-boundary probes updated to repaired behavior; no actual PGID reuse."""
 import os,signal,subprocess,sys,time,uuid
 from pathlib import Path
 import pytest
@@ -29,7 +29,7 @@ def test_pre_spawn_exception_attempts_signal_after_pin_reap(tmp_path,monkeypatch
     monkeypatch.setattr(g.os,'killpg',lambda pgid,number:signals.append((pgid,number)))
     result=g.supervise(tmp_path)
     assert result['reason']=='guardian-failure' and not result.get('child_pid')
-    assert signals==[(pgid,signal.SIGKILL)]
+    assert signals==[]
 
 
 def test_single_post_reap_probe_failure_is_incomplete_without_survivors(tmp_path,monkeypatch):
@@ -54,7 +54,7 @@ def test_single_post_reap_probe_failure_is_incomplete_without_survivors(tmp_path
 
 
 @pytest.mark.parametrize('interruption',[False,True])
-def test_production_boundary_loses_lifecycle_and_known_counts(tmp_path,monkeypatch,interruption):
+def test_production_boundary_retains_known_counts(tmp_path,monkeypatch,interruption):
     root=package(tmp_path/'pkg',readme='```r\n1\n#> [1] 1\n```\n')
     segments,_,_,_=examples.extract(root/"README.md")
     assert sum(bool(s["expected"]) and s["execute"] and s["visible"] for s in segments)==1
@@ -71,8 +71,9 @@ def test_production_boundary_loses_lifecycle_and_known_counts(tmp_path,monkeypat
     else:
         result=docaudit.audit(root,run_examples=True)
         stage=result['stages']['examples']
-        assert result['incomplete'] and stage['state']=='unavailable'
-        assert stage['counts']=={} and 'provenance' not in stage
+        assert result['incomplete'] and stage['state']=='incomplete'
+        assert stage['counts']['eligible']==stage['counts']['blocked']==1
+        assert stage['provenance']['lifecycle']['boundary_error']=='OSError: controlled run failure'
         assert docaudit.exit_code(result,'warn')==docaudit.exit_code(result,'error')==2
     assert directories and not directories[0].exists()
 

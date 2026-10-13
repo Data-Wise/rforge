@@ -134,3 +134,61 @@ def test_distinct_file_deadline_and_defaults(tmp_path,monkeypatch):
     life=r['provenance']['lifecycle']
     assert r['state']=='incomplete' and r['counts']['checked']==0
     assert life['reason']=='deadline' and life['effective_deadline_ns']<life['global_deadline_ns']
+
+
+@pytest.mark.parametrize('checkpoint', [False, True])
+@pytest.mark.parametrize('threshold,expected', [('none',0),('warn',2),('error',2)])
+def test_replay_exception_retains_counts_and_lifecycle(tmp_path, monkeypatch, checkpoint, threshold, expected):
+    from lib import _docexamples as examples
+    guardian = examples.guardian
+    p = fixture(tmp_path, '~~~r\nprint(1)\n#> [1] 1\n~~~\n~~~r\nprint(2)\n#> [1] 2\n~~~')
+    monkeypatch.setattr(examples.shutil, 'which', lambda name: '/fake/Rscript')
+    def fail(command, directory, deadline, **kwargs):
+        guardian.atomic(directory/'initial.json', {'run_id':'current'})
+        guardian.atomic(directory/'terminal.json', {'run_id':'current','reason':'cleanup-unverified','cleanup_error':'probe-failed'})
+        if checkpoint:
+            segments = guardian.read(directory/'input.json')['segments']
+            guardian.atomic(directory/'result.json', {'records':[{'id':segments[0]['id'],'text':['[1] 1\n']}]})
+        raise OSError('guardian boundary')
+    monkeypatch.setattr(guardian, 'run', fail)
+    report = docaudit.audit(p, run_examples=True)
+    stage = report['stages']['examples']
+    assert stage['state'] == 'incomplete'
+    assert stage['counts']['eligible'] == 2
+    assert stage['counts']['checked'] == int(checkpoint)
+    assert stage['counts']['matched'] == int(checkpoint)
+    assert stage['counts']['blocked'] == 2-int(checkpoint)
+    assert stage['provenance']['lifecycle']['cleanup_error'] == 'probe-failed'
+    assert 'OSError: guardian boundary' in stage['provenance']['lifecycle']['boundary_error']
+    assert docaudit.exit_code(report, threshold) == expected
+
+
+@pytest.mark.parametrize('failure', ['prepare','interrupt','stale','completed'])
+def test_replay_boundary_failure_guards(tmp_path, monkeypatch, failure):
+    from lib import _docexamples as examples
+    guardian = examples.guardian
+    p = fixture(tmp_path, '~~~r\nprint(1)\n#> [1] 1\n~~~')
+    monkeypatch.setattr(examples.shutil, 'which', lambda name: '/fake/Rscript')
+    if failure == 'prepare':
+        original = guardian.atomic
+        def atomic(path, data):
+            if path.name == 'input.json':raise OSError('input failure')
+            return original(path, data)
+        monkeypatch.setattr(guardian, 'atomic', atomic)
+    def fail(command, directory, deadline, **kwargs):
+        if failure == 'interrupt':raise KeyboardInterrupt
+        guardian.atomic(directory/'initial.json', {'run_id':'current'})
+        guardian.atomic(directory/'terminal.json', {'run_id':'stale' if failure=='stale' else 'current',
+            'reason':'completed','direct_child_reaped':True})
+        raise OSError('boundary')
+    monkeypatch.setattr(guardian, 'run', fail)
+    if failure == 'interrupt':
+        with pytest.raises(KeyboardInterrupt):docaudit.audit(p, run_examples=True)
+        return
+    report = docaudit.audit(p, run_examples=True)
+    stage = report['stages']['examples']
+    assert stage['state'] == 'incomplete' and stage['counts']['blocked'] == stage['counts']['eligible'] == 1
+    lifecycle = stage['provenance']['lifecycle']
+    assert lifecycle['reason'] == 'guardian-failure'
+    assert lifecycle.get('direct_child_reaped',False) == (failure=='completed')
+    assert docaudit.exit_code(report,'warn') == docaudit.exit_code(report,'error') == 2

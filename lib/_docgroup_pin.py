@@ -73,10 +73,11 @@ def spawn_in_group(pgid, command, directory, run_id, deadline_ns, cwd, env, stdo
     argv = [sys.executable, '-I', '-S', '-c', _LAUNCH, str(cwd), str(directory),
             run_id, str(deadline_ns), *command]
     with defer_launch_signals() as previous:
-        process = SpawnedProcess(os.posix_spawn(sys.executable, argv, env, setpgroup=pgid,
+        process = SpawnedProcess(None)
+        process.pid = os.posix_spawn(sys.executable, argv, env, setpgroup=pgid,
             setsigmask=previous if signal_mask is None else signal_mask, setsigdef=(signal.SIGPIPE,), file_actions=[
                 (os.POSIX_SPAWN_DUP2, stdout.fileno(), 1),
-                (os.POSIX_SPAWN_DUP2, stderr.fileno(), 2)]))
+                (os.POSIX_SPAWN_DUP2, stderr.fileno(), 2)])
     return process
 
 

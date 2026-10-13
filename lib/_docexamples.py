@@ -227,10 +227,21 @@ def audit(root:Path, *, deadline):
     dependencies=["knitr"] if "knitr::" in selected.read_text() else []
     with tempfile.TemporaryDirectory(prefix="rforge-examples-") as temp:
         directory=Path(temp)
-        guardian.atomic(directory/"input.json",{"package":str(root.resolve()),"dependencies":dependencies,"segments":segments})
-        script=Path(__file__).parent/"r/docexamples.R"
-        print(f"docaudit: replay {root} / {selected.name}; remaining budget {max(0,(deadline-time.monotonic_ns())/1_000_000_000):.1f}s; file 300s, chunk 60s; executable package code, not a sandbox", file=sys.stderr)
-        terminal=guardian.run([rscript,"--vanilla",str(script),str(directory)],directory,deadline,cwd=directory)
+        try:
+            guardian.atomic(directory/"input.json",{"package":str(root.resolve()),"dependencies":dependencies,"segments":segments})
+            script=Path(__file__).parent/"r/docexamples.R"
+            print(f"docaudit: replay {root} / {selected.name}; remaining budget {max(0,(deadline-time.monotonic_ns())/1_000_000_000):.1f}s; file 300s, chunk 60s; executable package code, not a sandbox", file=sys.stderr)
+            terminal=guardian.run([rscript,"--vanilla",str(script),str(directory)],directory,deadline,cwd=directory)
+        except Exception as exc:
+            # Recover before TemporaryDirectory removes partial replay evidence.
+            initial = guardian.read(directory/"initial.json")
+            saved = guardian.read(directory/"terminal.json")
+            terminal = dict(saved) if isinstance(saved, dict) and isinstance(initial, dict) and initial.get("run_id") and saved.get("run_id") == initial["run_id"] else {}
+            terminal["boundary_error"] = f"{type(exc).__name__}: {exc}"
+            # Even a completed checkpoint cannot make a failed boundary complete.
+            if terminal.get("reason") in (None, "completed"):
+                terminal["reason"] = "guardian-failure"
+            stage["reasons"].append(terminal["boundary_error"])
         final_started=time.monotonic_ns()
         result=guardian.read(directory/"result.json")
         checkpoint_invalid = result is not None and not isinstance(result, dict)

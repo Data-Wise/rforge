@@ -174,3 +174,10 @@ mask. A failed liveness probe cannot prevent the guardian from attempting KILL
 and independently reaping its unreaped direct child. Such failures remain
 incomplete, even when cleanup succeeds; destructive signals never follow the
 direct-child reap in the guardian’s exception path.
+
+Ordinary replay preparation or execution exceptions retain the known assertion
+counts and valid partial checkpoints in an incomplete report. Lifecycle evidence
+is recovered only when its run ID matches the current initial checkpoint;
+completed lifecycle evidence cannot override the exception. KeyboardInterrupt
+still propagates. Before workload spawn, a checkpoint PGID alone does not authorize
+a destructive signal; the child handle is allocated before launching the workload.

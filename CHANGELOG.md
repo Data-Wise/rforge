@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Prevent pre-spawn guardian exceptions from signaling an unowned checkpoint PGID; allocate the workload handle before spawning. Preserve README assertion counts, valid partial checkpoints, and authenticated lifecycle evidence when replay preparation or execution raises an ordinary exception. Add acceptance regressions; interruption propagation and release gates remain unchanged.
+
 - Repair A2 guardian cleanup after repeated liveness-probe failure with the parent absent; preserve direct-child handles through pending launch interruptions and close the pin-construction cleanup gap. Native regressions cover all three failures; release acceptance remains pending.
 
 - Add Python 3.15 to the general CI test matrix; retain the approved Python 3.12 pin for A2 acceptance evidence.

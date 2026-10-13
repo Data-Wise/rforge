@@ -56,3 +56,29 @@ PYTHONPATH="$PWD" .venv/bin/python -m pytest REVIEW-docs-check-a2-ownership-repa
 ```
 
 Next: repair the confirmed pre-release ownership guard and replay-boundary evidence/count loss, convert the characterization cases into acceptance regression tests, then review the repaired diff and obtain both-platform evidence. The post-reap race concern stays unconfirmed.
+
+## Confirmed-gap repair follow-up
+
+The two confirmed defects are repaired after validation HEAD e36c341. The
+pre-spawn exception branch no longer signals a checkpoint PGID. The workload
+handle is allocated before POSIX spawn so handle-allocation failure cannot start
+an unowned child; existing signal deferral still protects caller assignment.
+Ordinary replay preparation/execution failures now recover known assertion
+counts, valid completed comparisons, and matching-run lifecycle evidence before
+temporary-directory teardown. A completed lifecycle cannot override the failure,
+and KeyboardInterrupt still propagates.
+
+Eight new regressions failed before the changes. The inventory now maps 419
+unique expanded nodes: two guardian cases and ten replay cases, including
+none/warn/error gates, partial comparisons, preparation failure, stale lifecycle
+rejection and interruption. The linked characterization probes have been updated
+to assert repaired behavior; the earlier observations above describe the original
+validation candidate. Seven coverage groups remain pending. Revision 7 and the
+Python 3.12 acceptance pin are unchanged. Local focused checks: 61 guardian/replay
+cases passed before adding the final four boundary cases; all ten replay recovery
+cases and all five updated probes passed. Repository gates 47/47 and strict docs
+build passed. Independent repair review and both-platform acceptance remain next.
+
+Full local Python 3.12.15 suite: 1318 passed / 4 existing skipped (149.42 seconds).
+Spec SHA and requirement ledger unchanged; all 419 inventory nodes uniquely
+mapped with verified source hashes; platform workflow and runtime locks unchanged.

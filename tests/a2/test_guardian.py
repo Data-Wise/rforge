@@ -547,3 +547,41 @@ def test_nul_command_fails_before_bootstrap_without_success(tmp_path):
     result=guardian.run(['invalid\x00command'],tmp_path,time.monotonic_ns()+3*guardian.NS,cwd=tmp_path)
     assert result['reason']=='guardian-failure' and not result.get('child_pid')
     assert result['pin_reaped'] and not (tmp_path/'launch-error.json').exists()
+
+
+def test_prestart_interrupt_never_signals_reaped_pin(tmp_path, monkeypatch):
+    import signal
+    from lib._docgroup_pin import GroupPin
+    group = GroupPin(tmp_path, 'prestart', time.monotonic_ns()+5*guardian.NS)
+    pgid = group.pgid
+    group.finish()
+    now = time.monotonic_ns()
+    guardian.atomic(tmp_path/'initial.json', {'run_id':'prestart','parent_pid':os.getppid(),
+        'group_pgid':pgid,'deadline_ns':now+guardian.NS,'file_started_ns':now,
+        'file_budget_ns':guardian.NS})
+    original = guardian.read
+    signals = []
+    def interrupt(path):
+        if path.name == 'heartbeat.json':
+            os.kill(os.getpid(), signal.SIGINT)
+        return original(path)
+    monkeypatch.setattr(guardian, 'read', interrupt)
+    monkeypatch.setattr(os, 'killpg', lambda *args: signals.append(args))
+    result = guardian.supervise(tmp_path)
+    assert result['reason'] == 'guardian-failure'
+    assert not result['direct_child_reaped'] and not signals
+
+
+def test_handle_allocation_failure_precedes_spawn(tmp_path, monkeypatch):
+    from lib import _docgroup_pin as pin
+    calls = []
+    def fail(pid):
+        raise MemoryError('handle allocation')
+    monkeypatch.setattr(pin, 'SpawnedProcess', fail)
+    monkeypatch.setattr(os, 'posix_spawn', lambda *a, **kw: calls.append(a) or 123)
+    with (tmp_path/'out').open('wb') as stream:
+        with pytest.raises(MemoryError):
+            pin.spawn_in_group(123, [sys.executable, '-c', 'pass'], tmp_path,
+                'allocation', time.monotonic_ns()+guardian.NS, tmp_path,
+                dict(os.environ), stream, stream)
+    assert not calls

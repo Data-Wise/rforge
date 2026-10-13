@@ -104,3 +104,18 @@ Final Python 3.15 full-suite result: 1302 passed / 4 existing skipped.
 ## Final ownership review validation
 
 G08 adds four concrete nodes (407 total): repeated probe failure with the parent absent, pending SIGINT at workload handoff, interruption after pin construction, and NUL-command rejection before bootstrap. The first three failed on the reviewed candidate and are repaired. The fourth already returned guardian-failure. Source hashes refreshed; seven coverage groups remain pending, including independent repair review and both-platform execution. Spec revision 7 is unchanged.
+
+## Confirmed-gap acceptance regressions
+
+The inventory now maps 419 unique expanded nodes across the same 87 groups.
+Two guardian regressions cover a real SIGINT after pin reap, with no destructive
+group signal, and handle allocation failure before spawn. Ten replay regressions
+cover partial checkpoints and severity gates, preparation failure, stale lifecycle
+rejection, completed lifecycle evidence plus boundary failure, and propagated
+KeyboardInterrupt. Source hashes refreshed; seven pending coverage groups and
+both-platform release requirements remain pending. Revision 7 and Python 3.12
+acceptance pins are unchanged.
+
+Final local Python 3.12.15 verification: 1318 passed / 4 existing skipped,
+repository gates 47/47, strict docs build passed, five updated validation probes
+passed. These local results do not supply either required platform artifact.

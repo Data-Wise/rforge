@@ -176,9 +176,7 @@ def supervise(directory):
                 status["reason"] = "cleanup-unverified"
     except BaseException as exc:
         status.update(reason="guardian-failure",error=str(exc))
-        if process is None and pgid is not None:
-            try:os.killpg(pgid,signal.SIGKILL)
-            except OSError:pass
+        # Before spawn, a checkpoint PGID is not an owned signal capability.
         if process is not None and not status.get("direct_child_reaped"):
             try:
                 # The direct child is still unreaped: its PID reserves identity.
