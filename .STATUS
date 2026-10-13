@@ -1,7 +1,7 @@
 project: rforge
 updated: 2026-10-12
 status: Active
-in_progress: A2 implementation on codex/docs-check-a2; mapping review complete; 10 coverage groups and both-platform release evidence pending. v2.21.0 release history:
+in_progress: A2 implementation on codex/docs-check-a2; mapping review complete; 7 coverage groups and both-platform release evidence pending. v2.21.0 release history:
   (1) #84 fix MERGED to dev 2026-10-11 as PR #85 (squash 99b4171; CI 5/5 green). #84 stays
   open until release (a feature→dev merge does not auto-close it). Follow-up PR #86 MERGED (squash f7036b4): a Codex
   adversarial review found #85 stopped /rforge:finish adding `version:` to a .STATUS that lacks one; fixed via
@@ -11,7 +11,7 @@ in_progress: A2 implementation on codex/docs-check-a2; mapping review complete; 
   (TRIAGE-docaudit-signature-gate-2026-10-11.md) in archive/specs/; guide docs/guides/docs-audit.md. Seven Codex rounds under
   the stop rule; unrecognized R binding forms are documented known limitations. test-all 47/47, 44 commands.
   A2 (--site, --run-examples) is a separate later plan.
-next: Consolidated A2 acceptance: 118 spec entries, 87 groups, 382 nodes; 10 groups retain explicit gaps. Full suite 1281 passed/4 existing skipped; test-all 47/47; mkdocs strict passed. Next resolve PID-reuse safety, checkpoint/UTF-8 cases, CI integration, and candidate-bound release observations before fresh review and both-platform acceptance.
+next: A2: 118 spec entries, 87 groups, 386 expanded nodes; seven groups retain gaps. Full suite 1285 passed/4 existing skipped; test-all 47/47; mkdocs strict passed. Claude lifecycle/CI review complete with unresolved guardian ownership finding; next prototype a parent-owned group pin with fault injection and verify both-platform deadlines before release evidence.
 version: 2.21.0 (released, on main 7387a05; dev fast-forwarded to main)
 last_release: 2026-10-11 v2.21.0 (minor, 44 commands, no surface change — PR #91 dev→main merge 7387a05; tag v2.21.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.21.0. Ships /rforge:docs:check content audit (lib.docaudit, A1), tests/harness, #84 fix (#85/#86), docs gap-fill (#89/#90). Gates: test-all 47/47, pytest 899+4 skipped, CI green on main (RForge CI + Deploy Documentation). Tap Data-Wise/homebrew-tap#244 squash 09bc9c3 — formula+manifest → v2.21.0 sha256 f376d0da…, stale revision dropped, generate.py --diff IDENTICAL; brew audit by path unavailable. Aggregator claude-plugins#74 auto-merged. Pending: user runs `brew upgrade rforge`.)
 last_release_prior_v2_20_1: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge

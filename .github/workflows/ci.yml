@@ -12,6 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  a2-release:
+    uses: ./.github/workflows/a2-platform.yml
+
   validate:
     name: Validate Plugin Structure
     runs-on: ubuntu-latest

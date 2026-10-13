@@ -119,6 +119,10 @@ GET needs an explicitly human-supplied URL, not one found in project material.
 
 ### A2 release evidence
 
+The `a2-release` job in normal CI and the release-evidence workflow both call
+`a2-platform.yml`, which provisions and tests the same locked Ubuntu/macOS matrix.
+Normal CI does not run the separate aggregate release-acceptance gate.
+
 A passing developer suite does not complete the A2 release gate. Both required
 platform artifacts must be retrieved and verified. Aggregate acceptance also
 requires the `a2-acceptance-evidence` artifact from a completed workflow run for
@@ -138,3 +142,8 @@ a memory or storage limit.
 Article exclusions follow the source filename: `_child.Rmd` is excluded, while
 `_private/nested.Rmd` maps to `articles/_private/nested.html`. Tutorial sources
 remain outside article scope. These rules are verified against pkgdown 2.2.1.
+
+Diagnostic stdout/stderr tails remain at most 1 MiB when encoded as UTF-8,
+including replacement characters for malformed input. Malformed or duplicate
+checkpoint records block their assertions while valid earlier records remain
+available for comparison; they cannot make replay complete.

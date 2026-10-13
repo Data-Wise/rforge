@@ -129,3 +129,38 @@ def test_public_diagnostics_bounded_and_json_isolated(tmp_path,monkeypatch,capsy
         tail=stage['provenance'][stream]
         assert len(tail.encode())<=1024*1024 and 'prefix' not in tail and tail.endswith('{"fake":"'+stream+'"}')
     assert 'fake' not in r
+
+
+@pytest.mark.parametrize('bad',[{}, {'id':'README.md:7','text':[1]}, {'id':'README.md:7','text':['[1] 2\n']}])
+def test_mixed_checkpoint_preserves_valid_earlier(tmp_path,monkeypatch,bad):
+    from lib import _docexamples as examples
+    from .helpers import package
+    p=package(tmp_path,'```r\nprint(1)\n#> [1] 1\n```\n```r\nprint(2)\n#> [1] 2\n```')
+    def replay(command,directory,deadline,**kwargs):
+        records=[{'id':'README.md:3','text':['[1] 1\n']},bad]
+        if bad.get('id')=='README.md:7' and bad.get('text')==['[1] 2\n']:
+            records.append({'id':'README.md:7','text':['[1] 2\n']})
+        guardian.atomic(directory/'result.json',{'records':records})
+        return {'reason':'completed'}
+    monkeypatch.setattr(guardian,'run',replay);monkeypatch.setattr(examples.shutil,'which',lambda *a:'/fixture/Rscript')
+    r=examples.audit(p,deadline=time.monotonic_ns()+guardian.NS)
+    assert r['state']=='incomplete' and r['counts']['checked']==r['counts']['matched']==1 and r['counts']['blocked']==1
+
+
+def test_utf8_diagnostic_tail_byte_limit(tmp_path,monkeypatch):
+    from lib import _docexamples as examples
+    from .helpers import package
+    p=package(tmp_path,'```r\nprint(1)\n#> [1] 1\n```')
+    def replay(command,directory,deadline,**kwargs):
+        (directory/'stdout').write_bytes(('€'*400000+'END€').encode())
+        (directory/'stderr').write_bytes(b'\xff'*1100000+b'END!')
+        guardian.atomic(directory/'result.json',{'records':[{'id':'README.md:3','text':['[1] 1\n']}]})
+        return {'reason':'completed'}
+    monkeypatch.setattr(guardian,'run',replay);monkeypatch.setattr(examples.shutil,'which',lambda *a:'/fixture/Rscript')
+    r=examples.audit(p,deadline=time.monotonic_ns()+guardian.NS)
+    for stream in ('stdout','stderr'):
+        tail=r['provenance'][stream]
+        assert 0<len(tail.encode())<=1024*1024
+        assert tail.encode().decode('utf-8')==tail
+        assert tail.endswith('END€' if stream=='stdout' else 'END!')
+        if stream=='stdout':assert tail.startswith('€')

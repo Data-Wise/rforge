@@ -2,7 +2,7 @@
 
 Approved spec revision 7 remains unchanged. Mapping review is complete; release coverage is not complete.
 
-Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 382 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 10 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
+Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 386 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 7 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
 
 The immutable requirement ledger records exact source text/hash/anchor/ordinal plus inventory ownership. Test source hashes bind this review snapshot. Header, historical validation and approval paragraphs are contextual documentation obligations, not invented runtime tests. Actual external evidence is separate from portable validators.
 
@@ -14,35 +14,17 @@ Mapped: `tests/a2/test_guardian.py::test_guardian_failure_emergency_cleanup`, `t
 
 - Live guardian death and emergency group ownership are now reproduced; PID reuse safety remains unresolved.
 
-### I01 / T09
-
-Mapped: `tests/a2/test_stdio.py::test_native_output_does_not_deadlock`, `tests/a2/test_stdio.py::test_public_diagnostics_bounded_and_json_isolated`.
-
-- Public JSON isolation and ASCII diagnostic tails are covered; multibyte UTF-8 tail byte bounds remain unverified.
-
-### I04 / T09
-
-Mapped: `tests/a2/test_stdio.py::test_checkpoint_and_marker_integrity`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[None]`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{]`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[[]]`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[[{}]]`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{"records":[{}]}]`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{"records":{}}]`, `tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{"records":[{"id":"README.md:3","text":[1]}]}]`.
-
-- Malformed/partial/missing checkpoint no-match regressions pass; mixed valid/malformed and duplicate-record preservation need direct cases.
-
 ### D04 / T18
 
 Mapped: `tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/guides/docs-audit.md-terms0]`, `tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/tutorials/fix-a-docs-check-finding.md-terms1]`, `tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/workflows/index.md-terms2]`, `tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/quickstart.md-terms3]`.
 
-- Guide/tutorial/workflows/quickstart text checks exist; REFCARD/cards and all changed rendered-content observations remain aggregate work.
+- Guide/tutorial/workflows/quickstart and REFCARD/cards text checks pass; changed rendered-content inspection records remain aggregate work.
 
 ### D05 / T19
 
 Mapped: `tests/a2/test_docs.py::test_version_and_agent_mirror`.
 
 - Version and mirror gates covered; status/count accuracy and boundary prohibitions need explicit assertions.
-
-### V05 / T21
-
-Mapped: `tests/a2/test_release_ci.py::test_both_platforms_locked_runtime`.
-
-- Dedicated workflow_dispatch matrix exists, but approved spec additionally names a2-release under ci.yml; CI integration not realized.
 
 ### H01 / T22
 
@@ -72,6 +54,10 @@ Mapped: `tests/a2/test_final_gates.py::test_review_record_validation`, `tests/a2
 
 Close the listed fixture/validator gaps and review their oracles before making required.json ready. Reconcile the independent ledger with the unchanged approved spec. Then commit a stable candidate, run the actual locked acceptance collection on Ubuntu 24.04 and macOS 14, retrieve both artifacts, and produce candidate/run-bound live, triage, full-gate, rendered-review and finalized adversarial-review observations. Only then can the aggregate gate certify acceptance. No CI dispatch, source publication, or release has occurred.
 
-## Consolidated local validation
+## Local checkpoint and focused review
 
-382 expanded A2 nodes collected. Full repository suite: 1281 passed, four existing skips. Repository gate: 47/47. Strict documentation build passed. The live guardian-death case exercises emergency cleanup but does not prove PID-reuse safety. Malformed checkpoint input no longer raises KeyError; mixed-record preservation and UTF-8 tail byte bounds remain explicit gaps. No release readiness, platform CI, finalized review, or rendered visual inspection is claimed.
+386 expanded nodes. Full suite: 1285 passed, four existing skips; repository checks: 47/47; strict docs build passed. After strengthening UTF-8 tail-content assertions, the focused stdio/CI suite passed 27 cases. No production code changed after the full suite.
+
+Claude job b17e1ee1-8dcb-40a8-aa07-7a2796d49377 completed: one high unresolved guardian ownership finding and two low findings. The UTF-8 oracle finding is addressed by suffix and valid-encoding assertions. CI matrix execution on normal pushes/PRs implements the approved ci.yml contract; the live main protection API reports no required status checks, so no existing check-name binding needs migration. The guardian signal path is confirmed from source; actual PID reuse has not been reproduced. Proposed remediation is a parent-owned process-group pin, with Python >=3.10 compatibility, guardian-death, parent-loss, and bounded cleanup tests required before adoption. Start-time comparison alone is rejected as incomplete because it leaves a check-to-signal race.
+
+The raw review records skipped checkpoint implementation and planning/evidence files, medium uncertainty, Sonnet request/effective claude-sonnet-5-5, 9 turns, 203563 tokens, $0.2086217, 65697ms, and no cost/turn/Evidence Lease exhaustion. It is not final A2 acceptance. No automatic resume, model chain, or budget expansion occurred.

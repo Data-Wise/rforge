@@ -23,14 +23,19 @@ def test_artifact_failure_blocks_acceptance(defect):
 def test_both_platforms_locked_runtime():
     root=Path(__file__).resolve().parents[2]
     import yaml,json
-    workflow=yaml.safe_load((root/'.github/workflows/a2-release.yml').read_text())
+    workflow=yaml.safe_load((root/'.github/workflows/a2-platform.yml').read_text())
     lock=json.loads((root/'tests/a2/fixture-lock.json').read_text())
     assert workflow['jobs']['a2-release']['strategy']['matrix']['os']==lock['platforms']
     steps=workflow['jobs']['a2-release']['steps']
     assert next(s for s in steps if s.get('uses','').startswith('actions/setup-python'))['with']['python-version']==lock['python']
     assert next(s for s in steps if s.get('uses','').startswith('r-lib/actions/setup-r'))['with']['r-version']=='${{ steps.lock.outputs.R }}'
     assert any('scripts/run_a2_release.py' in s.get('run','') for s in steps)
-    assert workflow['jobs']['aggregate']['needs']=='a2-release'
+    release=yaml.safe_load((root/'.github/workflows/a2-release.yml').read_text())
+    ci=yaml.safe_load((root/'.github/workflows/ci.yml').read_text())
+    assert release['jobs']['aggregate']['needs']=='a2-release'
+    for caller in (release,ci):
+        assert caller['jobs']['a2-release']['uses']=='./.github/workflows/a2-platform.yml'
+    assert 'workflow_call' in workflow.get('on',workflow.get(True))
 
 
 def test_unsupported_platform_diagnostic(tmp_path,monkeypatch):

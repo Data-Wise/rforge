@@ -252,7 +252,7 @@ def audit(root:Path, *, deadline):
             if (directory/stream).exists():
                 with (directory/stream).open("rb") as diagnostic:
                     diagnostic.seek(max(0,(directory/stream).stat().st_size-1024*1024))
-                    stage["provenance"][stream]=diagnostic.read(1024*1024).decode("utf-8",errors="replace")
+                    stage["provenance"][stream]=diagnostic.read(1024*1024).decode("utf-8",errors="replace").encode("utf-8")[-1024*1024:].decode("utf-8",errors="ignore")
         stage["engine_missing"]=sorted(result.get("engine_missing",[]))
         failed=checkpoint_invalid
         eligible_unverified=0

@@ -41,8 +41,8 @@ requires its plan acceptance and verification, not merely writing its proposed t
 
 Implementation is in progress in `codex/docs-check-a2`. The optional engines,
 guardian, acceptance tests, runtime lock, release verifier and CI workflow exist.
-Contract mapping review is complete: 118 spec entries, 87 groups and 382 expanded nodes.
-10 groups retain explicit coverage gaps; see [coverage audit](COVERAGE-docs-check-a2-2026-10-12.md).
+Contract mapping review is complete: 118 spec entries, 87 groups and 386 expanded nodes.
+7 groups retain explicit coverage gaps; see [coverage audit](COVERAGE-docs-check-a2-2026-10-12.md).
 Actual Ubuntu/macOS release artifacts remain pending.
 Unchecked tasks have not yet satisfied their complete plan acceptance.
 External PR/merge/release/deployment actions are separate.

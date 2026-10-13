@@ -2257,5 +2257,5 @@
     }
   ],
   "coverage_status": "pending",
-  "review_candidate": "ae1f1c9 plus consolidated acceptance additions"
+  "review_candidate": "03a80c2 plus checkpoint, UTF-8 and shared CI gate changes"
 }

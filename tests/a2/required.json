@@ -607,15 +607,14 @@
       "proposed_node": "tests/a2/test_stdio.py::test_native_output_does_not_deadlock",
       "nodes": [
         "tests/a2/test_stdio.py::test_native_output_does_not_deadlock",
-        "tests/a2/test_stdio.py::test_public_diagnostics_bounded_and_json_isolated"
+        "tests/a2/test_stdio.py::test_public_diagnostics_bounded_and_json_isolated",
+        "tests/a2/test_stdio.py::test_utf8_diagnostic_tail_byte_limit"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Public JSON isolation and ASCII diagnostic tails are covered; multibyte UTF-8 tail byte bounds remain unverified."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_stdio.py": "0b3da953083be0b6376b3d66b941564c3c1e48f18037c74522b8d99362741ba9"
+        "tests/a2/test_stdio.py": "ecbf2d11f066c789887d01aaf84b10632e0ecfc0181ebe67b2098e5ce79f4a84"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -634,7 +633,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_examples_r.py": "dad1195093b8f91543d4b03b7adcfbba08e2e67ec882256c591b1a3fadcc08b4",
-        "tests/a2/test_stdio.py": "0b3da953083be0b6376b3d66b941564c3c1e48f18037c74522b8d99362741ba9"
+        "tests/a2/test_stdio.py": "ecbf2d11f066c789887d01aaf84b10632e0ecfc0181ebe67b2098e5ce79f4a84"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -649,7 +648,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_stdio.py": "0b3da953083be0b6376b3d66b941564c3c1e48f18037c74522b8d99362741ba9"
+        "tests/a2/test_stdio.py": "ecbf2d11f066c789887d01aaf84b10632e0ecfc0181ebe67b2098e5ce79f4a84"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -665,15 +664,16 @@
         "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[[{}]]",
         "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{\"records\":[{}]}]",
         "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{\"records\":{}}]",
-        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{\"records\":[{\"id\":\"README.md:3\",\"text\":[1]}]}]"
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{\"records\":[{\"id\":\"README.md:3\",\"text\":[1]}]}]",
+        "tests/a2/test_stdio.py::test_mixed_checkpoint_preserves_valid_earlier[bad0]",
+        "tests/a2/test_stdio.py::test_mixed_checkpoint_preserves_valid_earlier[bad1]",
+        "tests/a2/test_stdio.py::test_mixed_checkpoint_preserves_valid_earlier[bad2]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Malformed/partial/missing checkpoint no-match regressions pass; mixed valid/malformed and duplicate-record preservation need direct cases."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_stdio.py": "0b3da953083be0b6376b3d66b941564c3c1e48f18037c74522b8d99362741ba9"
+        "tests/a2/test_stdio.py": "ecbf2d11f066c789887d01aaf84b10632e0ecfc0181ebe67b2098e5ce79f4a84"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -688,7 +688,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_stdio.py": "0b3da953083be0b6376b3d66b941564c3c1e48f18037c74522b8d99362741ba9"
+        "tests/a2/test_stdio.py": "ecbf2d11f066c789887d01aaf84b10632e0ecfc0181ebe67b2098e5ce79f4a84"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1475,13 +1475,11 @@
       "nodes": [
         "tests/a2/test_release_ci.py::test_both_platforms_locked_runtime"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Dedicated workflow_dispatch matrix exists, but approved spec additionally names a2-release under ci.yml; CI integration not realized."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_ci.py": "78cca05dde54a31a3ec0f2a6988c4d72e69fca1273e80a874b25c37ab9e42faa"
+        "tests/a2/test_release_ci.py": "89a22366cdf9cde59f4efafa1daac2b47d38b989689b614961d1bd36de549acf"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1502,7 +1500,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_ci.py": "78cca05dde54a31a3ec0f2a6988c4d72e69fca1273e80a874b25c37ab9e42faa"
+        "tests/a2/test_release_ci.py": "89a22366cdf9cde59f4efafa1daac2b47d38b989689b614961d1bd36de549acf"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1517,7 +1515,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_ci.py": "78cca05dde54a31a3ec0f2a6988c4d72e69fca1273e80a874b25c37ab9e42faa"
+        "tests/a2/test_release_ci.py": "89a22366cdf9cde59f4efafa1daac2b47d38b989689b614961d1bd36de549acf"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1636,8 +1634,8 @@
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 382,
-  "review_candidate": "ae1f1c9 plus consolidated acceptance additions",
+  "collected_nodes": 386,
+  "review_candidate": "03a80c2 plus checkpoint, UTF-8 and shared CI gate changes",
   "platforms": [
     "ubuntu-24.04",
     "macos-14"
