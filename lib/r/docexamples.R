@@ -55,14 +55,23 @@ tryCatch({
     segment <- input$segments[[i]]
     if (!segment$execute) next
     release_phase(i, paste0("segment-", i), segment$chunk)
-    values <- evaluate::evaluate(segment$code, envir = env, stop_on_error = 1L,
-                                 keep_warning = TRUE, keep_message = TRUE)
+    # Split evaluate's sink into a dedicated spool visible to the guardian even
+    # inside a single expression. It never reaches the native stdout capture.
+    spool <- file(file.path(directory, "evaluate-text"), open = "ab")
+    sink(spool)
+    count_condition <- function(value) {
+      payload <<- payload + sum(nchar(enc2utf8(conditionMessage(value)), type="bytes"))
+      atomic_json("payload.json", list(bytes = payload))
+      value
+    }
+    handler <- evaluate::new_output_handler(message = count_condition,
+                                            warning = count_condition, error = count_condition)
+    values <- tryCatch(evaluate::evaluate(segment$code, envir = env, stop_on_error = 1L,
+                                 keep_warning = TRUE, keep_message = TRUE,
+                                 debug = TRUE, output_handler = handler),
+                       finally = { sink(); close(spool) })
     output <- character(); failure <- NULL
     for (value in values) {
-      if (is.character(value) || inherits(value, "condition")) {
-        generated <- if (inherits(value, "condition")) conditionMessage(value) else value
-        payload <- payload + sum(nchar(enc2utf8(generated), type="bytes"))
-      }
       if (inherits(value, "source") && length(parse(text = value$src))) {
         output <- character()
       }

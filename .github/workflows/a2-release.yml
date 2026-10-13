@@ -2,13 +2,13 @@ name: A2 release evidence
 on:
   workflow_dispatch:
     inputs:
-      acceptance-observations:
-        description: Candidate-bound JSON observations collected after the candidate commit; missing data blocks aggregate acceptance.
+      acceptance-evidence-run:
+        description: Numeric completed workflow run ID containing the a2-acceptance-evidence artifact for this candidate; missing evidence blocks acceptance.
         type: string
-        required: false
-        default: ''
+        required: true
 permissions:
   contents: read
+  actions: read
 jobs:
   a2-release:
     name: A2 required evidence (${{ matrix.os }})
@@ -57,17 +57,17 @@ jobs:
         with:
           pattern: a2-release-evidence-*
           path: retrieved-a2-evidence
-      - name: Read candidate-bound observation input as data
+      - name: Validate evidence run identity
         env:
-          A2_OBSERVATIONS: ${{ inputs.acceptance-observations }}
-        run: |
-          python - <<'PYOBS'
-          import json, os
-          from pathlib import Path
-          value = json.loads(os.environ.get("A2_OBSERVATIONS") or "{}")
-          if not isinstance(value, dict) or not value:
-              raise SystemExit("Completed candidate-bound observations are required for aggregate acceptance")
-          Path("a2-acceptance-observations.json").write_text(json.dumps(value))
-          PYOBS
+          A2_EVIDENCE_RUN: ${{ inputs.acceptance-evidence-run }}
+        run: python -c 'import os; assert os.environ["A2_EVIDENCE_RUN"].isdigit(), "Numeric evidence run ID required"'
+      - uses: actions/download-artifact@v4
+        with:
+          name: a2-acceptance-evidence
+          run-id: ${{ inputs.acceptance-evidence-run }}
+          github-token: ${{ github.token }}
+          path: retrieved-a2-observations
       - name: Verify source-bound artifacts and actual completed observations
-        run: python scripts/verify_a2_aggregate.py --artifacts retrieved-a2-evidence --observations a2-acceptance-observations.json --candidate-sha "$GITHUB_SHA"
+        env:
+          A2_EVIDENCE_RUN: ${{ inputs.acceptance-evidence-run }}
+        run: python scripts/verify_a2_aggregate.py --artifacts retrieved-a2-evidence --observations retrieved-a2-observations/index.json --observation-artifacts retrieved-a2-observations --candidate-sha "$GITHUB_SHA" --producer-run-id "$A2_EVIDENCE_RUN"

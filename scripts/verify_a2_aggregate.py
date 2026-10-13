@@ -12,6 +12,8 @@ def main(argv=None):
     parser.add_argument('--artifacts',type=Path,required=True)
     parser.add_argument('--observations',type=Path,required=True)
     parser.add_argument('--candidate-sha',required=True)
+    parser.add_argument('--observation-artifacts',type=Path,required=True)
+    parser.add_argument('--producer-run-id',required=True)
     args=parser.parse_args(argv)
     try:
         platforms=[]
@@ -23,7 +25,11 @@ def main(argv=None):
             verification=subprocess.run([sys.executable,'scripts/verify_a2_release.py','--evidence',str(file),'--candidate-sha',args.candidate_sha],capture_output=True,text=True)
             require(verification.returncode==0,'retrieved platform verification failed: '+platform)
             platforms.append({'platform':platform,'candidate_sha':evidence['candidate_sha'],'uploaded':True,'retrieved':True,'verified':True})
-        result=validate_aggregate(platforms,json.loads(args.observations.read_text()),candidate_sha=args.candidate_sha)
+        observations=json.loads(args.observations.read_text())
+        require(isinstance(observations,dict), 'observation index must be an object')
+        require(args.producer_run_id.isdigit(), 'numeric downloaded producer run required')
+        require(all(isinstance(item,dict) and isinstance(item.get('provenance'),dict) and str(item['provenance'].get('run_id'))==args.producer_run_id for item in observations.values()), 'downloaded producer run mismatch')
+        result=validate_aggregate(platforms,observations,candidate_sha=args.candidate_sha,evidence_root=args.observation_artifacts)
         print(json.dumps(result));return 0
     except (OSError,ValueError,KeyError,VerificationError) as exc:
         print(json.dumps({'verified':False,'reason':str(exc)}));return 2

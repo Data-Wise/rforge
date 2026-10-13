@@ -115,3 +115,22 @@ clean audit or fabricate recovered JSON. Ordinary process-group
 cleanup does not contain detached children or guarantee reporting after host loss.
 The orchestrator always recommends examples/combined runs; site-only automatic
 GET needs an explicitly human-supplied URL, not one found in project material.
+
+
+### A2 release evidence
+
+A passing developer suite does not complete the A2 release gate. Both required
+platform artifacts must be retrieved and verified. Aggregate acceptance also
+requires the `a2-acceptance-evidence` artifact from a completed workflow run for
+the candidate. Supply its numeric run ID through `acceptance-evidence-run`.
+Its `index.json` names each observation file, SHA-256 digest and producer run ID;
+the verifier checks the downloaded file's candidate, kind, status and required
+facts. Bare passing claims, missing files, altered hashes, stale candidates and
+unresolved review findings fail acceptance. Contract mapping and actual platform
+evidence remain pending until those observations have been produced.
+
+Evaluate text is mirrored into a separate temporary spool, allowing the guardian
+to observe output growth inside a running expression. Captured text is counted
+once from that spool; condition text is counted separately as it occurs. Native
+stdout and stderr remain separate. Polling permits overshoot and does not impose
+a memory or storage limit.

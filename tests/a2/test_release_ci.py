@@ -43,14 +43,14 @@ def test_unsupported_platform_diagnostic(tmp_path,monkeypatch):
     assert r['state']=='unavailable' and r['counts']['blocked']==1 and 'Windows' in r['reasons'][-1]
 
 
-def test_candidate_observations_do_not_require_self_referential_commit():
+def test_candidate_observations_require_retrieved_artifacts():
     import yaml
     root=Path(__file__).resolve().parents[2]
     workflow=yaml.safe_load((root/'.github/workflows/a2-release.yml').read_text())
     trigger=workflow.get('on',workflow.get(True))
-    assert 'acceptance-observations' in trigger['workflow_dispatch']['inputs']
+    assert 'acceptance-evidence-run' in trigger['workflow_dispatch']['inputs']
     steps=workflow['jobs']['aggregate']['steps']
-    step=next(s for s in steps if s.get('env',{}).get('A2_OBSERVATIONS'))
-    assert 'json.loads' in step['run'] and '${{' not in step['run']
-    verification=steps[-1]['run']
-    assert 'a2-acceptance-observations.json' in verification and 'tests/a2/evidence/acceptance.json' not in verification
+    downloads=[s for s in steps if s.get('uses','').startswith('actions/download-artifact')]
+    assert any(s['with'].get('run-id')=='${{ inputs.acceptance-evidence-run }}' for s in downloads)
+    assert '--observation-artifacts retrieved-a2-observations' in steps[-1]['run']
+    assert 'acceptance-observations' not in str(workflow)

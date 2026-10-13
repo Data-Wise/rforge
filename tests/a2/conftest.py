@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 R_FUNCTIONS = {
+    "test_running_evaluate_output_limit", "test_evaluate_spool_counts_text_once",
     'test_clean_and_planted_stale_output', 'test_fresh_ordered_hidden_setup',
     'test_source_success_does_not_clear_rendered', 'test_native_chunk_deadline',
     'test_expression_subsequence_no_reuse', 'test_one_upstream_failure_stops_same_chunk',

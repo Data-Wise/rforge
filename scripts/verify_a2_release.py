@@ -83,13 +83,45 @@ def validate_run(manifest, evidence, *, candidate_sha, lock_hash, manifest_hash)
     return {"verified":True,"required_nodes":len(required),"R_checked":r_checked,"HTTP_checked":http_checked}
 
 
-def validate_aggregate(platforms, observations, *, candidate_sha):
+def validate_observation(name, item, *, candidate_sha, evidence_root):
+    require(isinstance(item, dict), "observation object required")
+    require(item.get("candidate_sha") == candidate_sha and item.get("status") == "passed", f"actual {name} evidence missing or failed")
+    provenance = item.get("provenance")
+    require(isinstance(provenance, dict), "artifact provenance required")
+    require(evidence_root is not None, "retrieved observation artifacts required")
+    root = Path(evidence_root).resolve()
+    relative = provenance.get("path", "")
+    require(isinstance(relative, str) and bool(relative) and not Path(relative).is_absolute(), "relative evidence artifact path required")
+    path = (root / relative).resolve()
+    require(path.is_relative_to(root) and path.is_file(), "missing or escaping observation artifact")
+    require(digest(path) == provenance.get("sha256"), "observation artifact hash mismatch")
+    record = json.loads(path.read_text())
+    require(isinstance(record, dict), "artifact record object required")
+    require(record.get("candidate_sha") == candidate_sha and record.get("kind") == name and record.get("status") == "passed", "artifact identity/status mismatch")
+    require(record.get("producer_run_id") == provenance.get("run_id") and str(record.get("producer_run_id", "")).isdigit(), "artifact producer run mismatch")
+    facts = record.get("facts", {})
+    require(isinstance(facts, dict), "observation facts required")
+    if name == "live_smoke":
+        require(bool(facts.get("url")) and bool(facts.get("source_ref")) and facts.get("requests", 0) > 0 and facts.get("checked", 0) > 0, "live execution missing")
+    elif name == "package_triage":
+        require(set(facts.get("packages", {})) >= {"medfit", "probmed", "medrobust"} and all(v.get("reviewed") is True and bool(v.get("disposition")) for v in facts["packages"].values()), "package triage incomplete")
+    elif name == "full_gates":
+        require(facts.get("pytest_passed", 0) > 0 and facts.get("test_all_passed") == 47 and all(facts.get(k) is True for k in ("version_sync", "reference_sync", "command_sync", "mkdocs_strict")), "full gates incomplete")
+    elif name == "rendered_review":
+        require(bool(facts.get("pages")) and all(v.get("inspected") is True and re.fullmatch(r"[a-f0-9]{64}", v.get("sha256", "")) for v in facts["pages"]), "render inspection incomplete")
+    elif name == "adversarial_review":
+        require(bool(facts.get("job_id")) and facts.get("unresolved_findings") == 0 and facts.get("coverage_reviewed") is True, "review unresolved or incomplete")
+    elif name == "requirement_mapping":
+        require(facts.get("review") == "complete" and facts.get("unmapped") == 0 and facts.get("requirements", 0) > 0, "mapping incomplete")
+
+
+def validate_aggregate(platforms, observations, *, candidate_sha, evidence_root=None):
     require({p.get("platform") for p in platforms} == {"ubuntu-24.04", "macos-14"}, "both actual release platforms required")
     require(len(platforms) == 2, "duplicate platform artifacts")
     require(all(p.get("candidate_sha") == candidate_sha and p.get("uploaded") and p.get("retrieved") and p.get("verified") for p in platforms), "missing/failed/stale actual artifact")
     for name in ("live_smoke","package_triage","full_gates","rendered_review","adversarial_review","requirement_mapping"):
         item = observations.get(name, {})
-        require(item.get("candidate_sha") == candidate_sha and item.get("status") == "passed" and bool(item.get("provenance")), f"actual {name} evidence missing or failed")
+        validate_observation(name, item, candidate_sha=candidate_sha, evidence_root=evidence_root)
     return {"verified":True,"platforms":2}
 
 

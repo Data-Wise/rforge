@@ -153,3 +153,20 @@ def test_rendered_unpaired_counts(tmp_path, monkeypatch, source_assertion, allow
     assert stage['counts']['checked']==int(source_assertion)
     assert 'rendered-unpaired' in stage['reasons']
     assert docaudit.exit_code(report,'warn')==docaudit.exit_code(report,'error')==2
+
+
+def test_running_evaluate_output_limit(tmp_path):
+    p = fixture(tmp_path, '```r\nprint(1)\n#> [1] 1\n```\n```r\nfor (i in 1:100000) { cat(strrep("x", 8192), "\\n"); Sys.sleep(.001) }\n#> never completed\n```')
+    started = time.monotonic()
+    report = examples.audit(p, deadline=time.monotonic_ns()+20_000_000_000)
+    assert report['state'] == 'incomplete', report
+    assert any('output-limit' in reason for reason in report['reasons']), report
+    assert report['counts']['checked'] == 1
+    assert time.monotonic()-started < 15
+
+
+def test_evaluate_spool_counts_text_once(tmp_path):
+    p = fixture(tmp_path, '```{r setup, include=FALSE}\ncat(strrep("x", 6*1024*1024))\n```\n```r\nprint(1)\n#> [1] 1\n```')
+    report = examples.audit(p, deadline=time.monotonic_ns()+20_000_000_000)
+    assert report['state'] == 'complete' and report['counts']['checked'] == 1, report
+    assert not report['findings']

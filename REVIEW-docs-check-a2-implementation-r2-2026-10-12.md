@@ -19,3 +19,31 @@ Read: guardian, R worker, verifier/aggregate/runner, CI, expected-findings manif
 Local full suite after the wrapper regression: **1,151 passed, 4 existing skipped**, 84.87 seconds. This is not the locked no-skip release gate. Earlier 251-node locked run and 47 repository checks remain historical evidence; current A2 collection has 252 nodes. Requirement mapping, the confirmed gate/output issues, emergency identity investigation and both actual platform artifact runs remain pending. No publication or release has occurred.
 
 Next: fix the confirmed aggregate artifact validation and incremental captured-text accounting, add meaningful negative/native tests, then finish contract mapping and run the two-platform acceptance workflow after publication authorization.
+
+
+## Remediation (2026-10-12)
+
+The two confirmed findings are fixed locally. Aggregate acceptance now downloads
+`a2-acceptance-evidence` from the supplied numeric workflow run; its index must
+identify candidate-bound files, hashes and the same producer run. Each file's
+identity, status and required facts are checked. Missing/changed files, escaping
+paths, wrong candidates/producers, empty facts and unresolved reviews are tested
+negative cases. Actual observation producers and both platform runs remain
+pending; controlled records used by tests are never release observations.
+
+The R worker splits evaluate's output sink into a dedicated temporary text spool.
+The guardian polls its byte size while an expression runs; condition callbacks
+publish condition bytes immediately. Text is counted from the spool once rather
+than again from checkpoint records. Native stdout/stderr remain distinct.
+Evaluate's debug mode also writes source diagnostics to native stderr, whose
+actual bytes remain included in the shared threshold. This is polling detection
+with permitted overshoot, not a memory/storage bound. Native tests demonstrate a
+printing loop exceeds the output limit before returning, retains an earlier valid
+assertion, and a 6 MiB hidden setup does not falsely exceed the 10 MiB threshold
+through duplicate text accounting.
+
+Validation: 262 A2 tests passed with the exact locked R runtime and no skips;
+47/47 repository checks; full suite 1161 passed with 4 existing skips; strict
+docs build; rendered remediation text inspected.
+The speculative emergency PID-reuse finding is still unverified/unresolved.
+No additional Claude review or publication was initiated.

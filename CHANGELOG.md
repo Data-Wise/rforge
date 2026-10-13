@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added (A2 implementation in progress)
 
 - Opt-in docs audit site/source comparison and supervised README replay. Release acceptance and both-platform evidence remain pending.
+- A2 remediation: guardian-visible evaluate text during running expressions; aggregate acceptance requires retrieved, hash-bound observation artifacts and their producer run identity.
 
 ---
 

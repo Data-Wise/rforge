@@ -5,16 +5,21 @@ from .test_release_verifier import v
 
 @pytest.mark.parametrize('name',['live_smoke','package_triage'])
 @pytest.mark.parametrize('status',['failed','incomplete','unavailable','pending'])
-def test_live_site_smoke_evidence(name,status):
-    platforms,observations=records();observations[name]['status']=status
-    with pytest.raises(v.VerificationError):v.validate_aggregate(platforms,observations,candidate_sha='sha')
-
-
-def test_package_coverage_triage():
+def test_live_site_smoke_evidence(name,status,tmp_path):
+    from .test_final_gates import evidence_records
     platforms,observations=records()
-    assert v.validate_aggregate(platforms,observations,candidate_sha='sha')['verified']
+    evidence_records(observations,tmp_path)
+    observations[name]['status']=status
+    with pytest.raises(v.VerificationError):v.validate_aggregate(platforms,observations,candidate_sha='sha',evidence_root=tmp_path)
+
+
+def test_package_coverage_triage(tmp_path):
+    from .test_final_gates import evidence_records
+    platforms,observations=records()
+    evidence_records(observations,tmp_path)
+    assert v.validate_aggregate(platforms,observations,candidate_sha='sha',evidence_root=tmp_path)['verified']
     observations['package_triage']['provenance']=''
-    with pytest.raises(v.VerificationError):v.validate_aggregate(platforms,observations,candidate_sha='sha')
+    with pytest.raises(v.VerificationError):v.validate_aggregate(platforms,observations,candidate_sha='sha',evidence_root=tmp_path)
 
 
 def test_committed_defect_replay():

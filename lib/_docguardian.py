@@ -89,7 +89,8 @@ def supervise(directory):
                 heartbeat_sequence = heartbeat["sequence"]; heartbeat_time = now
             payload = read(directory / "payload.json") or {}
             native = sum((directory/name).stat().st_size for name in ("stdout","stderr"))
-            total = native + max(0, int(payload.get("bytes",0)))
+            spool = directory / "evaluate-text"
+            total = native + (spool.stat().st_size if spool.exists() else 0) + max(0, int(payload.get("bytes",0)))
             # Deadline always wins over observing a completion in the same poll.
             if now >= phase_deadline:
                 status.update(reason="deadline",enforcement_delay_ns=max(0,now-phase_deadline)); break
