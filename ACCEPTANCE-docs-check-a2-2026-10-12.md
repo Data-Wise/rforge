@@ -1,6 +1,6 @@
 # Acceptance-test inventory — docs:check A2 revision 7
 
-Date: 2026-10-12. Status: planning revision 2 after validated Claude review; approved product spec remains revision 7. Implementation in progress: 273 expanded A2 nodes collected locally; contract-to-node review complete, with 44 groups retaining coverage gaps. Both-platform evidence remains pending. See [coverage audit](COVERAGE-docs-check-a2-2026-10-12.md).
+Date: 2026-10-12. Status: planning revision 2 after validated Claude review; approved product spec remains revision 7. Implementation in progress: 306 expanded A2 nodes collected locally; contract-to-node review complete, with 39 groups retaining coverage gaps. Both-platform evidence remains pending. See [coverage audit](COVERAGE-docs-check-a2-2026-10-12.md).
 Approved spec: [SPEC-docs-check-a2-2026-10-12.md](SPEC-docs-check-a2-2026-10-12.md), SHA256 `b202409f690b478fcb3fe6473afb4021930a1e271e8ae2a90ec0370bebe65b51`.
 Plan: [PLAN-docs-check-a2-2026-10-12.md](PLAN-docs-check-a2-2026-10-12.md); task state: [TASKS-docs-check-a2-2026-10-12.md](TASKS-docs-check-a2-2026-10-12.md).
 

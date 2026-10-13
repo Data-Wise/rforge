@@ -2,41 +2,11 @@
 
 Approved spec revision 7 remains unchanged. Mapping review is complete; release coverage is not complete.
 
-Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 273 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 44 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
+Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 306 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 39 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
 
 The immutable requirement ledger records exact source text/hash/anchor/ordinal plus inventory ownership. Test source hashes bind this review snapshot. Header, historical validation and approval paragraphs are contextual documentation obligations, not invented runtime tests. Actual external evidence is separate from portable validators.
 
 ## Remaining coverage work
-
-### C02 / T02
-
-Mapped: `tests/a2/test_reporting.py::test_cli_scope_validation[args0]`, `tests/a2/test_reporting.py::test_cli_scope_validation[args1]`, `tests/a2/test_reporting.py::test_cli_scope_validation[args2]`, `tests/a2/test_reporting.py::test_cli_scope_validation[args3]`.
-
-- Ambiguous two-package site scope and negative integer budgets need direct no-side-effect misuse cases.
-
-### C03 / T02
-
-Mapped: `tests/a2/test_reporting.py::test_stage_state_preserves_static_findings`.
-
-- Only unavailable is injected; complete/incomplete/not-applicable plus retained planted static findings need full stage-state cases.
-
-### C04 / T02
-
-Mapped: `tests/a2/test_reporting.py::test_threshold_matrix[none-True-warn-0]`, `tests/a2/test_reporting.py::test_threshold_matrix[warn-True-warn-2]`, `tests/a2/test_reporting.py::test_threshold_matrix[error-True-warn-2]`, `tests/a2/test_reporting.py::test_threshold_matrix[warn-False-warn-1]`, `tests/a2/test_reporting.py::test_threshold_matrix[error-False-warn-0]`, `tests/a2/test_reporting.py::test_threshold_matrix[error-False-error-1]`, `tests/a2/test_reporting.py::test_threshold_matrix[warn-False-none-0]`.
-
-- Matrix lacks complete error under warn and clean error/none variants; explicit incomplete-stage plus completed-A2-warning mixed cases need direct facade tests.
-
-### C05 / T02
-
-Mapped: `tests/a2/test_reporting.py::test_text_json_diagnostics`, `tests/a2/test_reporting.py::test_detailed_info_visibility_does_not_change_coverage[False]`, `tests/a2/test_reporting.py::test_detailed_info_visibility_does_not_change_coverage[True]`.
-
-- Info visibility tested on report object, not text/JSON detailed on/off; real missing-Rscript default-threshold diagnostics are not exercised.
-
-### C06 / T02
-
-Mapped: `tests/a2/test_reporting.py::test_engine_union_and_package_reasons`.
-
-- Both packages unavailable; mixed successful/unavailable package union case missing.
 
 ### S02 / T03
 
@@ -276,6 +246,8 @@ Mapped: `tests/a2/test_final_gates.py::test_review_record_validation`, `tests/a2
 
 Close the listed fixture/validator gaps and review their oracles before making required.json ready. Reconcile the independent ledger with the unchanged approved spec. Then commit a stable candidate, run the actual locked acceptance collection on Ubuntu 24.04 and macOS 14, retrieve both artifacts, and produce candidate/run-bound live, triage, full-gate, rendered-review and finalized adversarial-review observations. Only then can the aggregate gate certify acceptance. No CI dispatch, source publication, or release has occurred.
 
-## Local verification
+## Closed reporting coverage
 
-Added 11 expanded acceptance cases; targeted README/CLI tests: 45 passed, guardian tests: 16 passed. Full suite: 1172 passed, 4 existing skipped. Repository gates: 47/47. Strict MkDocs build passed. Exact-spec ledger validation and rejection of the pending manifest passed. These local results do not supply both-platform acceptance evidence.
+C02–C06 now cover ambiguous package scope and negative-budget no-execution checks, all four stage states preserving a planted Rd/NAMESPACE signature error, all 18 severity/threshold/completeness combinations, mixed completed warnings and incomplete stages, text/JSON info visibility, missing-Rscript diagnostics through the real optional-stage dispatcher, and mixed successful/unavailable package aggregation. These are portable reporting checks; they do not establish native runtime or platform acceptance.
+
+Verification: 51 reporting cases passed; full suite 1205 passed with 4 existing skips; test-all 47/47. Exact-spec ledger and all 306 collected-node ownership checks passed; pending manifest rejection remains verified.

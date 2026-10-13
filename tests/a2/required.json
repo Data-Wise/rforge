@@ -13,7 +13,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_reporting.py": "a9a64c0a01fab16389697b193cfda31e8829dc260bcb63435e5b98ac3a0e1aaf"
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -25,15 +25,15 @@
         "tests/a2/test_reporting.py::test_cli_scope_validation[args0]",
         "tests/a2/test_reporting.py::test_cli_scope_validation[args1]",
         "tests/a2/test_reporting.py::test_cli_scope_validation[args2]",
-        "tests/a2/test_reporting.py::test_cli_scope_validation[args3]"
+        "tests/a2/test_reporting.py::test_cli_scope_validation[args3]",
+        "tests/a2/test_reporting.py::test_misuse_never_runs_optional_stages[negative]",
+        "tests/a2/test_reporting.py::test_misuse_never_runs_optional_stages[ambiguous]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Ambiguous two-package site scope and negative integer budgets need direct no-side-effect misuse cases."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_reporting.py": "a9a64c0a01fab16389697b193cfda31e8829dc260bcb63435e5b98ac3a0e1aaf"
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -42,15 +42,17 @@
       "task": "T02",
       "proposed_node": "tests/a2/test_reporting.py::test_stage_state_preserves_static_findings",
       "nodes": [
-        "tests/a2/test_reporting.py::test_stage_state_preserves_static_findings"
+        "tests/a2/test_reporting.py::test_stage_state_preserves_static_findings",
+        "tests/a2/test_reporting.py::test_every_stage_state_retains_static_findings[complete]",
+        "tests/a2/test_reporting.py::test_every_stage_state_retains_static_findings[incomplete]",
+        "tests/a2/test_reporting.py::test_every_stage_state_retains_static_findings[unavailable]",
+        "tests/a2/test_reporting.py::test_every_stage_state_retains_static_findings[not-applicable]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Only unavailable is injected; complete/incomplete/not-applicable plus retained planted static findings need full stage-state cases."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_reporting.py": "a9a64c0a01fab16389697b193cfda31e8829dc260bcb63435e5b98ac3a0e1aaf"
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -65,15 +67,34 @@
         "tests/a2/test_reporting.py::test_threshold_matrix[warn-False-warn-1]",
         "tests/a2/test_reporting.py::test_threshold_matrix[error-False-warn-0]",
         "tests/a2/test_reporting.py::test_threshold_matrix[error-False-error-1]",
-        "tests/a2/test_reporting.py::test_threshold_matrix[warn-False-none-0]"
+        "tests/a2/test_reporting.py::test_threshold_matrix[warn-False-none-0]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-none-none]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-none-warn]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-none-error]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-warn-none]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-warn-warn]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-warn-error]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-error-none]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-error-warn]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-error-error]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-none-none]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-none-warn]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-none-error]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-warn-none]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-warn-warn]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-warn-error]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-error-none]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-error-warn]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-error-error]",
+        "tests/a2/test_reporting.py::test_mixed_stage_warning_and_incomplete_gate[none-0]",
+        "tests/a2/test_reporting.py::test_mixed_stage_warning_and_incomplete_gate[warn-2]",
+        "tests/a2/test_reporting.py::test_mixed_stage_warning_and_incomplete_gate[error-2]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Matrix lacks complete error under warn and clean error/none variants; explicit incomplete-stage plus completed-A2-warning mixed cases need direct facade tests."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_reporting.py": "a9a64c0a01fab16389697b193cfda31e8829dc260bcb63435e5b98ac3a0e1aaf"
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -84,15 +105,18 @@
       "nodes": [
         "tests/a2/test_reporting.py::test_text_json_diagnostics",
         "tests/a2/test_reporting.py::test_detailed_info_visibility_does_not_change_coverage[False]",
-        "tests/a2/test_reporting.py::test_detailed_info_visibility_does_not_change_coverage[True]"
+        "tests/a2/test_reporting.py::test_detailed_info_visibility_does_not_change_coverage[True]",
+        "tests/a2/test_reporting.py::test_cli_info_visibility[False-text]",
+        "tests/a2/test_reporting.py::test_cli_info_visibility[False-json]",
+        "tests/a2/test_reporting.py::test_cli_info_visibility[True-text]",
+        "tests/a2/test_reporting.py::test_cli_info_visibility[True-json]",
+        "tests/a2/test_reporting.py::test_missing_rscript_default_diagnostic"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Info visibility tested on report object, not text/JSON detailed on/off; real missing-Rscript default-threshold diagnostics are not exercised."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_reporting.py": "a9a64c0a01fab16389697b193cfda31e8829dc260bcb63435e5b98ac3a0e1aaf"
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -101,15 +125,14 @@
       "task": "T02",
       "proposed_node": "tests/a2/test_reporting.py::test_engine_union_and_package_reasons",
       "nodes": [
-        "tests/a2/test_reporting.py::test_engine_union_and_package_reasons"
+        "tests/a2/test_reporting.py::test_engine_union_and_package_reasons",
+        "tests/a2/test_reporting.py::test_mixed_package_engine_union"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Both packages unavailable; mixed successful/unavailable package union case missing."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_reporting.py": "a9a64c0a01fab16389697b193cfda31e8829dc260bcb63435e5b98ac3a0e1aaf"
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -124,7 +147,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_reporting.py": "a9a64c0a01fab16389697b193cfda31e8829dc260bcb63435e5b98ac3a0e1aaf"
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1590,8 +1613,8 @@
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 273,
-  "review_candidate": "fa5b65d plus acceptance-test additions",
+  "collected_nodes": 306,
+  "review_candidate": "6bf0e5b plus reporting acceptance additions",
   "platforms": [
     "ubuntu-24.04",
     "macos-14"
