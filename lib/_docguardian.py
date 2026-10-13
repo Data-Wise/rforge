@@ -12,6 +12,8 @@ from pathlib import Path
 
 NS = 1_000_000_000
 OUTPUT_LIMIT = 10 * 1024 * 1024
+# Retain ownership if an uninterruptible guardian cannot be observed dead.
+_UNREAPED_PINS = []
 
 
 def atomic(path, data):
@@ -40,16 +42,18 @@ def exited_unreaped(process):
     return state.startswith("Z")
 
 
-def live_group_members(pgid):
-    result = subprocess.run(["ps", "-e", "-o", "pgid=", "-o", "stat="],
+def live_group_members(pgid, exclude_pid=None):
+    result = subprocess.run(["ps", "-e", "-o", "pgid=", "-o", "pid=", "-o", "stat="],
                             capture_output=True, text=True, timeout=1, check=True)
-    return any(fields[0] == str(pgid) and not fields[1].startswith("Z")
-               for line in result.stdout.splitlines() if len(fields := line.split()) >= 2)
+    return any(fields[0] == str(pgid) and fields[1] != str(exclude_pid) and not fields[2].startswith("Z")
+               for line in result.stdout.splitlines() if len(fields := line.split()) >= 3)
 
 
 def supervise(directory):
     directory = Path(directory)
     initial = read(directory / "initial.json")
+    if "signal_mask" in initial:
+        signal.pthread_sigmask(signal.SIG_SETMASK, initial["signal_mask"])
     run_id = initial["run_id"]
     deadline = initial["deadline_ns"]
     phase_deadline = min(deadline, initial["file_started_ns"] + initial["file_budget_ns"])
@@ -57,6 +61,10 @@ def supervise(directory):
               "guardian_pid":os.getpid(),"effective_deadline_ns":phase_deadline,"reason":"deadline","direct_child_reaped":False,"kill_sent":False,"phase":"startup"}
     atomic(directory / "armed.json", status)
     process = None
+    pgid = initial.get("group_pgid")
+    if pgid is not None: status["group_pgid"] = pgid
+    def workload_alive():
+        return live_group_members(pgid, exclude_pid=pgid) if pgid is not None else live_group_members(process.pid)
     streams = []
     heartbeat_sequence = None
     heartbeat_time = time.monotonic_ns()
@@ -78,8 +86,14 @@ def supervise(directory):
         if release and release.get("run_id") == run_id and time.monotonic_ns() < phase_deadline:
             for name in ("stdout", "stderr"):
                 streams.append((directory / name).open("wb"))
-            process = subprocess.Popen(initial["command"], cwd=initial["cwd"], env=initial["env"],
-                                       stdout=streams[0], stderr=streams[1], start_new_session=True)
+            command = initial["command"]
+            if pgid is not None:
+                from ._docgroup_pin import spawn_in_group
+                process = spawn_in_group(pgid, command, directory, run_id, phase_deadline,
+                                         initial["cwd"], initial["env"], *streams)
+            else:
+                process = subprocess.Popen(command, cwd=initial["cwd"], env=initial["env"],
+                                           stdout=streams[0], stderr=streams[1], start_new_session=True)
             status["child_pid"] = process.pid
             atomic(directory / "armed.json", status)
         while process is not None:
@@ -120,22 +134,22 @@ def supervise(directory):
                 break
             time.sleep(0.05)
         if process is not None:
-            group_alive = live_group_members(process.pid)
+            group_alive = workload_alive()
             if group_alive:
                 status.update(termination_id=uuid.uuid4().hex,termination_ns=time.monotonic_ns())
                 atomic(directory/"termination.json", status)
                 try:
-                    os.killpg(process.pid,signal.SIGTERM)
+                    os.killpg(pgid or process.pid,signal.SIGTERM)
                 except ProcessLookupError:
                     pass
                 grace = time.monotonic() + 2
                 while time.monotonic() < grace:
-                    if not live_group_members(process.pid):
+                    if not workload_alive():
                         break
                     time.sleep(0.05)
                 try:
-                    if live_group_members(process.pid):
-                        os.killpg(process.pid,signal.SIGKILL);status["kill_sent"] = True
+                    if workload_alive():
+                        os.killpg(pgid or process.pid,signal.SIGKILL);status["kill_sent"] = True
                 except ProcessLookupError:
                     pass
             # Direct-child reap and group disappearance are separate observations.
@@ -143,18 +157,31 @@ def supervise(directory):
                 status["returncode"] = process.wait(timeout=5);status["direct_child_reaped"] = True
             except subprocess.TimeoutExpired:
                 status["reason"] = "cleanup-unverified"
-            try:
-                os.killpg(process.pid,0);status["group_disappeared"] = False
-            except ProcessLookupError:
-                status["group_disappeared"] = True
-            if not status["group_disappeared"]:
+            launch_error = read(directory / "launch-error.json")
+            if launch_error and launch_error.get("run_id") == run_id:
+                status.update(reason="guardian-failure", error=launch_error["error"])
+            if pgid is not None:
+                status["workload_disappeared"] = not workload_alive()
+            if pgid is not None:
+                # The parent still owns the pin; only it can finalize this probe
+                # after reaping that child. macOS may return EPERM for zombies.
+                status["group_disappeared"] = False
+            else:
+                try:
+                    os.killpg(process.pid,0);status["group_disappeared"] = False
+                except ProcessLookupError:
+                    status["group_disappeared"] = True
+            if pgid is None and not status["group_disappeared"] or pgid is not None and not status.get("workload_disappeared"):
                 status["reason"] = "cleanup-unverified"
-    except Exception as exc:
+    except BaseException as exc:
         status.update(reason="guardian-failure",error=str(exc))
+        if process is None and pgid is not None:
+            try:os.killpg(pgid,signal.SIGKILL)
+            except OSError:pass
         if process is not None and not status.get("direct_child_reaped"):
             try:
-                if live_group_members(process.pid):
-                    os.killpg(process.pid,signal.SIGKILL)
+                if workload_alive():
+                    os.killpg(pgid or process.pid,signal.SIGKILL)
                 process.wait(timeout=5)
                 status["direct_child_reaped"] = True
             except (OSError,subprocess.SubprocessError):
@@ -162,6 +189,19 @@ def supervise(directory):
     finally:
         for stream in streams:
             stream.close()
+        if pgid is not None:
+            # No destructive group signal is allowed beyond this ownership release.
+            atomic(directory / "pin-release.json", {"run_id": run_id})
+            if os.getppid() != initial["parent_pid"]:
+                until = time.monotonic() + 2
+                while time.monotonic() < until:
+                    try:os.killpg(pgid, 0)
+                    except ProcessLookupError:
+                        status["group_disappeared"] = True; break
+                    except PermissionError:
+                        pass  # Not evidence of disappearance; await the orphan reap.
+                    time.sleep(.02)
+                if not status.get("group_disappeared"):status["reason"] = "cleanup-unverified"
         atomic(directory/"terminal.json",status)
     return status
 
@@ -178,12 +218,34 @@ def run(command, directory, deadline, *, cwd, env=None, file_budget=300, chunk_b
     if input_data is not None:
         input_data["run_id"]=run_id
         atomic(directory/"input.json",input_data)
-    atomic(directory/"initial.json",initial)
     atomic(directory/"marker.json",{"run_id":run_id,"state":"started"})
-    sequence = 0; last_heartbeat = 0; phase_sequence = None
-    guardian = subprocess.Popen([sys.executable,"-m","lib._docguardian",str(directory)],cwd=package_root,
-                                env=inherited,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+    startup_deadline = min(deadline, initial["file_started_ns"] + initial["file_budget_ns"])
+    startup_status = {"run_id":run_id,"reason":"deadline","phase":"startup",
+                      "global_deadline_ns":deadline,"effective_deadline_ns":startup_deadline,
+                      "direct_child_reaped":False,"kill_sent":False}
+    atomic(directory/"initial.json",initial)
+    if time.monotonic_ns() >= startup_deadline:
+        terminal = dict(startup_status)
+        atomic(directory/"marker.json",{"run_id":run_id,"state":"interrupted"})
+        return terminal
+    from ._docgroup_pin import GroupPin
     try:
+        pin = GroupPin(directory, run_id, startup_deadline)
+    except TimeoutError as exc:
+        terminal = dict(startup_status, reason="deadline" if time.monotonic_ns() >= startup_deadline else "guardian-failure", error=str(exc), pin_reaped=True)
+        atomic(directory/"marker.json",{"run_id":run_id,"state":"interrupted"})
+        return terminal
+    initial.update(group_pgid=pin.pgid, parent_pid=os.getpid())
+    sequence = 0; last_heartbeat = 0; phase_sequence = None
+    guardian = None; terminal = None
+    try:
+        atomic(directory/"initial.json",initial)
+        from ._docgroup_pin import defer_launch_signals
+        with defer_launch_signals() as previous:
+            initial["signal_mask"] = list(previous)
+            atomic(directory/"initial.json",initial)
+            guardian = subprocess.Popen([sys.executable,"-m","lib._docguardian",str(directory)],cwd=package_root,
+                                        env=inherited,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
         while guardian.poll() is None:
             now = time.monotonic_ns()
             if now-last_heartbeat >= NS//2:
@@ -192,7 +254,6 @@ def run(command, directory, deadline, *, cwd, env=None, file_budget=300, chunk_b
             armed = read(directory/"armed.json")
             if armed and armed.get("run_id") == run_id:
                 atomic(directory/"startup-release.json", {"run_id":run_id})
-            # R requests a phase; parent forwards it and releases R only after ack.
             phase = read(directory/"phase-request.json")
             if phase and phase.get("run_id") == run_id and phase.get("sequence") != phase_sequence:
                 phase_sequence = phase["sequence"]
@@ -203,39 +264,53 @@ def run(command, directory, deadline, *, cwd, env=None, file_budget=300, chunk_b
                     atomic(directory/"phase-release.json",ack)
                 else:
                     atomic(directory/"terminate.json",{"run_id":run_id,"reason":"deadline"})
-            # A dead/silent guardian must not leave the parent polling indefinitely.
             if now > deadline + 12*NS:
                 guardian.kill();break
             time.sleep(0.05)
         guardian.wait(timeout=5)
         terminal = read(directory/"terminal.json")
-        if terminal is not None and terminal.get("run_id") != run_id:
-            terminal = None
-        if terminal is None:
+        if not isinstance(terminal, dict) or terminal.get("run_id") != run_id:
             terminal = {"reason":"guardian-failure","run_id":run_id}
-            armed = read(directory/"armed.json") or {}
-            pid = armed.get("child_pid")
-            # Emergency only after observed guardian death; never read an old run PID.
-            if pid and armed.get("run_id") == run_id:
-                try:
-                    os.killpg(pid,signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
-        atomic(directory/"marker.json",{"run_id":run_id,"state":"completed" if terminal["reason"]=="completed" else "interrupted","phase":terminal.get("phase")})
-        return terminal
+        if terminal.get("reason") in ("guardian-failure", "cleanup-unverified"):
+            # The guardian is observed dead; use our unreaped direct pin child,
+            # never the integer child_pid read from a checkpoint.
+            try:pin.signal_group(signal.SIGKILL)
+            except OSError as exc:terminal["cleanup_error"] = str(exc)
     finally:
-        if guardian.poll() is None:
-            atomic(directory/"terminate.json", {"run_id":run_id,"reason":"parent-interrupted"})
-            try:
-                guardian.wait(timeout=8)
-            except subprocess.TimeoutExpired:
-                guardian.kill();guardian.wait(timeout=5)
-                armed = read(directory/"armed.json") or {}
-                if armed.get("run_id") == run_id and armed.get("child_pid"):
-                    try:
-                        os.killpg(armed["child_pid"],signal.SIGKILL)
-                    except ProcessLookupError:
-                        pass
+        try:
+            if guardian is not None and guardian.poll() is None:
+                try:
+                    atomic(directory/"terminate.json", {"run_id":run_id,"reason":"parent-interrupted"})
+                except OSError:
+                    guardian.kill()
+                try:
+                    guardian.wait(timeout=8)
+                except subprocess.TimeoutExpired:
+                    guardian.kill();guardian.wait(timeout=5)
+                    try:pin.signal_group(signal.SIGKILL)
+                    except OSError:pass
+            if terminal is None and guardian is not None and guardian.poll() is not None:
+                try:pin.signal_group(signal.SIGKILL)
+                except OSError:pass
+        finally:
+            if guardian is not None and guardian.poll() is None:
+                # Do not release/reap while a guardian can still issue signals.
+                _UNREAPED_PINS.append(pin)
+            else:
+                pin.finish()
+    if terminal is not None:
+        terminal.update(group_pgid=pin.pgid, pin_reaped=pin.process.returncode is not None)
+        try:
+            os.killpg(pin.pgid,0); terminal["group_disappeared"] = False
+        except ProcessLookupError:
+            terminal["group_disappeared"] = True
+        except PermissionError:
+            terminal["group_disappeared"] = False
+        if not terminal["group_disappeared"] and terminal["reason"] == "completed":
+            terminal["reason"] = "cleanup-unverified"
+        atomic(directory/"terminal.json",terminal)
+        atomic(directory/"marker.json",{"run_id":run_id,"state":"completed" if terminal["reason"]=="completed" else "interrupted","phase":terminal.get("phase")})
+    return terminal
 
 
 if __name__ == "__main__":

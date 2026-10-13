@@ -147,3 +147,23 @@ Diagnostic stdout/stderr tails remain at most 1 MiB when encoded as UTF-8,
 including replacement characters for malformed input. Malformed or duplicate
 checkpoint records block their assertions while valid earlier records remain
 available for comparison; they cannot make replay complete.
+
+### Process-group ownership
+
+The Python parent creates a separate group pin and retains it as an unreaped
+direct child until the guardian has exited and all possible group signals have
+finished. The guardian launches R into that group and remains R’s direct parent
+and the sole normal termination owner. Emergency parent cleanup uses its owned
+pin object, not a PID recovered from a checkpoint. The parent closes the signal
+capability before reaping the pin and observes group disappearance afterward.
+
+The pin ignores TERM during the guardian’s grace period and has no independent
+expiry that could release ownership before a delayed guardian resumes. The
+guardian releases it after its final possible group signal. The parent reaps it
+on ordinary shutdown; total parent/guardian loss still cannot guarantee cleanup.
+`os.posix_spawn(setpgroup=...)` assigns group membership before the launcher
+runs. An isolated `python -I -S` bootstrap changes to the workload directory
+and checks the original deadline before exec. This supports Python 3.10 and
+prevents project-local `lib` files from replacing the launcher. Workload and pin reaping are reported
+separately; a missing guardian terminal record remains incomplete even when
+emergency cleanup succeeds.

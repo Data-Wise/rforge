@@ -2257,5 +2257,5 @@
     }
   ],
   "coverage_status": "pending",
-  "review_candidate": "03a80c2 plus checkpoint, UTF-8 and shared CI gate changes"
+  "review_candidate": "702f28b plus group pin and atomic isolated launcher"
 }

@@ -77,7 +77,7 @@ def test_output_overshoot_with_parent_loss(tmp_path):
     finally:
         if parent.poll() is None:parent.kill();parent.wait(timeout=2)
         if not terminal and armed.get('child_pid'):
-            try:os.killpg(armed['child_pid'],signal.SIGKILL)
+            try:os.killpg(armed.get('group_pgid',armed['child_pid']),signal.SIGKILL)
             except ProcessLookupError:pass
         if not terminal and armed.get('guardian_pid'):
             try:os.kill(armed['guardian_pid'],signal.SIGKILL)

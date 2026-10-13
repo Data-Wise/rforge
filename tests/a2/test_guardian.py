@@ -2,6 +2,7 @@ import os
 import sys
 import time
 from pathlib import Path
+import pytest
 from lib import _docguardian as guardian
 
 
@@ -48,11 +49,12 @@ for sequence in (1,2):
     assert len(deadlines)==2 and deadlines[0]==deadlines[1]
 
 
-def test_parent_loss_preserves_deadline(tmp_path):
+@pytest.mark.parametrize('budget,expected',[(1,'deadline'),(8,'parent-loss')])
+def test_parent_loss_preserves_deadline(tmp_path,budget,expected):
     import subprocess
     import signal
     root=Path(guardian.__file__).resolve().parents[1]
-    code=f"from lib import _docguardian as g;import time,sys;g.run([sys.executable,'-c','import time;time.sleep(30)'],{str(tmp_path)!r},time.monotonic_ns()+1000000000,cwd={str(tmp_path)!r})"
+    code=f"from lib import _docguardian as g;import time,sys;g.run([sys.executable,'-c','import time;time.sleep(30)'],{str(tmp_path)!r},time.monotonic_ns()+{budget}*g.NS,cwd={str(tmp_path)!r})"
     parent=subprocess.Popen([sys.executable,'-c',code],cwd=root)
     try:
         limit=time.monotonic()+3
@@ -62,15 +64,15 @@ def test_parent_loss_preserves_deadline(tmp_path):
             time.sleep(.02)
         assert armed.get('child_pid')
         parent.kill();parent.wait(timeout=2)
-        limit=time.monotonic()+5
+        limit=time.monotonic()+8
         while time.monotonic()<limit and not (tmp_path/'terminal.json').exists():time.sleep(.02)
         terminal=guardian.read(tmp_path/'terminal.json')
-        assert terminal['reason']=='deadline' and terminal['direct_child_reaped']
+        assert terminal['reason']==expected and terminal['direct_child_reaped']
         assert terminal['global_deadline_ns']==armed['global_deadline_ns']
     finally:
         if parent.poll() is None:parent.kill();parent.wait()
         if armed.get('child_pid'):
-            try:os.killpg(armed['child_pid'],signal.SIGKILL)
+            try:os.killpg(armed.get('group_pgid',armed['child_pid']),signal.SIGKILL)
             except ProcessLookupError:pass
 
 
@@ -84,7 +86,6 @@ def supervisor(tmp_path,budget,command):
     return process,run_id
 
 
-import pytest
 @pytest.mark.parametrize('budget,expected',[(.25,'deadline'),(6,'parent-loss')])
 def test_heartbeat_age_and_stale_records(tmp_path,budget,expected):
     process,run_id=supervisor(tmp_path,budget,[sys.executable,'-c','import time;time.sleep(30)'])
@@ -104,10 +105,10 @@ def test_stale_phase_request_does_not_execute(tmp_path):
 
 
 def test_guardian_failure_emergency_cleanup(tmp_path,monkeypatch):
-    # Failure before child launch cannot reuse an old run PID.
+    # Exec failure reaps the trusted launcher and cannot reuse an old run PID.
     guardian.atomic(tmp_path/'armed.json',{'run_id':'old','child_pid':os.getpid()})
     result=guardian.run(['nonexistent-a2-command'],tmp_path,time.monotonic_ns()+guardian.NS,cwd=tmp_path)
-    assert result['reason']=='guardian-failure' and not result.get('direct_child_reaped')
+    assert result['reason']=='guardian-failure' and result['direct_child_reaped'] and result['pin_reaped']
 
 
 def test_deadline_completion_collision(tmp_path):
@@ -171,7 +172,7 @@ def test_detached_child_and_total_host_loss(tmp_path):
     finally:
         if process.poll() is None: process.kill(); process.wait(timeout=2)
         if armed.get('child_pid'):
-            try: os.killpg(armed['child_pid'],signal.SIGKILL)
+            try: os.killpg(armed.get('group_pgid',armed['child_pid']),signal.SIGKILL)
             except ProcessLookupError: pass
 
 
@@ -333,7 +334,8 @@ def test_live_guardian_death_emergency_owner(tmp_path,monkeypatch):
             os.kill(record['guardian_pid'],signal.SIGKILL);killed.append(record)
         return record
     def emergency(pid,number):
-        assert killed and pid==killed[0]['child_pid'] and number==signal.SIGKILL
+        if number==0:return original_killpg(pid,number)
+        assert killed and pid==killed[0]['group_pgid'] and number==signal.SIGKILL
         # run() has reaped its guardian before emergency group signalling.
         import subprocess
         probe=subprocess.run(['ps','-o','stat=','-p',str(killed[0]['guardian_pid'])],capture_output=True,text=True)
@@ -343,7 +345,111 @@ def test_live_guardian_death_emergency_owner(tmp_path,monkeypatch):
     monkeypatch.setattr(guardian.os,'killpg',emergency)
     result=guardian.run([sys.executable,'-c','import time;time.sleep(30)'],tmp_path,time.monotonic_ns()+3*guardian.NS,cwd=tmp_path)
     assert result['reason']=='guardian-failure' and not result.get('direct_child_reaped')
-    assert signals==[killed[0]['child_pid']]
+    assert signals==[killed[0]['group_pgid']]
+    assert result['pin_reaped'] and result['group_disappeared']
     until=time.monotonic()+2
     while guardian.live_group_members(signals[0]) and time.monotonic()<until:time.sleep(.02)
     assert not guardian.live_group_members(signals[0])
+
+
+@pytest.mark.parametrize('corrupt_checkpoint',[False,True])
+def test_guardian_crash_after_reap_keeps_pin_owned(tmp_path,monkeypatch,corrupt_checkpoint):
+    import signal
+    import subprocess
+    original_popen=subprocess.Popen;original_killpg=os.killpg
+    unrelated=original_popen([sys.executable,'-c','import time;time.sleep(30)'],start_new_session=True)
+    pins=[];signals=[]
+    def faulting_guardian(command,*args,**kwargs):
+        if command[1:3]==['-m','lib._docgroup_pin'] and command[3]=='pin':
+            process=original_popen(command,*args,**kwargs);pins.append(process);return process
+        if command[1:3]==['-m','lib._docguardian']:
+            code=f"""import os,signal
+from pathlib import Path
+from lib import _docguardian as g
+original=g.atomic
+p=Path({str(tmp_path)!r})
+def write(path,data):
+ if path.name=='terminal.json' and data.get('direct_child_reaped'):
+  original(p/'reap-before-crash.json',data)
+  if {corrupt_checkpoint!r}:
+   armed=g.read(p/'armed.json');armed['child_pid']={unrelated.pid};armed['group_pgid']={unrelated.pid};original(p/'armed.json',armed)
+  os.kill(os.getpid(),signal.SIGKILL)
+ return original(path,data)
+g.atomic=write
+g.supervise(p)
+"""
+            return original_popen([sys.executable,'-c',code],*args,**kwargs)
+        return original_popen(command,*args,**kwargs)
+    def observed(pgid,number):
+        if number!=0:
+            assert pins and pins[0].returncode is None
+            assert pgid==pins[0].pid and pgid!=unrelated.pid
+            signals.append((pgid,number))
+        return original_killpg(pgid,number)
+    monkeypatch.setattr(subprocess,'Popen',faulting_guardian)
+    monkeypatch.setattr(os,'killpg',observed)
+    try:
+        result=guardian.run([sys.executable,'-c','pass'],tmp_path,time.monotonic_ns()+3*guardian.NS,cwd=tmp_path)
+        assert guardian.read(tmp_path/'reap-before-crash.json')['direct_child_reaped']
+        assert result['reason']=='guardian-failure' and not result.get('direct_child_reaped')
+        assert result['pin_reaped'] and result['group_disappeared']
+        assert signals==[(pins[0].pid,signal.SIGKILL)] and unrelated.poll() is None
+    finally:
+        if unrelated.poll() is None:unrelated.kill();unrelated.wait(timeout=2)
+
+
+
+def test_join_launcher_ignores_decoy_lib_in_workload_cwd(tmp_path):
+    decoy=tmp_path/'lib';decoy.mkdir()
+    (decoy/'__init__.py').write_text("from pathlib import Path;Path('decoy-executed').write_text('unsafe')")
+    (decoy/'_docgroup_pin.py').write_text('raise SystemExit(99)')
+    result=guardian.run([sys.executable,'-c',"print('safe-workload')"],tmp_path,time.monotonic_ns()+3*guardian.NS,cwd=tmp_path)
+    assert result['reason']=='completed'
+    assert not (tmp_path/'decoy-executed').exists()
+    assert (tmp_path/'stdout').read_text().strip()=='safe-workload'
+
+
+def test_deadline_before_join_never_executes_workload(tmp_path,monkeypatch):
+    import subprocess
+    original=subprocess.Popen
+    def delayed_guardian(command,*args,**kwargs):
+        if command[1:3]==['-m','lib._docguardian']:
+            code=f"""from lib import _docguardian as g
+import os
+original=os.posix_spawn
+def launch(path,command,*args,**kwargs):
+ command=list(command)
+ command[4]={('import time;from pathlib import Path;Path('+repr(str(tmp_path/'prejoin-entered'))+').write_text("entered");time.sleep(.8)'+chr(10))!r}+command[4]
+ return original(path,command,*args,**kwargs)
+os.posix_spawn=launch
+g.supervise({str(tmp_path)!r})
+"""
+            return original([sys.executable,'-c',code],*args,**kwargs)
+        return original(command,*args,**kwargs)
+    monkeypatch.setattr(subprocess,'Popen',delayed_guardian)
+    started=time.monotonic()
+    result=guardian.run([sys.executable,'-c',"from pathlib import Path;Path('workload-executed').write_text('unsafe');import time;time.sleep(30)"],tmp_path,time.monotonic_ns()+.4*guardian.NS,cwd=tmp_path)
+    assert (tmp_path/'prejoin-entered').exists()
+    assert not (tmp_path/'workload-executed').exists()
+    assert result['reason']=='deadline' and result['direct_child_reaped'] and result['group_disappeared']
+    assert time.monotonic()-started<3
+
+
+@pytest.mark.parametrize('target',['pin','guardian'])
+def test_interrupt_after_launch_tracks_and_reaps_child(tmp_path,monkeypatch,target):
+    import signal
+    import subprocess
+    original=subprocess.Popen
+    children=[]
+    def interrupt(command,*args,**kwargs):
+        process=original(command,*args,**kwargs)
+        if command[1:3] in (['-m','lib._docgroup_pin'],['-m','lib._docguardian']):
+            children.append(process)
+            matched=command[2]==('lib._docgroup_pin' if target=='pin' else 'lib._docguardian')
+            if matched:os.kill(os.getpid(),signal.SIGINT)
+        return process
+    monkeypatch.setattr(subprocess,'Popen',interrupt)
+    with pytest.raises(KeyboardInterrupt):
+        guardian.run([sys.executable,'-c',"from pathlib import Path;Path('unexpected-workload').touch()"],tmp_path,time.monotonic_ns()+3*guardian.NS,cwd=tmp_path)
+    assert children and all(child.poll() is not None for child in children)
+    assert not (tmp_path/'unexpected-workload').exists()

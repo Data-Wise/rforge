@@ -2,7 +2,7 @@
 
 Approved spec revision 7 remains unchanged. Mapping review is complete; release coverage is not complete.
 
-Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 386 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 7 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
+Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 403 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 7 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
 
 The immutable requirement ledger records exact source text/hash/anchor/ordinal plus inventory ownership. Test source hashes bind this review snapshot. Header, historical validation and approval paragraphs are contextual documentation obligations, not invented runtime tests. Actual external evidence is separate from portable validators.
 
@@ -10,15 +10,15 @@ The immutable requirement ledger records exact source text/hash/anchor/ordinal p
 
 ### G08 / T08
 
-Mapped: `tests/a2/test_guardian.py::test_guardian_failure_emergency_cleanup`, `tests/a2/test_guardian.py::test_no_exception_signal_after_direct_child_reap`, `tests/a2/test_guardian.py::test_live_guardian_death_emergency_owner`.
+Mapped: `tests/a2/test_group_pin.py::test_pin_holds_identity_after_workload_reap`, `tests/a2/test_group_pin.py::test_pin_retains_exited_child_without_poll`, `tests/a2/test_group_pin.py::test_guardian_crash_uses_owned_pin[False]`, `tests/a2/test_group_pin.py::test_guardian_crash_uses_owned_pin[True]`, `tests/a2/test_group_pin.py::test_pin_ignores_term_during_guardian_grace`, `tests/a2/test_group_pin.py::test_pin_stays_armed_past_deadline_until_owner_releases`, `tests/a2/test_guardian.py::test_guardian_failure_emergency_cleanup`, `tests/a2/test_guardian.py::test_no_exception_signal_after_direct_child_reap`, `tests/a2/test_guardian.py::test_live_guardian_death_emergency_owner`, `tests/a2/test_guardian.py::test_guardian_crash_after_reap_keeps_pin_owned[False]`, `tests/a2/test_guardian.py::test_guardian_crash_after_reap_keeps_pin_owned[True]`, `tests/a2/test_guardian.py::test_join_launcher_ignores_decoy_lib_in_workload_cwd`, `tests/a2/test_guardian.py::test_deadline_before_join_never_executes_workload`, `tests/a2/test_guardian.py::test_interrupt_after_launch_tracks_and_reaps_child[pin]`, `tests/a2/test_guardian.py::test_interrupt_after_launch_tracks_and_reaps_child[guardian]`.
 
-- Live guardian death and emergency group ownership are now reproduced; PID reuse safety remains unresolved.
+- Parent-owned group pin integrated; native guardian death after workload reap, corrupt checkpoint PID, and parent-loss tests pass locally. Independent ownership review and both-platform execution remain pending; no actual PID-wrap reproduction is claimed.
 
 ### D04 / T18
 
 Mapped: `tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/guides/docs-audit.md-terms0]`, `tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/tutorials/fix-a-docs-check-finding.md-terms1]`, `tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/workflows/index.md-terms2]`, `tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/quickstart.md-terms3]`.
 
-- Guide/tutorial/workflows/quickstart and REFCARD/cards text checks pass; changed rendered-content inspection records remain aggregate work.
+- Guide/tutorial/workflows/quickstart text checks exist; REFCARD/cards and all changed rendered-content observations remain aggregate work.
 
 ### D05 / T19
 
@@ -54,10 +54,34 @@ Mapped: `tests/a2/test_final_gates.py::test_review_record_validation`, `tests/a2
 
 Close the listed fixture/validator gaps and review their oracles before making required.json ready. Reconcile the independent ledger with the unchanged approved spec. Then commit a stable candidate, run the actual locked acceptance collection on Ubuntu 24.04 and macOS 14, retrieve both artifacts, and produce candidate/run-bound live, triage, full-gate, rendered-review and finalized adversarial-review observations. Only then can the aggregate gate certify acceptance. No CI dispatch, source publication, or release has occurred.
 
-## Local checkpoint and focused review
 
-386 expanded nodes. Full suite: 1285 passed, four existing skips; repository checks: 47/47; strict docs build passed. After strengthening UTF-8 tail-content assertions, the focused stdio/CI suite passed 27 cases. No production code changed after the full suite.
+## Group-pin review disposition
 
-Claude job b17e1ee1-8dcb-40a8-aa07-7a2796d49377 completed: one high unresolved guardian ownership finding and two low findings. The UTF-8 oracle finding is addressed by suffix and valid-encoding assertions. CI matrix execution on normal pushes/PRs implements the approved ci.yml contract; the live main protection API reports no required status checks, so no existing check-name binding needs migration. The guardian signal path is confirmed from source; actual PID reuse has not been reproduced. Proposed remediation is a parent-owned process-group pin, with Python >=3.10 compatibility, guardian-death, parent-loss, and bounded cleanup tests required before adoption. Start-time comparison alone is rejected as incomplete because it leaves a check-to-signal race.
+Raw read-only Claude review: `REVIEW-docs-check-a2-group-pin-2026-10-12.json`,
+job `1ef64607-b22b-47ab-8c5c-ec667d20501d`, against the initial pin integration.
+The reviewer inspected helper/guardian bodies and searched tests; broader
+contracts, inventory and complete test bodies were outside that review scope.
+The result includes conflicting budget flags between the tool envelope and
+reviewer's structured report; it is not a clean final acceptance review.
 
-The raw review records skipped checkpoint implementation and planning/evidence files, medium uncertainty, Sonnet request/effective claude-sonnet-5-5, 9 turns, 203563 tokens, $0.2086217, 65697ms, and no cost/turn/Evidence Lease exhaustion. It is not final A2 acceptance. No automatic resume, model chain, or budget expansion occurred.
+- Confirmed: workload-cwd `lib` shadowing executed the decoy module in the native
+  red regression. Production now uses an isolated stdlib-only `-I -S` bootstrap.
+- Confirmed: delaying child-side group join allowed workload execution after the
+  deadline. Production now assigns membership in `os.posix_spawn(setpgroup=...)`
+  before any bootstrap instruction; the bootstrap also checks the original
+  absolute deadline before exec. Native delayed-bootstrap regression passes.
+- Addressed locally: SIGINT between process creation and handle assignment could
+  lose ownership. Launch masks defer delivery until assignment; native pin and
+  guardian interruptions verify tracked children are reaped and no workload runs.
+- Parent-loss ownership proof remains a review obligation. Native tests exercise
+  original deadlines and missing startup release, not actual PID wrap or complete
+  simultaneous owner loss. The pin must not expire while a guardian can signal.
+
+G08 and F02 remain pending final independent review and both-platform evidence.
+No acceptance requirement or approved product-spec text was relaxed.
+
+Local post-fix verification: full pytest 1302 passed / 4 existing skipped;
+focused mapping/guardian/pin 65 passed; launcher/interruption regression subset
+4 passed; test-all 47/47; mkdocs strict passed. The unchanged approved spec hash
+is `b202409f690b478fcb3fe6473afb4021930a1e271e8ae2a90ec0370bebe65b51`.
+These local checks do not replace the seven pending acceptance groups.
