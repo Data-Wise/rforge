@@ -195,3 +195,32 @@ def test_no_exception_signal_after_direct_child_reap(tmp_path, monkeypatch):
     result=guardian.supervise(tmp_path)
     assert result['reason']=='guardian-failure' and result['direct_child_reaped']
     assert late_signals==[]
+
+
+def test_lost_phase_ack_never_releases_code(tmp_path,monkeypatch):
+    original=guardian.read
+    monkeypatch.setattr(guardian,'read',lambda path:None if path.name=='arm-ack.json' else original(path))
+    code='''import json,time
+from pathlib import Path
+p=Path('.')
+r=json.loads((p/'initial.json').read_text())['run_id']
+t=p/'request.tmp';t.write_text(json.dumps({'run_id':r,'sequence':1,'phase':'chunk','chunk':1}));t.replace(p/'phase-request.json')
+while not (p/'phase-release.json').exists():time.sleep(.01)
+(p/'executed').write_text('forbidden')
+'''
+    result=guardian.run([sys.executable,'-c',code],tmp_path,time.monotonic_ns()+guardian.NS,cwd=tmp_path,chunk_budget=.25)
+    assert result['reason']=='deadline' and result['direct_child_reaped']
+    assert not (tmp_path/'executed').exists() and not (tmp_path/'phase-release.json').exists()
+
+
+def test_ordinary_group_child_cleanup(tmp_path):
+    code='''import subprocess,sys,time
+from pathlib import Path
+p=subprocess.Popen([sys.executable,'-c','import time;time.sleep(30)'])
+Path('ordinary-child.pid').write_text(str(p.pid))
+time.sleep(30)
+'''
+    result=guardian.run([sys.executable,'-c',code],tmp_path,time.monotonic_ns()+guardian.NS,cwd=tmp_path)
+    assert (tmp_path/'ordinary-child.pid').is_file()
+    assert result['reason']=='deadline' and result['direct_child_reaped']
+    assert result['group_disappeared'] and not guardian.live_group_members(result['child_pid'])

@@ -105,3 +105,42 @@ def test_quarto_defaults_report_all_unsupported_options(tmp_path):
     _,reasons,_,_=e.extract(p)
     assert any('fig-width' in reason for reason in reasons)
     assert any('out-width' in reason for reason in reasons)
+
+
+@pytest.mark.parametrize('source',['README.Rmd','README.qmd','both','md-only'])
+def test_source_selection_and_ambiguity(tmp_path,monkeypatch,source):
+    p=package(tmp_path,'```r\nprint(1)\n#> [1] 1\n```')
+    if source!='md-only':
+        (p/('README.Rmd' if source=='both' else source)).write_text('# source without assertions')
+    if source=='both':(p/'README.qmd').write_text('# second source')
+    monkeypatch.setattr(e.shutil,'which',lambda name:None)
+    monkeypatch.setattr(e.guardian,'run',lambda *a,**k:pytest.fail('unavailable or ineligible replay launched'))
+    report=e.audit(p,deadline=0)
+    if source=='both':
+        assert report['state']=='incomplete' and 'ambiguous README sources' in report['reasons']
+    elif source=='md-only':
+        assert report['state']=='unavailable' and report['provenance']['source']=='README.md'
+        assert any('omitted setup' in reason for reason in report['reasons'])
+    else:
+        assert report['provenance']['source']==source and report['counts']['unverified']==1
+        assert report['provenance']['coverage_sources']['README.md']['selection']=='rendered-unpaired'
+
+
+@pytest.mark.parametrize('excluded_only',[False,True])
+def test_coverage_partition_and_exclusions(tmp_path,monkeypatch,excluded_only):
+    text='\n'.join('```{r eval=FALSE}\nstop("excluded")\n#> excluded\n```' for _ in range(5))
+    if not excluded_only:text+='\n```r\nprint(1)\n#> [1] 1\n```'
+    p=package(tmp_path,text)
+    def replay(command,directory,deadline,**kwargs):
+        segments=e.extract(p/'README.md')[0]
+        eligible=[seg for seg in segments if seg['execute'] and seg['visible'] and seg['expected']]
+        e.guardian.atomic(directory/'result.json',{'records':[{'id':seg['id'],'text':['[1] 1\n']} for seg in eligible]})
+        return {'reason':'completed'}
+    monkeypatch.setattr(e.guardian,'run',lambda *a,**k:pytest.fail('excluded-only setup launched') if excluded_only else replay(*a,**k))
+    monkeypatch.setattr(e.shutil,'which',lambda name:'/fixture/Rscript')
+    report=e.audit(p,deadline=1)
+    c=report['counts']
+    assert report['state']==('not-applicable' if excluded_only else 'complete')
+    assert c['checked']==c['eligible']==int(not excluded_only) and c['excluded']==5
+    assert c['discovered']==sum(c[k] for k in ('checked','excluded','unverified','blocked'))
+    assert len(report['provenance']['exclusions'])==5

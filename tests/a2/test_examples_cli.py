@@ -94,3 +94,14 @@ def test_wrapper_lifetime_and_interruption():
         with pytest.raises(json.JSONDecodeError):json.loads(stdout)
     finally:
         if wrapper.poll() is None:wrapper.kill();wrapper.wait(timeout=2)
+
+
+@pytest.mark.parametrize('threshold,expected',[('none',0),('warn',1),('error',0)])
+def test_warn_only_and_complete_mismatch(tmp_path,threshold,expected):
+    p=fixture(tmp_path,'```r\nprint(0.19)\n#> [1] 0.80\n```')
+    report=docaudit.audit(p,run_examples=True)
+    stage=report['stages']['examples']
+    assert stage['state']=='complete' and stage['counts']['checked']==stage['counts']['mismatched']==1
+    assert [f['check'] for f in stage['findings']]==['examples-output']
+    assert all(f['severity']=='warn' for f in stage['findings'])
+    assert docaudit.exit_code(report,threshold)==expected
