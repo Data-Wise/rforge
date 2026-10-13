@@ -33,3 +33,5 @@ Session: `4654f07b-41c3-4ac4-a752-4f92dd80167b`; resume hint: `claude --resume 4
 Claude recommended a deep focused follow-up on ps failure, SIGINT at context exit, macOS zombie-group behavior and full fault-test bodies. No automatic resume, second review, budget expansion or fallback occurred.
 
 Next: validate these findings against revision-7 contracts and native fault injection before deciding fixes; obtain actual both-platform evidence before acceptance.
+
+Validation follow-up: [contract checks, native reproductions and repair disposition](REVIEW-docs-check-a2-final-ownership-validation-2026-10-12.md). The original findings and raw result above are preserved as historical review evidence.

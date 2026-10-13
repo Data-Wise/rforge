@@ -453,3 +453,97 @@ def test_interrupt_after_launch_tracks_and_reaps_child(tmp_path,monkeypatch,targ
         guardian.run([sys.executable,'-c',"from pathlib import Path;Path('unexpected-workload').touch()"],tmp_path,time.monotonic_ns()+3*guardian.NS,cwd=tmp_path)
     assert children and all(child.poll() is not None for child in children)
     assert not (tmp_path/'unexpected-workload').exists()
+
+
+
+def test_parent_absent_repeated_probe_failure_still_kills_and_reaps(tmp_path):
+    import signal
+    import subprocess
+    root=Path(guardian.__file__).resolve().parents[1]
+    code=f"""import subprocess,sys,time
+from lib import _docguardian as g
+original=subprocess.Popen
+def launch(command,*args,**kwargs):
+ if command[1:3]==['-m','lib._docguardian']:
+  replacement="from lib import _docguardian as g;import subprocess;g.live_group_members=lambda *a,**k:(_ for _ in ()).throw(subprocess.CalledProcessError(1,'ps'));g.supervise("+repr(command[3])+")"
+  command=[sys.executable,'-c',replacement]
+ return original(command,*args,**kwargs)
+subprocess.Popen=launch
+g.run([sys.executable,'-c',"from pathlib import Path;import time;Path('workload-live').touch();time.sleep(30)"],{str(tmp_path)!r},time.monotonic_ns()+2*g.NS,cwd={str(tmp_path)!r})
+"""
+    parent=subprocess.Popen([sys.executable,'-c',code],cwd=root)
+    armed={}
+    try:
+        until=time.monotonic()+3
+        while not (tmp_path/'workload-live').exists() and time.monotonic()<until:time.sleep(.02)
+        assert (tmp_path/'workload-live').exists()
+        armed=guardian.read(tmp_path/'armed.json')
+        parent.kill();parent.wait(timeout=2)
+        until=time.monotonic()+8
+        while not (tmp_path/'terminal.json').exists() and time.monotonic()<until:time.sleep(.02)
+        terminal=guardian.read(tmp_path/'terminal.json')
+        assert terminal['reason'] in ('guardian-failure','cleanup-unverified')
+        assert terminal['global_deadline_ns']==armed['global_deadline_ns']
+        assert terminal['direct_child_reaped'] and terminal['kill_sent']
+        until=time.monotonic()+2
+        while guardian.live_group_members(armed['group_pgid']) and time.monotonic()<until:time.sleep(.02)
+        assert not guardian.live_group_members(armed['group_pgid'])
+    finally:
+        if parent.poll() is None:parent.kill();parent.wait(timeout=2)
+        if armed and guardian.live_group_members(armed['group_pgid']):
+            try:os.killpg(armed['group_pgid'],signal.SIGKILL)
+            except ProcessLookupError:pass
+
+
+def test_pending_workload_sigint_retains_direct_child_handle(tmp_path,monkeypatch):
+    import signal
+    from lib._docgroup_pin import GroupPin
+    group=GroupPin(tmp_path,'interrupt-workload',time.monotonic_ns()+5*guardian.NS)
+    now=time.monotonic_ns();children=[]
+    guardian.atomic(tmp_path/'initial.json',{'run_id':group.run_id,'parent_pid':os.getppid(),'group_pgid':group.pgid,'deadline_ns':now+3*guardian.NS,'file_started_ns':now,'file_budget_ns':3*guardian.NS,'chunk_budget_ns':guardian.NS,'command':[sys.executable,'-c','import time;time.sleep(30)'],'cwd':str(tmp_path),'env':dict(os.environ)})
+    guardian.atomic(tmp_path/'startup-release.json',{'run_id':group.run_id})
+    original=os.posix_spawn
+    def interrupt(*args,**kwargs):
+        assert signal.SIGINT not in kwargs["setsigmask"]
+        pid=original(*args,**kwargs);children.append(pid)
+        os.kill(os.getpid(),signal.SIGINT)
+        return pid
+    monkeypatch.setattr(os,'posix_spawn',interrupt)
+    try:
+        result=guardian.supervise(tmp_path)
+        assert result['reason']=='guardian-failure' and result['direct_child_reaped']
+        with pytest.raises(ChildProcessError):os.waitpid(children[0],os.WNOHANG)
+    finally:
+        group.finish()
+        for pid in children:
+            try:os.waitpid(pid,0)
+            except ChildProcessError:pass
+
+
+def test_interrupt_after_pin_constructor_enters_cleanup(tmp_path):
+    from lib._docgroup_pin import GroupPin
+    pins=[]
+    def interrupt(frame,event,arg):
+        if frame.f_code is guardian.run.__code__ and event=='line':
+            pin=frame.f_locals.get('pin')
+            if isinstance(pin,GroupPin) and not pins:
+                pins.append(pin)
+                raise KeyboardInterrupt
+        return interrupt
+    previous=sys.gettrace()
+    try:
+        sys.settrace(interrupt)
+        with pytest.raises(KeyboardInterrupt):
+            guardian.run([sys.executable,'-c','pass'],tmp_path,time.monotonic_ns()+3*guardian.NS,cwd=tmp_path)
+    finally:
+        sys.settrace(previous)
+        for pin in pins:
+            leaked=not pin.closed
+            pin.finish()
+    assert pins and not leaked and pins[0].process.returncode is not None
+
+
+def test_nul_command_fails_before_bootstrap_without_success(tmp_path):
+    result=guardian.run(['invalid\x00command'],tmp_path,time.monotonic_ns()+3*guardian.NS,cwd=tmp_path)
+    assert result['reason']=='guardian-failure' and not result.get('child_pid')
+    assert result['pin_reaped'] and not (tmp_path/'launch-error.json').exists()

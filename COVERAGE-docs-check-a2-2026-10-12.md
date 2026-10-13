@@ -2,7 +2,7 @@
 
 Approved spec revision 7 remains unchanged. Mapping review is complete; release coverage is not complete.
 
-Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 403 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 7 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
+Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 407 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 7 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
 
 The immutable requirement ledger records exact source text/hash/anchor/ordinal plus inventory ownership. Test source hashes bind this review snapshot. Header, historical validation and approval paragraphs are contextual documentation obligations, not invented runtime tests. Actual external evidence is separate from portable validators.
 
@@ -100,3 +100,7 @@ Python 3.12 focused lifecycle/mapping checks: 65 passed. Python 3.15 repository
 gates: 47/47; strict docs build passed with Homebrew Cairo available.
 
 Final Python 3.15 full-suite result: 1302 passed / 4 existing skipped.
+
+## Final ownership review validation
+
+G08 adds four concrete nodes (407 total): repeated probe failure with the parent absent, pending SIGINT at workload handoff, interruption after pin construction, and NUL-command rejection before bootstrap. The first three failed on the reviewed candidate and are repaired. The fourth already returned guardian-failure. Source hashes refreshed; seven coverage groups remain pending, including independent repair review and both-platform execution. Spec revision 7 is unchanged.

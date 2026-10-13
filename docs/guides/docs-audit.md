@@ -167,3 +167,10 @@ and checks the original deadline before exec. This supports Python 3.10 and
 prevents project-local `lib` files from replacing the launcher. Workload and pin reaping are reported
 separately; a missing guardian terminal record remains incomplete even when
 emergency cleanup succeeds.
+
+Ownership assignment remains inside signal deferral through the caller’s handle
+assignment, including pin construction; children restore the original signal
+mask. A failed liveness probe cannot prevent the guardian from attempting KILL
+and independently reaping its unreaped direct child. Such failures remain
+incomplete, even when cleanup succeeds; destructive signals never follow the
+direct-child reap in the guardian’s exception path.

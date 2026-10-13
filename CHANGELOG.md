@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Repair A2 guardian cleanup after repeated liveness-probe failure with the parent absent; preserve direct-child handles through pending launch interruptions and close the pin-construction cleanup gap. Native regressions cover all three failures; release acceptance remains pending.
+
 - Add Python 3.15 to the general CI test matrix; retain the approved Python 3.12 pin for A2 acceptance evidence.
 
 - Keep generated dataclass reference defaults stable on Python 3.15 by comparing against the public `dataclasses.MISSING` sentinel, preserving compatibility with earlier Python versions.

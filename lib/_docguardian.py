@@ -88,9 +88,10 @@ def supervise(directory):
                 streams.append((directory / name).open("wb"))
             command = initial["command"]
             if pgid is not None:
-                from ._docgroup_pin import spawn_in_group
-                process = spawn_in_group(pgid, command, directory, run_id, phase_deadline,
-                                         initial["cwd"], initial["env"], *streams)
+                from ._docgroup_pin import spawn_in_group, defer_launch_signals
+                with defer_launch_signals() as previous:
+                    process = spawn_in_group(pgid, command, directory, run_id, phase_deadline,
+                                             initial["cwd"], initial["env"], *streams, signal_mask=previous)
             else:
                 process = subprocess.Popen(command, cwd=initial["cwd"], env=initial["env"],
                                            stdout=streams[0], stderr=streams[1], start_new_session=True)
@@ -180,12 +181,17 @@ def supervise(directory):
             except OSError:pass
         if process is not None and not status.get("direct_child_reaped"):
             try:
-                if workload_alive():
-                    os.killpg(pgid or process.pid,signal.SIGKILL)
+                # The direct child is still unreaped: its PID reserves identity.
+                # A failed probe must not disable cleanup when the parent is gone.
+                os.killpg(pgid or process.pid,signal.SIGKILL)
+                status["kill_sent"] = True
+            except OSError as cleanup_error:
+                status["cleanup_error"] = str(cleanup_error)
+            try:
                 process.wait(timeout=5)
                 status["direct_child_reaped"] = True
-            except (OSError,subprocess.SubprocessError):
-                pass
+            except (OSError,subprocess.SubprocessError) as cleanup_error:
+                status["cleanup_error"] = str(cleanup_error)
     finally:
         for stream in streams:
             stream.close()
@@ -228,17 +234,18 @@ def run(command, directory, deadline, *, cwd, env=None, file_budget=300, chunk_b
         terminal = dict(startup_status)
         atomic(directory/"marker.json",{"run_id":run_id,"state":"interrupted"})
         return terminal
-    from ._docgroup_pin import GroupPin
-    try:
-        pin = GroupPin(directory, run_id, startup_deadline)
-    except TimeoutError as exc:
-        terminal = dict(startup_status, reason="deadline" if time.monotonic_ns() >= startup_deadline else "guardian-failure", error=str(exc), pin_reaped=True)
-        atomic(directory/"marker.json",{"run_id":run_id,"state":"interrupted"})
-        return terminal
-    initial.update(group_pgid=pin.pgid, parent_pid=os.getpid())
+    from ._docgroup_pin import GroupPin, defer_launch_signals
+    pin = None; guardian = None; terminal = None
     sequence = 0; last_heartbeat = 0; phase_sequence = None
-    guardian = None; terminal = None
     try:
+        try:
+            with defer_launch_signals() as previous:
+                pin = GroupPin(directory, run_id, startup_deadline, signal_mask=previous)
+        except TimeoutError as exc:
+            terminal = dict(startup_status, reason="deadline" if time.monotonic_ns() >= startup_deadline else "guardian-failure", error=str(exc), pin_reaped=True)
+            atomic(directory/"marker.json",{"run_id":run_id,"state":"interrupted"})
+            return terminal
+        initial.update(group_pgid=pin.pgid, parent_pid=os.getpid())
         atomic(directory/"initial.json",initial)
         from ._docgroup_pin import defer_launch_signals
         with defer_launch_signals() as previous:
@@ -296,7 +303,7 @@ def run(command, directory, deadline, *, cwd, env=None, file_budget=300, chunk_b
             if guardian is not None and guardian.poll() is None:
                 # Do not release/reap while a guardian can still issue signals.
                 _UNREAPED_PINS.append(pin)
-            else:
+            elif pin is not None:
                 pin.finish()
     if terminal is not None:
         terminal.update(group_pgid=pin.pgid, pin_reaped=pin.process.returncode is not None)

@@ -68,13 +68,13 @@ class SpawnedProcess:
         os.kill(self.pid, signal.SIGKILL)
 
 
-def spawn_in_group(pgid, command, directory, run_id, deadline_ns, cwd, env, stdout, stderr):
+def spawn_in_group(pgid, command, directory, run_id, deadline_ns, cwd, env, stdout, stderr, *, signal_mask=None):
     # Kernel group assignment precedes every instruction in the isolated launcher.
     argv = [sys.executable, '-I', '-S', '-c', _LAUNCH, str(cwd), str(directory),
             run_id, str(deadline_ns), *command]
     with defer_launch_signals() as previous:
         process = SpawnedProcess(os.posix_spawn(sys.executable, argv, env, setpgroup=pgid,
-            setsigmask=previous, setsigdef=(signal.SIGPIPE,), file_actions=[
+            setsigmask=previous if signal_mask is None else signal_mask, setsigdef=(signal.SIGPIPE,), file_actions=[
                 (os.POSIX_SPAWN_DUP2, stdout.fileno(), 1),
                 (os.POSIX_SPAWN_DUP2, stderr.fileno(), 2)]))
     return process
@@ -83,7 +83,7 @@ def spawn_in_group(pgid, command, directory, run_id, deadline_ns, cwd, env, stdo
 class GroupPin:
     """Own a PGID through its unreaped direct child; never use checkpoint PIDs."""
 
-    def __init__(self, directory, run_id, deadline_ns):
+    def __init__(self, directory, run_id, deadline_ns, *, signal_mask=None):
         self.directory = Path(directory)
         self.run_id = run_id
         self.closed = False
@@ -96,7 +96,7 @@ class GroupPin:
             with defer_launch_signals() as previous:
                 self.process = subprocess.Popen(
                     [sys.executable, "-m", "lib._docgroup_pin", "pin", str(self.directory),
-                     run_id, str(os.getpid()), json.dumps(list(previous))], cwd=root, env=env,
+                     run_id, str(os.getpid()), json.dumps(list(previous if signal_mask is None else signal_mask))], cwd=root, env=env,
                     stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             while time.monotonic_ns() < ready_deadline:
                 ready = read(self.directory / "pin-ready.json")
