@@ -224,3 +224,100 @@ time.sleep(30)
     assert (tmp_path/'ordinary-child.pid').is_file()
     assert result['reason']=='deadline' and result['direct_child_reaped']
     assert result['group_disappeared'] and not guardian.live_group_members(result['child_pid'])
+
+
+@pytest.mark.parametrize('fault_sequence',[1,2])
+def test_wrong_sequence_ack_blocks_transition(tmp_path,monkeypatch,fault_sequence):
+    original=guardian.read
+    def stale_ack(path):
+        record=original(path)
+        if path.name=='arm-ack.json' and record and record.get('sequence')==fault_sequence:
+            return {**record,'sequence':record['sequence']+100}
+        return record
+    monkeypatch.setattr(guardian,'read',stale_ack)
+    code='''import json,time
+from pathlib import Path
+p=Path('.')
+r=json.loads((p/'initial.json').read_text())['run_id']
+for sequence in (1,2):
+ t=p/'request.tmp';t.write_text(json.dumps({'run_id':r,'sequence':sequence,'phase':'chunk','chunk':sequence}));t.replace(p/'phase-request.json')
+ while True:
+  try:ack=json.loads((p/'phase-release.json').read_text())
+  except (OSError,ValueError):ack={}
+  if ack.get('run_id')==r and ack.get('sequence')==sequence:break
+  time.sleep(.01)
+ (p/('executed-'+str(sequence))).write_text('executed')
+'''
+    result=guardian.run([sys.executable,'-c',code],tmp_path,time.monotonic_ns()+2*guardian.NS,cwd=tmp_path,chunk_budget=.35)
+    assert result['reason']=='deadline' and result['direct_child_reaped']
+    assert not (tmp_path/f'executed-{fault_sequence}').exists()
+    if fault_sequence==2:assert (tmp_path/'executed-1').exists()
+    request=original(tmp_path/'arm-request.json');ack=original(tmp_path/'arm-ack.json')
+    assert request['sequence']==ack['sequence']==fault_sequence
+    assert request['run_id']==ack['run_id']==result['run_id']
+
+
+def local_supervise(tmp_path,command,budget=1):
+    import uuid
+    now=time.monotonic_ns();run_id=uuid.uuid4().hex
+    guardian.atomic(tmp_path/'initial.json',{'run_id':run_id,'deadline_ns':now+int(budget*guardian.NS),'file_started_ns':now,'file_budget_ns':int(budget*guardian.NS),'chunk_budget_ns':guardian.NS,'command':command,'cwd':str(tmp_path),'env':dict(os.environ)})
+    guardian.atomic(tmp_path/'startup-release.json',{'run_id':run_id})
+    return guardian.supervise(tmp_path)
+
+
+def test_repeated_requests_record_before_single_term(tmp_path,monkeypatch):
+    import signal
+    original=guardian.os.killpg;signals=[]
+    def observed_signal(pid,number):
+        if number in (signal.SIGTERM,signal.SIGKILL):
+            record=guardian.read(tmp_path/'termination.json')
+            assert record and record['child_pid']==pid and record['termination_id']
+            signals.append((number,record['termination_id']))
+        return original(pid,number)
+    monkeypatch.setattr(guardian.os,'killpg',observed_signal)
+    code='''import json,time
+from pathlib import Path
+p=Path('.')
+r=json.loads((p/'initial.json').read_text())['run_id']
+for i in range(100):
+ t=p/'request.tmp';t.write_text(json.dumps({'run_id':r,'reason':'requested','request':i}));t.replace(p/'terminate.json');time.sleep(.001)
+time.sleep(30)
+'''
+    result=local_supervise(tmp_path,[sys.executable,'-c',code],budget=3)
+    assert result['reason']=='requested' and result['direct_child_reaped'] and result['group_disappeared']
+    assert signals==[(signal.SIGTERM,result['termination_id'])]
+
+
+@pytest.mark.parametrize('delay',[0,.15])
+def test_wall_clock_and_delayed_poll_do_not_reset_deadline(tmp_path,monkeypatch,delay):
+    original=guardian.time.sleep
+    monkeypatch.setattr(guardian.time,'time',lambda:(_ for _ in ()).throw(AssertionError('wall clock used')))
+    if delay:monkeypatch.setattr(guardian.time,'sleep',lambda seconds:original(max(seconds,delay)))
+    result=local_supervise(tmp_path,[sys.executable,'-c','import time;time.sleep(30)'],budget=.2)
+    assert result['reason']=='deadline' and result['direct_child_reaped']
+    assert result['effective_deadline_ns']==result['global_deadline_ns']
+    assert result['enforcement_delay_ns']>=0
+    if delay:assert result['enforcement_delay_ns']>0
+
+
+def test_heartbeat_cadence_and_sequence(tmp_path,monkeypatch):
+    original=guardian.atomic;beats=[]
+    def observed(path,record):
+        if path.name=='heartbeat.json':beats.append((time.monotonic_ns(),record.copy()))
+        return original(path,record)
+    monkeypatch.setattr(guardian,'atomic',observed)
+    result=guardian.run([sys.executable,'-c','import time;time.sleep(1.6)'],tmp_path,time.monotonic_ns()+4*guardian.NS,cwd=tmp_path)
+    assert result['reason']=='completed' and result['direct_child_reaped']
+    assert len(beats)>=3
+    assert [record['sequence'] for _,record in beats]==list(range(1,len(beats)+1))
+    assert all(record['run_id']==result['run_id'] for _,record in beats)
+    assert all(0<later-earlier<=guardian.NS for (earlier,_),(later,_) in zip(beats,beats[1:]))
+
+
+def test_simultaneous_heartbeat_and_deadline_expiry(tmp_path,monkeypatch):
+    ticks=iter([0]*5)
+    monkeypatch.setattr(guardian.time,'monotonic_ns',lambda:next(ticks,5*guardian.NS))
+    result=local_supervise(tmp_path,[sys.executable,'-c','import time;time.sleep(30)'],budget=5)
+    assert result['reason']=='deadline' and result['direct_child_reaped']
+    assert result['global_deadline_ns']==result['effective_deadline_ns']==5*guardian.NS
+    assert result['enforcement_delay_ns']==0

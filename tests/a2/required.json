@@ -447,7 +447,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "5a6c9f447121c52cc7d070143c0b0187756f934a6d0dc6d87754ff873cfd39f6"
+        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -458,15 +458,15 @@
       "nodes": [
         "tests/a2/test_guardian.py::test_phase_arm_ack_sequence",
         "tests/a2/test_guardian.py::test_stale_phase_request_does_not_execute",
-        "tests/a2/test_guardian.py::test_lost_phase_ack_never_releases_code"
+        "tests/a2/test_guardian.py::test_lost_phase_ack_never_releases_code",
+        "tests/a2/test_guardian.py::test_wrong_sequence_ack_blocks_transition[1]",
+        "tests/a2/test_guardian.py::test_wrong_sequence_ack_blocks_transition[2]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Lost ack now covered; stale ack with current run/wrong sequence and rapid transition fault ordering need distinct cases."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "5a6c9f447121c52cc7d070143c0b0187756f934a6d0dc6d87754ff873cfd39f6"
+        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -476,15 +476,15 @@
       "proposed_node": "tests/a2/test_guardian.py::test_heartbeat_age_and_stale_records",
       "nodes": [
         "tests/a2/test_guardian.py::test_heartbeat_age_and_stale_records[0.25-deadline]",
-        "tests/a2/test_guardian.py::test_heartbeat_age_and_stale_records[6-parent-loss]"
+        "tests/a2/test_guardian.py::test_heartbeat_age_and_stale_records[6-parent-loss]",
+        "tests/a2/test_guardian.py::test_heartbeat_cadence_and_sequence",
+        "tests/a2/test_guardian.py::test_simultaneous_heartbeat_and_deadline_expiry"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Both heartbeat/global orderings covered; simultaneous expiry and measured heartbeat update cadence missing."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "5a6c9f447121c52cc7d070143c0b0187756f934a6d0dc6d87754ff873cfd39f6"
+        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -493,15 +493,14 @@
       "task": "T08",
       "proposed_node": "tests/a2/test_guardian.py::test_single_termination_owner_idempotence",
       "nodes": [
-        "tests/a2/test_guardian.py::test_single_termination_owner_idempotence"
+        "tests/a2/test_guardian.py::test_single_termination_owner_idempotence",
+        "tests/a2/test_guardian.py::test_repeated_requests_record_before_single_term"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Termination record identity tested; repeated request idempotence and record-before-TERM ordering need instrumentation."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "5a6c9f447121c52cc7d070143c0b0187756f934a6d0dc6d87754ff873cfd39f6"
+        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -516,7 +515,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "5a6c9f447121c52cc7d070143c0b0187756f934a6d0dc6d87754ff873cfd39f6"
+        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -532,7 +531,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "5a6c9f447121c52cc7d070143c0b0187756f934a6d0dc6d87754ff873cfd39f6"
+        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -547,7 +546,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "5a6c9f447121c52cc7d070143c0b0187756f934a6d0dc6d87754ff873cfd39f6"
+        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -565,7 +564,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "5a6c9f447121c52cc7d070143c0b0187756f934a6d0dc6d87754ff873cfd39f6"
+        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -580,7 +579,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "5a6c9f447121c52cc7d070143c0b0187756f934a6d0dc6d87754ff873cfd39f6"
+        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -589,15 +588,15 @@
       "task": "T08",
       "proposed_node": "tests/a2/test_guardian.py::test_monotonic_clock_and_scheduler_delay",
       "nodes": [
-        "tests/a2/test_guardian.py::test_monotonic_clock_and_scheduler_delay"
+        "tests/a2/test_guardian.py::test_monotonic_clock_and_scheduler_delay",
+        "tests/a2/test_guardian.py::test_wall_clock_and_delayed_poll_do_not_reset_deadline[0]",
+        "tests/a2/test_guardian.py::test_wall_clock_and_delayed_poll_do_not_reset_deadline[0.15]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Shared monotonic metadata covered; wall-clock mutation and injected scheduling delay not exercised."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_guardian.py": "5a6c9f447121c52cc7d070143c0b0187756f934a6d0dc6d87754ff873cfd39f6"
+        "tests/a2/test_guardian.py": "f80f76d3cb56cc8f85e62e0bba2f072425647178422fb038841c7c168c83a673"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1616,8 +1615,8 @@
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 323,
-  "review_candidate": "d1556f5 plus pinned-build and sitemap acceptance additions",
+  "collected_nodes": 330,
+  "review_candidate": "d4cf8e2 plus guardian protocol acceptance additions",
   "platforms": [
     "ubuntu-24.04",
     "macos-14"

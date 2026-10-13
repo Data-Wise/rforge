@@ -2,41 +2,17 @@
 
 Approved spec revision 7 remains unchanged. Mapping review is complete; release coverage is not complete.
 
-Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 323 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 31 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
+Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 330 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 27 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
 
 The immutable requirement ledger records exact source text/hash/anchor/ordinal plus inventory ownership. Test source hashes bind this review snapshot. Header, historical validation and approval paragraphs are contextual documentation obligations, not invented runtime tests. Actual external evidence is separate from portable validators.
 
 ## Remaining coverage work
-
-### G02 / T07
-
-Mapped: `tests/a2/test_guardian.py::test_phase_arm_ack_sequence`, `tests/a2/test_guardian.py::test_stale_phase_request_does_not_execute`, `tests/a2/test_guardian.py::test_lost_phase_ack_never_releases_code`.
-
-- Lost ack now covered; stale ack with current run/wrong sequence and rapid transition fault ordering need distinct cases.
-
-### G03 / T07
-
-Mapped: `tests/a2/test_guardian.py::test_heartbeat_age_and_stale_records[0.25-deadline]`, `tests/a2/test_guardian.py::test_heartbeat_age_and_stale_records[6-parent-loss]`.
-
-- Both heartbeat/global orderings covered; simultaneous expiry and measured heartbeat update cadence missing.
-
-### G04 / T08
-
-Mapped: `tests/a2/test_guardian.py::test_single_termination_owner_idempotence`.
-
-- Termination record identity tested; repeated request idempotence and record-before-TERM ordering need instrumentation.
 
 ### G08 / T08
 
 Mapped: `tests/a2/test_guardian.py::test_guardian_failure_emergency_cleanup`, `tests/a2/test_guardian.py::test_no_exception_signal_after_direct_child_reap`.
 
 - Existing guardian failure occurs before child launch or after reap; live guardian death with a launched child and emergency ownership are not reproduced; PID reuse hypothesis unresolved.
-
-### G10 / T08
-
-Mapped: `tests/a2/test_guardian.py::test_monotonic_clock_and_scheduler_delay`.
-
-- Shared monotonic metadata covered; wall-clock mutation and injected scheduling delay not exercised.
 
 ### I01 / T09
 
@@ -200,12 +176,10 @@ Close the listed fixture/validator gaps and review their oracles before making r
 
 ## Closed coverage slices
 
-C02–C06: reporting misuse, stage retention, severity gates, visibility and package aggregation. S02/S03/S04/S07/S08: local source selection, configuration-reader failures, unsupported layouts, destination and development overrides.
+Previously closed: C02–C06 reporting; S02/S03/S04/S06/S07/S08/S09/S11 source selection, pinned routes and bounded sitemap behavior. The pinned build also fixed underscore directory exclusion; see CHANGELOG.
 
-S06: real pkgdown 2.2.1 build checks root/articles/nested Rmd output, underscore filename and tutorial exclusions, and records source hashes plus actual output routes. The fixture exposed and fixed an incorrect underscore-parent-directory exclusion; `_private/nested.Rmd` is rendered.
+G02: same-run wrong-sequence acknowledgments block both first execution and rapid second transition, preserving the earlier valid side effect. G03: actual heartbeat sequence/cadence observations and deterministic simultaneous heartbeat/global expiry with deadline precedence. G04: a repeated-request burst yields one TERM; instrumentation verifies the termination record exists with the child PID and termination ID before signaling. G10: wall-clock access is forbidden and delayed polls cannot reset the original monotonic deadline. Seven expanded cases added; targeted guardian suite: 23 passed.
 
-S09/S11: absent source URL permits the explicit base; canonical disagreement rejects before network; missing sitemap remains incomplete without missing-page findings; an actual slow HTTP peer reaches the fixed 10-second total deadline (9–13 second observation tolerance).
+These are local POSIX protocol observations. Live guardian-death emergency ownership, PID reuse and actual both-platform release evidence remain pending. All 330 collected nodes have exactly one owner; exact-spec ledger validation and pending manifest rejection passed.
 
-Targeted checks: 56 passed. All 323 collected A2 nodes have one owner; exact-spec ledger validation and pending release rejection passed. Strict MkDocs build passed; changed guide text was checked in the rendered HTML. No visual browser inspection or platform acceptance is claimed.
-
-Full repository validation: 1222 passed, 4 existing skips; test-all 47/47. Release acceptance remains pending.
+Full repository validation: 1229 passed, 4 existing skips; test-all 47/47. No runtime change or both-platform release acceptance is claimed.

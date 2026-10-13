@@ -1471,7 +1471,7 @@
         "G04"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -1551,7 +1551,7 @@
         "G10"
       ],
       "review": "complete",
-      "coverage_status": "gaps-pending",
+      "coverage_status": "mapped-local-tests",
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     },
     {
@@ -2257,5 +2257,5 @@
     }
   ],
   "coverage_status": "pending",
-  "review_candidate": "d1556f5 plus pinned-build and sitemap acceptance additions"
+  "review_candidate": "d4cf8e2 plus guardian protocol acceptance additions"
 }
