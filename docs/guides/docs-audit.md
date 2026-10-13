@@ -134,3 +134,7 @@ to observe output growth inside a running expression. Captured text is counted
 once from that spool; condition text is counted separately as it occurs. Native
 stdout and stderr remain separate. Polling permits overshoot and does not impose
 a memory or storage limit.
+
+Article exclusions follow the source filename: `_child.Rmd` is excluded, while
+`_private/nested.Rmd` maps to `articles/_private/nested.html`. Tutorial sources
+remain outside article scope. These rules are verified against pkgdown 2.2.1.

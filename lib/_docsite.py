@@ -163,7 +163,7 @@ def routes(paths, config):
             route = "reference/" + path.stem + ".html"
         elif file.startswith("vignettes/"):
             parts = list(path.parts[1:])
-            if any(part.startswith("_") for part in parts) or "tutorials" in parts:
+            if path.name.startswith("_") or "tutorials" in parts:
                 counts["excluded"] += 1; continue
             if path.suffix != ".Rmd":
                 if path.suffix in (".qmd", ".md", ".Rmarkdown"):

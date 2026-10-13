@@ -201,3 +201,23 @@ def test_destination_and_workflow_mode_integration(tmp_path,monkeypatch,case):
         r=site.audit(pkg,url='https://example.org/pkg/',ref='main')
         assert r['state']=='incomplete' and r['counts']['checked']==0 and not r['findings']
         assert any('PKGDOWN_DEV_MODE' in reason for reason in r['reasons'])
+
+
+@pytest.mark.parametrize('source_url',['absent','disagree'])
+def test_source_url_and_missing_sitemap(tmp_path,monkeypatch,source_url):
+    pkg,web=fixture(tmp_path)
+    if source_url=='disagree':
+        (pkg/'_pkgdown.yml').write_text('url: https://canonical.example/pkg/\n')
+        git(pkg,'add','.');git(pkg,'commit','-m','canonical URL')
+        monkeypatch.setattr(site,'sitemap',lambda *a:pytest.fail('source URL disagreement requested network'))
+    with server(web) as url:r=site.audit(pkg,url=url,ref='main')
+    assert r['state']=='incomplete' and r['counts']['checked']==0 and not r['findings']
+    assert any(('source url disagrees' if source_url=='disagree' else '404') in reason for reason in r['reasons'])
+
+
+def test_absent_source_url_allows_explicit_base(tmp_path):
+    pkg,web=fixture(tmp_path)
+    with server(web) as url:
+        (web/'pkg/sitemap.xml').write_text('<urlset>'+''.join(f'<url><loc>{url}{route}</loc></url>' for route in ('reference/internal.html','articles/pizza/slice.html'))+'</urlset>')
+        r=site.audit(pkg,url=url,ref='main')
+    assert r['state']=='complete' and r['counts']['checked']==2 and not r['findings']

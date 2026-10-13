@@ -68,3 +68,21 @@ def test_foreign_and_zero_inbase_entries():
     with server(Handler) as base:
         paths,foreign=site.sitemap(base)
     assert paths=={'reference/Case%2Froute.html','reference/case/route.html'} and foreign==1
+
+
+def test_slow_sitemap_total_deadline():
+    import time
+    class Handler(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200);self.end_headers()
+            try:
+                for _ in range(200):
+                    self.wfile.write(b' ');self.wfile.flush();time.sleep(.1)
+            except (BrokenPipeError,ConnectionResetError):pass
+        def log_message(self,*args):pass
+    assert site.TIMEOUT==10
+    with server(Handler) as base:
+        start=time.monotonic()
+        with pytest.raises((ValueError,TimeoutError),match='budget|timed out'):site.sitemap(base)
+        elapsed=time.monotonic()-start
+    assert 9<=elapsed<13

@@ -2,29 +2,11 @@
 
 Approved spec revision 7 remains unchanged. Mapping review is complete; release coverage is not complete.
 
-Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 319 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 34 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
+Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 323 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 31 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
 
 The immutable requirement ledger records exact source text/hash/anchor/ordinal plus inventory ownership. Test source hashes bind this review snapshot. Header, historical validation and approval paragraphs are contextual documentation obligations, not invented runtime tests. Actual external evidence is separate from portable validators.
 
 ## Remaining coverage work
-
-### S06 / T04
-
-Mapped: `tests/a2/test_site_routes.py::test_pinned_pkgdown_article_routes`.
-
-- Pinned build proves three supported paths; exclusions are tested statically, not in that build; recorded build provenance is limited to asserted version.
-
-### S09 / T05
-
-Mapped: `tests/a2/test_site_http.py::test_base_url_validation_normalization[https://EXAMPLE.org:443/pkg-https://example.org/pkg/]`, `tests/a2/test_site_http.py::test_base_url_validation_normalization[http://example.org:80/pkg/-http://example.org/pkg/]`, `tests/a2/test_site_http.py::test_base_url_validation_normalization[https://example.org/Pkg%2fslice/-https://example.org/Pkg%2Fslice/]`, `tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[file:///etc/passwd]`, `tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[https://user:pass@example.org/]`, `tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[https://example.org/?q=1]`, `tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[https://example.org/#x]`.
-
-- Canonical source-url disagreement and absent-url success are not explicitly paired in tests.
-
-### S11 / T05
-
-Mapped: `tests/a2/test_site_http.py::test_sitemap_shape_and_bounds`, `tests/a2/test_site_integration.py::test_invalid_sitemap_never_missing_pages[<sitemapindex/>]`, `tests/a2/test_site_integration.py::test_invalid_sitemap_never_missing_pages[not xml]`, `tests/a2/test_site_integration.py::test_invalid_sitemap_never_missing_pages[<urlset><url><loc>https://foreign.org/other.html</loc></url></urlset>]`.
-
-- Slow response 10-second bound and missing sitemap with absent source URL need direct cases; invalid/index/oversize are covered.
 
 ### G02 / T07
 
@@ -218,10 +200,12 @@ Close the listed fixture/validator gaps and review their oracles before making r
 
 ## Closed coverage slices
 
-C02–C06: misuse before execution, all stage states retaining a planted static finding, complete severity gates, CLI diagnostic visibility and mixed package aggregation (33 added cases).
+C02–C06: reporting misuse, stage retention, severity gates, visibility and package aggregation. S02/S03/S04/S07/S08: local source selection, configuration-reader failures, unsupported layouts, destination and development overrides.
 
-S02/S03/S04/S07/S08: remote-tracking priority with distinct local/remote commits for inferred and fallback refs; alternate checkout, reusable/multiple workflows, unavailable ref/git before network; selected immutable config without YAML reader; Quarto/custom extension/overlay scopes preserving checked routes; local destination without URL suffix; workflow development override before comparison (13 added cases).
+S06: real pkgdown 2.2.1 build checks root/articles/nested Rmd output, underscore filename and tutorial exclusions, and records source hashes plus actual output routes. The fixture exposed and fixed an incorrect underscore-parent-directory exclusion; `_private/nested.Rmd` is rendered.
 
-Targeted source/route integration: 44 passed. All 319 collected A2 nodes have exactly one owner. The unchanged-spec ledger validates and the pending manifest is rejected. Native/platform/release acceptance remains pending.
+S09/S11: absent source URL permits the explicit base; canonical disagreement rejects before network; missing sitemap remains incomplete without missing-page findings; an actual slow HTTP peer reaches the fixed 10-second total deadline (9–13 second observation tolerance).
 
-Full repository validation: 1218 passed, 4 existing skips; test-all 47/47. Release manifest remains pending.
+Targeted checks: 56 passed. All 323 collected A2 nodes have one owner; exact-spec ledger validation and pending release rejection passed. Strict MkDocs build passed; changed guide text was checked in the rendered HTML. No visual browser inspection or platform acceptance is claimed.
+
+Full repository validation: 1222 passed, 4 existing skips; test-all 47/47. Release acceptance remains pending.

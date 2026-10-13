@@ -163,7 +163,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e",
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9",
         "tests/a2/test_site_refs.py": "5a3346a29fadb6da059475918f285f1e87683a6547d06b2d0a947a362ecf24ac"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
@@ -219,7 +219,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e",
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9",
         "tests/a2/test_site_refs.py": "5a3346a29fadb6da059475918f285f1e87683a6547d06b2d0a947a362ecf24ac"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
@@ -235,7 +235,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_routes.py": "0cf1455c14dc5b5638981d321abb90e3c299fb48f5074a0fe3d67be0a7ca657a"
+        "tests/a2/test_site_routes.py": "49fc012db734446278d082c1129eafa2055a46c58255f7af859f1ae3689c8153"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -246,13 +246,11 @@
       "nodes": [
         "tests/a2/test_site_routes.py::test_pinned_pkgdown_article_routes"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Pinned build proves three supported paths; exclusions are tested statically, not in that build; recorded build provenance is limited to asserted version."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_routes.py": "0cf1455c14dc5b5638981d321abb90e3c299fb48f5074a0fe3d67be0a7ca657a"
+        "tests/a2/test_site_routes.py": "49fc012db734446278d082c1129eafa2055a46c58255f7af859f1ae3689c8153"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -272,7 +270,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e"
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -296,8 +294,8 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e",
-        "tests/a2/test_site_routes.py": "0cf1455c14dc5b5638981d321abb90e3c299fb48f5074a0fe3d67be0a7ca657a"
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9",
+        "tests/a2/test_site_routes.py": "49fc012db734446278d082c1129eafa2055a46c58255f7af859f1ae3689c8153"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -312,16 +310,15 @@
         "tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[file:///etc/passwd]",
         "tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[https://user:pass@example.org/]",
         "tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[https://example.org/?q=1]",
-        "tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[https://example.org/#x]"
+        "tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[https://example.org/#x]",
+        "tests/a2/test_site_integration.py::test_absent_source_url_allows_explicit_base"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Canonical source-url disagreement and absent-url success are not explicitly paired in tests."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_http.py": "47d2d73113631010dad905561dd4d6a72363a59ebf39b8173c9de6aa21aa5295",
-        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e"
+        "tests/a2/test_site_http.py": "59c8b4826bb8f0e0cf0124d5a60f42c7f36a50108d5df011507f9e43fb204597",
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -341,7 +338,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_http.py": "47d2d73113631010dad905561dd4d6a72363a59ebf39b8173c9de6aa21aa5295"
+        "tests/a2/test_site_http.py": "59c8b4826bb8f0e0cf0124d5a60f42c7f36a50108d5df011507f9e43fb204597"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -351,18 +348,19 @@
       "proposed_node": "tests/a2/test_site_http.py::test_sitemap_shape_and_bounds",
       "nodes": [
         "tests/a2/test_site_http.py::test_sitemap_shape_and_bounds",
+        "tests/a2/test_site_http.py::test_slow_sitemap_total_deadline",
         "tests/a2/test_site_integration.py::test_invalid_sitemap_never_missing_pages[<sitemapindex/>]",
         "tests/a2/test_site_integration.py::test_invalid_sitemap_never_missing_pages[not xml]",
-        "tests/a2/test_site_integration.py::test_invalid_sitemap_never_missing_pages[<urlset><url><loc>https://foreign.org/other.html</loc></url></urlset>]"
+        "tests/a2/test_site_integration.py::test_invalid_sitemap_never_missing_pages[<urlset><url><loc>https://foreign.org/other.html</loc></url></urlset>]",
+        "tests/a2/test_site_integration.py::test_source_url_and_missing_sitemap[absent]",
+        "tests/a2/test_site_integration.py::test_source_url_and_missing_sitemap[disagree]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Slow response 10-second bound and missing sitemap with absent source URL need direct cases; invalid/index/oversize are covered."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_http.py": "47d2d73113631010dad905561dd4d6a72363a59ebf39b8173c9de6aa21aa5295",
-        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e"
+        "tests/a2/test_site_http.py": "59c8b4826bb8f0e0cf0124d5a60f42c7f36a50108d5df011507f9e43fb204597",
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -377,7 +375,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_http.py": "47d2d73113631010dad905561dd4d6a72363a59ebf39b8173c9de6aa21aa5295"
+        "tests/a2/test_site_http.py": "59c8b4826bb8f0e0cf0124d5a60f42c7f36a50108d5df011507f9e43fb204597"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -392,7 +390,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e"
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -418,7 +416,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e"
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -433,7 +431,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "6656733ccdb29ecf42d03fe9cd6f66d6aa521d62e97dba16b68b5ee28654fb6e"
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1618,8 +1616,8 @@
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 319,
-  "review_candidate": "f6d457b plus site acceptance additions",
+  "collected_nodes": 323,
+  "review_candidate": "d1556f5 plus pinned-build and sitemap acceptance additions",
   "platforms": [
     "ubuntu-24.04",
     "macos-14"
