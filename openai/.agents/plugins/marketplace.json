@@ -1,0 +1,20 @@
+{
+  "name": "rforge-openai-local",
+  "interface": {
+    "displayName": "Rforge for Codex (Personal)"
+  },
+  "plugins": [
+    {
+      "name": "rforge-openai",
+      "source": {
+        "source": "local",
+        "path": "./rforge-openai"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

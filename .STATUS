@@ -1,3 +1,13 @@
+# Codex personal checks pilot — 2026-10-22
+# Prepared two skills and a local catalog on codex/rforge-check-skills.
+# Reuses lib.rcmd and lib.docaudit; no new engines or Claude hook imports.
+# Checks: 47/47 repository gates; pytest 899 passed, 4 skipped; strict MkDocs
+# and rendered-guide inspection passed. Both skills validate; new Markdown lints.
+# Reference generation passes with Python 3.12 (3.15 changes signatures).
+# Next: approve local catalog registration/installation, restart, and invoke
+# both skills on a selected package. Native Codex runtime remains unverified.
+# No push, PR, release, installation, or runtime acceptance claimed.
+
 project: rforge
 updated: 2026-10-11
 status: Active

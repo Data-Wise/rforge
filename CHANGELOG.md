@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Personal Codex adapter with `rforge-check` and `rforge-docs-check` skills,
+  reusing the local Rforge engines. Includes a local catalog and setup guide;
+  installation and runtime acceptance remain separate.
+
 ---
 
 ## [2.21.0] - 2026-10-11
