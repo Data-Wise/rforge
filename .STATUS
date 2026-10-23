@@ -1,7 +1,16 @@
 # Codex durable verification checkpoint — 2026-10-22
 # PR #92 merged to dev fe8c8ef; adapter 0.1.1 uses durable rforge/openai catalog.
-# Fresh-session discovery and isolated medfit checks passed; missing/older engine
-# fresh-session cases and static variadic signatures remain unverified.
+# Fresh-session discovery and isolated medfit checks passed. Both skills rejected
+# missing and v2.21.0 engines in two fresh read-only sessions (synthetic package).
+# No fallback engine, R check, unguarded audit or passing result; spec has evidence.
+# Fresh sessions: engine/package paths with spaces verified, docs 0 findings/1 of 1;
+# as-cran completed 0 errors/0 warnings/1 new-submission NOTE, exit 0, not incomplete.
+# Both skills rejected the fixture restricted to Python 3.9 without engine/R execution.
+# Remaining: variadic limits; unexplained restricted-session incoming termination;
+# missing-interpreter and invalid-package fresh sessions not separately exercised.
+# Paths/Python update: 920 tests passed/4 skipped; 47/47 gates; version/reference
+# checks, strict MkDocs build and changed-line Markdown lint passed.
+# Docs-only verification; no main promotion, release or writing-format expansion.
 # Medfit rlang import #296 and 404 repair #297 integrated to dev; #298 merged
 # to main 100cca7b; deployment/live verification remains separate.
 # Codex docs audited: homepage, installation, quickstart, refcard, adapter README,

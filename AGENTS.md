@@ -13,8 +13,12 @@ through PR #92 (`fe8c8ef`). The durable engine/catalog checkout is
 retired pilot worktrees are not prerequisites. Report the actual engine ref.
 Both skills were discovered in a fresh session and exercised on isolated medfit.
 Static API checks do not establish example, pkgdown or live-site correctness;
-those require separate web-write/build/browser evidence. Missing/older-engine
-fresh-session handling and variadic-signature coverage remain explicit gaps.
+those require separate web-write/build/browser evidence. Fresh-session
+missing/older-engine rejection was verified with installed 0.1.1 on a synthetic
+package and the v2.21.0 engine. Fresh sessions also verified space-containing
+engine/package paths and rejection when restricted to Python 3.9. Static
+variadic-signature limits and an unexplained restricted-session check termination
+remain; see the spec for evidence and unexercised edge cases.
 Do not expand this adapter into website generation or a full Claude command port.
 
 ## Current state (2026-10-11)

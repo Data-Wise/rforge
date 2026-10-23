@@ -8,7 +8,8 @@ more workflows may follow. Do not create a second GitHub repository.
 
 Current checkpoint: integrated to dev via PR #92 (`fe8c8ef`); installed 0.1.1
 uses the durable Rforge checkout/catalog. Fresh-session medfit discovery and
-real checks passed. Missing/older-engine fresh-session behavior remains open.
+real checks passed. Fresh sessions verified missing/older-engine rejection,
+space-containing engine/package paths and controlled Python 3.9 rejection.
 
 The skills, catalog, installation, and spec already exist. This plan records
 remaining work; it does not present completed implementation as future work.
@@ -57,6 +58,10 @@ and durable registration passed; see the spec for the remaining boundary.
 
 ## Open input
 
-Remaining input: an explicit fresh-session missing/older-engine case. Existing
-medfit evidence and durable registration supersede the original planning gaps.
+Missing/older-engine rejection is verified in two fresh read-only sessions; see
+the spec negative-preflight and paths/Python records. Paths and controlled
+Python-version rejection are verified. Static variadic limits and an unexplained
+restricted-session check termination remain; missing-interpreter and invalid
+package fresh-session cases were not separately exercised. Existing medfit
+evidence and durable registration supersede the original planning gaps.
 No new service, hook layer, distribution framework, or full command port.
