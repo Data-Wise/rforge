@@ -1,6 +1,9 @@
 # Codex personal checks pilot — 2026-10-22
 # Prepared two skills and a local catalog on codex/rforge-check-skills.
 # Spec: SPEC-codex-check-skills-2026-10-22.md (initial slice, not full parity).
+# Plan/tasks/grill: matching *-codex-check-skills-2026-10-22.md root files.
+# Fresh review found docs-scope and new-export-ref gaps; reconciliation
+# awaits the offered cross-model choice. Same-repo decision is confirmed.
 # Reuses lib.rcmd and lib.docaudit; no new engines or Claude hook imports.
 # Checks: 47/47 repository gates; pytest 899 passed, 4 skipped; strict MkDocs
 # and rendered-guide inspection passed. Both skills validate; new Markdown lints.
