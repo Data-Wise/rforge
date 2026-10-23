@@ -97,6 +97,7 @@ nav:
   - Get Started:
     - 📦 Installation: installation.md
     - 🚀 Quick Start: quickstart.md
+    - Codex plugin and checks: guides/codex-checks.md
   - Learn:
     - 📊 Visual Workflows: workflows/index.md
     - "🧰 Package Development Guide": package-development-guide.md
