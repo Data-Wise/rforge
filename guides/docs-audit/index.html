@@ -527,7 +527,35 @@
   <span class="md-ellipsis">
     
   
-    Codex plugin and checks
+    Codex personal checks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evidence-and-approval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Check evidence and approvals
   
 
     
@@ -2922,7 +2950,11 @@ Code in an unlabeled fence downgrades <code>error</code> to <code>warn</code> (i
 <h2 id="scope">Scope<a class="headerlink" href="#scope" title="Permanent link">&para;</a></h2>
 <p>Without an argument it audits the package you are in (walking up to the nearest <code>DESCRIPTION</code>). Outside a package it
 sweeps the ecosystem only if a <code>.rforge.yaml</code> manifest exists or you pass <code>--eco</code>; otherwise it says so and exits 0.
-A <code>kind: hybrid</code> root audits the root package and its nested packages.</p>
+A <code>kind: hybrid</code> root audits the root package and its nested packages.
+The Python CLI option <code>--package-only</code> disables both hybrid and manifest
+expansion: only the nearest package at an existing path is audited. It does
+not discover packages by name and cannot be combined with <code>--eco</code>. The Codex
+single-package workflow uses this option by default.</p>
 <h2 id="suppressing-a-finding">Suppressing a finding<a class="headerlink" href="#suppressing-a-finding" title="Permanent link">&para;</a></h2>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># .rforge.yaml (package root)</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">docs</span><span class="p">:</span>

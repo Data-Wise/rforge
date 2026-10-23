@@ -445,10 +445,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#codex-personal-plugin" class="md-nav__link">
+  <a href="#codex-personal-pilot" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Codex personal plugin
+        Codex personal pilot
       
     </span>
   </a>
@@ -721,7 +721,35 @@
   <span class="md-ellipsis">
     
   
-    Codex plugin and checks
+    Codex personal checks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guides/evidence-and-approval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Check evidence and approvals
   
 
     
@@ -2822,10 +2850,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#codex-personal-plugin" class="md-nav__link">
+  <a href="#codex-personal-pilot" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Codex personal plugin
+        Codex personal pilot
       
     </span>
   </a>
@@ -3010,15 +3038,10 @@
 </ul>
 </div>
 <p>Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python <code>lib/</code> modules handle discovery, dependencies, status, and init. <strong>No MCP server, no Node.js</strong> at runtime. The fast ecosystem commands (analysis, deps, status) are pure Python; the <code>r:*</code> dev-cycle commands and <code>/rforge:thorough</code> shell out to R via <code>lib/rcmd.py</code>.</p>
-<h2 id="codex-personal-plugin">Codex personal plugin<a class="headerlink" href="#codex-personal-plugin" title="Permanent link">&para;</a></h2>
-<p>The native <code>rforge-openai</code> adapter 0.1.1 provides two skills:
-<code>$rforge-check</code> for package validation and <code>$rforge-docs-check</code> for static
-README/vignette API audits. Both reuse the Rforge engines and have been verified
-in fresh sessions on isolated medfit copies. The adapter is integrated on <code>dev</code>
-(<a href="https://github.com/Data-Wise/rforge/pull/92">PR #92</a>); it is not a published
-adapter release or a port of the Claude command catalog and hooks.</p>
-<p>Start with the <a href="guides/codex-checks/">Codex installation and checks guide</a>. Claude
-marketplace and Homebrew installation below do not install these Codex skills.</p>
+<h2 id="codex-personal-pilot">Codex personal pilot<a class="headerlink" href="#codex-personal-pilot" title="Permanent link">&para;</a></h2>
+<p>Two focused skills for package checks and documentation audits are prepared in
+<code>openai/rforge-openai</code>. See the <a href="guides/codex-checks/">Codex checks guide</a>.
+Installation and runtime verification remain separate.</p>
 <h2 id="where-rforge-fits">Where rforge fits<a class="headerlink" href="#where-rforge-fits" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>flowchart LR
     A["usethis&lt;br/&gt;scaffold"] --&gt; B["devtools&lt;br/&gt;document · test · build"]
