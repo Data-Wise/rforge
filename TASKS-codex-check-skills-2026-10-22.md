@@ -66,6 +66,16 @@ PR #92 is merged to dev at `fe8c8ef`; durable registration points to
 `rforge/openai`, and the installed adapter is 0.1.1. Fresh-session discovery and
 isolated medfit docs/package checks passed. The import repair is integrated to
 medfit dev (#296); website repair is integrated there (#297), with scoped main
-promotion #298 awaiting its final CI checks. Paths-with-spaces and fresh-session
+promotion #298 merged to main as `100cca7b`; live deployment is a separate gate. Paths-with-spaces and fresh-session
 missing/older-engine acceptance are not promoted to verified by these results.
 The earlier unchecked runtime group remains partial for those cases.
+
+## Documentation audit closure
+
+Audited the README, site homepage, installation, Quick Start, reference card,
+Codex guide/navigation and adapter README against the two skill contracts and
+catalog. Replaced retired-worktree instructions, corrected prepared-only status,
+and added setup/discovery and baseline examples. Kept Claude slash commands and
+Codex skills distinct. Mirrored CLAUDE.md/AGENTS.md checkpoint bodies match.
+Validation: 920 Python tests passed, 4 skipped; 47/47 gates and strict site build
+passed. Website publication is tracked separately from this dev checkpoint.

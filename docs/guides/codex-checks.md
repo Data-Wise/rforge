@@ -77,9 +77,10 @@ and skips are recorded separately from package-check status.
 
 The import fix is integrated into medfit dev (#296). A separate pkgdown audit
 found the generated 404 page's invalid `/medfit/NA` MathJax script source; its
-repair is integrated into medfit dev (#297). Main promotion/deployment is tracked
-in [medfit PR #298](https://github.com/Data-Wise/medfit/pull/298), not inferred
-from a successful local build.
+repair is integrated into medfit dev (#297). The scoped main promotion
+[medfit PR #298](https://github.com/Data-Wise/medfit/pull/298) merged as
+`100cca7b` after review and CI. Live deployment is verified separately from
+a successful local build.
 
 Use [web-write](https://data-wise.github.io/codex-config/guides/web-write/) for
 explicitly requested documentation/site audits and repairs. Its isolated pkgdown
