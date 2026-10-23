@@ -98,6 +98,7 @@ nav:
     - 📦 Installation: installation.md
     - 🚀 Quick Start: quickstart.md
     - Codex personal checks: guides/codex-checks.md
+    - Check evidence and approvals: guides/evidence-and-approval.md
   - Learn:
     - 📊 Visual Workflows: workflows/index.md
     - "🧰 Package Development Guide": package-development-guide.md
