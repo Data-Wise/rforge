@@ -1,5 +1,8 @@
 # Rforge checks in Codex
 
+See [Check evidence and approval decisions](evidence-and-approval.md) to separate
+technical check outcomes, unresolved evidence and owner authorization.
+
 !!! tip "Personal pilot"
     Two focused skills reuse the local Rforge checkout. The full Claude command
     catalog and its hooks are not imported.
