@@ -2,7 +2,7 @@
 
 Spec revision 8 applies the user-authorized 2026-10-23 Python policy amendment; all other obligations remain. Mapping review is complete; release coverage is not complete.
 
-Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 427 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 7 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
+Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 435 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 6 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
 
 The immutable requirement ledger records exact source text/hash/anchor/ordinal plus inventory ownership. Test source hashes bind this review snapshot. Header, historical validation and approval paragraphs are contextual documentation obligations, not invented runtime tests. Actual external evidence is separate from portable validators.
 
@@ -22,9 +22,7 @@ Mapped: `tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/guides/d
 
 ### D05 / T19
 
-Mapped: `tests/a2/test_docs.py::test_version_and_agent_mirror`.
-
-- Version and mirror gates covered; status/count accuracy and boundary prohibitions need explicit assertions.
+Closed locally: version/mirror gate plus `test_status_guidance_count_sync` and seven `test_agent_boundary_prohibitions` cases. Actual runner check count, active command count excluding rename stubs, unchanged feature version, current pending-group count and release hold are asserted. Both-platform acceptance remains pending.
 
 ### H01 / T22
 
@@ -123,3 +121,7 @@ passed. These local results do not supply either required platform artifact.
 ## 2026-10-23 checkpoint
 
 Focused review of 7eb8a40 reported no material finding; 126 native-process regressions passed on Python 3.12.15. See REVIEW-docs-check-a2-7eb8a40-2026-10-23.md for coverage limits. G08/F02 remain open for broader final review and actual platform evidence. Python policy is now latest stable, with exact interpreter recorded; eight runtime evidence regressions bring the uniquely mapped inventory to 427. No group was closed by this policy change. Historical revision-7 hashes and Python 3.12 observations below remain historical records.
+
+## D05 local coverage — 2026-10-23
+
+Added eight expanded nodes: current status/count/version/release-hold assertion and seven agent prohibition cases. Focused docs/agent tests pass 35/35 on Python 3.15.0; full suite 1334 passed/4 existing skipped, repository gates 47/47 and strict MkDocs passed. Inventory now owns 435 unique nodes; D05 has no remaining local coverage gap. Six groups remain pending: G08, D04, H01, H02, F01, F02. The spec, latest-stable policy and external acceptance requirements are unchanged. Earlier seven-group/427-node entries are historical.

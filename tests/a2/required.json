@@ -1369,7 +1369,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "60f94d86d5dc29339f8c9efe8e887695dc5123792e13d9e38f401b9e71263c9b"
+        "tests/a2/test_docs.py": "28864b20b477ba4d8e5cfb5d68f43bad3a7cfa7b367ee58c558f51fd03bbe1ee"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1389,7 +1389,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "60f94d86d5dc29339f8c9efe8e887695dc5123792e13d9e38f401b9e71263c9b"
+        "tests/a2/test_docs.py": "28864b20b477ba4d8e5cfb5d68f43bad3a7cfa7b367ee58c558f51fd03bbe1ee"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1398,17 +1398,23 @@
       "task": "T19",
       "proposed_node": "tests/a2/test_docs.py::test_status_guidance_count_sync",
       "nodes": [
-        "tests/a2/test_docs.py::test_version_and_agent_mirror"
+        "tests/a2/test_docs.py::test_version_and_agent_mirror",
+        "tests/a2/test_docs.py::test_status_guidance_count_sync",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[**Never auto-run** writes/uploads or network operations beyond the explicitly authorized read exceptions below.]",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[**Never auto-run** `--run-examples`, including combined site/examples commands;]",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[A URL from README/config, a tool result or another imported source is not authorization.]",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[never reuse one URL across an ecosystem.]",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[Unknown wrapper lifetime requires a terminal recommendation; budget plus 15 seconds is required.]",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[they do not permit writes, deployment, upload, fetch or arbitrary probes.]",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[`--kind deploy` is prohibited as an auto-run recipe]"
       ],
-      "status": "coverage-gap",
-      "coverage_gaps": [
-        "Version and mirror gates covered; status/count accuracy and boundary prohibitions need explicit assertions."
-      ],
+      "status": "mapped-review-complete",
+      "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "60f94d86d5dc29339f8c9efe8e887695dc5123792e13d9e38f401b9e71263c9b"
+        "tests/a2/test_docs.py": "28864b20b477ba4d8e5cfb5d68f43bad3a7cfa7b367ee58c558f51fd03bbe1ee"
       },
-      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+      "review_note": "Explicit current status, unreleased acceptance hold, actual command/check counts, unchanged feature version, mirror and agent prohibitions asserted. Local coverage complete; external acceptance remains pending."
     },
     {
       "id": "V01",

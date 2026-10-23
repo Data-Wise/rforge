@@ -1,7 +1,7 @@
 project: rforge
 updated: 2026-10-23
 status: Active
-in_progress: A2 implementation on codex/docs-check-a2; mapping review complete; 7 coverage groups and both-platform release evidence pending. v2.21.0 release history:
+in_progress: A2 implementation on codex/docs-check-a2; mapping review complete; 6 coverage groups and both-platform release evidence pending. v2.21.0 release history:
   (1) #84 fix MERGED to dev 2026-10-11 as PR #85 (squash 99b4171; CI 5/5 green). #84 stays
   open until release (a feature→dev merge does not auto-close it). Follow-up PR #86 MERGED (squash f7036b4): a Codex
   adversarial review found #85 stopped /rforge:finish adding `version:` to a .STATUS that lacks one; fixed via
@@ -11,7 +11,7 @@ in_progress: A2 implementation on codex/docs-check-a2; mapping review complete; 
   (TRIAGE-docaudit-signature-gate-2026-10-11.md) in archive/specs/; guide docs/guides/docs-audit.md. Seven Codex rounds under
   the stop rule; unrecognized R binding forms are documented known limitations. test-all 47/47, 44 commands.
   A2 (--site, --run-examples) is a separate later plan.
-next: Close D05 status/count and boundary assertions, then H02/F01 evidence validation; complete seven coverage groups and actual Ubuntu 24.04/macOS 14 acceptance on latest stable Python. Focused Claude review of 7eb8a40 found no material issue; 126 native-process regressions passed. No push/release.
+next: Strengthen H02/F01 evidence validation; complete six coverage groups and actual Ubuntu 24.04/macOS 14 acceptance on latest stable Python. Focused Claude review of 7eb8a40 found no material issue; 126 native-process regressions passed. No push/release.
 version: 2.21.0 (released, on main 7387a05; dev fast-forwarded to main)
 last_release: 2026-10-11 v2.21.0 (minor, 44 commands, no surface change — PR #91 dev→main merge 7387a05; tag v2.21.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.21.0. Ships /rforge:docs:check content audit (lib.docaudit, A1), tests/harness, #84 fix (#85/#86), docs gap-fill (#89/#90). Gates: test-all 47/47, pytest 899+4 skipped, CI green on main (RForge CI + Deploy Documentation). Tap Data-Wise/homebrew-tap#244 squash 09bc9c3 — formula+manifest → v2.21.0 sha256 f376d0da…, stale revision dropped, generate.py --diff IDENTICAL; brew audit by path unavailable. Aggregator claude-plugins#74 auto-merged. Pending: user runs `brew upgrade rforge`.)
 last_release_prior_v2_20_1: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
@@ -643,3 +643,5 @@ python_ci: General CI matrix now includes 3.11, 3.12, 3.13 and 3.15; A2 platform
 a2_review_20261023: Focused Claude review e3646895-1416-4234-b475-e516ed31ef1f of 7eb8a40 found no material finding; three implementation files examined, tests/docs skipped by reviewer; Codex validated existing coverage with 126 focused native-process passes on Python 3.12.15. Seven groups and final platform evidence remain pending. User then authorized unpinning Python; revision 8 selects latest stable Python 3 (currently 3.15.0), recording exact interpreter; other acceptance requirements and R/dependency locks retained.
 
 a2_python_latest_validation: Python 3.15.0 full suite 1326 passed/4 existing skipped; repository gates 47/47; strict MkDocs build and rendered contributor policy verified with Homebrew Cairo library path. 427 unique collected A2 nodes, 118 obligations and 87 groups reconciled; manifest and seven groups remain pending. No push, workflow dispatch or release.
+
+a2_acceptance_state: Python 3.15.0 full suite 1334 passed/4 existing skipped, repository gates 47/47 and strict MkDocs passed; 435 unique mapped nodes. Local implementation in progress; 6 coverage groups pending; both-platform evidence pending; latest stable Python 3; no push, tag, deployment or release.

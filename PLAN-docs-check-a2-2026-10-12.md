@@ -28,7 +28,7 @@ CI's latest stable Python 3 selector, excludes prereleases and records the exact
 interpreter. Current stable Python is 3.15.0, already installed locally. R and
 fixture dependency locks, required platforms, no-skip release gates and all
 non-Python requirements remain unchanged. The ledger retains all 118 obligations
-and 87 groups; 427 expanded tests are uniquely mapped. Seven groups remain open.
+and 87 groups; 435 expanded tests are uniquely mapped. Six groups remain open.
 
 ### Remaining work, in order
 
@@ -36,13 +36,13 @@ and 87 groups; 427 expanded tests are uniquely mapped. Seven groups remain open.
 |---|---|
 | G08 / Codex | Preserve the focused repair-review evidence; complete broad ownership review and actual Ubuntu/macOS process tests. |
 | D04 / Codex | Finish REFCARD/card coverage and inspect all changed rendered guides/tutorials. |
-| D05 / Codex | Add explicit status/count and agent-boundary prohibition assertions. |
+| D05 / Codex | Closed locally: explicit status/count, release hold and seven agent-boundary prohibition assertions. |
 | H01 / Codex | Record historical defect recall counts and source/sitemap provenance; keep unavailable history pending. |
 | H02 / Codex | Strengthen all-six-count/reason/source-hash triage validation and refresh findings on medfit, probmed and medrobust. |
 | F01 / Codex | Bind aggregate full-gate observations to actual logs, named checks and candidate sources. |
 | F02 / Codex | Complete final review/mapping and verify both retrieved platform artifacts plus actual observation producers. |
 
-Next implementation slice: close D05's explicit assertions, then strengthen H02
+Next implementation slice: strengthen H02
 and F01 validators and review their oracles. Do not mark the required manifest
 ready until all coverage gaps are closed. After a stable candidate exists, the
 release owner must authorize remote execution/publication separately; obtain
@@ -265,8 +265,8 @@ Acceptance contracts: D04.
 Dependencies: 15,16,17,18. Scope: M. Likely files: CHANGELOG.md; .STATUS; CLAUDE.md; AGENTS.md; docs/contributing.md (if check count changes).
 Acceptance contracts: D05.
 
-- [ ] Implement D05 after feature evidence exists; mark gates/pending accurately, mirror owning guidance and check counts only if changed. No release/version/tag/deployment actions.
-- [ ] Verification: Run mirror/version-count gates and inspect status/changelog against actual tests and unfinished release obligations.
+- [x] D05 local coverage: explicit pending status, active command/runner counts, unchanged version, mirror and agent boundary assertions. Release/platform evidence remains pending; no release/version/tag/deployment actions.
+- [x] Verification: Mirror/version-count gates and status/changelog assertions pass; remaining release obligations stay explicit.
 
 ### T20: Make the required-test verifier non-vacuous
 

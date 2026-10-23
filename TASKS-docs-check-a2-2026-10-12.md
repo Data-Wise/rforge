@@ -41,8 +41,8 @@ requires its plan acceptance and verification, not merely writing its proposed t
 
 Implementation is in progress in `codex/docs-check-a2`. The optional engines,
 guardian, acceptance tests, runtime lock, release verifier and CI workflow exist.
-Contract mapping review is complete: 118 spec entries, 87 groups and 427 expanded nodes.
-7 groups retain explicit coverage gaps; see [coverage audit](COVERAGE-docs-check-a2-2026-10-12.md).
+Contract mapping review is complete: 118 spec entries, 87 groups and 435 expanded nodes.
+6 groups retain explicit coverage gaps; see [coverage audit](COVERAGE-docs-check-a2-2026-10-12.md).
 Actual Ubuntu/macOS release artifacts remain pending.
 Unchecked tasks have not yet satisfied their complete plan acceptance.
 External PR/merge/release/deployment actions are separate.
@@ -51,7 +51,7 @@ External PR/merge/release/deployment actions are separate.
 
 - [x] Run focused Claude adversarial review of 7eb8a40 and validate follow-up concerns: no confirmed issue; 126 focused native-process tests passed.
 - [x] Replace A2 Python 3.12 pin with latest-stable selection and exact runtime provenance; update spec/ledger without removing requirements.
-- [ ] Close G08, D04, D05, H01, H02, F01 and F02; see the plan for ordered actions and owners.
+- [ ] Close G08, D04, H01, H02, F01 and F02 (D05 local coverage complete); see the plan for ordered actions and owners.
 - [ ] Obtain actual Ubuntu/macOS acceptance artifacts and final observations after separate authorization for external actions.
 
 Existing unchecked tasks remain unchecked because their full acceptance criteria have not been demonstrated.
