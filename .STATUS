@@ -9,7 +9,8 @@
 # Remaining: variadic limits; unexplained restricted-session incoming termination;
 # missing-interpreter and invalid-package fresh sessions not separately exercised.
 # Paths/Python update: 920 tests passed/4 skipped; 47/47 gates; version/reference
-# checks, strict MkDocs build and changed-line Markdown lint passed. Local only.
+# checks, strict MkDocs build and changed-line Markdown lint passed.
+# Docs-only verification; no main promotion, release or writing-format expansion.
 # Medfit rlang import #296 and 404 repair #297 integrated to dev; #298 merged
 # to main 100cca7b; deployment/live verification remains separate.
 # Codex docs audited: homepage, installation, quickstart, refcard, adapter README,
