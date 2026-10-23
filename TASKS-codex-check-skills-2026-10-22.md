@@ -33,8 +33,9 @@ Dependencies: task 2 and a restarted Codex session. Scope: acceptance evidence.
 Repairs and isolated real engine fixtures pass; installation is not fresh-
 session acceptance.
 
-- [ ] Both skills discover and invoke on a selected R package, including paths
+- [x] Both skills discover and invoke on a selected R package, including paths
       containing spaces; recorded behavior satisfies the spec checklist.
+- [x] Both skills reject Python 3.9 as the sole permitted fixture interpreter.
 - [ ] Docs coverage/incomplete results and real package-check logs are honest;
       invalid package and unavailable engine cases do not produce success.
 
@@ -56,9 +57,9 @@ work.
 
 Latest-release verification: both installed skill contracts followed on isolated
 v0.12.0; see spec/grill. Fresh-session discovery was verified earlier. Remaining
-acceptance: paths containing spaces and Python-only unavailability; package
-warning and static variadic limits are explicit. Integration was subsequently
-authorized and completed; see the checkpoint.
+acceptance is updated in the paths/Python spec record; static variadic limits
+remain explicit. Integration was subsequently authorized and completed; see
+the checkpoint.
 
 
 ## Reconciled checkpoint — 2026-10-22
@@ -69,9 +70,10 @@ isolated medfit docs/package checks passed. The import repair is integrated to
 medfit dev (#296); website repair is integrated there (#297), with scoped main
 promotion #298 merged to main as `100cca7b`; live deployment is a separate gate.
 Fresh-session missing/older-engine rejection is now verified; see the spec
-negative-preflight record. Paths-with-spaces and Python-only unavailability
-remain unverified.
-The earlier unchecked runtime group remains partial for those cases.
+negative-preflight record. Paths with spaces and controlled Python 3.9 rejection
+are now verified in fresh sessions. The remaining unchecked group includes
+invalid-package fresh-session handling; missing-interpreter behavior was not
+separately exercised. Restricted-session termination remains unexplained.
 
 ## Documentation audit closure
 

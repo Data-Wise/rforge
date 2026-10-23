@@ -3,8 +3,12 @@
 # Fresh-session discovery and isolated medfit checks passed. Both skills rejected
 # missing and v2.21.0 engines in two fresh read-only sessions (synthetic package).
 # No fallback engine, R check, unguarded audit or passing result; spec has evidence.
-# Remaining: paths with spaces, Python-only unavailability, static variadic limits.
-# Negative-preflight update: 920 tests passed/4 skipped; 47/47 gates; version/reference
+# Fresh sessions: engine/package paths with spaces verified, docs 0 findings/1 of 1;
+# as-cran completed 0 errors/0 warnings/1 new-submission NOTE, exit 0, not incomplete.
+# Both skills rejected the fixture restricted to Python 3.9 without engine/R execution.
+# Remaining: variadic limits; unexplained restricted-session incoming termination;
+# missing-interpreter and invalid-package fresh sessions not separately exercised.
+# Paths/Python update: 920 tests passed/4 skipped; 47/47 gates; version/reference
 # checks, strict MkDocs build and changed-line Markdown lint passed. Local only.
 # Medfit rlang import #296 and 404 repair #297 integrated to dev; #298 merged
 # to main 100cca7b; deployment/live verification remains separate.

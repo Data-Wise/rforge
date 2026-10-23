@@ -94,9 +94,18 @@ without the required interfaces. Neither ran a package check or unguarded docs
 audit, substituted another engine, or reported passing results. This used a
 synthetic package; it does not add package-check coverage.
 
-Still unverified: paths containing spaces, Python-only unavailability, unchecked
-variadic signatures, full external-resource/accessibility coverage, and
-standalone Quarto.
+Fresh sessions also verified engine/package paths containing spaces: static
+audit completed with zero findings and 1/1 exports checked; the default
+`--as-cran` check completed with zero errors/warnings and one new-submission
+NOTE. Both skills rejected Python 3.9 when it was the fixture's sole permitted
+interpreter; this does not claim supported Python is absent from the host.
+
+Remaining: unchecked variadic signatures; an unexplained check termination
+during CRAN incoming checks in the earlier network-restricted session; and
+separately unexercised missing-interpreter/invalid-package fresh-session cases.
+The successful network-enabled rerun does not prove the earlier failure's cause.
+Full external-resource/accessibility coverage and standalone Quarto also remain
+unverified.
 Article, tutorial, cookbook and refcard generation remain deferred.
 
 ## Common requests

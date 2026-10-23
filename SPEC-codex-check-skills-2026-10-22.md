@@ -67,12 +67,14 @@ Additional approved CLI review found one contract ambiguity and two small
 implementation issues; their dispositions and repairs are recorded in the grill.
 Tarball behavior is preserved and remains outside this pilot's acceptance.
 
-## Remaining runtime acceptance
+## Runtime acceptance
 
 - [x] Fresh session loads both skills; R execution verified by authorized rerun.
 - [x] Verified medfit checkout, honoring holds; see version limitation below.
 - [x] Confirm missing/older engine is reported unavailable in fresh sessions;
       see the negative-preflight record below.
+- [x] Both skills invoke with engine and package paths containing spaces.
+- [x] Both reject Python 3.9 as the fixture's sole permitted interpreter.
 
 The original worktree-retention requirement is superseded by the durable
 registration checkpoint below. Earlier execution records remain historical.
@@ -197,3 +199,48 @@ older `01a1673a-4b47-7361-aca3-54a64288721a`.
 This closes missing/older-engine acceptance only; paths containing spaces and
 Python-only unavailability remain unverified. Static variadic-signature limits
 remain. Writing formats remain deferred.
+
+## Paths and Python fresh-session verification — 2026-10-22
+
+Installed adapter 0.1.1; engine lib archive from `d0dce50` (same engine code as
+`fe8c8ef`). Synthetic package `spacefixture` 0.0.1 has one documented export.
+Both engine and package paths contain spaces under
+`/private/tmp/rforge-runtime-edge-cases/`.
+
+- Paths: fresh workspace-write session, Python 3.12.15, temporary-file and CRAN
+  network access. Default `--as-cran` completed: JSON, `incomplete: false`,
+  inner exit status 0, zero errors/warnings, one new-submission NOTE. Envelope
+  status is `warn`, not a warning-free claim. Retained `00check.log` ends DONE
+  and `Status: 1 NOTE`. Docs audit confirmed exact package scope, audited true,
+  incomplete false, zero findings, 1/1 exports checked. New-export coverage was
+  not requested; no comparison ref was invented.
+- Earlier network-restricted fresh session: docs passed, but the package check
+  stopped at CRAN incoming feasibility with inner exit 1 and incomplete true.
+  The skill correctly reported failure. The successful rerun does not establish
+  the cause of that earlier termination; it remains unexplained.
+- Python-only gate: independent read-only session used the current compatible
+  engine with `/usr/bin/python3` (3.9.6) as the fixture's sole permitted
+  interpreter. Both skills reported unavailable and ran neither engine nor R.
+  This is a controlled interpreter restriction, not proof that supported Python
+  is absent from the host. A missing executable was not separately exercised.
+
+Actual command transcripts and structured results were inspected. Hashes of all
+27 original package/engine source files matched afterward; generated files,
+interpreter caches and hook state are outside that source-preservation claim.
+Startup skill-context warnings occurred, but both installed skill files were
+explicitly read. No skill/engine code, installation or global configuration changed.
+
+Local temporary evidence: `/private/tmp/rforge-runtime-edge-cases/` contains
+`spaces-`, `python-` and `spaces-network-` prompts, JSONL transcripts and reports,
+plus `rforge-check-result.json`, `rforge-docs-check-result.json` and original
+source hashes. These paths are temporary, not a durable evidence archive.
+Sessions: initial paths `01a1673f-df57-7071-8817-bfc3dd488824`;
+Python `01a1673f-eae3-78e0-a483-de2105cd0d07`;
+paths rerun `01a16740-eecd-72b1-91ec-ef053f2f49ee`.
+R log: `/var/folders/xn/dn01tdjd78q6mxfmq6c4_jqc0000gn/T/rforge-check-14af27731ae4f/spacefixture.Rcheck/00check.log`.
+
+This supersedes the earlier open paths/Python-version acceptance notes. Remaining:
+static variadic-signature limits, unexplained restricted-session termination,
+and separately unexercised missing-interpreter/invalid-package fresh-session
+cases. This does not establish arbitrary path-character or Python-version
+coverage. Website/example/URL checks remain separate; writing formats deferred.
