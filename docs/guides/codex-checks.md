@@ -34,6 +34,13 @@ It does not execute examples or build a site.
 
 ## Setup and first use
 
+1. Use a durable checkout of `dev` containing PR #92. Review the two skills.
+2. In Codex's local marketplace controls, register the checkout's `openai`
+   directory (the catalog file is `openai/.agents/plugins/marketplace.json`).
+3. Install and enable `rforge-openai`, then start a fresh Codex session.
+4. Confirm `$rforge-check` and `$rforge-docs-check` are discoverable. Run the
+   static audit first, then explicitly request the package check.
+
 The source package is `openai/rforge-openai`; the personal catalog is
 `openai/.agents/plugins/marketplace.json`. Review the two skill instructions,
 register the local catalog in Codex, install `rforge-openai`, and restart.
@@ -83,3 +90,19 @@ skills; it does not expand their contract or introduce a new Rforge command.
 Still unverified: fresh-session missing/older-engine handling, unchecked variadic
 signatures, full external-resource/accessibility coverage, and standalone Quarto.
 Article, tutorial, cookbook and refcard generation remain deferred.
+
+## Common requests
+
+```text
+$rforge-docs-check Audit /absolute/path/to/package and explain unchecked exports.
+$rforge-docs-check Check new-export documentation in /absolute/path/to/package since v0.11.1.
+$rforge-check Check /absolute/path/to/package and summarize errors, warnings and NOTEs.
+```
+
+Replace the sample path and comparison ref with the requested package and its
+actual baseline. New-export coverage requires an established ref; a general
+static audit may proceed without it and must report coverage as not run.
+For a requested strict check, the skill runs both labeled dependency flavors;
+incoming adds its own bundle. It does not automatically install dependencies,
+change source, submit packages or deploy sites. Missing dependencies or malformed
+results are unavailable/incomplete, never passing results.
