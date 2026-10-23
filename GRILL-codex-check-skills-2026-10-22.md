@@ -199,3 +199,18 @@ Strict/incoming flavors were verified on synthetic fixtures, not this release.
 No URL/site/reverse-dependency or platform certification is implied.
 Integration and durable catalog/engine relocation remain pending. Retain the
 isolated checkout and logs for inspection. No source fixes or external actions.
+
+## Isolated medfit import repair verification (2026-10-22)
+
+Branch codex/fix-rlang-import at /private/tmp/medfit-rforge-rlang-fix, based on
+v0.12.0. Declared existing rlang runtime use in DESCRIPTION Imports and recorded
+it in NEWS. No R function, NAMESPACE, release tag, or original checkout changed.
+Default Rforge --as-cran rerun: structured JSON, incomplete false, inner exit 0,
+zero check errors/warnings/NOTEs. Retained log ended * DONE / Status: OK.
+Test runner separately reports FAIL 0, WARN 1, SKIP 98, PASS 5993; this is not
+an assertion that every test executed warning-free. Evidence:
+/private/tmp/medfit-rlang-fixed-check.json and
+/var/folders/xn/dn01tdjd78q6mxfmq6c4_jqc0000gn/T/rforge-check-a78b1b0771e8/medfit.Rcheck/00check.log.
+
+The undeclared import gap is resolved locally, not in the published release.
+Other previously recorded audit/runtime limits remain. No push or merge.

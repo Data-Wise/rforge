@@ -1,3 +1,5 @@
+# Local medfit rlang import repair rerun: Rforge as-cran 0/0/0; log complete.
+# Test runner separately 5993 pass, 98 skip, 1 warning. Fix not integrated.
 # Codex personal checks pilot — 2026-10-22
 # Six gaps repaired in shared engines and adapter 0.1.1; same-repo scope retained.
 # Spec/plan/tasks/grill: matching *-codex-check-skills-2026-10-22.md root files.
