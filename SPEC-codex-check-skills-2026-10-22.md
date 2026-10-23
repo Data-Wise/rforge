@@ -18,7 +18,8 @@ or imported Claude hooks. Savant is a separate follow-up.
   Report every pass, errors/warnings/classified NOTEs, and retained real logs.
 - Check evidence includes structured-output provenance, completeness, and R's
   inner check exit statuses. Missing/malformed evidence or an unsuccessful
-  subprocess cannot pass. Incoming requires exactly two integer statuses.
+  subprocess cannot pass; outer failure also marks the result incomplete.
+  Incoming requires exactly two integer statuses.
 - `rforge-docs-check`: default `--package-only` prevents hybrid/manifest
   expansion. Ecosystem scope requires an explicit request. New-export coverage
   requires an established `--since REF`; otherwise state coverage was omitted.
@@ -59,6 +60,12 @@ these repairs; select this pilot checkout explicitly until integration.
 
 These are direct engine/fixture observations following the skill contracts,
 not proof that a fresh Codex session loads and follows cached 0.1.1 instructions.
+
+Log availability is reported separately from check completion. Verify every
+reported file before citing it; absent logs mean unavailable log evidence.
+Additional approved CLI review found one contract ambiguity and two small
+implementation issues; their dispositions and repairs are recorded in the grill.
+Tarball behavior is preserved and remains outside this pilot's acceptance.
 
 ## Remaining runtime acceptance
 

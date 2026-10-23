@@ -71,9 +71,8 @@ existing engines and flavor selectors; do not add a wrapper or new service.
 This proposes a narrow exception to the original unchanged-engine constraint:
 existing-engine safety/evidence repairs, not a replacement engine. The user
 authorized and implementation completed this narrow exception.
-A fresh repair review was completed. No additional external CLI run was made;
-the optional offer received no selection and the recommended local review/test
-path proceeded.
+A fresh repair review and local tests completed first. The delayed user
+selection then authorized the additional CLI second opinion recorded below.
 
 ## Repair dispositions and verification
 
@@ -106,3 +105,36 @@ remain
 unverified. The unused standalone scaffold remains inactive and unregistered.
 Retain the worktree-backed catalog until integration and durable registration.
 No push, PR, merge, release, or website deployment occurred.
+
+## Additional approved CLI review (2026-10-22)
+
+The user selected the delayed optional second opinion and confirmed the exact
+command. Codex CLI 0.163.0 used the configured gpt-5.6-sol model, ephemeral
+session, and read-only sandbox. Its prompt contained only the adversarial review
+instructions, contract, committed engine/test diff, spec, and two skills.
+Outer-sandbox initialization failed; the same approved command ran with that
+outer restriction lifted, retaining the reviewer's read-only sandbox.
+Local connector warnings occurred, but the CLI completed its source inspection
+and mocked-output probes. This was not another real R package run.
+
+Three findings were reconciled against the actual artifact:
+
+1. **Missing logs accepted as complete — contract misread.** The review prompt
+   overstated mandatory log availability. The installed skill explicitly says
+   to verify reported paths and report an empty/missing log as unavailable.
+   Check completion and log availability are separate: no file may be invented
+   or described as retained without inspection. Preserve this small design;
+   do not introduce filesystem log validation into every mocked engine result.
+   The earlier five real completed logs remain direct retention evidence.
+2. **Outer process failure with incomplete false — valid/actionable, repaired.**
+   The probe reproduced valid arrays and inner status zero with outer exit 1:
+   status error but incomplete false. Include the outer code in incomplete and
+   strengthen the regression assertion. This was already a failure result;
+   the repair makes its completeness signal consistent.
+3. **Unintended tarball-check change — valid/actionable, repaired.** Restrict
+   the new nonzero/inner-status rule to kind check. Preserve the preexisting
+   tarball timeout rule and other tarball behavior; tarball hardening is outside
+   this pilot and has not been certified here.
+
+Reconciliation uses local regression tests, not a claim that the CLI reviewed
+its own subsequent repairs. No further external review invocation is implied.

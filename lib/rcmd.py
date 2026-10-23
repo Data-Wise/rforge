@@ -197,9 +197,8 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
     if raw.get("engine_missing"):
         return "error"
     if kind in ("check", "tarball-check"):
-        if exit_code != 0:
-            return "error"
-        if any(status != 0 for status in _as_list(raw.get("check_status"))):
+        if exit_code == 124 or (kind == "check" and (
+                exit_code != 0 or any(status != 0 for status in _as_list(raw.get("check_status"))))):
             return "error"
         if raw.get("errors"):
             return "error"
@@ -714,7 +713,7 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
     env = normalize(kind, raw, code, pkg)
     if kind == "check":
         env.update(output_format=output_format,
-                   incomplete=not check_complete or any(
+                   incomplete=code != 0 or not check_complete or any(
                        status != 0 for status in env["check"]["exit_status"]))
         if not check_complete:
             env["status"] = "error"

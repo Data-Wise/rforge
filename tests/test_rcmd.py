@@ -226,7 +226,8 @@ def test_check_console_counts_are_not_structured_success(tmp_path, monkeypatch):
 def test_check_nonzero_exit_cannot_pass(tmp_path, monkeypatch):
     _write_desc(tmp_path)
     monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"errors":[],"warnings":[],"notes":[],"check_status":0}', 1))
-    assert rcmd.run("check", str(tmp_path))["status"] == "error"
+    env = rcmd.run("check", str(tmp_path))
+    assert env["status"] == "error" and env["incomplete"]
 
 
 def test_check_keeps_log_paths_and_structured_evidence(tmp_path, monkeypatch):
