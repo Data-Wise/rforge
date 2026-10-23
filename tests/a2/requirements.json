@@ -1,5 +1,5 @@
 {
-  "spec_sha256": "b202409f690b478fcb3fe6473afb4021930a1e271e8ae2a90ec0370bebe65b51",
+  "spec_sha256": "898ff1e77e68efeaf493942df228fea30a5eb4fd93202e06d785fdf0f33a6898",
   "review": "complete",
   "requirements": [
     {
@@ -19,14 +19,14 @@
       "id": "docscheck-a2--live-site-and-readme-example-audit:2",
       "anchor": "docscheck-a2--live-site-and-readme-example-audit",
       "ordinal": 2,
-      "text": "Date: 2026-10-12. Revision: 7 (consolidated final proposal).\nStatus: revision 7 approved by the user on 2026-10-12; implementation not authorized.\nTarget: next minor release (provisionally 2.22.0); 44 commands remain.",
-      "sha256": "d5d349dd9344341c12b54c69e989fdfc4202741d1df4eff0dc2f9a27f4f35533",
+      "text": "Date: 2026-10-12. Revision: 8 (Python policy amendment, 2026-10-23).\nStatus: revision 7 approved and implementation authorized on 2026-10-12; user authorized removing the Python 3.12 pin on 2026-10-23. All other acceptance requirements remain unchanged.\nTarget: next minor release (provisionally 2.22.0); 44 commands remain.",
+      "sha256": "803b54aafe442a70de5b7a7607c386992d1831a2f03e790b09cc3e1f27040f57",
       "inventory_ids": [
         "D05"
       ],
       "review": "complete",
       "coverage_status": "gaps-pending",
-      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+      "review_note": "User-authorized 2026-10-23 Python policy amendment; same inventory owners and all non-Python obligations retained."
     },
     {
       "id": "objective-and-recommendation:1",
@@ -1803,8 +1803,8 @@
       "id": "required-evidence:4",
       "anchor": "required-evidence",
       "ordinal": 4,
-      "text": "Required release-manifest entries must all pass on both declared POSIX release\nplatforms: Ubuntu 24.04 and macOS 14, with Python 3.12. The fixture lock records\nexact R/pkgload/evaluate/knitr/pkgdown versions, resolved before implementation\nacceptance; no unpinned `latest` run establishes this compatibility contract.\nOther POSIX platforms are unverified until equivalent evidence exists.\nWindows must either pass its own process-tree acceptance suite\nor report example execution unavailable; it must not silently inherit POSIX\ncleanup claims. A skipped Windows suite cannot substitute for required POSIX\nevidence. Source/render pairing remains explicitly deferred: successful source\nreplay alone cannot certify published README output.",
-      "sha256": "41e9925e0e1965a8f3becb0ba5875f41575c3fda077508cf9f42146213697a8b",
+      "text": "Required release-manifest entries must all pass on both declared POSIX release\nplatforms: Ubuntu 24.04 and macOS 14, using the latest stable Python 3 selected\nby CI (3.x, check-latest enabled, prereleases disabled). Each artifact records\nthe exact interpreter used; Python must be a final 3.10-or-newer release. The\nfixture lock retains exact R/pkgload/evaluate/knitr/pkgdown versions, resolved\nbefore implementation acceptance; unpinned R/dependency runs cannot establish\nthis compatibility contract.\nOther POSIX platforms are unverified until equivalent evidence exists.\nWindows must either pass its own process-tree acceptance suite\nor report example execution unavailable; it must not silently inherit POSIX\ncleanup claims. A skipped Windows suite cannot substitute for required POSIX\nevidence. Source/render pairing remains explicitly deferred: successful source\nreplay alone cannot certify published README output.",
+      "sha256": "5c253344890ebb025ec687f2187530f934ca1a2176f3b29682be48f6d3434063",
       "inventory_ids": [
         "V01",
         "V02",
@@ -1820,7 +1820,7 @@
       ],
       "review": "complete",
       "coverage_status": "gaps-pending",
-      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+      "review_note": "User-authorized 2026-10-23 Python policy amendment; same inventory owners and all non-Python obligations retained."
     },
     {
       "id": "release-verifier-ownership-and-evidence:1",
@@ -1846,8 +1846,8 @@
       "id": "release-verifier-ownership-and-evidence:2",
       "anchor": "release-verifier-ownership-and-evidence",
       "ordinal": 2,
-      "text": "Implementation must add a dedicated `a2-release` job in `.github/workflows/ci.yml`\non Ubuntu 24.04 and macOS 14/Python 3.12. It provisions locked R/fixture dependencies,\nruns the committed manifest and invokes a proposed\n`scripts/verify_a2_release.py` against machine-readable pytest results. These\npaths/job names are planned artifacts, not files created by this revision.\nThe feature implementer owns provisioning, manifest-to-contract mapping and\nverifier tests; the release owner checks both platform results before release.",
-      "sha256": "c40410a1702a55f31a8aec9dd4a098dbafe6036cf167724bcb4e31cfedeb0721",
+      "text": "Implementation must add a dedicated `a2-release` job in `.github/workflows/ci.yml`\non Ubuntu 24.04 and macOS 14/latest stable Python 3. It provisions locked R/fixture dependencies,\nruns the committed manifest and invokes a proposed\n`scripts/verify_a2_release.py` against machine-readable pytest results. These\npaths/job names are planned artifacts, not files created by this revision.\nThe feature implementer owns provisioning, manifest-to-contract mapping and\nverifier tests; the release owner checks both platform results before release.",
+      "sha256": "90ce83fb1834de1773d80ed32bc44cd9322e46d276fd263c1b0d6c8f8e118877",
       "inventory_ids": [
         "V01",
         "V02",
@@ -1860,7 +1860,7 @@
       ],
       "review": "complete",
       "coverage_status": "gaps-pending",
-      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+      "review_note": "User-authorized 2026-10-23 Python policy amendment; same inventory owners and all non-Python obligations retained."
     },
     {
       "id": "release-verifier-ownership-and-evidence:3",

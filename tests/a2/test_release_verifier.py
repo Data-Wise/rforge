@@ -38,6 +38,16 @@ def test_manifest_mapping_and_collection():
     with pytest.raises(v.VerificationError):v.validate_run(m,e,candidate_sha="sha",lock_hash="lock",manifest_hash="manifest")
 
 
+@pytest.mark.parametrize('python,accepted', [('3.15.0',True),('3.16.1',True),('3.12.15',True),('3.9.9',False),('3.16.0rc1',False),('3.16.0a1',False),('latest',False),(None,False)])
+def test_stable_python_evidence(python,accepted):
+    m,e=records();e['python']=python
+    if accepted:
+        assert v.validate_run(m,e,candidate_sha='sha',lock_hash='lock',manifest_hash='manifest')['verified']
+    else:
+        with pytest.raises(v.VerificationError,match='Stable Python'):
+            v.validate_run(m,e,candidate_sha='sha',lock_hash='lock',manifest_hash='manifest')
+
+
 def test_removed_normative_paragraph_or_table_row_rejected():
     source='## Contract\n\nMust supervise.\n\n| Case | Obligation |\n|---|---|\n| Native | Must terminate |\n'
     obligations=v.spec_obligations(source)

@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Repair A2 guardian cleanup after repeated liveness-probe failure with the parent absent; preserve direct-child handles through pending launch interruptions and close the pin-construction cleanup gap. Native regressions cover all three failures; release acceptance remains pending.
 
-- Add Python 3.15 to the general CI test matrix; retain the approved Python 3.12 pin for A2 acceptance evidence.
+- Add Python 3.15 to the general CI test matrix. Per the 2026-10-23 Python policy amendment, A2 platform and aggregate jobs select latest stable Python 3 and record the exact interpreter; reject prerelease/unsupported runtime evidence. R/dependency locks and both-platform acceptance remain required.
 
 - Keep generated dataclass reference defaults stable on Python 3.15 by comparing against the public `dataclasses.MISSING` sentinel, preserving compatibility with earlier Python versions.
 

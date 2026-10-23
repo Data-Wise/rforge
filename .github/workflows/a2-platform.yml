@@ -16,7 +16,9 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          python-version: '3.12'
+          python-version: '3.x'
+          check-latest: true
+          allow-prereleases: false
       - name: Read exact R lock
         id: lock
         run: python -c 'import json,os; f=open(os.environ["GITHUB_OUTPUT"],"a"); print("R="+json.load(open("tests/a2/fixture-lock.json"))["R"],file=f)'

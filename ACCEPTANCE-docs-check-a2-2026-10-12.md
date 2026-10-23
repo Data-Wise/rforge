@@ -1,13 +1,13 @@
-# Acceptance-test inventory — docs:check A2 revision 7
+# Acceptance-test inventory — docs:check A2 revision 8
 
-Date: 2026-10-12. Status: planning revision 2 after validated Claude review; approved product spec remains revision 7. Implementation in progress: 403 expanded A2 nodes collected locally; contract-to-node review complete, with 7 groups retaining coverage gaps. Both-platform evidence remains pending. See [coverage audit](COVERAGE-docs-check-a2-2026-10-12.md).
+Date: 2026-10-12. Status: planning revision 2 after validated Claude review; product spec revision 8 changes only the Python runtime policy, authorized 2026-10-23. Implementation in progress: 427 expanded A2 nodes collected locally; contract-to-node review complete, with 7 groups retaining coverage gaps. Both-platform evidence remains pending. See [coverage audit](COVERAGE-docs-check-a2-2026-10-12.md).
 Approved spec: [SPEC-docs-check-a2-2026-10-12.md](SPEC-docs-check-a2-2026-10-12.md), SHA256 `b202409f690b478fcb3fe6473afb4021930a1e271e8ae2a90ec0370bebe65b51`.
 Plan: [PLAN-docs-check-a2-2026-10-12.md](PLAN-docs-check-a2-2026-10-12.md); task state: [TASKS-docs-check-a2-2026-10-12.md](TASKS-docs-check-a2-2026-10-12.md).
 
 ## Required mapping and result policy
 
 Every proposed pytest node below is mandatory on Ubuntu 24.04 and macOS 14,
-with Python 3.12 and locked R/pkgload/evaluate/knitr/pkgdown dependencies.
+with latest stable Python 3 (exact interpreter recorded) and locked R/pkgload/evaluate/knitr/pkgdown dependencies.
 Each node validates executable behavior or an evidence validator's success and
 failure cases. Actual external observations are additional aggregate obligations;
 synthetic validator records cannot satisfy those observations. P rows also run
@@ -207,7 +207,7 @@ not a line-number promise; SHA256 protects against unnoticed baseline changes.
 
 | ID/task | Proposed pytest node | Type/spec anchor | Required fixture and oracle |
 |---|---|---|---|
-| V05 / T21 | `tests/a2/test_release_ci.py::test_both_platforms_locked_runtime` | D / [contract](SPEC-docs-check-a2-2026-10-12.md#required-evidence) | Dedicated a2-release matrix Ubuntu24.04/macOS14 Python3.12 provisions exact fixture-lock R/deps; no unpinned latest; each platform runs full required manifest and verifier with real R/HTTP nonzero. Node checks workflow contract and effective local runtime/lock; actual two-platform runs, real execution and provisioning success are aggregate obligations after jobs complete. |
+| V05 / T21 | `tests/a2/test_release_ci.py::test_both_platforms_locked_runtime` | D / [contract](SPEC-docs-check-a2-2026-10-12.md#required-evidence) | Dedicated a2-release matrix Ubuntu24.04/macOS14 uses latest stable Python 3 with exact interpreter recorded and provisions exact fixture-lock R/deps; no unpinned R/dependency versions; each platform runs full required manifest and verifier with real R/HTTP nonzero. Node checks workflow contract and effective local runtime/lock; actual two-platform runs, real execution and provisioning success are aggregate obligations after jobs complete. |
 | V06 / T21 | `tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance` | P / [contract](SPEC-docs-check-a2-2026-10-12.md#release-verifier-ownership-and-evidence) | Each platform publishes a2-release-evidence; missing/upload-failed artifact prevents release-acceptance claim, generic green Python suite insufficient. Node feeds missing, upload-failed, stale and good controlled artifact records to the validator. Actual successful retrieval of both uploaded artifacts is aggregate; it never waits for its own future upload. |
 | V07 / T21 | `tests/a2/test_release_ci.py::test_unsupported_platform_diagnostic` | P / [contract](SPEC-docs-check-a2-2026-10-12.md#required-evidence) | Windows either has equivalent process-tree evidence or examples unavailable; unsupported POSIX evidence explicitly unverified, never inherits macOS/Linux cleanup guarantees. |
 

@@ -1,5 +1,5 @@
 {
-  "spec_sha256": "b202409f690b478fcb3fe6473afb4021930a1e271e8ae2a90ec0370bebe65b51",
+  "spec_sha256": "898ff1e77e68efeaf493942df228fea30a5eb4fd93202e06d785fdf0f33a6898",
   "status": "pending",
   "groups": [
     {
@@ -1423,7 +1423,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_verifier.py": "b4a588634fb6532b2bbb8b074c20c950b3198c29c9b7c075a706c00329ee195d"
+        "tests/a2/test_release_verifier.py": "678ed4e9fd2293c0aa1cb2d23840065cc6dd6006a561eff9bad2bd69382f4335"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1443,7 +1443,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_verifier.py": "b4a588634fb6532b2bbb8b074c20c950b3198c29c9b7c075a706c00329ee195d"
+        "tests/a2/test_release_verifier.py": "678ed4e9fd2293c0aa1cb2d23840065cc6dd6006a561eff9bad2bd69382f4335"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1458,7 +1458,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_verifier.py": "b4a588634fb6532b2bbb8b074c20c950b3198c29c9b7c075a706c00329ee195d"
+        "tests/a2/test_release_verifier.py": "678ed4e9fd2293c0aa1cb2d23840065cc6dd6006a561eff9bad2bd69382f4335"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1479,15 +1479,23 @@
         "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[source-hash]",
         "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[expected-hash]",
         "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[missing-fixture]",
-        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[duplicate-fixture]"
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[duplicate-fixture]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.15.0-True]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.16.1-True]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.12.15-True]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.9.9-False]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.16.0rc1-False]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.16.0a1-False]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[latest-False]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[None-False]"
       ],
       "status": "mapped-review-complete",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_verifier.py": "b4a588634fb6532b2bbb8b074c20c950b3198c29c9b7c075a706c00329ee195d"
+        "tests/a2/test_release_verifier.py": "678ed4e9fd2293c0aa1cb2d23840065cc6dd6006a561eff9bad2bd69382f4335"
       },
-      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance. User-authorized latest-stable policy: final supported versions accepted, prerelease/malformed/unsupported evidence rejected; CI enforces latest selection."
     },
     {
       "id": "V08",
@@ -1500,7 +1508,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_verifier.py": "b4a588634fb6532b2bbb8b074c20c950b3198c29c9b7c075a706c00329ee195d"
+        "tests/a2/test_release_verifier.py": "678ed4e9fd2293c0aa1cb2d23840065cc6dd6006a561eff9bad2bd69382f4335"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1515,7 +1523,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_ci.py": "89a22366cdf9cde59f4efafa1daac2b47d38b989689b614961d1bd36de549acf"
+        "tests/a2/test_release_ci.py": "27bf00c2f4b72d13aaf51239b8510c1ac8a60439c8765b52a5e7f57286e00bdb"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1536,7 +1544,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_ci.py": "89a22366cdf9cde59f4efafa1daac2b47d38b989689b614961d1bd36de549acf"
+        "tests/a2/test_release_ci.py": "27bf00c2f4b72d13aaf51239b8510c1ac8a60439c8765b52a5e7f57286e00bdb"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1551,7 +1559,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_ci.py": "89a22366cdf9cde59f4efafa1daac2b47d38b989689b614961d1bd36de549acf"
+        "tests/a2/test_release_ci.py": "27bf00c2f4b72d13aaf51239b8510c1ac8a60439c8765b52a5e7f57286e00bdb"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },

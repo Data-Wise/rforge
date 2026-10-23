@@ -71,7 +71,9 @@ def validate_run(manifest, evidence, *, candidate_sha, lock_hash, manifest_hash)
     require(set(required) <= set(collected), "required nodes not collected")
     outcomes = evidence.get("outcomes", {})
     require(all(outcomes.get(node) == "passed" for node in required), "missing, failed, skipped, xfailed, xpassed or deselected required outcome")
-    require(evidence.get("python", "").startswith("3.12."), "Python 3.12 required")
+    python = evidence.get("python", "")
+    stable = re.fullmatch(r"3\.(\d+)\.(\d+)", python) if isinstance(python, str) else None
+    require(stable is not None and int(stable[1]) >= 10, "Stable Python 3.10 or newer required; CI selects latest stable")
     executions = evidence.get("fixture_executions", [])
     require(bool(executions), "no independent fixture execution evidence")
     r_checked = http_checked = 0

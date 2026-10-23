@@ -1,13 +1,54 @@
-# Implementation plan — docs:check A2, approved revision 7
+# Implementation plan — docs:check A2, revision 8
 
-Date: 2026-10-12. Status: planning revision 2 after validated review; approved spec remains revision 7; implementation authorized 2026-10-12; in progress.
+Date: 2026-10-12. Updated: 2026-10-23. Implementation authorized; in progress. Revision 8 applies the user-authorized latest-stable Python policy; all other acceptance obligations are retained.
 Baseline: local dev at 74824ac; one worktree; only untracked planning/review files.
 This is observed local state, not a live remote/CI claim.
-Approved specification: [SPEC-docs-check-a2-2026-10-12.md](SPEC-docs-check-a2-2026-10-12.md). SHA256: `b202409f690b478fcb3fe6473afb4021930a1e271e8ae2a90ec0370bebe65b51`.
+Approved specification: [SPEC-docs-check-a2-2026-10-12.md](SPEC-docs-check-a2-2026-10-12.md). SHA256: `898ff1e77e68efeaf493942df228fea30a5eb4fd93202e06d785fdf0f33a6898`.
 Acceptance inventory: [ACCEPTANCE-docs-check-a2-2026-10-12.md](ACCEPTANCE-docs-check-a2-2026-10-12.md). Task list target: [TASKS-docs-check-a2-2026-10-12.md](TASKS-docs-check-a2-2026-10-12.md).
 The repository's root-plan convention replaces the generic skill's tasks/plan.md
 and tasks/todo.md locations. Neither existing plans nor implementation files are
 replaced. Proposal approval authorizes this planning work only.
+
+## Current checkpoint — 2026-10-23
+
+A2 is implemented locally, with acceptance still pending. `--site URL` compares
+source-derived reference/article routes with a bounded deployed sitemap;
+`--run-examples` replays README assertions against the working-tree R package,
+with shared setup, deadlines, bounded output and recoverable partial counts.
+Both are opt-in; default static audit behavior is preserved. Source/render
+pairing remains deferred, so successful source replay cannot certify rendered output.
+
+The [Claude review of 7eb8a40](REVIEW-docs-check-a2-7eb8a40-2026-10-23.md)
+found no material defect in the three implementation files examined. Independent
+native-process regression runs passed 126 tests on Python 3.12.15. This focused
+review does not close broad final-review or both-platform acceptance obligations.
+
+The user authorized removing the Python 3.12 pin on 2026-10-23. Revision 8 uses
+CI's latest stable Python 3 selector, excludes prereleases and records the exact
+interpreter. Current stable Python is 3.15.0, already installed locally. R and
+fixture dependency locks, required platforms, no-skip release gates and all
+non-Python requirements remain unchanged. The ledger retains all 118 obligations
+and 87 groups; 427 expanded tests are uniquely mapped. Seven groups remain open.
+
+### Remaining work, in order
+
+| Group / owner | Required next action |
+|---|---|
+| G08 / Codex | Preserve the focused repair-review evidence; complete broad ownership review and actual Ubuntu/macOS process tests. |
+| D04 / Codex | Finish REFCARD/card coverage and inspect all changed rendered guides/tutorials. |
+| D05 / Codex | Add explicit status/count and agent-boundary prohibition assertions. |
+| H01 / Codex | Record historical defect recall counts and source/sitemap provenance; keep unavailable history pending. |
+| H02 / Codex | Strengthen all-six-count/reason/source-hash triage validation and refresh findings on medfit, probmed and medrobust. |
+| F01 / Codex | Bind aggregate full-gate observations to actual logs, named checks and candidate sources. |
+| F02 / Codex | Complete final review/mapping and verify both retrieved platform artifacts plus actual observation producers. |
+
+Next implementation slice: close D05's explicit assertions, then strengthen H02
+and F01 validators and review their oracles. Do not mark the required manifest
+ready until all coverage gaps are closed. After a stable candidate exists, the
+release owner must authorize remote execution/publication separately; obtain
+Ubuntu 24.04 and macOS 14 evidence on latest stable Python, historical recall,
+package triage, live-site smoke at an authorized URL, full gates and rendered/final
+review observations. No push, workflow dispatch, deployment or release is authorized.
 
 ## Delivery shape and dependencies
 
@@ -240,7 +281,7 @@ Acceptance contracts: V01, V02, V03, V04, V08.
 Dependencies: 20,16. Scope: M. Likely files: .github/workflows/ci.yml; tests/a2/test_release_ci.py; tests/a2/fixture-lock.json.
 Acceptance contracts: V05, V06, V07.
 
-- [ ] Implement V05–V07: Ubuntu24.04/macOS14 Python3.12, locked R/deps, whole manifest/verifier and evidence artifact. Unsupported Windows execution unavailable until equivalent tests; no inherited cleanup promise.
+- [ ] Implement V05–V07: Ubuntu24.04/macOS14 latest stable Python 3 (exact interpreter recorded), locked R/deps, whole manifest/verifier and evidence artifact. Unsupported Windows execution unavailable until equivalent tests; no inherited cleanup promise.
 - [ ] Verification: Review workflow schema locally; after external workflow execution is authorized, verify two actual candidate-SHA platform runs/artifacts. No local YAML test can substitute for those runs.
 
 ### T22: Run recall, package triage and site smoke
@@ -318,3 +359,16 @@ actual platform evidence. Early lifecycle checkpoints claim local evidence only.
 T01 also records the current 47 declared test-all checks; review the candidate
 check-name/count delta instead of hardcoding an unchanged future count. Optional
 R parse checks do not establish release-R execution.
+
+## Runtime amendment verification — 2026-10-23
+
+Python 3.15.0 full suite: 1326 passed, 4 existing skips (148.10s). Repository
+gates: 47/47. Strict MkDocs build passed with the installed Homebrew Cairo
+library exposed through DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib. Rendered
+contributor policy was inspected in site/contributing/index.html (57165 bytes);
+the build contains 66 HTML pages. Targeted runtime/workflow checks: 41 passed.
+All 118 obligations, 87 groups, 427 unique collected nodes and source hashes
+were reconciled; required manifest remains pending. No requirement outside the
+user-authorized Python policy changed. No external execution or publication.
+
+Current Python release source: [Python 3.15.0 final announcement](https://blog.python.org/2026/10/python-3150-final-is-here/).

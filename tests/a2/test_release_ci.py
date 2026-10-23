@@ -27,10 +27,14 @@ def test_both_platforms_locked_runtime():
     lock=json.loads((root/'tests/a2/fixture-lock.json').read_text())
     assert workflow['jobs']['a2-release']['strategy']['matrix']['os']==lock['platforms']
     steps=workflow['jobs']['a2-release']['steps']
-    assert next(s for s in steps if s.get('uses','').startswith('actions/setup-python'))['with']['python-version']==lock['python']
+    python = next(s for s in steps if s.get('uses','').startswith('actions/setup-python'))['with']
+    assert python['python-version']==lock['python']=='3.x'
+    assert python['check-latest'] is True and python['allow-prereleases'] is False
     assert next(s for s in steps if s.get('uses','').startswith('r-lib/actions/setup-r'))['with']['r-version']=='${{ steps.lock.outputs.R }}'
     assert any('scripts/run_a2_release.py' in s.get('run','') for s in steps)
     release=yaml.safe_load((root/'.github/workflows/a2-release.yml').read_text())
+    aggregate_python = next(s for s in release['jobs']['aggregate']['steps'] if s.get('uses','').startswith('actions/setup-python'))['with']
+    assert aggregate_python == python
     ci=yaml.safe_load((root/'.github/workflows/ci.yml').read_text())
     assert release['jobs']['aggregate']['needs']=='a2-release'
     for caller in (release,ci):

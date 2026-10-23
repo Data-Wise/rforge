@@ -1,8 +1,8 @@
 # A2 contract-to-test mapping audit
 
-Approved spec revision 7 remains unchanged. Mapping review is complete; release coverage is not complete.
+Spec revision 8 applies the user-authorized 2026-10-23 Python policy amendment; all other obligations remain. Mapping review is complete; release coverage is not complete.
 
-Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 407 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 7 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
+Mapped 118 unchanged paragraphs/table rows to 87 inventory groups and 427 actual expanded nodes. All collected A2 nodes have one semantic inventory owner; no duplicated or unowned nodes. 7 groups retain explicit gaps. Neither filename similarity nor local test success closes these gaps.
 
 The immutable requirement ledger records exact source text/hash/anchor/ordinal plus inventory ownership. Test source hashes bind this review snapshot. Header, historical validation and approval paragraphs are contextual documentation obligations, not invented runtime tests. Actual external evidence is separate from portable validators.
 
@@ -119,3 +119,7 @@ acceptance pins are unchanged.
 Final local Python 3.12.15 verification: 1318 passed / 4 existing skipped,
 repository gates 47/47, strict docs build passed, five updated validation probes
 passed. These local results do not supply either required platform artifact.
+
+## 2026-10-23 checkpoint
+
+Focused review of 7eb8a40 reported no material finding; 126 native-process regressions passed on Python 3.12.15. See REVIEW-docs-check-a2-7eb8a40-2026-10-23.md for coverage limits. G08/F02 remain open for broader final review and actual platform evidence. Python policy is now latest stable, with exact interpreter recorded; eight runtime evidence regressions bring the uniquely mapped inventory to 427. No group was closed by this policy change. Historical revision-7 hashes and Python 3.12 observations below remain historical records.

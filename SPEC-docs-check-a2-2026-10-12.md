@@ -1,7 +1,7 @@
 # docs:check A2 — live-site and README example audit
 
-Date: 2026-10-12. Revision: 7 (consolidated final proposal).
-Status: revision 7 approved by the user on 2026-10-12; implementation not authorized.
+Date: 2026-10-12. Revision: 8 (Python policy amendment, 2026-10-23).
+Status: revision 7 approved and implementation authorized on 2026-10-12; user authorized removing the Python 3.12 pin on 2026-10-23. All other acceptance requirements remain unchanged.
 Target: next minor release (provisionally 2.22.0); 44 commands remain.
 
 ## Objective and recommendation
@@ -542,9 +542,12 @@ and cannot pass through allowlists, skips or zero checked assertions. Manifest
 changes require review. Real-package triage does not waive fixture assertions.
 
 Required release-manifest entries must all pass on both declared POSIX release
-platforms: Ubuntu 24.04 and macOS 14, with Python 3.12. The fixture lock records
-exact R/pkgload/evaluate/knitr/pkgdown versions, resolved before implementation
-acceptance; no unpinned `latest` run establishes this compatibility contract.
+platforms: Ubuntu 24.04 and macOS 14, using the latest stable Python 3 selected
+by CI (3.x, check-latest enabled, prereleases disabled). Each artifact records
+the exact interpreter used; Python must be a final 3.10-or-newer release. The
+fixture lock retains exact R/pkgload/evaluate/knitr/pkgdown versions, resolved
+before implementation acceptance; unpinned R/dependency runs cannot establish
+this compatibility contract.
 Other POSIX platforms are unverified until equivalent evidence exists.
 Windows must either pass its own process-tree acceptance suite
 or report example execution unavailable; it must not silently inherit POSIX
@@ -555,7 +558,7 @@ replay alone cannot certify published README output.
 ### Release verifier ownership and evidence
 
 Implementation must add a dedicated `a2-release` job in `.github/workflows/ci.yml`
-on Ubuntu 24.04 and macOS 14/Python 3.12. It provisions locked R/fixture dependencies,
+on Ubuntu 24.04 and macOS 14/latest stable Python 3. It provisions locked R/fixture dependencies,
 runs the committed manifest and invokes a proposed
 `scripts/verify_a2_release.py` against machine-readable pytest results. These
 paths/job names are planned artifacts, not files created by this revision.
