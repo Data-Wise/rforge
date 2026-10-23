@@ -10,7 +10,10 @@
 # Installed 0.1.1/source parity 4/4. Catalog names visible this session.
 # Additional approved gpt-5.6-sol CLI review reconciled: log contract clarified;
 # outer failure now incomplete; unintended tarball behavior change scoped out.
-# Pending: fresh-session 0.1.1 skill invocation and selected real user package.
+# Medfit fresh-session skills discovered; authorized temp-access R check passed.
+# Release-ref coverage v0.12.0: zero new exports/findings; checked 11/22.
+# Target checkout version 0.10.0, not latest release; variadic audit gap remains.
+# Pending: fresh-session older/missing engine handling; durable integration.
 # Default durable engine lacks repairs; explicitly use this pilot worktree.
 # Retain worktree-backed local catalog; no push/PR/merge/release/deploy performed.
 

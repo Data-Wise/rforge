@@ -69,10 +69,37 @@ Tarball behavior is preserved and remains outside this pilot's acceptance.
 
 ## Remaining runtime acceptance
 
-- [ ] Fresh session loads installed 0.1.1 and invokes both skills successfully.
-- [ ] Verify on a selected real user package, honoring its holds and prerequisites.
+- [x] Fresh session loads both skills; R execution verified by authorized rerun.
+- [x] Verified medfit checkout, honoring holds; see version limitation below.
 - [ ] Confirm missing/older engine is reported unavailable in that fresh session.
 
 Retain this feature worktree: the installed local catalog points into it.
 Integration and durable catalog relocation require their own authorized workflow.
 No push, PR, merge, release, or live deployment is claimed.
+
+## Medfit installed-skill verification (2026-10-22)
+
+Fresh ephemeral Codex session discovered and followed both installed 0.1.1
+skills using this pilot engine. Target: medfit checkout dd42073d18bc0463f31a1a0e1d469117689b5b28,
+DESCRIPTION version 0.10.0. Read-only session completed the docs audit but
+blocked R temporary-file creation. Authorized rerun with temporary-file access
+completed the default --as-cran check: status ok, structured JSON,
+incomplete false, inner exit 0, zero errors/warnings/NOTEs. Retained actual
+00check.log ended with * DONE and Status: OK; tests and PDF manual passed.
+
+Latest published non-draft/non-prerelease release verified via GitHub:
+v0.12.0 (local ref e89428295af0abe8dcf41642696c65097dcd1f09).
+Static audit used --package-only --since v0.12.0: audited true,
+incomplete false, zero findings, checked 11/22 exports; 11 variadic exports
+unchecked. New-export set is empty, so there were no new exports to assess.
+This older checkout result does not certify the current release or exercise
+positive new-export detection; the earlier defect fixture covers that behavior.
+
+Evidence: /private/tmp/medfit-rforge-fresh-session.md,
+/private/tmp/medfit-rforge-temp-access-check.json,
+/private/tmp/medfit-rforge-release-coverage.json. Actual R log:
+/var/folders/xn/dn01tdjd78q6mxfmq6c4_jqc0000gn/T/rforge-check-17587fe276d5/medfit.Rcheck/00check.log.
+No package source changes; two preexisting untracked plan files preserved.
+Remaining: fresh-session older/missing-engine handling remains unverified;
+11 variadic signatures remain outside the audit. Integration and durable
+engine/catalog relocation remain pending. No push, merge, or release performed.
