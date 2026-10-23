@@ -14,14 +14,20 @@ Tasks and acceptance criteria: [task list](TASKS-codex-check-skills-2026-10-22.m
 
 1. Grill the spec and packaging decision using a fresh-context reviewer.
    Record actionable findings, accepted trade-offs, and unresolved questions.
-2. Reconcile only evidenced gaps in the current skills/spec. Preserve the
-   current installed package until any changed instructions are validated.
+2. Repair the six reconciled findings in the grill. Start with the smallest
+   existing-engine provenance/log-evidence fix, then correct skill orchestration
+   and docs scope/ref instructions. This proposes a narrow exception to the
+   original unchanged-engine constraint; no wrapper or new service. Preserve
+   the installed package until repairs pass focused validation and review.
 3. After a Codex restart, verify both skills on a selected R package. Capture
    invocation, package path, result, coverage/logs, and prerequisite failures.
 4. If runtime acceptance passes and publishing is authorized, use feature-to-dev
    integration. Move the local catalog registration to a durable Rforge checkout
    only after the package files exist there. Verify cache/source parity before
    removing this feature worktree.
+
+Review outcome: same-repo packaging stands. Six actionable contract gaps remain;
+runtime acceptance is blocked. The two installed skills have not been repaired.
 
 ## Checkpoints
 

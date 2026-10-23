@@ -2,15 +2,17 @@
 # Prepared two skills and a local catalog on codex/rforge-check-skills.
 # Spec: SPEC-codex-check-skills-2026-10-22.md (initial slice, not full parity).
 # Plan/tasks/grill: matching *-codex-check-skills-2026-10-22.md root files.
-# Fresh review found docs-scope and new-export-ref gaps; reconciliation
-# awaits the offered cross-model choice. Same-repo decision is confirmed.
+# Fresh agent + approved Codex CLI reviews reconciled: six actionable gaps.
+# Runtime blocked: false-clean R fallback, missing log evidence, check defaults/
+# strict orchestration, docs scope expansion, and missing new-export ref guidance.
+# No skill/engine repair yet. Same-repo decision remains confirmed.
 # Reuses lib.rcmd and lib.docaudit; no new engines or Claude hook imports.
 # Checks: 47/47 repository gates; pytest 899 passed, 4 skipped; strict MkDocs
 # and rendered-guide inspection passed. Both skills validate; new Markdown lints.
 # Reference generation passes with Python 3.12 (3.15 changes signatures).
 # Local catalog registered; rforge-openai 0.1.0 installed/enabled; four cache files
 # match source. Catalog points to this feature worktree; retain it until moved.
-# Next: restart Codex and invoke both skills on a selected package.
+# Next: repair review blockers, validate/review, then restart/runtime checks.
 # No push, PR, release, or native runtime acceptance claimed.
 
 project: rforge

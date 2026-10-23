@@ -5,15 +5,20 @@
 Dependencies: none. Scope: spec, plan, review record.
 
 - [x] Fresh reviewer checks the same-repo decision and skill contracts.
-- [ ] Findings are reconciled or explicitly retained as trade-offs.
+- [x] Findings are reconciled; six actionable repairs are recorded in the grill.
 
 Verification: record file-specific findings and dispositions in the grill.
 
 ## 2. Close evidenced contract gaps
 
-Dependencies: task 1. Scope: two skill files and affected documentation only.
+Dependencies: task 1. Scope: two skills, affected documentation, and a proposed
+narrow existing-engine safety/evidence repair. No replacement engine or wrapper.
 
-- [ ] Fix blocking findings without introducing new engines or hooks.
+- [ ] Preserve structured-output provenance; regression-test malformed R output.
+- [ ] Establish real log availability and align the log-evidence contract.
+- [ ] Align default and strict check orchestration with existing Rforge semantics.
+- [ ] Preflight docs scope and establish the ref for new-export coverage.
+- [ ] Review repaired contracts without introducing new engines or hooks.
 - [ ] Skills validate and changed Markdown lints; update spec/status if needed.
 
 Verification: focused validators plus relevant existing checks. Repeat the full
@@ -23,6 +28,7 @@ and verify file parity; do not infer runtime success from a file comparison.
 ## 3. Runtime acceptance
 
 Dependencies: task 2 and a restarted Codex session. Scope: acceptance evidence.
+Blocked by the unresolved review findings; installation is not runtime acceptance.
 
 - [ ] Both skills discover and invoke on a selected R package, including paths
       containing spaces; recorded behavior satisfies the spec checklist.
