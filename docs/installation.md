@@ -1,17 +1,20 @@
 # 📦 Installation
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** All install paths for the rforge plugin.
+    - **What:** Claude plugin installation; Codex has a separate local adapter.
     - **Why:** macOS users prefer brew; cross-platform users prefer the marketplace.
-    - **How:** Pick one method below — they all install the same thing.
+    - **How:** For Codex, use the guide below; for Claude, pick one method.
     - **Next:** [Quick Start](quickstart.md) to run your first command.
 
 ⏱️ **2 minutes** • 🟢 Beginner • Pick ONE method
 
-## Codex personal pilot
+## Codex personal plugin
 
-For Codex, see [Rforge checks in Codex](guides/codex-checks.md). The Claude
-installation methods below do not install the two native Codex skills.
+For Codex, use the [Codex installation and checks guide](guides/codex-checks.md).
+Register the local catalog from a durable checkout of `dev` containing PR #92,
+install `rforge-openai`, then restart and verify both skill names. Adapter 0.1.1
+is separate from the Claude plugin version. The Claude methods below do not
+install the two native Codex skills.
 
 ## Pick an install method
 

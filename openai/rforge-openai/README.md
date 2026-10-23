@@ -10,8 +10,9 @@ contains instructions only and requires a local Rforge checkout with Python
 3.10+; package checks additionally require R and the engine's R dependencies.
 The personal default source path is `/Users/davood/projects/dev-tools/rforge`.
 Version 0.1.1 requires check output provenance/log fields and docaudit's
-`--package-only`; older engines are unavailable for this pilot. Before
-integration, explicitly supply the repaired feature worktree as the checkout.
+`--package-only`; older engines are unavailable for this pilot. The adapter and repaired engines are integrated on `dev` through PR #92. Use
+the durable checkout containing that integration; retired pilot worktrees are
+not required. Report the engine Git ref separately from adapter 0.1.1.
 It works from another package directory because each skill resolves that
 package first and runs its engine from the Rforge checkout.
 
@@ -40,3 +41,11 @@ and registration change personal configuration and are separate from preparing
 these files. No hooks, Claude command migration, background jobs, or automatic
 submissions are included. Refresh the package after editing skill instructions;
 engine changes are read directly from the local checkout.
+
+## Verification boundary
+
+Fresh-session discovery and isolated medfit package/docs checks passed. Static
+checks leave variadic signatures unchecked; missing/older-engine behavior still
+needs an explicit fresh-session test. Site builds, runnable examples and live
+resources need separate verification. See the repository website's
+[Codex guide](https://data-wise.github.io/rforge/guides/codex-checks/).
