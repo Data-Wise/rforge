@@ -53,3 +53,8 @@ Scope: integration state and local catalog registration.
 
 Verification: live integration ref and catalog location; preserve unrelated
 work.
+
+Latest-release verification: both installed skill contracts followed on isolated
+v0.12.0; see spec/grill. Fresh-session discovery was verified earlier. Remaining
+acceptance: missing/older engine in fresh session; package warning and static
+variadic limits are explicit. Integration remains unauthorized.

@@ -103,3 +103,37 @@ No package source changes; two preexisting untracked plan files preserved.
 Remaining: fresh-session older/missing-engine handling remains unverified;
 11 variadic signatures remain outside the audit. Integration and durable
 engine/catalog relocation remain pending. No push, merge, or release performed.
+
+## Latest-release isolated verification (2026-10-22)
+
+Verified published release v0.12.0 and checked out exact commit
+`e89428295af0abe8dcf41642696c65097dcd1f09` in detached isolated worktree
+`/private/tmp/medfit-rforge-release-v0.12.0`. DESCRIPTION confirms 0.12.0.
+Followed both installed 0.1.1 skill instructions with the repaired pilot engine.
+This direct rerun complements the earlier fresh-session discovery evidence;
+it is not a second fresh-session invocation. Both source checkouts stayed clean
+apart from the original checkout's two preexisting untracked plan files.
+
+Docs: package-only, audited true, incomplete false, no findings, checked 12/23;
+11 variadic exports unchecked. Comparison against v0.12.0 itself correctly has
+no new exports. Additional comparison against previous release v0.11.1 exercises
+positive coverage: compare_lr is mentioned in README.md and three vignette
+articles. Mention coverage does not establish example correctness.
+
+Package check: one default --as-cran invocation, medfit 0.12.0, structured JSON,
+incomplete false, inner exit 0, zero errors, one warning, zero NOTEs.
+Warning: '::' or ':::' import not declared from rlang. Tests, examples including
+donttest, and manuals completed. Real retained 00check.log contains * DONE and
+Status: 1 WARNING. Skill reports warning honestly; package is not warning-free.
+
+Evidence: /private/tmp/medfit-v0120-check.json,
+/private/tmp/medfit-v0120-docaudit.json,
+/private/tmp/medfit-v0120-previous-release-docaudit.json. Log:
+/var/folders/xn/dn01tdjd78q6mxfmq6c4_jqc0000gn/T/rforge-check-65272589ca7e/medfit.Rcheck/00check.log.
+
+Remaining gaps: medfit's undeclared rlang import; 11 variadic signatures outside
+the static audit; fresh-session missing/older-engine handling unverified.
+Strict/incoming flavors were verified on synthetic fixtures, not this release.
+No URL/site/reverse-dependency or platform certification is implied.
+Integration and durable catalog/engine relocation remain pending. Retain the
+isolated checkout and logs for inspection. No source fixes or external actions.

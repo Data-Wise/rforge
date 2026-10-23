@@ -12,7 +12,10 @@
 # outer failure now incomplete; unintended tarball behavior change scoped out.
 # Medfit fresh-session skills discovered; authorized temp-access R check passed.
 # Release-ref coverage v0.12.0: zero new exports/findings; checked 11/22.
-# Target checkout version 0.10.0, not latest release; variadic audit gap remains.
+# Latest release v0.12.0 isolated at e894282: docs 0 findings, checked 12/23;
+# compare_lr coverage present vs v0.11.1. Default as-cran completed: 0/1/0,
+# undeclared rlang import WARNING. Actual completed log retained; source clean.
+# Earlier 0.10.0 results are historical; latest-release evidence in spec/grill.
 # Pending: fresh-session older/missing engine handling; durable integration.
 # Default durable engine lacks repairs; explicitly use this pilot worktree.
 # Retain worktree-backed local catalog; no push/PR/merge/release/deploy performed.
