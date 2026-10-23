@@ -1,5 +1,8 @@
 # 📖 RForge Quick Start
 
+For Codex, start with the [two-skill setup and usage guide](guides/codex-checks.md).
+The slash commands below are for Claude Code.
+
 Get started with RForge in 5 minutes. This guide walks you through installation, basic usage, and your first analysis.
 
 !!! tip "TL;DR (30 seconds)"

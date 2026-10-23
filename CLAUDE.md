@@ -4,6 +4,18 @@
 > Follows the global `~/.claude/CLAUDE.md`; this file only captures
 > rforge-specific patterns that don't apply to other dev-tools repos.
 
+## Codex verification checkpoint — 2026-10-22
+
+The native adapter is `openai/rforge-openai` (0.1.1), integrated into `dev`
+through PR #92 (`fe8c8ef`). The durable engine/catalog checkout is
+`/Users/davood/projects/dev-tools/rforge` and its `openai` directory;
+retired pilot worktrees are not prerequisites. Report the actual engine ref.
+Both skills were discovered in a fresh session and exercised on isolated medfit.
+Static API checks do not establish example, pkgdown or live-site correctness;
+those require separate web-write/build/browser evidence. Missing/older-engine
+fresh-session handling and variadic-signature coverage remain explicit gaps.
+Do not expand this adapter into website generation or a full Claude command port.
+
 ## Current state (2026-10-11)
 
 **v2.21.0 (released 2026-10-11 — minor, 44 commands, no command-surface change):** `/rforge:docs:check` is now a deterministic content audit (`lib/docaudit.py`, release A1): `signature-named-arg` (error), `signature-names`/`signature-arity` (warn), `scannability` (info), `coverage` (warn, `--since TAG` only); `--eco`, `--detailed`, `--fail-on none|warn|error`, `docs.allowlist` in `.rforge.yaml`; text reports end `INCOMPLETE`/`NOT AUDITED` instead of "no findings" when the audit could not finish. Dev-only replay harness `tests/harness/`; orchestrator `DOCS_AUDIT` row; Docs audit guide. Also #85/#86 (`/rforge:finish` version drift, #84) and a docs gap-fill (#89, #90). `test-all.sh` 47 checks. A2 (`--site`, `--run-examples`) is a separate later plan. Records: `.STATUS`, CHANGELOG `[2.21.0]`.

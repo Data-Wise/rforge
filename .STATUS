@@ -1,3 +1,14 @@
+# Codex durable verification checkpoint — 2026-10-22
+# PR #92 merged to dev fe8c8ef; adapter 0.1.1 uses durable rforge/openai catalog.
+# Fresh-session discovery and isolated medfit checks passed; missing/older engine
+# fresh-session cases and static variadic signatures remain unverified.
+# Medfit rlang import #296 and 404 repair #297 integrated to dev; #298 merged
+# to main 100cca7b; deployment/live verification remains separate.
+# Codex docs audited: homepage, installation, quickstart, refcard, adapter README,
+# guide/nav and mirrored instructions. 920 tests passed/4 skipped; 47/47 gates;
+# Python 3.12 reference check and strict MkDocs build passed. Writing deferred.
+# Earlier pilot/worktree-only status below is historical and superseded.
+
 # Local medfit rlang import repair rerun: Rforge as-cran 0/0/0; log complete.
 # Test runner separately 5993 pass, 98 skip, 1 warning. Fix not integrated.
 # Codex personal checks pilot — 2026-10-22
