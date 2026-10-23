@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "rforge-openai",
+  "version": "0.1.1",
+  "description": "Personal Codex workflows for R package checks and documentation audits using a local Rforge checkout."
+}

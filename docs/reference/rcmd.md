@@ -13,6 +13,10 @@ Each "kind" maps to a lower-level R package (NOT devtools):
 
 The R subprocess emits JSON via jsonlite; this module normalizes it. Console
 regex parsing is only a fallback when jsonlite/structured output is absent.
+For package checks that fallback is incomplete evidence and cannot pass. The
+check envelope includes output_format, incomplete, check.exit_status, and
+check.log_paths; actual
+00check.log files are retained in explicit temporary check directories.
 
 Usage: python3 -m lib.rcmd --kind <kind> [--path .] [--as-cran]
        [--preview] [--strict] [--articles-only] [--devel]

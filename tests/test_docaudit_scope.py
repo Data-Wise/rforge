@@ -93,6 +93,41 @@ def test_hybrid_root_audits_root_and_nested(tmp_path):
     assert "hybrid" in s.line()
 
 
+def test_package_only_never_discovers_hybrid_children(tmp_path, monkeypatch):
+    root = mkpkg(tmp_path / "root", "root", docs="```r\nf(x = 1)\n```\n")
+    mkpkg(root / "tools" / "inner", "inner")
+    (root / ".rforge.yaml").write_text("kind: hybrid\n")
+    monkeypatch.setattr(docaudit, "_discover", lambda *a: pytest.fail("unexpected package discovery"))
+    report = docaudit.audit(root, package_only=True)
+    assert report["scope"]["mode"] == "package"
+    assert report["summary"]["exports"] == 1
+    assert report["findings"] == [] and report["audited"]
+
+
+def test_package_only_rejects_manifest_root_and_missing_path(tmp_path, monkeypatch):
+    mkpkg(tmp_path / "child")
+    (tmp_path / ".rforge.yaml").write_text("manifest: m.yaml\n")
+    monkeypatch.setattr(docaudit, "_discover", lambda *a: pytest.fail("unexpected ecosystem sweep"))
+    for path in (tmp_path, tmp_path / "absent"):
+        report = docaudit.audit(path, package_only=True)
+        assert report["audited"] is False and not report["scope"]["packages"]
+
+
+def test_package_only_cli_conflicts_with_eco(tmp_path):
+    proc = run_cli("--package-only", "--eco", cwd=ROOT, home=tmp_path)
+    assert proc.returncode == 2 and "not allowed" in proc.stderr
+
+
+def test_package_only_cli_reports_one_package(tmp_path):
+    root = mkpkg(tmp_path / "package with spaces", "root")
+    mkpkg(root / "nested", "inner")
+    (root / ".rforge.yaml").write_text("kind: hybrid\n")
+    proc = run_cli("--path", str(root), "--package-only", "--format", "json", cwd=ROOT, home=tmp_path)
+    report = json.loads(proc.stdout)
+    assert proc.returncode == 0 and report["scope"]["mode"] == "package"
+    assert report["summary"]["exports"] == 1
+
+
 def test_non_hybrid_package_does_not_audit_nested(tmp_path):
     root = mkpkg(tmp_path / "root", "root")
     mkpkg(root / "tools" / "inner", "inner")

@@ -36,6 +36,10 @@ checked 18 of 22 exported functions (3 no-usage, 1 variadic not checked)
 Without an argument it audits the package you are in (walking up to the nearest `DESCRIPTION`). Outside a package it
 sweeps the ecosystem only if a `.rforge.yaml` manifest exists or you pass `--eco`; otherwise it says so and exits 0.
 A `kind: hybrid` root audits the root package and its nested packages.
+The Python CLI option `--package-only` disables both hybrid and manifest
+expansion: only the nearest package at an existing path is audited. It does
+not discover packages by name and cannot be combined with `--eco`. The Codex
+single-package workflow uses this option by default.
 
 ## Suppressing a finding
 

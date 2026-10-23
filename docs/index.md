@@ -14,6 +14,12 @@
 
 Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. **No MCP server, no Node.js** at runtime. The fast ecosystem commands (analysis, deps, status) are pure Python; the `r:*` dev-cycle commands and `/rforge:thorough` shell out to R via `lib/rcmd.py`.
 
+## Codex personal pilot
+
+Two focused skills for package checks and documentation audits are prepared in
+`openai/rforge-openai`. See the [Codex checks guide](guides/codex-checks.md).
+Installation and runtime verification remain separate.
+
 ## Where rforge fits
 
 ```mermaid
