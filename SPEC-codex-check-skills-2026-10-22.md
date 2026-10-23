@@ -73,9 +73,8 @@ Tarball behavior is preserved and remains outside this pilot's acceptance.
 - [x] Verified medfit checkout, honoring holds; see version limitation below.
 - [ ] Confirm missing/older engine is reported unavailable in that fresh session.
 
-Retain this feature worktree: the installed local catalog points into it.
-Integration and durable catalog relocation require their own authorized workflow.
-No push, PR, merge, release, or live deployment is claimed.
+The original worktree-retention requirement is superseded by the durable
+registration checkpoint below. Earlier execution records remain historical.
 
 ## Medfit installed-skill verification (2026-10-22)
 
@@ -152,3 +151,15 @@ an assertion that every test executed warning-free. Evidence:
 
 The undeclared import gap is resolved locally, not in the published release.
 Other previously recorded audit/runtime limits remain. No push or merge.
+
+
+## Durable integration checkpoint — 2026-10-22
+
+PR #92 merged to dev as `fe8c8ef`. The active catalog source is the durable
+`/Users/davood/projects/dev-tools/rforge/openai`; installed adapter 0.1.1 uses
+that repository's engines. Pilot worktree paths in earlier evidence are history,
+not current setup instructions. No adapter release/tag is implied by dev merge.
+Fresh-session discovery and medfit invocation passed; missing/older-engine
+fresh-session behavior and uninspected variadic signatures remain unverified.
+Rforge static docs audits do not verify pkgdown, examples, or deployed resources;
+web-write has separate evidence for those checks. Writing formats stay deferred.
