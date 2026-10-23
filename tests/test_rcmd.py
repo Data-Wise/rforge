@@ -192,10 +192,54 @@ def test_r_snippet_site_flags():
 def test_run_check_happy(tmp_path, monkeypatch):
     _write_desc(tmp_path, "foo", "0.2.0")
     monkeypatch.setattr(rcmd, "_invoke_r",
-                        lambda s: ('{"errors":[],"warnings":["W"],"notes":[]}', 0))
+                        lambda s: ('{"errors":[],"warnings":["W"],"notes":[],"check_status":0}', 0))
     env = rcmd.run("check", str(tmp_path))
     assert env["status"] == "warn" and env["package"] == "foo"
     assert env["check"]["warnings"] == ["W"]
+
+
+@pytest.mark.parametrize("stdout", ["", "unrecognized engine output", "{}",
+                                     '{"errors":[],"warnings":[]}',
+                                     '{"errors":0,"warnings":[],"notes":[],"check_status":0}',
+                                     '{"errors":null,"warnings":null,"notes":null,"check_status":0}',
+                                     '{"errors":[],"warnings":[],"notes":[]}',
+                                     '{"errors":[],"warnings":[],"notes":[],"check_status":false}'])
+def test_check_rejects_missing_or_malformed_evidence(tmp_path, monkeypatch, stdout):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: (stdout, 0))
+    env = rcmd.run("check", str(tmp_path))
+    assert env["status"] == "error"
+    assert env["incomplete"] is True
+    assert env["output_format"] in ("json", "console_fallback")
+    if not stdout:
+        assert env["output_format"] == "console_fallback"
+    assert any("structured check result" in m for m in env["messages"])
+
+
+def test_check_console_counts_are_not_structured_success(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ("0 errors | 0 warnings | 0 notes", 0))
+    env = rcmd.run("check", str(tmp_path))
+    assert env["status"] == "error" and env["incomplete"]
+
+
+def test_check_nonzero_exit_cannot_pass(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"errors":[],"warnings":[],"notes":[],"check_status":0}', 1))
+    assert rcmd.run("check", str(tmp_path))["status"] == "error"
+
+
+def test_check_keeps_log_paths_and_structured_evidence(tmp_path, monkeypatch):
+    _write_desc(tmp_path)
+    log = tmp_path / "check output" / "foo.Rcheck" / "00check.log"
+    log.parent.mkdir(parents=True)
+    log.write_text("Status: OK\n")
+    raw = {"errors": [], "warnings": [], "notes": [], "check_status": 0, "log_paths": [str(log)]}
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: (json.dumps(raw), 0))
+    env = rcmd.run("check", str(tmp_path))
+    assert env["status"] == "ok" and env["output_format"] == "json"
+    assert not env["incomplete"]
+    assert env["check"]["log_paths"] == [str(log)]
 
 
 def test_run_no_description_error(tmp_path):
@@ -233,7 +277,7 @@ def test_cycle_stops_on_first_error(tmp_path, monkeypatch):
 
 def test_main_emits_json(tmp_path, monkeypatch, capsys):
     _write_desc(tmp_path)
-    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"errors":[],"warnings":[],"notes":[]}', 0))
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: ('{"errors":[],"warnings":[],"notes":[],"check_status":0}', 0))
     rc = rcmd.main(["--kind", "check", "--path", str(tmp_path)])
     assert json.loads(capsys.readouterr().out)["status"] == "ok" and rc == 0
 
@@ -1425,3 +1469,22 @@ def test_cli_tidy_kind_wires_through(tmp_path, monkeypatch, capsys):
     assert code == 0
     out = json.loads(capsys.readouterr().out)
     assert out["kind"] == "tidy"
+
+
+@pytest.mark.parametrize("status,incoming", [(1, False), (137, False), ([0, 1], True)])
+def test_check_inner_exit_failure_cannot_pass(tmp_path, monkeypatch, status, incoming):
+    _write_desc(tmp_path)
+    raw = {"errors": [], "warnings": [], "notes": [], "check_status": status}
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: (json.dumps(raw), 0))
+    env = rcmd.run("check", str(tmp_path), incoming=incoming)
+    assert env["status"] == "error" and env["incomplete"]
+    assert env["check"]["exit_status"] == rcmd._as_list(status)
+
+
+@pytest.mark.parametrize("status,incoming", [([0, 0], False), (0, True), ([0, None], True)])
+def test_check_requires_status_for_each_expected_pass(tmp_path, monkeypatch, status, incoming):
+    _write_desc(tmp_path)
+    raw = {"errors": [], "warnings": [], "notes": [], "check_status": status}
+    monkeypatch.setattr(rcmd, "_invoke_r", lambda s: (json.dumps(raw), 0))
+    env = rcmd.run("check", str(tmp_path), incoming=incoming)
+    assert env["status"] == "error" and env["incomplete"]

@@ -1,106 +1,71 @@
 # Spec: Rforge checks in Codex
 
-Date: 2026-10-22. Status: instruction package implemented; review blockers
-and runtime acceptance pending.
+Date: 2026-10-22. Status: six repairs implemented; local verification passed.
+Fresh-session acceptance and integration remain pending.
 
-## Purpose and scope
+## Purpose and packaging
 
-Make Davood's frequent Rforge workflows available in Codex with little setup
-or maintenance. Start with package checks and documentation checks, the first
-priorities selected during discussion. Two skills are an initial slice, not a
-technical limit or a claim of complete Rforge import. Add other frequent
-workflows when selected, reusing the existing engines wherever possible.
+Support Davood's frequent package and documentation checks with a small Codex
+plugin inside the existing Rforge repository: `openai/rforge-openai`.
+The two skills are the initial slice, not a limit or full Claude command parity.
+Reuse `lib.rcmd` and `lib.docaudit`; no separate repository, wrapper, service,
+or imported Claude hooks. Savant is a separate follow-up.
 
-## Packaging decision
+## Implemented (adapter 0.1.1)
 
-Use a separate Codex plugin package inside the existing Rforge repository:
-`openai/rforge-openai`. Keep its skills, manifest, and local catalog separate
-from the Claude plugin, while sharing the existing Rforge engines. No separate
-repository, duplicate engine, or new service is needed for this personal pilot.
+- `rforge-check`: default `--as-cran`; strict requests run the existing depends
+  and suggests flavors separately; incoming adds the two-pass incoming call.
+  Report every pass, errors/warnings/classified NOTEs, and retained real logs.
+- Check evidence includes structured-output provenance, completeness, and R's
+  inner check exit statuses. Missing/malformed evidence or an unsuccessful
+  subprocess cannot pass. Incoming requires exactly two integer statuses.
+- `rforge-docs-check`: default `--package-only` prevents hybrid/manifest
+  expansion. Ecosystem scope requires an explicit request. New-export coverage
+  requires an established `--since REF`; otherwise state coverage was omitted.
+  Report audited/incomplete state and checked-versus-total signatures separately.
 
-## Implemented
+Resolve the requested package to an existing absolute path, honor its instructions
+and holds, and require Python 3.10+. Package checks also need R and engine packages.
+Missing prerequisites remain unavailable; no dependency installation is implied.
+Checks execute package code and retain temporary artifacts. Docs audits are static.
+Neither skill authorizes submission, release, deployment, or unrelated edits.
+Advanced `--changed` baseline tagging is outside this pilot.
 
-The instruction-only package is `openai/rforge-openai`, version 0.1.0.
-The bullets below describe its current instructions, not verified runtime
-capabilities. Review found gaps between those instructions and engine behavior;
-see the blockers below.
+## Verified locally
 
-- `rforge-check` uses `python3 -m lib.rcmd --kind check` and reports the
-  package, options, errors/warnings/NOTEs, log path, and next fix.
-- `rforge-docs-check` uses `python3 -m lib.docaudit --format json` and reports
-  resolved scope, findings, coverage, and incomplete/unavailable work.
+Engine: feature checkout `/Users/davood/projects/dev-tools/_worktrees/rforge-codex-checks`
+on `codex/rforge-check-skills`. The default durable checkout does not yet contain
+these repairs; select this pilot checkout explicitly until integration.
 
-Both skills resolve the user's package to an absolute path before running the
-engine from the local Rforge checkout. The personal default engine location is
-`/Users/davood/projects/dev-tools/rforge`; the checkout and Python 3.10+ must be
-available. Package checks also require R and the existing engine's dependencies.
-The package does not bundle or duplicate those engines.
+- Full Python suite: **920 passed, 4 skipped**. Repository gates: **47/47**.
+- Both skills pass frontmatter validation and changed Markdown lint; strict
+  MkDocs build passes. Generated references use Python 3.12 to avoid unrelated
+  Python 3.15 signature rendering changes.
+- Fresh-context review findings (null arrays, blank-output provenance, missing
+  incoming status slots) repaired and covered by regression tests.
+- Real synthetic R package `rforgepilot` 0.0.1 at
+  `/private/tmp/rforge pilot verification/clean package`: default as-cran,
+  both strict flavors, and incoming completed with inner statuses zero.
+  Each pass had zero errors/warnings and one expected new-submission NOTE.
+  All five real `00check.log` files survived R exit and contained `* DONE`.
+- Clean docs fixture: audited true, incomplete false, checked 1/1, no findings.
+  Defect fixture at `/private/tmp/rforge pilot verification/coverage package`,
+  `--since HEAD`: stale `add_one(nope=1)` error and missing `new_thing` coverage
+  warning, checked 2/2. Both fixture paths contain spaces.
+- Scope/missing-path regressions prevent discovery sweeps. Malformed output,
+  outer/inner failures, and missing/extra/null status slots cannot pass.
+- Both skill names are discoverable in this session's catalog. Local plugin
+  refreshed to 0.1.1; all four installed package files match source.
 
-Requested options pass through to the existing engine. Advanced options use
-its current command documentation. Missing prerequisites, skipped stages,
-malformed output, and incomplete scans must never be described as passing.
-Documentation checks must distinguish checked exports from unchecked exports.
+These are direct engine/fixture observations following the skill contracts,
+not proof that a fresh Codex session loads and follows cached 0.1.1 instructions.
 
-Package checks execute package code and can create build/check artifacts.
-Documentation audits are static and read-only. Respect the target package's
-instructions and holds. Neither skill authorizes dependency installation,
-CRAN submission, releases, deployment, hook changes, or unrelated edits.
+## Remaining runtime acceptance
 
-A local catalog and setup guide are prepared. Local installation reports the
-package installed/enabled, and all four installed package files matched source
-at installation. The catalog currently points into this feature worktree;
-retain it until the registration is moved to a durable integration location.
+- [ ] Fresh session loads installed 0.1.1 and invokes both skills successfully.
+- [ ] Verify on a selected real user package, honoring its holds and prerequisites.
+- [ ] Confirm missing/older engine is reported unavailable in that fresh session.
 
-## Review blockers before runtime acceptance
-
-The fresh-context and approved CLI reviews are reconciled in
-[the grill](GRILL-codex-check-skills-2026-10-22.md). Six actionable gaps remain:
-malformed R output can normalize to a false-clean result; the engine exposes
-no check-log path; the skill omits Rforge's default `--as-cran`; raw `--strict`
-does not orchestrate the documented flavor passes; docs scope can expand
-without `--eco`; and new-export coverage requires a comparison ref.
-
-These are unimplemented repairs, not accepted runtime limitations. In particular,
-the current engine cannot substantiate the promised malformed-output guarantee
-or log evidence. Runtime acceptance is blocked until those contracts are repaired.
-A narrow existing-engine safety/evidence repair is proposed, while retaining
-shared engines and avoiding a wrapper or new service.
-
-## Verified before runtime acceptance
-
-- Both skill files passed frontmatter validation and Markdown lint.
-- All 47 repository checks passed using Python 3.12; Python 3.15 causes
-  unrelated generated-reference signature differences.
-- The full Python suite passed: 899 tests, four skipped.
-- Strict MkDocs build and rendered guide content inspection passed.
-- Direct documentation-engine fixtures returned zero findings for the clean
-  case and two for the defect case. Both checked only 1 of 22 exports, so these
-  results establish bounded fixture behavior, not full API coverage.
-- A direct package-engine call with a nonexistent package returned an error.
-
-These checks validate files and existing engines; they do not establish that
-Codex has loaded or correctly followed the installed skills.
-
-## Runtime acceptance still required
-
-After restarting Codex, use a selected R package to verify:
-
-- [ ] Both installed skill names appear and can be invoked.
-- [ ] Each skill targets the requested package while running from Rforge's
-      checkout, including when the package path contains spaces.
-- [ ] `rforge-docs-check` reports actual scope, findings, incomplete work, and
-      export coverage accurately; it does not modify the package.
-- [ ] `rforge-check` runs a real package check and reports its actual result
-      and log location; unavailable dependencies remain explicit.
-- [ ] A missing checkout or invalid package produces an unavailable/error
-      explanation rather than a clean result.
-
-Record the package, invocation, result, and limits when checking these boxes.
-Runtime acceptance is complete only when the observations support every item.
-
-## Outside this first slice
-
-Full Claude command parity, new check engines, copied Claude hooks, background
-jobs, and automatic submission are outside this pilot. Savant remains a
-separate follow-up. No push, PR, published release, or live-site deployment is
-claimed for these local changes.
+Retain this feature worktree: the installed local catalog points into it.
+Integration and durable catalog relocation require their own authorized workflow.
+No push, PR, merge, release, or live deployment is claimed.

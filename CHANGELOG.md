@@ -15,6 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   reusing the local Rforge engines. Includes a local catalog and setup guide;
   installation and runtime acceptance remain separate.
 
+### Fixed
+
+- Codex pilot 0.1.1: default CRAN-style checks and explicit strict flavor
+  orchestration; docs scope isolation and comparison-ref guidance. Unsupported
+  changed-baseline checks and stale engines are reported explicitly.
+- Package checks reject missing/malformed structured evidence and nonzero R
+  exits; retain real check logs in explicit temporary directories and expose
+  `check.log_paths`, `output_format`, and `incomplete`.
+- Documentation CLI adds mutually exclusive `--package-only` scope control,
+  preventing hybrid/manifest expansion without changing existing defaults.
+
 ---
 
 ## [2.21.0] - 2026-10-11

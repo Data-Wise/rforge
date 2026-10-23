@@ -24,11 +24,12 @@ how many exports that covers ("checked N of M").
 
 CLI::
 
-    python3 -m lib.docaudit [--path <package-dir-or-name>] [--eco] [--detailed] [--since TAG]
+    python3 -m lib.docaudit [--path <package-dir-or-name>] [--eco | --package-only] [--detailed] [--since TAG]
         [--fail-on none|warn|error] [--format text|json]
 
 Scope (D0): walks up from --path (default: the cwd) to the nearest DESCRIPTION; with none, sweeps the ecosystem
-only if a .rforge.yaml manifest exists or --eco is given. The first output line states the resolved scope.
+only if a .rforge.yaml manifest exists or --eco is given. --package-only prevents
+hybrid/manifest expansion and package-name discovery. The first output line states the resolved scope.
 
 Run as a package module (``python3 -m lib.docaudit``), never as a script.
 """
@@ -975,18 +976,27 @@ def _sweep(base: Path, how: str) -> Scope:
     return Scope("ecosystem", str(base), pkgs, how, notes=notes)
 
 
-def resolve_scope(path: str | Path = ".", eco: bool = False) -> Scope:
+def resolve_scope(path: str | Path = ".", eco: bool = False, *, package_only: bool = False) -> Scope:
     """D0: walk up from `path` to the nearest DESCRIPTION and audit that package; with no DESCRIPTION, sweep the
     ecosystem only if a `.rforge.yaml` manifest exists or `eco` is set. `path` may also be a package name found
-    under the cwd. A `kind: hybrid` root also audits its nested packages."""
+    under the cwd. A `kind: hybrid` root also audits its nested packages, unless
+    `package_only` confines resolution to an existing path's nearest package."""
     given = Path(path)
+    if package_only and eco:
+        return Scope("none", str(given), [], reason="--package-only and --eco are mutually exclusive")
     if not given.exists():
+        if package_only:
+            return Scope("none", str(given), [], reason=f"package path does not exist: {given}")
         named = [p for p in _discover(Path.cwd().resolve(), []) if str(path) in (p.name, _package_name(p, []))]
         if not named:
             return Scope("none", str(given), [], reason=f"no package or path named `{path}`")
         given = named[0]
     start = (given if given.is_dir() else given.parent).resolve()
     pkg = _nearest_package(start)
+    if package_only:
+        if pkg is None:
+            return Scope("none", str(start), [], reason="--package-only: no DESCRIPTION found; no ecosystem sweep")
+        return Scope("package", str(pkg), [pkg], "--package-only")
     if eco:
         base = pkg.parent if pkg is not None else start
         return _sweep(base, "--eco")
@@ -1015,10 +1025,11 @@ def _hide_info(report: dict) -> dict:
     return {**report, "findings": shown, "summary": summary, "max_severity": top, "status": status}
 
 
-def audit(path: str | Path = ".", *, eco: bool = False, detailed: bool = False, since: Optional[str] = None,
+def audit(path: str | Path = ".", *, eco: bool = False, package_only: bool = False,
+          detailed: bool = False, since: Optional[str] = None,
           max_paragraph_words: int = 110, max_section_words: int = 800, min_h3: int = 3) -> dict:
     """Audit the package (or packages) D0 resolves `path` to. `info` findings appear only when `detailed`."""
-    scope = resolve_scope(path, eco)
+    scope = resolve_scope(path, eco, package_only=package_only)
     if not scope.packages:
         env = _envelope([], [scope.reason, *scope.notes], {}, incomplete=bool(scope.notes), audited=False)
         return {**env, "scope": scope.to_dict()}
@@ -1077,7 +1088,9 @@ def format_text(report: dict) -> str:
 def main(argv: Optional[list] = None) -> int:
     ap = argparse.ArgumentParser(prog="python3 -m lib.docaudit", description=__doc__.split("\n")[0])
     ap.add_argument("--path", default=".", help="package path or name (default: the cwd; walks up to a DESCRIPTION)")
-    ap.add_argument("--eco", action="store_true", help="sweep the whole ecosystem")
+    scope_args = ap.add_mutually_exclusive_group()
+    scope_args.add_argument("--eco", action="store_true", help="sweep the whole ecosystem")
+    scope_args.add_argument("--package-only", action="store_true", help="audit only the nearest package; never expand scope")
     ap.add_argument("--detailed", action="store_true", help="also print `info` findings")
     ap.add_argument("--format", choices=["text", "json"], default="text")
     ap.add_argument("--fail-on", choices=["none", "warn", "error"], default="none",
@@ -1087,7 +1100,8 @@ def main(argv: Optional[list] = None) -> int:
     ap.add_argument("--max-section-words", type=int, default=800)
     ap.add_argument("--min-h3", type=int, default=3, help="H3 headings an over-long H2 section needs")
     args = ap.parse_args(argv)
-    report = audit(args.path, eco=args.eco, detailed=args.detailed, since=args.since,
+    report = audit(args.path, eco=args.eco, package_only=args.package_only,
+                   detailed=args.detailed, since=args.since,
                    max_paragraph_words=args.max_paragraph_words, max_section_words=args.max_section_words,
                    min_h3=args.min_h3)
     print(format_json(report) if args.format == "json" else format_text(report))

@@ -43,21 +43,15 @@ def test_r_snippet_check_suggests_flavor_sets_env_and_donttest():
     assert "_R_CHECK_DEPENDS_ONLY_" not in src
 
 
-def test_r_snippet_check_plain_is_unchanged():
-    """Backward-compat lock: no flavor / no incoming → no env, no donttest."""
+def test_r_snippet_check_plain_preserves_flags():
+    """No flavor / no incoming still means no withholding env or donttest."""
     src = rcmd.r_snippet("check", "/tmp/foo", as_cran=True)
     assert "--run-donttest" not in src
     assert "_R_CHECK_DEPENDS_ONLY_" not in src
     assert "_R_CHECK_SUGGESTS_ONLY_" not in src
     assert "_R_CHECK_CRAN_INCOMING_" not in src
-    # The whole call must be byte-identical to the pre-strict snippet.
-    expected = rcmd._guard(
-        "rcmdcheck",
-        'r <- rcmdcheck::rcmdcheck("/tmp/foo", args=c("--as-cran"), '
-        'quiet=TRUE, error_on = "never"); '
-        'cat(jsonlite::toJSON(list(errors=r$errors, warnings=r$warnings, '
-        'notes=r$notes), auto_unbox=TRUE, null="list"))')
-    assert src == expected
+    assert 'args=c("--as-cran")' in src
+    assert src.count("rcmdcheck::rcmdcheck(") == 1
 
 
 def test_r_snippet_check_incoming_bundle():
@@ -74,7 +68,7 @@ def test_run_check_threads_flavor(tmp_path, monkeypatch):
 
     def fake_invoke(snippet):
         captured["snippet"] = snippet
-        return ('{"errors":[],"warnings":[],"notes":[]}', 0)
+        return ('{"errors":[],"warnings":[],"notes":[],"check_status":0}', 0)
 
     monkeypatch.setattr(rcmd, "_invoke_r", fake_invoke)
     env = rcmd.run("check", str(tmp_path), as_cran=True, flavor="depends", strict=True)
@@ -88,8 +82,10 @@ def test_run_check_threads_incoming(tmp_path, monkeypatch):
     captured = {}
     monkeypatch.setattr(rcmd, "_invoke_r",
                         lambda s: (captured.setdefault("s", s),
-                                   ('{"errors":[],"warnings":[],"notes":[]}', 0))[1])
-    rcmd.run("check", str(tmp_path), as_cran=True, incoming=True)
+                                   ('{"errors":[],"warnings":[],"notes":[],"check_status":[0,0]}', 0))[1])
+    env = rcmd.run("check", str(tmp_path), as_cran=True, incoming=True)
+    assert env["status"] == "ok"
+    assert env["check"]["exit_status"] == [0, 0]
     assert "_R_CHECK_CRAN_INCOMING_" in captured["s"]
 
 

@@ -8,7 +8,8 @@ more workflows may follow. Do not create a second GitHub repository.
 
 The skills, catalog, installation, and spec already exist. This plan records
 remaining work; it does not present completed implementation as future work.
-Tasks and acceptance criteria: [task list](TASKS-codex-check-skills-2026-10-22.md).
+Tasks and acceptance criteria: [task list](TASKS-codex-check-
+skills-2026-10-22.md).
 
 ## Sequence
 
@@ -16,9 +17,9 @@ Tasks and acceptance criteria: [task list](TASKS-codex-check-skills-2026-10-22.m
    Record actionable findings, accepted trade-offs, and unresolved questions.
 2. Repair the six reconciled findings in the grill. Start with the smallest
    existing-engine provenance/log-evidence fix, then correct skill orchestration
-   and docs scope/ref instructions. This proposes a narrow exception to the
-   original unchanged-engine constraint; no wrapper or new service. Preserve
-   the installed package until repairs pass focused validation and review.
+   and docs scope/ref instructions. The user authorized narrow existing-engine
+   repairs; no wrapper or new
+   service. Refresh installed instructions after focused validation and review.
 3. After a Codex restart, verify both skills on a selected R package. Capture
    invocation, package path, result, coverage/logs, and prerequisite failures.
 4. If runtime acceptance passes and publishing is authorized, use feature-to-dev
@@ -26,8 +27,10 @@ Tasks and acceptance criteria: [task list](TASKS-codex-check-skills-2026-10-22.m
    only after the package files exist there. Verify cache/source parity before
    removing this feature worktree.
 
-Review outcome: same-repo packaging stands. Six actionable contract gaps remain;
-runtime acceptance is blocked. The two installed skills have not been repaired.
+Review outcome: same-repo packaging stands. All six gaps are repaired;
+920 tests and 47 gates pass. Real isolated fixtures verified both engine
+contracts; installed 0.1.1 matches source. Fresh-session/user-package acceptance
+remains pending; see the spec for the evidence boundary.
 
 ## Checkpoints
 
@@ -50,5 +53,5 @@ runtime acceptance is blocked. The two installed skills have not been repaired.
 
 ## Open input
 
-Runtime package selection and post-restart invocation evidence remain needed.
+A real user package and fresh-session 0.1.1 invocation evidence remain needed.
 No new service, hook layer, distribution framework, or full command port.

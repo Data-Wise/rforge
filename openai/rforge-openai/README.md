@@ -9,8 +9,15 @@ The adapter version is independent of the Claude plugin version. This package
 contains instructions only and requires a local Rforge checkout with Python
 3.10+; package checks additionally require R and the engine's R dependencies.
 The personal default source path is `/Users/davood/projects/dev-tools/rforge`.
+Version 0.1.1 requires check output provenance/log fields and docaudit's
+`--package-only`; older engines are unavailable for this pilot. Before
+integration, explicitly supply the repaired feature worktree as the checkout.
 It works from another package directory because each skill resolves that
 package first and runs its engine from the Rforge checkout.
+
+Default checks use `--as-cran`. Strict requests run both flavor calls;
+incoming adds the incoming bundle. Advanced `--changed` is outside the pilot.
+Docs audits stay within one package; new-export coverage needs `--since REF`.
 
 ## First use
 

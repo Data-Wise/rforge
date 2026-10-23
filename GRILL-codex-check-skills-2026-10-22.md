@@ -1,7 +1,8 @@
 # Grill: personal Codex check pilot
 
-Status: initial reviews complete and findings reconciled; runtime acceptance
-blocked. No clean-review verdict is claimed. The instruction package is unchanged.
+Status: all six findings repaired in adapter 0.1.1 and shared engines.
+Local regression and real fixture verification pass; fresh-session acceptance
+remains.
 
 ## Review and contract
 
@@ -14,14 +15,18 @@ same approved invocation completed outside that sandbox, retaining the inner
 read-only sandbox. Existing login and environment were unchanged.
 
 Contract: a small personal adapter in the existing Rforge repo, reusing local
-engines, preserving package scope, and distinguishing implementation from runtime
+engines, preserving package scope, and distinguishing implementation from
+runtime
 acceptance. No second GitHub repo, duplicate engines, new hooks, or full
 command port.
 
 ## Reconciled findings
 
-All six findings are valid and actionable. Engine behavior was inspected directly;
-review severity labels are not treated as proof. No finding was dismissed as noise.
+All six initial findings were valid and actionable. The descriptions below
+record the pre-repair evidence; their current dispositions follow. Engine
+behavior was inspected directly;
+review severity labels are not treated as proof. No finding was dismissed as
+noise.
 
 1. **Blocker: false-clean package output.** `lib/rcmd.py` parses unrecognized
    R output through `console_fallback`, then normalizes it without preserving
@@ -39,7 +44,8 @@ review severity labels are not treated as proof. No finding was dismissed as noi
 3. **Default check differs from Claude.** `commands/r/check.md` defines the
    ordinary workflow as an `--as-cran` pass. The Codex skill's default omits
    that flag, and the Python CLI defaults it off. Align the skill's ordinary
-   check with the documented Rforge default; honor an explicit plain-check request.
+   check with the documented Rforge default; honor an explicit plain-check
+   request.
 4. **Strict orchestration is missing.** Passing `--strict` to `lib.rcmd` adds
    `--run-donttest` to one check; it does not orchestrate the documented
    Suggests-withholding flavor passes. Spell out the existing flavor calls
@@ -63,18 +69,40 @@ strict orchestration, scope preflight, and comparison-ref instructions. Reuse
 existing engines and flavor selectors; do not add a wrapper or new service.
 
 This proposes a narrow exception to the original unchanged-engine constraint:
-existing-engine safety/evidence repairs, not a replacement engine. It remains
-unimplemented. Repeat focused review after repairs; a new external CLI run
-requires its own invocation confirmation under the chosen skill.
+existing-engine safety/evidence repairs, not a replacement engine. The user
+authorized and implementation completed this narrow exception.
+A fresh repair review was completed. No additional external CLI run was made;
+the optional offer received no selection and the recommended local review/test
+path proceeded.
 
-## Verification and remaining gates
+## Repair dispositions and verification
 
-CLI second opinion completed on 2026-10-22. The engine probe confirmed the
-false-clean limitation without running R or changing a package. Earlier test
-counts remain historical evidence; they do not cover these newly identified
-contracts. Post-restart discovery, real-package checks, and runtime acceptance
-remain unverified. The installed 0.1.0 instructions still contain these gaps.
+1. Structured JSON provenance and schema are required; outer and inner check
+   failures cannot pass. Null fields, empty output, and missing incoming slots
+   found by the repair review are now rejected with regression coverage.
+2. Explicit persistent check directories retain actual logs; emitted paths are
+   verified against existing completed `00check.log` files.
+3. Skill default now includes `--as-cran`.
+4. Skill orchestrates labeled depends/suggests passes and incoming when
+requested.
+5. New opt-in `--package-only` guards scope before discovery; legacy defaults
+stay.
+6. Skill requires an established coverage ref and distinguishes signature
+counts.
 
-The unused standalone local scaffold remains inactive and unregistered. The
-installed catalog points into this feature worktree; retain the worktree.
+Final checks: 920 pytest passed, 4 skipped; 47/47 repository gates; strict
+MkDocs,
+frontmatter validation, and changed Markdown lint passed. Real isolated R
+fixtures completed ordinary, both strict, and incoming checks with five retained
+logs, zero errors/warnings, and expected new-submission NOTEs. Clean and
+deliberately
+broken docs fixtures produced the expected scope/counts/findings; details in
+spec.
+
+Installed 0.1.1 matches source in all four files. Both skill names appear in
+this
+session's catalog, but fresh-session 0.1.1 loading and a real user package
+remain
+unverified. The unused standalone scaffold remains inactive and unregistered.
+Retain the worktree-backed catalog until integration and durable registration.
 No push, PR, merge, release, or website deployment occurred.

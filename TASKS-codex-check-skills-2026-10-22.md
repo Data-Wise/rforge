@@ -11,15 +11,17 @@ Verification: record file-specific findings and dispositions in the grill.
 
 ## 2. Close evidenced contract gaps
 
-Dependencies: task 1. Scope: two skills, affected documentation, and a proposed
+Dependencies: task 1. Scope: two skills, affected documentation, and an
+authorized
 narrow existing-engine safety/evidence repair. No replacement engine or wrapper.
 
-- [ ] Preserve structured-output provenance; regression-test malformed R output.
-- [ ] Establish real log availability and align the log-evidence contract.
-- [ ] Align default and strict check orchestration with existing Rforge semantics.
-- [ ] Preflight docs scope and establish the ref for new-export coverage.
-- [ ] Review repaired contracts without introducing new engines or hooks.
-- [ ] Skills validate and changed Markdown lints; update spec/status if needed.
+- [x] Preserve structured-output provenance; regression-test malformed R output.
+- [x] Establish real log availability and align the log-evidence contract.
+- [x] Align default and strict check orchestration with existing Rforge
+semantics.
+- [x] Preflight docs scope and establish the ref for new-export coverage.
+- [x] Review repaired contracts without introducing new engines or hooks.
+- [x] Skills validate and changed Markdown lints; update spec/status if needed.
 
 Verification: focused validators plus relevant existing checks. Repeat the full
 suite only when behavior changes justify it. Refresh changed installed skills
@@ -28,7 +30,8 @@ and verify file parity; do not infer runtime success from a file comparison.
 ## 3. Runtime acceptance
 
 Dependencies: task 2 and a restarted Codex session. Scope: acceptance evidence.
-Blocked by the unresolved review findings; installation is not runtime acceptance.
+Repairs and isolated real engine fixtures pass; installation is not fresh-
+session acceptance.
 
 - [ ] Both skills discover and invoke on a selected R package, including paths
       containing spaces; recorded behavior satisfies the spec checklist.
@@ -48,4 +51,5 @@ Scope: integration state and local catalog registration.
 - [ ] Register the catalog from a durable checkout only once files exist there,
       verify enabled installation/cache parity, then assess worktree cleanup.
 
-Verification: live integration ref and catalog location; preserve unrelated work.
+Verification: live integration ref and catalog location; preserve unrelated
+work.
