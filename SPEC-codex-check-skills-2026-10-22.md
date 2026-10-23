@@ -71,7 +71,8 @@ Tarball behavior is preserved and remains outside this pilot's acceptance.
 
 - [x] Fresh session loads both skills; R execution verified by authorized rerun.
 - [x] Verified medfit checkout, honoring holds; see version limitation below.
-- [ ] Confirm missing/older engine is reported unavailable in that fresh session.
+- [x] Confirm missing/older engine is reported unavailable in fresh sessions;
+      see the negative-preflight record below.
 
 The original worktree-retention requirement is superseded by the durable
 registration checkpoint below. Earlier execution records remain historical.
@@ -163,3 +164,36 @@ Fresh-session discovery and medfit invocation passed; missing/older-engine
 fresh-session behavior and uninspected variadic signatures remain unverified.
 Rforge static docs audits do not verify pkgdown, examples, or deployed resources;
 web-write has separate evidence for those checks. Writing formats stay deferred.
+
+## Missing/older-engine fresh-session verification — 2026-10-22
+
+Two independent ephemeral, read-only Codex sessions read both installed 0.1.1
+skills and used an explicitly supplied engine with a synthetic DESCRIPTION package.
+All four outcomes were unavailable, never passing:
+
+| Engine case | rforge-check | rforge-docs-check |
+| --- | --- | --- |
+| Missing checkout | Unavailable; no check | Unavailable; no audit |
+| v2.21.0 lib archive | Fields absent; no check | Flag absent; no audit |
+
+Older ref: `7387a05fd01b55a27a37871cab0902b2778b75ce`. Required check
+fields and the docs `--package-only` flag were absent.
+
+The older case used Python 3.13.17 for definitive help checks. The missing case
+also reported default Python 3.9.6; this does not independently establish a
+Python-only failure or prove no supported interpreter was installed. Neither
+session substituted the default engine, installed anything, executed R, ran an
+unguarded audit, or invented passing results/logs. Command transcripts were
+inspected, not just final summaries. DESCRIPTION and archived engine sources
+matched their originals afterward; hook `.remember` files and interpreter caches
+are outside that preservation claim. Startup reported skill-context budget
+warnings, but both sessions explicitly read both installed skill files.
+
+Evidence: `/private/tmp/rforge-unavailable-verification/` contains
+`missing-prompt.md`, `older-prompt.md`, both `*-events.jsonl` command transcripts
+and `*-result.md` reports. Temporary evidence is local and not a durable artifact.
+Session IDs: missing `01a1673a-2215-7623-aa6a-a211f6233a4d`;
+older `01a1673a-4b47-7361-aca3-54a64288721a`.
+This closes missing/older-engine acceptance only; paths containing spaces and
+Python-only unavailability remain unverified. Static variadic-signature limits
+remain. Writing formats remain deferred.

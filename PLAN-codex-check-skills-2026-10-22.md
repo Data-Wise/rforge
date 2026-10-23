@@ -57,6 +57,8 @@ and durable registration passed; see the spec for the remaining boundary.
 
 ## Open input
 
-Remaining input: an explicit fresh-session missing/older-engine case. Existing
-medfit evidence and durable registration supersede the original planning gaps.
+Missing/older-engine rejection is verified in two fresh read-only sessions; see
+the spec negative-preflight record. Paths containing spaces and Python-only
+unavailability remain unverified. Existing medfit evidence and durable
+registration supersede the original planning gaps.
 No new service, hook layer, distribution framework, or full command port.

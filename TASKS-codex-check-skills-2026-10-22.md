@@ -56,8 +56,9 @@ work.
 
 Latest-release verification: both installed skill contracts followed on isolated
 v0.12.0; see spec/grill. Fresh-session discovery was verified earlier. Remaining
-acceptance: missing/older engine in fresh session; package warning and static
-variadic limits are explicit. Integration was subsequently authorized and completed; see the checkpoint.
+acceptance: paths containing spaces and Python-only unavailability; package
+warning and static variadic limits are explicit. Integration was subsequently
+authorized and completed; see the checkpoint.
 
 
 ## Reconciled checkpoint — 2026-10-22
@@ -66,8 +67,10 @@ PR #92 is merged to dev at `fe8c8ef`; durable registration points to
 `rforge/openai`, and the installed adapter is 0.1.1. Fresh-session discovery and
 isolated medfit docs/package checks passed. The import repair is integrated to
 medfit dev (#296); website repair is integrated there (#297), with scoped main
-promotion #298 merged to main as `100cca7b`; live deployment is a separate gate. Paths-with-spaces and fresh-session
-missing/older-engine acceptance are not promoted to verified by these results.
+promotion #298 merged to main as `100cca7b`; live deployment is a separate gate.
+Fresh-session missing/older-engine rejection is now verified; see the spec
+negative-preflight record. Paths-with-spaces and Python-only unavailability
+remain unverified.
 The earlier unchecked runtime group remains partial for those cases.
 
 ## Documentation audit closure

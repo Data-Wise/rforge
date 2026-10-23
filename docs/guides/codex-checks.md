@@ -88,8 +88,15 @@ checks covered a full build, examples, 106 HTML pages, 8,268 local references,
 and representative desktop/mobile output. This complements the static Rforge
 skills; it does not expand their contract or introduce a new Rforge command.
 
-Still unverified: fresh-session missing/older-engine handling, unchecked variadic
-signatures, full external-resource/accessibility coverage, and standalone Quarto.
+Two fresh read-only sessions verified that both installed 0.1.1 skills report
+unavailable for a missing explicit engine and for the actual v2.21.0 engine
+without the required interfaces. Neither ran a package check or unguarded docs
+audit, substituted another engine, or reported passing results. This used a
+synthetic package; it does not add package-check coverage.
+
+Still unverified: paths containing spaces, Python-only unavailability, unchecked
+variadic signatures, full external-resource/accessibility coverage, and
+standalone Quarto.
 Article, tutorial, cookbook and refcard generation remain deferred.
 
 ## Common requests
