@@ -2,7 +2,7 @@ name: A2 smoke (diagnostic, not evidence)
 # Temporary: runs the A2 tests directly on both required platforms while the release
 # manifest is still pending. Produces no acceptance evidence; remove before the PR.
 on:
-  workflow_dispatch:
+  workflow_call:
 permissions:
   contents: read
 jobs:

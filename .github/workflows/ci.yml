@@ -15,6 +15,11 @@ jobs:
   a2-release:
     uses: ./.github/workflows/a2-platform.yml
 
+  a2-smoke:
+    # Temporary diagnostic (manual dispatch only); remove before the PR.
+    if: github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/a2-smoke.yml
+
   validate:
     name: Validate Plugin Structure
     runs-on: ubuntu-latest
