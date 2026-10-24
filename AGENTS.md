@@ -215,3 +215,14 @@ For details not in this file, see project memory at `~/.claude/projects/-Users-d
 - `reference_dotfiles_sync_workflow.md` — chezmoi for `~/.claude/`, flow-cli for `~/.config/zsh/`, `claude-sync` helper
 - `project_rforge_mcp_never_public.md` — historical context for the v1.3.0 absorption
 - `reference_brew_outdated_testing.md` — Cellar-rename trick for testing `brew outdated` UX
+
+## Review-fix harness
+
+Goal: after each phase of work, run an adversarial review, check each finding against the source, plan and
+implement the fixes, and verify with evidence. Agents `adversarial-reviewer`, `fix-implementer` and
+`gate-verifier` live in `.claude/agents/`; the `review-fix-loop` skill in `.claude/skills/` coordinates them.
+It applies only to review-fix work, not to other requests.
+
+| Date | Change | Target | Reason |
+|---|---|---|---|
+| 2026-10-24 | Initial narrow harness | `.claude/agents/`, `.claude/skills/review-fix-loop/` | Codify the per-phase adversarial review, triage, fix and verify loop. |
