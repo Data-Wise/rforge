@@ -110,6 +110,15 @@ def test_triage_schema_accepts_a_complete_record():
     ('unknown-triage-class',lambda p,f:p['findings'][0]['triage'].update(**{'class':'ignored'})),
     ('false-positive-unresolved',lambda p,f:p['findings'][0]['triage'].update(**{'class':'false-positive-class','class_id':'shape-width','resolved':False,'scoped_out':False})),
     ('false-positive-no-class-id',lambda p,f:p['findings'][0]['triage'].update(**{'class':'false-positive-class','resolved':True})),
+    # Exact schema: nothing may hide in an unchecked key, an unseverity'd finding, or an extra package.
+    ('finding-without-severity',lambda p,f:p['findings'][0].pop('severity')),
+    ('finding-unknown-severity',lambda p,f:p['findings'][0].update(severity='low')),
+    ('finding-without-check',lambda p,f:p['findings'][0].pop('check')),
+    ('extra-count-key',lambda p,f:p['counts'].update(extra=-1)),
+    ('extra-package-key',lambda p,f:p.update(secret='x')),
+    ('extra-package',lambda p,f:f['packages'].update(extra=dict(p))),
+    ('package-name-mismatch',lambda p,f:p.update(package='probmed')),
+    ('hash-for-non-readme-key',lambda p,f:p['source_sha256'].update({'../../etc/passwd':'c'*64})),
 ])
 def test_triage_schema_rejects_defects(defect,mutate):
     with pytest.raises(v.VerificationError):v.validate_package_triage(_triage(mutate))

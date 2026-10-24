@@ -59,6 +59,15 @@ def test_install_detection_ignores_strings_comments(tmp_path):
     'pak::pak("data-wise/medfit")', 'pak::pak(c("a", "b"))', 'pak::pkg_install("x")', 'pak::local_install(".")',
     'renv::install("x")', 'renv::restore()', 'BiocManager::install("x")', 'remotes::install_github("a/b")',
     'devtools::install()', 'devtools::install_deps()', 'utils::install.packages("x")', 'install_github("a/b")',
+    # Spaced and backticked namespaces, renv bootstrap, and installers passed as values (found by adversarial review).
+    'pak :: pak("x")', '`pak::pak`("x")', 'pak::`pak`("x")', 'renv::activate()', 'renv::init()',
+    '(install.packages)("x")', 'f <- install.packages\nf("x")', 'sapply("x", install.packages)',
+    # Dispatch by name and shell-outs are real installs even though the name is a string literal.
+    'do.call("install.packages", list("x"))', 'do.call(\'utils::install.packages\', list("x"))',
+    'system("R CMD INSTALL x.tar.gz")', 'system2("R", c("CMD", "INSTALL", "x.tar.gz"))',
+    'system("Rscript -e \'install.packages(\\"x\\")\'")',
+    # A bare installer call counts once the chunk attaches an installer package.
+    'library(BiocManager)\ninstall("x")', 'library("devtools")\ninstall()', 'require(pak)\npak("x")',
 ])
 def test_installation_forms_are_never_executed(tmp_path,call):
     # A real README's `pak::pak("owner/pkg")` chunk was executed (pak subprocess, network, compile) before
@@ -70,6 +79,9 @@ def test_installation_forms_are_never_executed(tmp_path,call):
 @pytest.mark.parametrize('call',[
     'pak::pkg_list()', 'installed.packages()', 'renv::status()', 'devtools::document()', 'my_pak::pak("x")',
     'reinstall_helper()', 'x$install_github("a/b")',
+    # Mentioning an installer in a string or comment, or an unrelated bare install(), is not an installation.
+    'print("install.packages")', 'cat("R CMD INSTALL")', 'do.call("print", list(1))', 'install("x")',
+    'library(dplyr)\ninstall("x")', 'get("mean")', 'system("echo hello")',
 ])
 def test_non_installation_look_alikes_still_execute(tmp_path,call):
     p=package(tmp_path,f'```r\n{call}\n```')

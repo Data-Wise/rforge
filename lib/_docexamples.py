@@ -92,17 +92,40 @@ def assignments(text, *, body=False):
     return options
 
 
-# Calls that install, update, or restore packages. README replay never installs dependencies, so a chunk
-# containing any of them is skipped. The lookbehind rejects longer identifiers and member access
-# (`my_pak::pak`, `x$install_github`); strings and comments are removed before matching.
+# README replay never installs dependencies, so a chunk that installs, updates, restores or bootstraps packages
+# is skipped. This is a convenience filter over code tokens, not a sandbox: fully dynamic code
+# (`eval(parse(text = ...))`, names built with paste()) cannot be recognized and is out of reach.
+#
+# Views of a chunk: `tokens` has comments and string literals removed (so `print("install.packages")` is
+# prose, not a call); `kept` has only comments removed (so `do.call("install.packages", ...)` and
+# `system("R CMD INSTALL ...")`, whose behavior lives in the string, are still seen).
+_STRING_OR_COMMENT = re.compile(r"(\"(?:\\.|[^\"])*\"|'(?:\\.|[^'])*')|#[^\n]*")
+_STRING = re.compile(r"\"(?:\\.|[^\"])*\"|'(?:\\.|[^'])*'")
+# Installer names; a bare reference counts too (`sapply(x, install.packages)`, `(install.packages)(x)`).
 INSTALL_CALL = re.compile(r"""
     (?<![\w.$@])
     (?:
-        (?:[A-Za-z][\w.]*::)?(?:install|update)\.packages
+        (?:[A-Za-z][\w.]*::)?(?:install|update)\.packages(?!\w)
       | (?:remotes|devtools|pak|pkgdepends|renv|BiocManager)::
-            (?:install[\w.]*|restore|hydrate|pak|pkg_install|local_install\w*|pkg_upgrade)
-      | install_(?:github|gitlab|bitbucket|git|svn|url|local|cran|version|bioc|deps|dev_deps)
-    )\s*\(""", re.X)
+            (?:install[\w.]*|restore|hydrate|pak|pkg_install|local_install\w*|pkg_upgrade
+              |init|activate|update|upgrade|rebuild|repair)(?!\w)
+      | install_(?:github|gitlab|bitbucket|git|svn|url|local|cran|version|bioc|deps|dev_deps)\s*\(
+    )""", re.X)
+_INSTALLER_NAME = r"(?:(?:install|update)\.packages|install_\w+|pkg_install|local_install\w*|pak)"
+DISPATCH_INSTALL = re.compile(r"(?:do\.call|match\.fun|get0?|getFromNamespace|getExportedValue)\s*\(\s*([\"'])(?:[\w.]+:::?)?"
+                              + _INSTALLER_NAME + r"\1")
+SHELL_INSTALL = re.compile(r"\bsystem2?\s*\([^)]*?(?:\bINSTALL\b|(?:install|update)\.packages|(?:pak|remotes|devtools|renv|BiocManager)::)")
+ATTACH_INSTALLER = re.compile(r"\b(?:library|require|requireNamespace|loadNamespace|attachNamespace)\s*\(\s*[\"']?"
+                              r"(?:BiocManager|devtools|pak|remotes|renv|pkgdepends)\b")
+BARE_INSTALLER = re.compile(r"(?<![\w.$@:])(?:install|pak|pkg_install|restore|init|activate)\s*\(")
+
+
+def is_installation(code):
+    """True when the chunk installs, updates, restores or bootstraps packages (see the notes above)."""
+    kept = _STRING_OR_COMMENT.sub(lambda match: match.group(1) or "", code)
+    tokens = re.sub(r"\s*:{2,3}\s*", "::", _STRING.sub("", kept).replace("`", ""))
+    return bool(INSTALL_CALL.search(tokens) or DISPATCH_INSTALL.search(kept) or SHELL_INSTALL.search(kept)
+                or (ATTACH_INSTALLER.search(kept) and BARE_INSTALLER.search(tokens)))
 
 
 def extract(file):
@@ -144,9 +167,7 @@ def extract(file):
         preceding=next((s.strip() for s in reversed(lines[:start]) if s.strip()),"")
         code="\n".join(line for _,line in content)
         skip=any(re.match(r"^\s*#(?:\|)?\s*docs-check:\s*skip\s*$",line) for _,line in content) or preceding=="<!-- docs-check: skip -->"
-        # Remove strings and comments before recognizing actual installation calls.
-        tokens=re.sub(r"\"(?:\\.|[^\"])*\"|'(?:\\.|[^'])*'|#[^\n]*", "",code)
-        install=bool(INSTALL_CALL.search(tokens))
+        install=is_installation(code)
         execute=options["eval"] and not skip and not install
         visible=options["include"] and options["results"]!="hide"
         buffer=[];j=0
@@ -179,6 +200,8 @@ def compare(expected,actual):
     expected=normalize(expected);actual=normalize(actual)
     # A bare numeric bound (`<2e-16`) has no label to compare; a tibble type row (`<chr> <dbl>`) is not one.
     if re.match(r"^(?:<=|<|>=|>)\s*[-+.\d]",expected):return "shape"
+    # A row made only of type tags (`<dbl[2]>`, `<chr [3]>`) is metadata: digits inside it get no numeric tolerance.
+    if re.fullmatch(r"(?:<[A-Za-z][^<>]*>)+",expected):return "match" if expected==actual else "shape"
     if expected==actual:return "match"
     inequality=re.fullmatch(r"(.+?)(<=|<|>=|>)([-+\d.eE]+)",expected)
     if inequality:

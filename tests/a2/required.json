@@ -581,8 +581,8 @@
         "tests/a2/test_guardian.py::test_pending_workload_sigint_retains_direct_child_handle",
         "tests/a2/test_guardian.py::test_interrupt_after_pin_constructor_enters_cleanup",
         "tests/a2/test_guardian.py::test_nul_command_fails_before_bootstrap_without_success",
-        "tests/a2/test_guardian.py::test_handle_allocation_failure_precedes_spawn",
-        "tests/a2/test_guardian.py::test_prestart_interrupt_never_signals_reaped_pin"
+        "tests/a2/test_guardian.py::test_prestart_interrupt_never_signals_reaped_pin",
+        "tests/a2/test_guardian.py::test_handle_allocation_failure_precedes_spawn"
       ],
       "status": "coverage-gap",
       "coverage_gaps": [
@@ -734,7 +734,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_examples_r.py": "917f57ba124babb400f1ad9422ba24130a172873566f436cbc9ef534e9e9f45c",
-        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -774,7 +774,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -794,7 +794,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -812,7 +812,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -831,7 +831,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -859,7 +859,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -881,19 +881,42 @@
         "tests/a2/test_readme.py::test_installation_forms_are_never_executed[devtools::install_deps()]",
         "tests/a2/test_readme.py::test_installation_forms_are_never_executed[utils::install.packages(\"x\")]",
         "tests/a2/test_readme.py::test_installation_forms_are_never_executed[install_github(\"a/b\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[pak :: pak(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[`pak::pak`(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[pak::`pak`(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[renv::activate()]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[renv::init()]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[(install.packages)(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[f <- install.packages\\nf(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[sapply(\"x\", install.packages)]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[do.call(\"install.packages\", list(\"x\"))]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[do.call('utils::install.packages', list(\"x\"))]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[system(\"R CMD INSTALL x.tar.gz\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[system2(\"R\", c(\"CMD\", \"INSTALL\", \"x.tar.gz\"))]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[system(\"Rscript -e 'install.packages(\\\\\"x\\\\\")'\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[library(BiocManager)\\ninstall(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[library(\"devtools\")\\ninstall()]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[require(pak)\\npak(\"x\")]",
         "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[pak::pkg_list()]",
         "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[installed.packages()]",
         "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[renv::status()]",
         "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[devtools::document()]",
         "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[my_pak::pak(\"x\")]",
         "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[reinstall_helper()]",
-        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[x$install_github(\"a/b\")]"
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[x$install_github(\"a/b\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[print(\"install.packages\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[cat(\"R CMD INSTALL\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[do.call(\"print\", list(1))]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[install(\"x\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[library(dplyr)\\ninstall(\"x\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[get(\"mean\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[system(\"echo hello\")]"
       ],
       "status": "mapped-review-complete",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -912,7 +935,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_examples_r.py": "917f57ba124babb400f1ad9422ba24130a172873566f436cbc9ef534e9e9f45c",
-        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -945,7 +968,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_examples_r.py": "917f57ba124babb400f1ad9422ba24130a172873566f436cbc9ef534e9e9f45c",
-        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -984,7 +1007,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_comparison.py": "23cda6e3907a258941cf9361d2f1c2da43a351415cb5f1c73ef4649c0a2aa7da",
+        "tests/a2/test_comparison.py": "5a4d2e98ee41e669485e9544639e364b762dde1bd68cf07c18e9c336f26af627",
         "tests/a2/test_examples_r.py": "917f57ba124babb400f1ad9422ba24130a172873566f436cbc9ef534e9e9f45c"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
@@ -1005,6 +1028,11 @@
         "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<chr>      <dbl>     <dbl>-  <chr>      <dbl>     <dbl>-match]",
         "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<dbl> <dbl> <dbl> <dbl> <int> <lgl>-  <dbl> <dbl> <dbl> <dbl> <int> <lgl>    -match]",
         "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<chr> <dbl>-<chr> <int>-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<dbl[2]>-<dbl[3]>-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<chr [3]>-<chr [4]>-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<S3: foo2>-<S3: foo3>-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<dbl[2]>-<dbl[2]>-match]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<chr [3]>-  <chr [3]>  -match]",
         "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<2e-16-<2e-16-shape]",
         "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[>=0.05->=0.05-shape]",
         "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[< 0.001-< 0.001-shape]"
@@ -1013,7 +1041,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_comparison.py": "23cda6e3907a258941cf9361d2f1c2da43a351415cb5f1c73ef4649c0a2aa7da"
+        "tests/a2/test_comparison.py": "5a4d2e98ee41e669485e9544639e364b762dde1bd68cf07c18e9c336f26af627"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1115,7 +1143,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_examples_r.py": "917f57ba124babb400f1ad9422ba24130a172873566f436cbc9ef534e9e9f45c",
-        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1226,16 +1254,16 @@
         "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[warn-2-text]",
         "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[error-2-json]",
         "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[error-2-text]",
-        "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[completed]",
-        "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[interrupt]",
-        "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[prepare]",
-        "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[stale]",
-        "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[error-2-False]",
-        "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[error-2-True]",
         "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[none-0-False]",
         "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[none-0-True]",
         "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[warn-2-False]",
-        "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[warn-2-True]"
+        "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[warn-2-True]",
+        "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[error-2-False]",
+        "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[error-2-True]",
+        "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[prepare]",
+        "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[interrupt]",
+        "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[stale]",
+        "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[completed]"
       ],
       "status": "mapped-review-complete",
       "coverage_gaps": [],
@@ -1430,7 +1458,6 @@
       "task": "T19",
       "proposed_node": "tests/a2/test_docs.py::test_status_guidance_count_sync",
       "nodes": [
-        "tests/a2/test_docs.py::test_version_and_agent_mirror",
         "tests/a2/test_docs.py::test_status_guidance_count_sync",
         "tests/a2/test_docs.py::test_agent_boundary_prohibitions[**Never auto-run** writes/uploads or network operations beyond the explicitly authorized read exceptions below.]",
         "tests/a2/test_docs.py::test_agent_boundary_prohibitions[**Never auto-run** `--run-examples`, including combined site/examples commands;]",
@@ -1438,7 +1465,8 @@
         "tests/a2/test_docs.py::test_agent_boundary_prohibitions[never reuse one URL across an ecosystem.]",
         "tests/a2/test_docs.py::test_agent_boundary_prohibitions[Unknown wrapper lifetime requires a terminal recommendation; budget plus 15 seconds is required.]",
         "tests/a2/test_docs.py::test_agent_boundary_prohibitions[they do not permit writes, deployment, upload, fetch or arbitrary probes.]",
-        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[`--kind deploy` is prohibited as an auto-run recipe]"
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[`--kind deploy` is prohibited as an auto-run recipe]",
+        "tests/a2/test_docs.py::test_version_and_agent_mirror"
       ],
       "status": "mapped-review-complete",
       "coverage_gaps": [],
@@ -1510,14 +1538,6 @@
         "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[manifest_hash]",
         "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[collection_run_id]",
         "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[reported_r_checked]",
-        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[none]",
-        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[R]",
-        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[packages]",
-        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[platform]",
-        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[source-hash]",
-        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[expected-hash]",
-        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[missing-fixture]",
-        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[duplicate-fixture]",
         "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.15.0-True]",
         "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.16.1-True]",
         "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.12.15-True]",
@@ -1525,7 +1545,15 @@
         "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.16.0rc1-False]",
         "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.16.0a1-False]",
         "tests/a2/test_release_verifier.py::test_stable_python_evidence[latest-False]",
-        "tests/a2/test_release_verifier.py::test_stable_python_evidence[None-False]"
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[None-False]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[none]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[R]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[packages]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[platform]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[source-hash]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[expected-hash]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[missing-fixture]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[duplicate-fixture]"
       ],
       "status": "mapped-review-complete",
       "coverage_gaps": [],
@@ -1616,7 +1644,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "5c50e21efe7550730c71319c7f613a8c99bb6fe00185c17763b39a26de1ae23a"
+        "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1648,6 +1676,14 @@
         "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[unknown-triage-class-<lambda>]",
         "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[false-positive-unresolved-<lambda>]",
         "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[false-positive-no-class-id-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[finding-without-severity-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[finding-unknown-severity-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[finding-without-check-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[extra-count-key-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[extra-package-key-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[extra-package-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[package-name-mismatch-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[hash-for-non-readme-key-<lambda>]",
         "tests/a2/test_evidence.py::test_triage_false_positive_class_may_be_scoped_out_only_with_partial_scope",
         "tests/a2/test_evidence.py::test_triage_complete_scope_requires_nothing_unverified",
         "tests/a2/test_evidence.py::test_triage_producer_audits_a_clone_and_never_goes_green_unreviewed",
@@ -1665,7 +1701,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "5c50e21efe7550730c71319c7f613a8c99bb6fe00185c17763b39a26de1ae23a"
+        "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1687,7 +1723,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "5c50e21efe7550730c71319c7f613a8c99bb6fe00185c17763b39a26de1ae23a"
+        "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1750,7 +1786,7 @@
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 501,
+  "collected_nodes": 537,
   "review_candidate": "e36c341 plus pre-spawn ownership and replay boundary repairs",
   "platforms": [
     "ubuntu-24.04",

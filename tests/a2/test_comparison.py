@@ -33,6 +33,9 @@ def test_remaining_normative_precision_rows(expected,actual,verdict):
  ('<chr>      <dbl>     <dbl>','  <chr>      <dbl>     <dbl>','match'),
  ('<dbl> <dbl> <dbl> <dbl> <int> <lgl>','  <dbl> <dbl> <dbl> <dbl> <int> <lgl>    ','match'),
  ('<chr> <dbl>','<chr> <int>','shape'),
+ # Digits inside type metadata are not numeric output: no display-precision tolerance applies.
+ ('<dbl[2]>','<dbl[3]>','shape'),('<chr [3]>','<chr [4]>','shape'),('<S3: foo2>','<S3: foo3>','shape'),
+ ('<dbl[2]>','<dbl[2]>','match'),('<chr [3]>','  <chr [3]>  ','match'),
  # Bare numeric bounds remain unverifiable, even when identical.
  ('<2e-16','<2e-16','shape'),('>=0.05','>=0.05','shape'),('< 0.001','< 0.001','shape'),
 ])

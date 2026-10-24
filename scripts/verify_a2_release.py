@@ -93,6 +93,11 @@ TRIAGE_PACKAGES = ("medfit", "probmed", "medrobust")
 TRIAGE_COUNTS = ("discovered", "eligible", "checked", "excluded", "unverified", "blocked")
 TRIAGE_STATES = ("complete", "incomplete", "unavailable", "not-applicable")
 TRIAGE_CLASSES = ("true-positive", "false-positive-class", "fixed")
+TRIAGE_PACKAGE_KEYS = {"package", "commit", "source_dirty", "source_sha256", "state", "scope", "counts", "reasons",
+                       "findings", "reviewed", "disposition", "triaged_classes"}
+TRIAGE_FINDING_KEYS = {"check", "severity", "file", "line", "assertion_id", "message", "triage"}
+TRIAGE_TRIAGE_KEYS = {"class", "rationale", "class_id", "resolved", "scoped_out"}
+TRIAGE_CLASS_ENTRY_KEYS = {"class_id", "status", "rationale", "fix_commit"}
 
 
 def validate_package_triage(facts):
@@ -101,20 +106,25 @@ def validate_package_triage(facts):
     Counts must be internally consistent, a partial scope must say so and give reasons (never silently
     green), every warn/error finding needs a recorded triage, and a false-positive class blocks release
     unless it is resolved or explicitly scoped out of an honestly partial scope."""
+    require(isinstance(facts, dict) and set(facts) == {"packages"}, "package triage facts must hold exactly 'packages'")
     packages = facts.get("packages")
-    require(isinstance(packages, dict) and set(packages) >= set(TRIAGE_PACKAGES), "package triage must cover medfit, probmed, medrobust")
+    require(isinstance(packages, dict) and set(packages) == set(TRIAGE_PACKAGES), "package triage must cover exactly medfit, probmed, medrobust")
     for name in TRIAGE_PACKAGES:
         item = packages[name]
         where = f"package triage {name}"
         require(isinstance(item, dict), f"{where}: record object required")
+        require(set(item) <= TRIAGE_PACKAGE_KEYS, f"{where}: unknown record keys {sorted(set(item) - TRIAGE_PACKAGE_KEYS)}")
+        require(item.get("package") == name, f"{where}: package field must equal its key")
         require(item.get("reviewed") is True and bool(item.get("disposition")), f"{where}: unreviewed or no disposition")
         require(isinstance(item.get("commit"), str) and re.fullmatch(r"[a-f0-9]{40}", item["commit"]), f"{where}: pinned 40-hex commit required")
         hashes = item.get("source_sha256")
         require(isinstance(hashes, dict) and "README.md" in hashes
-                and all(isinstance(h, str) and re.fullmatch(r"[a-f0-9]{64}", h) for h in hashes.values()), f"{where}: README.md source hash required")
+                and all(isinstance(k, str) and re.fullmatch(r"README\.(?:md|Rmd|qmd)", k) and isinstance(h, str) and re.fullmatch(r"[a-f0-9]{64}", h)
+                        for k, h in hashes.items()), f"{where}: README source hashes (README.md required) must be 64-hex")
         require(item.get("state") in TRIAGE_STATES, f"{where}: unknown state")
         counts = item.get("counts")
-        require(isinstance(counts, dict) and all(isinstance(counts.get(k), int) and not isinstance(counts.get(k), bool) and counts[k] >= 0
+        require(isinstance(counts, dict) and set(counts) == set(TRIAGE_COUNTS), f"{where}: counts must hold exactly the six coverage counts")
+        require(all(isinstance(counts.get(k), int) and not isinstance(counts.get(k), bool) and counts[k] >= 0
                                                  for k in TRIAGE_COUNTS), f"{where}: all six counts must be non-negative integers")
         require(counts["eligible"] <= counts["discovered"] and counts["checked"] <= counts["eligible"], f"{where}: counts out of order")
         require(counts["checked"] + counts["excluded"] + counts["unverified"] + counts["blocked"] == counts["discovered"],
@@ -132,6 +142,7 @@ def validate_package_triage(facts):
         require(not (partial or vacuous) or bool(reasons), f"{where}: partial or vacuous coverage requires reasons")
         for entry in item.get("triaged_classes", []):
             # False-positive classes found earlier in this triage; each must end fixed (with the fixing commit) or scoped out.
+            require(isinstance(entry, dict) and set(entry) <= TRIAGE_CLASS_ENTRY_KEYS, f"{where}: unknown triaged-class keys")
             require(isinstance(entry, dict) and bool(entry.get("class_id")) and bool(entry.get("rationale"))
                     and entry.get("status") in ("fixed", "scoped-out"), f"{where}: triaged class needs id, status and rationale")
             require(entry["status"] != "fixed" or (isinstance(entry.get("fix_commit"), str) and re.fullmatch(r"[a-f0-9]{40}", entry["fix_commit"])),
@@ -140,10 +151,14 @@ def validate_package_triage(facts):
         findings = item.get("findings")
         require(isinstance(findings, list), f"{where}: findings list required")
         for finding in findings:
-            if finding.get("severity") not in ("warn", "error"):
+            require(isinstance(finding, dict) and set(finding) <= TRIAGE_FINDING_KEYS, f"{where}: unknown finding keys")
+            require(isinstance(finding.get("check"), str) and bool(finding["check"]) and finding.get("severity") in ("info", "warn", "error"),
+                    f"{where}: every finding needs a check and a severity of info, warn or error")
+            if finding["severity"] not in ("warn", "error"):
                 continue
             triage = finding.get("triage")
-            require(isinstance(triage, dict) and triage.get("class") in TRIAGE_CLASSES and bool(triage.get("rationale")),
+            require(isinstance(triage, dict) and set(triage) <= TRIAGE_TRIAGE_KEYS, f"{where}: unknown triage keys")
+            require(triage.get("class") in TRIAGE_CLASSES and bool(triage.get("rationale")),
                     f"{where}: every warn/error finding needs a class and rationale")
             if triage["class"] == "false-positive-class":
                 require(bool(triage.get("class_id")), f"{where}: false-positive class needs an id")

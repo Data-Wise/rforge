@@ -134,3 +134,10 @@ Read-only Codex adversarial review of D04 docs and a broad G08 ownership read.
 - Rejected as stated: moving the final PGID probe before pin release. An unreaped zombie pin keeps the group present (EPERM on macOS), so disappearance cannot be observed before the reap. A PGID reused after the reap can only turn success into `cleanup-unverified` (fails closed); no destructive signal follows pin release. Rationale recorded as a comment in `lib/_docguardian.py`. Linux behavior of the zombie-group probe is not yet observed; it falls under the Ubuntu platform run.
 - The reviewer's test run could not execute (no writable temp dir in its sandbox); local runs: full suite 1362 passed / 4 skipped, test-all 47/47, strict docs build passed, Python 3.15.
 - G08 remains pending: both-platform process tests and a review that actually executes them. D04 rendered inspection remains aggregate.
+
+## Phase 3 review disposition (static review: no tests executed by the reviewer)
+
+- Confirmed and fixed: install-chunk detection ran a regex after string removal, so dispatch (`do.call`, `match.fun`, `getExportedValue`), shell (`system2`) and attached-installer forms slipped through; `is_installation` now inspects token- and string-preserving views, with look-alike negatives pinned.
+- Confirmed and fixed: tibble type rows (`<chr>`, `<dbl[2]>`) compared as bare inequality bounds; type rows now require exact equality while numeric bounds such as `<2e-16` stay `shape`.
+- Confirmed, partly fixed: the triage validator accepted unknown keys, findings without `check`/`severity`, extra packages and non-README hash keys; it is now an exact-key schema. Limit: a well-formed but fabricated commit or hash cannot be detected by the validator; authenticity rests on the producer run ID plus the artifact hash.
+- Manifest refreshed: 537 collected nodes (36 added), source hashes recomputed. Local gates: full pytest 1460 passed / 5 skipped, `test-all.sh` 47/47, reference generator check clean.
