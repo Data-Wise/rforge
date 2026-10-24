@@ -89,6 +89,61 @@ def validate_run(manifest, evidence, *, candidate_sha, lock_hash, manifest_hash)
     return {"verified":True,"required_nodes":len(required),"R_checked":r_checked,"HTTP_checked":http_checked}
 
 
+TRIAGE_PACKAGES = ("medfit", "probmed", "medrobust")
+TRIAGE_COUNTS = ("discovered", "eligible", "checked", "excluded", "unverified", "blocked")
+TRIAGE_STATES = ("complete", "incomplete", "unavailable", "not-applicable")
+TRIAGE_CLASSES = ("true-positive", "false-positive-class", "fixed")
+
+
+def validate_package_triage(facts):
+    """Strict schema for the three-package README-coverage triage record.
+
+    Counts must be internally consistent, a partial scope must say so and give reasons (never silently
+    green), every warn/error finding needs a recorded triage, and a false-positive class blocks release
+    unless it is resolved or explicitly scoped out of an honestly partial scope."""
+    packages = facts.get("packages")
+    require(isinstance(packages, dict) and set(packages) >= set(TRIAGE_PACKAGES), "package triage must cover medfit, probmed, medrobust")
+    for name in TRIAGE_PACKAGES:
+        item = packages[name]
+        where = f"package triage {name}"
+        require(isinstance(item, dict), f"{where}: record object required")
+        require(item.get("reviewed") is True and bool(item.get("disposition")), f"{where}: unreviewed or no disposition")
+        require(isinstance(item.get("commit"), str) and re.fullmatch(r"[a-f0-9]{40}", item["commit"]), f"{where}: pinned 40-hex commit required")
+        hashes = item.get("source_sha256")
+        require(isinstance(hashes, dict) and "README.md" in hashes
+                and all(isinstance(h, str) and re.fullmatch(r"[a-f0-9]{64}", h) for h in hashes.values()), f"{where}: README.md source hash required")
+        require(item.get("state") in TRIAGE_STATES, f"{where}: unknown state")
+        counts = item.get("counts")
+        require(isinstance(counts, dict) and all(isinstance(counts.get(k), int) and not isinstance(counts.get(k), bool) and counts[k] >= 0
+                                                 for k in TRIAGE_COUNTS), f"{where}: all six counts must be non-negative integers")
+        require(counts["eligible"] <= counts["discovered"] and counts["checked"] <= counts["eligible"], f"{where}: counts out of order")
+        require(counts["checked"] + counts["excluded"] + counts["unverified"] + counts["blocked"] == counts["discovered"],
+                f"{where}: counts do not account for every discovered assertion")
+        require(item.get("state") != "complete" or (counts["unverified"] == 0 and counts["blocked"] == 0),
+                f"{where}: state complete contradicts unverified or blocked assertions")
+        vacuous = item.get("state") == "not-applicable"
+        require(not vacuous or all(counts[k] == 0 for k in TRIAGE_COUNTS), f"{where}: not-applicable requires zero assertions")
+        require(vacuous == (item.get("scope") == "not-applicable"), f"{where}: not-applicable state and scope must go together")
+        partial = not vacuous and (item.get("state") != "complete" or counts["unverified"] > 0 or counts["blocked"] > 0 or counts["excluded"] > 0)
+        require(item.get("scope") in ("complete", "partial", "not-applicable"), f"{where}: unknown scope")
+        require(not partial or item["scope"] == "partial", f"{where}: partial coverage cannot be recorded as complete")
+        reasons = item.get("reasons")
+        require(isinstance(reasons, list) and all(isinstance(r, str) and r for r in reasons), f"{where}: reasons must be strings")
+        require(not (partial or vacuous) or bool(reasons), f"{where}: partial or vacuous coverage requires reasons")
+        findings = item.get("findings")
+        require(isinstance(findings, list), f"{where}: findings list required")
+        for finding in findings:
+            if finding.get("severity") not in ("warn", "error"):
+                continue
+            triage = finding.get("triage")
+            require(isinstance(triage, dict) and triage.get("class") in TRIAGE_CLASSES and bool(triage.get("rationale")),
+                    f"{where}: every warn/error finding needs a class and rationale")
+            if triage["class"] == "false-positive-class":
+                require(bool(triage.get("class_id")), f"{where}: false-positive class needs an id")
+                require(triage.get("resolved") is True or (triage.get("scoped_out") is True and item["scope"] == "partial"),
+                        f"{where}: unresolved false-positive class blocks release unless scoped out of a partial scope")
+
+
 def validate_observation(name, item, *, candidate_sha, evidence_root):
     require(isinstance(item, dict), "observation object required")
     require(item.get("candidate_sha") == candidate_sha and item.get("status") == "passed", f"actual {name} evidence missing or failed")
@@ -110,7 +165,7 @@ def validate_observation(name, item, *, candidate_sha, evidence_root):
     if name == "live_smoke":
         require(bool(facts.get("url")) and bool(facts.get("source_ref")) and facts.get("requests", 0) > 0 and facts.get("checked", 0) > 0, "live execution missing")
     elif name == "package_triage":
-        require(set(facts.get("packages", {})) >= {"medfit", "probmed", "medrobust"} and all(v.get("reviewed") is True and bool(v.get("disposition")) for v in facts["packages"].values()), "package triage incomplete")
+        validate_package_triage(facts)
     elif name == "full_gates":
         require(facts.get("pytest_passed", 0) > 0 and facts.get("test_all_passed") == 47 and all(facts.get(k) is True for k in ("version_sync", "reference_sync", "command_sync", "mkdocs_strict")), "full gates incomplete")
     elif name == "rendered_review":

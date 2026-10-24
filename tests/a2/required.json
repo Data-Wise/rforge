@@ -984,7 +984,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_comparison.py": "5f3eabff15d204d3d2542108f1d9cb88fbcfb01a5e020f9a7d2cb91b956cfb02",
+        "tests/a2/test_comparison.py": "23cda6e3907a258941cf9361d2f1c2da43a351415cb5f1c73ef4649c0a2aa7da",
         "tests/a2/test_examples_r.py": "917f57ba124babb400f1ad9422ba24130a172873566f436cbc9ef534e9e9f45c"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
@@ -1001,13 +1001,19 @@
         "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-p > 0.01-unverified]",
         "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-<2e-16-shape]",
         "tests/a2/test_comparison.py::test_labeled_inequality_cases[<2e-16-<2e-16-shape]",
-        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-p < .-shape]"
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-p < .-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<chr>      <dbl>     <dbl>-  <chr>      <dbl>     <dbl>-match]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<dbl> <dbl> <dbl> <dbl> <int> <lgl>-  <dbl> <dbl> <dbl> <dbl> <int> <lgl>    -match]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<chr> <dbl>-<chr> <int>-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<2e-16-<2e-16-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[>=0.05->=0.05-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[< 0.001-< 0.001-shape]"
       ],
       "status": "mapped-review-complete",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_comparison.py": "5f3eabff15d204d3d2542108f1d9cb88fbcfb01a5e020f9a7d2cb91b956cfb02"
+        "tests/a2/test_comparison.py": "23cda6e3907a258941cf9361d2f1c2da43a351415cb5f1c73ef4649c0a2aa7da"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1610,7 +1616,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "523cf75592f01ad53b04a7d6bbef97576fc5ac4f2c297bc332683e1a68fd3751"
+        "tests/a2/test_evidence.py": "2023462e545867ab2d71da54aebdfc3762f1ee40b12e607290a2201acff4fe54"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1619,15 +1625,41 @@
       "task": "T22",
       "proposed_node": "tests/a2/test_evidence.py::test_package_coverage_triage",
       "nodes": [
-        "tests/a2/test_evidence.py::test_package_coverage_triage"
+        "tests/a2/test_evidence.py::test_package_coverage_triage",
+        "tests/a2/test_evidence.py::test_triage_schema_accepts_a_complete_record",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[missing-package-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[unreviewed-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[no-disposition-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[short-commit-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[no-readme-hash-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[bad-hash-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[missing-count-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[negative-count-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[non-integer-count-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[counts-do-not-sum-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[eligible-exceeds-discovered-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[checked-exceeds-eligible-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[partial-without-reason-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[partial-claims-complete-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[incomplete-state-claims-complete-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[unknown-state-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[finding-untriaged-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[finding-no-rationale-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[unknown-triage-class-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[false-positive-unresolved-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[false-positive-no-class-id-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_false_positive_class_may_be_scoped_out_only_with_partial_scope",
+        "tests/a2/test_evidence.py::test_triage_complete_scope_requires_nothing_unverified",
+        "tests/a2/test_evidence.py::test_triage_producer_audits_a_clone_and_never_goes_green_unreviewed",
+        "tests/a2/test_evidence.py::test_triage_not_applicable_is_vacuous_but_never_silent"
       ],
       "status": "coverage-gap",
       "coverage_gaps": [
-        "Controlled triage file facts checked; exact all-six-count/reason/source-hash triage schema needs strengthening and candidate-bound actual dogfood refresh."
+        "Strict triage schema and an untriaged producer exist (counts must account for every assertion; partial/vacuous scope needs reasons; every warn/error finding needs a triage; unresolved false-positive classes block). A candidate-bound three-package run on the final commit remains aggregate work."
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "523cf75592f01ad53b04a7d6bbef97576fc5ac4f2c297bc332683e1a68fd3751"
+        "tests/a2/test_evidence.py": "2023462e545867ab2d71da54aebdfc3762f1ee40b12e607290a2201acff4fe54"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1649,7 +1681,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "523cf75592f01ad53b04a7d6bbef97576fc5ac4f2c297bc332683e1a68fd3751"
+        "tests/a2/test_evidence.py": "2023462e545867ab2d71da54aebdfc3762f1ee40b12e607290a2201acff4fe54"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1681,7 +1713,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "4af4a1f16af09343aee8dea69f64398a0886ec6f3c0da63aff8d5e70e6f3094b"
+        "tests/a2/test_final_gates.py": "740ae30153ad817b4898509968bc3dc52e433f4595cd1a93c1f083427b4bc8fb"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1706,13 +1738,13 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "4af4a1f16af09343aee8dea69f64398a0886ec6f3c0da63aff8d5e70e6f3094b"
+        "tests/a2/test_final_gates.py": "740ae30153ad817b4898509968bc3dc52e433f4595cd1a93c1f083427b4bc8fb"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 463,
+  "collected_nodes": 495,
   "review_candidate": "e36c341 plus pre-spawn ownership and replay boundary repairs",
   "platforms": [
     "ubuntu-24.04",

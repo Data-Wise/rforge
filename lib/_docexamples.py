@@ -177,7 +177,8 @@ def compare(expected,actual):
         value=re.sub(r"\s+"," ",value.strip())
         return re.sub(r"(?<=[^\w])\s+|\s+(?=[^\w])","",value)
     expected=normalize(expected);actual=normalize(actual)
-    if re.match(r"^(?:<=|<|>=|>)",expected):return "shape"
+    # A bare numeric bound (`<2e-16`) has no label to compare; a tibble type row (`<chr> <dbl>`) is not one.
+    if re.match(r"^(?:<=|<|>=|>)\s*[-+.\d]",expected):return "shape"
     if expected==actual:return "match"
     inequality=re.fullmatch(r"(.+?)(<=|<|>=|>)([-+\d.eE]+)",expected)
     if inequality:

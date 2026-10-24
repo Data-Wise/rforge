@@ -23,11 +23,23 @@ def test_review_record_validation(tmp_path):
     with pytest.raises(v.VerificationError):v.validate_aggregate(platforms,observations,candidate_sha='sha',evidence_root=tmp_path)
 
 
+def triage_facts():
+    """A valid per-package triage record set (partial README scope, one triaged finding)."""
+    def package(name):
+        return {'package':name,'commit':'a'*40,'source_sha256':{'README.md':'b'*64},'state':'incomplete','scope':'partial',
+                'counts':{'discovered':6,'eligible':4,'checked':2,'excluded':0,'unverified':4,'blocked':0},
+                'reasons':['assertions outside supported R fences'],
+                'findings':[{'check':'examples-shape','severity':'warn','file':'README.md','assertion_id':'README.md:85',
+                             'triage':{'class':'true-positive','rationale':'documented output shape differs from the real result'}}],
+                'reviewed':True,'disposition':'reviewed; partial scope recorded as incomplete'}
+    return {'packages':{name:package(name) for name in ('medfit','probmed','medrobust')}}
+
+
 def evidence_records(observations, root):
     import json
     facts = {
         'live_smoke': {'url':'https://example.org/pkg/','source_ref':'abc','requests':1,'checked':2},
-        'package_triage': {'packages':{p:{'reviewed':True,'disposition':'reviewed incomplete scope'} for p in ('medfit','probmed','medrobust')}},
+        'package_triage': triage_facts(),
         'full_gates': {'pytest_passed':1151,'test_all_passed':47,'version_sync':True,'reference_sync':True,'command_sync':True,'mkdocs_strict':True},
         'rendered_review': {'pages':[{'inspected':True,'sha256':'a'*64}]},
         'adversarial_review': {'job_id':'review-job','unresolved_findings':0,'coverage_reviewed':True},

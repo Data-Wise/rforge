@@ -26,3 +26,15 @@ def test_labeled_inequality_cases(expected,actual,verdict):
 @pytest.mark.parametrize('expected,actual,verdict',[('0.1900','0.1901','match'),('0.1900','0.1902','output'),('0.164','0.1648','match'),('0.19','0.164','output')])
 def test_remaining_normative_precision_rows(expected,actual,verdict):
     assert examples.compare(expected,actual)==verdict
+
+
+@pytest.mark.parametrize('expected,actual,verdict',[
+ # Tibble/pillar column-type rows start with `<`; they are table headers, not bare inequality bounds.
+ ('<chr>      <dbl>     <dbl>','  <chr>      <dbl>     <dbl>','match'),
+ ('<dbl> <dbl> <dbl> <dbl> <int> <lgl>','  <dbl> <dbl> <dbl> <dbl> <int> <lgl>    ','match'),
+ ('<chr> <dbl>','<chr> <int>','shape'),
+ # Bare numeric bounds remain unverifiable, even when identical.
+ ('<2e-16','<2e-16','shape'),('>=0.05','>=0.05','shape'),('< 0.001','< 0.001','shape'),
+])
+def test_tibble_type_rows_are_not_bare_inequality_bounds(expected,actual,verdict):
+    assert examples.compare(expected,actual)==verdict
