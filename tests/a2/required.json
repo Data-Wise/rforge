@@ -1747,15 +1747,29 @@
         "tests/a2/test_final_gates.py::test_gate_record_validation[no-provenance-full_gates]",
         "tests/a2/test_final_gates.py::test_gate_record_validation[no-provenance-rendered_review]",
         "tests/a2/test_final_gates.py::test_gate_record_validation[no-provenance-adversarial_review]",
-        "tests/a2/test_final_gates.py::test_gate_record_validation[no-provenance-requirement_mapping]"
+        "tests/a2/test_final_gates.py::test_gate_record_validation[no-provenance-requirement_mapping]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[bad-log-hash]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[dirty-tree]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[duplicate-command]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[flag-without-command]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[missing-command]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[missing-log-hash]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[nonzero-exit]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[pytest-failures]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[test-all-failures]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[unknown-command]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[wrong-source-commit]",
+        "tests/a2/test_final_gates.py::test_gate_producer_record_is_accepted_by_the_validator",
+        "tests/a2/test_final_gates.py::test_gate_producer_records_failures_and_the_validator_rejects_them",
+        "tests/a2/test_final_gates.py::test_gate_producer_dirty_tree_is_flagged"
       ],
       "status": "coverage-gap",
       "coverage_gaps": [
-        "Artifact hashes and minimum facts checked; actual full-gate logs/check names/source binding are not yet inspected by aggregate producer."
+        "Full-gate record is now strict (clean candidate tree, per-gate exit code and log hash, exact gate set) and has a producer, scripts/a2_gate_record.py; the candidate-bound run on the final commit remains aggregate work."
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "740ae30153ad817b4898509968bc3dc52e433f4595cd1a93c1f083427b4bc8fb"
+        "tests/a2/test_final_gates.py": "f104e2bf76464391bab8416b68b27c9cd2ba3931e2d3bdd344ed5f452b8d0052"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1772,21 +1786,31 @@
         "tests/a2/test_final_gates.py::test_observation_artifact_validation[wrong-candidate]",
         "tests/a2/test_final_gates.py::test_observation_artifact_validation[wrong-producer]",
         "tests/a2/test_final_gates.py::test_observation_artifact_validation[empty-facts]",
-        "tests/a2/test_final_gates.py::test_observation_artifact_validation[unresolved-review]"
+        "tests/a2/test_final_gates.py::test_observation_artifact_validation[unresolved-review]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[count-disagrees]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[coverage-unreviewed]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[deferred-finding]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[duplicate-finding-id]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[finding-without-disposition]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[finding-without-evidence]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[no-executed-tests]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[static-review]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[wrong-reviewed-commit]",
+        "tests/a2/test_final_gates.py::test_review_with_no_findings_is_accepted_only_when_executed"
       ],
       "status": "coverage-gap",
       "coverage_gaps": [
-        "Unresolved review rejected; real finalized review coverage, complete mapping, both retrieved platform artifacts and observation producers pending."
+        "Review record validator rejects static, unbound, undispositioned and duplicate-id reviews; the real finalized review of the final candidate and both retrieved platform artifacts remain aggregate work."
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "740ae30153ad817b4898509968bc3dc52e433f4595cd1a93c1f083427b4bc8fb"
+        "tests/a2/test_final_gates.py": "f104e2bf76464391bab8416b68b27c9cd2ba3931e2d3bdd344ed5f452b8d0052"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 537,
+  "collected_nodes": 561,
   "review_candidate": "e36c341 plus pre-spawn ownership and replay boundary repairs",
   "platforms": [
     "ubuntu-24.04",

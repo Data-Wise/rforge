@@ -166,6 +166,40 @@ def validate_package_triage(facts):
                         f"{where}: unresolved false-positive class blocks release unless scoped out of a partial scope")
 
 
+GATE_NAMES = ("pytest", "test-all", "version-sync", "reference-sync", "command-sync", "mkdocs-strict")
+REVIEW_DISPOSITIONS = ("fixed", "rejected")
+
+
+def validate_full_gates(facts, candidate_sha):
+    """Every gate ran in the clean candidate tree, exited 0, and left a hashed log; flags alone are not evidence."""
+    where = "full gates"
+    require(facts.get("source_commit") == candidate_sha and facts.get("tree_clean") is True, f"{where}: not bound to a clean candidate tree")
+    require(facts.get("pytest_passed", 0) > 0 and facts.get("pytest_failed") == 0, f"{where}: pytest incomplete or failing")
+    require(facts.get("test_all_passed") == 47 and facts.get("test_all_failed") == 0, f"{where}: test-all incomplete or failing")
+    require(all(facts.get(k) is True for k in ("version_sync", "reference_sync", "command_sync", "mkdocs_strict")), f"{where}: sync/build flag false")
+    commands = facts.get("commands")
+    require(isinstance(commands, list) and all(isinstance(c, dict) for c in commands), f"{where}: command records required")
+    names = [c.get("name") for c in commands]
+    require(sorted(names) == sorted(GATE_NAMES), f"{where}: commands must be exactly {list(GATE_NAMES)}")
+    for c in commands:
+        require(bool(c.get("command")) and c.get("exit_code") == 0, f"{where}: {c.get('name')} did not exit 0")
+        require(isinstance(c.get("log_sha256"), str) and re.fullmatch(r"[a-f0-9]{64}", c["log_sha256"]), f"{where}: {c.get('name')} log hash required")
+
+
+def validate_review(facts, candidate_sha):
+    """A finalized review executed against the candidate; every finding fixed or rejected with evidence."""
+    where = "adversarial review"
+    require(bool(facts.get("job_id")) and facts.get("reviewed_commit") == candidate_sha, f"{where}: not bound to the candidate")
+    require(facts.get("mode") == "executed" and facts.get("executed_tests", 0) > 0, f"{where}: a static review is not release evidence")
+    require(facts.get("coverage_reviewed") is True, f"{where}: coverage not reviewed")
+    findings = facts.get("findings")
+    require(isinstance(findings, list) and all(isinstance(f, dict) for f in findings), f"{where}: findings list required")
+    ids = [f.get("id") for f in findings]
+    require(all(ids) and len(set(ids)) == len(ids), f"{where}: finding ids must be unique")
+    unresolved = sum(1 for f in findings if f.get("disposition") not in REVIEW_DISPOSITIONS or not f.get("evidence"))
+    require(unresolved == 0 and facts.get("unresolved_findings") == 0, f"{where}: unresolved findings")
+
+
 def validate_observation(name, item, *, candidate_sha, evidence_root):
     require(isinstance(item, dict), "observation object required")
     require(item.get("candidate_sha") == candidate_sha and item.get("status") == "passed", f"actual {name} evidence missing or failed")
@@ -189,11 +223,11 @@ def validate_observation(name, item, *, candidate_sha, evidence_root):
     elif name == "package_triage":
         validate_package_triage(facts)
     elif name == "full_gates":
-        require(facts.get("pytest_passed", 0) > 0 and facts.get("test_all_passed") == 47 and all(facts.get(k) is True for k in ("version_sync", "reference_sync", "command_sync", "mkdocs_strict")), "full gates incomplete")
+        validate_full_gates(facts, candidate_sha)
     elif name == "rendered_review":
         require(bool(facts.get("pages")) and all(v.get("inspected") is True and re.fullmatch(r"[a-f0-9]{64}", v.get("sha256", "")) for v in facts["pages"]), "render inspection incomplete")
     elif name == "adversarial_review":
-        require(bool(facts.get("job_id")) and facts.get("unresolved_findings") == 0 and facts.get("coverage_reviewed") is True, "review unresolved or incomplete")
+        validate_review(facts, candidate_sha)
     elif name == "requirement_mapping":
         require(facts.get("review") == "complete" and facts.get("unmapped") == 0 and facts.get("requirements", 0) > 0, "mapping incomplete")
 
