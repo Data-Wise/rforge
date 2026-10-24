@@ -6,7 +6,7 @@
       "id": "docscheck-a2--live-site-and-readme-example-audit:1",
       "anchor": "docscheck-a2--live-site-and-readme-example-audit",
       "ordinal": 1,
-      "text": "# docs:check A2 \u2014 live-site and README example audit",
+      "text": "# docs:check A2 — live-site and README example audit",
       "sha256": "77b12acea173b27c1b01c0130d8c2d8f8309b442ef439c77fb32f35e9e675b3f",
       "inventory_ids": [
         "D05"
@@ -50,7 +50,7 @@
       "id": "objective-and-recommendation:2",
       "anchor": "objective-and-recommendation",
       "ordinal": 2,
-      "text": "Extend the existing `/rforge:docs:check` with opt-in `--site URL` and\n`--run-examples`. Preserve the default static, offline audit. Keep site inspection\nand example execution independently testable and independently reportable.\nRecommended build order: shared stage reporting \u2192 site \u2192 examples \u2192 integration.\nThe user approved this specification and requested implementation planning only.\nImplementation and release remain separate authorized tasks. Material scope limitation: source/render\npairing is deferred, so source-based READMEs with asserted rendered output\nremain incomplete even when their source assertions replay successfully.",
+      "text": "Extend the existing `/rforge:docs:check` with opt-in `--site URL` and\n`--run-examples`. Preserve the default static, offline audit. Keep site inspection\nand example execution independently testable and independently reportable.\nRecommended build order: shared stage reporting → site → examples → integration.\nThe user approved this specification and requested implementation planning only.\nImplementation and release remain separate authorized tasks. Material scope limitation: source/render\npairing is deferred, so source-based READMEs with asserted rendered output\nremain incomplete even when their source assertions replay successfully.",
       "sha256": "2afecf9ffa5e087ed67fdea99dad8fa5758a7f608e8946cebea2de523abbca1a",
       "inventory_ids": [
         "C01",
@@ -185,7 +185,7 @@
       "id": "command-contract:4",
       "anchor": "command-contract",
       "ordinal": 4,
-      "text": "Each requested stage reports state (`complete`, `incomplete`, `unavailable`,\n`not-applicable`), counts, provenance, and reasons. Unrequested stages are absent.\nStatic findings remain available even when an optional stage fails. Missing\nengines propagate through package and ecosystem reports. A requested unavailable\nor incomplete stage sets overall `incomplete`; no assertions anywhere in the\nREADME surface is `not-applicable`. Assertions present but outside supported\ncomparison scope make the stage incomplete, with explicit unverified counts.\nAn excluded-only stage is also `not-applicable`, with exclusion reasons/counts.\n`--detailed` may hide info findings but never stage states or coverage counts.\nDefault `--fail-on none` remains exit 0; enabled thresholds retain exit 2 for\nincomplete/failed audits, exit 1 for complete threshold findings, else exit 0.\nCLI misuse exits 2 independently of `--fail-on`.\nBuffer the final report until execution completes or the runner deadline fires.\nKeep the existing scope as the first text line. Immediately afterward in that report, print\nrequested stage states and diagnostic reasons; unavailable/incomplete stages also\nemit a concise stderr notice, including in JSON mode. JSON stdout remains one\nvalid document. Preserve the final INCOMPLETE marker and prohibit \u201cno findings\u201d\nas a clean conclusion for such runs. No-output stages never execute setup alone.\nThe single-package site restriction is a proposed A2 scope choice, not removal\nof a shipped feature; ecosystem URL configuration is deferred.",
+      "text": "Each requested stage reports state (`complete`, `incomplete`, `unavailable`,\n`not-applicable`), counts, provenance, and reasons. Unrequested stages are absent.\nStatic findings remain available even when an optional stage fails. Missing\nengines propagate through package and ecosystem reports. A requested unavailable\nor incomplete stage sets overall `incomplete`; no assertions anywhere in the\nREADME surface is `not-applicable`. Assertions present but outside supported\ncomparison scope make the stage incomplete, with explicit unverified counts.\nAn excluded-only stage is also `not-applicable`, with exclusion reasons/counts.\n`--detailed` may hide info findings but never stage states or coverage counts.\nDefault `--fail-on none` remains exit 0; enabled thresholds retain exit 2 for\nincomplete/failed audits, exit 1 for complete threshold findings, else exit 0.\nCLI misuse exits 2 independently of `--fail-on`.\nBuffer the final report until execution completes or the runner deadline fires.\nKeep the existing scope as the first text line. Immediately afterward in that report, print\nrequested stage states and diagnostic reasons; unavailable/incomplete stages also\nemit a concise stderr notice, including in JSON mode. JSON stdout remains one\nvalid document. Preserve the final INCOMPLETE marker and prohibit “no findings”\nas a clean conclusion for such runs. No-output stages never execute setup alone.\nThe single-package site restriction is a proposed A2 scope choice, not removal\nof a shipped feature; ecosystem URL configuration is deferred.",
       "sha256": "8f2410a1a8f603f37af0b463c17745f97824cd96213631bf237bab04d5607c06",
       "inventory_ids": [
         "C01",
@@ -231,7 +231,7 @@
       "id": "site-stage:2",
       "anchor": "site-stage",
       "ordinal": 2,
-      "text": "1. Accept an explicit HTTP(S) base URL without credentials, query, or fragment.\n   Normalize its path and retrieve its `sitemap.xml` using stdlib `urllib`.\n   Bound time and response size (proposed 10 seconds, 5 MiB). Handle malformed\n   XML, offline responses, redirects, and sitemap indexes explicitly. A2 supports\n   a single URL-set sitemap; an index is incomplete, not an empty site.\n2. Resolve `--ref` locally to a commit. Otherwise infer one unambiguous pkgdown\n   deployment branch from recognized workflow configuration, falling back to\n   locally available `origin/main`, then `main`, with provenance. Ambiguous\n   triggers, dynamic workflows, missing refs, or missing git make the stage\n   incomplete. Do not fetch. Branch inference is evidence of intended source,\n   not proof of the commit currently deployed.\n3. Inspect the immutable commit tree, including pkgdown configuration. Derive\n   supported article and Rd routes; retain internal Rd topics. Honor recognized\n   exclusions and article naming rules. Never silently apply naive filename\n   mapping to an unsupported custom layout: report affected scope as incomplete.\n   Keep source path \u2192 expected URL attribution. No generated index, authors,\n   news, or 404 pages are mandatory expectations.\n4. Compare normalized same-site paths, preserving case and base-path boundaries.\n   Missing expected routes emit `site-missing-page` (warn), phrased as absent\n   from the sitemap, not a proven HTTP 404. Sitemap coverage is not availability.\n   Extra routes emit info only within the supported article/reference surface;\n   generated pages are not stale-page findings.\n5. Separately report pages added in the checkout relative to the selected ref\n   as unreleased info. Dirty-tree additions must be identified as such. Missing\n   pages from the selected ref stay warn even when the checkout is ahead.",
+      "text": "1. Accept an explicit HTTP(S) base URL without credentials, query, or fragment.\n   Normalize its path and retrieve its `sitemap.xml` using stdlib `urllib`.\n   Bound time and response size (proposed 10 seconds, 5 MiB). Handle malformed\n   XML, offline responses, redirects, and sitemap indexes explicitly. A2 supports\n   a single URL-set sitemap; an index is incomplete, not an empty site.\n2. Resolve `--ref` locally to a commit. Otherwise infer one unambiguous pkgdown\n   deployment branch from recognized workflow configuration, falling back to\n   locally available `origin/main`, then `main`, with provenance. Ambiguous\n   triggers, dynamic workflows, missing refs, or missing git make the stage\n   incomplete. Do not fetch. Branch inference is evidence of intended source,\n   not proof of the commit currently deployed.\n3. Inspect the immutable commit tree, including pkgdown configuration. Derive\n   supported article and Rd routes; retain internal Rd topics. Honor recognized\n   exclusions and article naming rules. Never silently apply naive filename\n   mapping to an unsupported custom layout: report affected scope as incomplete.\n   Keep source path → expected URL attribution. No generated index, authors,\n   news, or 404 pages are mandatory expectations.\n4. Compare normalized same-site paths, preserving case and base-path boundaries.\n   Missing expected routes emit `site-missing-page` (warn), phrased as absent\n   from the sitemap, not a proven HTTP 404. Sitemap coverage is not availability.\n   Extra routes emit info only within the supported article/reference surface;\n   generated pages are not stale-page findings.\n5. Separately report pages added in the checkout relative to the selected ref\n   as unreleased info. Dirty-tree additions must be identified as such. Missing\n   pages from the selected ref stay warn even when the checkout is ahead.",
       "sha256": "76477a6c101c92f56e43b38235aa801339dfa6c8786cb2d4911e95db77cd07fd",
       "inventory_ids": [
         "S01",
@@ -404,7 +404,7 @@
       "id": "normative-site-rules:8",
       "anchor": "normative-site-rules",
       "ordinal": 8,
-      "text": "| Standard Rmd articles | Output is always under `articles/`: `vignettes/foo.Rmd` \u2192 `articles/foo.html`; `vignettes/articles/foo.Rmd` \u2192 `articles/foo.html`; `vignettes/pizza/slice.Rmd` \u2192 `articles/pizza/slice.html`. Exclude underscore-prefixed child files; tutorial sources are outside article scope and explicitly counted. A pinned pkgdown fixture for all three mappings is a hard release gate; route collisions make derivation incomplete. |",
+      "text": "| Standard Rmd articles | Output is always under `articles/`: `vignettes/foo.Rmd` → `articles/foo.html`; `vignettes/articles/foo.Rmd` → `articles/foo.html`; `vignettes/pizza/slice.Rmd` → `articles/pizza/slice.html`. Exclude underscore-prefixed child files; tutorial sources are outside article scope and explicitly counted. A pinned pkgdown fixture for all three mappings is a hard release gate; route collisions make derivation incomplete. |",
       "sha256": "c573ac63a5586c25f79ebc0bc4df01d7b060c8ff437279cea775f399bf6321f7",
       "inventory_ids": [
         "S06",
@@ -458,7 +458,7 @@
       "id": "normative-site-rules:12",
       "anchor": "normative-site-rules",
       "ordinal": 12,
-      "text": "Parse recognized YAML data without evaluating expressions. If the optional YAML\nreader is unavailable and relevant configuration exists, mark inference incomplete\n(or require an explicit ref for workflow inference); do not add a mandatory Python\ndependency. An explicit ref bypasses branch inference, not route uncertainty.\nUnsupported route scope retains checked routes and reports excluded counts.\nWhen source `url:` is absent, use the explicit requested base for comparison;\na missing sitemap is incomplete, not evidence that source pages are missing.\nThe strict same-origin policy intentionally rejects HTTP\u2192HTTPS redirects: show\nthe canonical target and require a fresh invocation with it. This is a scope\nchoice, not a claimed live-site defect.",
+      "text": "Parse recognized YAML data without evaluating expressions. If the optional YAML\nreader is unavailable and relevant configuration exists, mark inference incomplete\n(or require an explicit ref for workflow inference); do not add a mandatory Python\ndependency. An explicit ref bypasses branch inference, not route uncertainty.\nUnsupported route scope retains checked routes and reports excluded counts.\nWhen source `url:` is absent, use the explicit requested base for comparison;\na missing sitemap is incomplete, not evidence that source pages are missing.\nThe strict same-origin policy intentionally rejects HTTP→HTTPS redirects: show\nthe canonical target and require a fresh invocation with it. This is a scope\nchoice, not a claimed live-site defect.",
       "sha256": "843867c07323f2b36917e5b2e6c8ab8f859de5470de7ed1470c2c1506f200727",
       "inventory_ids": [
         "S04",
@@ -1780,7 +1780,7 @@
       "id": "required-evidence:3",
       "anchor": "required-evidence",
       "ordinal": 3,
-      "text": "\u201cUnexplained\u201d is mechanical: fixture findings must exactly match a committed\nexpected-findings manifest by check, severity, source and assertion ID. Clean\nfixtures expect zero A2 findings and complete coverage. Unsupported fixtures\nassert precise incomplete states/counts. Planted fixtures expect the named warn\nand cannot pass through allowlists, skips or zero checked assertions. Manifest\nchanges require review. Real-package triage does not waive fixture assertions.",
+      "text": "“Unexplained” is mechanical: fixture findings must exactly match a committed\nexpected-findings manifest by check, severity, source and assertion ID. Clean\nfixtures expect zero A2 findings and complete coverage. Unsupported fixtures\nassert precise incomplete states/counts. Planted fixtures expect the named warn\nand cannot pass through allowlists, skips or zero checked assertions. Manifest\nchanges require review. Real-package triage does not waive fixture assertions.",
       "sha256": "b17563e4c621979ad584a35f35a2ed51f1ab2969cbe52559bd5d89dbdd80c8e3",
       "inventory_ids": [
         "V01",
@@ -1927,7 +1927,7 @@
       "id": "documentation-and-boundaries:2",
       "anchor": "documentation-and-boundaries",
       "ordinal": 2,
-      "text": "Update command frontmatter/Usage, docs/commands.md, docs/guides/docs-audit.md,\ndocs:check tutorial, REFCARD, command cards, relevant workflows, orchestrator\nrecipe/prohibition and guard tests, generated docaudit reference, CHANGELOG,\nand status. Search all shipped references for the current \u201cno R/no network\u201d\npromise. Mirror CLAUDE.md to AGENTS.md if project guidance changes. Add the R\nscript shipping/parse gate; update check counts only if checks are added.",
+      "text": "Update command frontmatter/Usage, docs/commands.md, docs/guides/docs-audit.md,\ndocs:check tutorial, REFCARD, command cards, relevant workflows, orchestrator\nrecipe/prohibition and guard tests, generated docaudit reference, CHANGELOG,\nand status. Search all shipped references for the current “no R/no network”\npromise. Mirror CLAUDE.md to AGENTS.md if project guidance changes. Add the R\nscript shipping/parse gate; update check counts only if checks are added.",
       "sha256": "c4c31f814e3f1251081d068ffba2172d1d8ee4744a3d4e7320ee37cfe33480e4",
       "inventory_ids": [
         "D01",
@@ -2094,7 +2094,7 @@
       "id": "actual-readme-coverage-and-review-disposition:5",
       "anchor": "actual-readme-coverage-and-review-disposition",
       "ordinal": 5,
-      "text": "| probmed/README.qmd | 1 | 1 | Literal assertions do exist at line 130. Hidden setup at lines 10\u201319 includes unsupported fig.path/out.width defaults, so preflight prevents source execution until scope changes. |",
+      "text": "| probmed/README.qmd | 1 | 1 | Literal assertions do exist at line 130. Hidden setup at lines 10–19 includes unsupported fig.path/out.width defaults, so preflight prevents source execution until scope changes. |",
       "sha256": "56ac27e9f8f68d48c78da59e42a6e3576afc66f8ff84e93c08ac4a0d051b2101",
       "inventory_ids": [
         "E07",
@@ -2240,7 +2240,7 @@
       "id": "approval-boundary-and-next-step:3",
       "anchor": "approval-boundary-and-next-step",
       "ordinal": 3,
-      "text": "Review the implementation plan and acceptance-test inventory next. After explicit implementation\nauthorization, create the implementation worktree and realize that inventory,\nthen follow shared reporting \u2192 site \u2192 examples \u2192 integration. Acceptance evidence\nis required before release; proposal finalization neither implements A2 nor\nclaims those gates passed. Revision 7 has not received a new Claude review.",
+      "text": "Review the implementation plan and acceptance-test inventory next. After explicit implementation\nauthorization, create the implementation worktree and realize that inventory,\nthen follow shared reporting → site → examples → integration. Acceptance evidence\nis required before release; proposal finalization neither implements A2 nor\nclaims those gates passed. Revision 7 has not received a new Claude review.",
       "sha256": "6b7868dfad86f419fdca91e57180ffbe8d2acc4ba85edc52353a8640e46ddb1a",
       "inventory_ids": [
         "C01",
@@ -2256,6 +2256,6 @@
       "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
     }
   ],
-  "coverage_status": "pending",
+  "coverage_status": "ready",
   "review_candidate": "702f28b plus group pin and atomic isolated launcher"
 }

@@ -43,6 +43,14 @@ CANONICAL={'pytest':'python -m pytest tests/ -q -p no:cacheprovider','test-all':
            'command-sync':'python tests/_check_commands_doc.py','mkdocs-strict':'python -m mkdocs build --strict -q -d {tmp}'}
 
 
+def live_facts():
+    """A valid live-smoke record: one supported real site checked completely, real packages the check cannot cover said so."""
+    site={'name':'cranlogs','url':'https://example.org/pkg/','source_ref':'abc','requests':1,'state':'complete','checked':4,'reasons':[]}
+    limit={'name':'medfit','url':'https://example.org/medfit/','source_ref':'def','requests':1,'state':'incomplete','checked':0,
+           'reasons':['development mode/destination mapping unsupported']}
+    return {'url':site['url'],'source_ref':'abc','requests':1,'checked':4,'supported_site':site,'unsupported_real_runs':[limit]}
+
+
 def gate_facts():
     """A valid full-gate record: every required gate ran in the candidate tree and left a hashed log."""
     return {'source_commit':'sha','tree_clean':True,'pytest_passed':1460,'pytest_failed':0,'test_all_passed':47,'test_all_failed':0,
@@ -61,7 +69,7 @@ def review_facts():
 def evidence_records(observations, root):
     import json
     facts = {
-        'live_smoke': {'url':'https://example.org/pkg/','source_ref':'abc','requests':1,'checked':2},
+        'live_smoke': live_facts(),
         'package_triage': triage_facts(),
         'full_gates': gate_facts(),
         'rendered_review': {'pages':[{'inspected':True,'sha256':'a'*64}]},

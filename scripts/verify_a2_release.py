@@ -212,6 +212,19 @@ def validate_full_gates(facts, candidate_sha):
             require(facts.get(GATE_FLAGS[name]) is (c["exit_code"] == 0), f"{where}: {name} flag disagrees with its exit code")
 
 
+def validate_live_smoke(facts):
+    """A real supported deployed site was checked over HTTP, and real packages the site check cannot cover say so."""
+    where = "live smoke"
+    site = facts.get("supported_site")
+    require(isinstance(site, dict) and site.get("url") == facts.get("url") and bool(facts.get("source_ref")), f"{where}: supported site required")
+    require(site.get("state") == "complete" and _int(site.get("requests")) and site["requests"] > 0
+            and _int(site.get("checked")) and site["checked"] > 0, f"{where}: supported site was not completely checked over HTTP")
+    require(facts.get("requests") == site["requests"] and facts.get("checked") == site["checked"], f"{where}: summary disagrees with the site run")
+    runs = facts.get("unsupported_real_runs")
+    require(isinstance(runs, list) and runs and all(isinstance(r, dict) and r.get("state") == "incomplete" and r.get("reasons") for r in runs),
+            f"{where}: unsupported real packages must be recorded as incomplete with reasons")
+
+
 def validate_review(facts, candidate_sha):
     """A finalized review executed against the candidate; every finding fixed or rejected with evidence."""
     where = "adversarial review"
@@ -248,7 +261,7 @@ def validate_observation(name, item, *, candidate_sha, evidence_root):
     facts = record.get("facts", {})
     require(isinstance(facts, dict), "observation facts required")
     if name == "live_smoke":
-        require(bool(facts.get("url")) and bool(facts.get("source_ref")) and facts.get("requests", 0) > 0 and facts.get("checked", 0) > 0, "live execution missing")
+        validate_live_smoke(facts)
     elif name == "package_triage":
         validate_package_triage(facts)
     elif name == "full_gates":

@@ -134,8 +134,16 @@ the candidate. Supply its numeric run ID through `acceptance-evidence-run`.
 Its `index.json` names each observation file, SHA-256 digest and producer run ID;
 the verifier checks the downloaded file's candidate, kind, status and required
 facts. Bare passing claims, missing files, altered hashes, stale candidates and
-unresolved review findings fail acceptance. Contract mapping and actual platform
-evidence remain pending until those observations have been produced.
+unresolved review findings fail acceptance.
+
+The `a2-observations.yml` workflow produces that artifact in one run bound to the
+candidate commit. It computes the full-gate record, a live-site smoke against a
+real deployed pkgdown site, the package-triage freshness check and the rendered-page
+inspection itself. The finalized adversarial review is a recorded judgment supplied
+as the `review-record` input: the run stamps it but cannot prove it, so it is
+attested by whoever dispatches. The live smoke checks one supported public site and
+records that real Data-Wise packages are reported incomplete, because pkgdown
+development mode and `.qmd` articles are unsupported by `--site` today.
 
 Evaluate text is mirrored into a separate temporary spool, allowing the guardian
 to observe output growth inside a running expression. Captured text is counted

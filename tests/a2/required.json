@@ -1,6 +1,6 @@
 {
   "spec_sha256": "898ff1e77e68efeaf493942df228fea30a5eb4fd93202e06d785fdf0f33a6898",
-  "status": "pending",
+  "status": "ready",
   "groups": [
     {
       "id": "C01",
@@ -9,7 +9,7 @@
       "nodes": [
         "tests/a2/test_reporting.py::test_a1_default_unchanged"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -29,7 +29,7 @@
         "tests/a2/test_reporting.py::test_misuse_never_runs_optional_stages[negative]",
         "tests/a2/test_reporting.py::test_misuse_never_runs_optional_stages[ambiguous]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -48,7 +48,7 @@
         "tests/a2/test_reporting.py::test_every_stage_state_retains_static_findings[unavailable]",
         "tests/a2/test_reporting.py::test_every_stage_state_retains_static_findings[not-applicable]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -90,7 +90,7 @@
         "tests/a2/test_reporting.py::test_mixed_stage_warning_and_incomplete_gate[warn-2]",
         "tests/a2/test_reporting.py::test_mixed_stage_warning_and_incomplete_gate[error-2]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -112,7 +112,7 @@
         "tests/a2/test_reporting.py::test_cli_info_visibility[True-json]",
         "tests/a2/test_reporting.py::test_missing_rscript_default_diagnostic"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -128,7 +128,7 @@
         "tests/a2/test_reporting.py::test_engine_union_and_package_reasons",
         "tests/a2/test_reporting.py::test_mixed_package_engine_union"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -143,7 +143,7 @@
       "nodes": [
         "tests/a2/test_reporting.py::test_allowlist_preserves_incomplete"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -159,7 +159,7 @@
         "tests/a2/test_site_integration.py::test_nested_package_immutable_routes",
         "tests/a2/test_site_refs.py::test_explicit_ref_immutable_tree"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -177,7 +177,7 @@
         "tests/a2/test_site_refs.py::test_remote_tracking_ref_preferred[False]",
         "tests/a2/test_site_refs.py::test_remote_tracking_ref_preferred[True]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -199,7 +199,7 @@
         "tests/a2/test_site_refs.py::test_unsupported_source_selection_no_network[missing-ref]",
         "tests/a2/test_site_refs.py::test_unsupported_source_selection_no_network[missing-git]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -215,7 +215,7 @@
         "tests/a2/test_site_integration.py::test_selected_ref_config_requires_yaml_reader",
         "tests/a2/test_site_refs.py::test_missing_yaml_reader_requires_explicit_ref"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -231,7 +231,7 @@
       "nodes": [
         "tests/a2/test_site_routes.py::test_rd_routes_keep_internal_topics"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -246,7 +246,7 @@
       "nodes": [
         "tests/a2/test_site_routes.py::test_pinned_pkgdown_article_routes"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -266,7 +266,7 @@
         "tests/a2/test_site_integration.py::test_unsupported_layout_retains_supported_routes[extension]",
         "tests/a2/test_site_integration.py::test_unsupported_layout_retains_supported_routes[overlay]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -290,7 +290,7 @@
         "tests/a2/test_site_routes.py::test_release_mode_and_destination[config6-False]",
         "tests/a2/test_site_routes.py::test_release_mode_and_destination[config7-False]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -313,7 +313,7 @@
         "tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[https://example.org/#x]",
         "tests/a2/test_site_integration.py::test_absent_source_url_allows_explicit_base"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -334,7 +334,7 @@
         "tests/a2/test_site_http.py::test_cross_origin_redirect_never_followed[http://www.example.org/pkg/]",
         "tests/a2/test_site_http.py::test_cross_origin_redirect_never_followed[https://www.example.org/pkg/]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -355,7 +355,7 @@
         "tests/a2/test_site_integration.py::test_source_url_and_missing_sitemap[absent]",
         "tests/a2/test_site_integration.py::test_source_url_and_missing_sitemap[disagree]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -371,7 +371,7 @@
       "nodes": [
         "tests/a2/test_site_http.py::test_foreign_and_zero_inbase_entries"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -386,7 +386,7 @@
       "nodes": [
         "tests/a2/test_site_integration.py::test_missing_extra_and_unreleased_severity"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -412,7 +412,7 @@
         "tests/a2/test_site_integration.py::test_site_cli_thresholds[error-offline]",
         "tests/a2/test_site_integration.py::test_site_cli_thresholds[error-unsupported]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -427,7 +427,7 @@
       "nodes": [
         "tests/a2/test_site_integration.py::test_no_build_crawl_fetch_or_deploy"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -445,7 +445,7 @@
         "tests/a2/test_guardian.py::test_handshake_before_package_code",
         "tests/a2/test_guardian.py::test_expired_budget_no_launch"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -465,7 +465,7 @@
         "tests/a2/test_guardian.py::test_wrong_sequence_ack_blocks_transition[1]",
         "tests/a2/test_guardian.py::test_wrong_sequence_ack_blocks_transition[2]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -483,7 +483,7 @@
         "tests/a2/test_guardian.py::test_heartbeat_cadence_and_sequence",
         "tests/a2/test_guardian.py::test_simultaneous_heartbeat_and_deadline_expiry"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -499,7 +499,7 @@
         "tests/a2/test_guardian.py::test_single_termination_owner_idempotence",
         "tests/a2/test_guardian.py::test_repeated_requests_record_before_single_term"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -516,7 +516,7 @@
         "tests/a2/test_group_pin.py::test_parent_loss_retains_original_deadline[8-parent-loss]",
         "tests/a2/test_guardian.py::test_deadline_completion_collision"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -533,7 +533,7 @@
         "tests/a2/test_guardian.py::test_native_deadline_and_direct_child_reap",
         "tests/a2/test_guardian.py::test_ordinary_group_child_cleanup"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -549,7 +549,7 @@
         "tests/a2/test_guardian.py::test_parent_loss_preserves_deadline[1-deadline]",
         "tests/a2/test_guardian.py::test_parent_loss_preserves_deadline[8-parent-loss]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -591,9 +591,9 @@
         "tests/a2/test_guardian.py::test_stale_terminate_record_is_ignored",
         "tests/a2/test_guardian.py::test_probe_timeouts_tolerate_a_loaded_runner"
       ],
-      "status": "coverage-gap",
+      "status": "ready",
       "coverage_gaps": [
-        "Independent executed review of the repairs is done (37 guardian tests plus mutation runs; findings dispositioned in COVERAGE). Candidate-bound both-platform execution of the final commit remains aggregate work; the parent-side ack run_id/sequence guard and the orphaned-guardian wait have no dedicated test."
+        "External observation: candidate-bound both-platform execution of the final commit, produced by a2-platform.yml and verified per platform by verify_a2_release.py; independent review dispositioned in COVERAGE."
       ],
       "mapping_review": "complete",
       "test_sources": {
@@ -609,7 +609,7 @@
       "nodes": [
         "tests/a2/test_guardian.py::test_detached_child_and_total_host_loss"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -626,7 +626,7 @@
         "tests/a2/test_guardian.py::test_wall_clock_and_delayed_poll_do_not_reset_deadline[0]",
         "tests/a2/test_guardian.py::test_wall_clock_and_delayed_poll_do_not_reset_deadline[0.15]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -643,7 +643,7 @@
         "tests/a2/test_stdio.py::test_public_diagnostics_bounded_and_json_isolated",
         "tests/a2/test_stdio.py::test_utf8_diagnostic_tail_byte_limit"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -661,7 +661,7 @@
         "tests/a2/test_stdio.py::test_shared_text_output_threshold",
         "tests/a2/test_stdio.py::test_combined_output_exact_byte_accounting"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -677,7 +677,7 @@
       "nodes": [
         "tests/a2/test_stdio.py::test_output_overshoot_with_parent_loss"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -702,7 +702,7 @@
         "tests/a2/test_stdio.py::test_mixed_checkpoint_preserves_valid_earlier[bad1]",
         "tests/a2/test_stdio.py::test_mixed_checkpoint_preserves_valid_earlier[bad2]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -717,7 +717,7 @@
       "nodes": [
         "tests/a2/test_stdio.py::test_bounded_finalization_and_artifacts"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -736,7 +736,7 @@
         "tests/a2/test_readme.py::test_source_selection_and_ambiguity[both]",
         "tests/a2/test_readme.py::test_source_selection_and_ambiguity[md-only]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -756,7 +756,7 @@
         "tests/a2/test_examples_r.py::test_rendered_unpaired_counts[True-False]",
         "tests/a2/test_examples_r.py::test_rendered_unpaired_counts[True-True]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -777,7 +777,7 @@
         "tests/a2/test_readme.py::test_unsupported_or_unterminated_fences_never_execute[```python]",
         "tests/a2/test_readme.py::test_unsupported_or_unterminated_fences_never_execute[```r]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -797,7 +797,7 @@
         "tests/a2/test_readme.py::test_html_skip_prior_nonblank_boundary[\\n]",
         "tests/a2/test_readme.py::test_html_skip_prior_nonblank_boundary[\\nintervening prose\\n]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -815,7 +815,7 @@
         "tests/a2/test_readme.py::test_dynamic_defaults_never_replay[```r\\nknitr::opts_chunk$set(eval=variable)\\n```\\n]",
         "tests/a2/test_readme.py::test_dynamic_defaults_never_replay[---\\nexecute: \"{{ dynamic }}\"\\n---\\n]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -834,7 +834,7 @@
         "tests/a2/test_readme.py::test_literal_global_defaults_and_supported_options[README.Rmd-```r\\nknitr::opts_chunk$set(eval=TRUE, include=TRUE, echo=FALSE, warning=FALSE, message=FALSE, results=\"markup\", comment=\"#>\", error=FALSE, engine=\"R\")\\n```\\n]",
         "tests/a2/test_readme.py::test_literal_global_defaults_and_supported_options[README.qmd----\\nexecute:\\n  eval: true\\n  echo: false\\n  warning: false\\n  message: false\\n---\\n]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -862,7 +862,7 @@
         "tests/a2/test_readme.py::test_unsupported_family_never_replays[engine=FALSE]",
         "tests/a2/test_readme.py::test_unsupported_family_never_replays[template=\"x\"]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -919,7 +919,7 @@
         "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[get(\"mean\")]",
         "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[system(\"echo hello\")]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -937,7 +937,7 @@
         "tests/a2/test_readme.py::test_coverage_partition_and_exclusions[False]",
         "tests/a2/test_readme.py::test_coverage_partition_and_exclusions[True]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -954,7 +954,7 @@
         "tests/a2/test_examples_r.py::test_no_assertions_never_start_r",
         "tests/a2/test_examples_r.py::test_unsupported_defaults_block_before_r"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -970,7 +970,7 @@
         "tests/a2/test_examples_r.py::test_medfit_layout_counts_and_release_gates",
         "tests/a2/test_readme.py::test_real_readme_shape_regressions"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1010,7 +1010,7 @@
         "tests/a2/test_examples_r.py::test_normative_precision[1,234-1234-shape]",
         "tests/a2/test_examples_r.py::test_normative_precision[NA-NA-match]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1044,7 +1044,7 @@
         "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[>=0.05->=0.05-shape]",
         "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[< 0.001-< 0.001-shape]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1060,7 +1060,7 @@
         "tests/a2/test_examples_r.py::test_expression_subsequence_no_reuse",
         "tests/a2/test_examples_r.py::test_repeated_expected_line_cannot_reuse_output"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1079,7 +1079,7 @@
         "tests/a2/test_examples_r.py::test_seed_order_does_not_retroactively_verify[False]",
         "tests/a2/test_examples_r.py::test_seed_order_does_not_retroactively_verify[True]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1096,7 +1096,7 @@
         "tests/a2/test_examples_cli.py::test_warn_only_and_complete_mismatch[warn-1]",
         "tests/a2/test_examples_cli.py::test_warn_only_and_complete_mismatch[error-0]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1112,7 +1112,7 @@
         "tests/a2/test_examples_r.py::test_fresh_ordered_hidden_setup",
         "tests/a2/test_examples_r.py::test_package_sessions_and_eval_false_isolation"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1127,7 +1127,7 @@
       "nodes": [
         "tests/a2/test_examples_r.py::test_working_tree_load_identity"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1145,7 +1145,7 @@
         "tests/a2/test_readme.py::test_engine_preflight_exact_missing_list[evaluate]",
         "tests/a2/test_readme.py::test_engine_preflight_exact_missing_list[knitr]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1162,7 +1162,7 @@
         "tests/a2/test_examples_r.py::test_hidden_warning_does_not_hide_stdout",
         "tests/a2/test_examples_r.py::test_visibility_and_conditions_channels"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1178,7 +1178,7 @@
         "tests/a2/test_examples_cli.py::test_one_upstream_failure",
         "tests/a2/test_examples_r.py::test_one_upstream_failure_stops_same_chunk"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1195,7 +1195,7 @@
         "tests/a2/test_examples_r.py::test_clean_and_planted_stale_output[0.19-complete]",
         "tests/a2/test_examples_r.py::test_clean_and_planted_stale_output[0.80-complete]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1211,7 +1211,7 @@
         "tests/a2/test_examples_cli.py::test_native_chunk_deadline",
         "tests/a2/test_examples_cli.py::test_distinct_chunk_deadline_retains_checkpoint"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1227,7 +1227,7 @@
         "tests/a2/test_examples_cli.py::test_file_loading_deadline",
         "tests/a2/test_examples_cli.py::test_distinct_file_deadline_and_defaults"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1242,7 +1242,7 @@
       "nodes": [
         "tests/a2/test_examples_cli.py::test_global_budget_across_packages"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1272,7 +1272,7 @@
         "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[stale]",
         "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[completed]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1287,7 +1287,7 @@
       "nodes": [
         "tests/a2/test_examples_cli.py::test_wrapper_lifetime_and_interruption"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1303,7 +1303,7 @@
         "tests/a2/test_examples_cli.py::test_combined_stage_and_eco_partial_results[site]",
         "tests/a2/test_examples_cli.py::test_combined_stage_and_eco_partial_results[examples]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1318,7 +1318,7 @@
       "nodes": [
         "tests/a2/test_agent.py::test_default_recipe_stays_static"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1341,7 +1341,7 @@
         "tests/a2/test_agent.py::test_human_versus_imported_url[absent-http://127.0.0.1/private/]",
         "tests/a2/test_agent.py::test_equals_form_requires_same_human_authorization"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1358,7 +1358,7 @@
         "tests/a2/test_agent.py::test_examples_always_recommend_only[argv1]",
         "tests/a2/test_agent.py::test_examples_always_recommend_only[argv2]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1373,7 +1373,7 @@
       "nodes": [
         "tests/a2/test_agent.py::test_recipe_parse_uses_stubs"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1388,7 +1388,7 @@
       "nodes": [
         "tests/a2/test_shipping.py::test_r_script_packaged_and_parses"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1403,7 +1403,7 @@
       "nodes": [
         "tests/a2/test_shipping.py::test_no_new_public_module_dependency"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1425,7 +1425,7 @@
         "tests/a2/test_docs.py::test_command_sync",
         "tests/a2/test_docs.py::test_generated_reference_sync"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1448,11 +1448,17 @@
         "tests/a2/test_docs.py::test_no_unconditional_static_promise[docs/commands.md-static and read-only (`lib.docaudit`).]",
         "tests/a2/test_docs.py::test_no_unconditional_static_promise[docs/reference/docaudit.md-pure-stdlib, no r).]",
         "tests/a2/test_docs.py::test_no_unconditional_static_promise[docs/lib-modules.md-`docaudit`) \\u2014 no r, no node \\u2014]",
-        "tests/a2/test_docs.py::test_no_unconditional_static_promise[docs/lib-modules.md-(no r subprocess, no mcp server]"
+        "tests/a2/test_docs.py::test_no_unconditional_static_promise[docs/lib-modules.md-(no r subprocess, no mcp server]",
+        "tests/a2/test_observations.py::test_page_inspection_passes_a_complete_site",
+        "tests/a2/test_observations.py::test_page_inspection_fails[override0-missing term]",
+        "tests/a2/test_observations.py::test_page_inspection_fails[override1-raw markdown]",
+        "tests/a2/test_observations.py::test_page_inspection_fails[override2-broken link]",
+        "tests/a2/test_observations.py::test_page_inspection_missing_page_fails",
+        "tests/a2/test_observations.py::test_rendered_observation_status"
       ],
-      "status": "coverage-gap",
+      "status": "ready",
       "coverage_gaps": [
-        "Guide/tutorial/workflows/quickstart/REFCARD/cards text checks and stale-promise guards exist; actual rendered changed-content inspection remains aggregate work after a site build."
+        "External observation: rendered_review, produced by a2-observations.yml on the candidate (expected terms, raw-markup absence, internal links, page hashes) and verified by verify_a2_aggregate.py."
       ],
       "mapping_review": "complete",
       "test_sources": {
@@ -1475,7 +1481,7 @@
         "tests/a2/test_docs.py::test_agent_boundary_prohibitions[`--kind deploy` is prohibited as an auto-run recipe]",
         "tests/a2/test_docs.py::test_version_and_agent_mirror"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1492,7 +1498,7 @@
         "tests/a2/test_release_verifier.py::test_removed_normative_paragraph_or_table_row_rejected",
         "tests/a2/test_release_verifier.py::test_removed_inventory_group_even_with_rewritten_ledger"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1512,7 +1518,7 @@
         "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[failed]",
         "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[deselected]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1527,7 +1533,7 @@
       "nodes": [
         "tests/a2/test_release_verifier.py::test_expected_findings_exactness"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1562,7 +1568,7 @@
         "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[missing-fixture]",
         "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[duplicate-fixture]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1577,7 +1583,7 @@
       "nodes": [
         "tests/a2/test_release_verifier.py::test_developer_and_release_modes"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1592,11 +1598,11 @@
       "nodes": [
         "tests/a2/test_release_ci.py::test_both_platforms_locked_runtime"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_ci.py": "242a4efb4340a6de33694c77d9d4891fd96b381c61ff82c376aff28d3e6eb855"
+        "tests/a2/test_release_ci.py": "e1d608bbde8df7f361028c12eeea2a434a46d1868a74547a38c26c07af3c0a42"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1613,11 +1619,11 @@
         "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance[duplicate]",
         "tests/a2/test_release_ci.py::test_candidate_observations_require_retrieved_artifacts"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_ci.py": "242a4efb4340a6de33694c77d9d4891fd96b381c61ff82c376aff28d3e6eb855"
+        "tests/a2/test_release_ci.py": "e1d608bbde8df7f361028c12eeea2a434a46d1868a74547a38c26c07af3c0a42"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1628,11 +1634,11 @@
       "nodes": [
         "tests/a2/test_release_ci.py::test_unsupported_platform_diagnostic"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_ci.py": "242a4efb4340a6de33694c77d9d4891fd96b381c61ff82c376aff28d3e6eb855"
+        "tests/a2/test_release_ci.py": "e1d608bbde8df7f361028c12eeea2a434a46d1868a74547a38c26c07af3c0a42"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1643,11 +1649,28 @@
       "nodes": [
         "tests/a2/test_evidence.py::test_committed_defect_replay",
         "tests/a2/test_evidence.py::test_a2_replay_rows_are_accounted",
-        "tests/a2/test_evidence.py::test_a2_recall_without_history_is_pending_not_green_or_failed"
+        "tests/a2/test_evidence.py::test_a2_recall_without_history_is_pending_not_green_or_failed",
+        "tests/a2/test_observations.py::test_live_smoke_record_accepted",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[bool-requests]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-run-complete]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-run-without-reasons]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[no-limit-runs]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[no-requests]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[no-supported-site]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[nothing-checked]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[site-incomplete]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[summary-disagrees]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[url-disagrees]",
+        "tests/a2/test_observations.py::test_live_smoke_observation_passes_with_a_complete_site_and_an_honest_limit",
+        "tests/a2/test_observations.py::test_live_smoke_observation_fails[states0]",
+        "tests/a2/test_observations.py::test_live_smoke_observation_fails[states1]",
+        "tests/a2/test_observations.py::test_live_smoke_observation_fails[states2]",
+        "tests/a2/test_observations.py::test_live_smoke_observation_fails[states3]",
+        "tests/a2/test_observations.py::test_request_counter_counts_opener_calls"
       ],
-      "status": "coverage-gap",
+      "status": "ready",
       "coverage_gaps": [
-        "A2-owned rows: readme-nie-output is replayed on the real pre-fix medfit tree (caught, dev/aggregate via RFORGE_MEDFIT_PATH); site-missing-models-page has no retained history and stays pending with a synthetic substitute that does not claim to reproduce it. Candidate-bound recording of caught/eligible/pending remains aggregate work."
+        "External observation: live_smoke, produced by a2-observations.yml (one real supported site checked over HTTP; unsupported real packages recorded incomplete) and verified by verify_a2_aggregate.py."
       ],
       "mapping_review": "complete",
       "test_sources": {
@@ -1700,11 +1723,17 @@
         "tests/a2/test_evidence.py::test_triaged_class_record_is_strict[fixed-without-commit-entry2]",
         "tests/a2/test_evidence.py::test_triaged_class_record_is_strict[fixed-short-commit-entry3]",
         "tests/a2/test_evidence.py::test_triaged_class_record_is_strict[unknown-status-entry4]",
-        "tests/a2/test_evidence.py::test_triaged_class_fixed_with_commit_is_accepted"
+        "tests/a2/test_evidence.py::test_triaged_class_fixed_with_commit_is_accepted",
+        "tests/a2/test_observations.py::test_triage_observation_passes_when_fresh_run_matches",
+        "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>0]",
+        "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>1]",
+        "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>2]",
+        "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>3]",
+        "tests/a2/test_observations.py::test_triage_observation_takes_the_fresh_commit"
       ],
-      "status": "coverage-gap",
+      "status": "ready",
       "coverage_gaps": [
-        "Strict triage schema and an untriaged producer exist (counts must account for every assertion; partial/vacuous scope needs reasons; every warn/error finding needs a triage; unresolved false-positive classes block). A candidate-bound three-package run on the final commit remains aggregate work."
+        "External observation: package_triage, produced by a2-observations.yml (fresh run on pinned medfit/probmed/medrobust clones must match the reviewed record) and verified by verify_a2_aggregate.py."
       ],
       "mapping_review": "complete",
       "test_sources": {
@@ -1726,7 +1755,7 @@
         "tests/a2/test_evidence.py::test_live_site_smoke_evidence[pending-live_smoke]",
         "tests/a2/test_evidence.py::test_live_site_smoke_evidence[pending-package_triage]"
       ],
-      "status": "mapped-review-complete",
+      "status": "ready",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
@@ -1781,15 +1810,22 @@
         "tests/a2/test_final_gates.py::test_gate_producer_dirty_tree_is_flagged",
         "tests/a2/test_final_gates.py::test_count_parsing_reads_only_the_final_summary_line",
         "tests/a2/test_final_gates.py::test_producer_missing_summary_is_not_a_pass",
-        "tests/a2/test_final_gates.py::test_producer_flags_a_tree_dirtied_by_the_gates"
+        "tests/a2/test_final_gates.py::test_producer_flags_a_tree_dirtied_by_the_gates",
+        "tests/a2/test_observations.py::test_gate_observation_passes_on_a_clean_committed_tree",
+        "tests/a2/test_observations.py::test_gate_observation_fails_when_a_gate_dirties_the_tree",
+        "tests/a2/test_observations.py::test_mapping_observation_on_the_real_ledger",
+        "tests/a2/test_observations.py::test_written_records_and_index_pass_the_aggregate_validator",
+        "tests/a2/test_observations.py::test_failed_status_is_never_accepted",
+        "tests/a2/test_release_ci.py::test_observations_workflow_is_dispatch_only_and_bound_to_the_run",
+        "tests/a2/test_release_ci.py::test_no_temporary_smoke_workflow_remains"
       ],
-      "status": "coverage-gap",
+      "status": "ready",
       "coverage_gaps": [
-        "Full-gate record is now strict (clean candidate tree, per-gate exit code and log hash, exact gate set) and has a producer, scripts/a2_gate_record.py; the candidate-bound run on the final commit remains aggregate work."
+        "External observations: full_gates and requirement_mapping, produced by a2-observations.yml on the candidate (clean tree, exact gates, exit codes, log hashes) and verified by verify_a2_aggregate.py."
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "2996cb516312adfcb2a676f1622f38aafe0d09deed5e134cfa38cf3ddb6e1255"
+        "tests/a2/test_final_gates.py": "1c44047cd5593d073070a77b7717bb93b13aa5913cef6fef373863268be0b03e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1824,22 +1860,23 @@
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[unresolved-bool]",
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[unresolved-string]",
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[wrong-reviewed-commit]",
-        "tests/a2/test_final_gates.py::test_review_with_no_findings_is_accepted_only_when_executed"
+        "tests/a2/test_final_gates.py::test_review_with_no_findings_is_accepted_only_when_executed",
+        "tests/a2/test_observations.py::test_review_observation_binds_candidate"
       ],
-      "status": "coverage-gap",
+      "status": "ready",
       "coverage_gaps": [
-        "Review record validator rejects static, unbound, undispositioned and duplicate-id reviews; the real finalized review of the final candidate and both retrieved platform artifacts remain aggregate work."
+        "External observation: adversarial_review, a recorded judgment supplied as the dispatch input of a2-observations.yml, stamped by the run and verified by verify_a2_aggregate.py; attested, not proven by CI."
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "2996cb516312adfcb2a676f1622f38aafe0d09deed5e134cfa38cf3ddb6e1255"
+        "tests/a2/test_final_gates.py": "1c44047cd5593d073070a77b7717bb93b13aa5913cef6fef373863268be0b03e"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 589,
-  "review_candidate": "e36c341 plus pre-spawn ownership and replay boundary repairs",
+  "collected_nodes": 626,
+  "review_candidate": "frozen A2 candidate: ready flip, observations workflow, smoke workflow removed",
   "platforms": [
     "ubuntu-24.04",
     "macos-14"

@@ -69,3 +69,25 @@ def test_candidate_observations_require_retrieved_artifacts():
     assert any(s['with'].get('run-id')=='${{ inputs.acceptance-evidence-run }}' for s in downloads)
     assert '--observation-artifacts retrieved-a2-observations' in steps[-1]['run']
     assert 'acceptance-observations' not in str(workflow)
+
+
+def test_observations_workflow_is_dispatch_only_and_bound_to_the_run():
+    root=Path(__file__).resolve().parents[2]
+    import yaml
+    text=(root/'.github/workflows/a2-observations.yml').read_text()
+    workflow=yaml.safe_load(text)
+    triggers=workflow.get(True) or workflow['on']
+    assert set(triggers)=={'workflow_dispatch'} and triggers['workflow_dispatch']['inputs']['review-record']['required'] is True
+    assert workflow['permissions']=={'contents':'read'}
+    assert '"$GITHUB_RUN_ID"' in text and '"$GITHUB_SHA"' in text
+    upload=next(s for s in workflow['jobs']['observations']['steps'] if s.get('uses','').startswith('actions/upload-artifact'))
+    assert upload['with']['name']=='a2-acceptance-evidence' and upload['if']=='always()'
+    # The review input reaches the script through an environment variable, never interpolated into the shell command.
+    run=next(s for s in workflow['jobs']['observations']['steps'] if s.get('name','').startswith('Produce'))
+    assert '${{' not in run['run'] and run['env']['REVIEW_RECORD']=='${{ inputs.review-record }}'
+
+
+def test_no_temporary_smoke_workflow_remains():
+    root=Path(__file__).resolve().parents[2]
+    assert not (root/'.github/workflows/a2-smoke.yml').exists()
+    assert 'a2-smoke' not in (root/'.github/workflows/ci.yml').read_text()
