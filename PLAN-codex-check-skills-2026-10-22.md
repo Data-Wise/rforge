@@ -6,6 +6,11 @@ Keep `openai/rforge-openai` in the existing Rforge repository. Reuse
 `lib.rcmd` and `lib.docaudit`. The two skills are the first useful slice;
 more workflows may follow. Do not create a second GitHub repository.
 
+Current checkpoint: integrated to dev via PR #92 (`fe8c8ef`); installed 0.1.1
+uses the durable Rforge checkout/catalog. Fresh-session medfit discovery and
+real checks passed. Fresh sessions verified missing/older-engine rejection,
+space-containing engine/package paths and controlled Python 3.9 rejection.
+
 The skills, catalog, installation, and spec already exist. This plan records
 remaining work; it does not present completed implementation as future work.
 Tasks and acceptance criteria: [task list](TASKS-codex-check-
@@ -29,8 +34,8 @@ skills-2026-10-22.md).
 
 Review outcome: same-repo packaging stands. All six gaps are repaired;
 920 tests and 47 gates pass. Real isolated fixtures verified both engine
-contracts; installed 0.1.1 matches source. Fresh-session/user-package acceptance
-remains pending; see the spec for the evidence boundary.
+contracts; installed 0.1.1 matches source. Fresh-session medfit acceptance
+and durable registration passed; see the spec for the remaining boundary.
 
 ## Checkpoints
 
@@ -53,5 +58,10 @@ remains pending; see the spec for the evidence boundary.
 
 ## Open input
 
-A real user package and fresh-session 0.1.1 invocation evidence remain needed.
+Missing/older-engine rejection is verified in two fresh read-only sessions; see
+the spec negative-preflight and paths/Python records. Paths and controlled
+Python-version rejection are verified. Static variadic limits and an unexplained
+restricted-session check termination remain; missing-interpreter and invalid
+package fresh-session cases were not separately exercised. Existing medfit
+evidence and durable registration supersede the original planning gaps.
 No new service, hook layer, distribution framework, or full command port.
