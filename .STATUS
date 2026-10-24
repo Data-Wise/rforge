@@ -1,3 +1,27 @@
+# Local medfit rlang import repair rerun: Rforge as-cran 0/0/0; log complete.
+# Test runner separately 5993 pass, 98 skip, 1 warning. Fix not integrated.
+# Codex personal checks pilot — 2026-10-22
+# Six gaps repaired in shared engines and adapter 0.1.1; same-repo scope retained.
+# Spec/plan/tasks/grill: matching *-codex-check-skills-2026-10-22.md root files.
+# Structured check evidence/inner statuses and retained logs; default as-cran;
+# strict flavors; package-only docs scope; explicit new-export comparison ref.
+# Final checks: pytest 920 passed, 4 skipped; repository gates 47/47;
+# strict MkDocs, skill validators, and changed Markdown lint passed.
+# Real isolated package: default, strict flavors, incoming complete; 5 real logs;
+# zero errors/warnings, expected new-submission NOTEs. Docs clean/defect fixtures pass.
+# Installed 0.1.1/source parity 4/4. Catalog names visible this session.
+# Additional approved gpt-5.6-sol CLI review reconciled: log contract clarified;
+# outer failure now incomplete; unintended tarball behavior change scoped out.
+# Medfit fresh-session skills discovered; authorized temp-access R check passed.
+# Release-ref coverage v0.12.0: zero new exports/findings; checked 11/22.
+# Latest release v0.12.0 isolated at e894282: docs 0 findings, checked 12/23;
+# compare_lr coverage present vs v0.11.1. Default as-cran completed: 0/1/0,
+# undeclared rlang import WARNING. Actual completed log retained; source clean.
+# Earlier 0.10.0 results are historical; latest-release evidence in spec/grill.
+# 2026-10-22: adapter rforge-openai 0.1.1 integrated into dev via PR #92 (fe8c8ef);
+# durable engine is ~/projects/dev-tools/rforge; pilot worktrees no longer prerequisites.
+# Still pending: fresh-session older/missing-engine handling, variadic-signature coverage.
+
 project: rforge
 updated: 2026-10-23
 status: Active

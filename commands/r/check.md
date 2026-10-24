@@ -140,6 +140,15 @@ no subprocess-layer change.
     `--strict` and adds a third CRAN-incoming pass — expect **≈3× check time** vs. a plain
     `r:check`. Acceptable for a pre-submission gate; run it once, not in CI.
 
+## Engine evidence
+
+The Python check envelope includes `output_format`, `incomplete`, and
+`check.log_paths`/`check.exit_status`. Package checks require a structured
+result and zero inner R check statuses; malformed or
+console-only evidence is an error even if the R process exits zero. Explicit
+temporary check directories preserve real `00check.log` files after R exits.
+Report unavailable logs when the list is empty; do not fabricate a path.
+
 ## Output Format
 
 ```markdown

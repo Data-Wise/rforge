@@ -8,6 +8,11 @@
 
 ⏱️ **2 minutes** • 🟢 Beginner • Pick ONE method
 
+## Codex personal pilot
+
+For Codex, see [Rforge checks in Codex](guides/codex-checks.md). The Claude
+installation methods below do not install the two native Codex skills.
+
 ## Pick an install method
 
 ### Claude Code marketplace (cross-platform, recommended)

@@ -8,6 +8,12 @@
 
 Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. No MCP server required.
 
+## Codex personal pilot
+
+Two focused skills for package checks and documentation audits are prepared in
+`openai/rforge-openai`. See the [Codex checks guide](docs/guides/codex-checks.md).
+Installation and runtime verification remain separate.
+
 ## What's new in v2.21.0
 
 - 🔎 **`/rforge:docs:check` is a real docs audit** — `lib/docaudit.py` checks the calls and signatures in your README and vignettes against the package exports: `signature-named-arg` (error), `signature-names` / `signature-arity` (warn), `scannability` (info), `--since` coverage. `--eco`, `--detailed`, `--fail-on none|warn|error`, `docs.allowlist`. Reports end `INCOMPLETE` / `NOT AUDITED` instead of `no findings` when it could not finish. Opt-in A2 stages add `--site URL [--ref REF]` and `--run-examples [--examples-budget-seconds 300]`; the default stays offline. README execution is partial coverage and runs package code. Completed A2 discrepancies are warnings; incomplete stages exit 2 with either enabled threshold. See the [Docs audit guide](https://data-wise.github.io/rforge/guides/docs-audit/).

@@ -65,6 +65,10 @@ Map the flags straight through: `--detailed` → `--detailed`, `--eco` → `--ec
 `--examples-budget-seconds N` → `--examples-budget-seconds N`. Omit `--path` to use the current directory (the module itself must be run from the plugin/repo root, so pass `--path` unless you are already there). Read the JSON; render the
 text form with `python3 -m lib.docaudit ...` (no `--format`) when the user wants the plain report.
 
+For a strictly single-package Python invocation, add `--package-only`: it
+prevents hybrid/manifest expansion and conflicts with `--eco`. The existing
+Claude command's default scope semantics are unchanged.
+
 The first line of the text report is the **resolved scope** (which package, or which ecosystem, was audited).
 State it before any finding: "audited `medfit`" is not "audited the ecosystem".
 
