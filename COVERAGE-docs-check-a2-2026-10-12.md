@@ -125,3 +125,12 @@ Focused review of 7eb8a40 reported no material finding; 126 native-process regre
 ## D05 local coverage — 2026-10-23
 
 Added eight expanded nodes: current status/count/version/release-hold assertion and seven agent prohibition cases. Focused docs/agent tests pass 35/35 on Python 3.15.0; full suite 1334 passed/4 existing skipped, repository gates 47/47 and strict MkDocs passed. Inventory now owns 435 unique nodes; D05 has no remaining local coverage gap. Six groups remain pending: G08, D04, H01, H02, F01, F02. The spec, latest-stable policy and external acceptance requirements are unchanged. Earlier seven-group/427-node entries are historical.
+
+## Phase 2 Codex review disposition (2026-10-24, HEAD 146e670)
+
+Read-only Codex adversarial review of D04 docs and a broad G08 ownership read.
+
+- Confirmed and fixed: REFCARD/cards omitted the spec's `origin/main`, then `main` fallback when no deployment candidate exists (ambiguous candidates stay incomplete); `docs/lib-modules.md` still promised "no R" for `docaudit`. Both corrected; new nodes cover the fallback term and both lib-modules phrases (manifest hashes and D04 node list refreshed).
+- Rejected as stated: moving the final PGID probe before pin release. An unreaped zombie pin keeps the group present (EPERM on macOS), so disappearance cannot be observed before the reap. A PGID reused after the reap can only turn success into `cleanup-unverified` (fails closed); no destructive signal follows pin release. Rationale recorded as a comment in `lib/_docguardian.py`. Linux behavior of the zombie-group probe is not yet observed; it falls under the Ubuntu platform run.
+- The reviewer's test run could not execute (no writable temp dir in its sandbox); local runs: full suite 1362 passed / 4 skipped, test-all 47/47, strict docs build passed, Python 3.15.
+- G08 remains pending: both-platform process tests and a review that actually executes them. D04 rendered inspection remains aggregate.

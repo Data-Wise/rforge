@@ -1,13 +1,14 @@
 # 🐍 Lib Modules (`lib/`)
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** Pure-Python analysis modules (`discovery`, `deps`, `status`, `init`, `cranlint`, `deps_sync`, `ghrelease`, `runiverse`, `s7review`, `changed`, `scaffold`, `sitelint`, `tidyaudit`, `rstatus`, `docaudit`) — no R, no Node — plus `rcmd` (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the `r:` commands.
+    - **What:** Pure-Python analysis modules (`discovery`, `deps`, `status`, `init`, `cranlint`, `deps_sync`, `ghrelease`, `runiverse`, `s7review`, `changed`, `scaffold`, `sitelint`, `tidyaudit`, `rstatus`, `docaudit`) — no Node, and no R except the opt-in `docaudit --run-examples` replay — plus `rcmd` (v2.2.0), the R dev-cycle/quality/CRAN-submission runner behind the `r:` commands.
     - **Why:** No MCP server, no Node, no external deps — just `python3 -m lib.<module>`, fast and scriptable.
     - **How:** Each takes `--path` and `--format text|json`; importable as a Python API too.
     - **Next:** [Reference API docs](reference/discovery.md) for signatures, or [Architecture](architecture.md#path-b-lib-modules) for fit.
 
 Pure-Python R ecosystem analysis, callable from plugin commands or directly
-from any shell. Ships with rforge v1.3+ (no R subprocess, no MCP server, no
+from any shell. Ships with rforge v1.3+ (no R subprocess by default — only
+the opt-in `docaudit --run-examples` launches R — no MCP server, no
 external dependencies beyond the stdlib).
 
 > **Background.** As of v1.3.0 the plugin's entire analysis surface lives in

@@ -75,8 +75,8 @@ def test_version_and_agent_mirror():
  ('docs/tutorials/fix-a-docs-check-finding.md',['--site','--run-examples','INCOMPLETE','figure']),
  ('docs/workflows/index.md',['--run-examples','unknown','15 seconds']),
  ('docs/quickstart.md',['--site','--run-examples','incomplete']),
- ('docs/REFCARD.md',['--site','--run-examples','root README only','incomplete','15 seconds','terminal','sitemap']),
- ('docs/command-cards.md',['--site','--run-examples','root README only','incomplete','15 seconds','terminal','sitemap']),
+ ('docs/REFCARD.md',['--site','--run-examples','root README only','incomplete','15 seconds','terminal','sitemap','origin/main']),
+ ('docs/command-cards.md',['--site','--run-examples','root README only','incomplete','15 seconds','terminal','sitemap','origin/main']),
 ])
 def test_walkthroughs_and_site_content(path,terms):
     text=' '.join((ROOT/path).read_text().lower().split())
@@ -87,6 +87,8 @@ def test_walkthroughs_and_site_content(path,terms):
  ('docs/tutorials/fix-a-docs-check-finding.md','no r session required.'),
  ('docs/commands.md','static and read-only (`lib.docaudit`).'),
  ('docs/reference/docaudit.md','pure-stdlib, no r).'),
+ ('docs/lib-modules.md','`docaudit`) — no r, no node —'),
+ ('docs/lib-modules.md','(no r subprocess, no mcp server'),
 ])
 def test_no_unconditional_static_promise(path,promise):
     text=' '.join((ROOT/path).read_text().lower().split())

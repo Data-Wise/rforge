@@ -304,6 +304,10 @@ def run(command, directory, deadline, *, cwd, env=None, file_budget=300, chunk_b
             elif pin is not None:
                 pin.finish()
     if terminal is not None:
+        # Probe after the pin is reaped: an unreaped zombie pin keeps the group present (killpg(...,0)
+        # returns EPERM on macOS), so disappearance can only be observed afterwards. A reused PGID in
+        # this window can only turn success into 'cleanup-unverified' (fails closed); no
+        # destructive signal is sent after the pin is released.
         terminal.update(group_pgid=pin.pgid, pin_reaped=pin.process.returncode is not None)
         try:
             os.killpg(pin.pgid,0); terminal["group_disappeared"] = False
