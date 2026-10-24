@@ -149,3 +149,7 @@ Read-only Codex adversarial review of D04 docs and a broad G08 ownership read.
 - Confirmed and fixed: the producer checked cleanliness only before the gates and parsed the last match anywhere in the output; it now rechecks status and HEAD after the run and reads only the final summary line (errors count as failures, no summary is not a pass).
 - Limit, not fixed: the gate and review records remain self-attested. The validator cannot re-derive counts from logs; authenticity rests on the producer run ID plus the artifact hash. Shipping and re-hashing the logs is a design change deferred to the aggregate stage.
 - Deferred: mkdocs strict output directory is not retained as evidence.
+
+## D04 rendered-site inspection (dev-time, commit-unbound)
+
+Built with `mkdocs build --strict` on the A2 branch (strict build clean) and inspected the rendered `<article>` HTML of the eight A2-touched pages: docs-audit guide, fix-a-docs-check-finding tutorial, REFCARD, command-cards, commands, reference/docaudit, workflows, quickstart. Every expected term (`--site`, `--run-examples`, `unverified`, `sandbox`, `--fail-on error`, `INCOMPLETE`, `figure`) is present in the rendered text, no raw Markdown or admonition syntax leaked, and no internal link is broken; the tutorial renders six admonitions and five code blocks. This is a development-time inspection: the candidate-bound `rendered_review` observation (page hashes on the final commit, produced by the aggregate run) remains open.
