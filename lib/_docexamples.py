@@ -92,6 +92,19 @@ def assignments(text, *, body=False):
     return options
 
 
+# Calls that install, update, or restore packages. README replay never installs dependencies, so a chunk
+# containing any of them is skipped. The lookbehind rejects longer identifiers and member access
+# (`my_pak::pak`, `x$install_github`); strings and comments are removed before matching.
+INSTALL_CALL = re.compile(r"""
+    (?<![\w.$@])
+    (?:
+        (?:[A-Za-z][\w.]*::)?(?:install|update)\.packages
+      | (?:remotes|devtools|pak|pkgdepends|renv|BiocManager)::
+            (?:install[\w.]*|restore|hydrate|pak|pkg_install|local_install\w*|pkg_upgrade)
+      | install_(?:github|gitlab|bitbucket|git|svn|url|local|cran|version|bioc|deps|dev_deps)
+    )\s*\(""", re.X)
+
+
 def extract(file):
     text=file.read_text(); lines=text.splitlines(); segments=[]; reasons=[]; defaults=dict(DEFAULTS)
     all_groups=output_groups(text); assertion_set=assertion_lines(text); supported_lines=set(); i=0; sequence=0
@@ -133,7 +146,7 @@ def extract(file):
         skip=any(re.match(r"^\s*#(?:\|)?\s*docs-check:\s*skip\s*$",line) for _,line in content) or preceding=="<!-- docs-check: skip -->"
         # Remove strings and comments before recognizing actual installation calls.
         tokens=re.sub(r"\"(?:\\.|[^\"])*\"|'(?:\\.|[^'])*'|#[^\n]*", "",code)
-        install=bool(re.search(r"(?:install\.packages|(?:remotes|devtools)::install_[\w]+|pak::pkg_install)\s*\(",tokens))
+        install=bool(INSTALL_CALL.search(tokens))
         execute=options["eval"] and not skip and not install
         visible=options["include"] and options["results"]!="hide"
         buffer=[];j=0

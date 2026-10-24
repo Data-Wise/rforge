@@ -51,6 +51,9 @@ from .discovery import _KIND_DECL_RE, _read_allowlist, detect_ecosystem, read_de
 from .s7review import _mask_strings_and_comments
 
 IMPLEMENTED_CHECKS = frozenset({"signature-named-arg", "signature-names", "signature-arity", "scannability", "coverage"})
+# Checks emitted only by the opt-in stages (`--site` / `--run-examples`); not part of the default static run.
+OPT_IN_CHECKS = frozenset({"examples-output", "examples-error", "examples-shape", "examples-stochastic",
+                           "examples-unstable", "site-missing-page", "site-extra-page", "site-unreleased-page"})
 
 _SEVERITY_ORDER = {"info": 0, "warn": 1, "error": 2}
 _IDENT = r"[A-Za-z.][\w.]*"

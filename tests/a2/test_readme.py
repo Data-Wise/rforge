@@ -55,6 +55,27 @@ def test_install_detection_ignores_strings_comments(tmp_path):
     assert not e.extract(p/"README.md")[0][0]["execute"]
 
 
+@pytest.mark.parametrize('call',[
+    'pak::pak("data-wise/medfit")', 'pak::pak(c("a", "b"))', 'pak::pkg_install("x")', 'pak::local_install(".")',
+    'renv::install("x")', 'renv::restore()', 'BiocManager::install("x")', 'remotes::install_github("a/b")',
+    'devtools::install()', 'devtools::install_deps()', 'utils::install.packages("x")', 'install_github("a/b")',
+])
+def test_installation_forms_are_never_executed(tmp_path,call):
+    # A real README's `pak::pak("owner/pkg")` chunk was executed (pak subprocess, network, compile) before
+    # installation detection covered it; every common installer idiom must be skipped, never run.
+    p=package(tmp_path,f'```r\n{call}\n```')
+    assert not e.extract(p/"README.md")[0][0]["execute"]
+
+
+@pytest.mark.parametrize('call',[
+    'pak::pkg_list()', 'installed.packages()', 'renv::status()', 'devtools::document()', 'my_pak::pak("x")',
+    'reinstall_helper()', 'x$install_github("a/b")',
+])
+def test_non_installation_look_alikes_still_execute(tmp_path,call):
+    p=package(tmp_path,f'```r\n{call}\n```')
+    assert e.extract(p/"README.md")[0][0]["execute"]
+
+
 def test_multiline_string_is_not_pasted_output(tmp_path):
     from lib import _docexamples as examples
     p=tmp_path/'README.Rmd'

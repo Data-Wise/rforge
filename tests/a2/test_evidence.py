@@ -40,3 +40,37 @@ def test_committed_defect_replay():
     assert fixtures['examples-planted']['actual_findings']==[{'check':'examples-output','severity':'warn','file':'README.md','assertion_id':'README.md:4'}]
     assert fixtures['site-planted']['actual_findings']==[{'check':'site-missing-page','severity':'warn','file':'man/private.Rd'}]
     assert all(record['sentinel'] and len(record['source_hash'])==64 for record in fixtures.values())
+
+
+def _a2_manifest_rows():
+    import json
+    from pathlib import Path
+    path=Path(__file__).resolve().parents[1]/'fixtures/docaudit/defects.json'
+    return [r for r in json.loads(path.read_text())['defects'] if r.get('release')=='A2']
+
+
+def test_a2_replay_rows_are_accounted():
+    """Every A2-owned defect row is either replayable from a real ref or pending with an honest substitute."""
+    rows=_a2_manifest_rows()
+    assert {r['id'] for r in rows}=={'readme-nie-output','site-missing-models-page'}
+    for row in rows:
+        if row['ref'] is not None:
+            assert row['status']=='firm' and row['fix'], row['id']
+        else:
+            sub=row['substitute']
+            assert sub['history']=='pending' and sub['kind']=='synthetic' and sub['provenance_backed'] is False, row['id']
+            assert 'does not claim to reproduce' in sub['note']
+
+
+def test_a2_recall_without_history_is_pending_not_green_or_failed():
+    import sys
+    from pathlib import Path
+    sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'harness'))
+    import replay
+    import json
+    manifest=json.loads((Path(__file__).resolve().parents[1]/'fixtures/docaudit/defects.json').read_text())
+    summary=replay.run_recall(manifest,'a2',overrides={'medfit':'/nonexistent'},allow_unavailable=True)
+    outcomes={row['id']:row['outcome'] for row in summary['rows']}
+    assert outcomes=={'readme-nie-output':replay.UNAVAILABLE,'site-missing-models-page':replay.UNAVAILABLE}
+    assert summary['ok'] and summary['firm_caught']==0 and summary['conditional_caught']==0
+

@@ -38,11 +38,13 @@ LOST = "lost"  # a regression-locked row whose check is no longer implemented (o
 # Every check id a manifest row may name (SPEC, "In scope"). A misspelling must fail loudly: the
 # scope filter would otherwise drop the row before the lock guard ever sees it.
 KNOWN_CHECKS = frozenset({"signature-named-arg", "signature-names", "signature-arity", "scannability", "coverage",
-                          "site-missing-page", "examples-output", "examples-error", "examples-shape"})
+                          "site-missing-page", "site-extra-page", "site-unreleased-page", "examples-output",
+                          "examples-error", "examples-shape", "examples-stochastic", "examples-unstable"})
 
 SCOPES = {
     "signature": lambda r: (r.get("check") or "").startswith("signature-"),
     "a1": lambda r: r.get("release") == "A1",
+    "a2": lambda r: r.get("release") == "A2",
     "all": lambda r: True,
 }
 
@@ -64,8 +66,11 @@ def ref_exists(repo: Path, ref: str) -> bool:
     return _git(repo, "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}").returncode == 0
 
 
-def extract_tree(repo: Path, ref: str, dest: Path) -> bool:
+def extract_tree(repo: Path, ref: str, dest: Path, *, full: bool = False) -> bool:
     """Extract the documentation-relevant subset of `ref` into `dest` via `git archive`.
+
+    `full=True` extracts every top-level path: README replay loads the package's own code (`R/`, `data/`,
+    `src/`), which the documentation-only subset omits.
 
     Returns False only when the ref has none of the paths we audit (nothing to extract). A failing
     git or tar command raises `AuditCrashed`: it must never read as "nothing to audit".
@@ -74,7 +79,7 @@ def extract_tree(repo: Path, ref: str, dest: Path) -> bool:
     if top.returncode != 0:
         raise AuditCrashed(f"git ls-tree failed at {ref}: {top.stderr.strip()[-200:]}")
     present = set(top.stdout.split())
-    paths = [p for p in TREE_PATHS if p in present]
+    paths = sorted(present) if full else [p for p in TREE_PATHS if p in present]
     if not paths:
         return False
     archive = _git(repo, "archive", "--format=tar", ref, "--", *paths, binary=True)
@@ -107,16 +112,23 @@ def implemented_checks() -> set[str]:
         from lib import docaudit  # type: ignore
     except Exception as exc:  # present (see docaudit_available) but broken: that is red, not "not built yet"
         raise AuditCrashed(f"cannot import lib.docaudit: {exc}") from exc
-    return set(getattr(docaudit, "IMPLEMENTED_CHECKS", ()))
+    return set(getattr(docaudit, "IMPLEMENTED_CHECKS", ())) | set(getattr(docaudit, "OPT_IN_CHECKS", ()))
 
 
-def subprocess_audit(tree: Path, timeout: int = 120) -> list:
+# Rows whose check only runs under `--run-examples` replay the pre-fix README in real R. Partial README
+# coverage is by design there, so an incomplete audit still counts when it reports the finding.
+EXAMPLE_CHECKS = frozenset({"examples-output", "examples-error", "examples-shape", "examples-stochastic",
+                            "examples-unstable"})
+EXAMPLES_BUDGET_SECONDS = 200
+
+
+def subprocess_audit(tree: Path, timeout: int = 120, *, extra_args: tuple = (), require_complete: bool = True) -> list:
     """Run `python -m lib.docaudit` on `tree` with an isolated HOME; return its findings."""
     with tempfile.TemporaryDirectory() as home:
         env = {**os.environ, "HOME": home, "PYTHONDONTWRITEBYTECODE": "1"}
         try:
             proc = subprocess.run(
-                [sys.executable, "-m", "lib.docaudit", "--path", str(tree), "--format", "json", "--detailed"],
+                [sys.executable, "-m", "lib.docaudit", "--path", str(tree), "--format", "json", "--detailed", *extra_args],
                 cwd=REPO_ROOT, env=env, capture_output=True, text=True, timeout=timeout,
             )
         except subprocess.TimeoutExpired as exc:
@@ -135,7 +147,7 @@ def subprocess_audit(tree: Path, timeout: int = 120) -> list:
         raise AuditCrashed(f"audited {scope}, not the extracted tree {tree}")
     if report.get("audited") is False:  # e.g. no DESCRIPTION: nothing was looked at
         raise AuditCrashed("nothing was audited: " + "; ".join(report.get("messages", [])))
-    if report.get("incomplete"):  # a skipped region means "no finding" proves nothing
+    if report.get("incomplete") and require_complete:  # a skipped region means "no finding" proves nothing
         raise AuditCrashed("incomplete audit: " + "; ".join(report.get("messages", [])))
     return findings
 
@@ -159,8 +171,12 @@ def run_recall(manifest: dict, scope: str = "all", overrides: Optional[dict] = N
     so the harness can be tested against a stub (the mutation self-test)."""
     overrides = overrides or {}
     broken = ""
+    example_audit = None
     if audit is None:
         audit = subprocess_audit
+        example_audit = lambda tree: subprocess_audit(  # noqa: E731
+            tree, timeout=EXAMPLES_BUDGET_SECONDS + 90, require_complete=False,
+            extra_args=("--run-examples", "--examples-budget-seconds", str(EXAMPLES_BUDGET_SECONDS)))
         try:
             implemented = implemented_checks() if docaudit_available() else set()
         except AuditCrashed as exc:
@@ -197,10 +213,10 @@ def run_recall(manifest: dict, scope: str = "all", overrides: Optional[dict] = N
         with tempfile.TemporaryDirectory() as tmp:
             tree = Path(tmp) / "pkg"
             try:
-                if not extract_tree(repo, d["ref"], tree):
+                if not extract_tree(repo, d["ref"], tree, full=d["check"] in EXAMPLE_CHECKS):
                     row["outcome"], row["detail"] = NO_REF, f"nothing extractable at {d['ref']}"
                     continue
-                findings = audit(tree)
+                findings = (example_audit or audit)(tree) if d["check"] in EXAMPLE_CHECKS else audit(tree)
             except AuditCrashed as exc:
                 row["outcome"], row["detail"] = CRASHED, str(exc)
                 continue

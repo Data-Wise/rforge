@@ -734,7 +734,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_examples_r.py": "917f57ba124babb400f1ad9422ba24130a172873566f436cbc9ef534e9e9f45c",
-        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
+        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -774,7 +774,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
+        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -794,7 +794,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
+        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -812,7 +812,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
+        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -831,7 +831,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
+        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -859,7 +859,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
+        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -868,13 +868,32 @@
       "task": "T11",
       "proposed_node": "tests/a2/test_readme.py::test_installation_token_filter",
       "nodes": [
-        "tests/a2/test_readme.py::test_install_detection_ignores_strings_comments"
+        "tests/a2/test_readme.py::test_install_detection_ignores_strings_comments",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[pak::pak(\"data-wise/medfit\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[pak::pak(c(\"a\", \"b\"))]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[pak::pkg_install(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[pak::local_install(\".\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[renv::install(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[renv::restore()]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[BiocManager::install(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[remotes::install_github(\"a/b\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[devtools::install()]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[devtools::install_deps()]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[utils::install.packages(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[install_github(\"a/b\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[pak::pkg_list()]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[installed.packages()]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[renv::status()]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[devtools::document()]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[my_pak::pak(\"x\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[reinstall_helper()]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[x$install_github(\"a/b\")]"
       ],
       "status": "mapped-review-complete",
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
+        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -893,7 +912,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_examples_r.py": "917f57ba124babb400f1ad9422ba24130a172873566f436cbc9ef534e9e9f45c",
-        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
+        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -926,7 +945,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_examples_r.py": "917f57ba124babb400f1ad9422ba24130a172873566f436cbc9ef534e9e9f45c",
-        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
+        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1090,7 +1109,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_examples_r.py": "917f57ba124babb400f1ad9422ba24130a172873566f436cbc9ef534e9e9f45c",
-        "tests/a2/test_readme.py": "ef0c7f9d611f343b0b6a2bdb91fcdcec7b7496c924b0c6a113d069169bda897b"
+        "tests/a2/test_readme.py": "56346369f7d27683515a65a498e1a99f9dc96ee8b35827a42aa467397d18a064"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1581,15 +1600,17 @@
       "task": "T22",
       "proposed_node": "tests/a2/test_evidence.py::test_committed_defect_replay",
       "nodes": [
-        "tests/a2/test_evidence.py::test_committed_defect_replay"
+        "tests/a2/test_evidence.py::test_committed_defect_replay",
+        "tests/a2/test_evidence.py::test_a2_replay_rows_are_accounted",
+        "tests/a2/test_evidence.py::test_a2_recall_without_history_is_pending_not_green_or_failed"
       ],
       "status": "coverage-gap",
       "coverage_gaps": [
-        "Generated known-finding regressions pass; caught/eligible/pending historical replay and provenance-backed historical source/sitemap substitute not yet recorded."
+        "A2-owned rows: readme-nie-output is replayed on the real pre-fix medfit tree (caught, dev/aggregate via RFORGE_MEDFIT_PATH); site-missing-models-page has no retained history and stays pending with a synthetic substitute that does not claim to reproduce it. Candidate-bound recording of caught/eligible/pending remains aggregate work."
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "3149c04b343e2bbe5b28b71a42087c32e7055070ad1d322062995abd2915c5c6"
+        "tests/a2/test_evidence.py": "523cf75592f01ad53b04a7d6bbef97576fc5ac4f2c297bc332683e1a68fd3751"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1606,7 +1627,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "3149c04b343e2bbe5b28b71a42087c32e7055070ad1d322062995abd2915c5c6"
+        "tests/a2/test_evidence.py": "523cf75592f01ad53b04a7d6bbef97576fc5ac4f2c297bc332683e1a68fd3751"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1628,7 +1649,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "3149c04b343e2bbe5b28b71a42087c32e7055070ad1d322062995abd2915c5c6"
+        "tests/a2/test_evidence.py": "523cf75592f01ad53b04a7d6bbef97576fc5ac4f2c297bc332683e1a68fd3751"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1691,7 +1712,7 @@
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 419,
+  "collected_nodes": 463,
   "review_candidate": "e36c341 plus pre-spawn ownership and replay boundary repairs",
   "platforms": [
     "ubuntu-24.04",
