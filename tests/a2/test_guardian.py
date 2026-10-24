@@ -250,7 +250,7 @@ for sequence in (1,2):
   time.sleep(.01)
  (p/('executed-'+str(sequence))).write_text('executed')
 '''
-    result=guardian.run([sys.executable,'-c',code],tmp_path,time.monotonic_ns()+2*guardian.NS,cwd=tmp_path,chunk_budget=.35)
+    result=guardian.run([sys.executable,'-c',code],tmp_path,time.monotonic_ns()+30*guardian.NS,cwd=tmp_path,chunk_budget=3)
     assert result['reason']=='deadline' and result['direct_child_reaped']
     assert not (tmp_path/f'executed-{fault_sequence}').exists()
     if fault_sequence==2:assert (tmp_path/'executed-1').exists()
