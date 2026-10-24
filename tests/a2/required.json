@@ -1536,7 +1536,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_ci.py": "bbb6529731feb5b185c9f03221ba54e76bb7a54d98af9404a6b09c27978070cc"
+        "tests/a2/test_release_ci.py": "242a4efb4340a6de33694c77d9d4891fd96b381c61ff82c376aff28d3e6eb855"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1557,7 +1557,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_ci.py": "bbb6529731feb5b185c9f03221ba54e76bb7a54d98af9404a6b09c27978070cc"
+        "tests/a2/test_release_ci.py": "242a4efb4340a6de33694c77d9d4891fd96b381c61ff82c376aff28d3e6eb855"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1572,7 +1572,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_release_ci.py": "bbb6529731feb5b185c9f03221ba54e76bb7a54d98af9404a6b09c27978070cc"
+        "tests/a2/test_release_ci.py": "242a4efb4340a6de33694c77d9d4891fd96b381c61ff82c376aff28d3e6eb855"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },

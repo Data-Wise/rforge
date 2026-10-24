@@ -33,6 +33,8 @@ def test_both_platforms_locked_runtime():
     assert next(s for s in steps if s.get('uses','').startswith('r-lib/actions/setup-r'))['with']['r-version']=='${{ steps.lock.outputs.R }}'
     assert any('scripts/run_a2_release.py' in s.get('run','') for s in steps)
     names=[s.get('name','') for s in steps]
+    pandoc=next(s for s in steps if s.get('uses','').startswith('r-lib/actions/setup-pandoc'))
+    assert pandoc['with']['pandoc-version']=='3.1.11'
     syslibs=next(s for s in steps if 'system libraries' in s.get('name',''))
     assert syslibs.get('if')=="runner.os == 'Linux'" and 'libuv1-dev' in syslibs['run']
     assert names.index(syslibs['name'])<names.index('Provision locked fixture dependencies')
