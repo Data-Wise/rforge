@@ -32,6 +32,10 @@ def test_both_platforms_locked_runtime():
     assert python['check-latest'] is True and python['allow-prereleases'] is False
     assert next(s for s in steps if s.get('uses','').startswith('r-lib/actions/setup-r'))['with']['r-version']=='${{ steps.lock.outputs.R }}'
     assert any('scripts/run_a2_release.py' in s.get('run','') for s in steps)
+    names=[s.get('name','') for s in steps]
+    syslibs=next(s for s in steps if 'system libraries' in s.get('name',''))
+    assert syslibs.get('if')=="runner.os == 'Linux'" and 'libuv1-dev' in syslibs['run']
+    assert names.index(syslibs['name'])<names.index('Provision locked fixture dependencies')
     release=yaml.safe_load((root/'.github/workflows/a2-release.yml').read_text())
     aggregate_python = next(s for s in release['jobs']['aggregate']['steps'] if s.get('uses','').startswith('actions/setup-python'))['with']
     assert aggregate_python == python

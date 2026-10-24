@@ -25,6 +25,13 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ steps.lock.outputs.R }}
+      - name: Install Linux system libraries for locked R dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libuv1-dev libcurl4-openssl-dev libssl-dev libxml2-dev \
+            libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev \
+            libpng-dev libtiff-dev libjpeg-dev
       - name: Provision locked fixture dependencies
         run: Rscript --vanilla scripts/provision_a2.R
       - name: Install Python and build dependencies
