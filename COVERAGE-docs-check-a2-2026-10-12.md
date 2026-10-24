@@ -167,3 +167,7 @@ Built with `mkdocs build --strict` on the A2 branch (strict build clean) and ins
 ## H02 re-run after the Phase 3/4/G08 changes (local, not candidate-bound)
 
 The triage producer was re-run on fresh temporary clones of medfit, probmed and medrobust at their current heads. Counts, states, finding counts (all zero) and README source hashes are identical to the reviewed record `tests/a2/evidence/package-triage-2026-10-24.json`; medfit's head moved (`d29e656` to `2951b28`) with its README unchanged. The reviewed record therefore still describes the code as it stands. The candidate-bound, run-ID-bound observation on the final commit remains aggregate work. Source repositories were only cloned, never written.
+
+## Live-site smoke feasibility probe (2026-10-24, local, not evidence)
+
+`docs:check --site <url> --ref <ref>` was run against the deployed sites of RMediation, medfit, probmed and medrobust (Data-Wise) and six public tidyverse/r-lib packages (glue, withr, rprojroot, fs, lobstr, cli, pkgload). Every run ended `incomplete` with `checked: 0`: each `_pkgdown.yml` sets a development mode (reason `development mode/destination mapping unsupported`), and the Data-Wise packages also use `.qmd` articles (`unsupported article source`). One package (tibble) failed with `pkgdown configuration overlays unsupported`. The `live_smoke` observation requires `requests > 0` and `checked > 0`, so none of these can satisfy it. The site stage is therefore exercised only against fixtures (served over HTTP), and no real package has a supported pkgdown configuration yet.

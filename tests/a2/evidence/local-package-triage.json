@@ -9,7 +9,7 @@
   "records": [
     {
       "package": "medfit",
-      "path": "/Users/davood/projects/r-packages/active/medfit",
+      "path": "<local-r-packages>/medfit",
       "source_sha256": {
         "README.md": "a7161fc9a18b01d3d3dde1747c2b6d9e0ebaac0e4ed452a9e63a16f0db5c50f0"
       },
@@ -51,7 +51,7 @@
         ],
         "provenance": {
           "source": "README.md",
-          "package_path": "/Users/davood/projects/r-packages/active/medfit",
+          "package_path": "<local-r-packages>/medfit",
           "normalization": "UTF-8 width 80; decimal displayed-precision tolerance",
           "coverage_sources": {
             "README.md": {
@@ -89,7 +89,7 @@
             "nloptr": "2.2.1"
           },
           "package": {
-            "path": "/Users/davood/projects/r-packages/active/medfit",
+            "path": "<local-r-packages>/medfit",
             "name": "medfit",
             "version": "0.8.0"
           },
@@ -100,7 +100,7 @@
     },
     {
       "package": "probmed",
-      "path": "/Users/davood/projects/r-packages/active/probmed",
+      "path": "<local-r-packages>/probmed",
       "source_sha256": {
         "README.md": "57ddc9060f7d4947e4d5161a3e6c8baab97f2801980531254f4f28c4e94e638d",
         "README.qmd": "3b058a67d0b5ab14f817d3307e77cf591c719c70910e0d20b84953b948c96d88"
@@ -126,7 +126,7 @@
         "findings": [],
         "provenance": {
           "source": "README.qmd",
-          "package_path": "/Users/davood/projects/r-packages/active/probmed",
+          "package_path": "<local-r-packages>/probmed",
           "normalization": "UTF-8 width 80; decimal displayed-precision tolerance",
           "coverage_sources": {
             "README.qmd": {
@@ -144,7 +144,7 @@
     },
     {
       "package": "medrobust",
-      "path": "/Users/davood/projects/r-packages/active/medrobust",
+      "path": "<local-r-packages>/medrobust",
       "source_sha256": {
         "README.md": "1cb8a79fe66a023c620ee65326df105e8d93ade07476162c966319ed80fd89f0"
       },

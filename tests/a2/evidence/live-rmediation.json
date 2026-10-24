@@ -49,11 +49,11 @@
   },
   "scope": {
     "mode": "package",
-    "root": "/Users/davood/projects/r-packages/active/RMediation",
+    "root": "<local-r-packages>/RMediation",
     "packages": [
-      "/Users/davood/projects/r-packages/active/RMediation"
+      "<local-r-packages>/RMediation"
     ],
     "how": "",
-    "line": "scope: package RMediation at /Users/davood/projects/r-packages/active/RMediation"
+    "line": "scope: package RMediation at <local-r-packages>/RMediation"
   }
 }
