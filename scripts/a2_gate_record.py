@@ -35,9 +35,19 @@ def run_gate(command: list, cwd: Path) -> tuple:
     return done.returncode, done.stdout + done.stderr
 
 
-def _count(pattern: str, text: str) -> int:
-    found = re.findall(pattern, text)
-    return int(found[-1]) if found else 0
+def _summary(text: str, kind: str) -> Optional[int]:
+    """Count `kind` ('passed' or 'failed', failed including errors) from the final summary line only; None without one."""
+    lines = [l for l in text.splitlines() if re.search(r"\b\d+ (?:passed|failed|errors?)\b", l)]
+    if not lines:
+        return None
+    line = lines[-1]
+    pattern = r"(\d+) passed" if kind == "passed" else r"(\d+) (?:failed|errors?)"
+    return sum(int(n) for n in re.findall(pattern, line))
+
+
+def _test_all(text: str, kind: str) -> Optional[int]:
+    found = re.findall(r"Total:\s*\d+\s*\|\s*Passed:\s*(\d+)\s*\|\s*Failed:\s*(\d+)", text)
+    return int(found[-1][0 if kind == "passed" else 1]) if found else None
 
 
 def build_facts(results: dict, commit: str, *, clean: bool, commands: dict) -> dict:
@@ -46,11 +56,11 @@ def build_facts(results: dict, commit: str, *, clean: bool, commands: dict) -> d
     pytest_out, all_out = results["pytest"][1], results["test-all"][1]
     return {
         "source_commit": commit, "tree_clean": clean,
-        "pytest_passed": _count(r"(\d+) passed", pytest_out), "pytest_failed": _count(r"(\d+) failed", pytest_out),
-        "test_all_passed": _count(r"Passed:\s*(\d+)", all_out), "test_all_failed": _count(r"Failed:\s*(\d+)", all_out),
+        "pytest_passed": _summary(pytest_out, "passed") or 0, "pytest_failed": _summary(pytest_out, "failed") or 0,
+        "test_all_passed": _test_all(all_out, "passed") or 0, "test_all_failed": _test_all(all_out, "failed") or 0,
         "version_sync": ok["version-sync"], "reference_sync": ok["reference-sync"],
         "command_sync": ok["command-sync"], "mkdocs_strict": ok["mkdocs-strict"],
-        "commands": [{"name": name, "command": " ".join(commands[name]), "exit_code": results[name][0],
+        "commands": [{"name": name, "command": " ".join(commands[name]).replace(sys.executable, "python"), "exit_code": results[name][0],
                       "log_sha256": hashlib.sha256(results[name][1].encode()).hexdigest()} for name in results],
     }
 
@@ -58,16 +68,20 @@ def build_facts(results: dict, commit: str, *, clean: bool, commands: dict) -> d
 def produce(root: Path = ROOT, runner: Optional[Callable] = None, logs: Optional[Path] = None) -> dict:
     runner = runner or run_gate
     commit = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()
-    clean = not subprocess.run(["git", "-C", str(root), "status", "--porcelain"], capture_output=True, text=True, check=True).stdout.strip()
+    def dirty() -> bool:
+        return bool(subprocess.run(["git", "-C", str(root), "status", "--porcelain", "--untracked-files=all"],
+                                   capture_output=True, text=True, check=True).stdout.strip())
+    clean_before = not dirty()
     results, commands = {}, {}
     with tempfile.TemporaryDirectory() as tmp:
         for name, command in GATES:
-            command = [part.replace("{tmp}", tmp) for part in command]
             commands[name] = command
-            results[name] = runner(command, root)
+            results[name] = runner([part.replace("{tmp}", tmp) for part in command], root)
             if logs is not None:
                 logs.mkdir(parents=True, exist_ok=True)
                 (logs / f"{name}.log").write_text(results[name][1])
+    head_after = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()
+    clean = clean_before and not dirty() and head_after == commit
     return build_facts(results, commit, clean=clean, commands=commands)
 
 

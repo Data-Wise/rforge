@@ -1751,17 +1751,30 @@
         "tests/a2/test_final_gates.py::test_full_gate_record_rejects[bad-log-hash]",
         "tests/a2/test_final_gates.py::test_full_gate_record_rejects[dirty-tree]",
         "tests/a2/test_final_gates.py::test_full_gate_record_rejects[duplicate-command]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[exit-code-false]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[exit-code-float]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[failed-bool]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[flag-disagrees-with-exit]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[flag-truthy-int]",
         "tests/a2/test_final_gates.py::test_full_gate_record_rejects[flag-without-command]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[forged-command]",
         "tests/a2/test_final_gates.py::test_full_gate_record_rejects[missing-command]",
         "tests/a2/test_final_gates.py::test_full_gate_record_rejects[missing-log-hash]",
         "tests/a2/test_final_gates.py::test_full_gate_record_rejects[nonzero-exit]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[passed-bool]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[passed-none]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[passed-string]",
         "tests/a2/test_final_gates.py::test_full_gate_record_rejects[pytest-failures]",
         "tests/a2/test_final_gates.py::test_full_gate_record_rejects[test-all-failures]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[test-all-float]",
         "tests/a2/test_final_gates.py::test_full_gate_record_rejects[unknown-command]",
         "tests/a2/test_final_gates.py::test_full_gate_record_rejects[wrong-source-commit]",
         "tests/a2/test_final_gates.py::test_gate_producer_record_is_accepted_by_the_validator",
         "tests/a2/test_final_gates.py::test_gate_producer_records_failures_and_the_validator_rejects_them",
-        "tests/a2/test_final_gates.py::test_gate_producer_dirty_tree_is_flagged"
+        "tests/a2/test_final_gates.py::test_gate_producer_dirty_tree_is_flagged",
+        "tests/a2/test_final_gates.py::test_count_parsing_reads_only_the_final_summary_line",
+        "tests/a2/test_final_gates.py::test_producer_missing_summary_is_not_a_pass",
+        "tests/a2/test_final_gates.py::test_producer_flags_a_tree_dirtied_by_the_gates"
       ],
       "status": "coverage-gap",
       "coverage_gaps": [
@@ -1769,7 +1782,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "f104e2bf76464391bab8416b68b27c9cd2ba3931e2d3bdd344ed5f452b8d0052"
+        "tests/a2/test_final_gates.py": "2996cb516312adfcb2a676f1622f38aafe0d09deed5e134cfa38cf3ddb6e1255"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1787,14 +1800,22 @@
         "tests/a2/test_final_gates.py::test_observation_artifact_validation[wrong-producer]",
         "tests/a2/test_final_gates.py::test_observation_artifact_validation[empty-facts]",
         "tests/a2/test_final_gates.py::test_observation_artifact_validation[unresolved-review]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[blank-evidence]",
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[count-disagrees]",
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[coverage-unreviewed]",
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[deferred-finding]",
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[duplicate-finding-id]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[executed-bool]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[executed-float]",
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[finding-without-disposition]",
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[finding-without-evidence]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[findings-not-list]",
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[no-executed-tests]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[numeric-evidence]",
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[static-review]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[trivial-evidence]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[unresolved-bool]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[unresolved-string]",
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[wrong-reviewed-commit]",
         "tests/a2/test_final_gates.py::test_review_with_no_findings_is_accepted_only_when_executed"
       ],
@@ -1804,13 +1825,13 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "f104e2bf76464391bab8416b68b27c9cd2ba3931e2d3bdd344ed5f452b8d0052"
+        "tests/a2/test_final_gates.py": "2996cb516312adfcb2a676f1622f38aafe0d09deed5e134cfa38cf3ddb6e1255"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 561,
+  "collected_nodes": 582,
   "review_candidate": "e36c341 plus pre-spawn ownership and replay boundary repairs",
   "platforms": [
     "ubuntu-24.04",

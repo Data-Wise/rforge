@@ -141,3 +141,11 @@ Read-only Codex adversarial review of D04 docs and a broad G08 ownership read.
 - Confirmed and fixed: tibble type rows (`<chr>`, `<dbl[2]>`) compared as bare inequality bounds; type rows now require exact equality while numeric bounds such as `<2e-16` stay `shape`.
 - Confirmed, partly fixed: the triage validator accepted unknown keys, findings without `check`/`severity`, extra packages and non-README hash keys; it is now an exact-key schema. Limit: a well-formed but fabricated commit or hash cannot be detected by the validator; authenticity rests on the producer run ID plus the artifact hash.
 - Manifest refreshed: 537 collected nodes (36 added), source hashes recomputed. Local gates: full pytest 1460 passed / 5 skipped, `test-all.sh` 47/47, reference generator check clean.
+
+## Phase 4 review disposition (executed review: 101 tests passed)
+
+- Confirmed and fixed: bool/float/string values satisfied count and exit-code checks (`exit_code: False`, `pytest_passed: True`, `47.0`) and a non-numeric value raised a raw TypeError; all counts now require a real int. Review evidence of one character passed; it now needs a written string of at least 10 characters.
+- Confirmed and fixed: gate commands were not compared with the canonical commands (`true` passed); each gate's command is pinned and its flag must agree with its exit code.
+- Confirmed and fixed: the producer checked cleanliness only before the gates and parsed the last match anywhere in the output; it now rechecks status and HEAD after the run and reads only the final summary line (errors count as failures, no summary is not a pass).
+- Limit, not fixed: the gate and review records remain self-attested. The validator cannot re-derive counts from logs; authenticity rests on the producer run ID plus the artifact hash. Shipping and re-hashing the logs is a design change deferred to the aggregate stage.
+- Deferred: mkdocs strict output directory is not retained as evidence.

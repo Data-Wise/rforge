@@ -38,11 +38,16 @@ def triage_facts():
 GATE_COMMANDS=('pytest','test-all','version-sync','reference-sync','command-sync','mkdocs-strict')
 
 
+CANONICAL={'pytest':'python -m pytest tests/ -q -p no:cacheprovider','test-all':'bash tests/test-all.sh',
+           'version-sync':'python scripts/version_sync.py --check','reference-sync':'python scripts/gen_lib_reference.py --check',
+           'command-sync':'python tests/_check_commands_doc.py','mkdocs-strict':'python -m mkdocs build --strict -q -d {tmp}'}
+
+
 def gate_facts():
     """A valid full-gate record: every required gate ran in the candidate tree and left a hashed log."""
     return {'source_commit':'sha','tree_clean':True,'pytest_passed':1460,'pytest_failed':0,'test_all_passed':47,'test_all_failed':0,
             'version_sync':True,'reference_sync':True,'command_sync':True,'mkdocs_strict':True,
-            'commands':[{'name':n,'command':'run '+n,'exit_code':0,'log_sha256':'c'*64} for n in GATE_COMMANDS]}
+            'commands':[{'name':n,'command':CANONICAL[n],'exit_code':0,'log_sha256':'c'*64} for n in GATE_COMMANDS]}
 
 
 def review_facts():
@@ -113,6 +118,16 @@ GATE_DEFECTS={
     'duplicate-command':lambda f:f['commands'].append(dict(f['commands'][0])),
     'unknown-command':lambda f:f['commands'].append({'name':'extra','command':'x','exit_code':0,'log_sha256':'c'*64}),
     'flag-without-command':lambda f:f.pop('commands'),
+    'forged-command':lambda f:f['commands'][0].update(command='true'),
+    'exit-code-false':lambda f:f['commands'][0].update(exit_code=False),
+    'exit-code-float':lambda f:f['commands'][0].update(exit_code=0.0),
+    'passed-bool':lambda f:f.update(pytest_passed=True),
+    'failed-bool':lambda f:f.update(pytest_failed=False),
+    'test-all-float':lambda f:f.update(test_all_passed=47.0),
+    'passed-string':lambda f:f.update(pytest_passed='1460'),
+    'passed-none':lambda f:f.update(pytest_passed=None),
+    'flag-disagrees-with-exit':lambda f:f['commands'][2].update(exit_code=1),
+    'flag-truthy-int':lambda f:f.update(version_sync=1),
 }
 
 
@@ -130,6 +145,14 @@ REVIEW_DEFECTS={
     'finding-without-evidence':lambda f:f['findings'][1].update(evidence=''),
     'count-disagrees':lambda f:f.update(unresolved_findings=1),
     'duplicate-finding-id':lambda f:f['findings'][1].update(id='F1'),
+    'executed-bool':lambda f:f.update(executed_tests=True),
+    'executed-float':lambda f:f.update(executed_tests=0.5),
+    'unresolved-bool':lambda f:f.update(unresolved_findings=False),
+    'unresolved-string':lambda f:f.update(unresolved_findings='0'),
+    'trivial-evidence':lambda f:f['findings'][0].update(evidence='x'),
+    'numeric-evidence':lambda f:f['findings'][0].update(evidence=1111111111111),
+    'blank-evidence':lambda f:f['findings'][0].update(evidence=' '*20),
+    'findings-not-list':lambda f:f.update(findings='none'),
     'coverage-unreviewed':lambda f:f.update(coverage_reviewed=False),
 }
 
@@ -193,3 +216,31 @@ def test_gate_producer_dirty_tree_is_flagged(monkeypatch):
     facts=mod.produce(runner=_fake_runner())
     assert facts['tree_clean'] is False
     with pytest.raises(v.VerificationError): v.validate_full_gates(facts,facts['source_commit'])
+
+
+def test_count_parsing_reads_only_the_final_summary_line():
+    mod=_gates()
+    out='3 passed in noise\n=== 1460 passed, 2 errors in 160s ===\n'
+    assert mod._summary(out,'passed')==1460 and mod._summary(out,'failed')==2
+    assert mod._summary('no summary here','passed') is None
+    assert mod._summary('== 5 passed, 1 failed, 3 errors ==','failed')==4
+
+
+def test_producer_missing_summary_is_not_a_pass():
+    mod=_gates()
+    def run(command,cwd): return 0,'finished\n'
+    facts=mod.produce(runner=run)
+    assert facts['pytest_passed']==0
+    with pytest.raises(v.VerificationError): v.validate_full_gates(facts,facts['source_commit'])
+
+
+def test_producer_flags_a_tree_dirtied_by_the_gates(monkeypatch):
+    mod=_gates(); real=mod.subprocess.run; calls={'n':0}
+    def fake(cmd,*a,**k):
+        if 'status' in cmd:
+            calls['n']+=1
+            class R: stdout=('' if calls['n']==1 else ' M generated.md\n'); returncode=0
+            return R()
+        return real(cmd,*a,**k)
+    monkeypatch.setattr(mod.subprocess,'run',fake)
+    assert mod.produce(runner=_fake_runner())['tree_clean'] is False

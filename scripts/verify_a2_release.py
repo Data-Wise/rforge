@@ -167,37 +167,66 @@ def validate_package_triage(facts):
 
 
 GATE_NAMES = ("pytest", "test-all", "version-sync", "reference-sync", "command-sync", "mkdocs-strict")
+GATE_COMMANDS = {
+    "pytest": "python -m pytest tests/ -q -p no:cacheprovider", "test-all": "bash tests/test-all.sh",
+    "version-sync": "python scripts/version_sync.py --check", "reference-sync": "python scripts/gen_lib_reference.py --check",
+    "command-sync": "python tests/_check_commands_doc.py", "mkdocs-strict": "python -m mkdocs build --strict -q -d {tmp}",
+}
+GATE_FLAGS = {"version-sync": "version_sync", "reference-sync": "reference_sync", "command-sync": "command_sync", "mkdocs-strict": "mkdocs_strict"}
 REVIEW_DISPOSITIONS = ("fixed", "rejected")
+MIN_EVIDENCE_CHARS = 10
+
+
+def _int(value):
+    """A real integer: bool, float and numeric strings must not satisfy a count or exit-code check."""
+    return type(value) is int
+
+
+def _canonical(command):
+    parts = str(command).split()
+    if parts and Path(parts[0]).name.startswith("python"):
+        parts[0] = "python"
+    return " ".join(parts)
 
 
 def validate_full_gates(facts, candidate_sha):
-    """Every gate ran in the clean candidate tree, exited 0, and left a hashed log; flags alone are not evidence."""
+    """Every gate ran its canonical command in the clean candidate tree, exited 0, and left a hashed log.
+
+    The record is still self-attested: authenticity rests on the producer run ID and artifact hash, not on this check.
+    """
     where = "full gates"
     require(facts.get("source_commit") == candidate_sha and facts.get("tree_clean") is True, f"{where}: not bound to a clean candidate tree")
-    require(facts.get("pytest_passed", 0) > 0 and facts.get("pytest_failed") == 0, f"{where}: pytest incomplete or failing")
-    require(facts.get("test_all_passed") == 47 and facts.get("test_all_failed") == 0, f"{where}: test-all incomplete or failing")
+    require(_int(facts.get("pytest_passed")) and facts["pytest_passed"] > 0 and _int(facts.get("pytest_failed")) and facts["pytest_failed"] == 0, f"{where}: pytest incomplete or failing")
+    require(_int(facts.get("test_all_passed")) and facts["test_all_passed"] == 47 and _int(facts.get("test_all_failed")) and facts["test_all_failed"] == 0, f"{where}: test-all incomplete or failing")
     require(all(facts.get(k) is True for k in ("version_sync", "reference_sync", "command_sync", "mkdocs_strict")), f"{where}: sync/build flag false")
     commands = facts.get("commands")
     require(isinstance(commands, list) and all(isinstance(c, dict) for c in commands), f"{where}: command records required")
     names = [c.get("name") for c in commands]
-    require(sorted(names) == sorted(GATE_NAMES), f"{where}: commands must be exactly {list(GATE_NAMES)}")
+    require(sorted(map(str, names)) == sorted(GATE_NAMES), f"{where}: commands must be exactly {list(GATE_NAMES)}")
     for c in commands:
-        require(bool(c.get("command")) and c.get("exit_code") == 0, f"{where}: {c.get('name')} did not exit 0")
-        require(isinstance(c.get("log_sha256"), str) and re.fullmatch(r"[a-f0-9]{64}", c["log_sha256"]), f"{where}: {c.get('name')} log hash required")
+        name = c["name"]
+        require(_canonical(c.get("command")) == GATE_COMMANDS[name], f"{where}: {name} did not run its canonical command")
+        require(_int(c.get("exit_code")) and c["exit_code"] == 0, f"{where}: {name} did not exit 0")
+        require(isinstance(c.get("log_sha256"), str) and re.fullmatch(r"[a-f0-9]{64}", c["log_sha256"]), f"{where}: {name} log hash required")
+        if name in GATE_FLAGS:
+            require(facts.get(GATE_FLAGS[name]) is (c["exit_code"] == 0), f"{where}: {name} flag disagrees with its exit code")
 
 
 def validate_review(facts, candidate_sha):
     """A finalized review executed against the candidate; every finding fixed or rejected with evidence."""
     where = "adversarial review"
     require(bool(facts.get("job_id")) and facts.get("reviewed_commit") == candidate_sha, f"{where}: not bound to the candidate")
-    require(facts.get("mode") == "executed" and facts.get("executed_tests", 0) > 0, f"{where}: a static review is not release evidence")
+    require(facts.get("mode") == "executed" and _int(facts.get("executed_tests")) and facts["executed_tests"] > 0, f"{where}: a static review is not release evidence")
     require(facts.get("coverage_reviewed") is True, f"{where}: coverage not reviewed")
     findings = facts.get("findings")
     require(isinstance(findings, list) and all(isinstance(f, dict) for f in findings), f"{where}: findings list required")
     ids = [f.get("id") for f in findings]
     require(all(ids) and len(set(ids)) == len(ids), f"{where}: finding ids must be unique")
-    unresolved = sum(1 for f in findings if f.get("disposition") not in REVIEW_DISPOSITIONS or not f.get("evidence"))
-    require(unresolved == 0 and facts.get("unresolved_findings") == 0, f"{where}: unresolved findings")
+    for f in findings:
+        evidence = f.get("evidence")
+        require(f.get("disposition") in REVIEW_DISPOSITIONS and isinstance(evidence, str) and len(evidence.strip()) >= MIN_EVIDENCE_CHARS,
+                f"{where}: finding {f.get('id')} needs a fixed/rejected disposition and written evidence")
+    require(_int(facts.get("unresolved_findings")) and facts["unresolved_findings"] == 0, f"{where}: unresolved findings")
 
 
 def validate_observation(name, item, *, candidate_sha, evidence_root):
