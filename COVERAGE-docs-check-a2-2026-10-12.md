@@ -163,3 +163,7 @@ Built with `mkdocs build --strict` on the A2 branch (strict build clean) and ins
 - Confirmed and pinned: stale `startup-release.json` and stale `terminate.json` `run_id` guards were correct but untested; new tests fail when either guard is mutated away.
 - Deferred, no test yet: parent-side `arm-ack` `run_id`/sequence guard, orphaned-guardian group wait, `_UNREAPED_PINS` retention, the 12 s hard guardian kill and the parent fail-closed downgrade (all mutations survived).
 - Limits, documented not fixed: a PGID reused after the pin dies while the parent is also dead could be signaled (needs two independent kills plus PGID reuse; fails toward over-signaling, so a pin liveness check is the future fix); control files are workload-writable by design and `run()` must only be given a fresh directory.
+
+## H02 re-run after the Phase 3/4/G08 changes (local, not candidate-bound)
+
+The triage producer was re-run on fresh temporary clones of medfit, probmed and medrobust at their current heads. Counts, states, finding counts (all zero) and README source hashes are identical to the reviewed record `tests/a2/evidence/package-triage-2026-10-24.json`; medfit's head moved (`d29e656` to `2951b28`) with its README unchanged. The reviewed record therefore still describes the code as it stands. The candidate-bound, run-ID-bound observation on the final commit remains aggregate work. Source repositories were only cloned, never written.
