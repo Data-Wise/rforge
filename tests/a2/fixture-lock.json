@@ -6,7 +6,8 @@
     "evaluate": "1.0.5",
     "knitr": "1.51",
     "pkgdown": "2.2.1",
-    "jsonlite": "2.0.0"
+    "jsonlite": "2.0.0",
+    "rsconnect": "1.11.0"
   },
   "platforms": [
     "ubuntu-24.04",

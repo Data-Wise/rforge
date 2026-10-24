@@ -39,6 +39,7 @@ jobs:
       - name: Install Python dependencies
         run: python -m pip install pytest pyyaml mkdocs-material mkdocs-macros-plugin pillow cairosvg
       - name: Run A2 tests directly (no manifest gate)
+        shell: bash
         run: python -m pytest tests/a2 -q -rs -p no:cacheprovider 2>&1 | tee a2-smoke.log
       - name: Upload log
         if: always()

@@ -1,3 +1,4 @@
+import os
 import time
 import pytest
 from lib import _docexamples as examples
@@ -130,7 +131,7 @@ def test_working_tree_load_identity(tmp_path, monkeypatch):
     (installed/'NAMESPACE').write_text('export(f)\n')
     library=tmp_path/'library';library.mkdir()
     subprocess.run([rscript,'--vanilla','-e',f'install.packages({str(installed)!r}, repos=NULL, type="source", lib={str(library)!r})'],check=True,capture_output=True,timeout=30)
-    monkeypatch.setenv('R_LIBS_USER',str(library))
+    monkeypatch.setenv('R_LIBS_USER',os.pathsep.join(filter(None,[str(library),os.environ.get('R_LIBS_USER')])))
     report=examples.audit(p,deadline=time.monotonic_ns()+20_000_000_000)
     assert report['state']=='complete' and report['counts']['matched']==1, report
     identity=report['provenance']['package']

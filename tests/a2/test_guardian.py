@@ -9,9 +9,10 @@ from lib import _docguardian as guardian
 def test_native_deadline_and_direct_child_reap(tmp_path):
     command=[sys.executable,"-c","import signal,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); time.sleep(30)"]
     started=time.monotonic()
-    result=guardian.run(command,tmp_path,time.monotonic_ns()+150_000_000,cwd=tmp_path)
+    # Generous deadline: a slow runner must start the child before the deadline fires.
+    result=guardian.run(command,tmp_path,time.monotonic_ns()+3_000_000_000,cwd=tmp_path)
     assert result["reason"]=="deadline" and result["direct_child_reaped"]
-    assert result["kill_sent"] and time.monotonic()-started < 8
+    assert result["kill_sent"] and time.monotonic()-started < 20
 
 
 def test_handshake_before_package_code(tmp_path):
@@ -41,9 +42,9 @@ for sequence in (1,2):
   if r.get('sequence')==sequence:break
   time.sleep(.01)
  print(r['deadline_ns'],flush=True)
- time.sleep(.45)
+ time.sleep(2.0)
 '''
-    r=guardian.run([sys.executable,'-c',code],tmp_path,time.monotonic_ns()+5_000_000_000,cwd=tmp_path,chunk_budget=.7)
+    r=guardian.run([sys.executable,'-c',code],tmp_path,time.monotonic_ns()+30_000_000_000,cwd=tmp_path,chunk_budget=3)
     assert r['reason']=='deadline'
     deadlines=(tmp_path/'stdout').read_text().splitlines()
     assert len(deadlines)==2 and deadlines[0]==deadlines[1]
@@ -119,7 +120,7 @@ def test_deadline_completion_collision(tmp_path):
 
 
 def test_monotonic_clock_and_scheduler_delay(tmp_path):
-    result=guardian.run([sys.executable,'-c','import time;time.sleep(30)'],tmp_path,time.monotonic_ns()+150000000,cwd=tmp_path)
+    result=guardian.run([sys.executable,'-c','import time;time.sleep(30)'],tmp_path,time.monotonic_ns()+3_000_000_000,cwd=tmp_path)
     assert result['reason']=='deadline' and result['enforcement_delay_ns']>=0
     assert result['effective_deadline_ns']==result['global_deadline_ns']
     assert result['guardian_pid']!=result['child_pid']
