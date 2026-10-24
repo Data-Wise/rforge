@@ -35,7 +35,7 @@ def exited_unreaped(process):
         return os.waitid(os.P_PID, process.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT) is not None
     # macOS Python omits waitid; ps exposes zombie state without reaping it.
     result = subprocess.run(["ps", "-o", "stat=", "-p", str(process.pid)],
-                            capture_output=True, text=True, timeout=1)
+                            capture_output=True, text=True, timeout=5)
     state = result.stdout.strip()
     if not state:
         raise RuntimeError("owned child lifetime could not be verified")
@@ -44,7 +44,7 @@ def exited_unreaped(process):
 
 def live_group_members(pgid, exclude_pid=None):
     result = subprocess.run(["ps", "-e", "-o", "pgid=", "-o", "pid=", "-o", "stat="],
-                            capture_output=True, text=True, timeout=1, check=True)
+                            capture_output=True, text=True, timeout=5, check=True)
     return any(fields[0] == str(pgid) and fields[1] != str(exclude_pid) and not fields[2].startswith("Z")
                for line in result.stdout.splitlines() if len(fields := line.split()) >= 3)
 
@@ -156,6 +156,9 @@ def supervise(directory):
             # Direct-child reap and group disappearance are separate observations.
             try:
                 status["returncode"] = process.wait(timeout=5);status["direct_child_reaped"] = True
+                if status["reason"] == "completed" and status["returncode"] != 0:
+                    # A workload that was killed or failed cannot report completion.
+                    status["reason"] = "workload-killed" if status["returncode"] < 0 else "workload-exited-nonzero"
             except subprocess.TimeoutExpired:
                 status["reason"] = "cleanup-unverified"
             launch_error = read(directory / "launch-error.json")
@@ -281,6 +284,11 @@ def run(command, directory, deadline, *, cwd, env=None, file_budget=300, chunk_b
             # never the integer child_pid read from a checkpoint.
             try:pin.signal_group(signal.SIGKILL)
             except OSError as exc:terminal["cleanup_error"] = str(exc)
+    except BaseException:
+        # An interrupted or failed parent never reaches the marker write below; leave the inspection marker honest.
+        try:atomic(directory/"marker.json",{"run_id":run_id,"state":"interrupted"})
+        except OSError:pass
+        raise
     finally:
         try:
             if guardian is not None and guardian.poll() is None:

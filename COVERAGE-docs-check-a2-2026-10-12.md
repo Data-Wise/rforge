@@ -153,3 +153,13 @@ Read-only Codex adversarial review of D04 docs and a broad G08 ownership read.
 ## D04 rendered-site inspection (dev-time, commit-unbound)
 
 Built with `mkdocs build --strict` on the A2 branch (strict build clean) and inspected the rendered `<article>` HTML of the eight A2-touched pages: docs-audit guide, fix-a-docs-check-finding tutorial, REFCARD, command-cards, commands, reference/docaudit, workflows, quickstart. Every expected term (`--site`, `--run-examples`, `unverified`, `sandbox`, `--fail-on error`, `INCOMPLETE`, `figure`) is present in the rendered text, no raw Markdown or admonition syntax leaked, and no internal link is broken; the tutorial renders six admonitions and five code blocks. This is a development-time inspection: the candidate-bound `rendered_review` observation (page hashes on the final commit, produced by the aggregate run) remains open.
+
+## G08 independent review disposition (executed: 37 guardian tests, mutation runs on scratch copies)
+
+- Confirmed and fixed: a workload killed by a signal or exiting nonzero was reported `completed` (SPEC: a killed process cannot report completion); the guardian now reports `workload-killed` / `workload-exited-nonzero` and the marker reads `interrupted`; a clean exit is still `completed`.
+- Confirmed and fixed: after a parent `KeyboardInterrupt` the lifecycle marker stayed `started`; the parent now writes `interrupted` on any exception.
+- Confirmed and fixed: `ps` probes used a 1s timeout, which on a loaded runner turns a healthy workload into a spurious `guardian-failure`; timeouts are now 5s.
+- Confirmed and fixed: the interrupt tests failed under a backgrounded pytest (SIGINT inherited as ignored); they now install the default handler.
+- Confirmed and pinned: stale `startup-release.json` and stale `terminate.json` `run_id` guards were correct but untested; new tests fail when either guard is mutated away.
+- Deferred, no test yet: parent-side `arm-ack` `run_id`/sequence guard, orphaned-guardian group wait, `_UNREAPED_PINS` retention, the 12 s hard guardian kill and the parent fail-closed downgrade (all mutations survived).
+- Limits, documented not fixed: a PGID reused after the pin dies while the parent is also dead could be signaled (needs two independent kills plus PGID reuse; fails toward over-signaling, so a pin liveness check is the future fix); control files are workload-writable by design and `run()` must only be given a fresh directory.

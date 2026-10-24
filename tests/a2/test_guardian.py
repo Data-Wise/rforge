@@ -440,6 +440,9 @@ g.supervise({str(tmp_path)!r})
 def test_interrupt_after_launch_tracks_and_reaps_child(tmp_path,monkeypatch,target):
     import signal
     import subprocess
+    # A background job inherits SIGINT as SIG_IGN, which would stop Python raising KeyboardInterrupt.
+    monkeypatch.setattr(signal,'getsignal',signal.getsignal)
+    signal.signal(signal.SIGINT,signal.default_int_handler)
     original=subprocess.Popen
     children=[]
     def interrupt(command,*args,**kwargs):
@@ -586,3 +589,58 @@ def test_handle_allocation_failure_precedes_spawn(tmp_path, monkeypatch):
                 'allocation', time.monotonic_ns()+guardian.NS, tmp_path,
                 dict(os.environ), stream, stream)
     assert not calls
+
+
+@pytest.mark.parametrize('code,expected',[("import os,signal;os.kill(os.getpid(),signal.SIGKILL)",'killed'),("import sys;sys.exit(3)",'exited-nonzero')])
+def test_workload_that_dies_or_fails_is_not_reported_completed(tmp_path,code,expected):
+    result=guardian.run([sys.executable,'-c',code],tmp_path,time.monotonic_ns()+10*guardian.NS,cwd=tmp_path)
+    assert result['reason']==f'workload-{expected}'
+    assert guardian.read(tmp_path/'marker.json')['state']=='interrupted'
+
+
+def test_clean_exit_is_still_completed(tmp_path):
+    result=guardian.run([sys.executable,'-c','pass'],tmp_path,time.monotonic_ns()+10*guardian.NS,cwd=tmp_path)
+    assert result['reason']=='completed' and guardian.read(tmp_path/'marker.json')['state']=='completed'
+
+
+def test_parent_interrupt_leaves_an_interrupted_marker(tmp_path,monkeypatch):
+    import signal
+    import subprocess
+    signal.signal(signal.SIGINT,signal.default_int_handler)
+    original=subprocess.Popen
+    def interrupt(command,*args,**kwargs):
+        process=original(command,*args,**kwargs)
+        if command[1:3]==['-m','lib._docguardian']:os.kill(os.getpid(),signal.SIGINT)
+        return process
+    monkeypatch.setattr(subprocess,'Popen',interrupt)
+    with pytest.raises(KeyboardInterrupt):
+        guardian.run([sys.executable,'-c','pass'],tmp_path,time.monotonic_ns()+3*guardian.NS,cwd=tmp_path)
+    marker=guardian.read(tmp_path/'marker.json')
+    assert marker and marker['state']=='interrupted'
+
+
+def _initial(tmp_path,command,budget):
+    import uuid
+    now=time.monotonic_ns();run_id=uuid.uuid4().hex
+    guardian.atomic(tmp_path/'initial.json',{'run_id':run_id,'deadline_ns':now+int(budget*guardian.NS),'file_started_ns':now,'file_budget_ns':int(budget*guardian.NS),'chunk_budget_ns':guardian.NS,'command':command,'cwd':str(tmp_path),'env':dict(os.environ)})
+    return run_id
+
+
+def test_stale_startup_release_never_starts_the_workload(tmp_path):
+    _initial(tmp_path,[sys.executable,'-c',"from pathlib import Path;Path('started').touch()"],1)
+    guardian.atomic(tmp_path/'startup-release.json',{'run_id':'someone-elses-run'})
+    guardian.supervise(tmp_path)
+    assert not (tmp_path/'started').exists()
+
+
+def test_stale_terminate_record_is_ignored(tmp_path):
+    run_id=_initial(tmp_path,[sys.executable,'-c','import time;time.sleep(1)'],20)
+    guardian.atomic(tmp_path/'startup-release.json',{'run_id':run_id})
+    guardian.atomic(tmp_path/'terminate.json',{'run_id':'someone-elses-run','reason':'requested'})
+    assert guardian.supervise(tmp_path)['reason']=='completed'
+
+
+def test_probe_timeouts_tolerate_a_loaded_runner():
+    import inspect
+    source=inspect.getsource(guardian)
+    assert 'timeout=1)' not in source and 'timeout=1,' not in source
