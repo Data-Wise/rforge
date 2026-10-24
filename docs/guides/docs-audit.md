@@ -141,7 +141,7 @@ candidate commit. It computes the full-gate record, a live-site smoke against a
 real deployed pkgdown site, the package-triage freshness check and the rendered-page
 inspection itself. The finalized adversarial review is a recorded judgment supplied
 as the `review-record` input: the run stamps it but cannot prove it, so it is
-attested by whoever dispatches. The live smoke checks one supported public site and
+attested by whoever dispatches; keep it concise, because a dispatch input is limited to about 64 KB. Before downloading the artifact, `a2-release.yml` asks the Actions API whether the supplying run is the `a2-observations.yml` dispatch for the same head commit and finished successfully. The live smoke checks one supported public site and
 records that real Data-Wise packages are reported incomplete, because pkgdown
 development mode and `.qmd` articles are unsupported by `--site` today.
 

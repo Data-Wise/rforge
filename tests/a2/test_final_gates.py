@@ -45,7 +45,7 @@ CANONICAL={'pytest':'python -m pytest tests/ -q -p no:cacheprovider','test-all':
 
 def live_facts():
     """A valid live-smoke record: one supported real site checked completely, real packages the check cannot cover said so."""
-    site={'name':'cranlogs','url':'https://example.org/pkg/','source_ref':'abc','requests':1,'state':'complete','checked':4,'reasons':[]}
+    site={'name':'cranlogs','url':v.SUPPORTED_SITE_URL,'source_ref':'abc','requests':1,'state':'complete','checked':4,'reasons':[]}
     limit={'name':'medfit','url':'https://example.org/medfit/','source_ref':'def','requests':1,'state':'incomplete','checked':0,
            'reasons':['development mode/destination mapping unsupported']}
     return {'url':site['url'],'source_ref':'abc','requests':1,'checked':4,'supported_site':site,'unsupported_real_runs':[limit]}

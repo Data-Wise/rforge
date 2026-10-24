@@ -1665,8 +1665,12 @@
         "tests/a2/test_observations.py::test_live_smoke_observation_fails[states0]",
         "tests/a2/test_observations.py::test_live_smoke_observation_fails[states1]",
         "tests/a2/test_observations.py::test_live_smoke_observation_fails[states2]",
-        "tests/a2/test_observations.py::test_live_smoke_observation_fails[states3]",
-        "tests/a2/test_observations.py::test_request_counter_counts_opener_calls"
+        "tests/a2/test_observations.py::test_request_counter_counts_opener_calls",
+        "tests/a2/test_observations.py::test_a_limit_site_that_becomes_supported_is_an_improvement_not_a_failure",
+        "tests/a2/test_observations.py::test_supported_site_is_pinned_to_a_commit_and_url",
+        "tests/a2/test_observations.py::test_live_smoke_rejects_a_site_other_than_the_pinned_one",
+        "tests/a2/test_observations.py::test_clone_is_retried_on_a_transient_failure",
+        "tests/a2/test_observations.py::test_live_smoke_observation_fails[states3]"
       ],
       "status": "ready",
       "coverage_gaps": [
@@ -1729,6 +1733,12 @@
         "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>1]",
         "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>2]",
         "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>3]",
+        "tests/a2/test_observations.py::test_triage_observation_rejects_a_reviewed_commit_that_is_not_the_fresh_one",
+        "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>0]",
+        "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>1]",
+        "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>2]",
+        "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>3]",
+        "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>4]",
         "tests/a2/test_observations.py::test_triage_observation_takes_the_fresh_commit"
       ],
       "status": "ready",
@@ -1816,6 +1826,7 @@
         "tests/a2/test_observations.py::test_mapping_observation_on_the_real_ledger",
         "tests/a2/test_observations.py::test_written_records_and_index_pass_the_aggregate_validator",
         "tests/a2/test_observations.py::test_failed_status_is_never_accepted",
+        "tests/a2/test_observations.py::test_a_crashing_observation_becomes_a_failed_record_not_a_crash",
         "tests/a2/test_release_ci.py::test_observations_workflow_is_dispatch_only_and_bound_to_the_run",
         "tests/a2/test_release_ci.py::test_no_temporary_smoke_workflow_remains"
       ],
@@ -1825,7 +1836,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "1c44047cd5593d073070a77b7717bb93b13aa5913cef6fef373863268be0b03e"
+        "tests/a2/test_final_gates.py": "fd2b6c76e37168464d84ba12647b8d85eaf6950e57d56137fa12451a22725f07"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1861,7 +1872,21 @@
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[unresolved-string]",
         "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[wrong-reviewed-commit]",
         "tests/a2/test_final_gates.py::test_review_with_no_findings_is_accepted_only_when_executed",
-        "tests/a2/test_observations.py::test_review_observation_binds_candidate"
+        "tests/a2/test_observations.py::test_review_observation_binds_candidate",
+        "tests/a2/test_observations.py::test_malformed_review_input_is_rejected_before_any_work",
+        "tests/a2/test_producer_run.py::test_genuine_producer_run_accepted",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[head_sha-old]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[path-.github/workflows/evil.yml]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[path-]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[status-in_progress]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[conclusion-failure]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[conclusion-None]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[event-push]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[id-1]",
+        "tests/a2/test_producer_run.py::test_missing_fields_rejected",
+        "tests/a2/test_producer_run.py::test_workflow_path_suffix_is_tolerated_but_prefix_confusion_is_not",
+        "tests/a2/test_producer_run.py::test_cli_exit_codes",
+        "tests/a2/test_producer_run.py::test_release_workflow_verifies_the_producer_run_before_downloading_it"
       ],
       "status": "ready",
       "coverage_gaps": [
@@ -1869,14 +1894,14 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "1c44047cd5593d073070a77b7717bb93b13aa5913cef6fef373863268be0b03e"
+        "tests/a2/test_final_gates.py": "fd2b6c76e37168464d84ba12647b8d85eaf6950e57d56137fa12451a22725f07"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 626,
-  "review_candidate": "frozen A2 candidate: ready flip, observations workflow, smoke workflow removed",
+  "collected_nodes": 649,
+  "review_candidate": "A2 candidate 2: round-1 review fixes (producer-run binding, triage commit equality, crash-safe observations)",
   "platforms": [
     "ubuntu-24.04",
     "macos-14"

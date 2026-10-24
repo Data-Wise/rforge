@@ -31,6 +31,13 @@ jobs:
         env:
           A2_EVIDENCE_RUN: ${{ inputs.acceptance-evidence-run }}
         run: python -c 'import os; assert os.environ["A2_EVIDENCE_RUN"].isdigit(), "Numeric evidence run ID required"'
+      - name: Verify the producer run is the genuine observations run for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          A2_EVIDENCE_RUN: ${{ inputs.acceptance-evidence-run }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$A2_EVIDENCE_RUN" > producer-run.json
+          python scripts/verify_a2_producer_run.py --run producer-run.json --candidate-sha "$GITHUB_SHA" --run-id "$A2_EVIDENCE_RUN"
       - uses: actions/download-artifact@v4
         with:
           name: a2-acceptance-evidence

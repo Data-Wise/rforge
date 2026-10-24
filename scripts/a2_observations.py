@@ -18,6 +18,7 @@ import json
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -26,11 +27,12 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT))
 
 from a2_gate_record import produce as produce_gates  # noqa: E402
-from verify_a2_release import (VerificationError, validate_full_gates, validate_package_triage,  # noqa: E402
+from verify_a2_release import (SUPPORTED_SITE_URL, VerificationError, validate_full_gates, validate_package_triage,  # noqa: E402
                                validate_requirements, validate_review)
 
 # A real deployed pkgdown site with a supported configuration (release mode, no template, one sitemap request).
-SUPPORTED_SITE = {"name": "cranlogs", "repo": "https://github.com/r-hub/cranlogs", "url": "https://r-hub.github.io/cranlogs/"}
+SUPPORTED_SITE = {"name": "cranlogs", "repo": "https://github.com/r-hub/cranlogs", "url": SUPPORTED_SITE_URL,
+                  "commit": "c02280c7b4c6d77ff5500f80e15118edad5d94dc"}
 # Real packages whose sites A2 marks unsupported (development mode, .qmd articles): recorded honestly as incomplete.
 LIMIT_SITES = (
     {"name": "medfit", "repo": "https://github.com/Data-Wise/medfit", "url": "https://data-wise.github.io/medfit/"},
@@ -42,8 +44,8 @@ RENDERED_PAGES = {
     "REFCARD": ("--site", "--run-examples"),
     "command-cards": ("--site", "--run-examples"),
     "commands": ("--site", "--run-examples"),
-    "reference/docaudit": ("examples", "site"),
-    "quickstart": ("docs",),
+    "reference/docaudit": ("docs:check", "site"),
+    "quickstart": ("--run-examples", "docs:check"),
 }
 RAW_LEAKS = ("```", ":::", "!!! ", "{{", "<?claude")
 
@@ -74,8 +76,24 @@ def observe_full_gates(root: Path = ROOT, runner: Optional[Callable] = None) -> 
     return facts, _status(lambda: validate_full_gates(facts, facts["source_commit"]))
 
 
-def _clone(repo: str, dest: Path) -> str:
-    subprocess.run(["git", "clone", "-q", repo, str(dest)], check=True, capture_output=True, timeout=300)
+def guarded(name: str, observe: Callable[[], tuple]) -> tuple:
+    """A crashing observation becomes a failed record carrying the error, so the other records still land."""
+    try:
+        return observe()
+    except Exception as exc:  # noqa: BLE001 - every failure must surface as a record, not abort the run
+        print(f"observation {name} crashed: {exc}", file=sys.stderr)
+        return {"error": f"{type(exc).__name__}: {exc}"}, "failed"
+
+
+def _clone(repo: str, dest: Path, attempts: int = 3) -> str:
+    for attempt in range(attempts):
+        try:
+            subprocess.run(["git", "clone", "-q", repo, str(dest)], check=True, capture_output=True, timeout=300)
+            break
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            if attempt == attempts - 1:
+                raise
+            time.sleep(5 * (attempt + 1))
     return subprocess.run(["git", "-C", str(dest), "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()
 
 
@@ -109,6 +127,9 @@ def observe_live_smoke(workdir: Path, audit: Optional[Callable] = None, clone: O
     def run(site: dict) -> dict:
         dest = workdir / site["name"]
         sha = clone(site["repo"], dest)
+        if site.get("commit"):
+            subprocess.run(["git", "-C", str(dest), "checkout", "-q", site["commit"]], check=True, capture_output=True)
+            sha = site["commit"]
         branch = subprocess.run(["git", "-C", str(dest), "branch", "--show-current"], capture_output=True, text=True).stdout.strip() or "HEAD"
         result = audit(dest, site["url"], branch)
         stage = result["stage"]
@@ -116,11 +137,12 @@ def observe_live_smoke(workdir: Path, audit: Optional[Callable] = None, clone: O
                 "state": stage.get("state"), "checked": (stage.get("counts") or {}).get("checked", 0),
                 "reasons": list(stage.get("reasons") or [])}
     primary = run(supported)
-    unsupported = [run(site) for site in limits]
+    runs = [run(site) for site in limits]
+    unsupported = [r for r in runs if r["state"] == "incomplete" and r["reasons"]]
+    other = [r for r in runs if r not in unsupported]  # a real site that became supported is an improvement, not a failure
     facts = {"url": primary["url"], "source_ref": primary["source_ref"], "requests": primary["requests"], "checked": primary["checked"],
-             "supported_site": primary, "unsupported_real_runs": unsupported}
-    ok = (primary["state"] == "complete" and primary["requests"] > 0 and primary["checked"] > 0
-          and all(run_["state"] == "incomplete" and run_["reasons"] for run_ in unsupported))
+             "supported_site": primary, "unsupported_real_runs": unsupported, "other_real_runs": other}
+    ok = primary["state"] == "complete" and primary["requests"] > 0 and primary["checked"] > 0 and bool(unsupported)
     return facts, "passed" if ok else "failed"
 
 
@@ -130,15 +152,21 @@ def observe_package_triage(reviewed: dict, fresh: dict) -> tuple:
     drift = []
     for name, record in facts["packages"].items():
         now = fresh["packages"].get(name, {})
-        for key in ("state", "counts", "source_sha256"):
+        for key in ("commit", "state", "scope", "counts", "source_sha256"):
             if record.get(key) != now.get(key):
                 drift.append(f"{name}.{key}")
-        if len(record.get("findings", [])) != len(now.get("findings", [])):
+        if sorted(map(str, record.get("reasons", []))) != sorted(map(str, now.get("reasons", []))):
+            drift.append(f"{name}.reasons")
+        if _finding_keys(record) != _finding_keys(now):
             drift.append(f"{name}.findings")
-        record["commit"] = now.get("commit", record["commit"])
     if drift:
         print("triage drift: " + ", ".join(drift), file=sys.stderr)
     return facts, _status(lambda: (validate_package_triage(facts), _require_no_drift(drift)))
+
+
+def _finding_keys(record: dict) -> list:
+    return sorted((str(f.get("check")), str(f.get("severity")), str(f.get("file")), str(f.get("line")), str(f.get("assertion_id")))
+                  for f in record.get("findings", []))
 
 
 def _require_no_drift(drift: list) -> None:
@@ -229,22 +257,29 @@ def main(argv: Optional[list] = None) -> int:
     parser.add_argument("--triage-record", type=Path, default=ROOT / "tests/a2/evidence/package-triage-2026-10-24.json")
     parser.add_argument("--triage-pins", type=Path, default=ROOT / "tests/a2/evidence/triage-pins.json")
     args = parser.parse_args(argv)
+    if not args.clone_triage_only:
+        if not (args.output and args.run_id.isdigit() and args.candidate_sha and args.review_record):
+            parser.error("--output, --run-id (numeric), --candidate-sha and --review-record are required to produce observations")
+        try:
+            review = json.loads(args.review_record.read_text())
+        except (OSError, ValueError) as exc:
+            parser.error(f"review record unreadable: {exc}")
+        if not isinstance(review, dict):
+            parser.error("review record must be a JSON object")
     args.workdir.mkdir(parents=True, exist_ok=True)
     clones = pin_clones(args.workdir, json.loads(args.triage_pins.read_text()))
     if args.clone_triage_only:
         print("\n".join(str(path) for path in clones.values()))
         return 0
-    if not (args.output and args.run_id.isdigit() and args.candidate_sha and args.review_record):
-        parser.error("--output, --run-id (numeric), --candidate-sha and --review-record are required to produce observations")
     args.output.mkdir(parents=True, exist_ok=True)
     from a2_package_triage import produce as produce_triage
     observations = {
-        "full_gates": observe_full_gates(),
-        "live_smoke": observe_live_smoke(args.workdir),
-        "package_triage": observe_package_triage(json.loads(args.triage_record.read_text()), produce_triage(clones)),
-        "rendered_review": observe_rendered(args.workdir),
-        "adversarial_review": observe_review(json.loads(args.review_record.read_text()), args.candidate_sha),
-        "requirement_mapping": observe_mapping(),
+        "full_gates": guarded("full_gates", observe_full_gates),
+        "live_smoke": guarded("live_smoke", lambda: observe_live_smoke(args.workdir)),
+        "package_triage": guarded("package_triage", lambda: observe_package_triage(json.loads(args.triage_record.read_text()), produce_triage(clones))),
+        "rendered_review": guarded("rendered_review", lambda: observe_rendered(args.workdir)),
+        "adversarial_review": guarded("adversarial_review", lambda: observe_review(review, args.candidate_sha)),
+        "requirement_mapping": guarded("requirement_mapping", observe_mapping),
     }
     index = {kind: write_record(args.output, kind, status, args.candidate_sha, args.run_id, facts)
              for kind, (facts, status) in observations.items()}

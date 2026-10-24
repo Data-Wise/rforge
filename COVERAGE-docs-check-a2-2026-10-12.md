@@ -180,3 +180,13 @@ The triage producer was re-run on fresh temporary clones of medfit, probmed and 
 - Triage freshness: a fresh producer run on clones pinned in `tests/a2/evidence/triage-pins.json` must match the reviewed record (state, counts, README hashes, finding counts) or the observation fails.
 - The temporary `a2-smoke.yml` and its `ci.yml` job are removed. Merge method for the PR is a merge commit so the evidenced SHA stays in history.
 - Dry run on a dirty tree: 5 of 6 observations passed; `full_gates` failed only on the clean-tree check (pytest 1547 passed, test-all 47/47, all sync gates 0). The locked-runtime release runner cannot run locally (exact R and package versions required) and is exercised only in CI.
+
+## Candidate round 1 review disposition (ec357d0; executed 116 tests plus scratch-copy mutations)
+
+- Blocker, confirmed and fixed: the aggregate gate trusted the artifact's own JSON and never checked the producing run. `a2-release.yml` now asks the Actions API and `scripts/verify_a2_producer_run.py` requires the run ID, head SHA, the `a2-observations.yml` path, a manual dispatch and a successful completion before the artifact is downloaded.
+- Confirmed and fixed: the triage observation overwrote the reviewed commit with the fresh one. It now requires equality. The shipped record named medfit at `d29e656`, which is on no remote branch, so the record is re-attested at the pinned `2951b28` (README hash identical, fresh run reproduced state, counts and zero findings).
+- Confirmed and fixed: drift compared only finding counts and omitted scope and reasons; it now compares sorted finding identities, scope and reasons.
+- Confirmed and fixed: any crash lost every record. Each observation is guarded, a crash becomes a failed record carrying the error, the review input is validated before any work, and clones retry.
+- Confirmed and fixed: cranlogs is pinned to a commit and the supported URL is fixed in the verifier; a limit site that becomes supported is recorded as `other_real_runs`, not a failure. Network failures surface as failed records with the exception text.
+- Confirmed and fixed: the request-counter test could not detect a missing restore (verified by mutation); it now asserts restoration. Rendered-page terms for quickstart and reference/docaudit are now specific.
+- Documented, not fixed: the `review-record` dispatch input is capped at about 64 KB (guide note); a deployed third-party site can still change under a pinned source commit, which would show up as a failed live-smoke record rather than a false pass.

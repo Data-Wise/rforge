@@ -53,21 +53,20 @@ def _clone_stub(repo, dest):
     return subprocess.run(['git', '-C', str(dest), 'rev-parse', 'HEAD'], capture_output=True, text=True, check=True).stdout.strip()
 
 
-SITES = {'sup': {'name': 'sup', 'repo': 'r', 'url': 'https://s/'}, 'lim': ({'name': 'lim', 'repo': 'r', 'url': 'https://l/'},)}
+SITES = {'sup': {'name': 'sup', 'repo': 'r', 'url': v.SUPPORTED_SITE_URL}, 'lim': ({'name': 'lim', 'repo': 'r', 'url': 'https://l/'},)}
 
 
 def test_live_smoke_observation_passes_with_a_complete_site_and_an_honest_limit(tmp_path):
-    states = {'https://s/': ('complete', 4, []), 'https://l/': ('incomplete', 0, ['development mode/destination mapping unsupported'])}
+    states = {v.SUPPORTED_SITE_URL: ('complete', 4, []), 'https://l/': ('incomplete', 0, ['development mode/destination mapping unsupported'])}
     facts, status = obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=_clone_stub, supported=SITES['sup'], limits=SITES['lim'])
     assert status == 'passed'
     v.validate_live_smoke(facts)
 
 
 @pytest.mark.parametrize('states', [
-    {'https://s/': ('incomplete', 4, ['x']), 'https://l/': ('incomplete', 0, ['y'])},
-    {'https://s/': ('complete', 0, []), 'https://l/': ('incomplete', 0, ['y'])},
-    {'https://s/': ('complete', 4, []), 'https://l/': ('complete', 3, [])},
-    {'https://s/': ('complete', 4, []), 'https://l/': ('incomplete', 0, [])},
+    {v.SUPPORTED_SITE_URL: ('incomplete', 4, ['x']), 'https://l/': ('incomplete', 0, ['y'])},
+    {v.SUPPORTED_SITE_URL: ('complete', 0, []), 'https://l/': ('incomplete', 0, ['y'])},
+    {v.SUPPORTED_SITE_URL: ('complete', 4, []), 'https://l/': ('incomplete', 0, [])},
 ])
 def test_live_smoke_observation_fails(tmp_path, states):
     _, status = obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=_clone_stub, supported=SITES['sup'], limits=SITES['lim'])
@@ -81,16 +80,17 @@ def test_request_counter_counts_opener_calls(monkeypatch, tmp_path):
         def open(self, *a, **k):
             return 'ok'
 
-    monkeypatch.setattr(_docsite.request, 'build_opener', lambda *h: FakeOpener())
+    fake_builder = lambda *h: FakeOpener()
+    monkeypatch.setattr(_docsite.request, 'build_opener', fake_builder)
 
     def fake_audit(path, **kwargs):
         opener = _docsite.request.build_opener()
         opener.open('u'); opener.open('v')
         return {'stages': {'site': {'state': 'complete', 'counts': {'checked': 2}}}}
     monkeypatch.setattr(docaudit, 'audit', fake_audit)
-    result = obs.counting_audit(tmp_path, 'https://s/', 'main')
+    result = obs.counting_audit(tmp_path, v.SUPPORTED_SITE_URL, 'main')
     assert result['requests'] == 2 and result['stage']['counts']['checked'] == 2
-    assert _docsite.request.build_opener is not None and not hasattr(_docsite.request.build_opener, '__wrapped__')
+    assert _docsite.request.build_opener is fake_builder
 
 
 def _fresh(reviewed):
@@ -117,12 +117,27 @@ def test_triage_observation_fails_on_drift(mutate):
     assert status == 'failed'
 
 
-def test_triage_observation_takes_the_fresh_commit():
+def test_triage_observation_rejects_a_reviewed_commit_that_is_not_the_fresh_one():
     reviewed = {'facts': triage_facts()}
     fresh = _fresh(reviewed)
     fresh['packages']['medfit']['commit'] = 'f' * 40
-    facts, status = obs.observe_package_triage(reviewed, fresh)
-    assert status == 'passed' and facts['packages']['medfit']['commit'] == 'f' * 40
+    _, status = obs.observe_package_triage(reviewed, fresh)
+    assert status == 'failed'
+
+
+@pytest.mark.parametrize('mutate', [
+    lambda p: p['probmed']['findings'][0].update(check='examples-error'),
+    lambda p: p['probmed']['findings'][0].update(severity='error'),
+    lambda p: p['probmed']['findings'][0].update(assertion_id='README.md:99'),
+    lambda p: p['medfit'].update(scope='complete'),
+    lambda p: p['medfit'].update(reasons=['a different reason']),
+])
+def test_triage_drift_covers_finding_identity_scope_and_reasons(mutate):
+    reviewed = {'facts': triage_facts()}
+    fresh = _fresh(reviewed)
+    mutate(fresh['packages'])
+    _, status = obs.observe_package_triage(reviewed, fresh)
+    assert status == 'failed'
 
 
 def _site(root, pages):
@@ -221,3 +236,54 @@ def test_failed_status_is_never_accepted(tmp_path):
     index = {k: obs.write_record(tmp_path, k, 'failed' if k == 'live_smoke' else 'passed', 'sha', '123', f) for k, f in facts.items()}
     with pytest.raises(v.VerificationError):
         v.validate_aggregate(platforms, index, candidate_sha='sha', evidence_root=tmp_path)
+
+
+def test_a_limit_site_that_becomes_supported_is_an_improvement_not_a_failure(tmp_path):
+    states = {v.SUPPORTED_SITE_URL: ('complete', 4, []), 'https://l/': ('complete', 3, [])}
+    sites = ({'name': 'a', 'repo': 'r', 'url': 'https://l/'}, {'name': 'b', 'repo': 'r', 'url': 'https://l2/'})
+    states['https://l2/'] = ('incomplete', 0, ['development mode/destination mapping unsupported'])
+    facts, status = obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=_clone_stub, supported=SITES['sup'], limits=sites)
+    assert status == 'passed' and [r['name'] for r in facts['unsupported_real_runs']] == ['b'] and facts['other_real_runs'][0]['name'] == 'a'
+
+
+def test_supported_site_is_pinned_to_a_commit_and_url():
+    assert len(obs.SUPPORTED_SITE['commit']) == 40 and obs.SUPPORTED_SITE['url'] == v.SUPPORTED_SITE_URL
+
+
+def test_live_smoke_rejects_a_site_other_than_the_pinned_one():
+    facts = live_facts()
+    facts['url'] = facts['supported_site']['url'] = 'https://elsewhere.example/'
+    with pytest.raises(v.VerificationError):
+        v.validate_live_smoke(facts)
+
+
+def test_clone_is_retried_on_a_transient_failure(monkeypatch, tmp_path):
+    calls = {'n': 0}
+    import subprocess as sp
+    real = sp.run
+    def flaky(cmd, *a, **k):
+        if cmd[:2] == ['git', 'clone']:
+            calls['n'] += 1
+            if calls['n'] < 3:
+                raise sp.CalledProcessError(128, cmd)
+            real(['git', 'init', '-q', cmd[-1]], check=True)
+            return real(['git', '-C', cmd[-1], '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'x'], check=True)
+        return real(cmd, *a, **k)
+    monkeypatch.setattr(obs.subprocess, 'run', flaky)
+    monkeypatch.setattr(obs.time, 'sleep', lambda s: None)
+    obs._clone('https://example.invalid/x', tmp_path / 'x')
+    assert calls['n'] == 3
+
+
+def test_a_crashing_observation_becomes_a_failed_record_not_a_crash():
+    facts, status = obs.guarded('x', lambda: (_ for _ in ()).throw(RuntimeError('boom')))
+    assert status == 'failed' and 'boom' in facts['error']
+    assert obs.guarded('x', lambda: ({'ok': 1}, 'passed')) == ({'ok': 1}, 'passed')
+
+
+def test_malformed_review_input_is_rejected_before_any_work(tmp_path):
+    bad = tmp_path / 'review.json'
+    bad.write_text('["not", "an", "object"]')
+    with pytest.raises(SystemExit):
+        obs.main(['--workdir', str(tmp_path / 'w'), '--output', str(tmp_path / 'o'), '--run-id', '1', '--candidate-sha', 'x', '--review-record', str(bad)])
+    assert not (tmp_path / 'o').exists()

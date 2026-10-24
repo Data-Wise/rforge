@@ -8,7 +8,7 @@
     "packages": {
       "medfit": {
         "package": "medfit",
-        "commit": "d29e656a675c25a84f56438b70a38e38088314f6",
+        "commit": "2951b28a51a9a6c70d64b89cd8481a49bfa95859",
         "source_dirty": false,
         "source_sha256": {
           "README.md": "373181840ed8c27325095c56c14f2e920ebd39a0a96c35e58a17414cda366ba7"
@@ -29,7 +29,7 @@
         ],
         "findings": [],
         "reviewed": true,
-        "disposition": "Reviewed. 4 of 6 assertions checked and matched on the committed tree; 2 stay unverified (standalone markdown omitted setup; assertions outside supported R fences), so coverage is recorded as partial, not complete. No open warn/error findings.",
+        "disposition": "Reviewed. 4 of 6 assertions checked and matched on the committed tree; 2 stay unverified (standalone markdown omitted setup; assertions outside supported R fences), so coverage is recorded as partial, not complete. No open warn/error findings. Re-pinned from d29e656a675c to 2951b28a51a9: d29e656 is on no remote branch, the README source hash is identical at the pin, and a fresh producer run on the pinned clone reproduced state, counts and zero findings.",
         "triaged_classes": [
           {
             "class_id": "tibble-type-row",

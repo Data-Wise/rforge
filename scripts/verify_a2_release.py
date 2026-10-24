@@ -166,6 +166,7 @@ def validate_package_triage(facts):
                         f"{where}: unresolved false-positive class blocks release unless scoped out of a partial scope")
 
 
+SUPPORTED_SITE_URL = "https://r-hub.github.io/cranlogs/"
 GATE_NAMES = ("pytest", "test-all", "version-sync", "reference-sync", "command-sync", "mkdocs-strict")
 GATE_COMMANDS = {
     "pytest": "python -m pytest tests/ -q -p no:cacheprovider", "test-all": "bash tests/test-all.sh",
@@ -216,7 +217,7 @@ def validate_live_smoke(facts):
     """A real supported deployed site was checked over HTTP, and real packages the site check cannot cover say so."""
     where = "live smoke"
     site = facts.get("supported_site")
-    require(isinstance(site, dict) and site.get("url") == facts.get("url") and bool(facts.get("source_ref")), f"{where}: supported site required")
+    require(isinstance(site, dict) and site.get("url") == facts.get("url") == SUPPORTED_SITE_URL and bool(facts.get("source_ref")), f"{where}: the pinned supported site is required")
     require(site.get("state") == "complete" and _int(site.get("requests")) and site["requests"] > 0
             and _int(site.get("checked")) and site["checked"] > 0, f"{where}: supported site was not completely checked over HTTP")
     require(facts.get("requests") == site["requests"] and facts.get("checked") == site["checked"], f"{where}: summary disagrees with the site run")
