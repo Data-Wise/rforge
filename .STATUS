@@ -23,7 +23,7 @@
 # Still pending: fresh-session older/missing-engine handling, variadic-signature coverage.
 
 project: rforge
-updated: 2026-10-22
+updated: 2026-10-24
 status: Active
 in_progress: none — v2.21.0 released 2026-10-11. Shipped in it (kept for the record):
   (1) #84 fix MERGED to dev 2026-10-11 as PR #85 (squash 99b4171; CI 5/5 green). #84 stays
@@ -34,10 +34,13 @@ in_progress: none — v2.21.0 released 2026-10-11. Shipped in it (kept for the r
   lib.docaudit + /rforge:docs:check rewrite + dev-only replay harness (tests/harness/). SPEC and review record
   (TRIAGE-docaudit-signature-gate-2026-10-11.md) in archive/specs/; guide docs/guides/docs-audit.md. Seven Codex rounds under
   the stop rule; unrecognized R binding forms are documented known limitations. test-all 47/47, 44 commands.
-  A2 (--site, --run-examples): implemented on branch codex/docs-check-a2 (20 commits ahead of dev, no PR; worktree
-  ~/.codex/worktrees/docs-check-a2/rforge). Pending: seven coverage groups, both required platform runs (a2-platform/a2-release
-  workflows never dispatched), T22 smoke; branch predates #92 so rebase on dev before PR.
-next: finish A2 on codex/docs-check-a2 (seven coverage groups + two-platform evidence), rebase on dev, then PR. Open low-priority candidates in CLAUDE.md Roadmap.
+  A2 (--site, --run-examples): implemented on branch codex/docs-check-a2 (dev merged in; 36 commits ahead, no PR; worktree
+  ~/.codex/worktrees/docs-check-a2/rforge; pushed at 016ec5f). Two-platform smoke (ubuntu-24.04, macos-14, CI run 40137993702):
+  582/582 each. Phase 3 (H01 replay, H02 triage schema) and Phase 4 (F01 gate record, F02 review record) each had a Codex
+  adversarial review, findings triaged and fixed (dispositions in COVERAGE-docs-check-a2-2026-10-12.md). Still open: G08 process
+  review, D04 rendered-site inspection, H01/H02 candidate-bound runs, F01/F02 final records on the last commit, then
+  required.json -> ready; a2-release jobs fail closed (exit 2) until then. Remove temporary a2-smoke.yml + ci.yml job before PR.
+next: close G08/D04/H01/H02/F01/F02 on codex/docs-check-a2 (candidate-bound evidence on the final commit), flip required.json to ready, drop the smoke workflow, then PR. Open low-priority candidates in CLAUDE.md Roadmap.
 version: 2.21.0 (released, on main 7387a05; dev fast-forwarded to main)
 last_release: 2026-10-11 v2.21.0 (minor, 44 commands, no surface change — PR #91 dev→main merge 7387a05; tag v2.21.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.21.0. Ships /rforge:docs:check content audit (lib.docaudit, A1), tests/harness, #84 fix (#85/#86), docs gap-fill (#89/#90). Gates: test-all 47/47, pytest 899+4 skipped, CI green on main (RForge CI + Deploy Documentation). Tap Data-Wise/homebrew-tap#244 squash 09bc9c3 — formula+manifest → v2.21.0 sha256 f376d0da…, stale revision dropped, generate.py --diff IDENTICAL; brew audit by path unavailable. Aggregator claude-plugins#74 auto-merged. Pending: user runs `brew upgrade rforge`.)
 last_release_prior_v2_20_1: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
