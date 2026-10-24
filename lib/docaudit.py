@@ -1,4 +1,4 @@
-"""Static documentation-content audit for an R package (pure-stdlib, no R).
+"""Documentation-content audit for an R package (pure-stdlib; the default static audit needs no R).
 
 Backs `/rforge:docs:check`. Checks the *prose and code in the docs* against what
 the package actually exports, which is what a manual doc audit looks for:

@@ -3,7 +3,7 @@
 !!! tip "TL;DR (30 seconds)"
     - **What:** run the docs audit, decide whether each finding is a real doc bug, fix it, and re-run until the report is clean and complete.
     - **Time:** about 10 minutes.
-    - **You need:** an R package with a `man/` folder and docs (`README`, `vignettes/`). No R session required.
+    - **You need:** an R package with a `man/` folder and docs (`README`, `vignettes/`). No R session is required for the default static audit; `--run-examples` needs R.
 
 You will find a doc call that no longer matches the function, fix it, and wire the check into a release.
 The reference for every check is the [Docs audit guide](../guides/docs-audit.md).

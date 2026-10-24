@@ -399,6 +399,10 @@ rforge/
 
 Optional docs audit: `--site URL` plus optional local `--ref REF`;
 `--run-examples --examples-budget-seconds N` for supervised root README replay.
-Default remains static. Inspect stage coverage; unpaired rendered assertions and
-unsupported options are incomplete. Complete A2 warnings gate warn, incomplete
-stages gate warn/error. No site build/deploy/fetch; example replay is opt-in.
+Default remains static: no R, network or writes. `--site` reads only the sitemap
+over HTTP(S); without `--ref` the deployment source is inferred only when one
+pkgdown deploy branch is unambiguous, else the stage is incomplete. Replay is
+partial coverage: root README only, and unpaired rendered assertions or
+unsupported options are incomplete. Inspect stage coverage. Complete A2 warnings
+gate warn, incomplete stages gate warn/error. Allow the budget plus 15 seconds;
+use a terminal when the host lifetime is unknown. No site build or deploy.

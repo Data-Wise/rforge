@@ -1369,7 +1369,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "28864b20b477ba4d8e5cfb5d68f43bad3a7cfa7b367ee58c558f51fd03bbe1ee"
+        "tests/a2/test_docs.py": "f2bff0d297d0a2cb03342d6b8c25e7a667448e741c89d861233166dcad6226da"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1381,15 +1381,20 @@
         "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/guides/docs-audit.md-terms0]",
         "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/tutorials/fix-a-docs-check-finding.md-terms1]",
         "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/workflows/index.md-terms2]",
-        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/quickstart.md-terms3]"
+        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/quickstart.md-terms3]",
+        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/REFCARD.md-terms4]",
+        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/command-cards.md-terms5]",
+        "tests/a2/test_docs.py::test_no_unconditional_static_promise[docs/tutorials/fix-a-docs-check-finding.md-no r session required.]",
+        "tests/a2/test_docs.py::test_no_unconditional_static_promise[docs/commands.md-static and read-only (`lib.docaudit`).]",
+        "tests/a2/test_docs.py::test_no_unconditional_static_promise[docs/reference/docaudit.md-pure-stdlib, no r).]"
       ],
       "status": "coverage-gap",
       "coverage_gaps": [
-        "Guide/tutorial/workflows/quickstart text checks exist; REFCARD/cards and all changed rendered-content observations remain aggregate work."
+        "Guide/tutorial/workflows/quickstart/REFCARD/cards text checks and stale-promise guards exist; actual rendered changed-content inspection remains aggregate work after a site build."
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "28864b20b477ba4d8e5cfb5d68f43bad3a7cfa7b367ee58c558f51fd03bbe1ee"
+        "tests/a2/test_docs.py": "f2bff0d297d0a2cb03342d6b8c25e7a667448e741c89d861233166dcad6226da"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1412,7 +1417,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "28864b20b477ba4d8e5cfb5d68f43bad3a7cfa7b367ee58c558f51fd03bbe1ee"
+        "tests/a2/test_docs.py": "f2bff0d297d0a2cb03342d6b8c25e7a667448e741c89d861233166dcad6226da"
       },
       "review_note": "Explicit current status, unreleased acceptance hold, actual command/check counts, unchanged feature version, mirror and agent prohibitions asserted. Local coverage complete; external acceptance remains pending."
     },

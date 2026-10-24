@@ -491,7 +491,7 @@ auto-applied).
 
 ### /rforge:docs:check
 
-Audit documentation content against the package API: calls and signatures in `README` and `vignettes/` that no longer match the exports. Static and read-only (`lib.docaudit`).
+Audit documentation content against the package API: calls and signatures in `README` and `vignettes/` that no longer match the exports. The default is static and read-only (`lib.docaudit`); opt-in `--site` reads a sitemap and `--run-examples` executes README code in supervised R sessions.
 
 **Usage:**
 ```bash
