@@ -1616,7 +1616,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "2023462e545867ab2d71da54aebdfc3762f1ee40b12e607290a2201acff4fe54"
+        "tests/a2/test_evidence.py": "5c50e21efe7550730c71319c7f613a8c99bb6fe00185c17763b39a26de1ae23a"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1651,7 +1651,13 @@
         "tests/a2/test_evidence.py::test_triage_false_positive_class_may_be_scoped_out_only_with_partial_scope",
         "tests/a2/test_evidence.py::test_triage_complete_scope_requires_nothing_unverified",
         "tests/a2/test_evidence.py::test_triage_producer_audits_a_clone_and_never_goes_green_unreviewed",
-        "tests/a2/test_evidence.py::test_triage_not_applicable_is_vacuous_but_never_silent"
+        "tests/a2/test_evidence.py::test_triage_not_applicable_is_vacuous_but_never_silent",
+        "tests/a2/test_evidence.py::test_triaged_class_record_is_strict[no-status-entry0]",
+        "tests/a2/test_evidence.py::test_triaged_class_record_is_strict[no-rationale-entry1]",
+        "tests/a2/test_evidence.py::test_triaged_class_record_is_strict[fixed-without-commit-entry2]",
+        "tests/a2/test_evidence.py::test_triaged_class_record_is_strict[fixed-short-commit-entry3]",
+        "tests/a2/test_evidence.py::test_triaged_class_record_is_strict[unknown-status-entry4]",
+        "tests/a2/test_evidence.py::test_triaged_class_fixed_with_commit_is_accepted"
       ],
       "status": "coverage-gap",
       "coverage_gaps": [
@@ -1659,7 +1665,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "2023462e545867ab2d71da54aebdfc3762f1ee40b12e607290a2201acff4fe54"
+        "tests/a2/test_evidence.py": "5c50e21efe7550730c71319c7f613a8c99bb6fe00185c17763b39a26de1ae23a"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1681,7 +1687,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "2023462e545867ab2d71da54aebdfc3762f1ee40b12e607290a2201acff4fe54"
+        "tests/a2/test_evidence.py": "5c50e21efe7550730c71319c7f613a8c99bb6fe00185c17763b39a26de1ae23a"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1744,7 +1750,7 @@
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 495,
+  "collected_nodes": 501,
   "review_candidate": "e36c341 plus pre-spawn ownership and replay boundary repairs",
   "platforms": [
     "ubuntu-24.04",

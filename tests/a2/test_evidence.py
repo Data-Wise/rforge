@@ -193,3 +193,20 @@ def test_triage_not_applicable_is_vacuous_but_never_silent():
         with pytest.raises(v.VerificationError):v.validate_package_triage(_triage(mutated))
     def scope_only(p,f):p.update(scope='not-applicable')  # partial counts cannot hide behind a vacuous scope
     with pytest.raises(v.VerificationError):v.validate_package_triage(_triage(scope_only))
+
+
+@pytest.mark.parametrize('defect,entry',[
+    ('no-status',{'class_id':'x','rationale':'r'}),
+    ('no-rationale',{'class_id':'x','status':'scoped-out','rationale':''}),
+    ('fixed-without-commit',{'class_id':'x','status':'fixed','rationale':'r'}),
+    ('fixed-short-commit',{'class_id':'x','status':'fixed','rationale':'r','fix_commit':'abc'}),
+    ('unknown-status',{'class_id':'x','status':'ignored','rationale':'r'}),
+])
+def test_triaged_class_record_is_strict(defect,entry):
+    def add(p,f):p['triaged_classes']=[entry]
+    with pytest.raises(v.VerificationError):v.validate_package_triage(_triage(add))
+
+
+def test_triaged_class_fixed_with_commit_is_accepted():
+    def add(p,f):p['triaged_classes']=[{'class_id':'tibble-type-row','status':'fixed','rationale':'r','fix_commit':'c'*40}]
+    v.validate_package_triage(_triage(add))

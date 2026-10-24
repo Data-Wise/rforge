@@ -130,6 +130,13 @@ def validate_package_triage(facts):
         reasons = item.get("reasons")
         require(isinstance(reasons, list) and all(isinstance(r, str) and r for r in reasons), f"{where}: reasons must be strings")
         require(not (partial or vacuous) or bool(reasons), f"{where}: partial or vacuous coverage requires reasons")
+        for entry in item.get("triaged_classes", []):
+            # False-positive classes found earlier in this triage; each must end fixed (with the fixing commit) or scoped out.
+            require(isinstance(entry, dict) and bool(entry.get("class_id")) and bool(entry.get("rationale"))
+                    and entry.get("status") in ("fixed", "scoped-out"), f"{where}: triaged class needs id, status and rationale")
+            require(entry["status"] != "fixed" or (isinstance(entry.get("fix_commit"), str) and re.fullmatch(r"[a-f0-9]{40}", entry["fix_commit"])),
+                    f"{where}: a fixed class needs its 40-hex fix commit")
+            require(entry["status"] != "scoped-out" or item["scope"] == "partial", f"{where}: only a partial scope can scope a class out")
         findings = item.get("findings")
         require(isinstance(findings, list), f"{where}: findings list required")
         for finding in findings:
