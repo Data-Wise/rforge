@@ -38,6 +38,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   reusing the local Rforge engines. Includes a local catalog and setup guide;
   installation and runtime acceptance remain separate.
 
+### Changed
+
+- Codex verification records now cover fresh-session missing/older-engine
+  rejection, engine/package paths containing spaces, and controlled Python 3.9
+  rejection. Preserve the unexplained restricted-session check termination and
+  static-audit limits; writing formats remain deferred.
+
 ### Fixed
 
 - Codex pilot 0.1.1: default CRAN-style checks and explicit strict flavor

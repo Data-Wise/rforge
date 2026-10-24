@@ -1,3 +1,23 @@
+# Codex durable verification checkpoint — 2026-10-22
+# PR #92 merged to dev fe8c8ef; adapter 0.1.1 uses durable rforge/openai catalog.
+# Fresh-session discovery and isolated medfit checks passed. Both skills rejected
+# missing and v2.21.0 engines in two fresh read-only sessions (synthetic package).
+# No fallback engine, R check, unguarded audit or passing result; spec has evidence.
+# Fresh sessions: engine/package paths with spaces verified, docs 0 findings/1 of 1;
+# as-cran completed 0 errors/0 warnings/1 new-submission NOTE, exit 0, not incomplete.
+# Both skills rejected the fixture restricted to Python 3.9 without engine/R execution.
+# Remaining: variadic limits; unexplained restricted-session incoming termination;
+# missing-interpreter and invalid-package fresh sessions not separately exercised.
+# Paths/Python update: 920 tests passed/4 skipped; 47/47 gates; version/reference
+# checks, strict MkDocs build and changed-line Markdown lint passed.
+# Docs-only verification; no main promotion, release or writing-format expansion.
+# Medfit rlang import #296 and 404 repair #297 integrated to dev; #298 merged
+# to main 100cca7b; deployment/live verification remains separate.
+# Codex docs audited: homepage, installation, quickstart, refcard, adapter README,
+# guide/nav and mirrored instructions. 920 tests passed/4 skipped; 47/47 gates;
+# Python 3.12 reference check and strict MkDocs build passed. Writing deferred.
+# Earlier pilot/worktree-only status below is historical and superseded.
+
 # Local medfit rlang import repair rerun: Rforge as-cran 0/0/0; log complete.
 # Test runner separately 5993 pass, 98 skip, 1 warning. Fix not integrated.
 # Codex personal checks pilot — 2026-10-22
@@ -23,9 +43,9 @@
 # Still pending: fresh-session older/missing-engine handling, variadic-signature coverage.
 
 project: rforge
-updated: 2026-10-23
+updated: 2026-10-24
 status: Active
-in_progress: A2 implementation on codex/docs-check-a2; mapping review complete; 6 coverage groups and both-platform release evidence pending. v2.21.0 release history:
+in_progress: A2 on codex/docs-check-a2; both-platform smoke 582/582; G08, H01/H02, F01/F02 and commit-bound rendered_review still open (D04 dev-time inspection done). v2.21.0 release history:
   (1) #84 fix MERGED to dev 2026-10-11 as PR #85 (squash 99b4171; CI 5/5 green). #84 stays
   open until release (a feature→dev merge does not auto-close it). Follow-up PR #86 MERGED (squash f7036b4): a Codex
   adversarial review found #85 stopped /rforge:finish adding `version:` to a .STATUS that lacks one; fixed via
@@ -34,8 +54,13 @@ in_progress: A2 implementation on codex/docs-check-a2; mapping review complete; 
   lib.docaudit + /rforge:docs:check rewrite + dev-only replay harness (tests/harness/). SPEC and review record
   (TRIAGE-docaudit-signature-gate-2026-10-11.md) in archive/specs/; guide docs/guides/docs-audit.md. Seven Codex rounds under
   the stop rule; unrecognized R binding forms are documented known limitations. test-all 47/47, 44 commands.
-  A2 (--site, --run-examples): in implementation on codex/docs-check-a2; see in_progress/next above.
-next: Strengthen H02/F01 evidence validation; complete six coverage groups and actual Ubuntu 24.04/macOS 14 acceptance on latest stable Python. Focused Claude review of 7eb8a40 found no material issue; 126 native-process regressions passed. No push/release.
+  A2 (--site, --run-examples): implemented on branch codex/docs-check-a2 (dev merged in; 36 commits ahead, no PR; worktree
+  ~/.codex/worktrees/docs-check-a2/rforge; pushed at 016ec5f). Two-platform smoke (ubuntu-24.04, macos-14, CI run 40137993702):
+  582/582 each. Phase 3 (H01 replay, H02 triage schema) and Phase 4 (F01 gate record, F02 review record) each had a Codex
+  adversarial review, findings triaged and fixed (dispositions in COVERAGE-docs-check-a2-2026-10-12.md). Still open: G08 process
+  review, commit-bound rendered_review (D04 dev-time inspection done, fb8514d), H01/H02 candidate-bound runs, F01/F02 final records on the last commit, then
+  required.json -> ready; a2-release jobs fail closed (exit 2) until then. Remove temporary a2-smoke.yml + ci.yml job before PR.
+next: close G08/H01/H02/F01/F02 + commit-bound rendered_review on codex/docs-check-a2 (candidate-bound evidence on the final commit), flip required.json to ready, drop the smoke workflow, then PR. Open low-priority candidates in CLAUDE.md Roadmap.
 version: 2.21.0 (released, on main 7387a05; dev fast-forwarded to main)
 last_release: 2026-10-11 v2.21.0 (minor, 44 commands, no surface change — PR #91 dev→main merge 7387a05; tag v2.21.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.21.0. Ships /rforge:docs:check content audit (lib.docaudit, A1), tests/harness, #84 fix (#85/#86), docs gap-fill (#89/#90). Gates: test-all 47/47, pytest 899+4 skipped, CI green on main (RForge CI + Deploy Documentation). Tap Data-Wise/homebrew-tap#244 squash 09bc9c3 — formula+manifest → v2.21.0 sha256 f376d0da…, stale revision dropped, generate.py --diff IDENTICAL; brew audit by path unavailable. Aggregator claude-plugins#74 auto-merged. Pending: user runs `brew upgrade rforge`.)
 last_release_prior_v2_20_1: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge

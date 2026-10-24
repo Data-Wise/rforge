@@ -14,11 +14,17 @@
 
 Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python `lib/` modules handle discovery, dependencies, status, and init. **No MCP server, no Node.js** at runtime. The fast ecosystem commands (analysis, deps, status) are pure Python; the `r:*` dev-cycle commands and `/rforge:thorough` shell out to R via `lib/rcmd.py`.
 
-## Codex personal pilot
+## Codex personal plugin
 
-Two focused skills for package checks and documentation audits are prepared in
-`openai/rforge-openai`. See the [Codex checks guide](guides/codex-checks.md).
-Installation and runtime verification remain separate.
+The native `rforge-openai` adapter 0.1.1 provides two skills:
+`$rforge-check` for package validation and `$rforge-docs-check` for static
+README/vignette API audits. Both reuse the Rforge engines and have been verified
+in fresh sessions on isolated medfit copies. The adapter is integrated on `dev`
+([PR #92](https://github.com/Data-Wise/rforge/pull/92)); it is not a published
+adapter release or a port of the Claude command catalog and hooks.
+
+Start with the [Codex installation and checks guide](guides/codex-checks.md). Claude
+marketplace and Homebrew installation below do not install these Codex skills.
 
 ## Where rforge fits
 

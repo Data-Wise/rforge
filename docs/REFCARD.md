@@ -1,5 +1,8 @@
 # 📚 RForge Plugin - Reference Card
 
+For Codex, start with the [two-skill setup and usage guide](guides/codex-checks.md).
+The slash commands below are for Claude Code.
+
 > **Version:** {{ rforge.version }} | **Last Updated:** {{ rforge.release_date }}
 
 !!! tip "TL;DR (30 seconds)"
