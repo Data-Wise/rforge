@@ -541,6 +541,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/evidence-and-approval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Check evidence and approvals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1095,6 +1123,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evidence-bounded-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evidence-bounded verification
+      
+    </span>
+  </a>
   
 </li>
       
@@ -3173,6 +3212,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#evidence-bounded-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evidence-bounded verification
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#common-workflows" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3544,19 +3594,45 @@ or as a dependency of another package you're developing.</p>
 <h3 id="rsite-build-the-pkgdown-site"><code>r:site</code> — build the pkgdown site<a class="headerlink" href="#rsite-build-the-pkgdown-site" title="Permanent link">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>/rforge:r:site
 </span></code></pre></div>
-<p>Runs <code>pkgdown::build_site()</code>. Generates the HTML documentation site in <code>docs/</code>.</p>
+<p>Runs <code>pkgdown::build_site()</code>. Use the package's configured destination, not an
+assumed <code>docs/</code>. A package whose <code>docs/</code> holds design specifications may build
+into another directory such as <code>pkgdown-site/</code>.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>## Site: medfit v2.0.0
 </span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>### Status: 🟢
-</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>Built site → docs/index.html
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>Built site → &lt;destination&gt;/index.html
 </span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>  • 14 reference pages
 </span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>  • 3 vignettes
 </span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>  • Changelog
 </span></code></pre></div>
 <p><code>pkgdown</code> is optional — if missing, rforge reports 🟡 with an install hint.</p>
 <hr />
+<h2 id="evidence-bounded-verification">Evidence-bounded verification<a class="headerlink" href="#evidence-bounded-verification" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">A green subset is not full acceptance</p>
+<p>A passing run covers only what it ran. Report which checks were excluded
+rather than implying the whole specification was verified.</p>
+</div>
+<ul>
+<li>Scope the run with <code>/rforge:r:test --changed</code> (compare against <code>--base &lt;ref&gt;</code>,
+  gate with <code>--fail-on introduced|none</code>, bypass the baseline cache with
+  <code>--no-cache</code>), and say which tests were and were not run.</li>
+<li>Injected failures verify that failure handling works, but do not show that the
+  failure occurs naturally.</li>
+<li>A partial result is not a successful fit.</li>
+<li>Passing deterministic controls does not close a separately required real-case
+  acceptance check.</li>
+<li>A scoped reviewer approval is not full-specification sign-off.</li>
+<li>At session close, run <code>/rforge:finish</code> to sync <code>.STATUS</code> with what actually
+  happened.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Build and deployment are separate</p>
+<p>Inspect the produced page for the edited content at the configured path.
+A successful build does not mean the site is deployed.</p>
+</div>
 <h2 id="common-workflows">Common workflows<a class="headerlink" href="#common-workflows" title="Permanent link">&para;</a></h2>
 <h3 id="before-every-commit">Before every commit<a class="headerlink" href="#before-every-commit" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>/rforge:r:cycle<span class="w">          </span><span class="c1"># document → test → check (green = safe to push)</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>/rforge:r:cycle<span class="w">          </span><span class="c1"># document → test → check (green = ready for review)</span>
 </span></code></pre></div>
 <h3 id="before-a-pull-request">Before a pull request<a class="headerlink" href="#before-a-pull-request" title="Permanent link">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>/rforge:r:cycle
