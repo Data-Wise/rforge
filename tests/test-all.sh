@@ -484,19 +484,20 @@ if 'status' not in d:
 " 2>&1
 }
 
-# lib/r/s7runtime.R ships (sourced by lib.rcmd kind="s7runtime") and parses.
-# Parse check is R-optional: skip cleanly when Rscript is absent (R-free CI).
+# Both shipped R programs parse; developer R absence is optional, A2 release is not.
 lib_s7runtime_r_ships() {
-    if [ ! -f lib/r/s7runtime.R ]; then
-        echo "lib/r/s7runtime.R missing" >&2
-        return 1
-    fi
-    if command -v Rscript >/dev/null 2>&1; then
-        Rscript -e 'invisible(parse("lib/r/s7runtime.R"))' >/dev/null 2>&1 || {
-            echo "lib/r/s7runtime.R parse error" >&2
+    for script in lib/r/s7runtime.R lib/r/docexamples.R; do
+        if [ ! -f "$script" ]; then
+            echo "$script missing" >&2
             return 1
-        }
-    fi
+        fi
+        if command -v Rscript >/dev/null 2>&1; then
+            Rscript --vanilla -e 'invisible(parse(commandArgs(TRUE)[[1]]))' "$script" >/dev/null 2>&1 || {
+                echo "$script parse error" >&2
+                return 1
+            }
+        fi
+    done
     return 0
 }
 
@@ -701,7 +702,7 @@ run "Lib: reference docs in sync with source" lib_reference_in_sync
 run "Docs: version/count strings in sync with package.json" version_sync_in_sync
 run "Docs: AGENTS.md body mirrors CLAUDE.md" agents_md_mirrors_claude_md
 run "Lib: rcmd CLI smoke (R-free — accepts engine_missing envelope)" lib_rcmd_smoke
-run "Lib: s7runtime.R ships + parses (R-optional)" lib_s7runtime_r_ships
+run "Lib: shipped R scripts parse (developer R-optional)" lib_s7runtime_r_ships
 run "Dogfood: lib.cranlint Tier-4 advisory CLI on a fixture package" lib_cranlint_smoke
 run "Dogfood: lib.runiverse CLI smoke (offline → warn envelope)" lib_runiverse_smoke
 run "Dogfood: lib.s7review CLI smoke (advisory S7 convention envelope)" lib_s7review_smoke

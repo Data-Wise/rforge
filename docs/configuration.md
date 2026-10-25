@@ -176,3 +176,12 @@ A complete project-local override at `.claude/rforge.local.json`:
   automatically on every edit.
 - `.claude-plugin/config.json` — the plugin-shipped defaults (read-only).
 - `/rforge:status` — shows the active configuration for your project.
+
+## Optional docs-audit coverage
+
+`docs.allowlist` suppresses source findings, including A2 site/README findings,
+without changing checked/excluded/unverified/blocked counts or an incomplete
+stage. It cannot authorize execution or suppress source-less extra-URL
+information. `--site URL`, `--ref`, `--run-examples` and
+`--examples-budget-seconds` are invocation flags, not inferred site or execution
+authorization from configuration. See the [Docs audit guide](guides/docs-audit.md).

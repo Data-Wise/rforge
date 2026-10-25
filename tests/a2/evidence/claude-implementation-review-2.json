@@ -1,0 +1,188 @@
+{
+  "ok": true,
+  "operation": "review",
+  "review_kind": "adversarial",
+  "subject_kind": "changes",
+  "subject_label": "74824acf4a1b63d2477c342645b988018d0eedca..HEAD plus working tree",
+  "subject_fingerprint": "5f2ac82f07b2fcebab3216e7343962e3f6846df10b2f8ab273b4a721f28b66a1",
+  "usage_summary": "Usage: tokens=332608 output=8520 turns=18 duration_ms=83533 api_ms=82741 cost_usd=0.2958915",
+  "total_tokens": 332608,
+  "total_cost_usd": 0.2958915,
+  "cumulative_chain_cost_usd": 0.2958915,
+  "parent_job_id": null,
+  "num_turns": 18,
+  "duration_ms": 83533,
+  "duration_api_ms": 82741,
+  "task_profile": null,
+  "review_profile": "standard",
+  "requested_model": "sonnet",
+  "effective_models": [
+    "claude-sonnet-5-5"
+  ],
+  "effort": "medium",
+  "budget": {
+    "max_turns": 12,
+    "finalize_at_turn": 9,
+    "soft_budget_usd": 1,
+    "max_budget_usd": 1,
+    "timeout_ms": 240000
+  },
+  "evidence_lease": null,
+  "evidence_lease_exhausted": false,
+  "cost_budget_exhausted": false,
+  "turn_limit_reached": false,
+  "result": "{\"verdict\":\"needs-attention\",\"summary\":\"No confirmed defect in the nested-package git path handling, PID retention through signalling, startup heartbeat, or aggregate candidate-SHA binding in the files I read. Two issues block release. First, the aggregate gate's 'independent' acceptance evidence is a free-form workflow_dispatch string whose only provenance check is truthiness. Second, the R worker's output-limit accounting can't trip while a segment is running. I read about 8 of 69 changed files, so this is not a full review.\",\"findings\":[{\"severity\":\"high\",\"title\":\"Aggregate acceptance observations are self-attested and unverifiable\",\"body\":\"validate_aggregate accepts live_smoke, package_triage, full_gates, rendered_review, adversarial_review and requirement_mapping when each has the right candidate_sha, status=='passed' and any truthy 'provenance'. .github/workflows/a2-release.yml:5-71 takes these from a free-form workflow_dispatch string and writes it to disk as data. Anyone who can dispatch the workflow can type a passing JSON blob, and the aggregate job goes green with no live smoke, review, or requirement mapping ever run. Only the two platform artifacts are produced and re-verified in CI. The spec requires independent acceptance evidence, and this gate does not provide it.\",\"file\":\"scripts/verify_a2_release.py\",\"line_start\":90,\"line_end\":92,\"confidence\":0.8,\"recommendation\":\"Bind each observation to a verifiable artifact, such as a content hash of an uploaded evidence file or the run ID of a CI job that produced it, and have the verifier validate it. Reject a bare truthy provenance string. Or keep the gate explicitly pending until real evidence exists.\"},{\"severity\":\"medium\",\"title\":\"R output-limit accounting is only updated at segment boundaries\",\"body\":\"evaluate::evaluate buffers all output in memory. The payload counter is incremented and payload.json is written (via checkpoint()) only after the whole segment finishes. The guardian's 10 MiB output limit (lib/_docguardian.py:90-99) therefore sees nothing from one segment that prints in a loop. Only the 60 s chunk deadline bounds it, so R can allocate gigabytes in that window and be OOM-killed. That would end as a guardian-failure or crash, not a clean output-limit result.\",\"file\":\"lib/r/docexamples.R\",\"line_start\":58,\"line_end\":79,\"confidence\":0.65,\"recommendation\":\"Bound captured output inside the segment, using a custom output handler or text connection that updates the payload counter and aborts past the limit, or add an address-space limit on the R child. Add a test for a segment that loops on print().\"},{\"severity\":\"low\",\"title\":\"Emergency killpg on a stored child PID can hit a reused PID\",\"body\":\"When the guardian has died, the parent sends SIGKILL with os.killpg(armed['child_pid']). The leader may already have been reaped, or reparented and reaped by init, so the PGID could by then belong to an unrelated process group. The run_id check guards only against another run's armed.json, not PID reuse. This is inferred, not demonstrated, and the window is small.\",\"file\":\"lib/_docguardian.py\",\"line_start\":216,\"line_end\":237,\"confidence\":0.4,\"recommendation\":\"Before the emergency kill, confirm the group still has a member whose start time matches the recorded child, or document the residual risk.\"}],\"next_steps\":[\"Replace the self-attested observation input with hash-bound or run-bound evidence\",\"Enforce the output limit inside R segments, and test it\",\"Run the focused follow-up on the skipped files\"],\"coverage\":{\"files_examined\":[\"lib/_docguardian.py\",\"lib/r/docexamples.R\",\"scripts/verify_a2_release.py\",\"scripts/verify_a2_aggregate.py\",\"scripts/run_a2_release.py\",\".github/workflows/a2-release.yml\",\"tests/a2/expected-findings.json\",\"lib/_docsite.py (lines 86-220)\"],\"files_skipped\":[\"lib/_docexamples.py\",\"lib/docaudit.py\",\"scripts/a2_fixture_oracles.py\",\"tests/a2/ test modules (test_guardian.py, test_readme.py, test_examples_r.py, etc.)\",\"tests/a2/required.json\",\"tests/a2/requirements.json\",\"tests/a2/evidence/*.json\",\"docs/ and the SPEC/PLAN/ACCEPTANCE/REVIEW markdown files\",\"tests/test-all.sh\",\"agents/ and commands/ changes\"],\"areas\":[\"Guardian deadlines, lifecycle and PID retention (read only, tests not run)\",\"R worker checkpoint and payload accounting\",\"Release verifier and aggregate gate\",\"CI workflow\",\"Nested-package git paths in _docsite.audit\",\"Not reviewed: README source, exclusion and assertion coverage; requirement ledger against the spec; release task dependencies\"]},\"uncertainty\":\"high\",\"budget_exhausted\":false,\"cost_budget_exhausted\":false,\"turn_limit_reached\":false,\"evidence_lease_exhausted\":false,\"recommended_followup\":{\"profile\":\"standard\",\"focus\":[\"lib/_docexamples.py\",\"scripts/a2_fixture_oracles.py oracle independence\",\"tests/a2/test_guardian.py race and ordering coverage\",\"README assertion and exclusion coverage\",\"requirements.json mapping against the spec\"],\"reason\":\"Most of the changed files were not read, and the review's focus areas include README coverage, oracle independence and the requirement ledger, which I did not check.\"}}",
+  "structured_output": {
+    "verdict": "needs-attention",
+    "summary": "No confirmed defect in the nested-package git path handling, PID retention through signalling, startup heartbeat, or aggregate candidate-SHA binding in the files I read. Two issues block release. First, the aggregate gate's 'independent' acceptance evidence is a free-form workflow_dispatch string whose only provenance check is truthiness. Second, the R worker's output-limit accounting can't trip while a segment is running. I read about 8 of 69 changed files, so this is not a full review.",
+    "findings": [
+      {
+        "severity": "high",
+        "title": "Aggregate acceptance observations are self-attested and unverifiable",
+        "body": "validate_aggregate accepts live_smoke, package_triage, full_gates, rendered_review, adversarial_review and requirement_mapping when each has the right candidate_sha, status=='passed' and any truthy 'provenance'. .github/workflows/a2-release.yml:5-71 takes these from a free-form workflow_dispatch string and writes it to disk as data. Anyone who can dispatch the workflow can type a passing JSON blob, and the aggregate job goes green with no live smoke, review, or requirement mapping ever run. Only the two platform artifacts are produced and re-verified in CI. The spec requires independent acceptance evidence, and this gate does not provide it.",
+        "file": "scripts/verify_a2_release.py",
+        "line_start": 90,
+        "line_end": 92,
+        "confidence": 0.8,
+        "recommendation": "Bind each observation to a verifiable artifact, such as a content hash of an uploaded evidence file or the run ID of a CI job that produced it, and have the verifier validate it. Reject a bare truthy provenance string. Or keep the gate explicitly pending until real evidence exists."
+      },
+      {
+        "severity": "medium",
+        "title": "R output-limit accounting is only updated at segment boundaries",
+        "body": "evaluate::evaluate buffers all output in memory. The payload counter is incremented and payload.json is written (via checkpoint()) only after the whole segment finishes. The guardian's 10 MiB output limit (lib/_docguardian.py:90-99) therefore sees nothing from one segment that prints in a loop. Only the 60 s chunk deadline bounds it, so R can allocate gigabytes in that window and be OOM-killed. That would end as a guardian-failure or crash, not a clean output-limit result.",
+        "file": "lib/r/docexamples.R",
+        "line_start": 58,
+        "line_end": 79,
+        "confidence": 0.65,
+        "recommendation": "Bound captured output inside the segment, using a custom output handler or text connection that updates the payload counter and aborts past the limit, or add an address-space limit on the R child. Add a test for a segment that loops on print()."
+      },
+      {
+        "severity": "low",
+        "title": "Emergency killpg on a stored child PID can hit a reused PID",
+        "body": "When the guardian has died, the parent sends SIGKILL with os.killpg(armed['child_pid']). The leader may already have been reaped, or reparented and reaped by init, so the PGID could by then belong to an unrelated process group. The run_id check guards only against another run's armed.json, not PID reuse. This is inferred, not demonstrated, and the window is small.",
+        "file": "lib/_docguardian.py",
+        "line_start": 216,
+        "line_end": 237,
+        "confidence": 0.4,
+        "recommendation": "Before the emergency kill, confirm the group still has a member whose start time matches the recorded child, or document the residual risk."
+      }
+    ],
+    "next_steps": [
+      "Replace the self-attested observation input with hash-bound or run-bound evidence",
+      "Enforce the output limit inside R segments, and test it",
+      "Run the focused follow-up on the skipped files"
+    ],
+    "coverage": {
+      "files_examined": [
+        "lib/_docguardian.py",
+        "lib/r/docexamples.R",
+        "scripts/verify_a2_release.py",
+        "scripts/verify_a2_aggregate.py",
+        "scripts/run_a2_release.py",
+        ".github/workflows/a2-release.yml",
+        "tests/a2/expected-findings.json",
+        "lib/_docsite.py (lines 86-220)"
+      ],
+      "files_skipped": [
+        "lib/_docexamples.py",
+        "lib/docaudit.py",
+        "scripts/a2_fixture_oracles.py",
+        "tests/a2/ test modules (test_guardian.py, test_readme.py, test_examples_r.py, etc.)",
+        "tests/a2/required.json",
+        "tests/a2/requirements.json",
+        "tests/a2/evidence/*.json",
+        "docs/ and the SPEC/PLAN/ACCEPTANCE/REVIEW markdown files",
+        "tests/test-all.sh",
+        "agents/ and commands/ changes"
+      ],
+      "areas": [
+        "Guardian deadlines, lifecycle and PID retention (read only, tests not run)",
+        "R worker checkpoint and payload accounting",
+        "Release verifier and aggregate gate",
+        "CI workflow",
+        "Nested-package git paths in _docsite.audit",
+        "Not reviewed: README source, exclusion and assertion coverage; requirement ledger against the spec; release task dependencies"
+      ]
+    },
+    "uncertainty": "high",
+    "budget_exhausted": false,
+    "cost_budget_exhausted": false,
+    "turn_limit_reached": false,
+    "evidence_lease_exhausted": false,
+    "recommended_followup": {
+      "profile": "standard",
+      "focus": [
+        "lib/_docexamples.py",
+        "scripts/a2_fixture_oracles.py oracle independence",
+        "tests/a2/test_guardian.py race and ordering coverage",
+        "README assertion and exclusion coverage",
+        "requirements.json mapping against the spec"
+      ],
+      "reason": "Most of the changed files were not read, and the review's focus areas include README coverage, oracle independence and the requirement ledger, which I did not check."
+    }
+  },
+  "session_id": "d7f1428d-712d-4bd7-8691-ff17f102eec1",
+  "resume_hint": "claude --resume d7f1428d-712d-4bd7-8691-ff17f102eec1",
+  "disclosure": null,
+  "usage": {
+    "input_tokens": 1169,
+    "cache_creation_input_tokens": 45144,
+    "cache_read_input_tokens": 277775,
+    "output_tokens": 8520,
+    "output_tokens_details": {
+      "thinking_tokens": 2389
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 45144,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 4,
+        "output_tokens": 62,
+        "cache_read_input_tokens": 41963,
+        "cache_creation_input_tokens": 3181,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 3181
+        },
+        "type": "message"
+      },
+      {
+        "input_tokens": 1151,
+        "output_tokens": 2071,
+        "cache_read_input_tokens": 45144,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 1169,
+      "outputTokens": 8520,
+      "cacheReadInputTokens": 277775,
+      "cacheCreationInputTokens": 45144,
+      "webSearchRequests": 0,
+      "costUSD": 0.2958915,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 2389,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  }
+}

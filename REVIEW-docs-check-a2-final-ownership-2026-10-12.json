@@ -1,0 +1,199 @@
+{
+  "ok": true,
+  "operation": "review",
+  "review_kind": "adversarial",
+  "subject_kind": "changes",
+  "subject_label": "702f28bbb9afe8b75b45842f1f4bd3f8ccb4810b..HEAD plus working tree",
+  "subject_fingerprint": "4ad141a035892208ea9b4619fc218098b27c0d0cbee3fb24997fa7801dd9d8d8",
+  "usage_summary": "Usage: tokens=213495 output=14207 turns=9 duration_ms=108234 api_ms=107411 cost_usd=0.29856350000000004",
+  "total_tokens": 213495,
+  "total_cost_usd": 0.29856350000000004,
+  "cumulative_chain_cost_usd": 0.29856350000000004,
+  "parent_job_id": null,
+  "num_turns": 9,
+  "duration_ms": 108234,
+  "duration_api_ms": 107411,
+  "task_profile": null,
+  "review_profile": "standard",
+  "requested_model": "sonnet",
+  "effective_models": [
+    "claude-sonnet-5-5"
+  ],
+  "effort": "medium",
+  "budget": {
+    "max_turns": 12,
+    "finalize_at_turn": 9,
+    "soft_budget_usd": 1,
+    "max_budget_usd": 1,
+    "timeout_ms": 240000
+  },
+  "evidence_lease": null,
+  "evidence_lease_exhausted": false,
+  "cost_budget_exhausted": false,
+  "turn_limit_reached": false,
+  "result": "{\"verdict\":\"needs-attention\",\"summary\":\"Ownership design is sound for in-guarantee cases; no demonstrated parent-loss or deadline bypass. One fail-open cleanup path in the guardian (ps-probe failure) and one interruption gap in spawn_in_group were found by inspection only; nothing was executed. Several proof gaps remain. Simultaneous parent+guardian loss is out of guarantee and documented. Not both-platform release acceptance.\",\"findings\":[{\"severity\":\"high\",\"title\":\"Guardian skips group SIGKILL when ps probe fails (fail-open after parent loss)\",\"body\":\"live_group_members runs ps with timeout=1, check=True. A timeout/non-zero exit raises at line 137 or 151, jumping to except BaseException (176). That handler gates its kill on workload_alive() again (183); the probe fails the same way and SubprocessError is swallowed at 187, so killpg and process.wait are skipped. The guardian then writes pin-release.json (194) and exits. With a live parent, its pin.signal_group fallback rescues the run; if the parent is already lost the workload group survives with no owner. Inferred from code, not executed; a 1s ps timeout is plausible under load/macOS.\",\"file\":\"lib/_docguardian.py\",\"line_start\":176,\"line_end\":188,\"confidence\":0.7,\"recommendation\":\"Send an unconditional killpg(SIGKILL) in the failure path and treat a probe error as 'alive'. Add fault-injection tests where live_group_members raises during parent-loss cleanup.\"},{\"severity\":\"medium\",\"title\":\"spawn_in_group signal deferral ends before the handle is assigned by the caller\",\"body\":\"defer_launch_signals restores the mask in its finally before spawn_in_group returns; the caller assigns process = spawn_in_group(...) at _docguardian.py:92. A pending SIGINT delivered at context exit raises KeyboardInterrupt before return, leaving process None while the launcher runs in the group. Only the process-is-None SIGKILL fallback (_docguardian.py:178-180) covers it; the run ends as guardian-failure and the direct child is not reaped by the guardian. run() and GroupPin assign inside the with block and are fine.\",\"file\":\"lib/_docgroup_pin.py\",\"line_start\":71,\"line_end\":80,\"confidence\":0.6,\"recommendation\":\"Return/assign the handle inside the deferral scope (e.g. pass a holder or wrap the caller assignment in the with), and add a test that delivers SIGINT at context exit.\"},{\"severity\":\"low\",\"title\":\"Interrupt between GroupPin() return and try leaks the pin\",\"body\":\"Lines 238-240 are outside any try/finally; KeyboardInterrupt there skips pin.finish(). Pin self-exits only when the parent dies, so a long-lived parent keeps it and its PID reservation. Narrow window.\",\"file\":\"lib/_docguardian.py\",\"line_start\":233,\"line_end\":241,\"confidence\":0.5,\"recommendation\":\"Move the pin assignment's follow-up statements inside the try whose finally calls pin.finish().\"},{\"severity\":\"low\",\"title\":\"Destructive killpg and pin release not gated on pin still holding the PGID after parent loss\",\"body\":\"After parent loss the pin only reserves identity. If it dies (SIGKILL/OOM) init reaps it and the PGID may be recycled; killpg(SIGKILL) at line 179 and main-path signals do not verify the pin. pin-release.json (194) is also written before the final disappearance check, so cleanup-unverified leaves survivors with no retained owner. The invariant is asserted in comments, not enforced.\",\"file\":\"lib/_docguardian.py\",\"line_start\":178,\"line_end\":204,\"confidence\":0.5,\"recommendation\":\"Verify pin liveness before destructive signals and defer pin release until disappearance is observed or retries are exhausted.\"},{\"severity\":\"low\",\"title\":\"Launcher only reports OSError as launch-error\",\"body\":\"A ValueError (e.g. NUL in argv) or other exception exits 1 with no launch-error.json, so the run is reported completed instead of guardian-failure.\",\"file\":\"lib/_docgroup_pin.py\",\"line_start\":32,\"line_end\":43,\"confidence\":0.4,\"recommendation\":\"Catch Exception in the launcher and write launch-error.json.\"}],\"next_steps\":[\"Fix the ps-failure path in the guardian exception handler and add fault-injection test\",\"Assign the spawned handle inside the signal-deferral scope and test SIGINT at context exit\",\"Read SPEC revision 7 process/guardian contracts and test bodies to confirm coverage claims\",\"Run both-platform native acceptance before release\"],\"coverage\":{\"files_examined\":[\"lib/_docguardian.py\",\"lib/_docgroup_pin.py\",\"tests/a2/test_group_pin.py (test names via grep)\",\"tests/a2/test_guardian.py (test names via grep)\"],\"files_skipped\":[\"SPEC-docs-check-a2-2026-10-12.md\",\"tests/a2/test_stdio.py\",\"lib/_docexamples integration\",\"COVERAGE-docs-check-a2-2026-10-12.md\",\"REVIEW-docs-check-a2-group-pin-2026-10-12.json\",\"CI workflow and docs\"],\"areas\":[\"parent-loss cleanup\",\"absolute monotonic deadline enforcement\",\"interruption/signal-mask safety\",\"group identity lifetime after pin death\",\"guardian crash cleanup\"]},\"uncertainty\":\"medium\",\"budget_exhausted\":false,\"evidence_lease_exhausted\":false,\"cost_budget_exhausted\":false,\"turn_limit_reached\":false,\"recommended_followup\":{\"profile\":\"deep\",\"focus\":[\"ps-probe failure during parent-loss cleanup in the guardian\",\"SIGINT delivery at spawn_in_group context exit\",\"macOS killpg(pgid,0) behavior on zombie-only groups\",\"test bodies for fault injection coverage\"],\"reason\":\"Nothing was executed and test bodies/spec were not read; the high-severity finding rests on code inspection and merits a targeted fault-injection follow-up.\"}}",
+  "structured_output": {
+    "verdict": "needs-attention",
+    "summary": "Ownership design is sound for in-guarantee cases; no demonstrated parent-loss or deadline bypass. One fail-open cleanup path in the guardian (ps-probe failure) and one interruption gap in spawn_in_group were found by inspection only; nothing was executed. Several proof gaps remain. Simultaneous parent+guardian loss is out of guarantee and documented. Not both-platform release acceptance.",
+    "findings": [
+      {
+        "severity": "high",
+        "title": "Guardian skips group SIGKILL when ps probe fails (fail-open after parent loss)",
+        "body": "live_group_members runs ps with timeout=1, check=True. A timeout/non-zero exit raises at line 137 or 151, jumping to except BaseException (176). That handler gates its kill on workload_alive() again (183); the probe fails the same way and SubprocessError is swallowed at 187, so killpg and process.wait are skipped. The guardian then writes pin-release.json (194) and exits. With a live parent, its pin.signal_group fallback rescues the run; if the parent is already lost the workload group survives with no owner. Inferred from code, not executed; a 1s ps timeout is plausible under load/macOS.",
+        "file": "lib/_docguardian.py",
+        "line_start": 176,
+        "line_end": 188,
+        "confidence": 0.7,
+        "recommendation": "Send an unconditional killpg(SIGKILL) in the failure path and treat a probe error as 'alive'. Add fault-injection tests where live_group_members raises during parent-loss cleanup."
+      },
+      {
+        "severity": "medium",
+        "title": "spawn_in_group signal deferral ends before the handle is assigned by the caller",
+        "body": "defer_launch_signals restores the mask in its finally before spawn_in_group returns; the caller assigns process = spawn_in_group(...) at _docguardian.py:92. A pending SIGINT delivered at context exit raises KeyboardInterrupt before return, leaving process None while the launcher runs in the group. Only the process-is-None SIGKILL fallback (_docguardian.py:178-180) covers it; the run ends as guardian-failure and the direct child is not reaped by the guardian. run() and GroupPin assign inside the with block and are fine.",
+        "file": "lib/_docgroup_pin.py",
+        "line_start": 71,
+        "line_end": 80,
+        "confidence": 0.6,
+        "recommendation": "Return/assign the handle inside the deferral scope (e.g. pass a holder or wrap the caller assignment in the with), and add a test that delivers SIGINT at context exit."
+      },
+      {
+        "severity": "low",
+        "title": "Interrupt between GroupPin() return and try leaks the pin",
+        "body": "Lines 238-240 are outside any try/finally; KeyboardInterrupt there skips pin.finish(). Pin self-exits only when the parent dies, so a long-lived parent keeps it and its PID reservation. Narrow window.",
+        "file": "lib/_docguardian.py",
+        "line_start": 233,
+        "line_end": 241,
+        "confidence": 0.5,
+        "recommendation": "Move the pin assignment's follow-up statements inside the try whose finally calls pin.finish()."
+      },
+      {
+        "severity": "low",
+        "title": "Destructive killpg and pin release not gated on pin still holding the PGID after parent loss",
+        "body": "After parent loss the pin only reserves identity. If it dies (SIGKILL/OOM) init reaps it and the PGID may be recycled; killpg(SIGKILL) at line 179 and main-path signals do not verify the pin. pin-release.json (194) is also written before the final disappearance check, so cleanup-unverified leaves survivors with no retained owner. The invariant is asserted in comments, not enforced.",
+        "file": "lib/_docguardian.py",
+        "line_start": 178,
+        "line_end": 204,
+        "confidence": 0.5,
+        "recommendation": "Verify pin liveness before destructive signals and defer pin release until disappearance is observed or retries are exhausted."
+      },
+      {
+        "severity": "low",
+        "title": "Launcher only reports OSError as launch-error",
+        "body": "A ValueError (e.g. NUL in argv) or other exception exits 1 with no launch-error.json, so the run is reported completed instead of guardian-failure.",
+        "file": "lib/_docgroup_pin.py",
+        "line_start": 32,
+        "line_end": 43,
+        "confidence": 0.4,
+        "recommendation": "Catch Exception in the launcher and write launch-error.json."
+      }
+    ],
+    "next_steps": [
+      "Fix the ps-failure path in the guardian exception handler and add fault-injection test",
+      "Assign the spawned handle inside the signal-deferral scope and test SIGINT at context exit",
+      "Read SPEC revision 7 process/guardian contracts and test bodies to confirm coverage claims",
+      "Run both-platform native acceptance before release"
+    ],
+    "coverage": {
+      "files_examined": [
+        "lib/_docguardian.py",
+        "lib/_docgroup_pin.py",
+        "tests/a2/test_group_pin.py (test names via grep)",
+        "tests/a2/test_guardian.py (test names via grep)"
+      ],
+      "files_skipped": [
+        "SPEC-docs-check-a2-2026-10-12.md",
+        "tests/a2/test_stdio.py",
+        "lib/_docexamples integration",
+        "COVERAGE-docs-check-a2-2026-10-12.md",
+        "REVIEW-docs-check-a2-group-pin-2026-10-12.json",
+        "CI workflow and docs"
+      ],
+      "areas": [
+        "parent-loss cleanup",
+        "absolute monotonic deadline enforcement",
+        "interruption/signal-mask safety",
+        "group identity lifetime after pin death",
+        "guardian crash cleanup"
+      ]
+    },
+    "uncertainty": "medium",
+    "budget_exhausted": false,
+    "evidence_lease_exhausted": false,
+    "cost_budget_exhausted": false,
+    "turn_limit_reached": false,
+    "recommended_followup": {
+      "profile": "deep",
+      "focus": [
+        "ps-probe failure during parent-loss cleanup in the guardian",
+        "SIGINT delivery at spawn_in_group context exit",
+        "macOS killpg(pgid,0) behavior on zombie-only groups",
+        "test bodies for fault injection coverage"
+      ],
+      "reason": "Nothing was executed and test bodies/spec were not read; the high-severity finding rests on code inspection and merits a targeted fault-injection follow-up."
+    }
+  },
+  "session_id": "4654f07b-41c3-4ac4-a752-4f92dd80167b",
+  "resume_hint": "claude --resume 4654f07b-41c3-4ac4-a752-4f92dd80167b",
+  "disclosure": null,
+  "usage": {
+    "input_tokens": 1163,
+    "cache_creation_input_tokens": 34450,
+    "cache_read_input_tokens": 163675,
+    "output_tokens": 14207,
+    "output_tokens_details": {
+      "thinking_tokens": 8225
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 34450,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 4,
+        "output_tokens": 62,
+        "cache_read_input_tokens": 40460,
+        "cache_creation_input_tokens": 2982,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 2982
+        },
+        "type": "message"
+      },
+      {
+        "input_tokens": 1151,
+        "output_tokens": 2269,
+        "cache_read_input_tokens": 43442,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 1163,
+      "outputTokens": 14207,
+      "cacheReadInputTokens": 163675,
+      "cacheCreationInputTokens": 34450,
+      "webSearchRequests": 0,
+      "costUSD": 0.29856350000000004,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 8225,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  }
+}

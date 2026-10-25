@@ -1,0 +1,183 @@
+{
+  "ok": true,
+  "operation": "review",
+  "review_kind": "adversarial",
+  "subject_kind": "changes",
+  "subject_label": "working tree (staged, unstaged, and untracked)",
+  "subject_fingerprint": "c6683fd2bd8c6d71e187f5630e6e71d3039eef6e381149695252ce7889fb59bf",
+  "usage_summary": "Usage: tokens=199610 output=13196 turns=9 duration_ms=101619 api_ms=101130 cost_usd=0.2746861",
+  "total_tokens": 199610,
+  "total_cost_usd": 0.2746861,
+  "cumulative_chain_cost_usd": 0.2746861,
+  "parent_job_id": null,
+  "num_turns": 9,
+  "duration_ms": 101619,
+  "duration_api_ms": 101130,
+  "task_profile": null,
+  "review_profile": "standard",
+  "requested_model": "sonnet",
+  "effective_models": [
+    "claude-sonnet-5-5"
+  ],
+  "effort": "medium",
+  "budget": {
+    "max_turns": 12,
+    "finalize_at_turn": 9,
+    "soft_budget_usd": 1,
+    "max_budget_usd": 1,
+    "timeout_ms": 240000
+  },
+  "evidence_lease": null,
+  "evidence_lease_exhausted": false,
+  "cost_budget_exhausted": false,
+  "turn_limit_reached": false,
+  "result": "{\"verdict\":\"needs-attention\",\"summary\":\"The core fix holds up. The parent keeps the unreaped pin child, signals only after the guardian is observed dead, uses the pin object rather than a checkpoint PID, and closes the capability before the reap. I found two ship blockers in the exec-join launcher path and one narrower ownership gap. I read both full lib files plus grep excerpts of the tests. I did not run tests or the diff adapter. Ubuntu/macOS release evidence and mapping are PENDING, so nothing here supports acceptance.\",\"findings\":[{\"severity\":\"high\",\"title\":\"Join launcher runs `python -m lib._docgroup_pin` in the workload cwd, so the target project can shadow `lib`\",\"body\":\"R is spawned as `python -m lib._docgroup_pin join ...` with cwd=initial['cwd'], which is the project under audit. With `-m`, the cwd is sys.path[0], ahead of the PYTHONPATH entry that gets prepended. lib/__init__.py exists here, so a regular `lib` package in the audited project would win the import. The guardian and the pin avoid this by using cwd=package_root; the join launcher does not. Impact is either arbitrary code from the audited tree running as the launcher before the workload, or a launch failure when the project has its own lib/ package. This is inferred from Python import semantics and was not reproduced. It is also a regression: the previous code ran the workload directly.\",\"file\":\"lib/_docguardian.py\",\"line_start\":88,\"line_end\":92,\"confidence\":0.8,\"recommendation\":\"Make the join launcher independent of the workload cwd and import-free, for example run it as a script path with -I -S, or use an explicit sys.path that excludes cwd. Add a regression test with a decoy lib/__init__.py in the cwd. Related: lib/_docgroup_pin.py:90-92.\"},{\"severity\":\"medium\",\"title\":\"Before R joins the pin group, workload_alive() returns False, so deadline, terminate, and failure paths signal nothing\",\"body\":\"In pin mode, workload_alive() only inspects members of pgid. Between Popen and the launcher's setpgid, R is alive but still in the guardian's own group. If the deadline, terminate.json, an output limit, or an exception lands in that window, workload_alive() is False and both killpg calls are skipped. process.wait(timeout=5) follows, but the launcher goes on to exec the real workload, which runs unsupervised for up to 5s. If it outlives the wait, the result is cleanup-unverified and only the parent's pin SIGKILL cleans up. The no-pin path is unaffected because start_new_session makes R the group leader immediately. The except-Exception handler has the same hole. The new tests do not appear to cover a deadline before the join.\",\"file\":\"lib/_docguardian.py\",\"line_start\":64,\"line_end\":65,\"confidence\":0.7,\"recommendation\":\"Treat R itself as part of the workload: if the process is not a zombie, also os.kill(process.pid, ...), or OR R's liveness into workload_alive. Alternatively gate on an R-joined handshake. Add a test that fires the deadline between Popen and setpgid. Related: lib/_docguardian.py:132-153 and 174-181.\"},{\"severity\":\"low\",\"title\":\"Pin ownership proof has gaps: an untracked guardian after interrupt, and any parent loss\",\"body\":\"(a) If KeyboardInterrupt or cancellation arrives after subprocess.Popen returns but before `guardian = ...` is assigned, the finally block sees guardian None and calls pin.finish(), which reaps the pin. The live, untracked guardian later hits heartbeat expiry and calls killpg on a released PGID. The window is narrow, but it is exactly the ownership hazard the fix claims to close. (b) After parent loss, init becomes the pin's parent. If the pin dies, init reaps it and the guardian's later killpg has no ownership proof. The guardian also writes pin-release before its final orphan probe. The pin has no self-expiry, so loss of both parent and guardian leaks a 20ms-polling process forever; this is documented as out of guarantee. PID wrap was not reproduced. This is a proof gap, not a demonstrated bug.\",\"file\":\"lib/_docguardian.py\",\"line_start\":232,\"line_end\":285,\"confidence\":0.5,\"recommendation\":\"Make the guardian assignment interrupt-safe, for example by masking signals around Popen. Document that post-parent-loss kills are best-effort and not ownership-proven. Consider a hard pin lifetime cap tied to a guardian-liveness check.\"}],\"next_steps\":[\"Fix the join launcher so it never imports from the workload cwd, and add a decoy-lib regression test.\",\"Make R itself a signal target before it joins the group, and add a test for a deadline between Popen and setpgid.\",\"Make guardian assignment interrupt-safe and document the post-parent-loss limits.\",\"Run Ubuntu and macOS release evidence and complete the mapping before any acceptance.\"],\"coverage\":{\"files_examined\":[\"lib/_docgroup_pin.py\",\"lib/_docguardian.py\",\"lib/__init__.py (existence check)\",\"grep excerpts of tests/a2/test_guardian.py, test_group_pin.py, test_stdio.py\"],\"files_skipped\":[\"ACCEPTANCE-docs-check-a2-2026-10-12.md\",\"COVERAGE-docs-check-a2-2026-10-12.md\",\"TASKS-docs-check-a2-2026-10-12.md\",\"CHANGELOG.md\",\"docs/guides/docs-audit.md\",\"tests/a2/required.json\",\"tests/a2/requirements.json\",\"Full bodies of tests/a2/test_group_pin.py, test_guardian.py and test_stdio.py\",\"Diff adapter not run\"],\"areas\":[\"pin lifecycle and finish ordering\",\"guardian finally paths and parent-loss handling\",\"exec-join launcher\",\"startup arm failure and cancellation\",\"TERM/grace/KILL and deadline handling\",\"Python>=3.10 compatibility\"]},\"uncertainty\":\"medium\",\"budget_exhausted\":true,\"turn_limit_reached\":true,\"cost_budget_exhausted\":false,\"evidence_lease_exhausted\":false,\"recommended_followup\":{\"profile\":\"deep\",\"focus\":[\"Launcher import path with a decoy lib/ in the workload cwd, on Linux and macOS\",\"Deadline fired between Popen and setpgid\",\"Interrupt between guardian Popen and assignment\",\"Read test_group_pin.py and the crash-after-reap and corrupt-PID regressions in full\"],\"reason\":\"Two launcher-path issues are inferred from code reading and were not reproduced. The new tests were seen only via grep excerpts, and the Ubuntu/macOS zombie-leader behavior is unverified.\"}}",
+  "structured_output": {
+    "verdict": "needs-attention",
+    "summary": "The core fix holds up. The parent keeps the unreaped pin child, signals only after the guardian is observed dead, uses the pin object rather than a checkpoint PID, and closes the capability before the reap. I found two ship blockers in the exec-join launcher path and one narrower ownership gap. I read both full lib files plus grep excerpts of the tests. I did not run tests or the diff adapter. Ubuntu/macOS release evidence and mapping are PENDING, so nothing here supports acceptance.",
+    "findings": [
+      {
+        "severity": "high",
+        "title": "Join launcher runs `python -m lib._docgroup_pin` in the workload cwd, so the target project can shadow `lib`",
+        "body": "R is spawned as `python -m lib._docgroup_pin join ...` with cwd=initial['cwd'], which is the project under audit. With `-m`, the cwd is sys.path[0], ahead of the PYTHONPATH entry that gets prepended. lib/__init__.py exists here, so a regular `lib` package in the audited project would win the import. The guardian and the pin avoid this by using cwd=package_root; the join launcher does not. Impact is either arbitrary code from the audited tree running as the launcher before the workload, or a launch failure when the project has its own lib/ package. This is inferred from Python import semantics and was not reproduced. It is also a regression: the previous code ran the workload directly.",
+        "file": "lib/_docguardian.py",
+        "line_start": 88,
+        "line_end": 92,
+        "confidence": 0.8,
+        "recommendation": "Make the join launcher independent of the workload cwd and import-free, for example run it as a script path with -I -S, or use an explicit sys.path that excludes cwd. Add a regression test with a decoy lib/__init__.py in the cwd. Related: lib/_docgroup_pin.py:90-92."
+      },
+      {
+        "severity": "medium",
+        "title": "Before R joins the pin group, workload_alive() returns False, so deadline, terminate, and failure paths signal nothing",
+        "body": "In pin mode, workload_alive() only inspects members of pgid. Between Popen and the launcher's setpgid, R is alive but still in the guardian's own group. If the deadline, terminate.json, an output limit, or an exception lands in that window, workload_alive() is False and both killpg calls are skipped. process.wait(timeout=5) follows, but the launcher goes on to exec the real workload, which runs unsupervised for up to 5s. If it outlives the wait, the result is cleanup-unverified and only the parent's pin SIGKILL cleans up. The no-pin path is unaffected because start_new_session makes R the group leader immediately. The except-Exception handler has the same hole. The new tests do not appear to cover a deadline before the join.",
+        "file": "lib/_docguardian.py",
+        "line_start": 64,
+        "line_end": 65,
+        "confidence": 0.7,
+        "recommendation": "Treat R itself as part of the workload: if the process is not a zombie, also os.kill(process.pid, ...), or OR R's liveness into workload_alive. Alternatively gate on an R-joined handshake. Add a test that fires the deadline between Popen and setpgid. Related: lib/_docguardian.py:132-153 and 174-181."
+      },
+      {
+        "severity": "low",
+        "title": "Pin ownership proof has gaps: an untracked guardian after interrupt, and any parent loss",
+        "body": "(a) If KeyboardInterrupt or cancellation arrives after subprocess.Popen returns but before `guardian = ...` is assigned, the finally block sees guardian None and calls pin.finish(), which reaps the pin. The live, untracked guardian later hits heartbeat expiry and calls killpg on a released PGID. The window is narrow, but it is exactly the ownership hazard the fix claims to close. (b) After parent loss, init becomes the pin's parent. If the pin dies, init reaps it and the guardian's later killpg has no ownership proof. The guardian also writes pin-release before its final orphan probe. The pin has no self-expiry, so loss of both parent and guardian leaks a 20ms-polling process forever; this is documented as out of guarantee. PID wrap was not reproduced. This is a proof gap, not a demonstrated bug.",
+        "file": "lib/_docguardian.py",
+        "line_start": 232,
+        "line_end": 285,
+        "confidence": 0.5,
+        "recommendation": "Make the guardian assignment interrupt-safe, for example by masking signals around Popen. Document that post-parent-loss kills are best-effort and not ownership-proven. Consider a hard pin lifetime cap tied to a guardian-liveness check."
+      }
+    ],
+    "next_steps": [
+      "Fix the join launcher so it never imports from the workload cwd, and add a decoy-lib regression test.",
+      "Make R itself a signal target before it joins the group, and add a test for a deadline between Popen and setpgid.",
+      "Make guardian assignment interrupt-safe and document the post-parent-loss limits.",
+      "Run Ubuntu and macOS release evidence and complete the mapping before any acceptance."
+    ],
+    "coverage": {
+      "files_examined": [
+        "lib/_docgroup_pin.py",
+        "lib/_docguardian.py",
+        "lib/__init__.py (existence check)",
+        "grep excerpts of tests/a2/test_guardian.py, test_group_pin.py, test_stdio.py"
+      ],
+      "files_skipped": [
+        "ACCEPTANCE-docs-check-a2-2026-10-12.md",
+        "COVERAGE-docs-check-a2-2026-10-12.md",
+        "TASKS-docs-check-a2-2026-10-12.md",
+        "CHANGELOG.md",
+        "docs/guides/docs-audit.md",
+        "tests/a2/required.json",
+        "tests/a2/requirements.json",
+        "Full bodies of tests/a2/test_group_pin.py, test_guardian.py and test_stdio.py",
+        "Diff adapter not run"
+      ],
+      "areas": [
+        "pin lifecycle and finish ordering",
+        "guardian finally paths and parent-loss handling",
+        "exec-join launcher",
+        "startup arm failure and cancellation",
+        "TERM/grace/KILL and deadline handling",
+        "Python>=3.10 compatibility"
+      ]
+    },
+    "uncertainty": "medium",
+    "budget_exhausted": true,
+    "turn_limit_reached": true,
+    "cost_budget_exhausted": false,
+    "evidence_lease_exhausted": false,
+    "recommended_followup": {
+      "profile": "deep",
+      "focus": [
+        "Launcher import path with a decoy lib/ in the workload cwd, on Linux and macOS",
+        "Deadline fired between Popen and setpgid",
+        "Interrupt between guardian Popen and assignment",
+        "Read test_group_pin.py and the crash-after-reap and corrupt-PID regressions in full"
+      ],
+      "reason": "Two launcher-path issues are inferred from code reading and were not reproduced. The new tests were seen only via grep excerpts, and the Ubuntu/macOS zombie-leader behavior is unverified."
+    }
+  },
+  "session_id": "84a17dc3-f86f-4c58-8eab-96d8c71f906f",
+  "resume_hint": "claude --resume 84a17dc3-f86f-4c58-8eab-96d8c71f906f",
+  "disclosure": null,
+  "usage": {
+    "input_tokens": 1163,
+    "cache_creation_input_tokens": 31250,
+    "cache_read_input_tokens": 154001,
+    "output_tokens": 13196,
+    "output_tokens_details": {
+      "thinking_tokens": 7437
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 31250,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 4,
+        "output_tokens": 62,
+        "cache_read_input_tokens": 37320,
+        "cache_creation_input_tokens": 2922,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 2922
+        },
+        "type": "message"
+      },
+      {
+        "input_tokens": 1151,
+        "output_tokens": 2493,
+        "cache_read_input_tokens": 40242,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 1163,
+      "outputTokens": 13196,
+      "cacheReadInputTokens": 154001,
+      "cacheCreationInputTokens": 31250,
+      "webSearchRequests": 0,
+      "costUSD": 0.2746861,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 7437,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  }
+}

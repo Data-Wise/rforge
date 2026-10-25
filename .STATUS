@@ -45,7 +45,7 @@
 project: rforge
 updated: 2026-10-24
 status: Active
-in_progress: none — v2.21.0 released 2026-10-11. Shipped in it (kept for the record):
+in_progress: A2 on codex/docs-check-a2; both-platform smoke 582/582; G08, H01/H02, F01/F02 and commit-bound rendered_review still open (D04 dev-time inspection done). v2.21.0 release history:
   (1) #84 fix MERGED to dev 2026-10-11 as PR #85 (squash 99b4171; CI 5/5 green). #84 stays
   open until release (a feature→dev merge does not auto-close it). Follow-up PR #86 MERGED (squash f7036b4): a Codex
   adversarial review found #85 stopped /rforge:finish adding `version:` to a .STATUS that lacks one; fixed via
@@ -58,9 +58,9 @@ in_progress: none — v2.21.0 released 2026-10-11. Shipped in it (kept for the r
   ~/.codex/worktrees/docs-check-a2/rforge; pushed at 016ec5f). Two-platform smoke (ubuntu-24.04, macos-14, CI run 40137993702):
   582/582 each. Phase 3 (H01 replay, H02 triage schema) and Phase 4 (F01 gate record, F02 review record) each had a Codex
   adversarial review, findings triaged and fixed (dispositions in COVERAGE-docs-check-a2-2026-10-12.md). Still open: G08 process
-  review, D04 rendered-site inspection, H01/H02 candidate-bound runs, F01/F02 final records on the last commit, then
+  review, commit-bound rendered_review (D04 dev-time inspection done, fb8514d), H01/H02 candidate-bound runs, F01/F02 final records on the last commit, then
   required.json -> ready; a2-release jobs fail closed (exit 2) until then. Remove temporary a2-smoke.yml + ci.yml job before PR.
-next: close G08/D04/H01/H02/F01/F02 on codex/docs-check-a2 (candidate-bound evidence on the final commit), flip required.json to ready, drop the smoke workflow, then PR. Open low-priority candidates in CLAUDE.md Roadmap.
+next: close G08/H01/H02/F01/F02 + commit-bound rendered_review on codex/docs-check-a2 (candidate-bound evidence on the final commit), flip required.json to ready, drop the smoke workflow, then PR. Open low-priority candidates in CLAUDE.md Roadmap.
 version: 2.21.0 (released, on main 7387a05; dev fast-forwarded to main)
 last_release: 2026-10-11 v2.21.0 (minor, 44 commands, no surface change — PR #91 dev→main merge 7387a05; tag v2.21.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.21.0. Ships /rforge:docs:check content audit (lib.docaudit, A1), tests/harness, #84 fix (#85/#86), docs gap-fill (#89/#90). Gates: test-all 47/47, pytest 899+4 skipped, CI green on main (RForge CI + Deploy Documentation). Tap Data-Wise/homebrew-tap#244 squash 09bc9c3 — formula+manifest → v2.21.0 sha256 f376d0da…, stale revision dropped, generate.py --diff IDENTICAL; brew audit by path unavailable. Aggregator claude-plugins#74 auto-merged. Pending: user runs `brew upgrade rforge`.)
 last_release_prior_v2_20_1: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
@@ -681,3 +681,16 @@ shipped:
   - "v1.3.0 — 2026-05-11 — Path B complete (rforge-mcp absorbed into lib/ pure-Python modules); /rforge:init promoted to first-class command (16 total); rforge-mcp local prototype tombstoned (was never public on GitHub or npm — SPEC scope-corrected); tap formula + manifest + docs Pages all synced; brew outdated UX verified via Cellar-rename trick"
   - "v1.2.0 — 2026-05-10 — craft parity foundations + post-merge polish + MCP decoupling"
   - "v1.1.0 — 2026-01-09 — initial standalone release"
+
+a2_local_validation: Python 3.12.15 full suite 1318 passed/4 existing skipped; focused guardian/replay 61 passed before final four boundary cases; ten replay recovery cases and five updated validation probes passed; test-all 47/47; mkdocs strict passed. Approved revision-7 spec hash unchanged; 419 nodes uniquely mapped with current test hashes. Python 3.12 acceptance pins unchanged; actual both-platform acceptance pending.
+a2_review: Validated ownership-repair findings fixed after e36c341: pre-spawn exceptions no longer signal checkpoint PGIDs, handle allocation precedes spawn, and ordinary replay boundary failures preserve known counts/partial comparisons/matching-run lifecycle before teardown. Eight red regressions reproduced defects; twelve expanded acceptance nodes added. KeyboardInterrupt propagation, deadlines, severity gates, requirement ledger and revision 7 unchanged. Independent repair review, seven coverage groups and both-platform acceptance pending.
+
+python_development: Python 3.15.0 installed with uv; isolated environment /Users/davood/.venvs/rforge-py315 (activate to use python/python3). Approved A2 Python 3.12 acceptance pin and existing .venv unchanged. dataclasses.MISSING identity fixes reference generation across 3.12/3.15. Python 3.12 lifecycle/mapping subset 65 passed; Python 3.15 gates 47/47 and strict docs passed; full Python 3.15 suite 1302 passed/4 existing skipped. Local interpreter update is supplemental compatibility validation, not A2 release acceptance.
+
+python_ci: General CI matrix now includes 3.11, 3.12, 3.13 and 3.15; A2 platform/aggregate workflows and fixture lock remain pinned to 3.12. Local workflow-contract tests 9 passed; test-all 47/47 under Python 3.15; A2 workflows and fixture lock byte-identical to prior commit. GitHub execution not dispatched.
+
+a2_review_20261023: Focused Claude review e3646895-1416-4234-b475-e516ed31ef1f of 7eb8a40 found no material finding; three implementation files examined, tests/docs skipped by reviewer; Codex validated existing coverage with 126 focused native-process passes on Python 3.12.15. Seven groups and final platform evidence remain pending. User then authorized unpinning Python; revision 8 selects latest stable Python 3 (currently 3.15.0), recording exact interpreter; other acceptance requirements and R/dependency locks retained.
+
+a2_python_latest_validation: Python 3.15.0 full suite 1326 passed/4 existing skipped; repository gates 47/47; strict MkDocs build and rendered contributor policy verified with Homebrew Cairo library path. 427 unique collected A2 nodes, 118 obligations and 87 groups reconciled; manifest and seven groups remain pending. No push, workflow dispatch or release.
+
+a2_acceptance_state: Python 3.15.0 full suite 1572 passed/5 skipped, repository gates 47/47 and strict MkDocs passed; 649 collected nodes, all mapped. Both-platform smoke 582/582 earlier; candidate-bound observations via a2-observations.yml pending; 6 coverage groups pending as named external observations; both-platform evidence pending on the frozen candidate; latest stable Python 3; pushed to origin without PR, tag, deployment or release.

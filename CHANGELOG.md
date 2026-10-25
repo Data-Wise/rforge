@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add explicit A2 status, command/check count, unchanged feature version and agent prohibition assertions; close D05 local coverage while keeping platform/release acceptance pending.
+
+- Prevent pre-spawn guardian exceptions from signaling an unowned checkpoint PGID; allocate the workload handle before spawning. Preserve README assertion counts, valid partial checkpoints, and authenticated lifecycle evidence when replay preparation or execution raises an ordinary exception. Add acceptance regressions; interruption propagation and release gates remain unchanged.
+
+- Repair A2 guardian cleanup after repeated liveness-probe failure with the parent absent; preserve direct-child handles through pending launch interruptions and close the pin-construction cleanup gap. Native regressions cover all three failures; release acceptance remains pending.
+
+- Add Python 3.15 to the general CI test matrix. Per the 2026-10-23 Python policy amendment, A2 platform and aggregate jobs select latest stable Python 3 and record the exact interpreter; reject prerelease/unsupported runtime evidence. R/dependency locks and both-platform acceptance remain required.
+
+- Keep generated dataclass reference defaults stable on Python 3.15 by comparing against the public `dataclasses.MISSING` sentinel, preserving compatibility with earlier Python versions.
+
+- Reserve README replay process-group identity with a parent-owned, unreaped pin through the final possible group signal. The guardian still launches/reaps R and owns normal termination; emergency cleanup no longer trusts checkpoint PIDs. Assign workload membership atomically with POSIX spawn and use an isolated bootstrap to prevent project-local launcher replacement or delayed group-join deadline escapes. Mask launch interruptions until child ownership is assigned. Add native before/after-reap crash, corrupt-PID, parent-loss, interruption, and pin lifetime regressions. Both-platform acceptance remains pending.
+
+- Bound emitted UTF-8 diagnostic tails to 1 MiB even for malformed bytes; verify mixed checkpoint preservation and duplicate rejection. Normal CI and release evidence now share the locked A2 Ubuntu/macOS platform workflow; aggregate acceptance stays separate and fail closed.
+
+- Fail closed on malformed README replay checkpoint records instead of raising `KeyError`; reject duplicate assertion identities. Expanded acceptance covers README selection/options, native session isolation, distinct deadlines, exact combined output accounting, guardian death, and verifier inventory/runtime binding. Release evidence remains pending.
+
+- Correct A2 site route filtering to exclude underscore-prefixed article filenames rather than parent directories; pinned pkgdown 2.2.1 build verifies nested routes and exclusions.
+
+### Added (A2 implementation in progress)
+
+- Opt-in docs audit site/source comparison and supervised README replay. Release acceptance and both-platform evidence remain pending.
+- A2 remediation: guardian-visible evaluate text during running expressions; aggregate acceptance requires retrieved, hash-bound observation artifacts and their producer run identity.
+
 ### Added
 
 - Personal Codex adapter with `rforge-check` and `rforge-docs-check` skills,

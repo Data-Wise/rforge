@@ -1,0 +1,17 @@
+{
+  "python": "3.x",
+  "R": "4.6.1",
+  "R_packages": {
+    "pkgload": "1.5.3",
+    "evaluate": "1.0.5",
+    "knitr": "1.51",
+    "pkgdown": "2.2.1",
+    "jsonlite": "2.0.0",
+    "rsconnect": "1.11.0"
+  },
+  "platforms": [
+    "ubuntu-24.04",
+    "macos-14"
+  ],
+  "provenance": "Observed local installed R versions 2026-10-12; both-platform provisioning and route compatibility pending"
+}

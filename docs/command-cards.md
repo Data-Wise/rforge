@@ -109,3 +109,14 @@ Handy one-line descriptions grouped by purpose.
 | `/rforge:r:use-citation` | Scaffold a CITATION file |
 
 → See the [full Reference Card](REFCARD.md) for detailed descriptions and flags.
+
+Optional docs audit: `--site URL` plus optional local `--ref REF`;
+`--run-examples --examples-budget-seconds N` for supervised root README replay.
+Default remains static: no R, network or writes. `--site` reads only the sitemap
+over HTTP(S); without `--ref` the deployment source is inferred from one
+unambiguous pkgdown deploy branch, falling back to local `origin/main`, then
+`main`, when there is none; ambiguous candidates are incomplete. Replay is
+partial coverage: root README only, and unpaired rendered assertions or
+unsupported options are incomplete. Inspect stage coverage. Complete A2 warnings
+gate warn, incomplete stages gate warn/error. Allow the budget plus 15 seconds;
+use a terminal when the host lifetime is unknown. No site build or deploy.

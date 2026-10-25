@@ -12,6 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  a2-release:
+    uses: ./.github/workflows/a2-platform.yml
+
   validate:
     name: Validate Plugin Structure
     runs-on: ubuntu-latest
@@ -119,7 +122,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.11', '3.12', '3.13' ]
+        python-version: [ '3.11', '3.12', '3.13', '3.15' ]
 
     steps:
       - name: Checkout repository

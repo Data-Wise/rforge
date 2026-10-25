@@ -1,0 +1,2261 @@
+{
+  "spec_sha256": "898ff1e77e68efeaf493942df228fea30a5eb4fd93202e06d785fdf0f33a6898",
+  "review": "complete",
+  "requirements": [
+    {
+      "id": "docscheck-a2--live-site-and-readme-example-audit:1",
+      "anchor": "docscheck-a2--live-site-and-readme-example-audit",
+      "ordinal": 1,
+      "text": "# docs:check A2 — live-site and README example audit",
+      "sha256": "77b12acea173b27c1b01c0130d8c2d8f8309b442ef439c77fb32f35e9e675b3f",
+      "inventory_ids": [
+        "D05"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "docscheck-a2--live-site-and-readme-example-audit:2",
+      "anchor": "docscheck-a2--live-site-and-readme-example-audit",
+      "ordinal": 2,
+      "text": "Date: 2026-10-12. Revision: 8 (Python policy amendment, 2026-10-23).\nStatus: revision 7 approved and implementation authorized on 2026-10-12; user authorized removing the Python 3.12 pin on 2026-10-23. All other acceptance requirements remain unchanged.\nTarget: next minor release (provisionally 2.22.0); 44 commands remain.",
+      "sha256": "803b54aafe442a70de5b7a7607c386992d1831a2f03e790b09cc3e1f27040f57",
+      "inventory_ids": [
+        "D05"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "User-authorized 2026-10-23 Python policy amendment; same inventory owners and all non-Python obligations retained."
+    },
+    {
+      "id": "objective-and-recommendation:1",
+      "anchor": "objective-and-recommendation",
+      "ordinal": 1,
+      "text": "## Objective and recommendation",
+      "sha256": "4061205e342c1083ea6aa05a33eb1d331641f334327330a4b5ecf8faa452765a",
+      "inventory_ids": [
+        "C01",
+        "C03",
+        "E01",
+        "E02",
+        "R12",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "objective-and-recommendation:2",
+      "anchor": "objective-and-recommendation",
+      "ordinal": 2,
+      "text": "Extend the existing `/rforge:docs:check` with opt-in `--site URL` and\n`--run-examples`. Preserve the default static, offline audit. Keep site inspection\nand example execution independently testable and independently reportable.\nRecommended build order: shared stage reporting → site → examples → integration.\nThe user approved this specification and requested implementation planning only.\nImplementation and release remain separate authorized tasks. Material scope limitation: source/render\npairing is deferred, so source-based READMEs with asserted rendered output\nremain incomplete even when their source assertions replay successfully.",
+      "sha256": "2afecf9ffa5e087ed67fdea99dad8fa5758a7f608e8946cebea2de523abbca1a",
+      "inventory_ids": [
+        "C01",
+        "C03",
+        "E01",
+        "E02",
+        "R12",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "design-review-and-owning-sources:1",
+      "anchor": "design-review-and-owning-sources",
+      "ordinal": 1,
+      "text": "## Design review and owning sources",
+      "sha256": "d32b3017e1eb42dfc4f16f9676440e0dbc14269ace4c0c3598b07aa13210c0e2",
+      "inventory_ids": [
+        "C03",
+        "C06",
+        "E03",
+        "S01",
+        "S13"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "design-review-and-owning-sources:2",
+      "anchor": "design-review-and-owning-sources",
+      "ordinal": 2,
+      "text": "- `archive/specs/SPEC-docs-check-content-audit-2026-10-11.md`, A2 contracts:\n  deploy-ref expectations, fresh ordered README sessions, working-tree package\n  loading, output normalization, skip markers, and real integration smoke tests.\n- `lib/docaudit.py#_envelope`, `audit_package`, `audit`, `main`: the shipped\n  envelope uses `kind: docaudit`, `max_severity`, `audited`, `incomplete`, and\n  `engine_missing`. With a threshold enabled, incomplete audits already exit 2.\n  Ecosystem aggregation currently initializes `engine_missing` to an empty list;\n  A2 must aggregate stage failures rather than lose them.\n- `commands/docs/check.md` and `docs/guides/docs-audit.md`: current public contract\n  is static and read-only. Execution changes that contract only when requested.\n- `lib/docaudit.py#extract_regions`: static extraction is not yet a complete\n  executable-chunk parser. Do not use A1 region extraction to select executable chunks.",
+      "sha256": "209aebc351d228bf5e8bffcff96932f8cef7945c6a5d002ef82a8b6eee2f6d20",
+      "inventory_ids": [
+        "C03",
+        "C06",
+        "E03",
+        "S01",
+        "S13"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "design-review-and-owning-sources:3",
+      "anchor": "design-review-and-owning-sources",
+      "ordinal": 3,
+      "text": "Retain the archived decisions, with explicit refinements below. In particular,\nbeing ahead of a deployment ref must not downgrade a page missing from that ref.\nUnreleased source pages and missing deployed-source pages are separate results.",
+      "sha256": "d6501e944c927060cfe6d871861dcb91dad6c9310e4267a3a0cd5c42e983d95e",
+      "inventory_ids": [
+        "C03",
+        "C06",
+        "E03",
+        "S01",
+        "S13"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "command-contract:1",
+      "anchor": "command-contract",
+      "ordinal": 1,
+      "text": "## Command contract",
+      "sha256": "dcbd15942abe3a29a123ae1273088270c2b7fa89a239bad846e0aca07383faa6",
+      "inventory_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "C05",
+        "C06",
+        "C07",
+        "R10",
+        "R11",
+        "R12"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "command-contract:2",
+      "anchor": "command-contract",
+      "ordinal": 2,
+      "text": "```bash\npython3 -m lib.docaudit --path /path/to/package --site https://example.org/pkg/\npython3 -m lib.docaudit --path /path/to/package --site https://example.org/pkg/ --ref origin/main\npython3 -m lib.docaudit --path /path/to/package --run-examples --format json\npython3 -m lib.docaudit --path /path/to/package --site https://example.org/pkg/ --run-examples --fail-on warn\n```",
+      "sha256": "a42f4e07c2e1074edbc2251b16fa3a4b2999922ac8d2d7a98cc7bbc9f6ed740f",
+      "inventory_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "C05",
+        "C06",
+        "C07",
+        "R10",
+        "R11",
+        "R12"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "command-contract:3",
+      "anchor": "command-contract",
+      "ordinal": 3,
+      "text": "Slash-command equivalents map these flags directly. `--ref` requires `--site`.\nAn explicit site URL requires exactly one resolved package; ambiguous ecosystem\nscope is a CLI error, not reuse of one URL for every package. `--run-examples`\nmay sweep packages, sequentially. No dependency installation, fetch, build,\ndeployment, or source edits occur automatically.",
+      "sha256": "616809ca7cfbbba4e8174a3f3138827d332799a17aff7c3244c81f5a80e5b5a2",
+      "inventory_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "C05",
+        "C06",
+        "C07",
+        "R10",
+        "R11",
+        "R12"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "command-contract:4",
+      "anchor": "command-contract",
+      "ordinal": 4,
+      "text": "Each requested stage reports state (`complete`, `incomplete`, `unavailable`,\n`not-applicable`), counts, provenance, and reasons. Unrequested stages are absent.\nStatic findings remain available even when an optional stage fails. Missing\nengines propagate through package and ecosystem reports. A requested unavailable\nor incomplete stage sets overall `incomplete`; no assertions anywhere in the\nREADME surface is `not-applicable`. Assertions present but outside supported\ncomparison scope make the stage incomplete, with explicit unverified counts.\nAn excluded-only stage is also `not-applicable`, with exclusion reasons/counts.\n`--detailed` may hide info findings but never stage states or coverage counts.\nDefault `--fail-on none` remains exit 0; enabled thresholds retain exit 2 for\nincomplete/failed audits, exit 1 for complete threshold findings, else exit 0.\nCLI misuse exits 2 independently of `--fail-on`.\nBuffer the final report until execution completes or the runner deadline fires.\nKeep the existing scope as the first text line. Immediately afterward in that report, print\nrequested stage states and diagnostic reasons; unavailable/incomplete stages also\nemit a concise stderr notice, including in JSON mode. JSON stdout remains one\nvalid document. Preserve the final INCOMPLETE marker and prohibit “no findings”\nas a clean conclusion for such runs. No-output stages never execute setup alone.\nThe single-package site restriction is a proposed A2 scope choice, not removal\nof a shipped feature; ecosystem URL configuration is deferred.",
+      "sha256": "8f2410a1a8f603f37af0b463c17745f97824cd96213631bf237bab04d5607c06",
+      "inventory_ids": [
+        "C01",
+        "C02",
+        "C03",
+        "C04",
+        "C05",
+        "C06",
+        "C07",
+        "R10",
+        "R11",
+        "R12"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "site-stage:1",
+      "anchor": "site-stage",
+      "ordinal": 1,
+      "text": "## Site stage",
+      "sha256": "2b73f45516f1b9206b37ff97c5f5fdc0ceea776283bdc37154b994e7a97b1768",
+      "inventory_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S05",
+        "S06",
+        "S07",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S15"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "site-stage:2",
+      "anchor": "site-stage",
+      "ordinal": 2,
+      "text": "1. Accept an explicit HTTP(S) base URL without credentials, query, or fragment.\n   Normalize its path and retrieve its `sitemap.xml` using stdlib `urllib`.\n   Bound time and response size (proposed 10 seconds, 5 MiB). Handle malformed\n   XML, offline responses, redirects, and sitemap indexes explicitly. A2 supports\n   a single URL-set sitemap; an index is incomplete, not an empty site.\n2. Resolve `--ref` locally to a commit. Otherwise infer one unambiguous pkgdown\n   deployment branch from recognized workflow configuration, falling back to\n   locally available `origin/main`, then `main`, with provenance. Ambiguous\n   triggers, dynamic workflows, missing refs, or missing git make the stage\n   incomplete. Do not fetch. Branch inference is evidence of intended source,\n   not proof of the commit currently deployed.\n3. Inspect the immutable commit tree, including pkgdown configuration. Derive\n   supported article and Rd routes; retain internal Rd topics. Honor recognized\n   exclusions and article naming rules. Never silently apply naive filename\n   mapping to an unsupported custom layout: report affected scope as incomplete.\n   Keep source path → expected URL attribution. No generated index, authors,\n   news, or 404 pages are mandatory expectations.\n4. Compare normalized same-site paths, preserving case and base-path boundaries.\n   Missing expected routes emit `site-missing-page` (warn), phrased as absent\n   from the sitemap, not a proven HTTP 404. Sitemap coverage is not availability.\n   Extra routes emit info only within the supported article/reference surface;\n   generated pages are not stale-page findings.\n5. Separately report pages added in the checkout relative to the selected ref\n   as unreleased info. Dirty-tree additions must be identified as such. Missing\n   pages from the selected ref stay warn even when the checkout is ahead.",
+      "sha256": "76477a6c101c92f56e43b38235aa801339dfa6c8786cb2d4911e95db77cd07fd",
+      "inventory_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S05",
+        "S06",
+        "S07",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S15"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "site-stage:3",
+      "anchor": "site-stage",
+      "ordinal": 3,
+      "text": "Site checks do not inspect prose, render pages, crawl links, or verify deployment\nfreshness. Network errors are stage diagnostics, not missing-page findings.\nRead-only site GETs are orchestrator auto-run only for an explicitly supplied\nURL, following the archived decision; do not discover arbitrary sites to probe.",
+      "sha256": "d485dc31581e35f6cb1dbb61f12d96d3ef78b1a54a06461d764bd328a8228d78",
+      "inventory_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S05",
+        "S06",
+        "S07",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S15"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:1",
+      "anchor": "normative-site-rules",
+      "ordinal": 1,
+      "text": "### Normative site rules",
+      "sha256": "e292177d8e46457316e34b2983fb555aebb050c5fd4e733a715cfdba9260a59e",
+      "inventory_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:2",
+      "anchor": "normative-site-rules",
+      "ordinal": 2,
+      "text": "The requested URL establishes the comparison origin and base path. Accept a\nmaximum of three same-origin redirects; reject HTTPS downgrade and cross-origin\nredirects as incomplete with the final target shown. Do not silently alias\ncustom domains, www/apex hosts, or HTTP/HTTPS. If source `url:` disagrees with\nthe requested base, stop comparison as incomplete and ask the caller to select\nthe canonical URL. A non-empty sitemap with no entries within that base is\nincomplete, never mass missing-page findings. Mixed foreign entries are counted\nand excluded with a message. Preserve escaped separators and path case; drop\nfragments, normalize default ports, and do not collapse distinct routes.",
+      "sha256": "927feda163791f038116f1dcc04ee780e05de26cf2e4b6fffff36091dfb7ea00",
+      "inventory_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:3",
+      "anchor": "normative-site-rules",
+      "ordinal": 3,
+      "text": "| Source input | Supported derivation or explicit limitation |",
+      "sha256": "6ffdd48e418dce8860c197a1254b4d48e32a40797f197b45c57149e3e333e50f",
+      "inventory_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:4",
+      "anchor": "normative-site-rules",
+      "ordinal": 4,
+      "text": "| Deployment workflow | Literal `on.push.branches` containing exactly one branch in a workflow with a literal pkgdown build/deploy command; no alternate checkout ref. Resolve `origin/<branch>`, then local branch. Multiple candidates, globs, expressions, alternate checkout refs and reusable workflows require explicit `--ref`. |",
+      "sha256": "f45cd460370872f44545a15a88185ea51b3d3595e992aeff69b808b54d664933",
+      "inventory_ids": [
+        "S02",
+        "S03"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:5",
+      "anchor": "normative-site-rules",
+      "ordinal": 5,
+      "text": "| No deployment candidate | Fall back to local `origin/main`, then `main`; label this a fallback assumption. Never fall back after detecting an ambiguous candidate. |",
+      "sha256": "b332f16439975caff7bfd7bba7fb630bf51857d2e022154253003bd85b84bf00",
+      "inventory_ids": [
+        "S02"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:6",
+      "anchor": "normative-site-rules",
+      "ordinal": 6,
+      "text": "| Ref provenance | Report selected ref, resolved SHA, commit timestamp, selection reason and observed local-ref status. Timestamp is not evidence that a remote-tracking ref is current. No deployment-SHA freshness claim. |",
+      "sha256": "8b180444c08dcc2f00ad9a77395566797b876ae2e677634a8bb6c9da2f1cc5fe",
+      "inventory_ids": [
+        "S01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:7",
+      "anchor": "normative-site-rules",
+      "ordinal": 7,
+      "text": "| Standard `man/*.Rd` | `reference/<Rd basename>.html`, including internal topics; index selection does not remove pages. |",
+      "sha256": "c3f0b27ccc7810590d791692b845444c26b600131b56336abfc3c8b9c906942c",
+      "inventory_ids": [
+        "S05"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:8",
+      "anchor": "normative-site-rules",
+      "ordinal": 8,
+      "text": "| Standard Rmd articles | Output is always under `articles/`: `vignettes/foo.Rmd` → `articles/foo.html`; `vignettes/articles/foo.Rmd` → `articles/foo.html`; `vignettes/pizza/slice.Rmd` → `articles/pizza/slice.html`. Exclude underscore-prefixed child files; tutorial sources are outside article scope and explicitly counted. A pinned pkgdown fixture for all three mappings is a hard release gate; route collisions make derivation incomplete. |",
+      "sha256": "c573ac63a5586c25f79ebc0bc4df01d7b060c8ff437279cea775f399bf6321f7",
+      "inventory_ids": [
+        "S06",
+        "S07"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:9",
+      "anchor": "normative-site-rules",
+      "ordinal": 9,
+      "text": "| `articles`, `reference`, `navbar` configuration | Index/navigation organization alone is not a page exclusion or rename. External articles are links, not required local routes. |",
+      "sha256": "4a7b0a3313604d148a7296e9d9f7675e15b303276aedf70730268683c7d02bcd",
+      "inventory_ids": [
+        "S05",
+        "S07"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:10",
+      "anchor": "normative-site-rules",
+      "ordinal": 10,
+      "text": "| Quarto, custom extensions, `as_is`, build overrides, configuration overlays | Affected routes are unsupported/incomplete until committed fixtures establish their exact mapping; never invent `.html` routes. |",
+      "sha256": "fb4a6aeff6a4e9ac6bf4552e8bbb2085c15fd9a498365dc86673a17565f261af",
+      "inventory_ids": [
+        "S07"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:11",
+      "anchor": "normative-site-rules",
+      "ordinal": 11,
+      "text": "| `url:` | Canonical base validation only; never permission to silently rewrite origins. |",
+      "sha256": "9d7ae87b27ee71eb0ddb01779369756364ffe5deae9d4f019e09992066e6c348",
+      "inventory_ids": [
+        "S09"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:12",
+      "anchor": "normative-site-rules",
+      "ordinal": 12,
+      "text": "Parse recognized YAML data without evaluating expressions. If the optional YAML\nreader is unavailable and relevant configuration exists, mark inference incomplete\n(or require an explicit ref for workflow inference); do not add a mandatory Python\ndependency. An explicit ref bypasses branch inference, not route uncertainty.\nUnsupported route scope retains checked routes and reports excluded counts.\nWhen source `url:` is absent, use the explicit requested base for comparison;\na missing sitemap is incomplete, not evidence that source pages are missing.\nThe strict same-origin policy intentionally rejects HTTP→HTTPS redirects: show\nthe canonical target and require a fresh invocation with it. This is a scope\nchoice, not a claimed live-site defect.",
+      "sha256": "843867c07323f2b36917e5b2e6c8ab8f859de5470de7ed1470c2c1506f200727",
+      "inventory_ids": [
+        "S04",
+        "S09",
+        "S10",
+        "S11"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:13",
+      "anchor": "normative-site-rules",
+      "ordinal": 13,
+      "text": "Primary rule references: [pkgdown articles](https://pkgdown.r-lib.org/reference/build_articles.html)\nand [reference pages](https://pkgdown.r-lib.org/reference/build_reference.html).\nPin fixture provenance to the supported pkgdown release during implementation;\nlatest online documentation alone is not a versioned compatibility promise.",
+      "sha256": "c91aebb5e1018c584560f6d1e105b1d0db04823b344744a4781a7e579898b667",
+      "inventory_ids": [
+        "S06"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "normative-site-rules:14",
+      "anchor": "normative-site-rules",
+      "ordinal": 14,
+      "text": "[pkgdown build_site](https://pkgdown.r-lib.org/reference/build_site.html) distinguishes\nlocal destination from development-site subdirectories. Support default/explicit\nrelease mode initially. Non-default development mode, development.destination,\nor workflow PKGDOWN_DEV_MODE overrides make the site stage incomplete before\ncomparison until versioned fixtures establish their mapping. Top-level destination\nis a local build path, never an automatic public-URL suffix. Publication transforms\nremain unsupported. Add explicit fixtures for these configurations.",
+      "sha256": "37939d0f413dbd175a3c3472c2920d543175226b25a3f919936b60d7ff12d023",
+      "inventory_ids": [
+        "S08"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "example-stage:1",
+      "anchor": "example-stage",
+      "ordinal": 1,
+      "text": "## Example stage",
+      "sha256": "039848a6ea631bae1161bece9163c5421a1ab517626c866db9b4bbaedf2d3d90",
+      "inventory_ids": [
+        "E01",
+        "E02",
+        "E03",
+        "E10",
+        "R01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "example-stage:2",
+      "anchor": "example-stage",
+      "ordinal": 2,
+      "text": "Scope: explicit R fences/chunks in root `README.md`, `README.Rmd`, and\n`README.qmd`. Each eligible execution document uses a fresh `Rscript --vanilla`\nsession, subject to the source-selection rules below. Vignettes, unlabeled\nfences, Python, plots, and semantic prose claims\nare outside A2.",
+      "sha256": "9c76f2d0152644782fb77ba64f557e487ffb66381158c2590921da21fff119f2",
+      "inventory_ids": [
+        "E01",
+        "E02",
+        "E03",
+        "E10",
+        "R01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "readme-source-selection-and-setup:1",
+      "anchor": "readme-source-selection-and-setup",
+      "ordinal": 1,
+      "text": "### README source selection and setup",
+      "sha256": "c6a71f0a080ff0f3ae09578f23b9a152c528741bfe2cd86fc0c53a4c10f95d6a",
+      "inventory_ids": [
+        "E01",
+        "E02",
+        "E03",
+        "E04",
+        "E05",
+        "E06",
+        "E07",
+        "E08",
+        "E10",
+        "R01",
+        "R02",
+        "R03"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "readme-source-selection-and-setup:2",
+      "anchor": "readme-source-selection-and-setup",
+      "ordinal": 2,
+      "text": "If exactly one README source (`README.Rmd` or `README.qmd`) coexists with\n`README.md`, prefer that source and do not independently replay the rendered md.\nA2 compares only literal `#>` assertions already in the selected source; it does\nnot knit or pair source chunks with rendered output. Count rendered `#>` assertion\ngroups as unverified whenever md is not executed: source assertions cannot verify\nrendered counterparts without pairing. Any such count makes the stage incomplete,\nincluding when the source has no assertions. With no assertions in either file,\nthe stage is not-applicable and setup does not execute. Two coexisting sources are ambiguous:\nmark the stage incomplete and execute neither. With only md present, execute it\nas a standalone transcript and state that omitted setup cannot be reconstructed.\nAn object-not-found failure without source evidence is an incomplete replay\n(`examples-error` candidate), not proof that the published example is broken.",
+      "sha256": "3a78c76480b219c55b1858517361d4b8ca4dfcab8e65e672fbf5b1599c61a753",
+      "inventory_ids": [
+        "E01",
+        "E02",
+        "E03",
+        "E04",
+        "E05",
+        "E06",
+        "E07",
+        "E08",
+        "E10",
+        "R01",
+        "R02",
+        "R03"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "readme-source-selection-and-setup:3",
+      "anchor": "readme-source-selection-and-setup",
+      "ordinal": 3,
+      "text": "Report `rendered-unpaired` whenever rendered assertions remain unverified.\nA source with no eligible assertions plus asserted rendered output executes no\nR and exits 2 under either enabled threshold. A source with eligible assertions\nmay execute them, but cannot clear that incompleteness. This is an explicit\npartial-coverage limitation, not an info-only finding; neither an allowlist nor\n`--fail-on error` bypasses it. Source/render pairing remains a future scope change.",
+      "sha256": "1d2b4e7c9ee82b6e014c896377d1198eb2ce92a4b82f75d2e96f9efbe15b00d7",
+      "inventory_ids": [
+        "E01",
+        "E02",
+        "E03",
+        "E04",
+        "E05",
+        "E06",
+        "E07",
+        "E08",
+        "E10",
+        "R01",
+        "R02",
+        "R03"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "readme-source-selection-and-setup:4",
+      "anchor": "readme-source-selection-and-setup",
+      "ordinal": 4,
+      "text": "This deliberately narrows the archived per-file execution contract rather than\nintroducing a fragile source/render pairing system. Add a source/md fixture with\nhidden state creation: selected-source execution must retain that state, rendered\nmd must not be executed a second time, and source-without-assertions must report\nunsupported comparison coverage rather than clean examples.\nGlobal `knitr::opts_chunk$set()` and Quarto execute defaults affecting eval/include\nmust be resolved as supported literal values before execution. Dynamic defaults,\nchild documents, option templates and unsupported visibility/output overrides\nmake the file incomplete; do not infer effective options solely from each header.\nBody options override header options, consistent with knitr; repeated conflicting\nvalues at the same precedence are unsupported. Setup requiring knitr adds it to\nthe file's dependency preflight, never automatic installation.",
+      "sha256": "86481a4304d83ab5462e1c4c887884389e5e6ff6d845255c04051d7d78ae94a6",
+      "inventory_ids": [
+        "E01",
+        "E02",
+        "E03",
+        "E04",
+        "E05",
+        "E06",
+        "E07",
+        "E08",
+        "E10",
+        "R01",
+        "R02",
+        "R03"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "readme-source-selection-and-setup:5",
+      "anchor": "readme-source-selection-and-setup",
+      "ordinal": 5,
+      "text": "Reference: [knitr chunk options](https://yihui.org/knitr/options/) establishes that\ninclude=false still evaluates code while omitting it from output, and that body\noptions override headers. A2's conservative subset is not a full knitr renderer.",
+      "sha256": "b139b54dec6461fa0277f627a1d87c959d4560d26e25b5185feb95b61794dbe0",
+      "inventory_ids": [
+        "E01",
+        "E02",
+        "E03",
+        "E04",
+        "E05",
+        "E06",
+        "E07",
+        "E08",
+        "E10",
+        "R01",
+        "R02",
+        "R03"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "readme-source-selection-and-setup:6",
+      "anchor": "readme-source-selection-and-setup",
+      "ordinal": 6,
+      "text": "Load the working tree with `pkgload::load_all()`; verify package path/version in\nthe report. Evaluate eligible chunks in document order, preserving setup state.\nUse `evaluate` and shipped `lib/r/docexamples.R`; missing Rscript, pkgload,\nevaluate, or required package dependencies is unavailable/incomplete. Do not\nsubstitute an installed package. Do not install dependencies.",
+      "sha256": "6fe2c0b6110ad165e7daa6c99b5fde898171219d7e195071e810e8d9db7eee19",
+      "inventory_ids": [
+        "E01",
+        "E02",
+        "E03",
+        "E04",
+        "E05",
+        "E06",
+        "E07",
+        "E08",
+        "E10",
+        "R01",
+        "R02",
+        "R03"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "readme-source-selection-and-setup:7",
+      "anchor": "readme-source-selection-and-setup",
+      "ordinal": 7,
+      "text": "Honor `eval: false`/`eval=FALSE` as non-execution. `include: false`/`include=FALSE`\nexecutes setup but supplies no visible output assertions; this intentionally\nrefines the archived instruction to skip hidden chunks, which would lose state.\nRecognize `# docs-check: skip`, preceding `<!-- docs-check: skip -->`, and\n`#| docs-check: skip`. Skip installation chunks; this is a convenience filter,\nnot a security sandbox. Unknown dynamic chunk options are explicitly unsupported.",
+      "sha256": "aba265b5379aa04b1d259444c8a5ca1dee3e105ad43033bdcfbf38bc15f62fcc",
+      "inventory_ids": [
+        "E01",
+        "E02",
+        "E03",
+        "E04",
+        "E05",
+        "E06",
+        "E07",
+        "E08",
+        "E10",
+        "R01",
+        "R02",
+        "R03"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "readme-source-selection-and-setup:8",
+      "anchor": "readme-source-selection-and-setup",
+      "ordinal": 8,
+      "text": "Use a dedicated executable-chunk extractor returning file/line spans, engine,\nliteral options, skip reason, expressions and associated `#>` output lines.\nSupport closed backtick/tilde fences labeled `r` or `{r ...}` only. Support literal\nboolean eval/include options from the Rmd header and Quarto `#|` lines under the\nprecedence rules above; unsupported dynamic values prevent execution. A preceding\nHTML skip marker must be the immediately preceding nonblank line. Unterminated\nR fences are incomplete and never executed. Installation detection must inspect\ncode tokens rather than comments/strings; it is not a sandbox guarantee.",
+      "sha256": "77a478f04ab49ca7e1087b635f5c08ce7430683a62c4dfca4b7c025bf38989b8",
+      "inventory_ids": [
+        "E01",
+        "E02",
+        "E03",
+        "E04",
+        "E05",
+        "E06",
+        "E07",
+        "E08",
+        "E10",
+        "R01",
+        "R02",
+        "R03"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "literal-options:1",
+      "anchor": "literal-options",
+      "ordinal": 1,
+      "text": "### Literal options",
+      "sha256": "655ec2f9807f389975787517f2db6112acd8724bed094e691e0789707ad4ee65",
+      "inventory_ids": [
+        "E05",
+        "E06",
+        "E07",
+        "R04"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "literal-options:2",
+      "anchor": "literal-options",
+      "ordinal": 2,
+      "text": "Support eval/include/echo/warning/message as literal booleans, results as markup\nor hide, collapse as a literal boolean, comment as literal `#>`, and error=FALSE\nwith stop-on-error semantics. Source echo controls display only. Include/results/\nwarning/message control eligible channels; hidden assertions are counted as\nexplicitly excluded. Unassociated output is incomplete. Plain chunk labels and\nengine identifiers are metadata. Every other execution/rendering option, literal\nor dynamic, is unsupported/incomplete before execution, including error=TRUE,\nnumeric error options and figure options. List unsupported options; never mistake\nan intentional error example for a broken example by silently ignoring error=TRUE.\nThe same subset applies to effective global defaults. This conservative subset\nis a proposed scope choice grounded in knitr's documented visibility semantics.",
+      "sha256": "d31d9cff71527b53a84486e78a02d93bae81fec98c8b1fc193aa5cfd8106e8d9",
+      "inventory_ids": [
+        "E05",
+        "E06",
+        "E07",
+        "R04"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:1",
+      "anchor": "output-comparison",
+      "ordinal": 1,
+      "text": "### Output comparison",
+      "sha256": "eb39ce4a41a5ec6bd72caa0961b386008f834bb05d108ec894ed6208b247240e",
+      "inventory_ids": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "R04"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:2",
+      "anchor": "output-comparison",
+      "ordinal": 2,
+      "text": "Only line-leading `#>` comments represent pasted output. Parse expression/output\nassociation conservatively; compare an ordered documented subsequence without\nreusing actual output tokens. Ambiguous alignment emits `examples-shape` (warn),\nnot a numeric error. Capture stdout, conditions, and output separately. Force\nUTF-8 and width 80; report R/package versions and normalization policy.",
+      "sha256": "308691da41c6bb8b85bec46ae4bee0b17bed121b7939bb64c373cb5141f28c53",
+      "inventory_ids": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "R04"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:3",
+      "anchor": "output-comparison",
+      "ordinal": 3,
+      "text": "Normalize whitespace. Numeric comparison uses one unit in the last documented\ndigit, including scientific notation; preserve signs, percentages, NA/NaN/Inf,\ninequality direction, and labels. Do not normalize unrelated numbers into a\nmatch. Formatting/token-shape differences remain warn. `examples-output` is\nwarn in the initial A2 release, subject to the promotion gate below.\nRNG calls without an earlier explicit seed make comparisons info; absence of\nrecognized RNG calls is not proof of determinism. Package-internal randomness\nand unstable output must be triaged before an error gate is claimed reliable.",
+      "sha256": "baa7758bf292d67f09bbf62d49f6ebd108d6ca2232a0da7ec99f2c8c4d979c8f",
+      "inventory_ids": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "R04"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:4",
+      "anchor": "output-comparison",
+      "ordinal": 4,
+      "text": "Alignment requires the same expression, an identical nonnumeric skeleton and\nequal numeric-token count (except the explicitly supported inequality form).\nSubsequence matching may omit undocumented expressions, never labels or values\nwithin a documented assertion. Warnings/messages are separate assertions;\ntimestamps, versions and unstable format fields are not numeric error candidates.\nThere is no automatic proof of determinism. A2 initially emits `examples-output`\nas warn; promoting it to error requires a separately approved revision after\nhold-out/replay validation. This explicitly revises the archived D7 error default;\nno per-package severity configuration is added in A2.\nUse decimal-string arithmetic with an inclusive tolerance: a documented decimal\nwith k fractional digits and exponent e has tolerance 10^(e-k), with e=0 when\nabsent. Thus 1e-04 has tolerance 0.0001, while 1.00e-04 has tolerance 0.000001.\nApply tolerance only to equality assertions; inequalities use the literal strict\nor non-strict bound without rounding tolerance. This policy measures agreement\nwith displayed precision, not full numerical accuracy.",
+      "sha256": "d5c3ddb4b9bc9eb499fa338f78437b76d169becc39d98bd72c7e6d309897735c",
+      "inventory_ids": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "R04"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:5",
+      "anchor": "output-comparison",
+      "ordinal": 5,
+      "text": "| Documented | Actual (same labeled assertion) | Verdict |",
+      "sha256": "a6bd40ffcb91696a88faf050968ac0f6b6e36cc79b90d49921837f6cd51e5a4e",
+      "inventory_ids": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "R04"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:6",
+      "anchor": "output-comparison",
+      "ordinal": 6,
+      "text": "| `0.19` | `0.1900` | match |",
+      "sha256": "ade25c14230540c0856ccc68cc4ba37796ca0cf77c4e3c4c761041db522bb0cd",
+      "inventory_ids": [
+        "N01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:7",
+      "anchor": "output-comparison",
+      "ordinal": 7,
+      "text": "| `0.19` | `0.20` | match at inclusive 0.01 boundary |",
+      "sha256": "d255d23695c83047a8af20f76077525221eeb8339cd8308f6cc23d1cb6c43c2d",
+      "inventory_ids": [
+        "N01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:8",
+      "anchor": "output-comparison",
+      "ordinal": 8,
+      "text": "| `0.19` | `0.2001` | examples-output warn |",
+      "sha256": "20d3156a353d969320b9ace92c18ec4dc054a2e87931493dc01dbad7e885f029",
+      "inventory_ids": [
+        "N01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:9",
+      "anchor": "output-comparison",
+      "ordinal": 9,
+      "text": "| `0.164` | `0.1648` | match within 0.001 |",
+      "sha256": "9a3d577f5a378ab9531cab5c264dff2e5e39bd97a21262a82d1e661d2c068f3d",
+      "inventory_ids": [
+        "N01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:10",
+      "anchor": "output-comparison",
+      "ordinal": 10,
+      "text": "| `0.19` | `0.164` | examples-output warn |",
+      "sha256": "1b384d00fd0b55f52193980d9a20324fac628f45b9562852c59bf64f3aefe299",
+      "inventory_ids": [
+        "N01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:11",
+      "anchor": "output-comparison",
+      "ordinal": 11,
+      "text": "| `1e-04` | `0.0001` | match |",
+      "sha256": "d226f7a5bd2282dca883d0ce65f3d4a6f89f5e234b710fa1e8850483caf57265",
+      "inventory_ids": [
+        "N01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:12",
+      "anchor": "output-comparison",
+      "ordinal": 12,
+      "text": "| `p < 0.001` | `p = 2.2e-16` | match by explicit p-value inequality rule |",
+      "sha256": "0658b57aa109f4f95b5c716431ffe80dc365832561d2ac8dfb76fd598fecb8bd",
+      "inventory_ids": [
+        "N02"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:13",
+      "anchor": "output-comparison",
+      "ordinal": 13,
+      "text": "| `p < 0.001` | `p = 0.002` | examples-output warn |",
+      "sha256": "cbacc07dba32fd786f97686404694ba64b7bd2dccc8eb3a2cc4434ade5dac1a6",
+      "inventory_ids": [
+        "N02"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:14",
+      "anchor": "output-comparison",
+      "ordinal": 14,
+      "text": "| `55%` | `36 %` | examples-output warn (percent unit preserved) |",
+      "sha256": "dbae23e7abda211640b088772ccb41d4fe0b8ef81a0244ce89e0f41885d0ecb2",
+      "inventory_ids": [
+        "N01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:15",
+      "anchor": "output-comparison",
+      "ordinal": 15,
+      "text": "| `55%` | `0.55` | examples-shape warn; no implicit percent conversion |",
+      "sha256": "b9e4399eedd3ff0bf9007d2a1a8b68f73462e6acc70998e76d4b7ec44ed2ea82",
+      "inventory_ids": [
+        "N01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:16",
+      "anchor": "output-comparison",
+      "ordinal": 16,
+      "text": "| `1,234` | `1234` | examples-shape warn; no guessed grouping convention |",
+      "sha256": "e83f8839e412e0a83e19f7706d73eac0462c43b8f479a9fc46944ef554053f3a",
+      "inventory_ids": [
+        "N01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:17",
+      "anchor": "output-comparison",
+      "ordinal": 17,
+      "text": "| `NA` | `NA` | match; NA, NaN and signed Inf otherwise require exact token identity |",
+      "sha256": "eb1b4f89ce6898e5b820e30760c4e13cd9b4deada86ac79725ca90907c580b76",
+      "inventory_ids": [
+        "N01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:18",
+      "anchor": "output-comparison",
+      "ordinal": 18,
+      "text": "Unseeded/uncertain stochastic assertions remain info and count as unverified,\nnot matched. Output mismatch is a completed comparison; lost output, ambiguous\nexpression association or blocked execution makes the stage incomplete.",
+      "sha256": "1a9a2f501bccdc984ccbaf873310cf0b877fac07362ce0dfec2ffc236c78f119",
+      "inventory_ids": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "R04"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "output-comparison:19",
+      "anchor": "output-comparison",
+      "ordinal": 19,
+      "text": "For the same labeled assertion, `p < 0.001` versus `p < 2e-16` matches because the\nactual upper bound implies the documented bound. Weaker or opposite inequality\nbounds are unverified/shape-warn and incomplete, not guessed contradictions.\nBare `<2e-16` without the matching label is outside alignment.",
+      "sha256": "18009a8ee684bd18ef69f135b9ae305349aa87a32abb9ef1c5c0d1adfe3d070a",
+      "inventory_ids": [
+        "N01",
+        "N02",
+        "N03",
+        "N04",
+        "N05",
+        "R04"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "coverage-accounting:1",
+      "anchor": "coverage-accounting",
+      "ordinal": 1,
+      "text": "### Coverage accounting",
+      "sha256": "5b22c1a91f41890cb9ca8f717f2b8640ed0124712cdfb4d9213230cd2499cf9b",
+      "inventory_ids": [
+        "C05",
+        "E02",
+        "E09",
+        "E10",
+        "E11"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "coverage-accounting:2",
+      "anchor": "coverage-accounting",
+      "ordinal": 2,
+      "text": "Coverage counts partition discovered assertion groups into checked, explicitly\nexcluded, unverified and blocked groups; matched/mismatched are subdivisions of\nchecked. Literal visibility exclusions, eval=false and explicit skip markers\nare excluded with reasons, not verified. Excluded-only documents are\nnot-applicable with counts; mixed checked/excluded coverage may complete.\nUnsupported options, uncertain assertions and unexecuted rendered assertions\nare unverified and make the stage incomplete. Execution failure makes affected\ngroups blocked and the stage incomplete. No eligible assertions means setup\ndoes not execute. Report the selected-source and rendered counts separately.\nSkip markers and eval/visibility rules define execution/comparison exclusions,\nnot `docs.allowlist` suppression. No minimum checked fraction is imposed: complete\nmeans the declared eligible scope finished, not that every published assertion\nwas verified. Always show all four partition counts in the stage headline and\nJSON, including under `--detailed`; never describe excluded groups as passed.\nTest a one-checked/many-excluded fixture and an excluded-only fixture. Fixture\nrelease gates require nonzero checked assertions for their clean/planted cases,\nindependently of this user-document exclusion policy.",
+      "sha256": "875801f7914b466286a79c21f3ce3cf6d91d78ae5f9d373741995fa8af846b27",
+      "inventory_ids": [
+        "C05",
+        "E02",
+        "E09",
+        "E10",
+        "E11"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "execution-limits-and-reporting:1",
+      "anchor": "execution-limits-and-reporting",
+      "ordinal": 1,
+      "text": "### Execution limits and reporting",
+      "sha256": "0612d54bdc6546df963c9d09704a0946d045534db84702f62bf46cef490fbdbd",
+      "inventory_ids": [
+        "G01",
+        "G02",
+        "G05",
+        "G06",
+        "G08",
+        "I04",
+        "I05",
+        "R05",
+        "R07",
+        "R08",
+        "R09",
+        "R10",
+        "R11"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "execution-limits-and-reporting:2",
+      "anchor": "execution-limits-and-reporting",
+      "ordinal": 2,
+      "text": "On execution failure emit one `examples-error` (warn), stop the file, and mark\nremaining chunks blocked with counts. Do not generate downstream failure spam.\nTimeout terminates the file session and marks it incomplete. Proposed limits:\n60 seconds per chunk and 300 seconds per file, with external process termination\nas the hard backstop. A blocking native call must not evade the file deadline.\nAdd `--examples-budget-seconds` (positive integer, default 300; requires\n`--run-examples`) as the total example-stage deadline across all packages/files,\nincluding engine startup and loading. Use the minimum of remaining global,\nfile and chunk limits. Terminate the owned process group on timeout (POSIX),\nwith a tested Windows process-tree strategy or explicit unavailable diagnostic.\nDo not reuse `_invoke_r` unchanged: its timeout does not guarantee descendant\ncleanup or partial output recovery. Completed chunk results are checkpointed\nin temporary structured files and included in the final report; no stdout JSON\nstreaming. Remaining packages/files are explicitly budget-blocked. The command\nhost must allow this deadline plus cleanup/report overhead; shorter host limits\nrequire a smaller flag value or a supported background invocation, never a\nclaim of complete results after host termination.\nBefore loading and before every chunk, the R runner atomically writes a\nsequence-numbered phase-start checkpoint identifying the file/chunk. The parent\nobtains the guardian's armed deadline/start timestamp and acknowledges each\ncheckpoint before the runner may enter that phase; sequence numbers prevent\noverwritten or stale acknowledgements. Do not restart timing on parent receipt.\nPoll every 100 ms while active; report observed enforcement delay rather than\npromise a scheduler-independent 100 ms maximum.\nThe parent enforces the 60-second chunk limit by requesting guardian termination,\nincluding for blocked native calls. Loading is a separate phase covered by the\nfile/global deadline. Completion checkpoints are atomic; malformed/partial or\nmissing checkpoints mean incomplete and never successful comparison.",
+      "sha256": "ef6e21b216f23df74ec2e4d88e5eed118c152322b7a90bd67e0693bbe39904b4",
+      "inventory_ids": [
+        "G01",
+        "G02",
+        "G05",
+        "G06",
+        "G08",
+        "I04",
+        "I05",
+        "R05",
+        "R07",
+        "R08",
+        "R09",
+        "R10",
+        "R11"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "execution-limits-and-reporting:3",
+      "anchor": "execution-limits-and-reporting",
+      "ordinal": 3,
+      "text": "The slash-command wrapper must configure a process lifetime longer than the\nrequested budget plus cleanup/report overhead, or pass a smaller budget with\nat least 15 seconds reserved for cleanup/reporting. A host's poll/yield interval\nis not a process timeout. If lifetime support is unknown, recommend the terminal\ninvocation instead of launching execution with an assumed safe deadline. Keep\n300 seconds as the standalone CLI default. Before launching R, stderr announces\nthe scope,\nbudget and started stage; flush phase/coverage progress there without contaminating\nJSON stdout. Controlled timeout returns the complete partial-result envelope.\nExternal host kill cannot guarantee a final report: report it as interrupted,\nnever interpret missing stdout as clean or claim checkpoint recovery succeeded.",
+      "sha256": "68941035f22228722bfc562ad39a2f7b875e88405cee2e758817cb2d3dc284f6",
+      "inventory_ids": [
+        "G01",
+        "G02",
+        "G05",
+        "G06",
+        "G08",
+        "I04",
+        "I05",
+        "R05",
+        "R07",
+        "R08",
+        "R09",
+        "R10",
+        "R11"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "execution-limits-and-reporting:4",
+      "anchor": "execution-limits-and-reporting",
+      "ordinal": 4,
+      "text": "Run from a temporary working directory, preserve access to package data, and\nclean temporary artifacts. This reduces accidental writes but is not isolation:\narbitrary R/package code can write elsewhere or use the network. The command\nmust describe execution clearly. Orchestrator execution remains recommend-only;\nexplicit user invocation authorizes it. Never claim this stage is read-only.",
+      "sha256": "dde9c29871456ed7e407f15e43b95476e3781e7dcd0d01f375d4ac59559e0042",
+      "inventory_ids": [
+        "G01",
+        "G02",
+        "G05",
+        "G06",
+        "G08",
+        "I04",
+        "I05",
+        "R05",
+        "R07",
+        "R08",
+        "R09",
+        "R10",
+        "R11"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "process-supervision-and-stdio:1",
+      "anchor": "process-supervision-and-stdio",
+      "ordinal": 1,
+      "text": "### Process supervision and stdio",
+      "sha256": "f6dd9ba39737bf20e843bad94ccdc4ffbdbccee2366a4c992c332b4f72e72d3d",
+      "inventory_ids": [
+        "G01",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "process-supervision-and-stdio:2",
+      "anchor": "process-supervision-and-stdio",
+      "ordinal": 2,
+      "text": "The existing `lib/rcmd.py#_invoke_r` uses subprocess.run/communicate; it does not\nitself exhibit the proposed polling-loop undrained-pipe bug. A2 must use separate\ntemporary stdout/stderr files and distinct structured evaluate checkpoints.\nRetain at most 1 MiB of diagnostics per stream; abort as incomplete when combined\ncaptured textual output exceeds the 10 MiB threshold defined below (report\nobserved polling overshoot).\nTest native/child output over 64 KiB that bypasses evaluate; child output never\ncontaminates JSON stdout.",
+      "sha256": "cc018b14c44aa55b8bde77bd3eef59c73da34901883ea3a8186de1ef28e32267",
+      "inventory_ids": [
+        "G01",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "process-supervision-and-stdio:3",
+      "anchor": "process-supervision-and-stdio",
+      "ordinal": 3,
+      "text": "Use an independent Python stdlib guardian outside the R process group. It\nlaunches and reaps its direct R child; the parent reaps the guardian on normal\ncompletion. Observe group disappearance separately; do not claim to reap\ngrandchildren. Cleanup is successful only when observed. Normal shutdown closes\nhandles; guardian failure or unverifiable termination is incomplete.",
+      "sha256": "38640c5f2cf8f1b5bb235d57ddc2e2d89253188702b97888740eb34fab433adc",
+      "inventory_ids": [
+        "G01",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "process-supervision-and-stdio:4",
+      "anchor": "process-supervision-and-stdio",
+      "ordinal": 4,
+      "text": "Process-group termination covers cooperating descendants remaining in that\ngroup. Detached sessions/groups are outside this guarantee; this is not process\ncontainment. If the host kills both parent and guardian, no cleanup guarantee\nremains. A killed process cannot report completion: the wrapper labels missing\ncompletion as interrupted. Print the temporary run-directory/run ID at startup;\nkeep an atomic lifecycle marker there (started/completed/interrupted and last\nphase) for inspection while it survives. Total host termination cannot guarantee\nmarker updates or temporary-file cleanup. Do not add automatic stale PID killing\nor claim that a later invocation reconstructs the lost report.",
+      "sha256": "51a098aef82d8fb94e3437ca91d9e476bbf8ff2d9606f6a6ce087b312f9b6918",
+      "inventory_ids": [
+        "G01",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "process-supervision-and-stdio:5",
+      "anchor": "process-supervision-and-stdio",
+      "ordinal": 5,
+      "text": "Test parent termination while the guardian survives, ordinary child cleanup,\nguardian failure, large-output handling and the documented detached-process\nlimit. The acceptance fixture must clean up its own deliberately detached child.\nThese are required implementation tests, not outcomes verified in this session.",
+      "sha256": "89735a5da2e34718004c8854817ac01b4bbb9cb7d9bce6233c71536d035d1bce",
+      "inventory_ids": [
+        "G01",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "process-supervision-and-stdio:6",
+      "anchor": "process-supervision-and-stdio",
+      "ordinal": 6,
+      "text": "The 10 MiB output threshold is one shared total of stdout bytes, stderr bytes\nand UTF-8 structured evaluate text payload bytes. It is detected by polling,\nnot a hard storage limit. Count each captured payload once across cumulative\ncheckpoints, excluding serialization metadata; do not echo evaluate output to\nthe native capture files. If a mirror is nevertheless captured, its bytes also\ncount. For example 1 MiB stdout + 2 MiB stderr + 3 MiB evaluate text totals\n6 MiB, not three independent allowances. It does not bound\narbitrary package filesystem writes, plots or memory. Report truncation and\nobserved overshoot; exceeding the cap remains incomplete.",
+      "sha256": "4e9e057ecf2612896df6e851d97f6d8998dc366d5c3c8d876f968c99acfe65e9",
+      "inventory_ids": [
+        "G01",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "guardian-protocol-and-deadline-ownership:1",
+      "anchor": "guardian-protocol-and-deadline-ownership",
+      "ordinal": 1,
+      "text": "### Guardian protocol and deadline ownership",
+      "sha256": "723aa9ac74b8e233a84c2ab2eead083eadcbab95cf768138d97b9706c28a155d",
+      "inventory_ids": [
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "G10",
+        "I02",
+        "I03",
+        "I04",
+        "I05"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "guardian-protocol-and-deadline-ownership:2",
+      "anchor": "guardian-protocol-and-deadline-ownership",
+      "ordinal": 2,
+      "text": "The guardian is the sole normal termination owner and direct\nR parent. The Python parent handles reports and phase requests. Only observed\nguardian failure permits emergency parent-owned group termination; report that\nrun incomplete even if cleanup succeeds. Parent-first termination with a later\nguardian deadline is rejected because it adds a second kill authority and shifts\nthe advertised global deadline.",
+      "sha256": "bc83d415af0665ef2f1cce09e6ad31c68fb8a0b99e1b5be0aeaa313ce2df450e",
+      "inventory_ids": [
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "G10",
+        "I02",
+        "I03",
+        "I04",
+        "I05"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "guardian-protocol-and-deadline-ownership:3",
+      "anchor": "guardian-protocol-and-deadline-ownership",
+      "ordinal": 3,
+      "text": "Parent and guardian use Python `time.monotonic_ns()` on the same host with Python\n3.10 or newer; record `get_clock_info('monotonic')`. Python documents a shared clock\nacross processes, including macOS from 3.10. Budgets measure that clock, not a\nwall-time promise across machine suspend. A heartbeat lapse can classify a host\nstall as interruption; it must not emit a package-output defect.",
+      "sha256": "2543e5c485450a70e4fa5db1e3aed254b42c518b8444a3ab9839aaf62510bfb7",
+      "inventory_ids": [
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "G10",
+        "I02",
+        "I03",
+        "I04",
+        "I05"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "guardian-protocol-and-deadline-ownership:4",
+      "anchor": "guardian-protocol-and-deadline-ownership",
+      "ordinal": 4,
+      "text": "Use atomic run-ID/sequence-numbered files in the private run directory for\nparent heartbeat (updated at least once per second), phase arm/ack, termination\nrequests and guardian status. The guardian measures heartbeat age from the last\nnew sequence it observes; stale timestamps cannot refresh it. No heartbeat\nfor 5 seconds, or the absolute global deadline, triggers termination, whichever\ncomes first. Neither event resets the deadline. Retain final complete checkpoints\nuntil report assembly; guardian shutdown must not delete them before the parent\nreads them. Partial/malformed records never verify an assertion.",
+      "sha256": "50ff66e74e7a9069c824273c66e24292eea81213e22eae48190c1686e6aaf03f",
+      "inventory_ids": [
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "G10",
+        "I02",
+        "I03",
+        "I04",
+        "I05"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "guardian-protocol-and-deadline-ownership:5",
+      "anchor": "guardian-protocol-and-deadline-ownership",
+      "ordinal": 5,
+      "text": "| State/event | Required action/evidence |",
+      "sha256": "8179df1af2c910b37b03016760cb9cffc003ee49cee067bdf6c8431affe5dbfc",
+      "inventory_ids": [
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "G10",
+        "I02",
+        "I03",
+        "I04",
+        "I05"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "guardian-protocol-and-deadline-ownership:6",
+      "anchor": "guardian-protocol-and-deadline-ownership",
+      "ordinal": 6,
+      "text": "| Startup | Establish global deadline before engine preflight/startup; arm guardian before R runs package code. Expired budget means no launch. |",
+      "sha256": "621edf8ba7f5511402ced23e4cd163fc583ec8166b009603321e41f30f63f6d7",
+      "inventory_ids": [
+        "G01"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "guardian-protocol-and-deadline-ownership:7",
+      "anchor": "guardian-protocol-and-deadline-ownership",
+      "ordinal": 7,
+      "text": "| Loading/chunk arm | Parent sends file/phase identity and remaining limits. Guardian records effective absolute deadline = minimum of global, file and (for chunks) its phase start + 60 seconds; guardian acknowledges, then parent releases R. No acknowledgement means no phase execution. |",
+      "sha256": "9727421117f1f4ea15d387070eaee4d87a5cad76ef9b08a4fa4472675531f719",
+      "inventory_ids": [
+        "G02",
+        "R07",
+        "R08",
+        "R09"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "guardian-protocol-and-deadline-ownership:8",
+      "anchor": "guardian-protocol-and-deadline-ownership",
+      "ordinal": 8,
+      "text": "| Deadline/request/output excess | Guardian records a termination ID, reason, phase and observed monotonic time before TERM; duplicate requests are idempotent. Parent may request but never independently signal a healthy guardian's group. |",
+      "sha256": "821ca67a402d18491a4e4fdc25f6012a0ae44d82af77bd01c9cf590ce80f4baf",
+      "inventory_ids": [
+        "G04"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "guardian-protocol-and-deadline-ownership:9",
+      "anchor": "guardian-protocol-and-deadline-ownership",
+      "ordinal": 9,
+      "text": "| Terminating | TERM immediately when the triggering event is observed; KILL after at most 2 seconds if necessary, then wait at most 5 seconds for direct-child exit/group disappearance. Record actual delay and cleanup observations. |",
+      "sha256": "2abafc30ab908e89dda6d22d88ca6d8578357ac9b7bb8ee546e2b5cffc729cab",
+      "inventory_ids": [
+        "G06"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "guardian-protocol-and-deadline-ownership:10",
+      "anchor": "guardian-protocol-and-deadline-ownership",
+      "ordinal": 10,
+      "text": "| Completion/deadline collision | Guardian processes expired effective deadlines before accepting success. Completion accepted before the deadline retains its results; completion at/after it cannot certify the phase. Record which event won rather than infer from R's signal/exit code. |",
+      "sha256": "ced17cb72c4e00590ca0bd0d16ba7b50f1677cfff257cdd173d9ffbf287daf36",
+      "inventory_ids": [
+        "G05"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "guardian-protocol-and-deadline-ownership:11",
+      "anchor": "guardian-protocol-and-deadline-ownership",
+      "ordinal": 11,
+      "text": "| Finalization | Parent reads guardian terminal status and valid checkpoints, marks remaining assertions blocked and assembles one partial envelope. Missing/failed terminal status is incomplete. Reap guardian; bounded report assembly has a 5-second allowance. |",
+      "sha256": "ab83f582a8172bbdee7d9a6cac94deac6544fb556195caae297e08f5074706c0",
+      "inventory_ids": [
+        "G08",
+        "I04",
+        "I05"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "guardian-protocol-and-deadline-ownership:12",
+      "anchor": "guardian-protocol-and-deadline-ownership",
+      "ordinal": 12,
+      "text": "The wrapper's 15-second reserve covers 2 seconds termination grace, 5 seconds\ncleanup, 5 seconds report assembly and overhead. Failure to assemble in that\nallowance is interrupted/incomplete; a killed host cannot guarantee a report.\nGuardian also monitors capture sizes and checkpoint text totals; parent loss\ncannot disable output-threshold detection while the guardian survives. Polling\nand scheduling delay is measured, never represented as a hard storage or\nscheduler-independent execution bound. Detached-process and total-host-kill\nlimitations remain unchanged. Deadline-collision, heartbeat-lapse, lost-ack,\nrapid-transition, checkpoint-retention and guardian-failure cases are mandatory\nmanifest tests, including tests of reason attribution.",
+      "sha256": "5f71ecc22d961f1012d1254f098b8e662afbe7b3ed063f9887cc959e307a6983",
+      "inventory_ids": [
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "G10",
+        "I02",
+        "I03",
+        "I04",
+        "I05"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "guardian-protocol-and-deadline-ownership:13",
+      "anchor": "guardian-protocol-and-deadline-ownership",
+      "ordinal": 13,
+      "text": "Reference: [Python monotonic clock](https://docs.python.org/3/library/time.html#time.monotonic).",
+      "sha256": "d76cfc2ff0977e41f57125fa74c27a7d44a963413ef5bc84115e335081fce28d",
+      "inventory_ids": [
+        "G10"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "architecture-and-suppression:1",
+      "anchor": "architecture-and-suppression",
+      "ordinal": 1,
+      "text": "## Architecture and suppression",
+      "sha256": "a0677b2752da20f661d76f2dc2b5e0e6f71c503c7a02161f63ddfd41435d8a44",
+      "inventory_ids": [
+        "C03",
+        "C06",
+        "C07",
+        "D01",
+        "D02"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "architecture-and-suppression:2",
+      "anchor": "architecture-and-suppression",
+      "ordinal": 2,
+      "text": "Keep `lib.docaudit` as the public facade; place site and execution internals in\nseparate private modules if that avoids expanding its existing scanner. Keep\nR code in `lib/r/docexamples.R`, using existing runner conventions and bounded\nsubprocess calls. No new public module or mandatory Python dependency.",
+      "sha256": "38abd24b787ab0f6533b537eb647825e129b73b34ac6f85a3390035e5759a189",
+      "inventory_ids": [
+        "C03",
+        "C06",
+        "C07",
+        "D01",
+        "D02"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "architecture-and-suppression:3",
+      "anchor": "architecture-and-suppression",
+      "ordinal": 3,
+      "text": "Preserve existing finding keys and add stage metadata, rather than replacing\nthe A1 schema. Reuse `docs.allowlist` source-relative suppression for attributable\nfindings; suppression never authorizes execution or conceals incomplete stages.\nSite-only extra URLs have no source file: report them as stage info outside the\nfile allowlist. Document that exception explicitly.",
+      "sha256": "57e963e910dc75340be248f9cbb678d39efe8d81917f8dab9ae7f4b15dcad7d7",
+      "inventory_ids": [
+        "C03",
+        "C06",
+        "C07",
+        "D01",
+        "D02"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "architecture-and-suppression:4",
+      "anchor": "architecture-and-suppression",
+      "ordinal": 4,
+      "text": "Package engine_missing lists are sorted unique engine identifiers; ecosystem\nengine_missing is their sorted union. Preserve each package's list and stage\nreasons in package entries. Add mixed-package missing-engine aggregation tests:\nthe existing `lib/docaudit.py#audit` currently hardcodes an empty aggregate list.",
+      "sha256": "57f16ca055481861977d48758adf40a98098d95b8d211373c7fdb2962f6c28d7",
+      "inventory_ids": [
+        "C03",
+        "C06",
+        "C07",
+        "D01",
+        "D02"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "verification-and-release-acceptance:1",
+      "anchor": "verification-and-release-acceptance",
+      "ordinal": 1,
+      "text": "## Verification and release acceptance",
+      "sha256": "79b6c056218f67882c22fc4756f1d1cdf5b8ab27bcbf565c198a05332a10cd27",
+      "inventory_ids": [
+        "C01",
+        "C04",
+        "C05",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "N01",
+        "N02",
+        "R06",
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06",
+        "V08",
+        "H01",
+        "H02",
+        "H03",
+        "F01",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "verification-and-release-acceptance:2",
+      "anchor": "verification-and-release-acceptance",
+      "ordinal": 2,
+      "text": "- Test default-threshold diagnostics in text and JSON for missing Rscript,\n  offline site, and mixed successful/failed ecosystem stages. Scope stays first,\n  JSON stays parseable, stderr is explicit, exit 0 remains intentional.\n- Test origin mismatch, cross-origin redirect rejection, mixed/zero in-base URLs,\n  source `url:` disagreement, workflow ambiguity, and actual supported route\n  fixtures. No unsupported configuration may yield complete coverage.\n- Test overall budget exhaustion across multiple files/packages, checkpoint\n  recovery, and process-tree cleanup with a spawned child. Test the normative\n  comparison table, extractor options/line mapping and no-output non-execution.",
+      "sha256": "91a5723e53968c07b248d83f8dfccb19ea839013d4bf29337e060e78ac65f37e",
+      "inventory_ids": [
+        "C01",
+        "C04",
+        "C05",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "N01",
+        "N02",
+        "R06",
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06",
+        "V08",
+        "H01",
+        "H02",
+        "H03",
+        "F01",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "verification-and-release-acceptance:3",
+      "anchor": "verification-and-release-acceptance",
+      "ordinal": 3,
+      "text": "- A1 fixtures and default reports remain unchanged when neither flag is used;\n  default execution invokes neither R nor network.\n- Site fixtures cover subdirectory URLs, trailing slashes, XML namespaces,\n  invalid/index/oversized sitemaps, redirect handling, ambiguous workflows,\n  missing refs, pkgdown exclusions/custom layout, internal topics, and checkout\n  ahead of deployment source. A missing selected-ref page remains warn.\n- A real local HTTP server plus throwaway git history verifies ref-derived route\n  comparison end to end. A separately recorded real-package live-site smoke test\n  verifies integration; transient network failure blocks claiming smoke success.\n- Real R fixture execution verifies setup sharing, hidden setup, eval=false,\n  all skip markers, local versus installed package, upstream failure attribution,\n  file/chunk deadlines, numeric normalization, and a planted stale output.\n  A clean counterpart must produce zero unexplained A2 warn/error findings and\n  complete eligible coverage. Missing-engine tests always run;\n  In portable developer suites only, R-dependent tests may skip when unavailable,\n  never counted passed. Required release-manifest tests cannot skip.\n- Re-run A2-owned defect-manifest rows and record caught/eligible/pending counts.\n  Resolve the historic missing-page case against its actual deployment ref;\n  if that history is unavailable locally, use committed provenance-backed source\n  and sitemap excerpts for the regression and mark the real-history run pending.\n  Do not claim the live historical deployment was reproduced from those excerpts.\n  Checkout-only pages are unreleased info; selected-ref routes absent from the\n  sitemap remain warn. Neither result proves deployment freshness or an HTTP 404.\n- Record and triage every A2 finding on medfit, probmed, and medrobust. Any\n  unresolved A2 warn/error false-positive class blocks release until corrected\n  or explicitly scoped out with honest incomplete coverage;\n  missed planted defects, raised exceptions, or failed integration smoke tests\n  block release. A numeric match does not verify the underlying statistical claim.\n- Verify stale-output and missing-route fixtures produce the expected warn and\n  exit 1 with `--fail-on warn`; `--fail-on error` intentionally does not fail\n  solely on completed A2 warnings. Incomplete stages still exit 2 with either\n  enabled threshold. Preserve A1 error behavior and gates independently.\n- Required final gates: `bash tests/test-all.sh`, `python3 -m pytest tests/`,\n  version/reference/command-doc sync gates, and `mkdocs build --strict` in the\n  supported development environment, plus the A2 release verifier on both\n  declared release platforms below. Inspect rendered changed guide/tutorial\n  content. Report exact pass/skip counts; do not substitute a build for review.",
+      "sha256": "675882e52a4ba96b1b1282b9987fbf253ee1d0dd2ba832bc0b33a129dbd0d1d1",
+      "inventory_ids": [
+        "C01",
+        "C04",
+        "C05",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "N01",
+        "N02",
+        "R06",
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06",
+        "V08",
+        "H01",
+        "H02",
+        "H03",
+        "F01",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "required-evidence:1",
+      "anchor": "required-evidence",
+      "ordinal": 1,
+      "text": "### Required evidence",
+      "sha256": "3c5f5031c1ba6e1509710140bd3abe5796b54fea120c05e1147df1119b7a71f1",
+      "inventory_ids": [
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06",
+        "V07",
+        "V08",
+        "H01",
+        "H02",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "required-evidence:2",
+      "anchor": "required-evidence",
+      "ordinal": 2,
+      "text": "R skips are acceptable only for portable developer suites. A2 release requires\na committed required-test manifest listing node IDs for real-R setup/source\nselection, clean/planted output, chunk/global deadlines, guardian parent-loss,\nordinary group-child cleanup, large native output and CLI exit cases, plus\nacknowledgement loss, rapid phase transitions, deadline collision, guardian\nfailure, unchanged global deadline after parent loss, output-cap accounting/\novershoot and mixed-package engine aggregation; also local HTTP and pinned\nroute fixtures. Every normative acceptance requirement must map to manifest\nnode IDs on both release platforms, including the existing agent-boundary,\nskip/visibility, malformed-output and unsupported-configuration cases. A release\nverifier must confirm every listed test was collected and passed, with no\nmissing, skipped, xfailed or\nxpassed entries and nonzero executed R/site counts. Missing Rscript/pkgload/\nevaluate/fixture dependencies fails release preflight. General pytest/test-all\nsuccess is insufficient; provisioning the release job/host is an implementation\ntask. The existing CI does not yet supply this A2 evidence.",
+      "sha256": "b71515b18b03b75d89d5a42501a26120c427d4880dfb6b8add13b74f04195a92",
+      "inventory_ids": [
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06",
+        "V07",
+        "V08",
+        "H01",
+        "H02",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "required-evidence:3",
+      "anchor": "required-evidence",
+      "ordinal": 3,
+      "text": "“Unexplained” is mechanical: fixture findings must exactly match a committed\nexpected-findings manifest by check, severity, source and assertion ID. Clean\nfixtures expect zero A2 findings and complete coverage. Unsupported fixtures\nassert precise incomplete states/counts. Planted fixtures expect the named warn\nand cannot pass through allowlists, skips or zero checked assertions. Manifest\nchanges require review. Real-package triage does not waive fixture assertions.",
+      "sha256": "b17563e4c621979ad584a35f35a2ed51f1ab2969cbe52559bd5d89dbdd80c8e3",
+      "inventory_ids": [
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06",
+        "V07",
+        "V08",
+        "H01",
+        "H02",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "required-evidence:4",
+      "anchor": "required-evidence",
+      "ordinal": 4,
+      "text": "Required release-manifest entries must all pass on both declared POSIX release\nplatforms: Ubuntu 24.04 and macOS 14, using the latest stable Python 3 selected\nby CI (3.x, check-latest enabled, prereleases disabled). Each artifact records\nthe exact interpreter used; Python must be a final 3.10-or-newer release. The\nfixture lock retains exact R/pkgload/evaluate/knitr/pkgdown versions, resolved\nbefore implementation acceptance; unpinned R/dependency runs cannot establish\nthis compatibility contract.\nOther POSIX platforms are unverified until equivalent evidence exists.\nWindows must either pass its own process-tree acceptance suite\nor report example execution unavailable; it must not silently inherit POSIX\ncleanup claims. A skipped Windows suite cannot substitute for required POSIX\nevidence. Source/render pairing remains explicitly deferred: successful source\nreplay alone cannot certify published README output.",
+      "sha256": "5c253344890ebb025ec687f2187530f934ca1a2176f3b29682be48f6d3434063",
+      "inventory_ids": [
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06",
+        "V07",
+        "V08",
+        "H01",
+        "H02",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "User-authorized 2026-10-23 Python policy amendment; same inventory owners and all non-Python obligations retained."
+    },
+    {
+      "id": "release-verifier-ownership-and-evidence:1",
+      "anchor": "release-verifier-ownership-and-evidence",
+      "ordinal": 1,
+      "text": "### Release verifier ownership and evidence",
+      "sha256": "f7089716e2fe8fedf5b365cab27d75f7bce832a82c2b3353d29a32edf3b58c37",
+      "inventory_ids": [
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06",
+        "V08",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "release-verifier-ownership-and-evidence:2",
+      "anchor": "release-verifier-ownership-and-evidence",
+      "ordinal": 2,
+      "text": "Implementation must add a dedicated `a2-release` job in `.github/workflows/ci.yml`\non Ubuntu 24.04 and macOS 14/latest stable Python 3. It provisions locked R/fixture dependencies,\nruns the committed manifest and invokes a proposed\n`scripts/verify_a2_release.py` against machine-readable pytest results. These\npaths/job names are planned artifacts, not files created by this revision.\nThe feature implementer owns provisioning, manifest-to-contract mapping and\nverifier tests; the release owner checks both platform results before release.",
+      "sha256": "90ce83fb1834de1773d80ed32bc44cd9322e46d276fd263c1b0d6c8f8e118877",
+      "inventory_ids": [
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06",
+        "V08",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "User-authorized 2026-10-23 Python policy amendment; same inventory owners and all non-Python obligations retained."
+    },
+    {
+      "id": "release-verifier-ownership-and-evidence:3",
+      "anchor": "release-verifier-ownership-and-evidence",
+      "ordinal": 3,
+      "text": "Proposed manifest: `tests/a2/required.json`, with contract IDs, concrete test node\nIDs, platform obligations and locked fixture versions. Every normative acceptance\nrequirement in this spec must have a mapped row; a reviewed coverage inventory\nmust reconcile that mapping before implementation acceptance. No missing, skipped,\nxfail/xpass or failed required node may pass the verifier. Verify collection and\noutcomes separately, reject an empty manifest/results set, and require nonzero\nreal-R checked assertions and local-HTTP comparisons on each platform.\nClean/planted rows retain exact warning expectations and threshold exit cases;\nthey cannot satisfy the gate with incomplete or zero-checked execution.\nUnsupported/no-assertion fixtures instead assert their named incomplete or\nnot-applicable states and counts; they never substitute for clean/planted rows.",
+      "sha256": "0aef69bb82083d6e296396582de28ec96d9493c794a74703b1989a572a674da4",
+      "inventory_ids": [
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06",
+        "V08",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "release-verifier-ownership-and-evidence:4",
+      "anchor": "release-verifier-ownership-and-evidence",
+      "ordinal": 4,
+      "text": "Publish per-platform evidence as CI artifacts named `a2-release-evidence`: source\nSHA, manifest/fixture-lock hashes, OS/Python/R/package versions, collection and\npass/skip counts by contract, pytest results, verifier result and smoke reports.\nBoth platform artifacts must identify the candidate commit. Upload failure or\nmissing evidence prevents claiming release acceptance. Test the verifier with\nmissing/skip/xfail/xpass/empty-result and wrong-commit evidence, not only a green\ncase. Existing generic pytest/test-all CI and dependency-based S7 skips do not\nsupply this evidence. No release job, verifier, R execution or smoke test was\nimplemented or run during this specification validation.",
+      "sha256": "d91f18ad2bbb0f9bf60d94afb9764027a4b30e3300734536c77399b879b2850f",
+      "inventory_ids": [
+        "V01",
+        "V02",
+        "V03",
+        "V04",
+        "V05",
+        "V06",
+        "V08",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "documentation-and-boundaries:1",
+      "anchor": "documentation-and-boundaries",
+      "ordinal": 1,
+      "text": "## Documentation and boundaries",
+      "sha256": "d66b0016747b2347515a89ab495fa4d99c678f696bda9176561073f0c6367912",
+      "inventory_ids": [
+        "D01",
+        "D02",
+        "D03",
+        "D04",
+        "D05",
+        "A01",
+        "A02",
+        "A03",
+        "A04"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "documentation-and-boundaries:2",
+      "anchor": "documentation-and-boundaries",
+      "ordinal": 2,
+      "text": "Update command frontmatter/Usage, docs/commands.md, docs/guides/docs-audit.md,\ndocs:check tutorial, REFCARD, command cards, relevant workflows, orchestrator\nrecipe/prohibition and guard tests, generated docaudit reference, CHANGELOG,\nand status. Search all shipped references for the current “no R/no network”\npromise. Mirror CLAUDE.md to AGENTS.md if project guidance changes. Add the R\nscript shipping/parse gate; update check counts only if checks are added.",
+      "sha256": "c4c31f814e3f1251081d068ffba2172d1d8ee4744a3d4e7320ee37cfe33480e4",
+      "inventory_ids": [
+        "D01",
+        "D02",
+        "D03",
+        "D04",
+        "D05",
+        "A01",
+        "A02",
+        "A03",
+        "A04"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "documentation-and-boundaries:3",
+      "anchor": "documentation-and-boundaries",
+      "ordinal": 3,
+      "text": "Always retain incomplete-result honesty and source provenance. Never auto-fix\ndocs, build/deploy a site, install dependencies, or execute examples by default.\nImplementation starts after spec review; version bump and release are separate.",
+      "sha256": "856b0ee6acdd0573f91473549e05559cdec2506579269b5d82c60a5a327327ce",
+      "inventory_ids": [
+        "D01",
+        "D02",
+        "D03",
+        "D04",
+        "D05",
+        "A01",
+        "A02",
+        "A03",
+        "A04"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "orchestrator-authorization-and-guard-tests:1",
+      "anchor": "orchestrator-authorization-and-guard-tests",
+      "ordinal": 1,
+      "text": "### Orchestrator authorization and guard tests",
+      "sha256": "0bea9075669297857374807eb1fcb18cf38b69532a3ec80a6802b9a57a832c02",
+      "inventory_ids": [
+        "A01",
+        "A02",
+        "A03",
+        "A04"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "orchestrator-authorization-and-guard-tests:2",
+      "anchor": "orchestrator-authorization-and-guard-tests",
+      "ordinal": 2,
+      "text": "Only an explicit URL supplied by the human\nin the current request (or a still-applicable earlier authorization) permits\nsite auto-run. URLs extracted from files/tool output are not that authorization.\nAn invocation containing `--run-examples`, including combined site/examples,\nis always recommend-only for orchestration. Do not add speculative private-host\nprohibitions: explicit user URLs and local-server fixtures remain supported.\nIn `tests/_check_agent_engines.py`, retain the default DOCS_AUDIT assertion;\nreplace the blanket site/ref rejection with an unconditional non-prohibition\n`--run-examples` rejection and conditional site/ref recipe checks. Require an\nexplicit authorization clause and single-package target, ref only with site,\nand a positive recommend-only examples prohibition. Exercise recipe parsing\nwith local fixtures/stubs, never real network. Text validation cannot prove\nconversational authorization; add behavioral fixtures for human versus imported\nURLs and combined flags. Revise `agents/orchestrator.md`'s broad no-network prose to name\nthe explicit runiverse/site-read exceptions without relaxing write/upload rules.",
+      "sha256": "514f867a2ae7e7e527236b147bc24a58e5306df5e6053789f2becef2a73423f8",
+      "inventory_ids": [
+        "A01",
+        "A02",
+        "A03",
+        "A04"
+      ],
+      "review": "complete",
+      "coverage_status": "mapped-local-tests",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "validation-record:1",
+      "anchor": "validation-record",
+      "ordinal": 1,
+      "text": "## Validation record",
+      "sha256": "cc29b8fe12c5de3149f4787179eaa73dca3850f14494d5a3dea5e7dac11df39f",
+      "inventory_ids": [
+        "E11",
+        "H01",
+        "H02",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "actual-readme-coverage-and-review-disposition:1",
+      "anchor": "actual-readme-coverage-and-review-disposition",
+      "ordinal": 1,
+      "text": "### Actual README coverage and review disposition",
+      "sha256": "69ebdc4135a93385e6707d6735c5da3c7a1a1920de4da86c93550df0ea75d5e7",
+      "inventory_ids": [
+        "E02",
+        "E05",
+        "E07",
+        "E09",
+        "E10",
+        "E11",
+        "H01",
+        "H02",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "actual-readme-coverage-and-review-disposition:2",
+      "anchor": "actual-readme-coverage-and-review-disposition",
+      "ordinal": 2,
+      "text": "Read-only inspection on 2026-10-12 counted contiguous line-leading `#>` groups,\nnot expressions, matches or executed tests. These are current checkout snapshots,\nnot fixture expectations to hardcode forever.",
+      "sha256": "0f2ee2db8707e78f8a1aa61ed8e0901e8a5f5becc20462cd937337fb2e2c8af1",
+      "inventory_ids": [
+        "E02",
+        "E05",
+        "E07",
+        "E09",
+        "E10",
+        "E11",
+        "H01",
+        "H02",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "actual-readme-coverage-and-review-disposition:3",
+      "anchor": "actual-readme-coverage-and-review-disposition",
+      "ordinal": 3,
+      "text": "| Package/file | All groups | Groups inside explicit R fences | Consequence under the proposed scope |",
+      "sha256": "83b59384895e005c8ba22de6fa1ba53704083b16dd1bc65ca31f765ddc4bfa88",
+      "inventory_ids": [
+        "E02",
+        "E05",
+        "E07",
+        "E09",
+        "E10",
+        "E11",
+        "H01",
+        "H02",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "actual-readme-coverage-and-review-disposition:4",
+      "anchor": "actual-readme-coverage-and-review-disposition",
+      "ordinal": 4,
+      "text": "| medfit/README.md | 6 | 4 | Four groups are extraction candidates; two in separate unlabeled output fences remain unverified. Runtime comparability is untested. |",
+      "sha256": "0eb5e2c8d09f9ccfedbd169bd1f4cb11f9a3ef4f325fff88c2f83c13d4c6a5fc",
+      "inventory_ids": [
+        "E11",
+        "H02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "actual-readme-coverage-and-review-disposition:5",
+      "anchor": "actual-readme-coverage-and-review-disposition",
+      "ordinal": 5,
+      "text": "| probmed/README.qmd | 1 | 1 | Literal assertions do exist at line 130. Hidden setup at lines 10–19 includes unsupported fig.path/out.width defaults, so preflight prevents source execution until scope changes. |",
+      "sha256": "56ac27e9f8f68d48c78da59e42a6e3576afc66f8ff84e93c08ac4a0d051b2101",
+      "inventory_ids": [
+        "E07",
+        "E11",
+        "H02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "actual-readme-coverage-and-review-disposition:6",
+      "anchor": "actual-readme-coverage-and-review-disposition",
+      "ordinal": 6,
+      "text": "| probmed/README.md | 1 | 1 | Rendered assertion group at line 118 remains rendered-unpaired; it is not independently replayed. |",
+      "sha256": "ce1481c376b9265b351611cd4f28f1c8ee58295e1f3956acc2432c07970beb47",
+      "inventory_ids": [
+        "E02",
+        "E11",
+        "H02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "actual-readme-coverage-and-review-disposition:7",
+      "anchor": "actual-readme-coverage-and-review-disposition",
+      "ordinal": 7,
+      "text": "| medrobust/README.md | 0 | 0 | No #> assertions; not-applicable. Its unprefixed Quick Start output is outside the comparison contract and is not certified. |",
+      "sha256": "338e33dbaaa2ec79ed7dab6c41edd2f046bc055d6050a1966dfdc000d5c068ed",
+      "inventory_ids": [
+        "E10",
+        "E11",
+        "H02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "actual-readme-coverage-and-review-disposition:8",
+      "anchor": "actual-readme-coverage-and-review-disposition",
+      "ordinal": 8,
+      "text": "The revision 5 Claude review's blanket source-layout/no-execution claim is\nrejected; the conditional\nsource-without-assertions case is confirmed. In particular probmed is not missing\nsource assertions. Its actual blockers are unsupported options and rendered\ncoverage. Do not downgrade either blocker to info to produce a green threshold.\nThe partial scope remains explicit; this revision does not introduce pairing,\nfigure-option support or unlabeled-output association. During implementation,\nrecord discovered/eligible/checked/excluded/unverified/blocked counts and reason\ncodes on all three packages, with source SHA or content hashes. Never infer\nexecuted coverage from this dry count. All-zero execution across eligible\nsupported fixtures blocks release; medrobust's deliberate no-assertion scope\ndoes not create an invented positive-coverage requirement for that package.",
+      "sha256": "c33569f993034882d023acc53444bc97c63ef99a55b0934ee753a7304ba9ae88",
+      "inventory_ids": [
+        "E02",
+        "E05",
+        "E07",
+        "E09",
+        "E10",
+        "E11",
+        "H01",
+        "H02",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "actual-readme-coverage-and-review-disposition:9",
+      "anchor": "actual-readme-coverage-and-review-disposition",
+      "ordinal": 9,
+      "text": "The other review findings are confirmed specification gaps: release-manifest\ncoverage/ownership, normal termination ownership, exclusion presentation,\nshared-output accounting and the stray unreleased-page sentence. A minimum\nuser-document coverage percentage and a hard filesystem output limit are not\nadopted: exclusions remain intentional and polling overshoot remains reported.\nThese are explicit choices, not demonstrated runtime defects.",
+      "sha256": "7278962b76bace855d0283019e74192b3297bc535855738ca8d967fce63f5750",
+      "inventory_ids": [
+        "E02",
+        "E05",
+        "E07",
+        "E09",
+        "E10",
+        "E11",
+        "H01",
+        "H02",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "actual-readme-coverage-and-review-disposition:10",
+      "anchor": "actual-readme-coverage-and-review-disposition",
+      "ordinal": 10,
+      "text": "Owning sources checked: `tests/test_docaudit_scope.py` (default exit 0 and\nincomplete threshold exit 2), `tests/test_rcmd.py` (dependency-based R skips),\n`lib/rcmd.py#_invoke_r` (ordinary subprocess timeout), `.github/workflows/ci.yml`\n(Python-only generic gates), `lib/docaudit.py`, command/guide contracts, orchestrator and guard\ntests, the archived A2 design and the actual README files above. The raw revision\n5 review is retained in `REVIEW-docs-check-a2-r5-2026-10-12.md`; its findings are\nnot runtime evidence. Earlier review narratives are superseded by this\nconsolidated contract. No A2 runtime, release verifier or smoke test has run.",
+      "sha256": "dad3945f218cba4b7d3ae4627fdcd7f5de3b1a0476272ddbbe83151ae3bf27d1",
+      "inventory_ids": [
+        "E02",
+        "E05",
+        "E07",
+        "E09",
+        "E10",
+        "E11",
+        "H01",
+        "H02",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "approval-boundary-and-next-step:1",
+      "anchor": "approval-boundary-and-next-step",
+      "ordinal": 1,
+      "text": "## Approval boundary and next step",
+      "sha256": "d7e9bb738995dbd0f618d0b4de0eb34e6ac99f622544f237ec4d6305a93c43db",
+      "inventory_ids": [
+        "C01",
+        "E02",
+        "S07",
+        "N05",
+        "A03",
+        "D05",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "approval-boundary-and-next-step:2",
+      "anchor": "approval-boundary-and-next-step",
+      "ordinal": 2,
+      "text": "The final proposal recommends the scoped site audit and conservative README\nreplay defined above, warn-only initial discrepancies, guardian-owned lifecycle,\nand mandatory Linux/macOS release evidence. Source/render pairing, unlabeled\noutput association, figure options, ecosystem site URLs, development-site layouts\nand full rendering remain deferred. Incompleteness must stay visible; no claim\nof comprehensive published README verification is permitted.",
+      "sha256": "0d03a92a35cd85ad30a8f8901bcde8dcfe32fe38f2f54ed7fc8179219b86d112",
+      "inventory_ids": [
+        "C01",
+        "E02",
+        "S07",
+        "N05",
+        "A03",
+        "D05",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    },
+    {
+      "id": "approval-boundary-and-next-step:3",
+      "anchor": "approval-boundary-and-next-step",
+      "ordinal": 3,
+      "text": "Review the implementation plan and acceptance-test inventory next. After explicit implementation\nauthorization, create the implementation worktree and realize that inventory,\nthen follow shared reporting → site → examples → integration. Acceptance evidence\nis required before release; proposal finalization neither implements A2 nor\nclaims those gates passed. Revision 7 has not received a new Claude review.",
+      "sha256": "6b7868dfad86f419fdca91e57180ffbe8d2acc4ba85edc52353a8640e46ddb1a",
+      "inventory_ids": [
+        "C01",
+        "E02",
+        "S07",
+        "N05",
+        "A03",
+        "D05",
+        "F02"
+      ],
+      "review": "complete",
+      "coverage_status": "gaps-pending",
+      "review_note": "Exact approved text retained; section and paragraph/table-row ownership reviewed. Inventory coverage gaps and external acceptance obligations remain independently blocking."
+    }
+  ],
+  "coverage_status": "ready",
+  "review_candidate": "702f28b plus group pin and atomic isolated launcher"
+}

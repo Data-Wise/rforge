@@ -1,0 +1,181 @@
+{
+  "ok": true,
+  "operation": "review",
+  "review_kind": "adversarial",
+  "subject_kind": "changes",
+  "subject_label": "working tree (staged, unstaged, and untracked)",
+  "subject_fingerprint": "f1290cefbd8a4eeaedc3e1cadddc6d4439ec4075c04a7991bb81516bd9164c2b",
+  "usage_summary": "Usage: tokens=203563 output=8947 turns=9 duration_ms=65697 api_ms=65036 cost_usd=0.20862170000000002",
+  "total_tokens": 203563,
+  "total_cost_usd": 0.20862170000000002,
+  "cumulative_chain_cost_usd": 0.20862170000000002,
+  "parent_job_id": null,
+  "num_turns": 9,
+  "duration_ms": 65697,
+  "duration_api_ms": 65036,
+  "task_profile": null,
+  "review_profile": "standard",
+  "requested_model": "sonnet",
+  "effective_models": [
+    "claude-sonnet-5-5"
+  ],
+  "effort": "medium",
+  "budget": {
+    "max_turns": 12,
+    "finalize_at_turn": 9,
+    "soft_budget_usd": 1,
+    "max_budget_usd": 1,
+    "timeout_ms": 240000
+  },
+  "evidence_lease": null,
+  "evidence_lease_exhausted": false,
+  "cost_budget_exhausted": false,
+  "turn_limit_reached": false,
+  "result": "{\"verdict\":\"needs-attention\",\"summary\":\"G08 is still open and blocks shipping the A2 emergency-kill path. The shared a2-platform.yml callers and the release aggregate look fail-closed on the files I read. The checkpoint and UTF-8 changes are sound as far as the new tests show, but I did not read the checkpoint parsing code. Pending manifest and actual platform evidence should not be treated as ready.\",\"findings\":[{\"severity\":\"high\",\"title\":\"G08 unresolved: parent emergency killpg(pid, SIGKILL) has no process-group lifetime pin\",\"body\":\"PROVEN from source: the parent calls os.killpg on a bare integer PID at lib/_docguardian.py lines 221 and 236. The only guards are `armed.run_id == run_id` and a ProcessLookupError catch. The run_id check only rejects stale armed.json files. It says nothing about whether the PID or group still belongs to our child.\\n\\nPath: the guardian exits or is killed (line 208 or 232) → terminal.json is missing or has a different run_id (line 214) → `armed['child_pid']` → `os.killpg(pid, SIGKILL)`.\\n\\nThe guardian reaps the group leader itself at line 143 (`process.wait`) and again at line 158. After that reap, the PID no longer reserves the group. Once every member of that group has also exited, the pgid can be reused by the kernel.\\n\\nTrigger: a guardian crash or kill between the line-143 reap and the `terminal.json` write at line 165. Examples are an `atomic()` failure inside the `finally` block, an OOM kill, or the line-208 kill at deadline+12s. The parent then SIGKILLs a recorded PID that may now lead an unrelated group.\\n\\nHYPOTHESIS, not reproduced: this needs a PID wrap inside the window. It is most plausible on macOS-14, where PIDs are capped at 99999. Surviving orphan grandchildren keep the group alive, so signalling is safe in that case. The unsafe case is a group that has already emptied.\\n\\nNo test covers PID reuse or a guardian crash between the reap and terminal.json.\",\"file\":\"lib/_docguardian.py\",\"line_start\":214,\"line_end\":238,\"confidence\":0.6,\"recommendation\":\"Pin the group lifetime. Have the parent start a small pin process as its direct child in its own group (`process_group=0`) and record its PID as the pgid. The guardian starts R with `process_group=pin_pid` (Python 3.11+, same session) instead of `start_new_session=True`. The parent reaps the pin only after the group is verified gone, with a bounded waitpid, so `killpg(pin_pid)` can never hit a reused group. Keep the existing SIGTERM, grace, SIGKILL sequence bounded by `deadline + 12*NS`. Weaker fallback: record the leader's start time in armed.json and verify `getpgid` plus a matching group member before signalling; this leaves a TOCTOU window. Also have the guardian use `waitid(WNOWAIT)` and write terminal.json before reaping the leader. Add a fault-injection test that kills the guardian after the reap and before terminal.json.\"},{\"severity\":\"low\",\"title\":\"UTF-8 clipping test only checks the upper bound\",\"body\":\"The production change at lib/_docexamples.py:255 clips by bytes and drops a partial leading character with `errors='ignore'`. That is correct and bounded. Invalid bytes become 3-byte U+FFFD characters and are then re-clipped to the last 1 MiB.\\n\\nThe new test only asserts `0 < len <= 1 MiB`. It does not check that the tail is kept, that no partial character is emitted, or that the final marker survives. A regression that kept the head instead of the tail would still pass. The earlier test at line 130 does assert the tail ending.\",\"file\":\"tests/a2/test_stdio.py\",\"line_start\":150,\"line_end\":162,\"confidence\":0.5,\"recommendation\":\"Assert that the output ends with the expected final bytes, that it round-trips as valid UTF-8, and that the first character is not a replacement character produced by a split sequence.\"},{\"severity\":\"low\",\"title\":\"Reusable-workflow refactor changes check names and adds an A2 matrix to every CI run\",\"body\":\"ci.yml now calls a2-platform.yml on every push and pull request. Required-check names change to the form `a2-release / A2 required evidence (<os>)`. Branch protection that pins the old a2-release.yml check names would stop matching.\\n\\nThis is not a fail-open issue. Release `aggregate` has `needs: a2-release`, so it is skipped if any matrix leg fails. scripts/verify_a2_aggregate.py (lines 19-27) requires both ubuntu-24.04 and macos-14 artifacts and fails on a missing one. The CI caller produces no `a2-acceptance-evidence`, so it cannot be mistaken for release evidence.\",\"file\":\".github/workflows/ci.yml\",\"line_start\":15,\"line_end\":16,\"confidence\":0.4,\"recommendation\":\"Confirm the required-check names in branch protection after the refactor, and decide whether running the full A2 matrix on every push and pull request is intended.\"}],\"next_steps\":[\"Implement the pgid pin, or at least the start-time verification, in lib/_docguardian.py.\",\"Add a test that kills the guardian after the leader reap and before terminal.json, then asserts no signal reaches a substituted PID or group.\",\"Add tail-content assertions to the UTF-8 clipping test.\",\"Confirm the required-check names in branch protection after the workflow refactor.\"],\"coverage\":{\"files_examined\":[\".github/workflows/a2-platform.yml\",\".github/workflows/a2-release.yml\",\".github/workflows/ci.yml\",\"tests/a2/test_release_ci.py\",\"tests/a2/test_stdio.py\",\"lib/_docexamples.py (diff only)\",\"lib/_docguardian.py (lines 60-243)\",\"scripts/verify_a2_aggregate.py (grep only)\"],\"files_skipped\":[\"ACCEPTANCE-docs-check-a2-2026-10-12.md\",\"COVERAGE-docs-check-a2-2026-10-12.md\",\"TASKS-docs-check-a2-2026-10-12.md\",\"CHANGELOG.md\",\"docs/guides/docs-audit.md\",\"tests/a2/required.json\",\"tests/a2/requirements.json\",\"lib/_docexamples.py checkpoint-validation body\"],\"areas\":[\"G08 killpg lifetime pin and PID reuse\",\"checkpoint malformed/duplicate preservation (tests only)\",\"UTF-8 diagnostic clipping\",\"a2-platform.yml shared callers\",\"release aggregate fail-closed behavior\"]},\"uncertainty\":\"medium\",\"budget_exhausted\":false,\"recommended_followup\":{\"profile\":\"deep\",\"focus\":[\"lib/_docguardian.py: prototype the pgid pin and fault-inject a guardian crash after the leader reap on Linux and macOS\",\"verify deadlines still hold under the pin design\",\"read the checkpoint validation body in lib/_docexamples.py\"],\"reason\":\"The G08 PID-reuse race is inferred from source and not reproduced. The checkpoint implementation was reviewed only through its tests.\"}}",
+  "structured_output": {
+    "verdict": "needs-attention",
+    "summary": "G08 is still open and blocks shipping the A2 emergency-kill path. The shared a2-platform.yml callers and the release aggregate look fail-closed on the files I read. The checkpoint and UTF-8 changes are sound as far as the new tests show, but I did not read the checkpoint parsing code. Pending manifest and actual platform evidence should not be treated as ready.",
+    "findings": [
+      {
+        "severity": "high",
+        "title": "G08 unresolved: parent emergency killpg(pid, SIGKILL) has no process-group lifetime pin",
+        "body": "PROVEN from source: the parent calls os.killpg on a bare integer PID at lib/_docguardian.py lines 221 and 236. The only guards are `armed.run_id == run_id` and a ProcessLookupError catch. The run_id check only rejects stale armed.json files. It says nothing about whether the PID or group still belongs to our child.\n\nPath: the guardian exits or is killed (line 208 or 232) → terminal.json is missing or has a different run_id (line 214) → `armed['child_pid']` → `os.killpg(pid, SIGKILL)`.\n\nThe guardian reaps the group leader itself at line 143 (`process.wait`) and again at line 158. After that reap, the PID no longer reserves the group. Once every member of that group has also exited, the pgid can be reused by the kernel.\n\nTrigger: a guardian crash or kill between the line-143 reap and the `terminal.json` write at line 165. Examples are an `atomic()` failure inside the `finally` block, an OOM kill, or the line-208 kill at deadline+12s. The parent then SIGKILLs a recorded PID that may now lead an unrelated group.\n\nHYPOTHESIS, not reproduced: this needs a PID wrap inside the window. It is most plausible on macOS-14, where PIDs are capped at 99999. Surviving orphan grandchildren keep the group alive, so signalling is safe in that case. The unsafe case is a group that has already emptied.\n\nNo test covers PID reuse or a guardian crash between the reap and terminal.json.",
+        "file": "lib/_docguardian.py",
+        "line_start": 214,
+        "line_end": 238,
+        "confidence": 0.6,
+        "recommendation": "Pin the group lifetime. Have the parent start a small pin process as its direct child in its own group (`process_group=0`) and record its PID as the pgid. The guardian starts R with `process_group=pin_pid` (Python 3.11+, same session) instead of `start_new_session=True`. The parent reaps the pin only after the group is verified gone, with a bounded waitpid, so `killpg(pin_pid)` can never hit a reused group. Keep the existing SIGTERM, grace, SIGKILL sequence bounded by `deadline + 12*NS`. Weaker fallback: record the leader's start time in armed.json and verify `getpgid` plus a matching group member before signalling; this leaves a TOCTOU window. Also have the guardian use `waitid(WNOWAIT)` and write terminal.json before reaping the leader. Add a fault-injection test that kills the guardian after the reap and before terminal.json."
+      },
+      {
+        "severity": "low",
+        "title": "UTF-8 clipping test only checks the upper bound",
+        "body": "The production change at lib/_docexamples.py:255 clips by bytes and drops a partial leading character with `errors='ignore'`. That is correct and bounded. Invalid bytes become 3-byte U+FFFD characters and are then re-clipped to the last 1 MiB.\n\nThe new test only asserts `0 < len <= 1 MiB`. It does not check that the tail is kept, that no partial character is emitted, or that the final marker survives. A regression that kept the head instead of the tail would still pass. The earlier test at line 130 does assert the tail ending.",
+        "file": "tests/a2/test_stdio.py",
+        "line_start": 150,
+        "line_end": 162,
+        "confidence": 0.5,
+        "recommendation": "Assert that the output ends with the expected final bytes, that it round-trips as valid UTF-8, and that the first character is not a replacement character produced by a split sequence."
+      },
+      {
+        "severity": "low",
+        "title": "Reusable-workflow refactor changes check names and adds an A2 matrix to every CI run",
+        "body": "ci.yml now calls a2-platform.yml on every push and pull request. Required-check names change to the form `a2-release / A2 required evidence (<os>)`. Branch protection that pins the old a2-release.yml check names would stop matching.\n\nThis is not a fail-open issue. Release `aggregate` has `needs: a2-release`, so it is skipped if any matrix leg fails. scripts/verify_a2_aggregate.py (lines 19-27) requires both ubuntu-24.04 and macos-14 artifacts and fails on a missing one. The CI caller produces no `a2-acceptance-evidence`, so it cannot be mistaken for release evidence.",
+        "file": ".github/workflows/ci.yml",
+        "line_start": 15,
+        "line_end": 16,
+        "confidence": 0.4,
+        "recommendation": "Confirm the required-check names in branch protection after the refactor, and decide whether running the full A2 matrix on every push and pull request is intended."
+      }
+    ],
+    "next_steps": [
+      "Implement the pgid pin, or at least the start-time verification, in lib/_docguardian.py.",
+      "Add a test that kills the guardian after the leader reap and before terminal.json, then asserts no signal reaches a substituted PID or group.",
+      "Add tail-content assertions to the UTF-8 clipping test.",
+      "Confirm the required-check names in branch protection after the workflow refactor."
+    ],
+    "coverage": {
+      "files_examined": [
+        ".github/workflows/a2-platform.yml",
+        ".github/workflows/a2-release.yml",
+        ".github/workflows/ci.yml",
+        "tests/a2/test_release_ci.py",
+        "tests/a2/test_stdio.py",
+        "lib/_docexamples.py (diff only)",
+        "lib/_docguardian.py (lines 60-243)",
+        "scripts/verify_a2_aggregate.py (grep only)"
+      ],
+      "files_skipped": [
+        "ACCEPTANCE-docs-check-a2-2026-10-12.md",
+        "COVERAGE-docs-check-a2-2026-10-12.md",
+        "TASKS-docs-check-a2-2026-10-12.md",
+        "CHANGELOG.md",
+        "docs/guides/docs-audit.md",
+        "tests/a2/required.json",
+        "tests/a2/requirements.json",
+        "lib/_docexamples.py checkpoint-validation body"
+      ],
+      "areas": [
+        "G08 killpg lifetime pin and PID reuse",
+        "checkpoint malformed/duplicate preservation (tests only)",
+        "UTF-8 diagnostic clipping",
+        "a2-platform.yml shared callers",
+        "release aggregate fail-closed behavior"
+      ]
+    },
+    "uncertainty": "medium",
+    "budget_exhausted": false,
+    "recommended_followup": {
+      "profile": "deep",
+      "focus": [
+        "lib/_docguardian.py: prototype the pgid pin and fault-inject a guardian crash after the leader reap on Linux and macOS",
+        "verify deadlines still hold under the pin design",
+        "read the checkpoint validation body in lib/_docexamples.py"
+      ],
+      "reason": "The G08 PID-reuse race is inferred from source and not reproduced. The checkpoint implementation was reviewed only through its tests."
+    }
+  },
+  "session_id": "7c796082-fca3-4883-93d4-002b8746b918",
+  "resume_hint": "claude --resume 7c796082-fca3-4883-93d4-002b8746b918",
+  "disclosure": null,
+  "usage": {
+    "input_tokens": 1165,
+    "cache_creation_input_tokens": 24994,
+    "cache_read_input_tokens": 168457,
+    "output_tokens": 8947,
+    "output_tokens_details": {
+      "thinking_tokens": 2673
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 24994,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 4,
+        "output_tokens": 62,
+        "cache_read_input_tokens": 31398,
+        "cache_creation_input_tokens": 2588,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 2588
+        },
+        "type": "message"
+      },
+      {
+        "input_tokens": 1151,
+        "output_tokens": 2607,
+        "cache_read_input_tokens": 33986,
+        "cache_creation_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 1165,
+      "outputTokens": 8947,
+      "cacheReadInputTokens": 168457,
+      "cacheCreationInputTokens": 24994,
+      "webSearchRequests": 0,
+      "costUSD": 0.20862170000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 2673,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  }
+}

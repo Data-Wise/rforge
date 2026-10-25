@@ -258,3 +258,13 @@ flowchart LR
 - **[Tutorials](../tutorials/README.md)** — step-by-step versions of every workflow above
 - **[REFCARD](../REFCARD.md)** — all {{ rforge.command_count }} commands on one page
 - **[Architecture](../architecture.md)** — how the plugin's internals fit together
+
+### Optional site and README stages
+
+The default docs audit remains static. A single-package `--site URL [--ref REF]`
+reads its sitemap without crawling or deploying. `--run-examples` executes
+partial README coverage and always needs human authorization; the orchestrator
+recommends it, including combined site/examples runs. Prefer the terminal when
+the wrapper lifetime is unknown; reserve 15 seconds beyond the example budget.
+Use `--fail-on warn` to gate completed A2 warnings; either enabled threshold
+blocks incomplete stages with exit 2.

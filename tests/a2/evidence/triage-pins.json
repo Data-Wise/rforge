@@ -1,0 +1,12 @@
+{
+  "repos": {
+    "medfit": "https://github.com/Data-Wise/medfit",
+    "probmed": "https://github.com/Data-Wise/probmed",
+    "medrobust": "https://github.com/Data-Wise/medrobust"
+  },
+  "commits": {
+    "medfit": "2951b28a51a9a6c70d64b89cd8481a49bfa95859",
+    "probmed": "af38d09dcf08697599c0edd65a20073175dae668",
+    "medrobust": "349771647b7798ef8e36f7512fb2a38b7eaabbc1"
+  }
+}

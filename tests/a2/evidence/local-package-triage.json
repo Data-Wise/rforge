@@ -1,0 +1,171 @@
+{
+  "status": "not-release-verified",
+  "scope": "Actual local package runs; candidate has uncommitted changes; no remote platform claim",
+  "implementation_sha256": {
+    "lib/_docexamples.py": "6c8d8c64585aec523541a857b4b6cf411d15fbf2afa32afe3ffac80e15459bcf",
+    "lib/r/docexamples.R": "7810725e7616ac4fec234d6346e3be9b5f3bc8587e3068b4abfdcafd6b0bb470",
+    "lib/_docguardian.py": "e30e30ff420b94e86dc3a154e9ba94f3349626852ac693ffd28fab6d4e807ace"
+  },
+  "records": [
+    {
+      "package": "medfit",
+      "path": "<local-r-packages>/medfit",
+      "source_sha256": {
+        "README.md": "a7161fc9a18b01d3d3dde1747c2b6d9e0ebaac0e4ed452a9e63a16f0db5c50f0"
+      },
+      "budget_seconds": 20,
+      "report": {
+        "state": "incomplete",
+        "counts": {
+          "discovered": 6,
+          "eligible": 4,
+          "checked": 2,
+          "excluded": 0,
+          "unverified": 4,
+          "blocked": 0,
+          "matched": 2,
+          "mismatched": 0
+        },
+        "reasons": [
+          "standalone markdown: omitted setup cannot be reconstructed",
+          "assertions outside supported R fences"
+        ],
+        "engine_missing": [],
+        "findings": [
+          {
+            "check": "examples-shape",
+            "severity": "warn",
+            "file": "README.md",
+            "line": 85,
+            "assertion_id": "README.md:85",
+            "message": "documented output comparison: shape"
+          },
+          {
+            "check": "examples-shape",
+            "severity": "warn",
+            "file": "README.md",
+            "line": 97,
+            "assertion_id": "README.md:97",
+            "message": "documented output comparison: shape"
+          }
+        ],
+        "provenance": {
+          "source": "README.md",
+          "package_path": "<local-r-packages>/medfit",
+          "normalization": "UTF-8 width 80; decimal displayed-precision tolerance",
+          "coverage_sources": {
+            "README.md": {
+              "discovered": 6,
+              "selection": "selected"
+            }
+          },
+          "exclusions": [],
+          "lifecycle": {
+            "run_id": "fe0fd2263d3043e9b9614056521805cf",
+            "armed_ns": 13315405017083,
+            "global_deadline_ns": 13335380408500,
+            "guardian_pid": 89911,
+            "effective_deadline_ns": 13335380408500,
+            "reason": "completed",
+            "direct_child_reaped": true,
+            "kill_sent": false,
+            "phase": "segment-9",
+            "child_pid": 89912,
+            "completed_ns": 13318018813791,
+            "returncode": 0,
+            "group_disappeared": true
+          },
+          "versions": {
+            "R": "4.6.1",
+            "pkgload": "1.5.3",
+            "evaluate": "1.0.5",
+            "S7": "0.2.2",
+            "stats": "4.6.1",
+            "methods": "4.6.1",
+            "checkmate": "2.3.4",
+            "generics": "0.1.4",
+            "lifecycle": "1.0.5",
+            "MASS": "7.3.66",
+            "nloptr": "2.2.1"
+          },
+          "package": {
+            "path": "<local-r-packages>/medfit",
+            "name": "medfit",
+            "version": "0.8.0"
+          },
+          "stdout": "",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "package": "probmed",
+      "path": "<local-r-packages>/probmed",
+      "source_sha256": {
+        "README.md": "57ddc9060f7d4947e4d5161a3e6c8baab97f2801980531254f4f28c4e94e638d",
+        "README.qmd": "3b058a67d0b5ab14f817d3307e77cf591c719c70910e0d20b84953b948c96d88"
+      },
+      "budget_seconds": 20,
+      "report": {
+        "state": "incomplete",
+        "counts": {
+          "discovered": 2,
+          "eligible": 1,
+          "checked": 0,
+          "excluded": 0,
+          "unverified": 2,
+          "blocked": 0,
+          "matched": 0,
+          "mismatched": 0
+        },
+        "reasons": [
+          "rendered-unpaired",
+          "unsupported option fig.path: \"man/figures/README-\"; unsupported option out.width: \"100%\""
+        ],
+        "engine_missing": [],
+        "findings": [],
+        "provenance": {
+          "source": "README.qmd",
+          "package_path": "<local-r-packages>/probmed",
+          "normalization": "UTF-8 width 80; decimal displayed-precision tolerance",
+          "coverage_sources": {
+            "README.qmd": {
+              "discovered": 1,
+              "selection": "selected"
+            },
+            "README.md": {
+              "discovered": 1,
+              "selection": "rendered-unpaired"
+            }
+          },
+          "exclusions": []
+        }
+      }
+    },
+    {
+      "package": "medrobust",
+      "path": "<local-r-packages>/medrobust",
+      "source_sha256": {
+        "README.md": "1cb8a79fe66a023c620ee65326df105e8d93ade07476162c966319ed80fd89f0"
+      },
+      "budget_seconds": 20,
+      "report": {
+        "state": "not-applicable",
+        "counts": {
+          "discovered": 0,
+          "eligible": 0,
+          "checked": 0,
+          "excluded": 0,
+          "unverified": 0,
+          "blocked": 0,
+          "matched": 0,
+          "mismatched": 0
+        },
+        "reasons": [],
+        "engine_missing": [],
+        "findings": [],
+        "provenance": {}
+      }
+    }
+  ]
+}
