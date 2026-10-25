@@ -382,7 +382,7 @@ Now that you're set up, explore:
 ```
 
 The docs audit prints its scope on the first line and `checked N of M` at the end; a report ending in
-`INCOMPLETE` or `NOT AUDITED` is not clean. See [Fix a docs:check finding](tutorials/fix-a-docs-check-finding.md).
+`INCOMPLETE` or `NOT AUDITED` is not clean. Optional `--site URL [--ref REF]` checks one sitemap; `--run-examples` replays partial README assertions using package code. Use `--fail-on warn` for A2 discrepancies; both enabled gates block incomplete stages. See [Fix a docs:check finding](tutorials/fix-a-docs-check-finding.md).
 
 ## Session start and end
 

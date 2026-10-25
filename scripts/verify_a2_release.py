@@ -1,0 +1,329 @@
+"""Fail-closed A2 release evidence verifier; general pytest success is insufficient."""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+import subprocess
+from pathlib import Path
+
+
+class VerificationError(ValueError):
+    pass
+
+
+def require(condition, reason):
+    if not condition:
+        raise VerificationError(reason)
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def spec_obligations(text):
+    """Include every paragraph and each table row, independently of inventory IDs."""
+    obligations=[];anchor="root";ordinal=0
+    for block in re.split(r"\n\s*\n",text.strip()):
+        if block.startswith("#"):
+            heading=block.splitlines()[0].lstrip("# ")
+            anchor=re.sub(r"[^a-z0-9 -]","",heading.lower()).replace(" ","-")
+            ordinal=0
+        rows=block.splitlines() if block.startswith("|") else [block]
+        for row in rows:
+            if re.fullmatch(r"[| :\-]+",row):continue
+            ordinal+=1
+            obligations.append({"id":anchor+":"+str(ordinal),"anchor":anchor,"ordinal":ordinal,"text":row,"sha256":hashlib.sha256(row.encode()).hexdigest()})
+    return obligations
+
+
+def validate_requirements(ledger, manifest, spec_text, inventory_text=None):
+    require(ledger.get("review")=="complete","requirement ledger review pending")
+    source=spec_obligations(spec_text)
+    entries=ledger.get("requirements",[])
+    require(len(entries)==len(source),"missing/extra approved spec obligation")
+    groups={g['id'] for g in manifest.get('groups',[])}
+    if inventory_text is not None:
+        inventory_ids=re.findall(r'^\| ([A-Z]+[0-9]+) /',inventory_text,re.M)
+        require(bool(inventory_ids) and len(inventory_ids)==len(set(inventory_ids)), 'empty/duplicate acceptance inventory')
+        require(groups==set(inventory_ids), 'removed/extra acceptance inventory group')
+    for expected,actual in zip(source,entries):
+        require(all(actual.get(k)==v for k,v in expected.items()),"altered/unmapped paragraph or table row")
+        require(actual.get("review")=="complete" and bool(actual.get("inventory_ids")),"unmapped/unreviewed spec requirement")
+        require(set(actual["inventory_ids"])<=groups,"requirement refers to removed inventory group")
+    require(set().union(*(set(r['inventory_ids']) for r in entries))==groups,"unmapped inventory group")
+
+
+def validate_run(manifest, evidence, *, candidate_sha, lock_hash, manifest_hash):
+    require(manifest.get("status") == "ready", "required manifest is not ready")
+    groups = manifest.get("groups", [])
+    require(bool(groups), "empty required manifest")
+    required = [node for group in groups for node in group.get("nodes", [])]
+    require(all(group.get("status") == "ready" and group.get("nodes") for group in groups), "pending or empty required group")
+    require(len(required) == len(set(required)), "duplicate required nodes")
+    require(evidence.get("candidate_sha") == candidate_sha, "wrong candidate SHA")
+    require(evidence.get("lock_hash") == lock_hash and evidence.get("manifest_hash") == manifest_hash, "wrong manifest/lock hashes")
+    require(bool(evidence.get("run_id")), "missing run identity")
+    require(evidence.get("collection_run_id") == evidence["run_id"], "collection/outcome run mismatch")
+    collected = evidence.get("collected", [])
+    require(len(collected) == len(set(collected)), "duplicate collected IDs")
+    require(set(required) <= set(collected), "required nodes not collected")
+    outcomes = evidence.get("outcomes", {})
+    require(all(outcomes.get(node) == "passed" for node in required), "missing, failed, skipped, xfailed, xpassed or deselected required outcome")
+    python = evidence.get("python", "")
+    stable = re.fullmatch(r"3\.(\d+)\.(\d+)", python) if isinstance(python, str) else None
+    require(stable is not None and int(stable[1]) >= 10, "Stable Python 3.10 or newer required; CI selects latest stable")
+    executions = evidence.get("fixture_executions", [])
+    require(bool(executions), "no independent fixture execution evidence")
+    r_checked = http_checked = 0
+    for fixture in executions:
+        require(fixture.get("expected_assertion_ids") == fixture.get("observed_assertion_ids"), "fixture assertion identity/count disagreement")
+        require(fixture.get("expected_routes") == fixture.get("observed_routes"), "fixture route count disagreement")
+        require(fixture.get("actual_findings") == fixture.get("expected_findings"), "unexpected or missed fixture finding")
+        require(bool(fixture.get("sentinel")), "missing real execution sentinel")
+        r_checked += len(fixture.get("observed_assertion_ids", [])) if fixture.get("engine") == "R" else 0
+        http_checked += len(fixture.get("observed_routes", [])) if fixture.get("engine") == "HTTP" else 0
+    require(r_checked > 0 and http_checked > 0, "zero independently verified R/HTTP execution")
+    require(evidence.get("reported_r_checked") == r_checked and evidence.get("reported_http_checked") == http_checked, "inflated/self-reported execution counts")
+    return {"verified":True,"required_nodes":len(required),"R_checked":r_checked,"HTTP_checked":http_checked}
+
+
+TRIAGE_PACKAGES = ("medfit", "probmed", "medrobust")
+TRIAGE_COUNTS = ("discovered", "eligible", "checked", "excluded", "unverified", "blocked")
+TRIAGE_STATES = ("complete", "incomplete", "unavailable", "not-applicable")
+TRIAGE_CLASSES = ("true-positive", "false-positive-class", "fixed")
+TRIAGE_PACKAGE_KEYS = {"package", "commit", "source_dirty", "source_sha256", "state", "scope", "counts", "reasons",
+                       "findings", "reviewed", "disposition", "triaged_classes"}
+TRIAGE_FINDING_KEYS = {"check", "severity", "file", "line", "assertion_id", "message", "triage"}
+TRIAGE_TRIAGE_KEYS = {"class", "rationale", "class_id", "resolved", "scoped_out"}
+TRIAGE_CLASS_ENTRY_KEYS = {"class_id", "status", "rationale", "fix_commit"}
+
+
+def validate_package_triage(facts):
+    """Strict schema for the three-package README-coverage triage record.
+
+    Counts must be internally consistent, a partial scope must say so and give reasons (never silently
+    green), every warn/error finding needs a recorded triage, and a false-positive class blocks release
+    unless it is resolved or explicitly scoped out of an honestly partial scope."""
+    require(isinstance(facts, dict) and set(facts) == {"packages"}, "package triage facts must hold exactly 'packages'")
+    packages = facts.get("packages")
+    require(isinstance(packages, dict) and set(packages) == set(TRIAGE_PACKAGES), "package triage must cover exactly medfit, probmed, medrobust")
+    for name in TRIAGE_PACKAGES:
+        item = packages[name]
+        where = f"package triage {name}"
+        require(isinstance(item, dict), f"{where}: record object required")
+        require(set(item) <= TRIAGE_PACKAGE_KEYS, f"{where}: unknown record keys {sorted(set(item) - TRIAGE_PACKAGE_KEYS)}")
+        require(item.get("package") == name, f"{where}: package field must equal its key")
+        require(item.get("reviewed") is True and bool(item.get("disposition")), f"{where}: unreviewed or no disposition")
+        require(isinstance(item.get("commit"), str) and re.fullmatch(r"[a-f0-9]{40}", item["commit"]), f"{where}: pinned 40-hex commit required")
+        hashes = item.get("source_sha256")
+        require(isinstance(hashes, dict) and "README.md" in hashes
+                and all(isinstance(k, str) and re.fullmatch(r"README\.(?:md|Rmd|qmd)", k) and isinstance(h, str) and re.fullmatch(r"[a-f0-9]{64}", h)
+                        for k, h in hashes.items()), f"{where}: README source hashes (README.md required) must be 64-hex")
+        require(item.get("state") in TRIAGE_STATES, f"{where}: unknown state")
+        counts = item.get("counts")
+        require(isinstance(counts, dict) and set(counts) == set(TRIAGE_COUNTS), f"{where}: counts must hold exactly the six coverage counts")
+        require(all(isinstance(counts.get(k), int) and not isinstance(counts.get(k), bool) and counts[k] >= 0
+                                                 for k in TRIAGE_COUNTS), f"{where}: all six counts must be non-negative integers")
+        require(counts["eligible"] <= counts["discovered"] and counts["checked"] <= counts["eligible"], f"{where}: counts out of order")
+        require(counts["checked"] + counts["excluded"] + counts["unverified"] + counts["blocked"] == counts["discovered"],
+                f"{where}: counts do not account for every discovered assertion")
+        require(item.get("state") != "complete" or (counts["unverified"] == 0 and counts["blocked"] == 0),
+                f"{where}: state complete contradicts unverified or blocked assertions")
+        vacuous = item.get("state") == "not-applicable"
+        require(not vacuous or all(counts[k] == 0 for k in TRIAGE_COUNTS), f"{where}: not-applicable requires zero assertions")
+        require(vacuous == (item.get("scope") == "not-applicable"), f"{where}: not-applicable state and scope must go together")
+        partial = not vacuous and (item.get("state") != "complete" or counts["unverified"] > 0 or counts["blocked"] > 0 or counts["excluded"] > 0)
+        require(item.get("scope") in ("complete", "partial", "not-applicable"), f"{where}: unknown scope")
+        require(not partial or item["scope"] == "partial", f"{where}: partial coverage cannot be recorded as complete")
+        reasons = item.get("reasons")
+        require(isinstance(reasons, list) and all(isinstance(r, str) and r for r in reasons), f"{where}: reasons must be strings")
+        require(not (partial or vacuous) or bool(reasons), f"{where}: partial or vacuous coverage requires reasons")
+        for entry in item.get("triaged_classes", []):
+            # False-positive classes found earlier in this triage; each must end fixed (with the fixing commit) or scoped out.
+            require(isinstance(entry, dict) and set(entry) <= TRIAGE_CLASS_ENTRY_KEYS, f"{where}: unknown triaged-class keys")
+            require(isinstance(entry, dict) and bool(entry.get("class_id")) and bool(entry.get("rationale"))
+                    and entry.get("status") in ("fixed", "scoped-out"), f"{where}: triaged class needs id, status and rationale")
+            require(entry["status"] != "fixed" or (isinstance(entry.get("fix_commit"), str) and re.fullmatch(r"[a-f0-9]{40}", entry["fix_commit"])),
+                    f"{where}: a fixed class needs its 40-hex fix commit")
+            require(entry["status"] != "scoped-out" or item["scope"] == "partial", f"{where}: only a partial scope can scope a class out")
+        findings = item.get("findings")
+        require(isinstance(findings, list), f"{where}: findings list required")
+        for finding in findings:
+            require(isinstance(finding, dict) and set(finding) <= TRIAGE_FINDING_KEYS, f"{where}: unknown finding keys")
+            require(isinstance(finding.get("check"), str) and bool(finding["check"]) and finding.get("severity") in ("info", "warn", "error"),
+                    f"{where}: every finding needs a check and a severity of info, warn or error")
+            if finding["severity"] not in ("warn", "error"):
+                continue
+            triage = finding.get("triage")
+            require(isinstance(triage, dict) and set(triage) <= TRIAGE_TRIAGE_KEYS, f"{where}: unknown triage keys")
+            require(triage.get("class") in TRIAGE_CLASSES and bool(triage.get("rationale")),
+                    f"{where}: every warn/error finding needs a class and rationale")
+            if triage["class"] == "false-positive-class":
+                require(bool(triage.get("class_id")), f"{where}: false-positive class needs an id")
+                require(triage.get("resolved") is True or (triage.get("scoped_out") is True and item["scope"] == "partial"),
+                        f"{where}: unresolved false-positive class blocks release unless scoped out of a partial scope")
+
+
+SUPPORTED_SITE_URL = "https://r-hub.github.io/cranlogs/"
+GATE_NAMES = ("pytest", "test-all", "version-sync", "reference-sync", "command-sync", "mkdocs-strict")
+GATE_COMMANDS = {
+    "pytest": "python -m pytest tests/ -q -p no:cacheprovider", "test-all": "bash tests/test-all.sh",
+    "version-sync": "python scripts/version_sync.py --check", "reference-sync": "python scripts/gen_lib_reference.py --check",
+    "command-sync": "python tests/_check_commands_doc.py", "mkdocs-strict": "python -m mkdocs build --strict -q -d {tmp}",
+}
+GATE_FLAGS = {"version-sync": "version_sync", "reference-sync": "reference_sync", "command-sync": "command_sync", "mkdocs-strict": "mkdocs_strict"}
+REVIEW_DISPOSITIONS = ("fixed", "rejected")
+MIN_EVIDENCE_CHARS = 10
+
+
+def _int(value):
+    """A real integer: bool, float and numeric strings must not satisfy a count or exit-code check."""
+    return type(value) is int
+
+
+def _canonical(command):
+    parts = str(command).split()
+    if parts and Path(parts[0]).name.startswith("python"):
+        parts[0] = "python"
+    return " ".join(parts)
+
+
+def validate_full_gates(facts, candidate_sha):
+    """Every gate ran its canonical command in the clean candidate tree, exited 0, and left a hashed log.
+
+    The record is still self-attested: authenticity rests on the producer run ID and artifact hash, not on this check.
+    """
+    where = "full gates"
+    require(facts.get("source_commit") == candidate_sha and facts.get("tree_clean") is True, f"{where}: not bound to a clean candidate tree")
+    require(_int(facts.get("pytest_passed")) and facts["pytest_passed"] > 0 and _int(facts.get("pytest_failed")) and facts["pytest_failed"] == 0, f"{where}: pytest incomplete or failing")
+    require(_int(facts.get("test_all_passed")) and facts["test_all_passed"] == 47 and _int(facts.get("test_all_failed")) and facts["test_all_failed"] == 0, f"{where}: test-all incomplete or failing")
+    require(all(facts.get(k) is True for k in ("version_sync", "reference_sync", "command_sync", "mkdocs_strict")), f"{where}: sync/build flag false")
+    commands = facts.get("commands")
+    require(isinstance(commands, list) and all(isinstance(c, dict) for c in commands), f"{where}: command records required")
+    names = [c.get("name") for c in commands]
+    require(sorted(map(str, names)) == sorted(GATE_NAMES), f"{where}: commands must be exactly {list(GATE_NAMES)}")
+    for c in commands:
+        name = c["name"]
+        require(_canonical(c.get("command")) == GATE_COMMANDS[name], f"{where}: {name} did not run its canonical command")
+        require(_int(c.get("exit_code")) and c["exit_code"] == 0, f"{where}: {name} did not exit 0")
+        require(isinstance(c.get("log_sha256"), str) and re.fullmatch(r"[a-f0-9]{64}", c["log_sha256"]), f"{where}: {name} log hash required")
+        if name in GATE_FLAGS:
+            require(facts.get(GATE_FLAGS[name]) is (c["exit_code"] == 0), f"{where}: {name} flag disagrees with its exit code")
+
+
+def validate_live_smoke(facts):
+    """A real supported deployed site was checked over HTTP, and real packages the site check cannot cover say so."""
+    where = "live smoke"
+    site = facts.get("supported_site")
+    require(isinstance(site, dict) and site.get("url") == facts.get("url") == SUPPORTED_SITE_URL and bool(facts.get("source_ref")), f"{where}: the pinned supported site is required")
+    require(site.get("state") == "complete" and _int(site.get("requests")) and site["requests"] > 0
+            and _int(site.get("checked")) and site["checked"] > 0, f"{where}: supported site was not completely checked over HTTP")
+    require(facts.get("requests") == site["requests"] and facts.get("checked") == site["checked"], f"{where}: summary disagrees with the site run")
+    runs = facts.get("unsupported_real_runs")
+    require(isinstance(runs, list) and runs and all(isinstance(r, dict) and r.get("state") == "incomplete" and r.get("reasons") for r in runs),
+            f"{where}: unsupported real packages must be recorded as incomplete with reasons")
+
+
+def validate_review(facts, candidate_sha):
+    """A finalized review executed against the candidate; every finding fixed or rejected with evidence."""
+    where = "adversarial review"
+    require(bool(facts.get("job_id")) and facts.get("reviewed_commit") == candidate_sha, f"{where}: not bound to the candidate")
+    require(facts.get("mode") == "executed" and _int(facts.get("executed_tests")) and facts["executed_tests"] > 0, f"{where}: a static review is not release evidence")
+    require(facts.get("coverage_reviewed") is True, f"{where}: coverage not reviewed")
+    findings = facts.get("findings")
+    require(isinstance(findings, list) and all(isinstance(f, dict) for f in findings), f"{where}: findings list required")
+    ids = [f.get("id") for f in findings]
+    require(all(ids) and len(set(ids)) == len(ids), f"{where}: finding ids must be unique")
+    for f in findings:
+        evidence = f.get("evidence")
+        require(f.get("disposition") in REVIEW_DISPOSITIONS and isinstance(evidence, str) and len(evidence.strip()) >= MIN_EVIDENCE_CHARS,
+                f"{where}: finding {f.get('id')} needs a fixed/rejected disposition and written evidence")
+    require(_int(facts.get("unresolved_findings")) and facts["unresolved_findings"] == 0, f"{where}: unresolved findings")
+
+
+def validate_observation(name, item, *, candidate_sha, evidence_root):
+    require(isinstance(item, dict), "observation object required")
+    require(item.get("candidate_sha") == candidate_sha and item.get("status") == "passed", f"actual {name} evidence missing or failed")
+    provenance = item.get("provenance")
+    require(isinstance(provenance, dict), "artifact provenance required")
+    require(evidence_root is not None, "retrieved observation artifacts required")
+    root = Path(evidence_root).resolve()
+    relative = provenance.get("path", "")
+    require(isinstance(relative, str) and bool(relative) and not Path(relative).is_absolute(), "relative evidence artifact path required")
+    path = (root / relative).resolve()
+    require(path.is_relative_to(root) and path.is_file(), "missing or escaping observation artifact")
+    require(digest(path) == provenance.get("sha256"), "observation artifact hash mismatch")
+    record = json.loads(path.read_text())
+    require(isinstance(record, dict), "artifact record object required")
+    require(record.get("candidate_sha") == candidate_sha and record.get("kind") == name and record.get("status") == "passed", "artifact identity/status mismatch")
+    require(record.get("producer_run_id") == provenance.get("run_id") and str(record.get("producer_run_id", "")).isdigit(), "artifact producer run mismatch")
+    facts = record.get("facts", {})
+    require(isinstance(facts, dict), "observation facts required")
+    if name == "live_smoke":
+        validate_live_smoke(facts)
+    elif name == "package_triage":
+        validate_package_triage(facts)
+    elif name == "full_gates":
+        validate_full_gates(facts, candidate_sha)
+    elif name == "rendered_review":
+        require(bool(facts.get("pages")) and all(v.get("inspected") is True and re.fullmatch(r"[a-f0-9]{64}", v.get("sha256", "")) for v in facts["pages"]), "render inspection incomplete")
+    elif name == "adversarial_review":
+        validate_review(facts, candidate_sha)
+    elif name == "requirement_mapping":
+        require(facts.get("review") == "complete" and facts.get("unmapped") == 0 and facts.get("requirements", 0) > 0, "mapping incomplete")
+
+
+def validate_aggregate(platforms, observations, *, candidate_sha, evidence_root=None):
+    require({p.get("platform") for p in platforms} == {"ubuntu-24.04", "macos-14"}, "both actual release platforms required")
+    require(len(platforms) == 2, "duplicate platform artifacts")
+    require(all(p.get("candidate_sha") == candidate_sha and p.get("uploaded") and p.get("retrieved") and p.get("verified") for p in platforms), "missing/failed/stale actual artifact")
+    for name in ("live_smoke","package_triage","full_gates","rendered_review","adversarial_review","requirement_mapping"):
+        item = observations.get(name, {})
+        validate_observation(name, item, candidate_sha=candidate_sha, evidence_root=evidence_root)
+    return {"verified":True,"platforms":2}
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--manifest", type=Path, default=Path("tests/a2/required.json"))
+    ap.add_argument("--lock", type=Path, default=Path("tests/a2/fixture-lock.json"))
+    ap.add_argument("--requirements", type=Path, default=Path("tests/a2/requirements.json"))
+    ap.add_argument("--spec", type=Path, default=Path("SPEC-docs-check-a2-2026-10-12.md"))
+    ap.add_argument("--inventory", type=Path, default=Path("ACCEPTANCE-docs-check-a2-2026-10-12.md"))
+    ap.add_argument("--expected", type=Path, default=Path("tests/a2/expected-findings.json"))
+    ap.add_argument("--evidence", type=Path, required=True)
+    ap.add_argument("--candidate-sha", required=True)
+    args = ap.parse_args(argv)
+    try:
+        ledger = json.loads(args.requirements.read_text())
+        manifest = json.loads(args.manifest.read_text())
+        require(digest(args.spec)==ledger.get("spec_sha256")==manifest.get("spec_sha256"),"approved spec hash mismatch")
+        validate_requirements(ledger,manifest,args.spec.read_text(),args.inventory.read_text())
+        evidence = json.loads(args.evidence.read_text())
+        result = validate_run(manifest, evidence, candidate_sha=args.candidate_sha, lock_hash=digest(args.lock), manifest_hash=digest(args.manifest))
+        expected=json.loads(args.expected.read_text())
+        require(expected.get("status")=="ready" and bool(expected.get("fixtures")),"expected fixture manifest pending")
+        require(evidence.get("expected_findings_hash")==digest(args.expected),"wrong expected-findings hash")
+        executions=evidence.get("fixture_executions",[])
+        require({f.get("fixture") for f in executions}==set(expected["fixtures"]),"missing/extra required fixture execution")
+        require(len(executions)==len(expected["fixtures"]),"duplicate fixture execution")
+        for execution in executions:
+            oracle=expected["fixtures"][execution["fixture"]]
+            require(execution.get("actual_findings")==oracle["findings"],"committed finding oracle mismatch")
+            require(execution.get("observed_assertion_ids",[])==oracle.get("assertion_ids",[]),"committed assertion oracle mismatch")
+            require(execution.get("observed_routes",[])==oracle.get("routes",[]),"committed route oracle mismatch")
+            require(bool(re.fullmatch(r"[a-f0-9]{64}",execution.get("source_hash",""))),"missing fixture source hash")
+        lock = json.loads(args.lock.read_text())
+        require(evidence.get("platform") in lock["platforms"],"unsupported release platform")
+        require(evidence.get("R") == lock["R"] and evidence.get("R_packages") == lock["R_packages"], "runtime lock mismatch")
+        print(json.dumps(result))
+        return 0
+    except (VerificationError,OSError,ValueError,KeyError) as exc:
+        print(json.dumps({"verified":False,"reason":str(exc)}))
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

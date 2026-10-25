@@ -1,19 +1,69 @@
+# Codex durable verification checkpoint — 2026-10-22
+# PR #92 merged to dev fe8c8ef; adapter 0.1.1 uses durable rforge/openai catalog.
+# Fresh-session discovery and isolated medfit checks passed. Both skills rejected
+# missing and v2.21.0 engines in two fresh read-only sessions (synthetic package).
+# No fallback engine, R check, unguarded audit or passing result; spec has evidence.
+# Fresh sessions: engine/package paths with spaces verified, docs 0 findings/1 of 1;
+# as-cran completed 0 errors/0 warnings/1 new-submission NOTE, exit 0, not incomplete.
+# Both skills rejected the fixture restricted to Python 3.9 without engine/R execution.
+# Remaining: variadic limits; unexplained restricted-session incoming termination;
+# missing-interpreter and invalid-package fresh sessions not separately exercised.
+# Paths/Python update: 920 tests passed/4 skipped; 47/47 gates; version/reference
+# checks, strict MkDocs build and changed-line Markdown lint passed.
+# Docs-only verification; no main promotion, release or writing-format expansion.
+# Medfit rlang import #296 and 404 repair #297 integrated to dev; #298 merged
+# to main 100cca7b; deployment/live verification remains separate.
+# Codex docs audited: homepage, installation, quickstart, refcard, adapter README,
+# guide/nav and mirrored instructions. 920 tests passed/4 skipped; 47/47 gates;
+# Python 3.12 reference check and strict MkDocs build passed. Writing deferred.
+# Earlier pilot/worktree-only status below is historical and superseded.
+
+# Local medfit rlang import repair rerun: Rforge as-cran 0/0/0; log complete.
+# Test runner separately 5993 pass, 98 skip, 1 warning. Fix not integrated.
+# Codex personal checks pilot — 2026-10-22
+# Six gaps repaired in shared engines and adapter 0.1.1; same-repo scope retained.
+# Spec/plan/tasks/grill: matching *-codex-check-skills-2026-10-22.md root files.
+# Structured check evidence/inner statuses and retained logs; default as-cran;
+# strict flavors; package-only docs scope; explicit new-export comparison ref.
+# Final checks: pytest 920 passed, 4 skipped; repository gates 47/47;
+# strict MkDocs, skill validators, and changed Markdown lint passed.
+# Real isolated package: default, strict flavors, incoming complete; 5 real logs;
+# zero errors/warnings, expected new-submission NOTEs. Docs clean/defect fixtures pass.
+# Installed 0.1.1/source parity 4/4. Catalog names visible this session.
+# Additional approved gpt-5.6-sol CLI review reconciled: log contract clarified;
+# outer failure now incomplete; unintended tarball behavior change scoped out.
+# Medfit fresh-session skills discovered; authorized temp-access R check passed.
+# Release-ref coverage v0.12.0: zero new exports/findings; checked 11/22.
+# Latest release v0.12.0 isolated at e894282: docs 0 findings, checked 12/23;
+# compare_lr coverage present vs v0.11.1. Default as-cran completed: 0/1/0,
+# undeclared rlang import WARNING. Actual completed log retained; source clean.
+# Earlier 0.10.0 results are historical; latest-release evidence in spec/grill.
+# 2026-10-22: adapter rforge-openai 0.1.1 integrated into dev via PR #92 (fe8c8ef);
+# durable engine is ~/projects/dev-tools/rforge; pilot worktrees no longer prerequisites.
+# Still pending: fresh-session older/missing-engine handling, variadic-signature coverage.
+
 project: rforge
-updated: 2026-10-11
+updated: 2026-10-24
 status: Active
-in_progress: 2026-10-11 — v2.21.0 release in flight (version bumped on dev; dev→main PR next). Two lines of work ship in it:
+in_progress: v2.22.0 release prep (A2 merged to dev via PR #99, evidenced candidate 87525d4); version bumped, dev->main PR for review, no tag or Homebrew yet. v2.21.0 release history:
   (1) #84 fix MERGED to dev 2026-10-11 as PR #85 (squash 99b4171; CI 5/5 green). #84 stays
   open until release (a feature→dev merge does not auto-close it). Follow-up PR #86 MERGED (squash f7036b4): a Codex
   adversarial review found #85 stopped /rforge:finish adding `version:` to a .STATUS that lacks one; fixed via
   lib.rstatus.version_overrides. Local worktrees feature-rstatus-version-drift and fix-finish-missing-version can be removed.
   (2) docs:check content audit, release A1 (v2.21.0): merged to dev via the feature->dev PR (see git log), UNRELEASED.
   lib.docaudit + /rforge:docs:check rewrite + dev-only replay harness (tests/harness/). SPEC and review record
-  (TRIAGE-docaudit-signature-gate-2026-10-11.md) at the repo root; guide docs/guides/docs-audit.md. Seven Codex rounds under
+  (TRIAGE-docaudit-signature-gate-2026-10-11.md) in archive/specs/; guide docs/guides/docs-audit.md. Seven Codex rounds under
   the stop rule; unrecognized R binding forms are documented known limitations. test-all 47/47, 44 commands.
-  A2 (--site, --run-examples) is a separate later plan.
-next: merge the v2.21.0 release PR on the user's go, then tag + GitHub release, tap formula + manifest sync (permission per write), close #84.
-version: 2.21.0 (bumped on dev, release PR dev→main pending; last released on main: v2.20.1 9d0b01a)
-last_release: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
+  A2 (--site, --run-examples): MERGED to dev 2026-10-25 as PR #99 (merge commit 08ae163, so evidenced SHA 87525d4 is in history).
+  Acceptance bound to 87525d4: RForge CI run 40151469287 (ubuntu-24.04 + macos-14, each 662/662 passed, 0 skipped, R 4.6.1),
+  observations run 40153274868 (six passed), release aggregate run 40155770154 (verified true, 2 platforms). Limits: the adversarial
+  review is attested (rounds 1-4 reviewed 661f9b5; 87525d4 differs only by the output-limit bound 15s->45s + manifest hash, delta_note
+  in the record); live smoke supported-site is r-hub/cranlogs only (no Data-Wise/tidyverse package is checkable by --site).
+  Planning files stay at repo root (tests/a2/requirements.json and scripts/verify_a2_release.py reference them).
+next: release v2.22.0 candidate (version bump, CHANGELOG [Unreleased]->version, dev->main PR, tag, GitHub release, Homebrew tap) after user approval. Open low-priority candidates in CLAUDE.md Roadmap.
+version: 2.22.0 (release prep on dev; dev->main PR pending review, no tag yet)
+last_release: 2026-10-11 v2.21.0 (minor, 44 commands, no surface change — PR #91 dev→main merge 7387a05; tag v2.21.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.21.0. Ships /rforge:docs:check content audit (lib.docaudit, A1), tests/harness, #84 fix (#85/#86), docs gap-fill (#89/#90). Gates: test-all 47/47, pytest 899+4 skipped, CI green on main (RForge CI + Deploy Documentation). Tap Data-Wise/homebrew-tap#244 squash 09bc9c3 — formula+manifest → v2.21.0 sha256 f376d0da…, stale revision dropped, generate.py --diff IDENTICAL; brew audit by path unavailable. Aggregator claude-plugins#74 auto-merged. Pending: user runs `brew upgrade rforge`.)
+last_release_prior_v2_20_1: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
   9d0b01a; tag v2.20.1; release https://github.com/Data-Wise/rforge/releases/tag/v2.20.1. Ships
   #75 (lib.status frontmatter dialect), #82 (phase from a phase: key only), #78 (NEWS ## subsection
   count), #76 (MediationVerse doctrine in Command Guides), #77/#80 (AGENTS.md mirror + gates), #79
@@ -631,3 +681,16 @@ shipped:
   - "v1.3.0 — 2026-05-11 — Path B complete (rforge-mcp absorbed into lib/ pure-Python modules); /rforge:init promoted to first-class command (16 total); rforge-mcp local prototype tombstoned (was never public on GitHub or npm — SPEC scope-corrected); tap formula + manifest + docs Pages all synced; brew outdated UX verified via Cellar-rename trick"
   - "v1.2.0 — 2026-05-10 — craft parity foundations + post-merge polish + MCP decoupling"
   - "v1.1.0 — 2026-01-09 — initial standalone release"
+
+a2_local_validation: Python 3.12.15 full suite 1318 passed/4 existing skipped; focused guardian/replay 61 passed before final four boundary cases; ten replay recovery cases and five updated validation probes passed; test-all 47/47; mkdocs strict passed. Approved revision-7 spec hash unchanged; 419 nodes uniquely mapped with current test hashes. Python 3.12 acceptance pins unchanged; actual both-platform acceptance pending.
+a2_review: Validated ownership-repair findings fixed after e36c341: pre-spawn exceptions no longer signal checkpoint PGIDs, handle allocation precedes spawn, and ordinary replay boundary failures preserve known counts/partial comparisons/matching-run lifecycle before teardown. Eight red regressions reproduced defects; twelve expanded acceptance nodes added. KeyboardInterrupt propagation, deadlines, severity gates, requirement ledger and revision 7 unchanged. Independent repair review, seven coverage groups and both-platform acceptance pending.
+
+python_development: Python 3.15.0 installed with uv; isolated environment /Users/davood/.venvs/rforge-py315 (activate to use python/python3). Approved A2 Python 3.12 acceptance pin and existing .venv unchanged. dataclasses.MISSING identity fixes reference generation across 3.12/3.15. Python 3.12 lifecycle/mapping subset 65 passed; Python 3.15 gates 47/47 and strict docs passed; full Python 3.15 suite 1302 passed/4 existing skipped. Local interpreter update is supplemental compatibility validation, not A2 release acceptance.
+
+python_ci: General CI matrix now includes 3.11, 3.12, 3.13 and 3.15; A2 platform/aggregate workflows and fixture lock remain pinned to 3.12. Local workflow-contract tests 9 passed; test-all 47/47 under Python 3.15; A2 workflows and fixture lock byte-identical to prior commit. GitHub execution not dispatched.
+
+a2_review_20261023: Focused Claude review e3646895-1416-4234-b475-e516ed31ef1f of 7eb8a40 found no material finding; three implementation files examined, tests/docs skipped by reviewer; Codex validated existing coverage with 126 focused native-process passes on Python 3.12.15. Seven groups and final platform evidence remain pending. User then authorized unpinning Python; revision 8 selects latest stable Python 3 (currently 3.15.0), recording exact interpreter; other acceptance requirements and R/dependency locks retained.
+
+a2_python_latest_validation: Python 3.15.0 full suite 1326 passed/4 existing skipped; repository gates 47/47; strict MkDocs build and rendered contributor policy verified with Homebrew Cairo library path. 427 unique collected A2 nodes, 118 obligations and 87 groups reconciled; manifest and seven groups remain pending. No push, workflow dispatch or release.
+
+a2_acceptance_state: merged to dev (PR #99, 08ae163); 6 external-observation groups satisfied by observations run 40153274868; 662 required nodes passed on ubuntu-24.04 and macos-14 at 87525d4; observations 40153274868 and aggregate 40155770154 verified. No tag, deployment or release yet.

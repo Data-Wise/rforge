@@ -1,0 +1,59 @@
+{
+  "kind": "docaudit",
+  "status": "ok",
+  "max_severity": "none",
+  "findings": [],
+  "messages": [
+    "checked 7 of 19 exported functions (12 variadic not checked)"
+  ],
+  "summary": {
+    "exports": 19,
+    "checked": 7,
+    "unchecked": {
+      "variadic": 12
+    },
+    "suppressed": 0,
+    "coverage_matrix": {},
+    "info_hidden": 0
+  },
+  "incomplete": true,
+  "audited": true,
+  "engine_missing": [],
+  "stages": {
+    "site": {
+      "state": "incomplete",
+      "counts": {
+        "checked": 0,
+        "missing": 0,
+        "extra": 0,
+        "unreleased": 0,
+        "excluded": 1,
+        "unsupported": 0
+      },
+      "provenance": {
+        "ref": "origin/main",
+        "sha": "27de034eb5d2177398796f22e709590c6ea0a928",
+        "timestamp": "2026-07-21T13:04:12-06:00",
+        "selection": "explicit local ref",
+        "local_ref": true,
+        "workflow_snapshot": "current local checkout; remote freshness unverified",
+        "requested_base": "https://data-wise.github.io/rmediation/"
+      },
+      "reasons": [
+        "development mode/destination mapping unsupported",
+        "custom template mapping unsupported"
+      ],
+      "engine_missing": [],
+      "findings": []
+    }
+  },
+  "scope": {
+    "mode": "package",
+    "root": "<local-r-packages>/RMediation",
+    "packages": [
+      "<local-r-packages>/RMediation"
+    ],
+    "how": "",
+    "line": "scope: package RMediation at <local-r-packages>/RMediation"
+  }
+}

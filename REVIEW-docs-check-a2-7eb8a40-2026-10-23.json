@@ -1,0 +1,134 @@
+{
+  "ok": true,
+  "operation": "review",
+  "review_kind": "adversarial",
+  "subject_kind": "changes",
+  "subject_label": "e36c341a4c5ac31fd0ff29ad351ce167174dad41..HEAD plus working tree",
+  "subject_fingerprint": "a79ba044267f1728207ad3eb8345ffd200fca9ceebc4f30e7d5f4b78998d948a",
+  "usage_summary": "Usage: tokens=264300 output=5525 turns=13 duration_ms=47332 api_ms=46496 cost_usd=0.22442030000000002",
+  "total_tokens": 264300,
+  "total_cost_usd": 0.22442030000000002,
+  "cumulative_chain_cost_usd": 0.22442030000000002,
+  "parent_job_id": null,
+  "num_turns": 13,
+  "duration_ms": 47332,
+  "duration_api_ms": 46496,
+  "task_profile": null,
+  "review_profile": "standard",
+  "requested_model": "sonnet",
+  "effective_models": [
+    "claude-sonnet-5-5"
+  ],
+  "effort": "medium",
+  "budget": {
+    "max_turns": 12,
+    "finalize_at_turn": 9,
+    "soft_budget_usd": 1,
+    "max_budget_usd": 1,
+    "timeout_ms": 240000
+  },
+  "evidence_lease": null,
+  "evidence_lease_exhausted": false,
+  "cost_budget_exhausted": false,
+  "turn_limit_reached": false,
+  "result": "{\"verdict\":\"approve\",\"summary\":\"No material ship blocker found in commit 7eb8a40. This is read-only analysis of the patches and surrounding code. I ran no tests or probes.\\n\\n- Pre-spawn ownership: removing the unconditional killpg(pgid, SIGKILL) when process is None (lib/_docguardian.py:178-180) is sound. A checkpoint PGID is not an owned signal capability before spawn. The parent's unreaped GroupPin child still owns the group, and run() still SIGKILLs via pin.signal_group after the guardian dies (_docguardian.py:279-283, 295-299).\\n- Spawn handle window: in lib/_docgroup_pin.py:76-80, pid is assigned inside defer_launch_signals. The guardian wraps spawn_in_group in its own defer_launch_signals and passes signal_mask=previous (_docguardian.py:92-94). Pending SIGINT/SIGTERM/SIGHUP can only be delivered at the outer exit, after process is bound, so I found no window with a live unowned child.\\n- Replay failure evidence: in lib/_docexamples.py:230-244, the try now covers the input.json write and guardian.run. Evidence is recovered from initial.json and terminal.json only when run_id matches. A completed or missing reason is forced to guardian-failure, so line 304 (reason != completed) keeps the stage non-complete. Recovery runs before TemporaryDirectory removal.\",\"findings\":[],\"next_steps\":[\"Optionally confirm the new tests in tests/a2/test_guardian.py and test_examples_cli.py inject faults at the posix_spawn return and at the outer defer_launch_signals exit.\",\"Optionally confirm consumers of stage provenance lifecycle tolerate a recovered terminal lacking group_disappeared, pin_reaped and group_pgid.\"],\"coverage\":{\"files_examined\":[\"lib/_docexamples.py\",\"lib/_docgroup_pin.py\",\"lib/_docguardian.py\"],\"files_skipped\":[\"CHANGELOG.md\",\"COVERAGE-docs-check-a2-2026-10-12.md\",\"REVIEW-docs-check-a2-ownership-repairs-validation-2026-10-12.md\",\"REVIEW-docs-check-a2-ownership-repairs-validation-probes-2026-10-12.py\",\"docs/guides/docs-audit.md\",\"tests/a2/required.json\",\"tests/a2/test_examples_cli.py\",\"tests/a2/test_guardian.py\"],\"areas\":[\"pre-spawn ownership and killpg removal\",\"posix_spawn pid assignment and signal deferral\",\"replay boundary exception recovery and reason forcing\",\"guardian.run cleanup/finally paths\"]},\"uncertainty\":\"medium\",\"budget_exhausted\":false,\"cost_budget_exhausted\":false,\"turn_limit_reached\":false,\"evidence_lease_exhausted\":false,\"recommended_followup\":{\"profile\":\"quick\",\"focus\":[\"Fault-injection coverage in tests/a2 at posix_spawn return and outer signal-deferral exit\",\"KeyboardInterrupt during guardian.run drops partial replay evidence (except Exception does not catch it)\",\"Consumers of recovered lifecycle missing group_disappeared/pin_reaped\"],\"reason\":\"Tests and docs were not read, and the narrow except Exception scope is a minor observability gap.\"}}",
+  "structured_output": {
+    "verdict": "approve",
+    "summary": "No material ship blocker found in commit 7eb8a40. This is read-only analysis of the patches and surrounding code. I ran no tests or probes.\n\n- Pre-spawn ownership: removing the unconditional killpg(pgid, SIGKILL) when process is None (lib/_docguardian.py:178-180) is sound. A checkpoint PGID is not an owned signal capability before spawn. The parent's unreaped GroupPin child still owns the group, and run() still SIGKILLs via pin.signal_group after the guardian dies (_docguardian.py:279-283, 295-299).\n- Spawn handle window: in lib/_docgroup_pin.py:76-80, pid is assigned inside defer_launch_signals. The guardian wraps spawn_in_group in its own defer_launch_signals and passes signal_mask=previous (_docguardian.py:92-94). Pending SIGINT/SIGTERM/SIGHUP can only be delivered at the outer exit, after process is bound, so I found no window with a live unowned child.\n- Replay failure evidence: in lib/_docexamples.py:230-244, the try now covers the input.json write and guardian.run. Evidence is recovered from initial.json and terminal.json only when run_id matches. A completed or missing reason is forced to guardian-failure, so line 304 (reason != completed) keeps the stage non-complete. Recovery runs before TemporaryDirectory removal.",
+    "findings": [],
+    "next_steps": [
+      "Optionally confirm the new tests in tests/a2/test_guardian.py and test_examples_cli.py inject faults at the posix_spawn return and at the outer defer_launch_signals exit.",
+      "Optionally confirm consumers of stage provenance lifecycle tolerate a recovered terminal lacking group_disappeared, pin_reaped and group_pgid."
+    ],
+    "coverage": {
+      "files_examined": [
+        "lib/_docexamples.py",
+        "lib/_docgroup_pin.py",
+        "lib/_docguardian.py"
+      ],
+      "files_skipped": [
+        "CHANGELOG.md",
+        "COVERAGE-docs-check-a2-2026-10-12.md",
+        "REVIEW-docs-check-a2-ownership-repairs-validation-2026-10-12.md",
+        "REVIEW-docs-check-a2-ownership-repairs-validation-probes-2026-10-12.py",
+        "docs/guides/docs-audit.md",
+        "tests/a2/required.json",
+        "tests/a2/test_examples_cli.py",
+        "tests/a2/test_guardian.py"
+      ],
+      "areas": [
+        "pre-spawn ownership and killpg removal",
+        "posix_spawn pid assignment and signal deferral",
+        "replay boundary exception recovery and reason forcing",
+        "guardian.run cleanup/finally paths"
+      ]
+    },
+    "uncertainty": "medium",
+    "budget_exhausted": false,
+    "cost_budget_exhausted": false,
+    "turn_limit_reached": false,
+    "evidence_lease_exhausted": false,
+    "recommended_followup": {
+      "profile": "quick",
+      "focus": [
+        "Fault-injection coverage in tests/a2 at posix_spawn return and outer signal-deferral exit",
+        "KeyboardInterrupt during guardian.run drops partial replay evidence (except Exception does not catch it)",
+        "Consumers of recovered lifecycle missing group_disappeared/pin_reaped"
+      ],
+      "reason": "Tests and docs were not read, and the narrow except Exception scope is a minor observability gap."
+    }
+  },
+  "session_id": "a33155e7-8342-4961-a04c-11d4bde81308",
+  "resume_hint": "claude --resume a33155e7-8342-4961-a04c-11d4bde81308",
+  "disclosure": null,
+  "usage": {
+    "input_tokens": 20,
+    "cache_creation_input_tokens": 36732,
+    "cache_read_input_tokens": 222023,
+    "output_tokens": 5525,
+    "output_tokens_details": {
+      "thinking_tokens": 1469
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 36732,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1346,
+        "cache_read_input_tokens": 35504,
+        "cache_creation_input_tokens": 1228,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1228
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "model_usage": {
+    "claude-sonnet-5-5": {
+      "inputTokens": 20,
+      "outputTokens": 5525,
+      "cacheReadInputTokens": 222023,
+      "cacheCreationInputTokens": 36732,
+      "webSearchRequests": 0,
+      "costUSD": 0.22442030000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "thinkingTokens": 1469,
+      "canonicalModel": "claude-sonnet-5-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  }
+}

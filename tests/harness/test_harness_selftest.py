@@ -161,7 +161,7 @@ def test_manifest_shape():
     rows = m["defects"]
     assert len(rows) == 18 and len({r["id"] for r in rows}) == 18
     required = {"id", "package", "ref", "fix", "file", "check", "release", "expectation", "status", "reason"}
-    assert required <= {k for r in rows for k in r} <= required | {"function", "arg"}
+    assert required <= {k for r in rows for k in r} <= required | {"function", "arg", "substitute"}
     assert {r["expectation"] for r in rows} <= {"firm", "conditional", "none"}
     assert {r["status"] for r in rows} <= {"pending", "firm"}
     assert sum(r["expectation"] == "firm" for r in rows) == 3
@@ -393,3 +393,29 @@ def test_subprocess_audit_rejects_a_report_for_a_different_package(fake_audit):
     tree = fake_audit('{"findings": [], "audited": true, "scope": {"root": "/somewhere/else"}}')
     with pytest.raises(replay.AuditCrashed, match="not the extracted tree"):
         replay.subprocess_audit(tree)
+
+def test_substitute_never_claims_real_history():
+    """A substitute fixture stands in only where history is unavailable; it must say so."""
+    rows = json.loads(MANIFEST.read_text(encoding="utf-8"))["defects"]
+    for row in (r for r in rows if "substitute" in r):
+        assert row["ref"] is None and row["substitute"]["history"] == "pending"
+        assert row["substitute"]["kind"] == "synthetic" and row["substitute"]["provenance_backed"] is False
+
+
+def test_full_extraction_includes_package_code(repo):
+    """README replay loads the package's own code, which the docs-only subset omits."""
+    r, _ = repo
+    (r / "R").mkdir(exist_ok=True)
+    (r / "R" / "f.R").write_text("f <- function() 1\n")
+    _git(r, "add", "-A")
+    _git(r, "commit", "-qm", "code")
+    docs_only, full = r.parent / "docs_only", r.parent / "full"
+    assert replay.extract_tree(r, "HEAD", docs_only) and replay.extract_tree(r, "HEAD", full, full=True)
+    assert not (docs_only / "R" / "f.R").exists() and (full / "R" / "f.R").exists()
+
+
+def test_opt_in_checks_are_the_known_remainder():
+    sys.path.insert(0, str(replay.REPO_ROOT))
+    from lib import docaudit
+    assert docaudit.OPT_IN_CHECKS.isdisjoint(docaudit.IMPLEMENTED_CHECKS)
+    assert docaudit.OPT_IN_CHECKS | docaudit.IMPLEMENTED_CHECKS == replay.KNOWN_CHECKS

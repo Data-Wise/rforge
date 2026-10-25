@@ -1,0 +1,1929 @@
+{
+  "spec_sha256": "898ff1e77e68efeaf493942df228fea30a5eb4fd93202e06d785fdf0f33a6898",
+  "status": "ready",
+  "groups": [
+    {
+      "id": "C01",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_a1_default_unchanged",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_a1_default_unchanged"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "C02",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_cli_scope_validation",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_cli_scope_validation[args0]",
+        "tests/a2/test_reporting.py::test_cli_scope_validation[args1]",
+        "tests/a2/test_reporting.py::test_cli_scope_validation[args2]",
+        "tests/a2/test_reporting.py::test_cli_scope_validation[args3]",
+        "tests/a2/test_reporting.py::test_misuse_never_runs_optional_stages[negative]",
+        "tests/a2/test_reporting.py::test_misuse_never_runs_optional_stages[ambiguous]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "C03",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_stage_state_preserves_static_findings",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_stage_state_preserves_static_findings",
+        "tests/a2/test_reporting.py::test_every_stage_state_retains_static_findings[complete]",
+        "tests/a2/test_reporting.py::test_every_stage_state_retains_static_findings[incomplete]",
+        "tests/a2/test_reporting.py::test_every_stage_state_retains_static_findings[unavailable]",
+        "tests/a2/test_reporting.py::test_every_stage_state_retains_static_findings[not-applicable]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "C04",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_threshold_matrix",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_threshold_matrix[none-True-warn-0]",
+        "tests/a2/test_reporting.py::test_threshold_matrix[warn-True-warn-2]",
+        "tests/a2/test_reporting.py::test_threshold_matrix[error-True-warn-2]",
+        "tests/a2/test_reporting.py::test_threshold_matrix[warn-False-warn-1]",
+        "tests/a2/test_reporting.py::test_threshold_matrix[error-False-warn-0]",
+        "tests/a2/test_reporting.py::test_threshold_matrix[error-False-error-1]",
+        "tests/a2/test_reporting.py::test_threshold_matrix[warn-False-none-0]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-none-none]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-none-warn]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-none-error]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-warn-none]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-warn-warn]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-warn-error]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-error-none]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-error-warn]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[False-error-error]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-none-none]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-none-warn]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-none-error]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-warn-none]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-warn-warn]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-warn-error]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-error-none]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-error-warn]",
+        "tests/a2/test_reporting.py::test_full_threshold_matrix[True-error-error]",
+        "tests/a2/test_reporting.py::test_mixed_stage_warning_and_incomplete_gate[none-0]",
+        "tests/a2/test_reporting.py::test_mixed_stage_warning_and_incomplete_gate[warn-2]",
+        "tests/a2/test_reporting.py::test_mixed_stage_warning_and_incomplete_gate[error-2]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "C05",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_text_json_diagnostics",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_text_json_diagnostics",
+        "tests/a2/test_reporting.py::test_detailed_info_visibility_does_not_change_coverage[False]",
+        "tests/a2/test_reporting.py::test_detailed_info_visibility_does_not_change_coverage[True]",
+        "tests/a2/test_reporting.py::test_cli_info_visibility[False-text]",
+        "tests/a2/test_reporting.py::test_cli_info_visibility[False-json]",
+        "tests/a2/test_reporting.py::test_cli_info_visibility[True-text]",
+        "tests/a2/test_reporting.py::test_cli_info_visibility[True-json]",
+        "tests/a2/test_reporting.py::test_missing_rscript_default_diagnostic"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "C06",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_engine_union_and_package_reasons",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_engine_union_and_package_reasons",
+        "tests/a2/test_reporting.py::test_mixed_package_engine_union"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "C07",
+      "task": "T02",
+      "proposed_node": "tests/a2/test_reporting.py::test_allowlist_preserves_incomplete",
+      "nodes": [
+        "tests/a2/test_reporting.py::test_allowlist_preserves_incomplete"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_reporting.py": "8261657489de4c4d74cfa9a0db5826e5bbb486a7b37b375845ac2a0160d522dd"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S01",
+      "task": "T03",
+      "proposed_node": "tests/a2/test_site_refs.py::test_explicit_ref_immutable_tree",
+      "nodes": [
+        "tests/a2/test_site_integration.py::test_nested_package_immutable_routes",
+        "tests/a2/test_site_refs.py::test_explicit_ref_immutable_tree"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9",
+        "tests/a2/test_site_refs.py": "5a3346a29fadb6da059475918f285f1e87683a6547d06b2d0a947a362ecf24ac"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S02",
+      "task": "T03",
+      "proposed_node": "tests/a2/test_site_refs.py::test_workflow_inference_and_fallback",
+      "nodes": [
+        "tests/a2/test_site_refs.py::test_workflow_inference_and_fallback",
+        "tests/a2/test_site_refs.py::test_remote_tracking_ref_preferred[False]",
+        "tests/a2/test_site_refs.py::test_remote_tracking_ref_preferred[True]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_refs.py": "5a3346a29fadb6da059475918f285f1e87683a6547d06b2d0a947a362ecf24ac"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S03",
+      "task": "T03",
+      "proposed_node": "tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref",
+      "nodes": [
+        "tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref[[main, dev]]",
+        "tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref[['*']]",
+        "tests/a2/test_site_refs.py::test_unsupported_workflows_require_ref[['${{ github.ref }}']]",
+        "tests/a2/test_site_refs.py::test_unsupported_source_selection_no_network[checkout]",
+        "tests/a2/test_site_refs.py::test_unsupported_source_selection_no_network[reusable]",
+        "tests/a2/test_site_refs.py::test_unsupported_source_selection_no_network[multiple]",
+        "tests/a2/test_site_refs.py::test_unsupported_source_selection_no_network[missing-ref]",
+        "tests/a2/test_site_refs.py::test_unsupported_source_selection_no_network[missing-git]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_refs.py": "5a3346a29fadb6da059475918f285f1e87683a6547d06b2d0a947a362ecf24ac"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S04",
+      "task": "T03",
+      "proposed_node": "tests/a2/test_site_refs.py::test_yaml_reader_missing",
+      "nodes": [
+        "tests/a2/test_site_integration.py::test_selected_ref_config_requires_yaml_reader",
+        "tests/a2/test_site_refs.py::test_missing_yaml_reader_requires_explicit_ref"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9",
+        "tests/a2/test_site_refs.py": "5a3346a29fadb6da059475918f285f1e87683a6547d06b2d0a947a362ecf24ac"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S05",
+      "task": "T04",
+      "proposed_node": "tests/a2/test_site_routes.py::test_rd_routes_keep_internal_topics",
+      "nodes": [
+        "tests/a2/test_site_routes.py::test_rd_routes_keep_internal_topics"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_routes.py": "49fc012db734446278d082c1129eafa2055a46c58255f7af859f1ae3689c8153"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S06",
+      "task": "T04",
+      "proposed_node": "tests/a2/test_site_routes.py::test_pinned_pkgdown_article_routes",
+      "nodes": [
+        "tests/a2/test_site_routes.py::test_pinned_pkgdown_article_routes"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_routes.py": "49fc012db734446278d082c1129eafa2055a46c58255f7af859f1ae3689c8153"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S07",
+      "task": "T04",
+      "proposed_node": "tests/a2/test_site_routes.py::test_route_collisions_and_custom_layout",
+      "nodes": [
+        "tests/a2/test_site_integration.py::test_routes_and_collisions",
+        "tests/a2/test_site_integration.py::test_custom_article_frontmatter_not_invented[output: custom::format]",
+        "tests/a2/test_site_integration.py::test_custom_article_frontmatter_not_invented[pkgdown:\\n  as_is: true]",
+        "tests/a2/test_site_integration.py::test_unsupported_layout_retains_supported_routes[quarto]",
+        "tests/a2/test_site_integration.py::test_unsupported_layout_retains_supported_routes[extension]",
+        "tests/a2/test_site_integration.py::test_unsupported_layout_retains_supported_routes[overlay]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S08",
+      "task": "T04",
+      "proposed_node": "tests/a2/test_site_routes.py::test_release_mode_and_destination",
+      "nodes": [
+        "tests/a2/test_site_integration.py::test_destination_and_workflow_mode_integration[destination]",
+        "tests/a2/test_site_integration.py::test_destination_and_workflow_mode_integration[workflow-dev]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config0-True]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config1-True]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config2-True]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config3-False]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config4-False]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config5-False]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config6-False]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config7-False]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9",
+        "tests/a2/test_site_routes.py": "49fc012db734446278d082c1129eafa2055a46c58255f7af859f1ae3689c8153"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S09",
+      "task": "T05",
+      "proposed_node": "tests/a2/test_site_http.py::test_base_url_validation_normalization",
+      "nodes": [
+        "tests/a2/test_site_http.py::test_base_url_validation_normalization[https://EXAMPLE.org:443/pkg-https://example.org/pkg/]",
+        "tests/a2/test_site_http.py::test_base_url_validation_normalization[http://example.org:80/pkg/-http://example.org/pkg/]",
+        "tests/a2/test_site_http.py::test_base_url_validation_normalization[https://example.org/Pkg%2fslice/-https://example.org/Pkg%2Fslice/]",
+        "tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[file:///etc/passwd]",
+        "tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[https://user:pass@example.org/]",
+        "tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[https://example.org/?q=1]",
+        "tests/a2/test_site_integration.py::test_url_rejects_unsafe_or_ambiguous_base[https://example.org/#x]",
+        "tests/a2/test_site_integration.py::test_absent_source_url_allows_explicit_base"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_http.py": "59c8b4826bb8f0e0cf0124d5a60f42c7f36a50108d5df011507f9e43fb204597",
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S10",
+      "task": "T05",
+      "proposed_node": "tests/a2/test_site_http.py::test_same_origin_redirect_policy",
+      "nodes": [
+        "tests/a2/test_site_http.py::test_same_origin_redirect_policy[1-True]",
+        "tests/a2/test_site_http.py::test_same_origin_redirect_policy[3-True]",
+        "tests/a2/test_site_http.py::test_same_origin_redirect_policy[4-False]",
+        "tests/a2/test_site_http.py::test_cross_origin_redirect_never_followed[https://example.org/pkg/]",
+        "tests/a2/test_site_http.py::test_cross_origin_redirect_never_followed[http://www.example.org/pkg/]",
+        "tests/a2/test_site_http.py::test_cross_origin_redirect_never_followed[https://www.example.org/pkg/]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_http.py": "59c8b4826bb8f0e0cf0124d5a60f42c7f36a50108d5df011507f9e43fb204597"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S11",
+      "task": "T05",
+      "proposed_node": "tests/a2/test_site_http.py::test_sitemap_shape_and_bounds",
+      "nodes": [
+        "tests/a2/test_site_http.py::test_sitemap_shape_and_bounds",
+        "tests/a2/test_site_http.py::test_slow_sitemap_total_deadline",
+        "tests/a2/test_site_integration.py::test_invalid_sitemap_never_missing_pages[<sitemapindex/>]",
+        "tests/a2/test_site_integration.py::test_invalid_sitemap_never_missing_pages[not xml]",
+        "tests/a2/test_site_integration.py::test_invalid_sitemap_never_missing_pages[<urlset><url><loc>https://foreign.org/other.html</loc></url></urlset>]",
+        "tests/a2/test_site_integration.py::test_source_url_and_missing_sitemap[absent]",
+        "tests/a2/test_site_integration.py::test_source_url_and_missing_sitemap[disagree]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_http.py": "59c8b4826bb8f0e0cf0124d5a60f42c7f36a50108d5df011507f9e43fb204597",
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S12",
+      "task": "T05",
+      "proposed_node": "tests/a2/test_site_http.py::test_foreign_and_zero_inbase_entries",
+      "nodes": [
+        "tests/a2/test_site_http.py::test_foreign_and_zero_inbase_entries"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_http.py": "59c8b4826bb8f0e0cf0124d5a60f42c7f36a50108d5df011507f9e43fb204597"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S13",
+      "task": "T06",
+      "proposed_node": "tests/a2/test_site_integration.py::test_missing_extra_and_unreleased_severity",
+      "nodes": [
+        "tests/a2/test_site_integration.py::test_missing_extra_and_unreleased_severity"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S14",
+      "task": "T06",
+      "proposed_node": "tests/a2/test_site_integration.py::test_site_cli_thresholds",
+      "nodes": [
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[none-clean]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[none-missing]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[none-offline]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[none-unsupported]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[warn-clean]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[warn-missing]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[warn-offline]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[warn-unsupported]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[error-clean]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[error-missing]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[error-offline]",
+        "tests/a2/test_site_integration.py::test_site_cli_thresholds[error-unsupported]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "S15",
+      "task": "T06",
+      "proposed_node": "tests/a2/test_site_integration.py::test_no_build_crawl_fetch_or_deploy",
+      "nodes": [
+        "tests/a2/test_site_integration.py::test_no_build_crawl_fetch_or_deploy"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "G01",
+      "task": "T07",
+      "proposed_node": "tests/a2/test_guardian.py::test_handshake_before_package_code",
+      "nodes": [
+        "tests/a2/test_group_pin.py::test_expired_pin_never_releases_workload",
+        "tests/a2/test_group_pin.py::test_parent_loss_before_startup_release_has_no_orphan_pin",
+        "tests/a2/test_guardian.py::test_handshake_before_package_code",
+        "tests/a2/test_guardian.py::test_expired_budget_no_launch"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_group_pin.py": "b9cab5ede0ec057af4cd2879fe63b7b6f18133b0dacc002988233fa84341d736",
+        "tests/a2/test_guardian.py": "19884c3c0a56eb2705b493d2f4774e26bd42d0761aad51ef49d755cceb0d065f"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "G02",
+      "task": "T07",
+      "proposed_node": "tests/a2/test_guardian.py::test_phase_arm_ack_sequence",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_phase_arm_ack_sequence",
+        "tests/a2/test_guardian.py::test_stale_phase_request_does_not_execute",
+        "tests/a2/test_guardian.py::test_lost_phase_ack_never_releases_code",
+        "tests/a2/test_guardian.py::test_wrong_sequence_ack_blocks_transition[1]",
+        "tests/a2/test_guardian.py::test_wrong_sequence_ack_blocks_transition[2]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_guardian.py": "19884c3c0a56eb2705b493d2f4774e26bd42d0761aad51ef49d755cceb0d065f"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "G03",
+      "task": "T07",
+      "proposed_node": "tests/a2/test_guardian.py::test_heartbeat_age_and_stale_records",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_heartbeat_age_and_stale_records[0.25-deadline]",
+        "tests/a2/test_guardian.py::test_heartbeat_age_and_stale_records[6-parent-loss]",
+        "tests/a2/test_guardian.py::test_heartbeat_cadence_and_sequence",
+        "tests/a2/test_guardian.py::test_simultaneous_heartbeat_and_deadline_expiry"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_guardian.py": "19884c3c0a56eb2705b493d2f4774e26bd42d0761aad51ef49d755cceb0d065f"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "G04",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_single_termination_owner_idempotence",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_single_termination_owner_idempotence",
+        "tests/a2/test_guardian.py::test_repeated_requests_record_before_single_term"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_guardian.py": "19884c3c0a56eb2705b493d2f4774e26bd42d0761aad51ef49d755cceb0d065f"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "G05",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_deadline_completion_collision",
+      "nodes": [
+        "tests/a2/test_group_pin.py::test_parent_loss_retains_original_deadline[0.8-deadline]",
+        "tests/a2/test_group_pin.py::test_parent_loss_retains_original_deadline[8-parent-loss]",
+        "tests/a2/test_guardian.py::test_deadline_completion_collision"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_group_pin.py": "b9cab5ede0ec057af4cd2879fe63b7b6f18133b0dacc002988233fa84341d736",
+        "tests/a2/test_guardian.py": "19884c3c0a56eb2705b493d2f4774e26bd42d0761aad51ef49d755cceb0d065f"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "G06",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_term_kill_cleanup_observations",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_native_deadline_and_direct_child_reap",
+        "tests/a2/test_guardian.py::test_ordinary_group_child_cleanup"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_guardian.py": "19884c3c0a56eb2705b493d2f4774e26bd42d0761aad51ef49d755cceb0d065f"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "G07",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_parent_loss_preserves_deadline",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_parent_loss_preserves_deadline[1-deadline]",
+        "tests/a2/test_guardian.py::test_parent_loss_preserves_deadline[8-parent-loss]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_guardian.py": "19884c3c0a56eb2705b493d2f4774e26bd42d0761aad51ef49d755cceb0d065f"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "G08",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_guardian_failure_emergency_cleanup",
+      "nodes": [
+        "tests/a2/test_group_pin.py::test_pin_holds_identity_after_workload_reap",
+        "tests/a2/test_group_pin.py::test_pin_retains_exited_child_without_poll",
+        "tests/a2/test_group_pin.py::test_guardian_crash_uses_owned_pin[False]",
+        "tests/a2/test_group_pin.py::test_guardian_crash_uses_owned_pin[True]",
+        "tests/a2/test_group_pin.py::test_pin_ignores_term_during_guardian_grace",
+        "tests/a2/test_group_pin.py::test_pin_stays_armed_past_deadline_until_owner_releases",
+        "tests/a2/test_guardian.py::test_guardian_failure_emergency_cleanup",
+        "tests/a2/test_guardian.py::test_no_exception_signal_after_direct_child_reap",
+        "tests/a2/test_guardian.py::test_live_guardian_death_emergency_owner",
+        "tests/a2/test_guardian.py::test_guardian_crash_after_reap_keeps_pin_owned[False]",
+        "tests/a2/test_guardian.py::test_guardian_crash_after_reap_keeps_pin_owned[True]",
+        "tests/a2/test_guardian.py::test_join_launcher_ignores_decoy_lib_in_workload_cwd",
+        "tests/a2/test_guardian.py::test_deadline_before_join_never_executes_workload",
+        "tests/a2/test_guardian.py::test_interrupt_after_launch_tracks_and_reaps_child[pin]",
+        "tests/a2/test_guardian.py::test_interrupt_after_launch_tracks_and_reaps_child[guardian]",
+        "tests/a2/test_guardian.py::test_parent_absent_repeated_probe_failure_still_kills_and_reaps",
+        "tests/a2/test_guardian.py::test_pending_workload_sigint_retains_direct_child_handle",
+        "tests/a2/test_guardian.py::test_interrupt_after_pin_constructor_enters_cleanup",
+        "tests/a2/test_guardian.py::test_nul_command_fails_before_bootstrap_without_success",
+        "tests/a2/test_guardian.py::test_prestart_interrupt_never_signals_reaped_pin",
+        "tests/a2/test_guardian.py::test_handle_allocation_failure_precedes_spawn",
+        "tests/a2/test_guardian.py::test_workload_that_dies_or_fails_is_not_reported_completed[import os,signal;os.kill(os.getpid(),signal.SIGKILL)-killed]",
+        "tests/a2/test_guardian.py::test_workload_that_dies_or_fails_is_not_reported_completed[import sys;sys.exit(3)-exited-nonzero]",
+        "tests/a2/test_guardian.py::test_clean_exit_is_still_completed",
+        "tests/a2/test_guardian.py::test_parent_interrupt_leaves_an_interrupted_marker",
+        "tests/a2/test_guardian.py::test_stale_startup_release_never_starts_the_workload",
+        "tests/a2/test_guardian.py::test_stale_terminate_record_is_ignored",
+        "tests/a2/test_guardian.py::test_probe_timeouts_tolerate_a_loaded_runner"
+      ],
+      "status": "ready",
+      "coverage_gaps": [
+        "External observation: candidate-bound both-platform execution of the final commit, produced by a2-platform.yml and verified per platform by verify_a2_release.py; independent review dispositioned in COVERAGE."
+      ],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_group_pin.py": "b9cab5ede0ec057af4cd2879fe63b7b6f18133b0dacc002988233fa84341d736",
+        "tests/a2/test_guardian.py": "19884c3c0a56eb2705b493d2f4774e26bd42d0761aad51ef49d755cceb0d065f"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "G09",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_detached_child_and_total_host_loss",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_detached_child_and_total_host_loss"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_guardian.py": "19884c3c0a56eb2705b493d2f4774e26bd42d0761aad51ef49d755cceb0d065f"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "G10",
+      "task": "T08",
+      "proposed_node": "tests/a2/test_guardian.py::test_monotonic_clock_and_scheduler_delay",
+      "nodes": [
+        "tests/a2/test_guardian.py::test_monotonic_clock_and_scheduler_delay",
+        "tests/a2/test_guardian.py::test_wall_clock_and_delayed_poll_do_not_reset_deadline[0]",
+        "tests/a2/test_guardian.py::test_wall_clock_and_delayed_poll_do_not_reset_deadline[0.15]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_guardian.py": "19884c3c0a56eb2705b493d2f4774e26bd42d0761aad51ef49d755cceb0d065f"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "I01",
+      "task": "T09",
+      "proposed_node": "tests/a2/test_stdio.py::test_native_output_does_not_deadlock",
+      "nodes": [
+        "tests/a2/test_stdio.py::test_native_output_does_not_deadlock",
+        "tests/a2/test_stdio.py::test_public_diagnostics_bounded_and_json_isolated",
+        "tests/a2/test_stdio.py::test_utf8_diagnostic_tail_byte_limit"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_stdio.py": "341008a4e28c0afa26bce497fe23864a7eb9a7173fe451f22ac91f52a7c89ab5"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "I02",
+      "task": "T09",
+      "proposed_node": "tests/a2/test_stdio.py::test_shared_text_output_threshold",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_running_evaluate_output_limit",
+        "tests/a2/test_examples_r.py::test_evaluate_spool_counts_text_once",
+        "tests/a2/test_stdio.py::test_shared_text_output_threshold",
+        "tests/a2/test_stdio.py::test_combined_output_exact_byte_accounting"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2",
+        "tests/a2/test_stdio.py": "341008a4e28c0afa26bce497fe23864a7eb9a7173fe451f22ac91f52a7c89ab5"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "I03",
+      "task": "T09",
+      "proposed_node": "tests/a2/test_stdio.py::test_output_overshoot_with_parent_loss",
+      "nodes": [
+        "tests/a2/test_stdio.py::test_output_overshoot_with_parent_loss"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_stdio.py": "341008a4e28c0afa26bce497fe23864a7eb9a7173fe451f22ac91f52a7c89ab5"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "I04",
+      "task": "T09",
+      "proposed_node": "tests/a2/test_stdio.py::test_checkpoint_and_marker_integrity",
+      "nodes": [
+        "tests/a2/test_stdio.py::test_checkpoint_and_marker_integrity",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[None]",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{]",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[[]]",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[[{}]]",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{\"records\":[{}]}]",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{\"records\":{}}]",
+        "tests/a2/test_stdio.py::test_invalid_checkpoint_cannot_match[{\"records\":[{\"id\":\"README.md:3\",\"text\":[1]}]}]",
+        "tests/a2/test_stdio.py::test_mixed_checkpoint_preserves_valid_earlier[bad0]",
+        "tests/a2/test_stdio.py::test_mixed_checkpoint_preserves_valid_earlier[bad1]",
+        "tests/a2/test_stdio.py::test_mixed_checkpoint_preserves_valid_earlier[bad2]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_stdio.py": "341008a4e28c0afa26bce497fe23864a7eb9a7173fe451f22ac91f52a7c89ab5"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "I05",
+      "task": "T09",
+      "proposed_node": "tests/a2/test_stdio.py::test_bounded_finalization_and_artifacts",
+      "nodes": [
+        "tests/a2/test_stdio.py::test_bounded_finalization_and_artifacts"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_stdio.py": "341008a4e28c0afa26bce497fe23864a7eb9a7173fe451f22ac91f52a7c89ab5"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "E01",
+      "task": "T10",
+      "proposed_node": "tests/a2/test_readme.py::test_source_selection_and_ambiguity",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_source_hidden_state_and_rendered_assertion",
+        "tests/a2/test_readme.py::test_source_selection_and_ambiguity[README.Rmd]",
+        "tests/a2/test_readme.py::test_source_selection_and_ambiguity[README.qmd]",
+        "tests/a2/test_readme.py::test_source_selection_and_ambiguity[both]",
+        "tests/a2/test_readme.py::test_source_selection_and_ambiguity[md-only]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2",
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "E02",
+      "task": "T10",
+      "proposed_node": "tests/a2/test_readme.py::test_rendered_unpaired_counts",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_source_success_does_not_clear_rendered",
+        "tests/a2/test_examples_r.py::test_rendered_unpaired_counts[False-False]",
+        "tests/a2/test_examples_r.py::test_rendered_unpaired_counts[False-True]",
+        "tests/a2/test_examples_r.py::test_rendered_unpaired_counts[True-False]",
+        "tests/a2/test_examples_r.py::test_rendered_unpaired_counts[True-True]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "E03",
+      "task": "T10",
+      "proposed_node": "tests/a2/test_readme.py::test_explicit_closed_fence_extraction",
+      "nodes": [
+        "tests/a2/test_readme.py::test_explicit_closed_fences[```r]",
+        "tests/a2/test_readme.py::test_explicit_closed_fences[~~~r]",
+        "tests/a2/test_readme.py::test_explicit_closed_fences[```{r label, eval=FALSE}]",
+        "tests/a2/test_readme.py::test_explicit_closed_fences[```{r label, include=FALSE}]",
+        "tests/a2/test_readme.py::test_unsupported_or_unterminated_fences_never_execute[```]",
+        "tests/a2/test_readme.py::test_unsupported_or_unterminated_fences_never_execute[```python]",
+        "tests/a2/test_readme.py::test_unsupported_or_unterminated_fences_never_execute[```r]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "E04",
+      "task": "T10",
+      "proposed_node": "tests/a2/test_readme.py::test_pasted_output_and_skip_marker_location",
+      "nodes": [
+        "tests/a2/test_readme.py::test_all_located_skip_markers[# docs-check: skip]",
+        "tests/a2/test_readme.py::test_all_located_skip_markers[#| docs-check: skip]",
+        "tests/a2/test_readme.py::test_all_located_skip_markers[<!-- docs-check: skip -->]",
+        "tests/a2/test_readme.py::test_multiline_string_is_not_pasted_output",
+        "tests/a2/test_readme.py::test_html_skip_prior_nonblank_boundary[\\n]",
+        "tests/a2/test_readme.py::test_html_skip_prior_nonblank_boundary[\\nintervening prose\\n]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "E05",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_literal_defaults_precedence",
+      "nodes": [
+        "tests/a2/test_readme.py::test_body_precedence_and_conflicts",
+        "tests/a2/test_readme.py::test_conflicting_global_defaults_fail_preflight",
+        "tests/a2/test_readme.py::test_dynamic_defaults_never_replay[```r\\nknitr::opts_chunk$set(eval=variable)\\n```\\n]",
+        "tests/a2/test_readme.py::test_dynamic_defaults_never_replay[---\\nexecute: \"{{ dynamic }}\"\\n---\\n]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "E06",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_supported_visibility_options",
+      "nodes": [
+        "tests/a2/test_readme.py::test_supported_visibility_options[warning-warning=FALSE-Warning: hidden]",
+        "tests/a2/test_readme.py::test_supported_visibility_options[message-message=FALSE-Message: hidden]",
+        "tests/a2/test_readme.py::test_supported_visibility_options[stdout-results=\"hide\"-[1] 1]",
+        "tests/a2/test_readme.py::test_literal_global_defaults_and_supported_options[README.Rmd-```r\\nknitr::opts_chunk$set(eval=TRUE, include=TRUE, echo=FALSE, warning=FALSE, message=FALSE, results=\"markup\", comment=\"#>\", error=FALSE, engine=\"R\")\\n```\\n]",
+        "tests/a2/test_readme.py::test_literal_global_defaults_and_supported_options[README.qmd----\\nexecute:\\n  eval: true\\n  echo: false\\n  warning: false\\n  message: false\\n---\\n]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "E07",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_unsupported_options_fail_preflight",
+      "nodes": [
+        "tests/a2/test_readme.py::test_unsupported_options_preflight[error=TRUE]",
+        "tests/a2/test_readme.py::test_unsupported_options_preflight[fig.path='plots/']",
+        "tests/a2/test_readme.py::test_unsupported_options_preflight[eval=variable]",
+        "tests/a2/test_readme.py::test_unsupported_options_preflight[child='x.Rmd']",
+        "tests/a2/test_readme.py::test_unsupported_options_preflight[results='asis']",
+        "tests/a2/test_readme.py::test_all_unsupported_options_are_reported",
+        "tests/a2/test_readme.py::test_quarto_defaults_report_all_unsupported_options",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[error=1]",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[eval=variable]",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[fig.path=\"x\"]",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[child=\"x.Rmd\"]",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[results=\"asis\"]",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[engine=FALSE]",
+        "tests/a2/test_readme.py::test_unsupported_family_never_replays[template=\"x\"]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "E08",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_installation_token_filter",
+      "nodes": [
+        "tests/a2/test_readme.py::test_install_detection_ignores_strings_comments",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[pak::pak(\"data-wise/medfit\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[pak::pak(c(\"a\", \"b\"))]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[pak::pkg_install(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[pak::local_install(\".\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[renv::install(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[renv::restore()]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[BiocManager::install(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[remotes::install_github(\"a/b\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[devtools::install()]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[devtools::install_deps()]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[utils::install.packages(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[install_github(\"a/b\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[pak :: pak(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[`pak::pak`(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[pak::`pak`(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[renv::activate()]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[renv::init()]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[(install.packages)(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[f <- install.packages\\nf(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[sapply(\"x\", install.packages)]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[do.call(\"install.packages\", list(\"x\"))]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[do.call('utils::install.packages', list(\"x\"))]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[system(\"R CMD INSTALL x.tar.gz\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[system2(\"R\", c(\"CMD\", \"INSTALL\", \"x.tar.gz\"))]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[system(\"Rscript -e 'install.packages(\\\\\"x\\\\\")'\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[library(BiocManager)\\ninstall(\"x\")]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[library(\"devtools\")\\ninstall()]",
+        "tests/a2/test_readme.py::test_installation_forms_are_never_executed[require(pak)\\npak(\"x\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[pak::pkg_list()]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[installed.packages()]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[renv::status()]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[devtools::document()]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[my_pak::pak(\"x\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[reinstall_helper()]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[x$install_github(\"a/b\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[print(\"install.packages\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[cat(\"R CMD INSTALL\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[do.call(\"print\", list(1))]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[install(\"x\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[library(dplyr)\\ninstall(\"x\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[get(\"mean\")]",
+        "tests/a2/test_readme.py::test_non_installation_look_alikes_still_execute[system(\"echo hello\")]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "E09",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_coverage_partition_and_exclusions",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_excluded_only_has_no_side_effect",
+        "tests/a2/test_readme.py::test_unsupported_assertions_preserve_supported_comparison",
+        "tests/a2/test_readme.py::test_coverage_partition_and_exclusions[False]",
+        "tests/a2/test_readme.py::test_coverage_partition_and_exclusions[True]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2",
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "E10",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_no_eligible_assertions_no_setup",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_no_assertions_never_start_r",
+        "tests/a2/test_examples_r.py::test_unsupported_defaults_block_before_r"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "E11",
+      "task": "T11",
+      "proposed_node": "tests/a2/test_readme.py::test_real_readme_shape_regressions",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_medfit_layout_counts_and_release_gates",
+        "tests/a2/test_readme.py::test_real_readme_shape_regressions"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2",
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "N01",
+      "task": "T12",
+      "proposed_node": "tests/a2/test_comparison.py::test_documented_precision_cases",
+      "nodes": [
+        "tests/a2/test_comparison.py::test_documented_precision_cases[0.19-0.20-match]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[0.19-0.20001-output]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[1e-04-2e-04-match]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[1.00e-04-1.02e-04-output]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[-0.19--0.20-match]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[55%-36 %-output]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[55%-0.55-shape]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[1,234-1234-shape]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[NA-NaN-output]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[Inf--Inf-output]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[label [1] 1-other [1] 1-shape]",
+        "tests/a2/test_comparison.py::test_documented_precision_cases[[1] 1 2-[1] 1-shape]",
+        "tests/a2/test_comparison.py::test_remaining_normative_precision_rows[0.1900-0.1901-match]",
+        "tests/a2/test_comparison.py::test_remaining_normative_precision_rows[0.1900-0.1902-output]",
+        "tests/a2/test_comparison.py::test_remaining_normative_precision_rows[0.164-0.1648-match]",
+        "tests/a2/test_comparison.py::test_remaining_normative_precision_rows[0.19-0.164-output]",
+        "tests/a2/test_examples_r.py::test_normative_precision[0.19-0.20-match]",
+        "tests/a2/test_examples_r.py::test_normative_precision[0.19-0.2001-output]",
+        "tests/a2/test_examples_r.py::test_normative_precision[1e-04-0.0001-match]",
+        "tests/a2/test_examples_r.py::test_normative_precision[p < 0.001-p = 2.2e-16-match]",
+        "tests/a2/test_examples_r.py::test_normative_precision[p < 0.001-p = 0.002-output]",
+        "tests/a2/test_examples_r.py::test_normative_precision[55%-36 %-output]",
+        "tests/a2/test_examples_r.py::test_normative_precision[55%-0.55-shape]",
+        "tests/a2/test_examples_r.py::test_normative_precision[1,234-1234-shape]",
+        "tests/a2/test_examples_r.py::test_normative_precision[NA-NA-match]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_comparison.py": "5a4d2e98ee41e669485e9544639e364b762dde1bd68cf07c18e9c336f26af627",
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "N02",
+      "task": "T12",
+      "proposed_node": "tests/a2/test_comparison.py::test_labeled_inequality_cases",
+      "nodes": [
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-p = 0.001-output]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p <= 0.001-p = 0.001-match]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-p < 2e-16-match]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-p < 0.01-unverified]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-p > 0.01-unverified]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-<2e-16-shape]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[<2e-16-<2e-16-shape]",
+        "tests/a2/test_comparison.py::test_labeled_inequality_cases[p < 0.001-p < .-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<chr>      <dbl>     <dbl>-  <chr>      <dbl>     <dbl>-match]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<dbl> <dbl> <dbl> <dbl> <int> <lgl>-  <dbl> <dbl> <dbl> <dbl> <int> <lgl>    -match]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<chr> <dbl>-<chr> <int>-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<dbl[2]>-<dbl[3]>-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<chr [3]>-<chr [4]>-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<S3: foo2>-<S3: foo3>-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<dbl[2]>-<dbl[2]>-match]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<chr [3]>-  <chr [3]>  -match]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[<2e-16-<2e-16-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[>=0.05->=0.05-shape]",
+        "tests/a2/test_comparison.py::test_tibble_type_rows_are_not_bare_inequality_bounds[< 0.001-< 0.001-shape]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_comparison.py": "5a4d2e98ee41e669485e9544639e364b762dde1bd68cf07c18e9c336f26af627"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "N03",
+      "task": "T12",
+      "proposed_node": "tests/a2/test_comparison.py::test_expression_subsequence_no_reuse",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_expression_subsequence_no_reuse",
+        "tests/a2/test_examples_r.py::test_repeated_expected_line_cannot_reuse_output"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "N04",
+      "task": "T12",
+      "proposed_node": "tests/a2/test_comparison.py::test_rng_and_unstable_fields",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_unstable_output_remains_unverified[packageVersion(\"evaluate\")-[1] 999]",
+        "tests/a2/test_examples_r.py::test_unstable_output_remains_unverified[Sys.Date()-[1] \"1900-01-01\"]",
+        "tests/a2/test_examples_r.py::test_unstable_output_remains_unverified[runif(1)-[1] 999]",
+        "tests/a2/test_examples_r.py::test_seed_order_does_not_retroactively_verify[False]",
+        "tests/a2/test_examples_r.py::test_seed_order_does_not_retroactively_verify[True]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "N05",
+      "task": "T12",
+      "proposed_node": "tests/a2/test_comparison.py::test_warn_only_and_complete_mismatch",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_warn_only_and_complete_mismatch[none-0]",
+        "tests/a2/test_examples_cli.py::test_warn_only_and_complete_mismatch[warn-1]",
+        "tests/a2/test_examples_cli.py::test_warn_only_and_complete_mismatch[error-0]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "R01",
+      "task": "T13",
+      "proposed_node": "tests/a2/test_examples_r.py::test_fresh_ordered_hidden_setup",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_fresh_ordered_hidden_setup",
+        "tests/a2/test_examples_r.py::test_package_sessions_and_eval_false_isolation"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "R02",
+      "task": "T13",
+      "proposed_node": "tests/a2/test_examples_r.py::test_working_tree_load_identity",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_working_tree_load_identity"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "R03",
+      "task": "T13",
+      "proposed_node": "tests/a2/test_examples_r.py::test_dependency_preflight_no_install",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_dependency_preflight_no_install",
+        "tests/a2/test_readme.py::test_engine_preflight_exact_missing_list[pkgload]",
+        "tests/a2/test_readme.py::test_engine_preflight_exact_missing_list[evaluate]",
+        "tests/a2/test_readme.py::test_engine_preflight_exact_missing_list[knitr]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2",
+        "tests/a2/test_readme.py": "3f6f5573934e577701bf07ef4f390dc0eef73a11548ea19990af68a1186a57d9"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "R04",
+      "task": "T13",
+      "proposed_node": "tests/a2/test_examples_r.py::test_visibility_and_conditions_channels",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_hidden_warning_does_not_hide_stdout",
+        "tests/a2/test_examples_r.py::test_visibility_and_conditions_channels"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "R05",
+      "task": "T13",
+      "proposed_node": "tests/a2/test_examples_r.py::test_one_upstream_failure",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_one_upstream_failure",
+        "tests/a2/test_examples_r.py::test_one_upstream_failure_stops_same_chunk"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79",
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "R06",
+      "task": "T13",
+      "proposed_node": "tests/a2/test_examples_r.py::test_clean_and_planted_stale_output",
+      "nodes": [
+        "tests/a2/test_examples_r.py::test_clean_and_planted_stale_output[0.19-complete]",
+        "tests/a2/test_examples_r.py::test_clean_and_planted_stale_output[0.80-complete]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "R07",
+      "task": "T14",
+      "proposed_node": "tests/a2/test_examples_cli.py::test_native_chunk_deadline",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_native_chunk_deadline",
+        "tests/a2/test_examples_cli.py::test_distinct_chunk_deadline_retains_checkpoint"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "R08",
+      "task": "T14",
+      "proposed_node": "tests/a2/test_examples_cli.py::test_file_loading_deadline",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_file_loading_deadline",
+        "tests/a2/test_examples_cli.py::test_distinct_file_deadline_and_defaults"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "R09",
+      "task": "T14",
+      "proposed_node": "tests/a2/test_examples_cli.py::test_global_budget_across_packages",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_global_budget_across_packages"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "R10",
+      "task": "T14",
+      "proposed_node": "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[none-0-json]",
+        "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[none-0-text]",
+        "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[warn-2-json]",
+        "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[warn-2-text]",
+        "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[error-2-json]",
+        "tests/a2/test_examples_cli.py::test_partial_cli_report_thresholds[error-2-text]",
+        "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[none-0-False]",
+        "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[none-0-True]",
+        "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[warn-2-False]",
+        "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[warn-2-True]",
+        "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[error-2-False]",
+        "tests/a2/test_examples_cli.py::test_replay_exception_retains_counts_and_lifecycle[error-2-True]",
+        "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[prepare]",
+        "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[interrupt]",
+        "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[stale]",
+        "tests/a2/test_examples_cli.py::test_replay_boundary_failure_guards[completed]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "R11",
+      "task": "T14",
+      "proposed_node": "tests/a2/test_examples_cli.py::test_wrapper_lifetime_and_interruption",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_wrapper_lifetime_and_interruption"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "R12",
+      "task": "T14",
+      "proposed_node": "tests/a2/test_examples_cli.py::test_combined_stage_and_eco_partial_results",
+      "nodes": [
+        "tests/a2/test_examples_cli.py::test_combined_stage_and_eco_partial_results[site]",
+        "tests/a2/test_examples_cli.py::test_combined_stage_and_eco_partial_results[examples]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "A01",
+      "task": "T15",
+      "proposed_node": "tests/a2/test_agent.py::test_default_recipe_stays_static",
+      "nodes": [
+        "tests/a2/test_agent.py::test_default_recipe_stays_static"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_agent.py": "dd332ae79793186116e59465929dc7d3da7304a5d49a4f72c700d0731a2d7354"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "A02",
+      "task": "T15",
+      "proposed_node": "tests/a2/test_agent.py::test_human_versus_imported_url",
+      "nodes": [
+        "tests/a2/test_agent.py::test_human_versus_imported_url[human-https://example.org/pkg/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[human-http://127.0.0.1/private/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[file-https://example.org/pkg/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[file-http://127.0.0.1/private/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[tool-https://example.org/pkg/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[tool-http://127.0.0.1/private/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[absent-https://example.org/pkg/]",
+        "tests/a2/test_agent.py::test_human_versus_imported_url[absent-http://127.0.0.1/private/]",
+        "tests/a2/test_agent.py::test_equals_form_requires_same_human_authorization"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_agent.py": "dd332ae79793186116e59465929dc7d3da7304a5d49a4f72c700d0731a2d7354"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "A03",
+      "task": "T15",
+      "proposed_node": "tests/a2/test_agent.py::test_examples_always_recommend_only",
+      "nodes": [
+        "tests/a2/test_agent.py::test_examples_always_recommend_only[argv0]",
+        "tests/a2/test_agent.py::test_examples_always_recommend_only[argv1]",
+        "tests/a2/test_agent.py::test_examples_always_recommend_only[argv2]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_agent.py": "dd332ae79793186116e59465929dc7d3da7304a5d49a4f72c700d0731a2d7354"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "A04",
+      "task": "T15",
+      "proposed_node": "tests/a2/test_agent.py::test_recipe_parse_uses_stubs",
+      "nodes": [
+        "tests/a2/test_agent.py::test_recipe_parse_uses_stubs"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_agent.py": "dd332ae79793186116e59465929dc7d3da7304a5d49a4f72c700d0731a2d7354"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "D01",
+      "task": "T16",
+      "proposed_node": "tests/a2/test_shipping.py::test_r_script_packaged_and_parses",
+      "nodes": [
+        "tests/a2/test_shipping.py::test_r_script_packaged_and_parses"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_shipping.py": "c5b9063d9a376fd4dc9170e79c0971a6362b8d739fb09345c158ee6a3647c8e6"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "D02",
+      "task": "T16",
+      "proposed_node": "tests/a2/test_shipping.py::test_no_new_public_module_dependency",
+      "nodes": [
+        "tests/a2/test_shipping.py::test_no_new_public_module_dependency"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_shipping.py": "c5b9063d9a376fd4dc9170e79c0971a6362b8d739fb09345c158ee6a3647c8e6"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "D03",
+      "task": "T17",
+      "proposed_node": "tests/a2/test_docs.py::test_command_flags_and_reference_sync",
+      "nodes": [
+        "tests/a2/test_docs.py::test_optional_flags_documented[commands/docs/check.md]",
+        "tests/a2/test_docs.py::test_optional_flags_documented[docs/commands.md]",
+        "tests/a2/test_docs.py::test_optional_flags_documented[docs/guides/docs-audit.md]",
+        "tests/a2/test_docs.py::test_optional_flags_documented[docs/tutorials/fix-a-docs-check-finding.md]",
+        "tests/a2/test_docs.py::test_optional_flags_documented[docs/REFCARD.md]",
+        "tests/a2/test_docs.py::test_optional_flags_documented[docs/command-cards.md]",
+        "tests/a2/test_docs.py::test_command_sync",
+        "tests/a2/test_docs.py::test_generated_reference_sync"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_docs.py": "1bf9bbff0a8ed1256b9b14e675464bd3a8a4c820dddcaa521347b73ee1f7d5f5"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "D04",
+      "task": "T18",
+      "proposed_node": "tests/a2/test_docs.py::test_walkthroughs_and_site_content",
+      "nodes": [
+        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/guides/docs-audit.md-terms0]",
+        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/tutorials/fix-a-docs-check-finding.md-terms1]",
+        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/workflows/index.md-terms2]",
+        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/quickstart.md-terms3]",
+        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/REFCARD.md-terms4]",
+        "tests/a2/test_docs.py::test_walkthroughs_and_site_content[docs/command-cards.md-terms5]",
+        "tests/a2/test_docs.py::test_no_unconditional_static_promise[docs/tutorials/fix-a-docs-check-finding.md-no r session required.]",
+        "tests/a2/test_docs.py::test_no_unconditional_static_promise[docs/commands.md-static and read-only (`lib.docaudit`).]",
+        "tests/a2/test_docs.py::test_no_unconditional_static_promise[docs/reference/docaudit.md-pure-stdlib, no r).]",
+        "tests/a2/test_docs.py::test_no_unconditional_static_promise[docs/lib-modules.md-`docaudit`) \\u2014 no r, no node \\u2014]",
+        "tests/a2/test_docs.py::test_no_unconditional_static_promise[docs/lib-modules.md-(no r subprocess, no mcp server]",
+        "tests/a2/test_observations.py::test_page_inspection_passes_a_complete_site",
+        "tests/a2/test_observations.py::test_page_inspection_fails[override0-missing term]",
+        "tests/a2/test_observations.py::test_page_inspection_fails[override1-raw markdown]",
+        "tests/a2/test_observations.py::test_page_inspection_fails[override2-broken link]",
+        "tests/a2/test_observations.py::test_page_inspection_missing_page_fails",
+        "tests/a2/test_observations.py::test_rendered_observation_status"
+      ],
+      "status": "ready",
+      "coverage_gaps": [
+        "External observation: rendered_review, produced by a2-observations.yml on the candidate (expected terms, raw-markup absence, internal links, page hashes) and verified by verify_a2_aggregate.py."
+      ],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_docs.py": "1bf9bbff0a8ed1256b9b14e675464bd3a8a4c820dddcaa521347b73ee1f7d5f5",
+        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "D05",
+      "task": "T19",
+      "proposed_node": "tests/a2/test_docs.py::test_status_guidance_count_sync",
+      "nodes": [
+        "tests/a2/test_docs.py::test_status_guidance_count_sync",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[**Never auto-run** writes/uploads or network operations beyond the explicitly authorized read exceptions below.]",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[**Never auto-run** `--run-examples`, including combined site/examples commands;]",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[A URL from README/config, a tool result or another imported source is not authorization.]",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[never reuse one URL across an ecosystem.]",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[Unknown wrapper lifetime requires a terminal recommendation; budget plus 15 seconds is required.]",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[they do not permit writes, deployment, upload, fetch or arbitrary probes.]",
+        "tests/a2/test_docs.py::test_agent_boundary_prohibitions[`--kind deploy` is prohibited as an auto-run recipe]",
+        "tests/a2/test_docs.py::test_version_and_agent_mirror"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_docs.py": "1bf9bbff0a8ed1256b9b14e675464bd3a8a4c820dddcaa521347b73ee1f7d5f5"
+      },
+      "review_note": "Explicit current status, unreleased acceptance hold, actual command/check counts, unchanged feature version, mirror and agent prohibitions asserted. Local coverage complete; external acceptance remains pending."
+    },
+    {
+      "id": "V01",
+      "task": "T20",
+      "proposed_node": "tests/a2/test_release_verifier.py::test_manifest_mapping_and_collection",
+      "nodes": [
+        "tests/a2/test_release_verifier.py::test_manifest_mapping_and_collection",
+        "tests/a2/test_release_verifier.py::test_removed_normative_paragraph_or_table_row_rejected",
+        "tests/a2/test_release_verifier.py::test_removed_inventory_group_even_with_rewritten_ledger"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_release_verifier.py": "678ed4e9fd2293c0aa1cb2d23840065cc6dd6006a561eff9bad2bd69382f4335"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "V02",
+      "task": "T20",
+      "proposed_node": "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass",
+      "nodes": [
+        "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[None]",
+        "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[skipped]",
+        "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[xfailed]",
+        "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[xpassed]",
+        "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[failed]",
+        "tests/a2/test_release_verifier.py::test_required_outcomes_no_vacuous_pass[deselected]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_release_verifier.py": "678ed4e9fd2293c0aa1cb2d23840065cc6dd6006a561eff9bad2bd69382f4335"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "V03",
+      "task": "T20",
+      "proposed_node": "tests/a2/test_release_verifier.py::test_expected_findings_exactness",
+      "nodes": [
+        "tests/a2/test_release_verifier.py::test_expected_findings_exactness"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_release_verifier.py": "678ed4e9fd2293c0aa1cb2d23840065cc6dd6006a561eff9bad2bd69382f4335"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "V04",
+      "task": "T20",
+      "proposed_node": "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions",
+      "nodes": [
+        "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[candidate_sha]",
+        "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[lock_hash]",
+        "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[manifest_hash]",
+        "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[collection_run_id]",
+        "tests/a2/test_release_verifier.py::test_evidence_identity_and_versions[reported_r_checked]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.15.0-True]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.16.1-True]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.12.15-True]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.9.9-False]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.16.0rc1-False]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[3.16.0a1-False]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[latest-False]",
+        "tests/a2/test_release_verifier.py::test_stable_python_evidence[None-False]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[none]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[R]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[packages]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[platform]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[source-hash]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[expected-hash]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[missing-fixture]",
+        "tests/a2/test_release_verifier.py::test_main_runtime_platform_fixture_binding[duplicate-fixture]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_release_verifier.py": "678ed4e9fd2293c0aa1cb2d23840065cc6dd6006a561eff9bad2bd69382f4335"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance. User-authorized latest-stable policy: final supported versions accepted, prerelease/malformed/unsupported evidence rejected; CI enforces latest selection."
+    },
+    {
+      "id": "V08",
+      "task": "T20",
+      "proposed_node": "tests/a2/test_release_verifier.py::test_developer_and_release_modes",
+      "nodes": [
+        "tests/a2/test_release_verifier.py::test_developer_and_release_modes"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_release_verifier.py": "678ed4e9fd2293c0aa1cb2d23840065cc6dd6006a561eff9bad2bd69382f4335"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "V05",
+      "task": "T21",
+      "proposed_node": "tests/a2/test_release_ci.py::test_both_platforms_locked_runtime",
+      "nodes": [
+        "tests/a2/test_release_ci.py::test_both_platforms_locked_runtime"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_release_ci.py": "e1d608bbde8df7f361028c12eeea2a434a46d1868a74547a38c26c07af3c0a42"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "V06",
+      "task": "T21",
+      "proposed_node": "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance",
+      "nodes": [
+        "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance[missing]",
+        "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance[upload-failed]",
+        "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance[stale]",
+        "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance[unretrieved]",
+        "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance[unverified]",
+        "tests/a2/test_release_ci.py::test_artifact_failure_blocks_acceptance[duplicate]",
+        "tests/a2/test_release_ci.py::test_candidate_observations_require_retrieved_artifacts"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_release_ci.py": "e1d608bbde8df7f361028c12eeea2a434a46d1868a74547a38c26c07af3c0a42"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "V07",
+      "task": "T21",
+      "proposed_node": "tests/a2/test_release_ci.py::test_unsupported_platform_diagnostic",
+      "nodes": [
+        "tests/a2/test_release_ci.py::test_unsupported_platform_diagnostic"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_release_ci.py": "e1d608bbde8df7f361028c12eeea2a434a46d1868a74547a38c26c07af3c0a42"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "H01",
+      "task": "T22",
+      "proposed_node": "tests/a2/test_evidence.py::test_committed_defect_replay",
+      "nodes": [
+        "tests/a2/test_evidence.py::test_committed_defect_replay",
+        "tests/a2/test_evidence.py::test_a2_replay_rows_are_accounted",
+        "tests/a2/test_evidence.py::test_a2_recall_without_history_is_pending_not_green_or_failed",
+        "tests/a2/test_observations.py::test_live_smoke_record_accepted",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[bool-requests]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-run-complete]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-run-without-reasons]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[no-limit-runs]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[no-requests]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[no-supported-site]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[nothing-checked]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[site-incomplete]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[summary-disagrees]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[url-disagrees]",
+        "tests/a2/test_observations.py::test_live_smoke_observation_passes_with_a_complete_site_and_an_honest_limit",
+        "tests/a2/test_observations.py::test_live_smoke_observation_fails[states0]",
+        "tests/a2/test_observations.py::test_live_smoke_observation_fails[states1]",
+        "tests/a2/test_observations.py::test_live_smoke_observation_fails[states2]",
+        "tests/a2/test_observations.py::test_request_counter_counts_opener_calls",
+        "tests/a2/test_observations.py::test_a_limit_site_that_becomes_supported_is_an_improvement_not_a_failure",
+        "tests/a2/test_observations.py::test_supported_site_is_pinned_to_a_commit_and_url",
+        "tests/a2/test_observations.py::test_live_smoke_rejects_a_site_other_than_the_pinned_one",
+        "tests/a2/test_observations.py::test_clone_is_retried_on_a_transient_failure"
+      ],
+      "status": "ready",
+      "coverage_gaps": [
+        "External observation: live_smoke, produced by a2-observations.yml (one real supported site checked over HTTP; unsupported real packages recorded incomplete) and verified by verify_a2_aggregate.py."
+      ],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa",
+        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "H02",
+      "task": "T22",
+      "proposed_node": "tests/a2/test_evidence.py::test_package_coverage_triage",
+      "nodes": [
+        "tests/a2/test_evidence.py::test_package_coverage_triage",
+        "tests/a2/test_evidence.py::test_triage_schema_accepts_a_complete_record",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[missing-package-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[unreviewed-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[no-disposition-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[short-commit-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[no-readme-hash-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[bad-hash-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[missing-count-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[negative-count-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[non-integer-count-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[counts-do-not-sum-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[eligible-exceeds-discovered-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[checked-exceeds-eligible-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[partial-without-reason-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[partial-claims-complete-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[incomplete-state-claims-complete-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[unknown-state-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[finding-untriaged-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[finding-no-rationale-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[unknown-triage-class-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[false-positive-unresolved-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[false-positive-no-class-id-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[finding-without-severity-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[finding-unknown-severity-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[finding-without-check-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[extra-count-key-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[extra-package-key-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[extra-package-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[package-name-mismatch-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_schema_rejects_defects[hash-for-non-readme-key-<lambda>]",
+        "tests/a2/test_evidence.py::test_triage_false_positive_class_may_be_scoped_out_only_with_partial_scope",
+        "tests/a2/test_evidence.py::test_triage_complete_scope_requires_nothing_unverified",
+        "tests/a2/test_evidence.py::test_triage_producer_audits_a_clone_and_never_goes_green_unreviewed",
+        "tests/a2/test_evidence.py::test_triage_not_applicable_is_vacuous_but_never_silent",
+        "tests/a2/test_evidence.py::test_triaged_class_record_is_strict[no-status-entry0]",
+        "tests/a2/test_evidence.py::test_triaged_class_record_is_strict[no-rationale-entry1]",
+        "tests/a2/test_evidence.py::test_triaged_class_record_is_strict[fixed-without-commit-entry2]",
+        "tests/a2/test_evidence.py::test_triaged_class_record_is_strict[fixed-short-commit-entry3]",
+        "tests/a2/test_evidence.py::test_triaged_class_record_is_strict[unknown-status-entry4]",
+        "tests/a2/test_evidence.py::test_triaged_class_fixed_with_commit_is_accepted",
+        "tests/a2/test_observations.py::test_triage_observation_passes_when_fresh_run_matches",
+        "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>0]",
+        "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>1]",
+        "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>2]",
+        "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>3]",
+        "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>4]",
+        "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>5]",
+        "tests/a2/test_observations.py::test_triage_observation_rejects_a_reviewed_commit_that_is_not_the_fresh_one",
+        "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>0]",
+        "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>1]",
+        "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>2]",
+        "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>3]",
+        "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>4]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [
+        "External observation: package_triage, produced by a2-observations.yml (fresh run on pinned medfit/probmed/medrobust clones must match the reviewed record) and verified by verify_a2_aggregate.py."
+      ],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa",
+        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "H03",
+      "task": "T22",
+      "proposed_node": "tests/a2/test_evidence.py::test_live_site_smoke_evidence",
+      "nodes": [
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[failed-live_smoke]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[failed-package_triage]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[incomplete-live_smoke]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[incomplete-package_triage]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[unavailable-live_smoke]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[unavailable-package_triage]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[pending-live_smoke]",
+        "tests/a2/test_evidence.py::test_live_site_smoke_evidence[pending-package_triage]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "F01",
+      "task": "T23",
+      "proposed_node": "tests/a2/test_final_gates.py::test_gate_record_validation",
+      "nodes": [
+        "tests/a2/test_final_gates.py::test_gate_record_validation[missing-full_gates]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[missing-rendered_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[missing-adversarial_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[missing-requirement_mapping]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[failed-full_gates]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[failed-rendered_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[failed-adversarial_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[failed-requirement_mapping]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[stale-full_gates]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[stale-rendered_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[stale-adversarial_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[stale-requirement_mapping]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[no-provenance-full_gates]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[no-provenance-rendered_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[no-provenance-adversarial_review]",
+        "tests/a2/test_final_gates.py::test_gate_record_validation[no-provenance-requirement_mapping]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[bad-log-hash]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[dirty-tree]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[duplicate-command]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[exit-code-false]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[exit-code-float]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[failed-bool]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[flag-disagrees-with-exit]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[flag-truthy-int]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[flag-without-command]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[forged-command]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[missing-command]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[missing-log-hash]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[nonzero-exit]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[passed-bool]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[passed-none]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[passed-string]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[pytest-failures]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[test-all-failures]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[test-all-float]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[unknown-command]",
+        "tests/a2/test_final_gates.py::test_full_gate_record_rejects[wrong-source-commit]",
+        "tests/a2/test_final_gates.py::test_gate_producer_record_is_accepted_by_the_validator",
+        "tests/a2/test_final_gates.py::test_gate_producer_records_failures_and_the_validator_rejects_them",
+        "tests/a2/test_final_gates.py::test_gate_producer_dirty_tree_is_flagged",
+        "tests/a2/test_final_gates.py::test_count_parsing_reads_only_the_final_summary_line",
+        "tests/a2/test_final_gates.py::test_producer_missing_summary_is_not_a_pass",
+        "tests/a2/test_final_gates.py::test_producer_flags_a_tree_dirtied_by_the_gates",
+        "tests/a2/test_manifest.py::test_manifest_nodes_are_exactly_the_collection",
+        "tests/a2/test_manifest.py::test_every_group_hashes_every_test_file_it_references",
+        "tests/a2/test_manifest.py::test_ready_manifest_has_no_pending_group",
+        "tests/a2/test_manifest.py::test_refresh_drops_phantoms_adds_new_nodes_and_rehashes",
+        "tests/a2/test_observations.py::test_gate_observation_passes_on_a_clean_committed_tree",
+        "tests/a2/test_observations.py::test_gate_observation_fails_when_a_gate_dirties_the_tree",
+        "tests/a2/test_observations.py::test_mapping_observation_on_the_real_ledger",
+        "tests/a2/test_observations.py::test_written_records_and_index_pass_the_aggregate_validator",
+        "tests/a2/test_observations.py::test_failed_status_is_never_accepted",
+        "tests/a2/test_observations.py::test_a_crashing_observation_becomes_a_failed_record_not_a_crash",
+        "tests/a2/test_observations.py::test_triage_drift_is_recorded_in_the_failed_observation",
+        "tests/a2/test_release_ci.py::test_observations_workflow_is_dispatch_only_and_bound_to_the_run",
+        "tests/a2/test_release_ci.py::test_no_temporary_smoke_workflow_remains",
+        "tests/a2/test_runtime_probe.py::test_probe_code_names_every_locked_package_once",
+        "tests/a2/test_runtime_probe.py::test_probe_code_follows_the_lock_not_a_fixed_list",
+        "tests/a2/test_runtime_probe.py::test_installed_reports_the_same_keys_as_the_lock",
+        "tests/a2/test_runtime_probe.py::test_installed_is_none_when_r_fails",
+        "tests/a2/test_runtime_probe.py::test_no_hardcoded_package_list_remains[scripts/run_a2_release.py]",
+        "tests/a2/test_runtime_probe.py::test_no_hardcoded_package_list_remains[tests/a2/conftest.py]"
+      ],
+      "status": "ready",
+      "coverage_gaps": [
+        "External observations: full_gates and requirement_mapping, produced by a2-observations.yml on the candidate (clean tree, exact gates, exit codes, log hashes) and verified by verify_a2_aggregate.py."
+      ],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_final_gates.py": "fd2b6c76e37168464d84ba12647b8d85eaf6950e57d56137fa12451a22725f07",
+        "tests/a2/test_manifest.py": "278f1646c0229c9563b70f13b58af7512e4e638185d9d61318b69ef484902636",
+        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085",
+        "tests/a2/test_release_ci.py": "e1d608bbde8df7f361028c12eeea2a434a46d1868a74547a38c26c07af3c0a42",
+        "tests/a2/test_runtime_probe.py": "739319d20f83a0fe032a2ae6eb2ecf25e5e6306b09348ccd2d84654747be9133"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    },
+    {
+      "id": "F02",
+      "task": "T23",
+      "proposed_node": "tests/a2/test_final_gates.py::test_review_record_validation",
+      "nodes": [
+        "tests/a2/test_final_gates.py::test_review_record_validation",
+        "tests/a2/test_final_gates.py::test_observation_artifact_validation[bare-claim]",
+        "tests/a2/test_final_gates.py::test_observation_artifact_validation[missing-file]",
+        "tests/a2/test_final_gates.py::test_observation_artifact_validation[wrong-hash]",
+        "tests/a2/test_final_gates.py::test_observation_artifact_validation[escaping-path]",
+        "tests/a2/test_final_gates.py::test_observation_artifact_validation[wrong-candidate]",
+        "tests/a2/test_final_gates.py::test_observation_artifact_validation[wrong-producer]",
+        "tests/a2/test_final_gates.py::test_observation_artifact_validation[empty-facts]",
+        "tests/a2/test_final_gates.py::test_observation_artifact_validation[unresolved-review]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[blank-evidence]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[count-disagrees]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[coverage-unreviewed]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[deferred-finding]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[duplicate-finding-id]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[executed-bool]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[executed-float]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[finding-without-disposition]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[finding-without-evidence]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[findings-not-list]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[no-executed-tests]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[numeric-evidence]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[static-review]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[trivial-evidence]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[unresolved-bool]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[unresolved-string]",
+        "tests/a2/test_final_gates.py::test_finalized_review_record_rejects[wrong-reviewed-commit]",
+        "tests/a2/test_final_gates.py::test_review_with_no_findings_is_accepted_only_when_executed",
+        "tests/a2/test_observations.py::test_review_observation_binds_candidate",
+        "tests/a2/test_observations.py::test_malformed_review_input_is_rejected_before_any_work",
+        "tests/a2/test_producer_run.py::test_genuine_producer_run_accepted",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[head_sha-old]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[path-.github/workflows/evil.yml]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[path-]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[status-in_progress]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[conclusion-failure]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[conclusion-None]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[event-push]",
+        "tests/a2/test_producer_run.py::test_forged_or_wrong_producer_run_rejected[id-1]",
+        "tests/a2/test_producer_run.py::test_missing_fields_rejected",
+        "tests/a2/test_producer_run.py::test_workflow_path_suffix_is_tolerated_but_prefix_confusion_is_not",
+        "tests/a2/test_producer_run.py::test_cli_exit_codes",
+        "tests/a2/test_producer_run.py::test_release_workflow_verifies_the_producer_run_before_downloading_it"
+      ],
+      "status": "ready",
+      "coverage_gaps": [
+        "External observation: adversarial_review, a recorded judgment supplied as the dispatch input of a2-observations.yml, stamped by the run and verified by verify_a2_aggregate.py; attested, not proven by CI."
+      ],
+      "mapping_review": "complete",
+      "test_sources": {
+        "tests/a2/test_final_gates.py": "fd2b6c76e37168464d84ba12647b8d85eaf6950e57d56137fa12451a22725f07",
+        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085",
+        "tests/a2/test_producer_run.py": "e06f3156d3322d996bbb50817f0dbf0f5f57185009f60622e34c478c563d1fca"
+      },
+      "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
+    }
+  ],
+  "mapping_review": "complete",
+  "collected_nodes": 662,
+  "review_candidate": "A2 candidate 2: round-1 review fixes (producer-run binding, triage commit equality, crash-safe observations)",
+  "platforms": [
+    "ubuntu-24.04",
+    "macos-14"
+  ]
+}

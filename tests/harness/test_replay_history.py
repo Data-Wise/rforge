@@ -61,3 +61,16 @@ def test_cli_replay_exits_2_while_the_module_is_missing(monkeypatch, tmp_path, c
 def test_real_medfit_history_runs_without_crashing():
     found = replay.run_history(Path(os.environ["RFORGE_MEDFIT_PATH"]).expanduser(), n=5)
     assert isinstance(found, list)
+
+
+@pytest.mark.skipif(not (os.environ.get("RFORGE_MEDFIT_PATH") and Path(os.environ["RFORGE_MEDFIT_PATH"]).is_dir()),
+                    reason="RFORGE_MEDFIT_PATH not set")
+def test_a2_stale_numeric_replay_on_real_medfit_history():
+    """A2 catches medfit's documented stale NIE on the real pre-fix tree (README replay in R); the
+    site row has no retained history and must stay pending, never reported caught."""
+    import json
+    manifest = json.loads((HARNESS.parent / "fixtures" / "docaudit" / "defects.json").read_text(encoding="utf-8"))
+    summary = replay.run_recall(manifest, "a2", overrides={"medfit": os.environ["RFORGE_MEDFIT_PATH"]})
+    outcomes = {row["id"]: row["outcome"] for row in summary["rows"]}
+    assert outcomes["readme-nie-output"] == replay.CAUGHT
+    assert outcomes["site-missing-models-page"] == replay.UNAVAILABLE

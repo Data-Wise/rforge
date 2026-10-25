@@ -1,4 +1,4 @@
-"""Static documentation-content audit for an R package (pure-stdlib, no R).
+"""Documentation-content audit for an R package (pure-stdlib; the default static audit needs no R).
 
 Backs `/rforge:docs:check`. Checks the *prose and code in the docs* against what
 the package actually exports, which is what a manual doc audit looks for:
@@ -24,11 +24,12 @@ how many exports that covers ("checked N of M").
 
 CLI::
 
-    python3 -m lib.docaudit [--path <package-dir-or-name>] [--eco] [--detailed] [--since TAG]
+    python3 -m lib.docaudit [--path <package-dir-or-name>] [--eco | --package-only] [--detailed] [--since TAG]
         [--fail-on none|warn|error] [--format text|json]
 
 Scope (D0): walks up from --path (default: the cwd) to the nearest DESCRIPTION; with none, sweeps the ecosystem
-only if a .rforge.yaml manifest exists or --eco is given. The first output line states the resolved scope.
+only if a .rforge.yaml manifest exists or --eco is given. --package-only prevents
+hybrid/manifest expansion and package-name discovery. The first output line states the resolved scope.
 
 Run as a package module (``python3 -m lib.docaudit``), never as a script.
 """
@@ -50,6 +51,9 @@ from .discovery import _KIND_DECL_RE, _read_allowlist, detect_ecosystem, read_de
 from .s7review import _mask_strings_and_comments
 
 IMPLEMENTED_CHECKS = frozenset({"signature-named-arg", "signature-names", "signature-arity", "scannability", "coverage"})
+# Checks emitted only by the opt-in stages (`--site` / `--run-examples`); not part of the default static run.
+OPT_IN_CHECKS = frozenset({"examples-output", "examples-error", "examples-shape", "examples-stochastic",
+                           "examples-unstable", "site-missing-page", "site-extra-page", "site-unreleased-page"})
 
 _SEVERITY_ORDER = {"info": 0, "warn": 1, "error": 2}
 _IDENT = r"[A-Za-z.][\w.]*"
@@ -975,18 +979,27 @@ def _sweep(base: Path, how: str) -> Scope:
     return Scope("ecosystem", str(base), pkgs, how, notes=notes)
 
 
-def resolve_scope(path: str | Path = ".", eco: bool = False) -> Scope:
+def resolve_scope(path: str | Path = ".", eco: bool = False, *, package_only: bool = False) -> Scope:
     """D0: walk up from `path` to the nearest DESCRIPTION and audit that package; with no DESCRIPTION, sweep the
     ecosystem only if a `.rforge.yaml` manifest exists or `eco` is set. `path` may also be a package name found
-    under the cwd. A `kind: hybrid` root also audits its nested packages."""
+    under the cwd. A `kind: hybrid` root also audits its nested packages, unless
+    `package_only` confines resolution to an existing path's nearest package."""
     given = Path(path)
+    if package_only and eco:
+        return Scope("none", str(given), [], reason="--package-only and --eco are mutually exclusive")
     if not given.exists():
+        if package_only:
+            return Scope("none", str(given), [], reason=f"package path does not exist: {given}")
         named = [p for p in _discover(Path.cwd().resolve(), []) if str(path) in (p.name, _package_name(p, []))]
         if not named:
             return Scope("none", str(given), [], reason=f"no package or path named `{path}`")
         given = named[0]
     start = (given if given.is_dir() else given.parent).resolve()
     pkg = _nearest_package(start)
+    if package_only:
+        if pkg is None:
+            return Scope("none", str(start), [], reason="--package-only: no DESCRIPTION found; no ecosystem sweep")
+        return Scope("package", str(pkg), [pkg], "--package-only")
     if eco:
         base = pkg.parent if pkg is not None else start
         return _sweep(base, "--eco")
@@ -1012,18 +1025,85 @@ def _hide_info(report: dict) -> dict:
     summary = {**report["summary"], "info_hidden": len(report["findings"]) - len(shown)}
     top = max((f["severity"] for f in shown), key=_SEVERITY_ORDER.get, default="none")
     status = report["status"] if report.get("audit_failed") else ("warn" if top in ("warn", "error") else "ok")
-    return {**report, "findings": shown, "summary": summary, "max_severity": top, "status": status}
+    stages = {name:{**stage,"findings":[f for f in stage.get("findings",[]) if f["severity"]!="info"]} for name,stage in report.get("stages",{}).items()}
+    return {**report, "findings": shown, "summary": summary, "max_severity": top, "status": status, **({"stages":stages} if "stages" in report else {})}
 
 
-def audit(path: str | Path = ".", *, eco: bool = False, detailed: bool = False, since: Optional[str] = None,
-          max_paragraph_words: int = 110, max_section_words: int = 800, min_h3: int = 3) -> dict:
+def exit_code(report: dict, threshold: str) -> int:
+    """Incomplete scope takes precedence over severity; default remains diagnostic."""
+    if threshold == "none":
+        return 0
+    if report.get("audit_failed") or report.get("audited") is False or report.get("incomplete"):
+        return 2
+    return int(_SEVERITY_ORDER.get(report["max_severity"], -1) >= {"warn": 1, "error": 2}[threshold])
+
+
+def _optional_stages(root: Path, *, site=None, ref=None, run_examples=False,
+                     examples_deadline=None) -> dict:
+    stages = {}
+    for name, requested, module, kwargs in (
+        ("site", site is not None, "_docsite", {"url": site, "ref": ref}),
+        ("examples", run_examples, "_docexamples", {"deadline": examples_deadline}),
+    ):
+        if not requested:
+            continue
+        try:
+            from importlib import import_module
+            stage = import_module("." + module, __package__).audit(root, **kwargs)
+        except Exception as exc:
+            stage = {"state": "unavailable", "counts": {}, "reasons": [f"{name}: {type(exc).__name__}: {exc}"],
+                     "engine_missing": [], "findings": []}
+        stages[name] = stage
+    return stages
+
+
+def _merge_stages(root: Path, report: dict, stages: dict) -> dict:
+    notes = []
+    files, pairs = _allowlist(root, notes)
+    findings = list(report["findings"])
+    stages={name:{**stage,"findings":list(stage.get("findings",[]))} for name,stage in stages.items()}
+    suppressed = 0
+    for stage in stages.values():
+        visible=[]
+        for finding in stage.get("findings", []):
+            file = finding.get("file", "")
+            if file and (file in files or (file, finding["check"]) in pairs):
+                suppressed += 1
+            else:
+                findings.append(finding)
+                visible.append(finding)
+        stage["findings"]=visible
+    top = max((f["severity"] for f in findings), key=_SEVERITY_ORDER.get, default="none")
+    return {**report, "findings": findings, "stages": stages,
+            "messages": [*report["messages"], *notes], "max_severity": top,
+            "status": "warn" if top in ("warn", "error") else report["status"],
+            "incomplete": report["incomplete"] or bool(notes) or any(s["state"] in ("incomplete", "unavailable") for s in stages.values()),
+            "engine_missing": sorted({e for s in stages.values() for e in s.get("engine_missing", [])}),
+            "summary": {**report["summary"], "suppressed": report["summary"].get("suppressed", 0) + suppressed}}
+
+
+def audit(path: str | Path = ".", *, eco: bool = False, package_only: bool = False,
+          detailed: bool = False, since: Optional[str] = None,
+          max_paragraph_words: int = 110, max_section_words: int = 800, min_h3: int = 3,
+          site: Optional[str] = None, ref: Optional[str] = None, run_examples: bool = False,
+          examples_budget_seconds: int = 300) -> dict:
     """Audit the package (or packages) D0 resolves `path` to. `info` findings appear only when `detailed`."""
-    scope = resolve_scope(path, eco)
+    scope = resolve_scope(path, eco, package_only=package_only)
     if not scope.packages:
         env = _envelope([], [scope.reason, *scope.notes], {}, incomplete=bool(scope.notes), audited=False)
         return {**env, "scope": scope.to_dict()}
+    if ref is not None and site is None:
+        raise ValueError("--ref requires --site")
+    if site is not None and len(scope.packages) != 1:
+        raise ValueError("--site requires exactly one resolved package")
+    if examples_budget_seconds <= 0:
+        raise ValueError("example budget must be positive")
+    from time import monotonic_ns
+    deadline = monotonic_ns() + examples_budget_seconds * 1_000_000_000
     reports = [(p, audit_package(p, since=since, max_paragraph_words=max_paragraph_words,
                                  max_section_words=max_section_words, min_h3=min_h3)) for p in scope.packages]
+    if site is not None or run_examples:
+        reports = [(p, _merge_stages(p, r, _optional_stages(p, site=site, ref=ref, run_examples=run_examples, examples_deadline=deadline))) for p, r in reports]
     if not detailed:
         reports = [(p, _hide_info(r)) for p, r in reports]
     if len(reports) == 1:
@@ -1036,7 +1116,8 @@ def audit(path: str | Path = ".", *, eco: bool = False, detailed: bool = False, 
         findings += [{**f, "package": name} for f in r["findings"]]
         messages += [f"[{name}] {m}" for m in r["messages"]]
         packages.append({"name": name, "path": str(p), "status": r["status"], "max_severity": r["max_severity"],
-                         "incomplete": r["incomplete"], "audited": r["audited"], "summary": r["summary"]})
+                         "incomplete": r["incomplete"], "audited": r["audited"], "summary": r["summary"],
+                         **({"stages": r["stages"], "engine_missing": r["engine_missing"]} if "stages" in r else {})})
     top = max((f["severity"] for f in findings), key=_SEVERITY_ORDER.get, default="none")
     summary = {"packages": len(reports),
                **{k: sum(r["summary"].get(k, 0) for _, r in reports) for k in ("exports", "checked", "suppressed", "info_hidden")}}
@@ -1044,7 +1125,7 @@ def audit(path: str | Path = ".", *, eco: bool = False, detailed: bool = False, 
             "max_severity": top, "findings": findings, "messages": messages, "summary": summary,
             "incomplete": bool(scope.notes) or any(r["incomplete"] for _, r in reports),
             "audited": all(r["audited"] for _, r in reports),
-            "engine_missing": [], "packages": packages, "scope": scope.to_dict(),
+            "engine_missing": sorted({e for _, r in reports for e in r["engine_missing"]}), "packages": packages, "scope": scope.to_dict(),
             **({"audit_failed": True} if any(r.get("audit_failed") for _, r in reports) else {})}
 
 
@@ -1059,6 +1140,11 @@ def format_json(report: dict) -> str:
 
 def format_text(report: dict) -> str:
     lines = [report["scope"]["line"]] if "scope" in report else []
+    stage_reports = [("", report)] if "stages" in report else [(p["name"], p) for p in report.get("packages", [])]
+    for package, r in stage_reports:
+        for name, stage in r.get("stages", {}).items():
+            lines.append(f"{package + ': ' if package else ''}{name}: {stage['state']} {json.dumps(stage.get('counts', {}), sort_keys=True)}")
+            lines.extend(stage.get("reasons", []))
     for f in report["findings"]:
         where = f"{f['package']}/{f['file']}" if "package" in f else f["file"]
         lines.append(f"{f['severity']:<5} {f['check']:<20} {where}:{f['line']}  {f['message']}")
@@ -1077,7 +1163,9 @@ def format_text(report: dict) -> str:
 def main(argv: Optional[list] = None) -> int:
     ap = argparse.ArgumentParser(prog="python3 -m lib.docaudit", description=__doc__.split("\n")[0])
     ap.add_argument("--path", default=".", help="package path or name (default: the cwd; walks up to a DESCRIPTION)")
-    ap.add_argument("--eco", action="store_true", help="sweep the whole ecosystem")
+    scope_args = ap.add_mutually_exclusive_group()
+    scope_args.add_argument("--eco", action="store_true", help="sweep the whole ecosystem")
+    scope_args.add_argument("--package-only", action="store_true", help="audit only the nearest package; never expand scope")
     ap.add_argument("--detailed", action="store_true", help="also print `info` findings")
     ap.add_argument("--format", choices=["text", "json"], default="text")
     ap.add_argument("--fail-on", choices=["none", "warn", "error"], default="none",
@@ -1086,18 +1174,29 @@ def main(argv: Optional[list] = None) -> int:
     ap.add_argument("--max-paragraph-words", type=int, default=110)
     ap.add_argument("--max-section-words", type=int, default=800)
     ap.add_argument("--min-h3", type=int, default=3, help="H3 headings an over-long H2 section needs")
+    ap.add_argument("--site", help="Explicit single-package HTTP(S) base URL; read sitemap only")
+    ap.add_argument("--ref", help="Local immutable deployment-source ref; requires --site")
+    ap.add_argument("--run-examples", action="store_true", help="Execute supported README transcripts; opt in")
+    ap.add_argument("--examples-budget-seconds", type=int, default=None, help="Total example-stage budget (default 300); requires --run-examples")
     args = ap.parse_args(argv)
-    report = audit(args.path, eco=args.eco, detailed=args.detailed, since=args.since,
+    if args.ref is not None and args.site is None:
+        ap.error("--ref requires --site")
+    if args.examples_budget_seconds is not None and (not args.run_examples or args.examples_budget_seconds <= 0):
+        ap.error("--examples-budget-seconds requires --run-examples and a positive integer")
+    if args.site is not None and len(resolve_scope(args.path, args.eco, package_only=args.package_only).packages) != 1:
+        ap.error("--site requires exactly one resolved package")
+    report = audit(args.path, eco=args.eco, package_only=args.package_only,
+                   detailed=args.detailed, since=args.since,
                    max_paragraph_words=args.max_paragraph_words, max_section_words=args.max_section_words,
-                   min_h3=args.min_h3)
+                   min_h3=args.min_h3, site=args.site, ref=args.ref, run_examples=args.run_examples,
+                   examples_budget_seconds=args.examples_budget_seconds or 300)
+    stage_reports = [report] if "stages" in report else report.get("packages", [])
+    for r in stage_reports:
+        for name, stage in r.get("stages", {}).items():
+            if stage["state"] in ("incomplete", "unavailable"):
+                print(f"docaudit: {name} {stage['state']}: " + "; ".join(stage.get("reasons", [])), file=sys.stderr)
     print(format_json(report) if args.format == "json" else format_text(report))
-    if args.fail_on == "none":
-        return 0
-    if report.get("audit_failed") or report.get("audited") is False or report.get("incomplete"):
-        print("docaudit: audit failed, incomplete or empty; the result cannot gate a release (exit 2)", file=sys.stderr)
-        return 2
-    level = {"warn": 1, "error": 2}[args.fail_on]
-    return 1 if _SEVERITY_ORDER.get(report["max_severity"], -1) >= level else 0
+    return exit_code(report, args.fail_on)
 
 
 if __name__ == "__main__":

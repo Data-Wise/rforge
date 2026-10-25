@@ -4,7 +4,7 @@
 
 ## Module overview
 
-Static documentation-content audit for an R package (pure-stdlib, no R).
+Documentation-content audit for an R package (pure-stdlib; the default static audit needs no R).
 
 Backs `/rforge:docs:check`. Checks the *prose and code in the docs* against what
 the package actually exports, which is what a manual doc audit looks for:
@@ -30,11 +30,12 @@ how many exports that covers ("checked N of M").
 
 CLI::
 
-    python3 -m lib.docaudit [--path <package-dir-or-name>] [--eco] [--detailed] [--since TAG]
+    python3 -m lib.docaudit [--path <package-dir-or-name>] [--eco | --package-only] [--detailed] [--since TAG]
         [--fail-on none|warn|error] [--format text|json]
 
 Scope (D0): walks up from --path (default: the cwd) to the nearest DESCRIPTION; with none, sweeps the ecosystem
-only if a .rforge.yaml manifest exists or --eco is given. The first output line states the resolved scope.
+only if a .rforge.yaml manifest exists or --eco is given. --package-only prevents
+hybrid/manifest expansion and package-name discovery. The first output line states the resolved scope.
 
 Run as a package module (``python3 -m lib.docaudit``), never as a script.
 
@@ -83,7 +84,7 @@ What `audit` looks at (D0). ``mode``: package | hybrid | ecosystem | none.
 ### `audit()`
 
 ```python
-def audit(path: 'str | Path' = '.', *, eco: 'bool' = False, detailed: 'bool' = False, since: 'Optional[str]' = None, max_paragraph_words: 'int' = 110, max_section_words: 'int' = 800, min_h3: 'int' = 3) -> 'dict'
+def audit(path: 'str | Path' = '.', *, eco: 'bool' = False, package_only: 'bool' = False, detailed: 'bool' = False, since: 'Optional[str]' = None, max_paragraph_words: 'int' = 110, max_section_words: 'int' = 800, min_h3: 'int' = 3, site: 'Optional[str]' = None, ref: 'Optional[str]' = None, run_examples: 'bool' = False, examples_budget_seconds: 'int' = 300) -> 'dict'
 ```
 
 Audit the package (or packages) D0 resolves `path` to. `info` findings appear only when `detailed`.
@@ -138,6 +139,14 @@ def doc_files(root: 'Path', notes: 'list') -> 'Iterator[Path]'
 ```
 
 _(no docstring)_
+
+### `exit_code()`
+
+```python
+def exit_code(report: 'dict', threshold: 'str') -> 'int'
+```
+
+Incomplete scope takes precedence over severity; default remains diagnostic.
 
 ### `exports_added_since()`
 
@@ -232,12 +241,13 @@ _(no docstring)_
 ### `resolve_scope()`
 
 ```python
-def resolve_scope(path: 'str | Path' = '.', eco: 'bool' = False) -> 'Scope'
+def resolve_scope(path: 'str | Path' = '.', eco: 'bool' = False, *, package_only: 'bool' = False) -> 'Scope'
 ```
 
 D0: walk up from `path` to the nearest DESCRIPTION and audit that package; with no DESCRIPTION, sweep the
 ecosystem only if a `.rforge.yaml` manifest exists or `eco` is set. `path` may also be a package name found
-under the cwd. A `kind: hybrid` root also audits its nested packages.
+under the cwd. A `kind: hybrid` root also audits its nested packages, unless
+`package_only` confines resolution to an existing path's nearest package.
 
 ### `scan_prose()`
 

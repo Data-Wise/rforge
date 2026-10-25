@@ -7,6 +7,10 @@ Each "kind" maps to a lower-level R package (NOT devtools):
 
 The R subprocess emits JSON via jsonlite; this module normalizes it. Console
 regex parsing is only a fallback when jsonlite/structured output is absent.
+For package checks that fallback is incomplete evidence and cannot pass. The
+check envelope includes output_format, incomplete, check.exit_status, and
+check.log_paths; actual
+00check.log files are retained in explicit temporary check directories.
 
 Usage: python3 -m lib.rcmd --kind <kind> [--path .] [--as-cran]
        [--preview] [--strict] [--articles-only] [--devel]
@@ -193,7 +197,8 @@ def _status_for(kind: str, raw: dict, exit_code: int) -> str:
     if raw.get("engine_missing"):
         return "error"
     if kind in ("check", "tarball-check"):
-        if exit_code == 124:
+        if exit_code == 124 or (kind == "check" and (
+                exit_code != 0 or any(status != 0 for status in _as_list(raw.get("check_status"))))):
             return "error"
         if raw.get("errors"):
             return "error"
@@ -251,6 +256,8 @@ def normalize(kind: str, raw: dict, exit_code: int, pkg: dict | None) -> dict:
         env["version"] = pkg.get("version", "")
     if kind == "check":
         env["check"] = {k: _as_list(raw.get(k)) for k in ("errors", "warnings", "notes")}
+        env["check"]["log_paths"] = _as_list(raw.get("log_paths"))
+        env["check"]["exit_status"] = _as_list(raw.get("check_status"))
         env["check"]["notes_classified"] = _classify_notes(raw.get("notes"))
         # G8: surface PDF-manual-skip as an advisory note (LaTeX absent locally)
         all_text = " ".join(env["check"].get("notes", []))
@@ -685,13 +692,31 @@ def run(kind: str, path: str = ".", *, as_cran: bool = False, preview: bool = Fa
                             flavor=flavor, incoming=incoming, platform=platform,
                             tidy=tidy, apply=apply)
         stdout, code = _invoke_r(snippet)
-        raw = _parse_json(stdout)
+        raw = _parse_json(stdout) if stdout.strip() else None
+        output_format = "json" if raw is not None else "console_fallback"
+        check_complete = kind != "check" or (raw is not None and
+            len(_as_list(raw.get("check_status"))) == (2 if incoming else 1) and
+            all(type(status) is int for status in _as_list(raw.get("check_status"))) and all(
+            key in raw and (isinstance(raw[key], str)
+                            or (isinstance(raw[key], list)
+                                and all(isinstance(item, str) for item in raw[key])))
+            for key in ("errors", "warnings", "notes")))
         if raw is None:
             raw = console_fallback(kind, stdout)
+        if kind == "check" and not check_complete and not (
+                raw.get("engine_missing") or raw.get("timed_out")):
+            raw = {"messages": [*raw.get("messages", []),
+                                "Missing or malformed structured check result; check incomplete."]}
     if code == 124 or raw.get("timed_out"):
         raw = {"messages": ["Rscript timed out — the operation took too long "
                             "(quick path bounded; long kinds are unbounded)."]}
     env = normalize(kind, raw, code, pkg)
+    if kind == "check":
+        env.update(output_format=output_format,
+                   incomplete=code != 0 or not check_complete or any(
+                       status != 0 for status in env["check"]["exit_status"]))
+        if not check_complete:
+            env["status"] = "error"
     for eng in env.get("engine_missing", []):
         if INSTALL_HINT.get(eng):
             env.setdefault("messages", []).append(f"Missing R package — run: {INSTALL_HINT[eng]}")

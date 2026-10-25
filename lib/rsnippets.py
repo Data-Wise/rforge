@@ -123,6 +123,12 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
         if run_donttest:
             flags.append("--run-donttest")
         args = f'c({", ".join(json.dumps(f) for f in flags)})' if flags else "character()"
+        # An explicit check_dir avoids rcmdcheck's automatic cleanup. R's own
+        # tempdir is removed at exit, so retain artifacts beside it instead.
+        log_setup = ('d <- tempfile("rforge-check-", tmpdir=dirname(tempdir())); '
+                     'dir.create(d); ')
+        log_result = ('log_paths=as.list(list.files(d, pattern="^00check[.]log$", '
+                      'recursive=TRUE, full.names=TRUE))')
         if incoming:
             # G7: _R_CHECK_DEPENDS_ONLY_ and _R_CHECK_SUGGESTS_ONLY_ are
             # mutually exclusive in rcmdcheck — run two sequential passes and
@@ -138,22 +144,29 @@ def r_snippet(kind: str, path: str, *, as_cran: bool = False, preview: bool = Fa
             env_p1 = {**_INCOMING_ENV, **_extra, "_R_CHECK_DEPENDS_ONLY_": "true"}
             env_p2 = {**_INCOMING_ENV, **_extra, "_R_CHECK_SUGGESTS_ONLY_": "true"}
             return _guard("rcmdcheck",
+                log_setup +
+                'dir.create(file.path(d,"depends")); dir.create(file.path(d,"suggests")); '
                 f'r1 <- rcmdcheck::rcmdcheck({p}, args={args}, '
+                'check_dir=file.path(d,"depends"), '
                 f'env={_r_named_char(env_p1)}, quiet=TRUE, error_on = "never"); '
                 f'r2 <- rcmdcheck::rcmdcheck({p}, args={args}, '
+                'check_dir=file.path(d,"suggests"), '
                 f'env={_r_named_char(env_p2)}, quiet=TRUE, error_on = "never"); '
                 f'cat(jsonlite::toJSON(list(errors=c(r1$errors,r2$errors), '
-                f'warnings=c(r1$warnings,r2$warnings), notes=c(r1$notes,r2$notes)), '
+                f'warnings=c(r1$warnings,r2$warnings), notes=c(r1$notes,r2$notes), '
+                f'check_status=list(r1$status,r2$status), {log_result}), '
                 f'auto_unbox=TRUE, null="list"))')
         env_vars: dict[str, str] = {}
         if flavor is not None:
             env_vars.update(_CHECK_ENV[flavor])
         env_arg = f", env={_r_named_char(env_vars)}" if env_vars else ""
         return _guard("rcmdcheck",
+            log_setup +
             f'r <- rcmdcheck::rcmdcheck({p}, args={args}{env_arg}, '
+            'check_dir=d, '
             f'quiet=TRUE, error_on = "never"); '
             f'cat(jsonlite::toJSON(list(errors=r$errors, warnings=r$warnings, '
-            f'notes=r$notes), auto_unbox=TRUE, null="list"))')
+            f'notes=r$notes, check_status=r$status, {log_result}), auto_unbox=TRUE, null="list"))')
     if kind == "build":
         return _guard("pkgbuild",
             f'p <- pkgbuild::build({p}, quiet=TRUE); '

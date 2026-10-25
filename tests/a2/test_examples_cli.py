@@ -1,0 +1,194 @@
+import time
+import pytest
+from lib import docaudit
+from .test_examples_r import fixture
+
+
+def test_native_chunk_deadline(tmp_path):
+    p=fixture(tmp_path,"```r\nSys.sleep(30)\nprint(1)\n#> [1] 1\n```")
+    r=docaudit.audit(p,run_examples=True,examples_budget_seconds=1)
+    assert r["incomplete"] and r["stages"]["examples"]["provenance"]["lifecycle"]["reason"]=="deadline"
+    assert docaudit.exit_code(r,"warn")==2 and docaudit.exit_code(r,"error")==2
+
+
+def test_one_upstream_failure(tmp_path):
+    p=fixture(tmp_path,"```r\nstop('upstream')\n#> expected\n```\n```r\nstop('later')\n#> later\n```")
+    r=docaudit.audit(p,run_examples=True)
+    assert r["incomplete"] and len([f for f in r["findings"] if f["check"]=="examples-error"])==1
+    assert r["stages"]["examples"]["counts"]["blocked"]==2
+
+
+def test_file_loading_deadline(tmp_path):
+    p = fixture(tmp_path, '```r\nprint(1)\n#> [1] 1\n```')
+    (p/'R'/'load.R').write_text('.onLoad <- function(libname, pkgname) Sys.sleep(30)\n')
+    r = docaudit.audit(p, run_examples=True, examples_budget_seconds=1)
+    stage = r['stages']['examples']
+    assert stage['state'] == 'incomplete' and stage['counts']['checked'] == 0
+    assert stage['provenance']['lifecycle']['reason'] == 'deadline'
+
+
+def test_global_budget_across_packages(tmp_path):
+    from .helpers import package
+    a = package(tmp_path/'a', name='a', readme='```r\nSys.sleep(30)\nprint(1)\n#> [1] 1\n```')
+    b = package(tmp_path/'b', name='b', readme='```r\nprint(2)\n#> [1] 2\n```')
+    for p in (a,b):
+        (p/'R').mkdir(); (p/'R'/'f.R').write_text('f <- function() 1\n')
+    r = docaudit.audit(tmp_path, eco=True, run_examples=True, examples_budget_seconds=1)
+    stages = [p['stages']['examples'] for p in r['packages']]
+    assert all(s['state']=='incomplete' for s in stages)
+    assert all(s['counts']['checked']==0 for s in stages)
+    lifecycle = stages[1]['provenance']['lifecycle']
+    assert lifecycle['reason'] == 'deadline' and lifecycle['phase'] == 'startup'
+    assert not lifecycle['direct_child_reaped']
+    assert lifecycle['global_deadline_ns'] == stages[0]['provenance']['lifecycle']['global_deadline_ns']
+
+
+@pytest.mark.parametrize('format', ['json', 'text'])
+@pytest.mark.parametrize('threshold,expected', [('none',0),('warn',2),('error',2)])
+def test_partial_cli_report_thresholds(tmp_path, capsys, format, threshold, expected):
+    import json
+    p = fixture(tmp_path, '```r\nprint(1)\n#> [1] 1\n```\n```r\nSys.sleep(30)\nprint(2)\n#> [1] 2\n```')
+    result = docaudit.main(['--path',str(p),'--run-examples','--examples-budget-seconds','2','--format',format,'--fail-on',threshold])
+    captured = capsys.readouterr()
+    assert result == expected and captured.err
+    if format == 'json':
+        stage = json.loads(captured.out)['stages']['examples']
+        assert stage['state']=='incomplete' and stage['counts']['checked']==1 and stage['counts']['blocked']==1
+    else:
+        assert 'INCOMPLETE' in captured.out and 'no findings' not in captured.out
+
+
+@pytest.mark.parametrize('failed_stage',['site','examples'])
+def test_combined_stage_and_eco_partial_results(tmp_path, failed_stage):
+    from .test_site_integration import fixture as site_fixture,server
+    p,web=site_fixture(tmp_path)
+    (p/'R').mkdir();(p/'R'/'f.R').write_text('f <- function() 1\n')
+    code='stop("upstream")' if failed_stage=='examples' else 'print(1)'
+    (p/'README.md').write_text(f'```r\n{code}\n#> [1] 1\n```')
+    with server(web) as url:
+        if failed_stage!='site':
+            (web/'pkg'/'sitemap.xml').write_text(f'<urlset><url><loc>{url}reference/internal.html</loc></url><url><loc>{url}articles/pizza/slice.html</loc></url></urlset>')
+        report=docaudit.audit(p,site=url,ref='main',run_examples=True)
+    stages=report['stages']
+    assert report['incomplete'] and set(stages)=={'site','examples'}
+    successful=stages['examples' if failed_stage=='site' else 'site']
+    assert successful['state']=='complete' and successful['counts']['checked']>0
+    assert stages[failed_stage]['state']=='incomplete'
+    assert docaudit.exit_code(report,'error')==2
+
+
+def test_wrapper_lifetime_and_interruption():
+    import json
+    from pathlib import Path
+    import subprocess
+    import sys
+    root=Path(__file__).resolve().parents[2]
+    recipe=' '.join((root/'commands/docs/check.md').read_text().split())
+    for phrase in ('budget plus 15 seconds','lifetime is unknown','shorter known host limit','reduce the requested budget','Poll/yield timeouts are not host lifetime limits','Missing stdout','interruption, never a clean audit or recovered JSON'):
+        assert phrase in recipe
+    wrapper=subprocess.Popen([sys.executable,'-c','import time; time.sleep(30)'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+    try:
+        wrapper.kill()
+        stdout,_=wrapper.communicate(timeout=2)
+        assert wrapper.returncode != 0 and not stdout
+        with pytest.raises(json.JSONDecodeError):json.loads(stdout)
+    finally:
+        if wrapper.poll() is None:wrapper.kill();wrapper.wait(timeout=2)
+
+
+@pytest.mark.parametrize('threshold,expected',[('none',0),('warn',1),('error',0)])
+def test_warn_only_and_complete_mismatch(tmp_path,threshold,expected):
+    p=fixture(tmp_path,'```r\nprint(0.19)\n#> [1] 0.80\n```')
+    report=docaudit.audit(p,run_examples=True)
+    stage=report['stages']['examples']
+    assert stage['state']=='complete' and stage['counts']['checked']==stage['counts']['mismatched']==1
+    assert [f['check'] for f in stage['findings']]==['examples-output']
+    assert all(f['severity']=='warn' for f in stage['findings'])
+    assert docaudit.exit_code(report,threshold)==expected
+
+
+def test_distinct_chunk_deadline_retains_checkpoint(tmp_path,monkeypatch):
+    from lib import _docexamples as examples
+    original=examples.guardian.run
+    def shorter(command,directory,deadline,**kwargs):return original(command,directory,deadline,chunk_budget=.4,**kwargs)
+    monkeypatch.setattr(examples.guardian,'run',shorter)
+    p=fixture(tmp_path,'```r\nprint(1)\n#> [1] 1\n```\n```r\nSys.sleep(30)\nprint(2)\n#> [1] 2\n```')
+    r=docaudit.audit(p,run_examples=True,examples_budget_seconds=15)['stages']['examples']
+    life=r['provenance']['lifecycle']
+    assert r['state']=='incomplete' and r['counts']['matched']==1 and r['counts']['blocked']==1
+    assert life['reason']=='deadline' and life['effective_deadline_ns']<life['global_deadline_ns']
+
+
+def test_distinct_file_deadline_and_defaults(tmp_path,monkeypatch):
+    import inspect
+    from lib import _docexamples as examples
+    assert inspect.signature(examples.guardian.run).parameters['file_budget'].default==300
+    assert inspect.signature(examples.guardian.run).parameters['chunk_budget'].default==60
+    assert inspect.signature(docaudit.audit).parameters['examples_budget_seconds'].default==300
+    original=examples.guardian.run
+    def shorter(command,directory,deadline,**kwargs):return original(command,directory,deadline,file_budget=1,**kwargs)
+    monkeypatch.setattr(examples.guardian,'run',shorter)
+    p=fixture(tmp_path,'```r\nprint(1)\n#> [1] 1\n```')
+    (p/'R'/'load.R').write_text('.onLoad <- function(libname,pkgname) Sys.sleep(30)\n')
+    r=docaudit.audit(p,run_examples=True,examples_budget_seconds=15)['stages']['examples']
+    life=r['provenance']['lifecycle']
+    assert r['state']=='incomplete' and r['counts']['checked']==0
+    assert life['reason']=='deadline' and life['effective_deadline_ns']<life['global_deadline_ns']
+
+
+@pytest.mark.parametrize('checkpoint', [False, True])
+@pytest.mark.parametrize('threshold,expected', [('none',0),('warn',2),('error',2)])
+def test_replay_exception_retains_counts_and_lifecycle(tmp_path, monkeypatch, checkpoint, threshold, expected):
+    from lib import _docexamples as examples
+    guardian = examples.guardian
+    p = fixture(tmp_path, '~~~r\nprint(1)\n#> [1] 1\n~~~\n~~~r\nprint(2)\n#> [1] 2\n~~~')
+    monkeypatch.setattr(examples.shutil, 'which', lambda name: '/fake/Rscript')
+    def fail(command, directory, deadline, **kwargs):
+        guardian.atomic(directory/'initial.json', {'run_id':'current'})
+        guardian.atomic(directory/'terminal.json', {'run_id':'current','reason':'cleanup-unverified','cleanup_error':'probe-failed'})
+        if checkpoint:
+            segments = guardian.read(directory/'input.json')['segments']
+            guardian.atomic(directory/'result.json', {'records':[{'id':segments[0]['id'],'text':['[1] 1\n']}]})
+        raise OSError('guardian boundary')
+    monkeypatch.setattr(guardian, 'run', fail)
+    report = docaudit.audit(p, run_examples=True)
+    stage = report['stages']['examples']
+    assert stage['state'] == 'incomplete'
+    assert stage['counts']['eligible'] == 2
+    assert stage['counts']['checked'] == int(checkpoint)
+    assert stage['counts']['matched'] == int(checkpoint)
+    assert stage['counts']['blocked'] == 2-int(checkpoint)
+    assert stage['provenance']['lifecycle']['cleanup_error'] == 'probe-failed'
+    assert 'OSError: guardian boundary' in stage['provenance']['lifecycle']['boundary_error']
+    assert docaudit.exit_code(report, threshold) == expected
+
+
+@pytest.mark.parametrize('failure', ['prepare','interrupt','stale','completed'])
+def test_replay_boundary_failure_guards(tmp_path, monkeypatch, failure):
+    from lib import _docexamples as examples
+    guardian = examples.guardian
+    p = fixture(tmp_path, '~~~r\nprint(1)\n#> [1] 1\n~~~')
+    monkeypatch.setattr(examples.shutil, 'which', lambda name: '/fake/Rscript')
+    if failure == 'prepare':
+        original = guardian.atomic
+        def atomic(path, data):
+            if path.name == 'input.json':raise OSError('input failure')
+            return original(path, data)
+        monkeypatch.setattr(guardian, 'atomic', atomic)
+    def fail(command, directory, deadline, **kwargs):
+        if failure == 'interrupt':raise KeyboardInterrupt
+        guardian.atomic(directory/'initial.json', {'run_id':'current'})
+        guardian.atomic(directory/'terminal.json', {'run_id':'stale' if failure=='stale' else 'current',
+            'reason':'completed','direct_child_reaped':True})
+        raise OSError('boundary')
+    monkeypatch.setattr(guardian, 'run', fail)
+    if failure == 'interrupt':
+        with pytest.raises(KeyboardInterrupt):docaudit.audit(p, run_examples=True)
+        return
+    report = docaudit.audit(p, run_examples=True)
+    stage = report['stages']['examples']
+    assert stage['state'] == 'incomplete' and stage['counts']['blocked'] == stage['counts']['eligible'] == 1
+    lifecycle = stage['provenance']['lifecycle']
+    assert lifecycle['reason'] == 'guardian-failure'
+    assert lifecycle.get('direct_child_reaped',False) == (failure=='completed')
+    assert docaudit.exit_code(report,'warn') == docaudit.exit_code(report,'error') == 2

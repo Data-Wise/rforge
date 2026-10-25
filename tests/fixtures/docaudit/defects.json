@@ -42,7 +42,14 @@
       "release": "A2",
       "expectation": "firm",
       "status": "pending",
-      "reason": "/articles/models.html absent from the live site; no git ref, needs --site (A2)"
+      "reason": "/articles/models.html absent from the live site; the page never existed in the repository, so there is no git ref and no historical source or sitemap was retained. History stays pending.",
+      "substitute": {
+        "fixture": "site-planted",
+        "kind": "synthetic",
+        "provenance_backed": false,
+        "history": "pending",
+        "note": "The committed synthetic fixture proves the check fires; it is not the historical deployment and does not claim to reproduce it."
+      }
     },
     {
       "id": "readme-nie-output",
@@ -53,8 +60,8 @@
       "check": "examples-output",
       "release": "A2",
       "expectation": "conditional",
-      "status": "pending",
-      "reason": "README NIE = 0.19 vs real 0.164; needs block-state sharing (A2)"
+      "status": "firm",
+      "reason": "README NIE = 0.19 vs real 0.164 on the real pre-fix tree; caught by --run-examples replay (examples-output at README.md) once the full package tree is extracted"
     },
     {
       "id": "extraction-long-paragraphs",

@@ -7,6 +7,13 @@ The full changelog lives in the repository:
 
 ---
 
+## 2.22.0 — 2026-10-25
+
+`/rforge:docs:check` gains opt-in `--site URL [--ref REF]` (deployed pkgdown site
+audit over HTTP) and `--run-examples` (guarded README example replay) stages.
+Incomplete stages exit 2 instead of reporting clean; accepted on ubuntu-24.04
+and macos-14. No command-surface change (44 commands).
+
 ## 2.21.0 — 2026-10-11
 
 `/rforge:docs:check` is now a static content audit (`lib/docaudit.py`): calls and

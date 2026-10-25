@@ -1,0 +1,86 @@
+{
+  "status": "local-inspection",
+  "candidate": "uncommitted feature; not aggregate release evidence",
+  "method": "Parsed rendered article text; verified flag spelling and relevant explanations",
+  "records": [
+    {
+      "path": "guides/docs-audit/index.html",
+      "sha256": "10a7374635980e6bc0f1a22c4feaa56c4d15be0ebe7487f4abbe9a8021128b09",
+      "checks": {
+        "--site": true,
+        "--run-examples": true
+      },
+      "excerpts": [
+        "\u00b6 /rforge:docs:check --site https://example.org/pkg/ --ref origin/main /rforge:docs:check --run-examples --examples-budget-seconds 300 --fail-on warn --site requires one resolved package. It compares an immutable local deployment source with one bounded sitemap; no build, fetch, deploy or link crawl occurs. Missing selected-ref ",
+        "neric, or a re-export cannot be checked; a clean report on checked 1 of 22 proves little. INCOMPLETE or NOT AUDITED at the end means the result is not clean , whatever status says: a file was unreadable, a region was too large to scan, or no package was found. Findings are candidates. A flagged call may be intentional pseudo-cod",
+        "sertions execute no setup. Package code may write files or use the network: this is not a sandbox. Read all six coverage counts before interpreting a result. Completed numeric mismatch is warn; it exits 1 under --fail-on warn , 0 under --fail-on error when nothing else gates. Incomplete/unavailable stages exit 2 under either thr",
+        "age and its nested packages. Suppressing a finding \u00b6 # .rforge.yaml (package root) docs : allowlist : - vignettes/articles/methods.qmd::scannability # one check in one file - NEWS-draft.md # everything in a file A malformed block is ignored with a message; the suppressed count appears in the summary. In a release gate \u00b6 --fail-o",
+        "Read all six coverage counts: discovered, eligible, checked, excluded, unverified and blocked. Checked groups divide into matched and mismatched. Discovered equals checked plus excluded plus unverified plus blocked; eligible records the replay scope. Unpaired rendered assertions stay unverified even when source comparisons match. Completed numeric mismatch is warn; it exits 1 under --fail-on warn , 0 under --fail-on error when nothing else gates. Incomplete/unavailable stages exit 2 under either threshold. Default ",
+        "Unknown host lifetime calls for a terminal recommendation. A shorter known host limit requires reducing the budget to leave the 15-second reserve or using the terminal. Missing stdout after wrapper termination is interruption; never infer a clean audit or fabricate recovered JSON. Ordinary process-group cleanup does not contain detached children or guarantee reporting after host loss. The orchestrator always recommends examples/combined runs; site-only automatic GET needs an "
+      ]
+    },
+    {
+      "path": "commands/index.html",
+      "sha256": "e7727bd492157e20fa84ec962c6dd86936a02e4d02c61152e5f69d69ad16fe32",
+      "checks": {
+        "--site": true,
+        "--run-examples": true
+      },
+      "excerpts": [
+        " URL reads one package's sitemap against local --ref REF (or an inferred deployment ref); --run-examples executes supported root README transcripts with --examples-budget-seconds N (default 300, positive integer). Source/render pairing is deferred: asserted rendered output remains unverified. Incomplete stages exit 2 with warn/e",
+        "ted A2 warnings gate only warn. Site GETs never build/deploy/fetch; replay is opt-in, not sandboxed. /rforge:complete \u00b6 Mark tasks complete with automatic documentation cascade. Usage: /rforge:complete [ task_id ] [ --no-cascade ] Parameters: - task_id (optional) - Task ID (e.g. T-YYYY-MM-DD-NNN ) or short description - --no-cas",
+        "scope; the summary line states how many exports were checked. Suppress findings with docs.allowlist in .rforge.yaml . Optional stages: --site URL reads one package's sitemap against local --ref REF (or an inferred deployment ref); --run-examples executes supported root README transcripts with --examples-budget-seconds N (default"
+      ]
+    },
+    {
+      "path": "tutorials/fix-a-docs-check-finding/index.html",
+      "sha256": "e605581c4553dce691b7fccd7dec7734950739c515e8a1a8d15609bd26585755",
+      "checks": {
+        "--site": true,
+        "--run-examples": true
+      },
+      "excerpts": [
+        "ks \u00b6 Use --site URL --ref REF for a single package's deployment-source sitemap check. Use --run-examples --examples-budget-seconds 300 --fail-on warn for supported README replay. Hidden setup stays ordered; source/render pairing and figure options remain unsupported. Check stage counts and INCOMPLETE before changing published ex",
+        "h it could see. checked 18 of 22 means 4 exports were not judged. If the report ends with INCOMPLETE or NOT AUDITED , it is not clean even when no findings are listed. Step 2: Triage each finding against the source of truth \u00b6 The Rd usage is the source of truth. For the error above: grep -A3 \"\\\\\\\\usage\" man/joint_effects.Rd # fo",
+        "s the name ( f <- other , a function(f) parameter). If it is a case the audit cannot see, allowlist it (Step 4). Step 3: Fix the docs and re-run \u00b6 Change the call or the listing to the real signature, then run the command again. Repeat until the only output is the scope line, checked N of M and no findings . Step 4: Suppress wha"
+      ]
+    },
+    {
+      "path": "workflows/index.html",
+      "sha256": "9827caea0d4c9fce38d4a58a85832f39fdf962fa9fc33b239a7cc138874590dd",
+      "checks": {
+        "--site": true,
+        "--run-examples": true
+      },
+      "excerpts": [
+        " A single-package --site URL [--ref REF] reads its sitemap without crawling or deploying. --run-examples executes partial README coverage and always needs human authorization; the orchestrator recommends it, including combined site/examples runs. Prefer the terminal when the wrapper lifetime is unknown; reserve 15 seconds beyond",
+        "re you build or release. flowchart LR A[\"/rforge:docs:check\"] --> B{\"report ends with<br/>INCOMPLETE / NOT AUDITED?\"} B -- \"yes\" --> C[\"fix the unreadable file<br/>or the unclosed call, re-run\"] C --> A B -- \"no\" --> D{\"findings?\"} D -- \"error / warn\" --> E[\"check the call against<br/>man/*.Rd, fix the docs<br/>or allowlist it\"]",
+        "gs?\"} D -- \"error / warn\" --> E[\"check the call against<br/>man/*.Rd, fix the docs<br/>or allowlist it\"] E --> A D -- \"none\" --> F[\"/rforge:r:cran-prep\"] \u2192 Fix a docs:check finding (~10 min) \u00b7 Docs audit guide \ud83d\udd1a Session boundary \u00b6 Start a session with a recap; end it by syncing .STATUS . flowchart LR A[\"/rforge:restore<br/>read-"
+      ]
+    },
+    {
+      "path": "quickstart/index.html",
+      "sha256": "51dc096fcb6a41ccc3618791ddbf530084d9a297093de3c0e606d6f2513d5216",
+      "checks": {
+        "--site": true,
+        "--run-examples": true
+      },
+      "excerpts": [
+        "COMPLETE or NOT AUDITED is not clean. Optional --site URL [--ref REF] checks one sitemap; --run-examples replays partial README assertions using package code. Use --fail-on warn for A2 discrepancies; both enabled gates block incomplete stages. See Fix a docs:check finding . Session start and end \u00b6 /rforge:restore # recap of this",
+        "udit prints its scope on the first line and checked N of M at the end; a report ending in INCOMPLETE or NOT AUDITED is not clean. Optional --site URL [--ref REF] checks one sitemap; --run-examples replays partial README assertions using package code. Use --fail-on warn for A2 discrepancies; both enabled gates block incomplete st"
+      ]
+    },
+    {
+      "path": "configuration/index.html",
+      "sha256": "080405c54709e12d70372b67c1bd7e09d2452285f67dd407e8b1570678edffcf",
+      "checks": {
+        "--site": true,
+        "--run-examples": true
+      },
+      "excerpts": [
+        "t authorize execution or suppress source-less extra-URL information. --site URL , --ref , --run-examples and --examples-budget-seconds are invocation flags, not inferred site or execution authorization from configuration. See the Docs audit guide .",
+        "us \u2014 shows the active configuration for your project. Optional docs-audit coverage \u00b6 docs.allowlist suppresses source findings, including A2 site/README findings, without changing checked/excluded/unverified/blocked counts or an incomplete stage. It cannot authorize execution or suppress source-less extra-URL information. --site"
+      ]
+    }
+  ]
+}

@@ -20,9 +20,13 @@ adapter release or a port of the Claude command catalog and hooks.
 Start with the [Codex installation and checks guide](docs/guides/codex-checks.md). Claude
 marketplace and Homebrew installation below do not install these Codex skills.
 
+## What's new in v2.22.0
+
+- 🌐 **`/rforge:docs:check --site URL [--ref REF]`** audits a deployed pkgdown site over HTTP and **`--run-examples [--examples-budget-seconds 300]`** replays README examples in a guarded R process. Both are opt-in; the default stays offline. Incomplete stages exit 2 with either enabled threshold, and `--site` reports pkgdown development-mode sites and `.qmd` articles as incomplete rather than clean. Accepted on ubuntu-24.04 and macos-14 (662 required checks each). See the [Docs audit guide](https://data-wise.github.io/rforge/guides/docs-audit/).
+
 ## What's new in v2.21.0
 
-- 🔎 **`/rforge:docs:check` is a real docs audit** — `lib/docaudit.py` checks the calls and signatures in your README and vignettes against the package exports: `signature-named-arg` (error), `signature-names` / `signature-arity` (warn), `scannability` (info), `--since` coverage. `--eco`, `--detailed`, `--fail-on none|warn|error`, `docs.allowlist`. Reports end `INCOMPLETE` / `NOT AUDITED` instead of `no findings` when it could not finish. See the [Docs audit guide](https://data-wise.github.io/rforge/guides/docs-audit/).
+- 🔎 **`/rforge:docs:check` is a real docs audit** — `lib/docaudit.py` checks the calls and signatures in your README and vignettes against the package exports: `signature-named-arg` (error), `signature-names` / `signature-arity` (warn), `scannability` (info), `--since` coverage. `--eco`, `--detailed`, `--fail-on none|warn|error`, `docs.allowlist`. Reports end `INCOMPLETE` / `NOT AUDITED` instead of `no findings` when it could not finish. Opt-in A2 stages add `--site URL [--ref REF]` and `--run-examples [--examples-budget-seconds 300]`; the default stays offline. README execution is partial coverage and runs package code. Completed A2 discrepancies are warnings; incomplete stages exit 2 with either enabled threshold. See the [Docs audit guide](https://data-wise.github.io/rforge/guides/docs-audit/).
 - 🐛 **`/rforge:finish`** keeps `.STATUS` version annotations and still adds `version:` when missing (#84).
 - 📚 New Ecosystem analysis guide, a "Fix a docs:check finding" tutorial, corrected command cards, one Quick Start.
 
@@ -451,6 +455,6 @@ MIT
 
 ---
 
-**Version:** 2.21.0
+**Version:** 2.22.0
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+

@@ -38,6 +38,13 @@ when any is missing):
 pip install pytest pyyaml mkdocs-material
 ```
 
+A2 acceptance jobs select the latest stable Python 3 (`3.x`, checking for the
+latest release and excluding prereleases). Each artifact records the exact
+interpreter used. The R and fixture dependency versions remain locked in
+`tests/a2/fixture-lock.json`; actual Ubuntu 24.04 and macOS 14 evidence is still
+required. Local compatibility tests on another supported Python version do not
+replace those platform runs.
+
 ## What makes a good PR
 
 1. **One concern per PR.** A bugfix, a feature, or a docs improvement — not all

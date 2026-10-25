@@ -27,7 +27,7 @@ import inspect
 import re
 import sys
 import textwrap
-from dataclasses import fields, is_dataclass
+from dataclasses import MISSING, fields, is_dataclass
 from pathlib import Path
 from types import ModuleType
 
@@ -79,9 +79,9 @@ def _format_dataclass(name: str, cls) -> str:
         )
         # Clean up some common verbose type reprs
         type_repr = re.sub(r"typing\.", "", type_repr)
-        if f.default is not inspect.Parameter.empty and f.default.__class__.__name__ != "_MISSING_TYPE":
+        if f.default is not MISSING:
             default = f"`{f.default!r}`"
-        elif f.default_factory.__class__.__name__ != "_MISSING_TYPE":  # type: ignore[union-attr]
+        elif f.default_factory is not MISSING:  # type: ignore[union-attr]
             default = f"`{f.default_factory.__name__}()`"
         else:
             default = "—"

@@ -1,0 +1,94 @@
+{
+  "status": "not-release-verified",
+  "kind": "package_triage",
+  "scope": "Local read-only run on pinned temp clones of each package HEAD; bound to the rforge commit below only, regenerate on the final candidate. Not a platform artifact.",
+  "rforge_commit": "5f8748753791041c8a491730e7bdce689802eea6",
+  "observed": "2026-10-24",
+  "facts": {
+    "packages": {
+      "medfit": {
+        "package": "medfit",
+        "commit": "2951b28a51a9a6c70d64b89cd8481a49bfa95859",
+        "source_dirty": false,
+        "source_sha256": {
+          "README.md": "373181840ed8c27325095c56c14f2e920ebd39a0a96c35e58a17414cda366ba7"
+        },
+        "state": "incomplete",
+        "scope": "partial",
+        "counts": {
+          "discovered": 6,
+          "eligible": 4,
+          "checked": 4,
+          "excluded": 0,
+          "unverified": 2,
+          "blocked": 0
+        },
+        "reasons": [
+          "standalone markdown: omitted setup cannot be reconstructed",
+          "assertions outside supported R fences"
+        ],
+        "findings": [],
+        "reviewed": true,
+        "disposition": "Reviewed. 4 of 6 assertions checked and matched on the committed tree; 2 stay unverified (standalone markdown omitted setup; assertions outside supported R fences), so coverage is recorded as partial, not complete. No open warn/error findings. Re-pinned from d29e656a675c to 2951b28a51a9: d29e656 is on no remote branch, the README source hash is identical at the pin, and a fresh producer run on the pinned clone reproduced state, counts and zero findings.",
+        "triaged_classes": [
+          {
+            "class_id": "tibble-type-row",
+            "status": "fixed",
+            "fix_commit": "5f8748753791041c8a491730e7bdce689802eea6",
+            "rationale": "Initial run reported two examples-shape warnings (README.md:93 tidy(result), :105 glance(result)). Real output matched the documented tibbles token for token; only the column-type rows (<chr> <dbl> ...) were unaligned because compare() treated any line starting with < as a bare inequality bound. Fixed so only a numeric bound is a fragment; the same README now checks 4 of 4 eligible assertions with 0 findings."
+          }
+        ]
+      },
+      "probmed": {
+        "package": "probmed",
+        "commit": "af38d09dcf08697599c0edd65a20073175dae668",
+        "source_dirty": false,
+        "source_sha256": {
+          "README.md": "3a58ef3a5b997243b74cfbb223f618adb29d379f7fccbdae4614eb32283a76c6",
+          "README.qmd": "64ee3f2668c1728933dad7a0141d63ada1defe7a24cfeb909b5c29b8c927372a"
+        },
+        "state": "incomplete",
+        "scope": "partial",
+        "counts": {
+          "discovered": 2,
+          "eligible": 1,
+          "checked": 0,
+          "excluded": 0,
+          "unverified": 2,
+          "blocked": 0
+        },
+        "reasons": [
+          "rendered-unpaired",
+          "unsupported option fig.path: \"man/figures/README-\"; unsupported option out.width: \"100%\""
+        ],
+        "findings": [],
+        "reviewed": true,
+        "disposition": "Reviewed. README.qmd is the source and README.md its rendered output (unpaired), with unsupported chunk options (fig.path, out.width); nothing could be checked. Recorded as incomplete/partial, never green. No findings."
+      },
+      "medrobust": {
+        "package": "medrobust",
+        "commit": "349771647b7798ef8e36f7512fb2a38b7eaabbc1",
+        "source_dirty": false,
+        "source_sha256": {
+          "README.md": "1cb8a79fe66a023c620ee65326df105e8d93ade07476162c966319ed80fd89f0"
+        },
+        "state": "not-applicable",
+        "scope": "not-applicable",
+        "counts": {
+          "discovered": 0,
+          "eligible": 0,
+          "checked": 0,
+          "excluded": 0,
+          "unverified": 0,
+          "blocked": 0
+        },
+        "reasons": [
+          "README has no replayable documented-output assertions"
+        ],
+        "findings": [],
+        "reviewed": true,
+        "disposition": "Reviewed. README.md has R code but no documented output (no #> assertions), so there is nothing to compare. Recorded as not-applicable, not as verified. No findings."
+      }
+    }
+  }
+}

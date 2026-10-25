@@ -3,7 +3,7 @@
 !!! tip "TL;DR (30 seconds)"
     - **What:** run the docs audit, decide whether each finding is a real doc bug, fix it, and re-run until the report is clean and complete.
     - **Time:** about 10 minutes.
-    - **You need:** an R package with a `man/` folder and docs (`README`, `vignettes/`). No R session required.
+    - **You need:** an R package with a `man/` folder and docs (`README`, `vignettes/`). No R session is required for the default static audit; `--run-examples` needs R.
 
 You will find a doc call that no longer matches the function, fix it, and wire the check into a release.
 The reference for every check is the [Docs audit guide](../guides/docs-audit.md).
@@ -77,3 +77,12 @@ vouch for a release.
 
 - [Docs audit guide](../guides/docs-audit.md): every check, scope rules and known limitations.
 - [CRAN release prep](cran-release-prep.md): where the audit sits before `r:cran-prep`.
+
+## Optional follow-up checks
+
+Use `--site URL --ref REF` for a single package's deployment-source sitemap check.
+Use `--run-examples --examples-budget-seconds 300 --fail-on warn` for supported
+README replay. Hidden setup stays ordered; source/render pairing and figure
+options remain unsupported. Check stage counts and INCOMPLETE before changing
+published examples. A warning is a candidate; an incomplete replay is not proof
+that the document is broken. Run replay in a terminal when host lifetime is unknown.

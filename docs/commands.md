@@ -491,7 +491,7 @@ auto-applied).
 
 ### /rforge:docs:check
 
-Audit documentation content against the package API: calls and signatures in `README` and `vignettes/` that no longer match the exports. Static and read-only (`lib.docaudit`).
+Audit documentation content against the package API: calls and signatures in `README` and `vignettes/` that no longer match the exports. The default is static and read-only (`lib.docaudit`); opt-in `--site` reads a sitemap and `--run-examples` executes README code in supervised R sessions.
 
 **Usage:**
 ```bash
@@ -517,6 +517,15 @@ Audit documentation content against the package API: calls and signatures in `RE
 **Checks:** `signature-named-arg` (error), `signature-names` and `signature-arity` (warn), `scannability` (info), `coverage` (warn, `--since` only). The first report line states the resolved scope; the summary line states how many exports were checked. Suppress findings with `docs.allowlist` in `.rforge.yaml`.
 
 ---
+
+Optional stages: `--site URL` reads one package's sitemap against local `--ref REF`
+(or an inferred deployment ref); `--run-examples` executes supported root README
+transcripts with `--examples-budget-seconds N` (default 300, positive integer).
+Source/render pairing is deferred: asserted rendered output remains unverified.
+Incomplete stages exit 2 with warn/error thresholds; completed A2 warnings gate
+only warn. Site GETs never build/deploy/fetch; replay is opt-in, not sandboxed.
+
+
 
 ### /rforge:complete
 
@@ -615,6 +624,7 @@ Get ecosystem-aware next task recommendation.
 - 2-3 alternatives
 
 ---
+
 
 ## Health Checks
 

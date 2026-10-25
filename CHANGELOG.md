@@ -11,6 +11,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.22.0] - 2026-10-25
+
+> `/rforge:docs:check` gains two opt-in stages: `--site URL [--ref REF]` (audits a deployed pkgdown site over HTTP)
+> and `--run-examples [--examples-budget-seconds N]` (replays README examples in a guarded R process). Accepted on
+> ubuntu-24.04 and macos-14 against a locked R 4.6.1 toolchain. No command-surface change (44); `test-all.sh` 47 checks.
+
+- A2 (`/rforge:docs:check --site`, `--run-examples`) accepted and merged to dev (PR #99): 662 required acceptance nodes passed on ubuntu-24.04 and macos-14 on the frozen candidate, six candidate-bound observations and the aggregate verifier passed. The adversarial review is attested, and `--site` live smoke covers one supported deployed site (r-hub/cranlogs); packages that use pkgdown development mode or `.qmd` articles are reported incomplete.
+
+- Add explicit A2 status, command/check count, unchanged feature version and agent prohibition assertions; close D05 local coverage while keeping platform/release acceptance pending.
+
+- Prevent pre-spawn guardian exceptions from signaling an unowned checkpoint PGID; allocate the workload handle before spawning. Preserve README assertion counts, valid partial checkpoints, and authenticated lifecycle evidence when replay preparation or execution raises an ordinary exception. Add acceptance regressions; interruption propagation and release gates remain unchanged.
+
+- Repair A2 guardian cleanup after repeated liveness-probe failure with the parent absent; preserve direct-child handles through pending launch interruptions and close the pin-construction cleanup gap. Native regressions cover all three failures; release acceptance remains pending.
+
+- Add Python 3.15 to the general CI test matrix. Per the 2026-10-23 Python policy amendment, A2 platform and aggregate jobs select latest stable Python 3 and record the exact interpreter; reject prerelease/unsupported runtime evidence. R/dependency locks and both-platform acceptance remain required.
+
+- Keep generated dataclass reference defaults stable on Python 3.15 by comparing against the public `dataclasses.MISSING` sentinel, preserving compatibility with earlier Python versions.
+
+- Reserve README replay process-group identity with a parent-owned, unreaped pin through the final possible group signal. The guardian still launches/reaps R and owns normal termination; emergency cleanup no longer trusts checkpoint PIDs. Assign workload membership atomically with POSIX spawn and use an isolated bootstrap to prevent project-local launcher replacement or delayed group-join deadline escapes. Mask launch interruptions until child ownership is assigned. Add native before/after-reap crash, corrupt-PID, parent-loss, interruption, and pin lifetime regressions. Both-platform acceptance remains pending.
+
+- Bound emitted UTF-8 diagnostic tails to 1 MiB even for malformed bytes; verify mixed checkpoint preservation and duplicate rejection. Normal CI and release evidence now share the locked A2 Ubuntu/macOS platform workflow; aggregate acceptance stays separate and fail closed.
+
+- Fail closed on malformed README replay checkpoint records instead of raising `KeyError`; reject duplicate assertion identities. Expanded acceptance covers README selection/options, native session isolation, distinct deadlines, exact combined output accounting, guardian death, and verifier inventory/runtime binding. Release evidence remains pending.
+
+- Correct A2 site route filtering to exclude underscore-prefixed article filenames rather than parent directories; pinned pkgdown 2.2.1 build verifies nested routes and exclusions.
+
+### Added (A2 implementation in progress)
+
+- Opt-in docs audit site/source comparison and supervised README replay. Release acceptance and both-platform evidence remain pending.
+- A2 remediation: guardian-visible evaluate text during running expressions; aggregate acceptance requires retrieved, hash-bound observation artifacts and their producer run identity.
+
+### Added
+
+- Personal Codex adapter with `rforge-check` and `rforge-docs-check` skills,
+  reusing the local Rforge engines. Includes a local catalog and setup guide;
+  installation and runtime acceptance remain separate.
+
+### Changed
+
+- Codex verification records now cover fresh-session missing/older-engine
+  rejection, engine/package paths containing spaces, and controlled Python 3.9
+  rejection. Preserve the unexplained restricted-session check termination and
+  static-audit limits; writing formats remain deferred.
+
+### Fixed
+
+- Codex pilot 0.1.1: default CRAN-style checks and explicit strict flavor
+  orchestration; docs scope isolation and comparison-ref guidance. Unsupported
+  changed-baseline checks and stale engines are reported explicitly.
+- Package checks reject missing/malformed structured evidence and nonzero R
+  exits; retain real check logs in explicit temporary directories and expose
+  `check.log_paths`, `output_format`, and `incomplete`.
+- Documentation CLI adds mutually exclusive `--package-only` scope control,
+  preventing hybrid/manifest expansion without changing existing defaults.
+
+---
+
 ## [2.21.0] - 2026-10-11
 
 > `/rforge:docs:check` is now a deterministic content audit (`lib/docaudit.py`): calls and signatures in

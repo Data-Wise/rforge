@@ -88,8 +88,24 @@ checks covered a full build, examples, 106 HTML pages, 8,268 local references,
 and representative desktop/mobile output. This complements the static Rforge
 skills; it does not expand their contract or introduce a new Rforge command.
 
-Still unverified: fresh-session missing/older-engine handling, unchecked variadic
-signatures, full external-resource/accessibility coverage, and standalone Quarto.
+Two fresh read-only sessions verified that both installed 0.1.1 skills report
+unavailable for a missing explicit engine and for the actual v2.21.0 engine
+without the required interfaces. Neither ran a package check or unguarded docs
+audit, substituted another engine, or reported passing results. This used a
+synthetic package; it does not add package-check coverage.
+
+Fresh sessions also verified engine/package paths containing spaces: static
+audit completed with zero findings and 1/1 exports checked; the default
+`--as-cran` check completed with zero errors/warnings and one new-submission
+NOTE. Both skills rejected Python 3.9 when it was the fixture's sole permitted
+interpreter; this does not claim supported Python is absent from the host.
+
+Remaining: unchecked variadic signatures; an unexplained check termination
+during CRAN incoming checks in the earlier network-restricted session; and
+separately unexercised missing-interpreter/invalid-package fresh-session cases.
+The successful network-enabled rerun does not prove the earlier failure's cause.
+Full external-resource/accessibility coverage and standalone Quarto also remain
+unverified.
 Article, tutorial, cookbook and refcard generation remain deferred.
 
 ## Common requests
