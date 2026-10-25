@@ -1836,7 +1836,13 @@
         "tests/a2/test_observations.py::test_a_crashing_observation_becomes_a_failed_record_not_a_crash",
         "tests/a2/test_observations.py::test_triage_drift_is_recorded_in_the_failed_observation",
         "tests/a2/test_release_ci.py::test_observations_workflow_is_dispatch_only_and_bound_to_the_run",
-        "tests/a2/test_release_ci.py::test_no_temporary_smoke_workflow_remains"
+        "tests/a2/test_release_ci.py::test_no_temporary_smoke_workflow_remains",
+        "tests/a2/test_runtime_probe.py::test_probe_code_names_every_locked_package_once",
+        "tests/a2/test_runtime_probe.py::test_probe_code_follows_the_lock_not_a_fixed_list",
+        "tests/a2/test_runtime_probe.py::test_installed_reports_the_same_keys_as_the_lock",
+        "tests/a2/test_runtime_probe.py::test_installed_is_none_when_r_fails",
+        "tests/a2/test_runtime_probe.py::test_no_hardcoded_package_list_remains[scripts/run_a2_release.py]",
+        "tests/a2/test_runtime_probe.py::test_no_hardcoded_package_list_remains[tests/a2/conftest.py]"
       ],
       "status": "ready",
       "coverage_gaps": [
@@ -1847,7 +1853,8 @@
         "tests/a2/test_final_gates.py": "fd2b6c76e37168464d84ba12647b8d85eaf6950e57d56137fa12451a22725f07",
         "tests/a2/test_manifest.py": "278f1646c0229c9563b70f13b58af7512e4e638185d9d61318b69ef484902636",
         "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085",
-        "tests/a2/test_release_ci.py": "e1d608bbde8df7f361028c12eeea2a434a46d1868a74547a38c26c07af3c0a42"
+        "tests/a2/test_release_ci.py": "e1d608bbde8df7f361028c12eeea2a434a46d1868a74547a38c26c07af3c0a42",
+        "tests/a2/test_runtime_probe.py": "739319d20f83a0fe032a2ae6eb2ecf25e5e6306b09348ccd2d84654747be9133"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1913,7 +1920,7 @@
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 656,
+  "collected_nodes": 662,
   "review_candidate": "A2 candidate 2: round-1 review fixes (producer-run binding, triage commit equality, crash-safe observations)",
   "platforms": [
     "ubuntu-24.04",

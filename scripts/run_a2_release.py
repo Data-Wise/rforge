@@ -10,6 +10,8 @@ import sys
 import uuid
 from pathlib import Path
 
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
@@ -34,7 +36,8 @@ def main(argv=None):
         if set(oracle)!=allowed:raise ValueError("unexpected fixture oracle schema")
         evidence.update({key:oracle[key] for key in allowed})
         (args.output/'fixture-executions.json').write_text(json.dumps(oracle,indent=2)+'\n')
-        runtime_code='cat(jsonlite::toJSON(list(R=as.character(getRversion()),R_packages=setNames(lapply(c("pkgload","evaluate","knitr","pkgdown","jsonlite"),function(p)as.character(packageVersion(p))),c("pkgload","evaluate","knitr","pkgdown","jsonlite"))),auto_unbox=TRUE))'
+        from tests.a2.runtime_probe import probe_code
+        runtime_code=probe_code(json.loads(lock_path.read_text())['R_packages'])
         runtime=json.loads(subprocess.check_output(["Rscript","--vanilla","-e",runtime_code],text=True,timeout=20))
         if set(runtime)!={"R","R_packages"}:raise ValueError("unexpected runtime evidence schema")
         evidence.update(runtime)

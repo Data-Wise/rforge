@@ -34,9 +34,8 @@ def pytest_addoption(parser):
 def runtime():
     r=shutil.which('Rscript')
     if not r:return None
-    code='cat(jsonlite::toJSON(list(R=as.character(getRversion()), R_packages=setNames(lapply(c("pkgload","evaluate","knitr","pkgdown","jsonlite"),function(p)as.character(packageVersion(p))),c("pkgload","evaluate","knitr","pkgdown","jsonlite"))),auto_unbox=TRUE))'
-    try:return json.loads(subprocess.run([r,'--vanilla','-e',code],capture_output=True,text=True,timeout=20,check=True).stdout)
-    except (OSError,subprocess.SubprocessError,ValueError):return None
+    from .runtime_probe import installed
+    return installed(json.loads((Path(__file__).parent/'fixture-lock.json').read_text()),r)
 
 
 def pytest_collection_modifyitems(config, items):
