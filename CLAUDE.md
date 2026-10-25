@@ -22,6 +22,8 @@ Do not expand this adapter into website generation or a full Claude command port
 
 ## Current state (2026-10-25)
 
+**v2.22.1 (2026-10-25, patch, 44 commands, no command-surface change):** `--run-examples` compares documented bare integers of up to six digits exactly (#105/#106); decimals, scientific notation and longer integers keep the spec tolerance. Records: `.STATUS`, CHANGELOG `[2.22.1]`.
+
 **v2.22.0 (2026-10-25, minor, 44 commands, no command-surface change):** `/rforge:docs:check --site URL [--ref REF]` and `--run-examples` stages (A2), accepted on ubuntu-24.04 and macos-14 (662 required checks, candidate-bound observations, aggregate verifier). Opt-in; default stays offline. Records: `.STATUS`, CHANGELOG `[2.22.0]`.
 
 **v2.21.0 (released 2026-10-11 — minor, 44 commands, no command-surface change):** `/rforge:docs:check` is now a deterministic content audit (`lib/docaudit.py`, release A1): `signature-named-arg` (error), `signature-names`/`signature-arity` (warn), `scannability` (info), `coverage` (warn, `--since TAG` only); `--eco`, `--detailed`, `--fail-on none|warn|error`, `docs.allowlist` in `.rforge.yaml`; text reports end `INCOMPLETE`/`NOT AUDITED` instead of "no findings" when the audit could not finish. Dev-only replay harness `tests/harness/`; orchestrator `DOCS_AUDIT` row; Docs audit guide. Also #85/#86 (`/rforge:finish` version drift, #84) and a docs gap-fill (#89, #90). `test-all.sh` 47 checks. A2 (`--site`, `--run-examples`) is a separate later plan. Records: `.STATUS`, CHANGELOG `[2.21.0]`.
@@ -43,6 +45,7 @@ Do not expand this adapter into website generation or a full Claude command port
 
 ### Release history — architecture deltas only (release mechanics live in CHANGELOG + git)
 
+- **v2.22.1** — exact short-integer comparison in `--run-examples` (#105/#106). 44 commands.
 - **v2.22.0** — `/rforge:docs:check --site`/`--run-examples` (A2) with candidate-bound two-platform acceptance (PR #99). 44 commands.
 - **v2.21.0** — `/rforge:docs:check` content audit (`lib/docaudit.py`, A1) + dev-only replay harness `tests/harness/`; `/rforge:finish` version-drift fix (#84/#85/#86); docs gap-fill (#89/#90). 44 commands, 47 `test-all.sh` checks.
 - **v2.20.1** — `lib.status` frontmatter dialect + `phase:`-key-only (#75/#82); NEWS `##`-subsection count (#78); MediationVerse doctrine (#76); `AGENTS.md` mirror + gates (#77/#80); test-all dev-dep warning (#79). 44 commands.

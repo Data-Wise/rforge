@@ -7,6 +7,13 @@ The full changelog lives in the repository:
 
 ---
 
+## 2.22.1 — 2026-10-25
+
+`/rforge:docs:check --run-examples` now compares documented whole numbers of up
+to six digits exactly, so a stale count such as `[1] 100` against `[1] 101` is a
+mismatch instead of a pass. Decimals, scientific notation and longer integers are
+unchanged. No command-surface change (44 commands).
+
 ## 2.22.0 — 2026-10-25
 
 `/rforge:docs:check` gains opt-in `--site URL [--ref REF]` (deployed pkgdown site

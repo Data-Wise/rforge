@@ -33,7 +33,7 @@ def test_status_guidance_count_sync():
                    for p in (ROOT / 'commands').rglob('*.md'))
     assert f'all {commands} commands' in (ROOT / 'CLAUDE.md').read_text()
     assert commands == 44
-    assert package['version'] == '2.22.0'
+    assert package['version'] == '2.22.1'
 
 
 @pytest.mark.parametrize('prohibition', [

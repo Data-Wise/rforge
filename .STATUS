@@ -77,7 +77,7 @@ in_progress: none. v2.22.0 released (A2 --site/--run-examples). Issue #101 close
   in the record); live smoke supported-site is r-hub/cranlogs only (no Data-Wise/tidyverse package is checkable by --site).
   Planning files stay at repo root (tests/a2/requirements.json and scripts/verify_a2_release.py reference them).
 next: batch v2.22.1 (integer comparator, #105) with the next change; open low-priority candidates in CLAUDE.md Roadmap.
-version: 2.22.0 (released 2026-10-25, on main d36cee7; dev fast-forwarded to main)
+version: 2.22.1 (release PR pending; v2.22.0 tag d36cee7)
 last_release: 2026-10-25 v2.22.0 (minor, 44 commands, no surface change; PR #100 dev→main merge d36cee7; tag v2.22.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.22.0; tap PR #245 merge 699b59a; brew audit --strict clean, 2.22.0 installed). Prior: 2026-10-11 v2.21.0 (minor, 44 commands, no surface change — PR #91 dev→main merge 7387a05; tag v2.21.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.21.0. Ships /rforge:docs:check content audit (lib.docaudit, A1), tests/harness, #84 fix (#85/#86), docs gap-fill (#89/#90). Gates: test-all 47/47, pytest 899+4 skipped, CI green on main (RForge CI + Deploy Documentation). Tap Data-Wise/homebrew-tap#244 squash 09bc9c3 — formula+manifest → v2.21.0 sha256 f376d0da…, stale revision dropped, generate.py --diff IDENTICAL; brew audit by path unavailable. Aggregator claude-plugins#74 auto-merged. Pending: user runs `brew upgrade rforge`.)
 last_release_prior_v2_20_1: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
   9d0b01a; tag v2.20.1; release https://github.com/Data-Wise/rforge/releases/tag/v2.20.1. Ships
