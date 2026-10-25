@@ -223,6 +223,10 @@ def compare(expected,actual):
             if token!=other:verdict="output"
             continue
         mantissa,_,exponent=token.lower().partition("e")
+        # A short bare integer is printed exactly by R, so a stale count must not ride the spec's 10^0 tolerance.
+        if "." not in mantissa and not exponent and len(mantissa.lstrip("+-"))<=6:
+            if Decimal(token)!=Decimal(other):verdict="output"
+            continue
         digits=len(mantissa.split(".",1)[1]) if "." in mantissa else 0
         tolerance=Decimal(10)**(int(exponent or 0)-digits)
         if abs(Decimal(token)-Decimal(other))>tolerance:verdict="output"
