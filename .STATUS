@@ -1,3 +1,19 @@
+# PR #95 conflict reconciliation — 2026-10-22
+# Incorporated dev d2f9e58 into the feature branch; dev/main remain unchanged.
+# Retained both status histories and dev's updated Codex navigation/setup guidance.
+# Reconciled tree: 47/47 gates; pytest 920 passed, 4 skipped; strict MkDocs passed.
+# No new Markdown lint diagnostics versus dev; rendered guide/navigation inspected.
+# No new deployment requested; the deployment receipt below applies to 4c8bc13.
+# Documentation follow-up — 2026-10-22: general evidence-and-approval guide added
+# to Get Started and linked from Codex checks/session-boundary guidance.
+# Separates technical evidence, scientific/historical gaps and owner decisions;
+# no new commands, check engines or automatic authorization gates.
+# Isolated branch codex/evidence-approval-guide; not merged.
+# Verification: 47/47 gates; pytest 920 passed, 4 skipped; strict MkDocs built.
+# Version sync and generated-reference checks pass under Python 3.12.
+# Python 3.15 reference drift avoided by 3.12 verification; no regen.
+# Deployment 39903994046 passed for 4c8bc13; served guide visually inspected.
+
 # Codex durable verification checkpoint — 2026-10-22
 # PR #92 merged to dev fe8c8ef; adapter 0.1.1 uses durable rforge/openai catalog.
 # Fresh-session discovery and isolated medfit checks passed. Both skills rejected
