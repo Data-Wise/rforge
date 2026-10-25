@@ -109,6 +109,12 @@ nothing else gates. Incomplete/unavailable stages exit 2 under either threshold.
 Default none exits 0 with explicit diagnostics. Allowlists never clear incomplete
 coverage. Source-less extra sitemap URLs are outside file allowlists.
 
+Numeric comparison reads the precision of the documented value. Decimals and scientific
+notation tolerate one unit in the last documented place (`0.19` matches `0.20`). A
+documented whole number of up to six digits must match exactly (`100` against `101` is a
+mismatch), so a stale count, size or index fails. Seven or more digits keep the loose
+tolerance, because R prints seven significant digits by default.
+
 The total budget defaults to 300 seconds across all example files/packages;
 file/chunk caps are 300/60 seconds, including loading. Allow budget plus 15 seconds
 for guardian cleanup and final report. Poll/yield timeouts are not host lifetime.

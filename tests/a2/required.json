@@ -1014,7 +1014,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_comparison.py": "5a4d2e98ee41e669485e9544639e364b762dde1bd68cf07c18e9c336f26af627",
+        "tests/a2/test_comparison.py": "24720640abac9095da41144b0052bf96b949a76b8b4a955aff9f3b982e87521c",
         "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
@@ -1048,7 +1048,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_comparison.py": "5a4d2e98ee41e669485e9544639e364b762dde1bd68cf07c18e9c336f26af627"
+        "tests/a2/test_comparison.py": "24720640abac9095da41144b0052bf96b949a76b8b4a955aff9f3b982e87521c"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1781,6 +1781,17 @@
       "task": "T23",
       "proposed_node": "tests/a2/test_final_gates.py::test_gate_record_validation",
       "nodes": [
+        "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[[1] 100-[1] 101-output]",
+        "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[[1] 0-[1] 1-output]",
+        "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[n = 3-n = 4-output]",
+        "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[[1] 3-[1] 3.9-output]",
+        "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[[1] 0-[1] -0-match]",
+        "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[[1] 5-[1] +5-match]",
+        "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[[1] 999999-[1] 1000000-output]",
+        "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[[1] 100-[1] 100-match]",
+        "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[[1] 1234568-[1] 1234567-match]",
+        "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[[1] 1234568-[1] 1234570-output]",
+        "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[1e3-1001-match]",
         "tests/a2/test_final_gates.py::test_gate_record_validation[missing-full_gates]",
         "tests/a2/test_final_gates.py::test_gate_record_validation[missing-rendered_review]",
         "tests/a2/test_final_gates.py::test_gate_record_validation[missing-adversarial_review]",
@@ -1857,6 +1868,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
+        "tests/a2/test_comparison.py": "24720640abac9095da41144b0052bf96b949a76b8b4a955aff9f3b982e87521c",
         "tests/a2/test_final_gates.py": "fd2b6c76e37168464d84ba12647b8d85eaf6950e57d56137fa12451a22725f07",
         "tests/a2/test_guardian.py": "2033368a0fbbd844fbb56e8fa5a66207a1654d4bbec510923f07a77bd7b904c1",
         "tests/a2/test_manifest.py": "278f1646c0229c9563b70f13b58af7512e4e638185d9d61318b69ef484902636",
@@ -1928,7 +1940,7 @@
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 669,
+  "collected_nodes": 680,
   "review_candidate": "A2 candidate 2: round-1 review fixes (producer-run binding, triage commit equality, crash-safe observations)",
   "platforms": [
     "ubuntu-24.04",

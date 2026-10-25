@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `docs:check --run-examples` compares documented whole numbers of up to six digits exactly. Before, `[1] 100` matched an actual `[1] 101` because a bare integer got a tolerance of 1, so stale counts passed as clean. This revises the A2 spec's literal tolerance for integers; decimals, scientific notation and seven-digit or longer integers are unchanged (#105).
+
 ---
 
 ## [2.22.0] - 2026-10-25

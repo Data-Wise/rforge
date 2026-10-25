@@ -41,3 +41,14 @@ def test_remaining_normative_precision_rows(expected,actual,verdict):
 ])
 def test_tibble_type_rows_are_not_bare_inequality_bounds(expected,actual,verdict):
     assert examples.compare(expected,actual)==verdict
+
+
+@pytest.mark.parametrize('expected,actual,verdict',[
+ ('[1] 100','[1] 101','output'),('[1] 0','[1] 1','output'),('n = 3','n = 4','output'),
+ ('[1] 3','[1] 3.9','output'),('[1] 0','[1] -0','match'),('[1] 5','[1] +5','match'),
+ ('[1] 999999','[1] 1000000','output'),('[1] 100','[1] 100','match'),
+ ('[1] 1234568','[1] 1234567','match'),('[1] 1234568','[1] 1234570','output'),
+ ('1e3','1001','match'),
+])
+def test_short_documented_integers_match_exactly(expected,actual,verdict):
+    assert examples.compare(expected,actual)==verdict
