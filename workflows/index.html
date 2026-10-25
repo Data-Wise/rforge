@@ -821,6 +821,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="See also">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-site-and-readme-stages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional site and README stages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -2985,6 +3002,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="See also">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-site-and-readme-stages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional site and README stages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -3198,6 +3232,14 @@ the set.</p>
 <li><strong><a href="../REFCARD/">REFCARD</a></strong> — all 44 commands on one page</li>
 <li><strong><a href="../architecture/">Architecture</a></strong> — how the plugin's internals fit together</li>
 </ul>
+<h3 id="optional-site-and-readme-stages">Optional site and README stages<a class="headerlink" href="#optional-site-and-readme-stages" title="Permanent link">&para;</a></h3>
+<p>The default docs audit remains static. A single-package <code>--site URL [--ref REF]</code>
+reads its sitemap without crawling or deploying. <code>--run-examples</code> executes
+partial README coverage and always needs human authorization; the orchestrator
+recommends it, including combined site/examples runs. Prefer the terminal when
+the wrapper lifetime is unknown; reserve 15 seconds beyond the example budget.
+Use <code>--fail-on warn</code> to gate completed A2 warnings; either enabled threshold
+blocks incomplete stages with exit 2.</p>
 
 
 

@@ -1099,6 +1099,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#optional-follow-up-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional follow-up checks
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2811,6 +2822,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#optional-follow-up-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional follow-up checks
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2842,7 +2864,7 @@
 <ul>
 <li><strong>What:</strong> run the docs audit, decide whether each finding is a real doc bug, fix it, and re-run until the report is clean and complete.</li>
 <li><strong>Time:</strong> about 10 minutes.</li>
-<li><strong>You need:</strong> an R package with a <code>man/</code> folder and docs (<code>README</code>, <code>vignettes/</code>). No R session required.</li>
+<li><strong>You need:</strong> an R package with a <code>man/</code> folder and docs (<code>README</code>, <code>vignettes/</code>). No R session is required for the default static audit; <code>--run-examples</code> needs R.</li>
 </ul>
 </div>
 <p>You will find a doc call that no longer matches the function, fix it, and wire the check into a release.
@@ -2902,6 +2924,13 @@ vouch for a release.</p>
 <li><a href="../../guides/docs-audit/">Docs audit guide</a>: every check, scope rules and known limitations.</li>
 <li><a href="../cran-release-prep/">CRAN release prep</a>: where the audit sits before <code>r:cran-prep</code>.</li>
 </ul>
+<h2 id="optional-follow-up-checks">Optional follow-up checks<a class="headerlink" href="#optional-follow-up-checks" title="Permanent link">&para;</a></h2>
+<p>Use <code>--site URL --ref REF</code> for a single package's deployment-source sitemap check.
+Use <code>--run-examples --examples-budget-seconds 300 --fail-on warn</code> for supported
+README replay. Hidden setup stays ordered; source/render pairing and figure
+options remain unsupported. Check stage counts and INCOMPLETE before changing
+published examples. A warning is a candidate; an incomplete replay is not proof
+that the document is broken. Run replay in a terminal when host lifetime is unknown.</p>
 
 
 

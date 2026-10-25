@@ -1147,6 +1147,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="What&#39;s next">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-documentation-release-gates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional documentation release gates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -2853,6 +2870,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="What&#39;s next">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-documentation-release-gates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional documentation release gates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -3100,7 +3134,7 @@ checks. <code>/rforge:release</code> computes the sequence:</p>
 </span></code></pre></div>
 <h2 id="pre-submission-checklist">Pre-submission checklist<a class="headerlink" href="#pre-submission-checklist" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[ ] <code>/rforge:docs:check</code> has no errors (the audit does not check NEWS.md or run examples: <code>description-sync</code> and <code>r:check</code> cover those)</li>
+<li>[ ] <code>/rforge:docs:check</code> has no errors (the default audit does not check NEWS.md or run examples: <code>description-sync</code> and <code>r:check</code> cover those)</li>
 <li>[ ] <code>description-sync</code> passes (DESCRIPTION version == NEWS top entry)</li>
 <li>[ ] DESCRIPTION has <code>Language: en-US</code> (or correct BCP 47 code) if package has <code>man/</code> or <code>vignettes/</code> dirs</li>
 <li>[ ] DOI references in DESCRIPTION use <code>&lt;doi:10.xxx/yyy&gt;</code> angle-bracket format, not bare <code>doi:</code> or raw <code>https://doi.org/</code> URLs</li>
@@ -3122,6 +3156,13 @@ checks. <code>/rforge:release</code> computes the sequence:</p>
 <li><strong><a href="../../configuration/">Configuration</a></strong> — set your <code>cran_mirror</code> and
   <code>vignette_engine</code> so checks use the right defaults.</li>
 </ul>
+<h3 id="optional-documentation-release-gates">Optional documentation release gates<a class="headerlink" href="#optional-documentation-release-gates" title="Permanent link">&para;</a></h3>
+<p>A site-only check needs one package and an explicitly supplied <code>--site URL</code>;
+<code>--ref</code> selects a local immutable source snapshot. README replay uses
+<code>--run-examples --examples-budget-seconds 300 --fail-on warn</code>. Completed A2
+discrepancies are warnings, so <code>--fail-on error</code> permits them. Both enabled
+thresholds return 2 for incomplete coverage. Source assertions do not certify
+rendered README output, and this replay does not replace <code>R CMD check</code>.</p>
 
 
 

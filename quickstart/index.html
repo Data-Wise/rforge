@@ -3848,7 +3848,7 @@ distros ship with a compatible Python by default.</p>
 </span><span id="__span-28-9"><a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>/rforge:r:cran-prep<span class="w">               </span><span class="c1"># the full CRAN gate</span>
 </span></code></pre></div>
 <p>The docs audit prints its scope on the first line and <code>checked N of M</code> at the end; a report ending in
-<code>INCOMPLETE</code> or <code>NOT AUDITED</code> is not clean. See <a href="../tutorials/fix-a-docs-check-finding/">Fix a docs:check finding</a>.</p>
+<code>INCOMPLETE</code> or <code>NOT AUDITED</code> is not clean. Optional <code>--site URL [--ref REF]</code> checks one sitemap; <code>--run-examples</code> replays partial README assertions using package code. Use <code>--fail-on warn</code> for A2 discrepancies; both enabled gates block incomplete stages. See <a href="../tutorials/fix-a-docs-check-finding/">Fix a docs:check finding</a>.</p>
 <h2 id="session-start-and-end">Session start and end<a class="headerlink" href="#session-start-and-end" title="Permanent link">&para;</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>/rforge:restore<span class="w">                   </span><span class="c1"># recap of this package (read-only)</span>
 </span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>/rforge:finish<span class="w">                    </span><span class="c1"># dry run: the proposed .STATUS update</span>

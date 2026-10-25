@@ -4517,7 +4517,7 @@ auto-applied).</p>
 <hr />
 <h2 id="documentation-tasks">Documentation &amp; Tasks<a class="headerlink" href="#documentation-tasks" title="Permanent link">&para;</a></h2>
 <h3 id="rforgedocscheck">/rforge:docs:check<a class="headerlink" href="#rforgedocscheck" title="Permanent link">&para;</a></h3>
-<p>Audit documentation content against the package API: calls and signatures in <code>README</code> and <code>vignettes/</code> that no longer match the exports. Static and read-only (<code>lib.docaudit</code>).</p>
+<p>Audit documentation content against the package API: calls and signatures in <code>README</code> and <code>vignettes/</code> that no longer match the exports. The default is static and read-only (<code>lib.docaudit</code>); opt-in <code>--site</code> reads a sitemap and <code>--run-examples</code> executes README code in supervised R sessions.</p>
 <p><strong>Usage:</strong>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>/rforge:docs:check<span class="w"> </span><span class="o">[</span>package<span class="o">]</span><span class="w"> </span><span class="o">[</span>--detailed<span class="o">]</span><span class="w"> </span><span class="o">[</span>--eco<span class="o">]</span><span class="w"> </span><span class="o">[</span>--since<span class="w"> </span>&lt;tag&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--fail-on<span class="w"> </span>none<span class="p">|</span>warn<span class="p">|</span>error<span class="o">]</span>
 </span></code></pre></div></p>
@@ -4536,6 +4536,12 @@ auto-applied).</p>
 </span></code></pre></div></p>
 <p><strong>Checks:</strong> <code>signature-named-arg</code> (error), <code>signature-names</code> and <code>signature-arity</code> (warn), <code>scannability</code> (info), <code>coverage</code> (warn, <code>--since</code> only). The first report line states the resolved scope; the summary line states how many exports were checked. Suppress findings with <code>docs.allowlist</code> in <code>.rforge.yaml</code>.</p>
 <hr />
+<p>Optional stages: <code>--site URL</code> reads one package's sitemap against local <code>--ref REF</code>
+(or an inferred deployment ref); <code>--run-examples</code> executes supported root README
+transcripts with <code>--examples-budget-seconds N</code> (default 300, positive integer).
+Source/render pairing is deferred: asserted rendered output remains unverified.
+Incomplete stages exit 2 with warn/error thresholds; completed A2 warnings gate
+only warn. Site GETs never build/deploy/fetch; replay is opt-in, not sandboxed.</p>
 <h3 id="rforgecomplete">/rforge:complete<a class="headerlink" href="#rforgecomplete" title="Permanent link">&para;</a></h3>
 <p>Mark tasks complete with automatic documentation cascade.</p>
 <p><strong>Usage:</strong>

@@ -2890,8 +2890,22 @@ explicitly requested documentation/site audits and repairs. Its isolated pkgdown
 checks covered a full build, examples, 106 HTML pages, 8,268 local references,
 and representative desktop/mobile output. This complements the static Rforge
 skills; it does not expand their contract or introduce a new Rforge command.</p>
-<p>Still unverified: fresh-session missing/older-engine handling, unchecked variadic
-signatures, full external-resource/accessibility coverage, and standalone Quarto.
+<p>Two fresh read-only sessions verified that both installed 0.1.1 skills report
+unavailable for a missing explicit engine and for the actual v2.21.0 engine
+without the required interfaces. Neither ran a package check or unguarded docs
+audit, substituted another engine, or reported passing results. This used a
+synthetic package; it does not add package-check coverage.</p>
+<p>Fresh sessions also verified engine/package paths containing spaces: static
+audit completed with zero findings and 1/1 exports checked; the default
+<code>--as-cran</code> check completed with zero errors/warnings and one new-submission
+NOTE. Both skills rejected Python 3.9 when it was the fixture's sole permitted
+interpreter; this does not claim supported Python is absent from the host.</p>
+<p>Remaining: unchecked variadic signatures; an unexplained check termination
+during CRAN incoming checks in the earlier network-restricted session; and
+separately unexercised missing-interpreter/invalid-package fresh-session cases.
+The successful network-enabled rerun does not prove the earlier failure's cause.
+Full external-resource/accessibility coverage and standalone Quarto also remain
+unverified.
 Article, tutorial, cookbook and refcard generation remain deferred.</p>
 <h2 id="common-requests">Common requests<a class="headerlink" href="#common-requests" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$rforge-docs-check Audit /absolute/path/to/package and explain unchecked exports.

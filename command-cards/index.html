@@ -3274,6 +3274,16 @@
 </tbody>
 </table>
 <p>→ See the <a href="../REFCARD/">full Reference Card</a> for detailed descriptions and flags.</p>
+<p>Optional docs audit: <code>--site URL</code> plus optional local <code>--ref REF</code>;
+<code>--run-examples --examples-budget-seconds N</code> for supervised root README replay.
+Default remains static: no R, network or writes. <code>--site</code> reads only the sitemap
+over HTTP(S); without <code>--ref</code> the deployment source is inferred from one
+unambiguous pkgdown deploy branch, falling back to local <code>origin/main</code>, then
+<code>main</code>, when there is none; ambiguous candidates are incomplete. Replay is
+partial coverage: root README only, and unpaired rendered assertions or
+unsupported options are incomplete. Inspect stage coverage. Complete A2 warnings
+gate warn, incomplete stages gate warn/error. Allow the budget plus 15 seconds;
+use a terminal when the host lifetime is unknown. No site build or deploy.</p>
 
 
 

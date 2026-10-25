@@ -1914,6 +1914,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#optional-docs-audit-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional docs-audit coverage
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3091,6 +3102,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#optional-docs-audit-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional docs-audit coverage
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3336,6 +3358,13 @@ sub-files or trimmed.</p>
 <li><code>.claude-plugin/config.json</code> — the plugin-shipped defaults (read-only).</li>
 <li><code>/rforge:status</code> — shows the active configuration for your project.</li>
 </ul>
+<h2 id="optional-docs-audit-coverage">Optional docs-audit coverage<a class="headerlink" href="#optional-docs-audit-coverage" title="Permanent link">&para;</a></h2>
+<p><code>docs.allowlist</code> suppresses source findings, including A2 site/README findings,
+without changing checked/excluded/unverified/blocked counts or an incomplete
+stage. It cannot authorize execution or suppress source-less extra-URL
+information. <code>--site URL</code>, <code>--ref</code>, <code>--run-examples</code> and
+<code>--examples-budget-seconds</code> are invocation flags, not inferred site or execution
+authorization from configuration. See the <a href="../guides/docs-audit/">Docs audit guide</a>.</p>
 
 
 
