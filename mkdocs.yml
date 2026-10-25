@@ -54,7 +54,7 @@ extra_css:
 # scripts/version_sync.py — do not hand-edit version/prev_version/release_date.
 extra:
   rforge:
-    version: "2.22.0"
+    version: "2.22.1"
     prev_version: "2.19.0"
     release_date: "2026-08-01"
     command_count: 44
@@ -98,6 +98,7 @@ nav:
     - 📦 Installation: installation.md
     - 🚀 Quick Start: quickstart.md
     - Codex plugin and checks: guides/codex-checks.md
+    - Check evidence and approvals: guides/evidence-and-approval.md
   - Learn:
     - 📊 Visual Workflows: workflows/index.md
     - "🧰 Package Development Guide": package-development-guide.md

@@ -345,12 +345,14 @@ Installed to /Library/Frameworks/R.framework/.../medfit
 /rforge:r:site
 ```
 
-Runs `pkgdown::build_site()`. Generates the HTML documentation site in `docs/`.
+Runs `pkgdown::build_site()`. Use the package's configured destination, not an
+assumed `docs/`. A package whose `docs/` holds design specifications may build
+into another directory such as `pkgdown-site/`.
 
 ```text
 ## Site: medfit v2.0.0
 ### Status: 🟢
-Built site → docs/index.html
+Built site → <destination>/index.html
   • 14 reference pages
   • 3 vignettes
   • Changelog
@@ -360,12 +362,34 @@ Built site → docs/index.html
 
 ---
 
+## Evidence-bounded verification
+
+!!! warning "A green subset is not full acceptance"
+    A passing run covers only what it ran. Report which checks were excluded
+    rather than implying the whole specification was verified.
+
+- Scope the run with `/rforge:r:test --changed` (compare against `--base <ref>`,
+  gate with `--fail-on introduced|none`, bypass the baseline cache with
+  `--no-cache`), and say which tests were and were not run.
+- Injected failures verify that failure handling works, but do not show that the
+  failure occurs naturally.
+- A partial result is not a successful fit.
+- Passing deterministic controls does not close a separately required real-case
+  acceptance check.
+- A scoped reviewer approval is not full-specification sign-off.
+- At session close, run `/rforge:finish` to sync `.STATUS` with what actually
+  happened.
+
+!!! note "Build and deployment are separate"
+    Inspect the produced page for the edited content at the configured path.
+    A successful build does not mean the site is deployed.
+
 ## Common workflows
 
 ### Before every commit
 
 ```bash
-/rforge:r:cycle          # document → test → check (green = safe to push)
+/rforge:r:cycle          # document → test → check (green = ready for review)
 ```
 
 ### Before a pull request

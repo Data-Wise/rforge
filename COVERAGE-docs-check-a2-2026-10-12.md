@@ -205,3 +205,14 @@ The triage producer was re-run on fresh temporary clones of medfit, probmed and 
 RForge CI run 40145639496 failed both `a2-release` jobs with `pytest_exit: 4` and `A2 release requires exact fixture-lock R/dependency versions`. Cause (my bug): `rsconnect` was added to `fixture-lock.json` earlier, but the two places that read the installed versions back (`runtime()` in `tests/a2/conftest.py` and the runtime probe in `scripts/run_a2_release.py`) hardcoded five packages, so `installed R_packages == lock R_packages` was false on every platform. The smoke runs never used `--a2-release`, and the release path had never run since it always failed closed on a pending manifest, so nothing exercised it; all three review rounds read it statically or with a note that it could not run locally. That note was wrong: local R is exactly 4.6.1 with the locked package versions, and the same bug was the local failure.
 
 Fix: `tests/a2/runtime_probe.py` builds the probe from the lock's own package list and both callers use it; `tests/a2/test_runtime_probe.py` asserts the probe names every locked package and that no hardcoded list remains. Verified by running the real `scripts/run_a2_release.py` locally on the fixed tree: `verified: true`, 662 required nodes, all passed, R checked 2, HTTP checked 4. The change makes the reviewed candidate stale (observations and review are SHA-bound), so it is candidate 4 and needs its own review.
+
+## Accepted limits after v2.22.0 (issue #101, 2026-10-25)
+
+Recorded as decisions, not defects. Each stays true until the named condition changes.
+
+- **Process-group ID reuse.** The guardian signals a recorded process group; if the OS recycled that ID after the group exited, a late signal could reach an unrelated group. The window is documented in `lib/_docguardian.py` next to the unreaped-pin handling. Accepted: closing it needs a kernel-level handle the platform does not give a plain subprocess. Revisit if the guardian moves to pidfd or a cgroup.
+- **Attested adversarial review.** The review observation is a recorded judgment supplied as the `review-record` input and bound to the candidate SHA; it is attested, not proven, by design. Kept attested.
+- **Guardian guards.** All five guards (arm-ack run ID and sequence, the 12 s hard kill, fail-closed downgrade, unreaped pins, the orphaned-parent wait) are pinned by tests, with fake-clock coverage for the two timing paths (PRs #103, #104).
+- **Comparator integers.** Short documented integers now compare exactly (PR #106, issue #105); the A2 spec text is unchanged because it is a frozen gate input.
+- **`--site` coverage.** Beyond the live smoke and rendered-page observation, deeper site coverage is an enhancement, not a defect; it needs its own spec if wanted.
+

@@ -21,7 +21,9 @@ variadic-signature limits and an unexplained restricted-session check terminatio
 remain; see the spec for evidence and unexercised edge cases.
 Do not expand this adapter into website generation or a full Claude command port.
 
-## Current state (2026-10-11)
+## Current state (2026-10-25)
+
+**v2.22.1 (2026-10-25, patch, 44 commands, no command-surface change):** `--run-examples` compares documented bare integers of up to six digits exactly (#105/#106); decimals, scientific notation and longer integers keep the spec tolerance. Records: `.STATUS`, CHANGELOG `[2.22.1]`.
 
 **v2.22.0 (2026-10-25, minor, 44 commands, no command-surface change):** `/rforge:docs:check --site URL [--ref REF]` and `--run-examples` stages (A2), accepted on ubuntu-24.04 and macos-14 (662 required checks, candidate-bound observations, aggregate verifier). Opt-in; default stays offline. Records: `.STATUS`, CHANGELOG `[2.22.0]`.
 
@@ -44,6 +46,7 @@ Do not expand this adapter into website generation or a full Claude command port
 
 ### Release history — architecture deltas only (release mechanics live in CHANGELOG + git)
 
+- **v2.22.1** — exact short-integer comparison in `--run-examples` (#105/#106). 44 commands.
 - **v2.22.0** — `/rforge:docs:check --site`/`--run-examples` (A2) with candidate-bound two-platform acceptance (PR #99). 44 commands.
 - **v2.21.0** — `/rforge:docs:check` content audit (`lib/docaudit.py`, A1) + dev-only replay harness `tests/harness/`; `/rforge:finish` version-drift fix (#84/#85/#86); docs gap-fill (#89/#90). 44 commands, 47 `test-all.sh` checks.
 - **v2.20.1** — `lib.status` frontmatter dialect + `phase:`-key-only (#75/#82); NEWS `##`-subsection count (#78); MediationVerse doctrine (#76); `AGENTS.md` mirror + gates (#77/#80); test-all dev-dep warning (#79). 44 commands.
@@ -158,7 +161,7 @@ The `arguments:` array is the machine-readable spec; the `## Usage` body is the 
 Both must pass before any PR:
 
 - `bash tests/test-all.sh` — **47 checks** (versions, hook compile + behavior, manifests parse, skills valid, lib pytest, lib CLI smoke incl. `rcmd`/`cranlint`/`runiverse`/`s7review`/`changed`, lib reference docs in sync, **version/count sync (`version_sync.py --check`)**, **AGENTS.md body mirrors CLAUDE.md**, **commands.md sync (`_check_commands_doc.py`)**, **mkdocs nav integrity (every nav file exists + no orphaned guide/tutorial/reference page)**, rename stubs/targets, command-name uniqueness, migration recipe E2E, **agent guards: no `rforge_` MCP refs / orchestrator frontmatter / real `lib.rcmd` engines**)
-- `python3 -m pytest tests/` — **400+ lib/\* cases** (discovery, deps, status, init, rcmd, cranlint, deps_sync, ghrelease, runiverse, s7review, changed, scaffold, **version_sync**)
+- `python3 -m pytest tests/` — **1500+ test cases** (discovery, deps, status, init, rcmd, cranlint, deps_sync, ghrelease, runiverse, s7review, changed, scaffold, **version_sync**)
 - **Python ≥3.10 environment:** system `python3` is 3.9 and fails 3 of 47 `test-all.sh` checks (pytest, mkdocs parse, nav) from environment alone. Use a venv with pytest, pyyaml, mkdocs-material, mkdocs-macros-plugin, pillow and cairosvg (`uv venv ~/.venvs/rforge-dev --python 3.12`). `test-all.sh`'s `lib_pytest` runs only 4 named test files; the rest run under `pytest tests/` in CI.
 
 ## Homebrew tap quirks (rforge-specific)
@@ -210,7 +213,7 @@ Per the global rules (see `## Pre-PR & Release Checklist` in `~/.claude/CLAUDE.m
 
 ## Memory pointers
 
-For details not in this file, see project memory at `~/.claude/projects/-Users-dt-projects-dev-tools-rforge/memory/`:
+For details not in this file, see project memory at `~/.claude/projects/-Users-davood-projects-dev-tools-rforge/memory/`:
 
 - `reference_rforge_doc_conventions.md` — frontmatter standard, admonition palette, doc-gap audit recipe, verification gotchas
 - `reference_homebrew_tap_drift.md` — manifest sync recipe + 6-surface drift inventory + release-time gotchas (tap-on-feature-branch, no-PTY brew, `Closes #N` auto-close)

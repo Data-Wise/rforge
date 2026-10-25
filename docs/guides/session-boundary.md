@@ -1,5 +1,8 @@
 # 🔖 Session boundary commands
 
+For reporting what checks establish and which decisions remain with the owner,
+use [Check evidence and approval decisions](evidence-and-approval.md).
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** `/rforge:restore` (recap where you left off) and `/rforge:finish` (sync
       `.STATUS` to what actually happened) — a single-package pair, not ecosystem-wide.

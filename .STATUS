@@ -1,3 +1,19 @@
+# PR #95 conflict reconciliation — 2026-10-22
+# Incorporated dev d2f9e58 into the feature branch; dev/main remain unchanged.
+# Retained both status histories and dev's updated Codex navigation/setup guidance.
+# Reconciled tree: 47/47 gates; pytest 920 passed, 4 skipped; strict MkDocs passed.
+# No new Markdown lint diagnostics versus dev; rendered guide/navigation inspected.
+# No new deployment requested; the deployment receipt below applies to 4c8bc13.
+# Documentation follow-up — 2026-10-22: general evidence-and-approval guide added
+# to Get Started and linked from Codex checks/session-boundary guidance.
+# Separates technical evidence, scientific/historical gaps and owner decisions;
+# no new commands, check engines or automatic authorization gates.
+# Isolated branch codex/evidence-approval-guide; not merged.
+# Verification: 47/47 gates; pytest 920 passed, 4 skipped; strict MkDocs built.
+# Version sync and generated-reference checks pass under Python 3.12.
+# Python 3.15 reference drift avoided by 3.12 verification; no regen.
+# Deployment 39903994046 passed for 4c8bc13; served guide visually inspected.
+
 # Codex durable verification checkpoint — 2026-10-22
 # PR #92 merged to dev fe8c8ef; adapter 0.1.1 uses durable rforge/openai catalog.
 # Fresh-session discovery and isolated medfit checks passed. Both skills rejected
@@ -45,7 +61,7 @@
 project: rforge
 updated: 2026-10-24
 status: Active
-in_progress: v2.22.0 release prep (A2 merged to dev via PR #99, evidenced candidate 87525d4); version bumped, dev->main PR for review, no tag or Homebrew yet. v2.21.0 release history:
+in_progress: none. v2.22.0 released (A2 --site/--run-examples). Issue #101 closed: guardian guards tested, accepted limits recorded in COVERAGE-docs-check-a2-2026-10-12.md; integer comparator fix merged (#106, issue #105 closes at release). Post-release macos-14 guardian timing flakes fixed in tests only (64bf438, 80b12b7; dev CI 662/662 on both platforms). Post-release docs merged to dev: PR #95 (evidence vs approval guide, 709d92b) and PR #102 (evidence-bounded verification tutorial section, 32ee189); both unreleased.
   (1) #84 fix MERGED to dev 2026-10-11 as PR #85 (squash 99b4171; CI 5/5 green). #84 stays
   open until release (a feature→dev merge does not auto-close it). Follow-up PR #86 MERGED (squash f7036b4): a Codex
   adversarial review found #85 stopped /rforge:finish adding `version:` to a .STATUS that lacks one; fixed via
@@ -60,9 +76,9 @@ in_progress: v2.22.0 release prep (A2 merged to dev via PR #99, evidenced candid
   review is attested (rounds 1-4 reviewed 661f9b5; 87525d4 differs only by the output-limit bound 15s->45s + manifest hash, delta_note
   in the record); live smoke supported-site is r-hub/cranlogs only (no Data-Wise/tidyverse package is checkable by --site).
   Planning files stay at repo root (tests/a2/requirements.json and scripts/verify_a2_release.py reference them).
-next: release v2.22.0 candidate (version bump, CHANGELOG [Unreleased]->version, dev->main PR, tag, GitHub release, Homebrew tap) after user approval. Open low-priority candidates in CLAUDE.md Roadmap.
-version: 2.22.0 (release prep on dev; dev->main PR pending review, no tag yet)
-last_release: 2026-10-11 v2.21.0 (minor, 44 commands, no surface change — PR #91 dev→main merge 7387a05; tag v2.21.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.21.0. Ships /rforge:docs:check content audit (lib.docaudit, A1), tests/harness, #84 fix (#85/#86), docs gap-fill (#89/#90). Gates: test-all 47/47, pytest 899+4 skipped, CI green on main (RForge CI + Deploy Documentation). Tap Data-Wise/homebrew-tap#244 squash 09bc9c3 — formula+manifest → v2.21.0 sha256 f376d0da…, stale revision dropped, generate.py --diff IDENTICAL; brew audit by path unavailable. Aggregator claude-plugins#74 auto-merged. Pending: user runs `brew upgrade rforge`.)
+next: batch v2.22.1 (integer comparator, #105) with the next change; open low-priority candidates in CLAUDE.md Roadmap.
+version: 2.22.1 (release PR pending; v2.22.0 tag d36cee7)
+last_release: 2026-10-25 v2.22.0 (minor, 44 commands, no surface change; PR #100 dev→main merge d36cee7; tag v2.22.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.22.0; tap PR #245 merge 699b59a; brew audit --strict clean, 2.22.0 installed). Prior: 2026-10-11 v2.21.0 (minor, 44 commands, no surface change — PR #91 dev→main merge 7387a05; tag v2.21.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.21.0. Ships /rforge:docs:check content audit (lib.docaudit, A1), tests/harness, #84 fix (#85/#86), docs gap-fill (#89/#90). Gates: test-all 47/47, pytest 899+4 skipped, CI green on main (RForge CI + Deploy Documentation). Tap Data-Wise/homebrew-tap#244 squash 09bc9c3 — formula+manifest → v2.21.0 sha256 f376d0da…, stale revision dropped, generate.py --diff IDENTICAL; brew audit by path unavailable. Aggregator claude-plugins#74 auto-merged. Pending: user runs `brew upgrade rforge`.)
 last_release_prior_v2_20_1: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
   9d0b01a; tag v2.20.1; release https://github.com/Data-Wise/rforge/releases/tag/v2.20.1. Ships
   #75 (lib.status frontmatter dialect), #82 (phase from a phase: key only), #78 (NEWS ## subsection
@@ -693,4 +709,4 @@ a2_review_20261023: Focused Claude review e3646895-1416-4234-b475-e516ed31ef1f o
 
 a2_python_latest_validation: Python 3.15.0 full suite 1326 passed/4 existing skipped; repository gates 47/47; strict MkDocs build and rendered contributor policy verified with Homebrew Cairo library path. 427 unique collected A2 nodes, 118 obligations and 87 groups reconciled; manifest and seven groups remain pending. No push, workflow dispatch or release.
 
-a2_acceptance_state: merged to dev (PR #99, 08ae163); 6 external-observation groups satisfied by observations run 40153274868; 662 required nodes passed on ubuntu-24.04 and macos-14 at 87525d4; observations 40153274868 and aggregate 40155770154 verified. No tag, deployment or release yet.
+a2_acceptance_state: v2.22.0 released (tag on d36cee7; A2 merged via PR #99, 08ae163). Evidence at candidate 87525d4: 6 external-observation groups satisfied by observations run 40153274868; 662 required nodes passed on ubuntu-24.04 and macos-14; aggregate 40155770154 verified. 680 nodes now required after four guardian guard tests, three fake-clock guardian tests (12 s hard kill, orphaned-parent group wait) and eleven exact-integer comparator rows (#105) were added post-release.

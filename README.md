@@ -20,6 +20,10 @@ adapter release or a port of the Claude command catalog and hooks.
 Start with the [Codex installation and checks guide](docs/guides/codex-checks.md). Claude
 marketplace and Homebrew installation below do not install these Codex skills.
 
+## What's new in v2.22.1
+
+- 🔢 **`--run-examples` compares short integers exactly.** A documented whole number of up to six digits must match the real output (`[1] 100` against `[1] 101` is now a mismatch). Decimals, scientific notation and longer integers keep their tolerance. See the [Docs audit guide](https://data-wise.github.io/rforge/guides/docs-audit/).
+
 ## What's new in v2.22.0
 
 - 🌐 **`/rforge:docs:check --site URL [--ref REF]`** audits a deployed pkgdown site over HTTP and **`--run-examples [--examples-budget-seconds 300]`** replays README examples in a guarded R process. Both are opt-in; the default stays offline. Incomplete stages exit 2 with either enabled threshold, and `--site` reports pkgdown development-mode sites and `.qmd` articles as incomplete rather than clean. Accepted on ubuntu-24.04 and macos-14 (662 required checks each). See the [Docs audit guide](https://data-wise.github.io/rforge/guides/docs-audit/).
@@ -455,6 +459,6 @@ MIT
 
 ---
 
-**Version:** 2.22.0
+**Version:** 2.22.1
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+

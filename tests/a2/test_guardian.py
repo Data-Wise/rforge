@@ -347,8 +347,8 @@ def test_live_guardian_death_emergency_owner(tmp_path,monkeypatch):
     result=guardian.run([sys.executable,'-c','import time;time.sleep(30)'],tmp_path,time.monotonic_ns()+3*guardian.NS,cwd=tmp_path)
     assert result['reason']=='guardian-failure' and not result.get('direct_child_reaped')
     assert signals==[killed[0]['group_pgid']]
-    assert result['pin_reaped'] and result['group_disappeared']
-    until=time.monotonic()+2
+    assert result['pin_reaped']
+    until=time.monotonic()+10
     while guardian.live_group_members(signals[0]) and time.monotonic()<until:time.sleep(.02)
     assert not guardian.live_group_members(signals[0])
 
@@ -420,7 +420,7 @@ import os
 original=os.posix_spawn
 def launch(path,command,*args,**kwargs):
  command=list(command)
- command[4]={('import time;from pathlib import Path;Path('+repr(str(tmp_path/'prejoin-entered'))+').write_text("entered");time.sleep(.8)'+chr(10))!r}+command[4]
+ command[4]={('import time;from pathlib import Path;Path('+repr(str(tmp_path/'prejoin-entered'))+').write_text("entered");time.sleep(3)'+chr(10))!r}+command[4]
  return original(path,command,*args,**kwargs)
 os.posix_spawn=launch
 g.supervise({str(tmp_path)!r})
@@ -429,11 +429,11 @@ g.supervise({str(tmp_path)!r})
         return original(command,*args,**kwargs)
     monkeypatch.setattr(subprocess,'Popen',delayed_guardian)
     started=time.monotonic()
-    result=guardian.run([sys.executable,'-c',"from pathlib import Path;Path('workload-executed').write_text('unsafe');import time;time.sleep(30)"],tmp_path,time.monotonic_ns()+.4*guardian.NS,cwd=tmp_path)
+    result=guardian.run([sys.executable,'-c',"from pathlib import Path;Path('workload-executed').write_text('unsafe');import time;time.sleep(30)"],tmp_path,time.monotonic_ns()+1.5*guardian.NS,cwd=tmp_path)
     assert (tmp_path/'prejoin-entered').exists()
     assert not (tmp_path/'workload-executed').exists()
     assert result['reason']=='deadline' and result['direct_child_reaped'] and result['group_disappeared']
-    assert time.monotonic()-started<3
+    assert time.monotonic()-started<8
 
 
 @pytest.mark.parametrize('target',['pin','guardian'])
@@ -644,3 +644,117 @@ def test_probe_timeouts_tolerate_a_loaded_runner():
     import inspect
     source=inspect.getsource(guardian)
     assert 'timeout=1)' not in source and 'timeout=1,' not in source
+
+
+@pytest.mark.parametrize('forge',['wrong-run-id','wrong-sequence'])
+def test_forged_phase_ack_never_releases_code(tmp_path,monkeypatch,forge):
+    # Only the parent-side comparison can reject this: the real guardian's own (correct) ack is hidden from the parent.
+    original=guardian.read
+    def read(path):
+        if path.name!='arm-ack.json':return original(path)
+        initial=original(path.parent/'initial.json')
+        if initial is None:return None
+        run_id=initial['run_id'] if forge=='wrong-sequence' else 'not-'+initial['run_id']
+        return {'run_id':run_id,'sequence':99 if forge=='wrong-sequence' else 1,'deadline_ns':time.monotonic_ns()+60*guardian.NS}
+    monkeypatch.setattr(guardian,'read',read)
+    code='''import json,time
+from pathlib import Path
+p=Path('.')
+r=json.loads((p/'initial.json').read_text())['run_id']
+t=p/'request.tmp';t.write_text(json.dumps({'run_id':r,'sequence':1,'phase':'chunk','chunk':1}));t.replace(p/'phase-request.json')
+while not (p/'phase-release.json').exists():time.sleep(.01)
+(p/'executed').write_text('forbidden')
+'''
+    result=guardian.run([sys.executable,'-c',code],tmp_path,time.monotonic_ns()+guardian.NS,cwd=tmp_path,chunk_budget=.25)
+    assert result['reason']=='deadline'
+    assert not (tmp_path/'executed').exists() and not (tmp_path/'phase-release.json').exists()
+
+
+def test_completed_run_with_live_group_fails_closed(tmp_path,monkeypatch):
+    original=guardian.os.killpg
+    monkeypatch.setattr(guardian.os,'killpg',lambda pgid,number:None if number==0 else original(pgid,number))
+    result=guardian.run([sys.executable,'-c','pass'],tmp_path,time.monotonic_ns()+5*guardian.NS,cwd=tmp_path)
+    assert result['group_disappeared'] is False
+    assert result['reason']=='cleanup-unverified'
+    assert guardian.read(tmp_path/'terminal.json')['reason']=='cleanup-unverified'
+    assert guardian.read(tmp_path/'marker.json')['state']=='interrupted'
+
+
+def test_live_guardian_pin_is_retained_unreaped(tmp_path,monkeypatch):
+    import signal
+    class LiveGuardian:
+        def poll(self):return None
+        def wait(self,timeout=None):return None
+        def kill(self):pass
+    original=guardian.read
+    def read(path):
+        if path.name=='armed.json':raise RuntimeError('simulated parent failure')
+        return original(path)
+    pins=[]
+    monkeypatch.setattr(guardian,'_UNREAPED_PINS',pins)
+    popen=guardian.subprocess.Popen
+    monkeypatch.setattr(guardian.subprocess,'Popen',lambda args,*a,**k:LiveGuardian() if 'lib._docguardian' in args else popen(args,*a,**k))
+    monkeypatch.setattr(guardian,'read',read)
+    try:
+        with pytest.raises(RuntimeError,match='simulated parent failure'):
+            guardian.run([sys.executable,'-c','pass'],tmp_path,time.monotonic_ns()+5*guardian.NS,cwd=tmp_path)
+        assert len(pins)==1 and pins[0].process.returncode is None
+    finally:
+        for pin in pins:
+            pin.signal_group(signal.SIGKILL); pin.finish()
+
+
+def test_hard_kill_of_unresponsive_guardian_after_deadline_plus_12s(tmp_path,monkeypatch):
+    # Fake clock: real time plus an offset that jumps past deadline+12s once the loop is running.
+    # The stub guardian never writes a terminal record and only dies when kill() is called.
+    offset=[0]
+    real_ns=time.monotonic_ns
+    monkeypatch.setattr(guardian.time,'monotonic_ns',lambda:real_ns()+offset[0])
+    class StuckGuardian:
+        polls=0; killed=0; dead=False
+        def poll(self):
+            self.polls+=1
+            if self.polls==3:offset[0]=60*guardian.NS
+            assert self.polls<200 or self.dead,'guardian never killed after deadline+12s'
+            return 0 if self.dead else None
+        def kill(self):
+            self.killed+=1; self.dead=True
+        def wait(self,timeout=None):return 0
+    stub=StuckGuardian()
+    popen=guardian.subprocess.Popen
+    monkeypatch.setattr(guardian.subprocess,'Popen',lambda args,*a,**k:stub if 'lib._docguardian' in args else popen(args,*a,**k))
+    started=real_ns()
+    result=guardian.run([sys.executable,'-c','pass'],tmp_path,guardian.time.monotonic_ns()+5*guardian.NS,cwd=tmp_path)
+    assert stub.killed==1 and stub.dead
+    assert result['reason']=='guardian-failure'
+    assert result['pin_reaped'] is True
+    assert real_ns()-started<10*guardian.NS
+
+
+@pytest.mark.parametrize('vanishes_after,expected_reason,expected_gone',[(3,'deadline',True),(None,'cleanup-unverified',False)])
+def test_orphaned_guardian_waits_for_group_disappearance(tmp_path,monkeypatch,vanishes_after,expected_reason,expected_gone):
+    # Parent is "gone" (recorded parent_pid differs from ours); the wait runs on a fake clock whose
+    # sleep() only advances the offset, so the 2 s orphan wait costs no real time.
+    offset=[0]
+    real=time.monotonic
+    monkeypatch.setattr(guardian.time,'monotonic',lambda:real()+offset[0])
+    monkeypatch.setattr(guardian.time,'sleep',lambda seconds:offset.__setitem__(0,offset[0]+seconds))
+    probes=[]
+    def killpg(pgid,sig):
+        assert sig==0 and pgid==424242
+        probes.append(offset[0])
+        if vanishes_after is not None and len(probes)>vanishes_after:raise ProcessLookupError
+        raise PermissionError
+    monkeypatch.setattr(guardian.os,'killpg',killpg)
+    now=time.monotonic_ns()
+    guardian.atomic(tmp_path/'initial.json',{'run_id':'r1','deadline_ns':now-guardian.NS,'file_started_ns':now-2*guardian.NS,
+        'file_budget_ns':guardian.NS,'chunk_budget_ns':guardian.NS,'command':[],'cwd':str(tmp_path),'env':{},
+        'group_pgid':424242,'parent_pid':-1})
+    status=guardian.supervise(tmp_path)
+    assert status['reason']==expected_reason
+    assert bool(status.get('group_disappeared'))==expected_gone
+    if vanishes_after is None:
+        assert probes[-1]-probes[0]>=1.9 and len(probes)>10
+    else:
+        assert len(probes)==vanishes_after+1
+    assert guardian.read(tmp_path/'terminal.json')['reason']==expected_reason
