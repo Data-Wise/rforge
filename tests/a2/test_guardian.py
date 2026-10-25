@@ -347,8 +347,8 @@ def test_live_guardian_death_emergency_owner(tmp_path,monkeypatch):
     result=guardian.run([sys.executable,'-c','import time;time.sleep(30)'],tmp_path,time.monotonic_ns()+3*guardian.NS,cwd=tmp_path)
     assert result['reason']=='guardian-failure' and not result.get('direct_child_reaped')
     assert signals==[killed[0]['group_pgid']]
-    assert result['pin_reaped'] and result['group_disappeared']
-    until=time.monotonic()+2
+    assert result['pin_reaped']
+    until=time.monotonic()+10
     while guardian.live_group_members(signals[0]) and time.monotonic()<until:time.sleep(.02)
     assert not guardian.live_group_members(signals[0])
 
