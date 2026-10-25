@@ -61,7 +61,7 @@
 project: rforge
 updated: 2026-10-24
 status: Active
-in_progress: none. v2.22.0 released (A2 --site/--run-examples). Follow-ups tracked in issue #101. Post-release docs merged to dev: PR #95 (evidence vs approval guide, 709d92b) and PR #102 (evidence-bounded verification tutorial section, 32ee189); both unreleased.
+in_progress: none. v2.22.0 released (A2 --site/--run-examples). Follow-ups tracked in issue #101. Post-release macos-14 guardian timing flakes fixed in tests only (64bf438, 80b12b7; dev CI 662/662 on both platforms). Post-release docs merged to dev: PR #95 (evidence vs approval guide, 709d92b) and PR #102 (evidence-bounded verification tutorial section, 32ee189); both unreleased.
   (1) #84 fix MERGED to dev 2026-10-11 as PR #85 (squash 99b4171; CI 5/5 green). #84 stays
   open until release (a feature→dev merge does not auto-close it). Follow-up PR #86 MERGED (squash f7036b4): a Codex
   adversarial review found #85 stopped /rforge:finish adding `version:` to a .STATUS that lacks one; fixed via
