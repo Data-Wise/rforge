@@ -20,9 +20,9 @@ def test_status_guidance_count_sync():
     assert f"{manifest['collected_nodes']} required nodes passed" in summary
     assert 'No tag, deployment or release yet' in summary
     assert re.search(r'^version: ' + re.escape(package['version']) + r'\b', status, re.M)
-    unreleased = (ROOT / 'CHANGELOG.md').read_text().split('## [Unreleased]', 1)[1].split('\n## [', 1)[0]
-    assert 'implementation in progress' in unreleased
-    assert 'Not released.' in unreleased
+    release = (ROOT / 'CHANGELOG.md').read_text().split('## [2.22.0]', 1)[1].split('\n## [', 1)[0]
+    assert 'implementation in progress' in release
+    assert 'Accepted on' in release
     checks = len(re.findall(r'^run "', (ROOT / 'tests/test-all.sh').read_text(), re.M))
     for path in ('CLAUDE.md', 'AGENTS.md', 'docs/contributing.md'):
         assert f'{checks} checks' in (ROOT / path).read_text()
@@ -32,7 +32,7 @@ def test_status_guidance_count_sync():
                    for p in (ROOT / 'commands').rglob('*.md'))
     assert f'all {commands} commands' in (ROOT / 'CLAUDE.md').read_text()
     assert commands == 44
-    assert package['version'] == '2.21.0'
+    assert package['version'] == '2.22.0'
 
 
 @pytest.mark.parametrize('prohibition', [

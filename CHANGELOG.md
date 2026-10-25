@@ -9,7 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- A2 (`/rforge:docs:check --site`, `--run-examples`) accepted and merged to dev (PR #99): 662 required acceptance nodes passed on ubuntu-24.04 and macos-14 on the frozen candidate, six candidate-bound observations and the aggregate verifier passed. The adversarial review is attested, and `--site` live smoke covers one supported deployed site (r-hub/cranlogs); packages that use pkgdown development mode or `.qmd` articles are reported incomplete. Not released.
+---
+
+## [2.22.0] - 2026-10-25
+
+> `/rforge:docs:check` gains two opt-in stages: `--site URL [--ref REF]` (audits a deployed pkgdown site over HTTP)
+> and `--run-examples [--examples-budget-seconds N]` (replays README examples in a guarded R process). Accepted on
+> ubuntu-24.04 and macos-14 against a locked R 4.6.1 toolchain. No command-surface change (44); `test-all.sh` 47 checks.
+
+- A2 (`/rforge:docs:check --site`, `--run-examples`) accepted and merged to dev (PR #99): 662 required acceptance nodes passed on ubuntu-24.04 and macos-14 on the frozen candidate, six candidate-bound observations and the aggregate verifier passed. The adversarial review is attested, and `--site` live smoke covers one supported deployed site (r-hub/cranlogs); packages that use pkgdown development mode or `.qmd` articles are reported incomplete.
 
 - Add explicit A2 status, command/check count, unchanged feature version and agent prohibition assertions; close D05 local coverage while keeping platform/release acceptance pending.
 

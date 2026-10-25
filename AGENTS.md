@@ -23,6 +23,8 @@ Do not expand this adapter into website generation or a full Claude command port
 
 ## Current state (2026-10-11)
 
+**v2.22.0 (2026-10-25, minor, 44 commands, no command-surface change):** `/rforge:docs:check --site URL [--ref REF]` and `--run-examples` stages (A2), accepted on ubuntu-24.04 and macos-14 (662 required checks, candidate-bound observations, aggregate verifier). Opt-in; default stays offline. Records: `.STATUS`, CHANGELOG `[2.22.0]`.
+
 **v2.21.0 (released 2026-10-11 — minor, 44 commands, no command-surface change):** `/rforge:docs:check` is now a deterministic content audit (`lib/docaudit.py`, release A1): `signature-named-arg` (error), `signature-names`/`signature-arity` (warn), `scannability` (info), `coverage` (warn, `--since TAG` only); `--eco`, `--detailed`, `--fail-on none|warn|error`, `docs.allowlist` in `.rforge.yaml`; text reports end `INCOMPLETE`/`NOT AUDITED` instead of "no findings" when the audit could not finish. Dev-only replay harness `tests/harness/`; orchestrator `DOCS_AUDIT` row; Docs audit guide. Also #85/#86 (`/rforge:finish` version drift, #84) and a docs gap-fill (#89, #90). `test-all.sh` 47 checks. A2 (`--site`, `--run-examples`) is a separate later plan. Records: `.STATUS`, CHANGELOG `[2.21.0]`.
 
 **v2.20.1 (released 2026-09-23 — patch, no command-surface change):** `lib.status` reads the frontmatter `.STATUS` dialect the R packages use (#75); `lib.rstatus.parse_news_header` counts NEWS entries under `##` subsections (#78); MediationVerse doctrine in the Command Guides (#76); `AGENTS.md` mirror of this file, gated by `version_sync.py` (#77) and a `test-all.sh` body check (#80, 45 checks); `test-all.sh` warns on missing dev deps (#79); `lib.rstatus` docstring no longer says `lib.status` can't read `key: value` files (#81); `lib.status` takes `phase` only from a `phase:` key in frontmatter files (#82). Records: `.STATUS` `recent:`, CHANGELOG `[2.20.1]`.
@@ -42,6 +44,7 @@ Do not expand this adapter into website generation or a full Claude command port
 
 ### Release history — architecture deltas only (release mechanics live in CHANGELOG + git)
 
+- **v2.22.0** — `/rforge:docs:check --site`/`--run-examples` (A2) with candidate-bound two-platform acceptance (PR #99). 44 commands.
 - **v2.21.0** — `/rforge:docs:check` content audit (`lib/docaudit.py`, A1) + dev-only replay harness `tests/harness/`; `/rforge:finish` version-drift fix (#84/#85/#86); docs gap-fill (#89/#90). 44 commands, 47 `test-all.sh` checks.
 - **v2.20.1** — `lib.status` frontmatter dialect + `phase:`-key-only (#75/#82); NEWS `##`-subsection count (#78); MediationVerse doctrine (#76); `AGENTS.md` mirror + gates (#77/#80); test-all dev-dep warning (#79). 44 commands.
 - **v2.20.0** — `/rforge:restore` + `/rforge:finish` session-boundary commands (PR #71/#72); new `lib/rstatus.py`; `apply_updates()` carry-forward helper closing a pre-merge adversarial-review data-loss finding. 42→44 commands.
