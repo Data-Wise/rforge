@@ -702,3 +702,59 @@ def test_live_guardian_pin_is_retained_unreaped(tmp_path,monkeypatch):
     finally:
         for pin in pins:
             pin.signal_group(signal.SIGKILL); pin.finish()
+
+
+def test_hard_kill_of_unresponsive_guardian_after_deadline_plus_12s(tmp_path,monkeypatch):
+    # Fake clock: real time plus an offset that jumps past deadline+12s once the loop is running.
+    # The stub guardian never writes a terminal record and only dies when kill() is called.
+    offset=[0]
+    real_ns=time.monotonic_ns
+    monkeypatch.setattr(guardian.time,'monotonic_ns',lambda:real_ns()+offset[0])
+    class StuckGuardian:
+        polls=0; killed=0; dead=False
+        def poll(self):
+            self.polls+=1
+            if self.polls==3:offset[0]=60*guardian.NS
+            assert self.polls<200 or self.dead,'guardian never killed after deadline+12s'
+            return 0 if self.dead else None
+        def kill(self):
+            self.killed+=1; self.dead=True
+        def wait(self,timeout=None):return 0
+    stub=StuckGuardian()
+    popen=guardian.subprocess.Popen
+    monkeypatch.setattr(guardian.subprocess,'Popen',lambda args,*a,**k:stub if 'lib._docguardian' in args else popen(args,*a,**k))
+    started=real_ns()
+    result=guardian.run([sys.executable,'-c','pass'],tmp_path,guardian.time.monotonic_ns()+5*guardian.NS,cwd=tmp_path)
+    assert stub.killed==1 and stub.dead
+    assert result['reason']=='guardian-failure'
+    assert result['pin_reaped'] is True
+    assert real_ns()-started<10*guardian.NS
+
+
+@pytest.mark.parametrize('vanishes_after,expected_reason,expected_gone',[(3,'deadline',True),(None,'cleanup-unverified',False)])
+def test_orphaned_guardian_waits_for_group_disappearance(tmp_path,monkeypatch,vanishes_after,expected_reason,expected_gone):
+    # Parent is "gone" (recorded parent_pid differs from ours); the wait runs on a fake clock whose
+    # sleep() only advances the offset, so the 2 s orphan wait costs no real time.
+    offset=[0]
+    real=time.monotonic
+    monkeypatch.setattr(guardian.time,'monotonic',lambda:real()+offset[0])
+    monkeypatch.setattr(guardian.time,'sleep',lambda seconds:offset.__setitem__(0,offset[0]+seconds))
+    probes=[]
+    def killpg(pgid,sig):
+        assert sig==0 and pgid==424242
+        probes.append(offset[0])
+        if vanishes_after is not None and len(probes)>vanishes_after:raise ProcessLookupError
+        raise PermissionError
+    monkeypatch.setattr(guardian.os,'killpg',killpg)
+    now=time.monotonic_ns()
+    guardian.atomic(tmp_path/'initial.json',{'run_id':'r1','deadline_ns':now-guardian.NS,'file_started_ns':now-2*guardian.NS,
+        'file_budget_ns':guardian.NS,'chunk_budget_ns':guardian.NS,'command':[],'cwd':str(tmp_path),'env':{},
+        'group_pgid':424242,'parent_pid':-1})
+    status=guardian.supervise(tmp_path)
+    assert status['reason']==expected_reason
+    assert bool(status.get('group_disappeared'))==expected_gone
+    if vanishes_after is None:
+        assert probes[-1]-probes[0]>=1.9 and len(probes)>10
+    else:
+        assert len(probes)==vanishes_after+1
+    assert guardian.read(tmp_path/'terminal.json')['reason']==expected_reason
