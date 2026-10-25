@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -31,10 +31,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -527,35 +527,7 @@
   <span class="md-ellipsis">
     
   
-    Codex personal checks
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../guides/evidence-and-approval/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Check evidence and approvals
+    Codex plugin and checks
   
 
     
@@ -3445,12 +3417,11 @@ valid there). The audit is a candidate generator, not an oracle: it only sees
 calls to exported functions whose <code>man/*.Rd</code> usage it can parse, and it reports
 how many exports that covers ("checked N of M").</p>
 <p>CLI::</p>
-<div class="language-text highlight"><pre><span></span><code>python3 -m lib.docaudit [--path &lt;package-dir-or-name&gt;] [--eco | --package-only] [--detailed] [--since TAG]
+<div class="language-text highlight"><pre><span></span><code>python3 -m lib.docaudit [--path &lt;package-dir-or-name&gt;] [--eco] [--detailed] [--since TAG]
     [--fail-on none|warn|error] [--format text|json]
 </code></pre></div>
 <p>Scope (D0): walks up from --path (default: the cwd) to the nearest DESCRIPTION; with none, sweeps the ecosystem
-only if a .rforge.yaml manifest exists or --eco is given. --package-only prevents
-hybrid/manifest expansion and package-name discovery. The first output line states the resolved scope.</p>
+only if a .rforge.yaml manifest exists or --eco is given. The first output line states the resolved scope.</p>
 <p>Run as a package module (<code>python3 -m lib.docaudit</code>), never as a script.</p>
 <h2 id="dataclasses">Dataclasses<a class="headerlink" href="#dataclasses" title="Permanent link">&para;</a></h2>
 <h3 id="class-packageapi"><code>class PackageApi</code><a class="headerlink" href="#class-packageapi" title="Permanent link">&para;</a></h3>
@@ -3579,7 +3550,7 @@ hybrid/manifest expansion and package-name discovery. The first output line stat
 </table>
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
 <h3 id="audit"><code>audit()</code><a class="headerlink" href="#audit" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">audit</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">'str | Path'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eco</span><span class="p">:</span> <span class="s1">'bool'</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">package_only</span><span class="p">:</span> <span class="s1">'bool'</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">detailed</span><span class="p">:</span> <span class="s1">'bool'</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">since</span><span class="p">:</span> <span class="s1">'Optional[str]'</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_paragraph_words</span><span class="p">:</span> <span class="s1">'int'</span> <span class="o">=</span> <span class="mi">110</span><span class="p">,</span> <span class="n">max_section_words</span><span class="p">:</span> <span class="s1">'int'</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span> <span class="n">min_h3</span><span class="p">:</span> <span class="s1">'int'</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'dict'</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">audit</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">'str | Path'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eco</span><span class="p">:</span> <span class="s1">'bool'</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">detailed</span><span class="p">:</span> <span class="s1">'bool'</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">since</span><span class="p">:</span> <span class="s1">'Optional[str]'</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_paragraph_words</span><span class="p">:</span> <span class="s1">'int'</span> <span class="o">=</span> <span class="mi">110</span><span class="p">,</span> <span class="n">max_section_words</span><span class="p">:</span> <span class="s1">'int'</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span> <span class="n">min_h3</span><span class="p">:</span> <span class="s1">'int'</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'dict'</span>
 </span></code></pre></div>
 <p>Audit the package (or packages) D0 resolves <code>path</code> to. <code>info</code> findings appear only when <code>detailed</code>.</p>
 <h3 id="audit_ecosystem"><code>audit_ecosystem()</code><a class="headerlink" href="#audit_ecosystem" title="Permanent link">&para;</a></h3>
@@ -3656,12 +3627,11 @@ only hide a finding, never invent one.</p>
 </span></code></pre></div>
 <p><em>(no docstring)</em></p>
 <h3 id="resolve_scope"><code>resolve_scope()</code><a class="headerlink" href="#resolve_scope" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_scope</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">'str | Path'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">,</span> <span class="n">eco</span><span class="p">:</span> <span class="s1">'bool'</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">package_only</span><span class="p">:</span> <span class="s1">'bool'</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'Scope'</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve_scope</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="s1">'str | Path'</span> <span class="o">=</span> <span class="s1">'.'</span><span class="p">,</span> <span class="n">eco</span><span class="p">:</span> <span class="s1">'bool'</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'Scope'</span>
 </span></code></pre></div>
 <p>D0: walk up from <code>path</code> to the nearest DESCRIPTION and audit that package; with no DESCRIPTION, sweep the
 ecosystem only if a <code>.rforge.yaml</code> manifest exists or <code>eco</code> is set. <code>path</code> may also be a package name found
-under the cwd. A <code>kind: hybrid</code> root also audits its nested packages, unless
-<code>package_only</code> confines resolution to an existing path's nearest package.</p>
+under the cwd. A <code>kind: hybrid</code> root also audits its nested packages.</p>
 <h3 id="scan_prose"><code>scan_prose()</code><a class="headerlink" href="#scan_prose" title="Permanent link">&para;</a></h3>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">scan_prose</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="s1">'str'</span><span class="p">,</span> <span class="n">rel</span><span class="p">:</span> <span class="s1">'str'</span><span class="p">,</span> <span class="n">max_paragraph_words</span><span class="p">:</span> <span class="s1">'int'</span> <span class="o">=</span> <span class="mi">110</span><span class="p">,</span> <span class="n">max_section_words</span><span class="p">:</span> <span class="s1">'int'</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span> <span class="n">min_h3</span><span class="p">:</span> <span class="s1">'int'</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">'list[dict]'</span>
 </span></code></pre></div>
@@ -3747,10 +3717,10 @@ below it was not looked at. Multi-line literals that do close are fine; <code>#<
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>

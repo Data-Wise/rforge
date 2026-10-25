@@ -16,25 +16,25 @@
         <link rel="prev" href="../../quickstart/">
       
       
-        <link rel="next" href="../evidence-and-approval/">
+        <link rel="next" href="../../workflows/">
       
       
         
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
-        <title>Codex personal checks - RForge Plugin</title>
+        <title>Codex plugin and checks - RForge Plugin</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -63,7 +63,7 @@
     
   
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Codex personal checks - RForge Plugin" />
+<meta property="og:title" content="Codex plugin and checks - RForge Plugin" />
 <meta property="og:description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)" />
 <meta property="og:image" content="https://data-wise.github.io/rforge/assets/images/social/guides/codex-checks.png" />
 <meta property="og:image:type" content="image/png" />
@@ -71,7 +71,7 @@
 <meta property="og:image:height" content="630" />
 <meta property="og:url" content="https://data-wise.github.io/rforge/guides/codex-checks/" />
 <meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:title" content="Codex personal checks - RForge Plugin" />
+<meta property="twitter:title" content="Codex plugin and checks - RForge Plugin" />
 <meta property="twitter:description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)" />
 <meta property="twitter:image" content="https://data-wise.github.io/rforge/assets/images/social/guides/codex-checks.png" />
 </head>
@@ -127,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Codex personal checks
+              Codex plugin and checks
             
           </span>
         </div>
@@ -541,7 +541,7 @@
   <span class="md-ellipsis">
     
   
-    Codex personal checks
+    Codex plugin and checks
   
 
     
@@ -559,7 +559,7 @@
   <span class="md-ellipsis">
     
   
-    Codex personal checks
+    Codex plugin and checks
   
 
     
@@ -617,38 +617,32 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#verified-behavior-and-remaining-gaps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verified behavior and remaining gaps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common requests
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../evidence-and-approval/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Check evidence and approvals
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -2773,6 +2767,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#verified-behavior-and-remaining-gaps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verified behavior and remaining gaps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common requests
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2799,8 +2815,6 @@
 
 
 <h1 id="rforge-checks-in-codex">Rforge checks in Codex<a class="headerlink" href="#rforge-checks-in-codex" title="Permanent link">&para;</a></h1>
-<p>See <a href="../evidence-and-approval/">Check evidence and approval decisions</a> to separate
-technical check outcomes, unresolved evidence and owner authorization.</p>
 <div class="admonition tip">
 <p class="admonition-title">Personal pilot</p>
 <p>Two focused skills reuse the local Rforge checkout. The full Claude command
@@ -2829,6 +2843,14 @@ New-export coverage requires <code>--since REF</code>; without a chosen comparis
 that component is omitted and must be reported separately from signature coverage.
 It does not execute examples or build a site.</p>
 <h2 id="setup-and-first-use">Setup and first use<a class="headerlink" href="#setup-and-first-use" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Use a durable checkout of <code>dev</code> containing PR #92. Review the two skills.</li>
+<li>In Codex's local marketplace controls, register the checkout's <code>openai</code>
+   directory (the catalog file is <code>openai/.agents/plugins/marketplace.json</code>).</li>
+<li>Install and enable <code>rforge-openai</code>, then start a fresh Codex session.</li>
+<li>Confirm <code>$rforge-check</code> and <code>$rforge-docs-check</code> are discoverable. Run the
+   static audit first, then explicitly request the package check.</li>
+</ol>
 <p>The source package is <code>openai/rforge-openai</code>; the personal catalog is
 <code>openai/.agents/plugins/marketplace.json</code>. Review the two skill instructions,
 register the local catalog in Codex, install <code>rforge-openai</code>, and restart.
@@ -2837,16 +2859,52 @@ point the workflow to another Rforge checkout if needed. Use Python 3.10+.</p>
 <p>Version 0.1.1 requires the repaired engines: check envelopes with
 <code>output_format</code>, <code>incomplete</code>, <code>check.exit_status</code>, and <code>check.log_paths</code>,
 plus docaudit's
-<code>--package-only</code>. While these changes remain on a feature branch, explicitly
-supply that worktree as the engine checkout. An older default checkout is
-reported as unavailable for this pilot; refresh the installed instructions
-after changes.</p>
+<code>--package-only</code>. These engines and the adapter are integrated on <code>dev</code> through
+<a href="https://github.com/Data-Wise/rforge/pull/92">PR #92</a>. Use the durable checkout
+containing that integration, rather than a retired verification worktree. See the
+<a href="https://github.com/Data-Wise/rforge/tree/dev/openai/rforge-openai">adapter source on dev</a>. The
+personal local catalog source is <code>/Users/davood/projects/dev-tools/rforge/openai</code>.
+Installed adapter 0.1.1 and the engine's Git ref should be reported separately.</p>
 <p>Start with <code>$rforge-docs-check Audit /absolute/path/to/package</code>.
 Confirm its resolved package and checked-versus-total coverage, then try
 <code>$rforge-check Check /absolute/path/to/package</code>. Missing prerequisites must
 produce an unavailable result, never a clean check.</p>
 <p>This is a prepared personal adapter, not a published release. Installation,
 post-restart skill discovery, and actual Codex invocation are separate gates.</p>
+<h2 id="verified-behavior-and-remaining-gaps">Verified behavior and remaining gaps<a class="headerlink" href="#verified-behavior-and-remaining-gaps" title="Permanent link">&para;</a></h2>
+<p>Both installed skills were discovered in a fresh Codex session and exercised on
+isolated medfit copies. The v0.12.0 audit found no static issues in its covered
+signatures; comparison with v0.11.1 found the new <code>compare_lr()</code> export covered.
+Eleven variadic signatures were outside the static checker. A default package
+check exposed medfit's undeclared <code>rlang</code> import; after the isolated import fix,
+the rerun completed with zero check errors, warnings, or NOTEs. Unit-test warnings
+and skips are recorded separately from package-check status.</p>
+<p>The import fix is integrated into medfit dev (#296). A separate pkgdown audit
+found the generated 404 page's invalid <code>/medfit/NA</code> MathJax script source; its
+repair is integrated into medfit dev (#297). The scoped main promotion
+<a href="https://github.com/Data-Wise/medfit/pull/298">medfit PR #298</a> merged as
+<code>100cca7b</code> after review and CI. Live deployment is verified separately from
+a successful local build.</p>
+<p>Use <a href="https://data-wise.github.io/codex-config/guides/web-write/">web-write</a> for
+explicitly requested documentation/site audits and repairs. Its isolated pkgdown
+checks covered a full build, examples, 106 HTML pages, 8,268 local references,
+and representative desktop/mobile output. This complements the static Rforge
+skills; it does not expand their contract or introduce a new Rforge command.</p>
+<p>Still unverified: fresh-session missing/older-engine handling, unchecked variadic
+signatures, full external-resource/accessibility coverage, and standalone Quarto.
+Article, tutorial, cookbook and refcard generation remain deferred.</p>
+<h2 id="common-requests">Common requests<a class="headerlink" href="#common-requests" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$rforge-docs-check Audit /absolute/path/to/package and explain unchecked exports.
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>$rforge-docs-check Check new-export documentation in /absolute/path/to/package since v0.11.1.
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>$rforge-check Check /absolute/path/to/package and summarize errors, warnings and NOTEs.
+</span></code></pre></div>
+<p>Replace the sample path and comparison ref with the requested package and its
+actual baseline. New-export coverage requires an established ref; a general
+static audit may proceed without it and must report coverage as not run.
+For a requested strict check, the skill runs both labeled dependency flavors;
+incoming adds its own bundle. It does not automatically install dependencies,
+change source, submit packages or deploy sites. Missing dependencies or malformed
+results are unavailable/incomplete, never passing results.</p>
 
 
 
@@ -2902,10 +2960,10 @@ post-restart skill discovery, and actual Codex invocation are separate gates.</p
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>
