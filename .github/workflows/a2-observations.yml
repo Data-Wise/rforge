@@ -1,0 +1,68 @@
+name: A2 acceptance observations
+# Produces the a2-acceptance-evidence artifact that a2-release.yml verifies. Dispatch it on the candidate ref;
+# the observations are bound to this run's ID and github.sha. The adversarial review is a recorded judgment
+# supplied as an input: it is stamped by this run, not proven by it.
+on:
+  workflow_dispatch:
+    inputs:
+      review-record:
+        description: JSON record of the finalized adversarial review of this exact commit (job_id, reviewed_commit, mode, executed_tests, coverage_reviewed, unresolved_findings, findings).
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  observations:
+    name: A2 observations (ubuntu-24.04)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+          check-latest: true
+          allow-prereleases: false
+      - name: Read exact R lock
+        id: lock
+        run: python -c 'import json,os; f=open(os.environ["GITHUB_OUTPUT"],"a"); print("R="+json.load(open("tests/a2/fixture-lock.json"))["R"],file=f)'
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ steps.lock.outputs.R }}
+      - uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: '3.1.11'
+      - name: Install Linux system libraries for R dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libuv1-dev libcurl4-openssl-dev libssl-dev libxml2-dev \
+            libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev \
+            libpng-dev libtiff-dev libjpeg-dev
+      - name: Provision locked fixture dependencies
+        run: Rscript --vanilla scripts/provision_a2.R
+      - name: Install Python and build dependencies
+        run: python -m pip install pytest pyyaml mkdocs-material mkdocs-macros-plugin pillow cairosvg
+      - name: Clone pinned triage sources and install their R dependencies
+        env:
+          WORKDIR: ${{ runner.temp }}/a2-work
+        run: |
+          python scripts/a2_observations.py --workdir "$WORKDIR" --clone-triage-only > "$RUNNER_TEMP/triage-dirs.txt"
+          while read -r dir; do
+            Rscript --vanilla -e 'options(repos=c(CRAN="https://cloud.r-project.org")); remotes::install_deps(commandArgs(TRUE)[1], dependencies=TRUE, upgrade="never")' "$dir"
+          done < "$RUNNER_TEMP/triage-dirs.txt"
+      - name: Produce the six observations
+        env:
+          WORKDIR: ${{ runner.temp }}/a2-work
+          OUTPUT: ${{ runner.temp }}/a2-acceptance-evidence
+          REVIEW_RECORD: ${{ inputs.review-record }}
+        run: |
+          printf '%s' "$REVIEW_RECORD" > "$RUNNER_TEMP/review-record.json"
+          python scripts/a2_observations.py --workdir "$WORKDIR" --output "$OUTPUT" \
+            --run-id "$GITHUB_RUN_ID" --candidate-sha "$GITHUB_SHA" --review-record "$RUNNER_TEMP/review-record.json"
+      - name: Upload observations including failure records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a2-acceptance-evidence
+          path: ${{ runner.temp }}/a2-acceptance-evidence/
+          if-no-files-found: error
