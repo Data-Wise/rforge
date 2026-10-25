@@ -1,0 +1,50 @@
+name: A2 release evidence
+on:
+  workflow_dispatch:
+    inputs:
+      acceptance-evidence-run:
+        description: Numeric completed workflow run ID containing the a2-acceptance-evidence artifact for this candidate; missing evidence blocks acceptance.
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  a2-release:
+    uses: ./.github/workflows/a2-platform.yml
+  aggregate:
+    name: Verify both retrieved A2 artifacts
+    needs: a2-release
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+          check-latest: true
+          allow-prereleases: false
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: a2-release-evidence-*
+          path: retrieved-a2-evidence
+      - name: Validate evidence run identity
+        env:
+          A2_EVIDENCE_RUN: ${{ inputs.acceptance-evidence-run }}
+        run: python -c 'import os; assert os.environ["A2_EVIDENCE_RUN"].isdigit(), "Numeric evidence run ID required"'
+      - name: Verify the producer run is the genuine observations run for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          A2_EVIDENCE_RUN: ${{ inputs.acceptance-evidence-run }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$A2_EVIDENCE_RUN" > producer-run.json
+          python scripts/verify_a2_producer_run.py --run producer-run.json --candidate-sha "$GITHUB_SHA" --run-id "$A2_EVIDENCE_RUN"
+      - uses: actions/download-artifact@v4
+        with:
+          name: a2-acceptance-evidence
+          run-id: ${{ inputs.acceptance-evidence-run }}
+          github-token: ${{ github.token }}
+          path: retrieved-a2-observations
+      - name: Verify source-bound artifacts and actual completed observations
+        env:
+          A2_EVIDENCE_RUN: ${{ inputs.acceptance-evidence-run }}
+        run: python scripts/verify_a2_aggregate.py --artifacts retrieved-a2-evidence --observations retrieved-a2-observations/index.json --observation-artifacts retrieved-a2-observations --candidate-sha "$GITHUB_SHA" --producer-run-id "$A2_EVIDENCE_RUN"
