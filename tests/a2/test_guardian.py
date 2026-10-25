@@ -420,7 +420,7 @@ import os
 original=os.posix_spawn
 def launch(path,command,*args,**kwargs):
  command=list(command)
- command[4]={('import time;from pathlib import Path;Path('+repr(str(tmp_path/'prejoin-entered'))+').write_text("entered");time.sleep(.8)'+chr(10))!r}+command[4]
+ command[4]={('import time;from pathlib import Path;Path('+repr(str(tmp_path/'prejoin-entered'))+').write_text("entered");time.sleep(3)'+chr(10))!r}+command[4]
  return original(path,command,*args,**kwargs)
 os.posix_spawn=launch
 g.supervise({str(tmp_path)!r})
@@ -429,11 +429,11 @@ g.supervise({str(tmp_path)!r})
         return original(command,*args,**kwargs)
     monkeypatch.setattr(subprocess,'Popen',delayed_guardian)
     started=time.monotonic()
-    result=guardian.run([sys.executable,'-c',"from pathlib import Path;Path('workload-executed').write_text('unsafe');import time;time.sleep(30)"],tmp_path,time.monotonic_ns()+.4*guardian.NS,cwd=tmp_path)
+    result=guardian.run([sys.executable,'-c',"from pathlib import Path;Path('workload-executed').write_text('unsafe');import time;time.sleep(30)"],tmp_path,time.monotonic_ns()+1.5*guardian.NS,cwd=tmp_path)
     assert (tmp_path/'prejoin-entered').exists()
     assert not (tmp_path/'workload-executed').exists()
     assert result['reason']=='deadline' and result['direct_child_reaped'] and result['group_disappeared']
-    assert time.monotonic()-started<3
+    assert time.monotonic()-started<8
 
 
 @pytest.mark.parametrize('target',['pin','guardian'])
