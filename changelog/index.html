@@ -2638,6 +2638,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2221-2026-10-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.22.1 — 2026-10-25
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2220-2026-10-25" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2906,6 +2917,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2221-2026-10-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.22.1 — 2026-10-25
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2220-2026-10-25" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3133,6 +3155,11 @@
 <p>The full changelog lives in the repository:
 <a href="https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md"><code>CHANGELOG.md</code></a>.</p>
 <hr />
+<h2 id="2221-2026-10-25">2.22.1 — 2026-10-25<a class="headerlink" href="#2221-2026-10-25" title="Permanent link">&para;</a></h2>
+<p><code>/rforge:docs:check --run-examples</code> now compares documented whole numbers of up
+to six digits exactly, so a stale count such as <code>[1] 100</code> against <code>[1] 101</code> is a
+mismatch instead of a pass. Decimals, scientific notation and longer integers are
+unchanged. No command-surface change (44 commands).</p>
 <h2 id="2220-2026-10-25">2.22.0 — 2026-10-25<a class="headerlink" href="#2220-2026-10-25" title="Permanent link">&para;</a></h2>
 <p><code>/rforge:docs:check</code> gains opt-in <code>--site URL [--ref REF]</code> (deployed pkgdown site
 audit over HTTP) and <code>--run-examples</code> (guarded README example replay) stages.
