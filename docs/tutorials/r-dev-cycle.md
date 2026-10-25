@@ -346,13 +346,13 @@ Installed to /Library/Frameworks/R.framework/.../medfit
 ```
 
 Runs `pkgdown::build_site()`. Use the package's configured destination, not an
-assumed `docs/`: missingmed, for example, uses `pkgdown-site/` because `docs/`
-contains design specifications.
+assumed `docs/`. A package whose `docs/` holds design specifications may build
+into another directory such as `pkgdown-site/`.
 
 ```text
 ## Site: medfit v2.0.0
 ### Status: 🟢
-Built site → docs/index.html
+Built site → <destination>/index.html
   • 14 reference pages
   • 3 vignettes
   • Changelog
@@ -365,39 +365,31 @@ Built site → docs/index.html
 ## Evidence-bounded verification
 
 !!! warning "A green subset is not full acceptance"
-    When a task forbids installs or simulations, inspect the test bodies before
-    running a broad cycle. Use existing dependencies and explicitly scoped
-    deterministic tests; report excluded checks rather than silently running
-    stochastic examples or an installation-producing package check.
+    A passing run covers only what it ran. Report which checks were excluded
+    rather than implying the whole specification was verified.
 
-For dependency work, pin the source commit actually loaded, not just the package
-version in `DESCRIPTION`. Record the tested files and assertion counts separately
-for provider and consumer. Preserve saved research results; a stored input can be
-read without regenerating the saved output.
-
-The medfit/missingmed T5 development work illustrates this distinction: injected
-covariance-stage throws can verify that accepted likelihood evidence and branch
-notices survive, but do not demonstrate a naturally observed failure. A partial
-likelihood payload is not a successful fit, and passing deterministic controls
-does not close a separately required real-case acceptance gate.
-
-Review receipts should name the source and test bodies actually read, omitted
-specification clauses, and post-review changes. A scoped Claude approval is not
-full-specification sign-off. At session close, synchronize `.STATUS` and active
-plans, update agent docs only for lasting workflow conventions, and distinguish
-website source edits, a locally inspected build, and deployment.
+- Scope the run with `/rforge:r:test --changed` (compare against `--base <ref>`,
+  gate with `--fail-on introduced|none`, bypass the baseline cache with
+  `--no-cache`), and say which tests were and were not run.
+- Injected failures verify that failure handling works, but do not show that the
+  failure occurs naturally.
+- A partial result is not a successful fit.
+- Passing deterministic controls does not close a separately required real-case
+  acceptance check.
+- A scoped reviewer approval is not full-specification sign-off.
+- At session close, run `/rforge:finish` to sync `.STATUS` with what actually
+  happened.
 
 !!! note "Build and deployment are separate"
     Inspect the produced page for the edited content at the configured path.
-    A source update or successful build never authorizes push, merge, release,
-    or deployment; each remains subject to the task's explicit restrictions.
+    A successful build does not mean the site is deployed.
 
 ## Common workflows
 
 ### Before every commit
 
 ```bash
-/rforge:r:cycle          # document → test → check; push still needs authorization
+/rforge:r:cycle          # document → test → check (green = ready for review)
 ```
 
 ### Before a pull request
