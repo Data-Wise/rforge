@@ -107,7 +107,9 @@ def test_triage_observation_passes_when_fresh_run_matches():
     lambda p: p['medfit']['counts'].update(checked=0),
     lambda p: p['medfit'].update(state='complete'),
     lambda p: p['probmed']['source_sha256'].update({'README.md': 'e' * 64}),
-    lambda p: p['medrobust'].update(findings=[]) if False else p['probmed']['findings'].append({'check': 'examples-shape', 'severity': 'warn'}),
+    lambda p: p['probmed']['findings'].append({'check': 'examples-shape', 'severity': 'warn'}),
+    lambda p: p['medfit'].update(source_dirty=True),
+    lambda p: p.update(extra=dict(p['medfit'])),
 ])
 def test_triage_observation_fails_on_drift(mutate):
     reviewed = {'facts': triage_facts()}
@@ -287,3 +289,13 @@ def test_malformed_review_input_is_rejected_before_any_work(tmp_path):
     with pytest.raises(SystemExit):
         obs.main(['--workdir', str(tmp_path / 'w'), '--output', str(tmp_path / 'o'), '--run-id', '1', '--candidate-sha', 'x', '--review-record', str(bad)])
     assert not (tmp_path / 'o').exists()
+
+
+def test_triage_drift_is_recorded_in_the_failed_observation():
+    reviewed = {'facts': triage_facts()}
+    fresh = _fresh(reviewed)
+    fresh['packages']['medfit']['counts']['checked'] = 0
+    facts, status = obs.observe_package_triage(reviewed, fresh)
+    assert status == 'failed' and facts['fresh_run_drift'] == ['medfit.counts']
+    clean, ok = obs.observe_package_triage(reviewed, _fresh(reviewed))
+    assert ok == 'passed' and 'fresh_run_drift' not in clean

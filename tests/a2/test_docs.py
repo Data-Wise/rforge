@@ -18,7 +18,7 @@ def test_status_guidance_count_sync():
     assert f'{gaps} coverage groups pending' in summary
     assert 'both-platform evidence pending' in summary
     assert 'latest stable Python 3' in summary
-    assert 'no push, tag, deployment or release' in summary
+    assert 'without PR, tag, deployment or release' in summary
     assert re.search(r'^version: ' + re.escape(package['version']) + r'\b', status, re.M)
     unreleased = (ROOT / 'CHANGELOG.md').read_text().split('## [Unreleased]', 1)[1].split('\n## [', 1)[0]
     assert 'implementation in progress' in unreleased

@@ -190,3 +190,12 @@ The triage producer was re-run on fresh temporary clones of medfit, probmed and 
 - Confirmed and fixed: cranlogs is pinned to a commit and the supported URL is fixed in the verifier; a limit site that becomes supported is recorded as `other_real_runs`, not a failure. Network failures surface as failed records with the exception text.
 - Confirmed and fixed: the request-counter test could not detect a missing restore (verified by mutation); it now asserts restoration. Rendered-page terms for quickstart and reference/docaudit are now specific.
 - Documented, not fixed: the `review-record` dispatch input is capped at about 64 KB (guide note); a deployed third-party site can still change under a pinned source commit, which would show up as a failed live-smoke record rather than a false pass.
+
+## Candidate round 2 review disposition (28b3e34; executed 191 tests)
+
+- Blocker, confirmed and fixed: `required.json` listed two nodes pytest does not collect (`test_live_smoke_observation_fails[states3]`, `test_triage_observation_takes_the_fresh_commit`), left over from tests I removed or renamed; my earlier refresh only added nodes. The release run requires every listed node collected, so both platforms would have failed closed. `scripts/refresh_a2_manifest.py` now reconciles the manifest (drops phantoms, assigns new nodes, re-hashes every referenced file) and `tests/a2/test_manifest.py` asserts the manifest equals the collection (656 nodes), that every group hashes every file it references, and that the manifest is ready.
+- Confirmed and fixed: new test files had no hash in their groups (the same refresh gap); every referenced file is now hashed and tested.
+- Confirmed and fixed: the failed triage observation did not say why; the drift list is now in the record as `fresh_run_drift`. Drift also covers `source_dirty` and packages present only in the fresh run; a dead test branch was removed.
+- Confirmed and fixed (found while triaging): `.STATUS` `a2_acceptance_state` and its pinning test still asserted "no push", which has been false since the first push; both now state the real position.
+- Reviewer-confirmed sound: producer-run API field semantics, `gh api` failure being fatal, same-ref SHA equality, no TOCTOU on completed-run artifacts, no index path that carries unproduced facts, `guarded()` leaving KeyboardInterrupt alone.
+- Not verifiable locally: whether R dependencies installed in CI shift triage counts (a drift failure would now show its reason in the record).

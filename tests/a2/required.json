@@ -1429,7 +1429,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "965000c469ff6a2707509326148f785108830470768154206c2a7378802a2dde"
+        "tests/a2/test_docs.py": "a0dfdeca3afc0d68275f89182e203b2fbfcb6f728246d88d325c9fbd8af49438"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1462,7 +1462,8 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "965000c469ff6a2707509326148f785108830470768154206c2a7378802a2dde"
+        "tests/a2/test_docs.py": "a0dfdeca3afc0d68275f89182e203b2fbfcb6f728246d88d325c9fbd8af49438",
+        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1485,7 +1486,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "965000c469ff6a2707509326148f785108830470768154206c2a7378802a2dde"
+        "tests/a2/test_docs.py": "a0dfdeca3afc0d68275f89182e203b2fbfcb6f728246d88d325c9fbd8af49438"
       },
       "review_note": "Explicit current status, unreleased acceptance hold, actual command/check counts, unchanged feature version, mirror and agent prohibitions asserted. Local coverage complete; external acceptance remains pending."
     },
@@ -1669,8 +1670,7 @@
         "tests/a2/test_observations.py::test_a_limit_site_that_becomes_supported_is_an_improvement_not_a_failure",
         "tests/a2/test_observations.py::test_supported_site_is_pinned_to_a_commit_and_url",
         "tests/a2/test_observations.py::test_live_smoke_rejects_a_site_other_than_the_pinned_one",
-        "tests/a2/test_observations.py::test_clone_is_retried_on_a_transient_failure",
-        "tests/a2/test_observations.py::test_live_smoke_observation_fails[states3]"
+        "tests/a2/test_observations.py::test_clone_is_retried_on_a_transient_failure"
       ],
       "status": "ready",
       "coverage_gaps": [
@@ -1678,7 +1678,8 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa"
+        "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa",
+        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1733,13 +1734,14 @@
         "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>1]",
         "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>2]",
         "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>3]",
+        "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>4]",
+        "tests/a2/test_observations.py::test_triage_observation_fails_on_drift[<lambda>5]",
         "tests/a2/test_observations.py::test_triage_observation_rejects_a_reviewed_commit_that_is_not_the_fresh_one",
         "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>0]",
         "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>1]",
         "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>2]",
         "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>3]",
-        "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>4]",
-        "tests/a2/test_observations.py::test_triage_observation_takes_the_fresh_commit"
+        "tests/a2/test_observations.py::test_triage_drift_covers_finding_identity_scope_and_reasons[<lambda>4]"
       ],
       "status": "ready",
       "coverage_gaps": [
@@ -1747,7 +1749,8 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa"
+        "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa",
+        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1821,12 +1824,17 @@
         "tests/a2/test_final_gates.py::test_count_parsing_reads_only_the_final_summary_line",
         "tests/a2/test_final_gates.py::test_producer_missing_summary_is_not_a_pass",
         "tests/a2/test_final_gates.py::test_producer_flags_a_tree_dirtied_by_the_gates",
+        "tests/a2/test_manifest.py::test_manifest_nodes_are_exactly_the_collection",
+        "tests/a2/test_manifest.py::test_every_group_hashes_every_test_file_it_references",
+        "tests/a2/test_manifest.py::test_ready_manifest_has_no_pending_group",
+        "tests/a2/test_manifest.py::test_refresh_drops_phantoms_adds_new_nodes_and_rehashes",
         "tests/a2/test_observations.py::test_gate_observation_passes_on_a_clean_committed_tree",
         "tests/a2/test_observations.py::test_gate_observation_fails_when_a_gate_dirties_the_tree",
         "tests/a2/test_observations.py::test_mapping_observation_on_the_real_ledger",
         "tests/a2/test_observations.py::test_written_records_and_index_pass_the_aggregate_validator",
         "tests/a2/test_observations.py::test_failed_status_is_never_accepted",
         "tests/a2/test_observations.py::test_a_crashing_observation_becomes_a_failed_record_not_a_crash",
+        "tests/a2/test_observations.py::test_triage_drift_is_recorded_in_the_failed_observation",
         "tests/a2/test_release_ci.py::test_observations_workflow_is_dispatch_only_and_bound_to_the_run",
         "tests/a2/test_release_ci.py::test_no_temporary_smoke_workflow_remains"
       ],
@@ -1836,7 +1844,10 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "fd2b6c76e37168464d84ba12647b8d85eaf6950e57d56137fa12451a22725f07"
+        "tests/a2/test_final_gates.py": "fd2b6c76e37168464d84ba12647b8d85eaf6950e57d56137fa12451a22725f07",
+        "tests/a2/test_manifest.py": "278f1646c0229c9563b70f13b58af7512e4e638185d9d61318b69ef484902636",
+        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085",
+        "tests/a2/test_release_ci.py": "e1d608bbde8df7f361028c12eeea2a434a46d1868a74547a38c26c07af3c0a42"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1894,13 +1905,15 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "fd2b6c76e37168464d84ba12647b8d85eaf6950e57d56137fa12451a22725f07"
+        "tests/a2/test_final_gates.py": "fd2b6c76e37168464d84ba12647b8d85eaf6950e57d56137fa12451a22725f07",
+        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085",
+        "tests/a2/test_producer_run.py": "e06f3156d3322d996bbb50817f0dbf0f5f57185009f60622e34c478c563d1fca"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 649,
+  "collected_nodes": 656,
   "review_candidate": "A2 candidate 2: round-1 review fixes (producer-run binding, triage commit equality, crash-safe observations)",
   "platforms": [
     "ubuntu-24.04",

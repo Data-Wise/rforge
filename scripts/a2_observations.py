@@ -152,14 +152,16 @@ def observe_package_triage(reviewed: dict, fresh: dict) -> tuple:
     drift = []
     for name, record in facts["packages"].items():
         now = fresh["packages"].get(name, {})
-        for key in ("commit", "state", "scope", "counts", "source_sha256"):
+        for key in ("commit", "state", "scope", "counts", "source_sha256", "source_dirty"):
             if record.get(key) != now.get(key):
                 drift.append(f"{name}.{key}")
         if sorted(map(str, record.get("reasons", []))) != sorted(map(str, now.get("reasons", []))):
             drift.append(f"{name}.reasons")
         if _finding_keys(record) != _finding_keys(now):
             drift.append(f"{name}.findings")
+    drift += [f"{name}.unreviewed_package" for name in sorted(set(fresh["packages"]) - set(facts["packages"]))]
     if drift:
+        facts["fresh_run_drift"] = drift  # visible in the failed record; the schema rejects this key, so status is failed
         print("triage drift: " + ", ".join(drift), file=sys.stderr)
     return facts, _status(lambda: (validate_package_triage(facts), _require_no_drift(drift)))
 
