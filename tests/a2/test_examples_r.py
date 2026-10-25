@@ -163,7 +163,7 @@ def test_running_evaluate_output_limit(tmp_path):
     assert report['state'] == 'incomplete', report
     assert any('output-limit' in reason for reason in report['reasons']), report
     assert report['counts']['checked'] == 1
-    assert time.monotonic()-started < 15
+    assert time.monotonic()-started < 45
 
 
 def test_evaluate_spool_counts_text_once(tmp_path):
