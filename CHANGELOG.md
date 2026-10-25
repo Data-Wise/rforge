@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A2 (`/rforge:docs:check --site`, `--run-examples`) accepted and merged to dev (PR #99): 662 required acceptance nodes passed on ubuntu-24.04 and macos-14 on the frozen candidate, six candidate-bound observations and the aggregate verifier passed. The adversarial review is attested, and `--site` live smoke covers one supported deployed site (r-hub/cranlogs); packages that use pkgdown development mode or `.qmd` articles are reported incomplete. Not released.
+
 - Add explicit A2 status, command/check count, unchanged feature version and agent prohibition assertions; close D05 local coverage while keeping platform/release acceptance pending.
 
 - Prevent pre-spawn guardian exceptions from signaling an unowned checkpoint PGID; allocate the workload handle before spawning. Preserve README assertion counts, valid partial checkpoints, and authenticated lifecycle evidence when replay preparation or execution raises an ordinary exception. Add acceptance regressions; interruption propagation and release gates remain unchanged.

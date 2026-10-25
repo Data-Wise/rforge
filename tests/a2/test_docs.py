@@ -15,14 +15,14 @@ def test_status_guidance_count_sync():
     summary = re.search(r'^a2_acceptance_state: (.+)$', status, re.M).group(1)
     manifest = json.loads((ROOT / 'tests/a2/required.json').read_text())
     gaps = sum(bool(group['coverage_gaps']) for group in manifest['groups'])
-    assert f'{gaps} coverage groups pending' in summary
-    assert 'both-platform evidence pending' in summary
-    assert 'latest stable Python 3' in summary
-    assert 'without PR, tag, deployment or release' in summary
+    assert manifest['status'] == 'ready'
+    assert f'{gaps} external-observation groups satisfied' in summary
+    assert f"{manifest['collected_nodes']} required nodes passed" in summary
+    assert 'No tag, deployment or release yet' in summary
     assert re.search(r'^version: ' + re.escape(package['version']) + r'\b', status, re.M)
     unreleased = (ROOT / 'CHANGELOG.md').read_text().split('## [Unreleased]', 1)[1].split('\n## [', 1)[0]
     assert 'implementation in progress' in unreleased
-    assert 'Release acceptance and both-platform evidence remain pending.' in unreleased
+    assert 'Not released.' in unreleased
     checks = len(re.findall(r'^run "', (ROOT / 'tests/test-all.sh').read_text(), re.M))
     for path in ('CLAUDE.md', 'AGENTS.md', 'docs/contributing.md'):
         assert f'{checks} checks' in (ROOT / path).read_text()
