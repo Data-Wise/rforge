@@ -644,3 +644,61 @@ def test_probe_timeouts_tolerate_a_loaded_runner():
     import inspect
     source=inspect.getsource(guardian)
     assert 'timeout=1)' not in source and 'timeout=1,' not in source
+
+
+@pytest.mark.parametrize('forge',['wrong-run-id','wrong-sequence'])
+def test_forged_phase_ack_never_releases_code(tmp_path,monkeypatch,forge):
+    # Only the parent-side comparison can reject this: the real guardian's own (correct) ack is hidden from the parent.
+    original=guardian.read
+    def read(path):
+        if path.name!='arm-ack.json':return original(path)
+        initial=original(path.parent/'initial.json')
+        if initial is None:return None
+        run_id=initial['run_id'] if forge=='wrong-sequence' else 'not-'+initial['run_id']
+        return {'run_id':run_id,'sequence':99 if forge=='wrong-sequence' else 1,'deadline_ns':time.monotonic_ns()+60*guardian.NS}
+    monkeypatch.setattr(guardian,'read',read)
+    code='''import json,time
+from pathlib import Path
+p=Path('.')
+r=json.loads((p/'initial.json').read_text())['run_id']
+t=p/'request.tmp';t.write_text(json.dumps({'run_id':r,'sequence':1,'phase':'chunk','chunk':1}));t.replace(p/'phase-request.json')
+while not (p/'phase-release.json').exists():time.sleep(.01)
+(p/'executed').write_text('forbidden')
+'''
+    result=guardian.run([sys.executable,'-c',code],tmp_path,time.monotonic_ns()+guardian.NS,cwd=tmp_path,chunk_budget=.25)
+    assert result['reason']=='deadline'
+    assert not (tmp_path/'executed').exists() and not (tmp_path/'phase-release.json').exists()
+
+
+def test_completed_run_with_live_group_fails_closed(tmp_path,monkeypatch):
+    original=guardian.os.killpg
+    monkeypatch.setattr(guardian.os,'killpg',lambda pgid,number:None if number==0 else original(pgid,number))
+    result=guardian.run([sys.executable,'-c','pass'],tmp_path,time.monotonic_ns()+5*guardian.NS,cwd=tmp_path)
+    assert result['group_disappeared'] is False
+    assert result['reason']=='cleanup-unverified'
+    assert guardian.read(tmp_path/'terminal.json')['reason']=='cleanup-unverified'
+    assert guardian.read(tmp_path/'marker.json')['state']=='interrupted'
+
+
+def test_live_guardian_pin_is_retained_unreaped(tmp_path,monkeypatch):
+    import signal
+    class LiveGuardian:
+        def poll(self):return None
+        def wait(self,timeout=None):return None
+        def kill(self):pass
+    original=guardian.read
+    def read(path):
+        if path.name=='armed.json':raise RuntimeError('simulated parent failure')
+        return original(path)
+    pins=[]
+    monkeypatch.setattr(guardian,'_UNREAPED_PINS',pins)
+    popen=guardian.subprocess.Popen
+    monkeypatch.setattr(guardian.subprocess,'Popen',lambda args,*a,**k:LiveGuardian() if 'lib._docguardian' in args else popen(args,*a,**k))
+    monkeypatch.setattr(guardian,'read',read)
+    try:
+        with pytest.raises(RuntimeError,match='simulated parent failure'):
+            guardian.run([sys.executable,'-c','pass'],tmp_path,time.monotonic_ns()+5*guardian.NS,cwd=tmp_path)
+        assert len(pins)==1 and pins[0].process.returncode is None
+    finally:
+        for pin in pins:
+            pin.signal_group(signal.SIGKILL); pin.finish()
