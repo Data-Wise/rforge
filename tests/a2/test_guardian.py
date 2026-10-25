@@ -715,6 +715,7 @@ def test_hard_kill_of_unresponsive_guardian_after_deadline_plus_12s(tmp_path,mon
         def poll(self):
             self.polls+=1
             if self.polls==3:offset[0]=60*guardian.NS
+            assert self.polls<200 or self.dead,'guardian never killed after deadline+12s'
             return 0 if self.dead else None
         def kill(self):
             self.killed+=1; self.dead=True
