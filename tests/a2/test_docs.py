@@ -17,8 +17,9 @@ def test_status_guidance_count_sync():
     gaps = sum(bool(group['coverage_gaps']) for group in manifest['groups'])
     assert manifest['status'] == 'ready'
     assert f'{gaps} external-observation groups satisfied' in summary
-    assert f"{manifest['collected_nodes']} required nodes passed" in summary
-    assert 'No tag, deployment or release yet' in summary
+    assert 'required nodes passed' in summary and '87525d4' in summary
+    assert f"{manifest['collected_nodes']} nodes now required" in summary
+    assert 'v2.22.0 released' in summary
     assert re.search(r'^version: ' + re.escape(package['version']) + r'\b', status, re.M)
     release = (ROOT / 'CHANGELOG.md').read_text().split('## [2.22.0]', 1)[1].split('\n## [', 1)[0]
     assert 'implementation in progress' in release

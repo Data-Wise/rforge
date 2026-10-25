@@ -709,4 +709,4 @@ a2_review_20261023: Focused Claude review e3646895-1416-4234-b475-e516ed31ef1f o
 
 a2_python_latest_validation: Python 3.15.0 full suite 1326 passed/4 existing skipped; repository gates 47/47; strict MkDocs build and rendered contributor policy verified with Homebrew Cairo library path. 427 unique collected A2 nodes, 118 obligations and 87 groups reconciled; manifest and seven groups remain pending. No push, workflow dispatch or release.
 
-a2_acceptance_state: merged to dev (PR #99, 08ae163); 6 external-observation groups satisfied by observations run 40153274868; 662 required nodes passed on ubuntu-24.04 and macos-14 at 87525d4; observations 40153274868 and aggregate 40155770154 verified. No tag, deployment or release yet.
+a2_acceptance_state: v2.22.0 released (tag on d36cee7; A2 merged via PR #99, 08ae163). Evidence at candidate 87525d4: 6 external-observation groups satisfied by observations run 40153274868; 662 required nodes passed on ubuntu-24.04 and macos-14; aggregate 40155770154 verified. 666 nodes now required after four guardian guard tests were added post-release.
