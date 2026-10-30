@@ -10,10 +10,13 @@ Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fu
 
 ## Codex personal plugin
 
-The native `rforge-openai` adapter 0.1.1 provides two skills:
-`$rforge-check` for package validation and `$rforge-docs-check` for static
-README/vignette API audits. Both reuse the Rforge engines and have been verified
-in fresh sessions on isolated medfit copies. The adapter is integrated on `dev`
+The source `rforge-openai` adapter 0.2.0 provides three skills:
+`$rforge-check` for package validation, `$rforge-docs-check` for static
+README/vignette API audits, and `$rforge-lint` for CI-aware package lint.
+All reuse the existing Rforge engines. Package/docs skills were verified in
+fresh sessions on isolated medfit copies; the new lint skill still needs
+installation and fresh-session discovery. The original adapter was integrated
+on `dev`
 ([PR #92](https://github.com/Data-Wise/rforge/pull/92)); it is not a published
 adapter release or a port of the Claude command catalog and hooks.
 

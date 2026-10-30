@@ -1,3 +1,22 @@
+# Codex CI lint skill — 2026-10-29 (local source only)
+# Branch: codex/ci-lint-skill; base: dev b17c099.
+# Adapter source 0.2.0 adds rforge-lint using the existing lib.rcmd engine.
+# Shared lint guidance covers fresh processes, installed-source/library evidence,
+# explicit testthat helper namespaces and honest CI-parity reporting.
+# Regression: unqualified helper gives 1 object_usage_linter finding; attaching
+# testthat masks it (0); explicit namespace passes fresh-process lint (0).
+# Space-containing package/library paths exercised; dependencies not installed.
+# Validation: new real-R regression passed; structural gates 47/47; manifest and
+# all 3 skill frontmatters valid; strict MkDocs and rendered-text checks passed.
+# Changed Markdown introduces no new diagnostics; version/reference sync passed.
+# Full local pytest: 1604 passed, 5 skipped (Python 3.12, pytest 8.4.2, R 4.6.2).
+# Invocation: PYTHONPATH=<worktree> python -m pytest tests/a2 tests/harness
+# tests/test_*.py -q; 1609 nodes collected. Listing A2 first registers its options
+# before parsing on pytest 8. Pytest 9 changes IDs in the existing A2 manifest.
+# Restricted A2 lifecycle/replay failures cleared with process/local-server access.
+# No push, PR, publication, installation/reload, deployment or hosted CI run.
+# Fresh-session discovery/invocation of the new skill remains unverified.
+
 # PR #95 conflict reconciliation — 2026-10-22
 # Incorporated dev d2f9e58 into the feature branch; dev/main remain unchanged.
 # Retained both status histories and dev's updated Codex navigation/setup guidance.

@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Source-only Codex adapter 0.2.0 adds `rforge-lint`, reusing the existing lint
+  engine with fresh-process, installed-source and CI-environment evidence. No
+  engine or Claude command-surface change; installation and fresh-session
+  verification remain separate.
+
+### Changed
+
+- Lint command and quality guide distinguish CI parity from loaded-session
+  results, diagnose stale installed namespaces, and recommend explicit testthat
+  namespaces in helpers.
+
 ---
 
 ## [2.22.1] - 2026-10-25
