@@ -31,6 +31,8 @@ report. It does not make the local environment identical to CI: the workflow
 records installed-source and library evidence separately. Automatically loading
 development code or suppressing missing-name diagnostics was rejected because
 the regression fixture shows that attaching testthat hides the helper defect.
+The fixture prepends its package library while retaining dependency libraries;
+it covers both the default environment and dependencies found via `R_LIBS_USER`.
 
 ## First use
 

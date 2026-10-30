@@ -136,16 +136,20 @@ jobs:
       - name: Install test dependencies
         run: |
           python3 -m pip install --upgrade pip
-          # lib/* and tests/* are R-free and pure-stdlib apart from these:
+          # Required Python dependencies; real-R integration cases skip without R:
           #  - pytest: the lib test suite
           #  - pyyaml: mkdocs.yml parsing in test-all.sh
           #  - mkdocs-material: test-all's "mkdocs.yml parses" check uses
           #    yaml.unsafe_load, which must resolve the config's
           #    !!python/name:material.* tags (Material theme)
-          python3 -m pip install pytest pyyaml mkdocs-material
+          # The A2 manifest records pytest 8 parameter IDs; pytest 9 changes them.
+          python3 -m pip install 'pytest==8.4.2' pyyaml mkdocs-material
 
       - name: Run pytest suite
-        run: python3 -m pytest tests/ -q
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        # Load A2 options before parsing; include every current test directory/file.
+        run: python3 -m pytest tests/a2 tests/harness tests/test_*.py -q
 
       - name: Run full validation suite (test-all.sh)
         run: bash tests/test-all.sh

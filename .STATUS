@@ -1,3 +1,17 @@
+# Lint-skill review repair — 2026-10-29 (local only)
+# Fixed P2: prepend fixture R_LIBS while preserving effective dependency libraries;
+# assert fixture selection and exercise default/user-library-only environments.
+# Red/green: old setup 1 failed/1 passed; repaired setup 2 passed. The exact
+# external user-library-only reproducer also passed both cases after repair.
+# CI now pins pytest 8.4.2, registers A2 options first, and exports PYTHONPATH.
+# Executed the configured workflow command locally on Python 3.12/R 4.6.2:
+# 1605 passed, 5 skipped; all test files included. Hosted matrix not run.
+# Structural gates 47/47; version/reference sync and strict MkDocs passed;
+# no new Markdown diagnostics. Frozen A2 test sources/manifests unchanged.
+# Contributor instructions and CLAUDE/AGENTS mirror match the configured runner.
+# No push, PR, plugin install/reload, hosted CI, publication or deployment.
+# New lint-skill fresh-session discovery/invocation remains unverified.
+
 # Codex CI lint skill — 2026-10-29 (local source only)
 # Branch: codex/ci-lint-skill; base: dev b17c099.
 # Adapter source 0.2.0 adds rforge-lint using the existing lib.rcmd engine.

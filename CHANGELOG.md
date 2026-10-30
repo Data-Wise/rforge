@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The lint regression retains dependency libraries when adding its fixture
+  library and exercises dependencies available only through `R_LIBS_USER`.
+- Fast CI pins pytest 8.4.2, loads A2 options before parsing, and supplies the
+  checkout on `PYTHONPATH`; the frozen A2 manifests are unchanged.
 - Lint command and quality guide distinguish CI parity from loaded-session
   results, diagnose stale installed namespaces, and recommend explicit testthat
   namespaces in helpers.
