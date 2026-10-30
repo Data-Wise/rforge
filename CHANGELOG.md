@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Limit embedded A2 platform evidence to `main` and PRs targeting `main`, keeping
+  expensive release runs out of ordinary dev CI.
 - The lint regression retains dependency libraries when adding its fixture
   library and exercises dependencies available only through `R_LIBS_USER`.
 - Fast CI pins pytest 8.4.2, loads A2 options before parsing, and supplies the

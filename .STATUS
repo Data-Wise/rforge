@@ -1,3 +1,13 @@
+# PR #113 fast-CI scope repair — 2026-10-29
+# Branch pushed and PR opened to dev at af7404f. The embedded unconditional A2
+# release call unexpectedly started expensive jobs in run 40989630575; the run
+# and both platform jobs are confirmed cancelled, with no acceptance claimed.
+# Guard A2 platform evidence to main refs/main-targeting PRs; five trigger cases
+# protect fast-only dev PR/push behavior. Fast CI will rerun on the repaired head.
+# Local scope checks: 16 passed; structural gates 47/47; strict MkDocs passed;
+# no new Markdown diagnostics. Full local lint-repair evidence is recorded below.
+# No merge, plugin installation, release, or deployment authorized/performed.
+
 # Lint-skill review repair — 2026-10-29 (local only)
 # Fixed P2: prepend fixture R_LIBS while preserving effective dependency libraries;
 # assert fixture selection and exercise default/user-library-only environments.

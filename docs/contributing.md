@@ -50,6 +50,9 @@ The local and CI full-suite command lists A2 first so pytest 8 registers its
 options before parsing. Pytest is pinned to 8.4.2 because the existing A2 manifest
 records its parameter identifiers; pytest 9 changes them. `PYTHONPATH` lets replay
 subprocesses import the checkout. This does not refresh frozen release evidence.
+Ordinary dev PRs and dev pushes run fast CI only. The embedded locked-platform
+release job runs on `main` or PRs targeting `main`; explicit A2 evidence workflows
+remain separate release actions.
 
 ## What makes a good PR
 
