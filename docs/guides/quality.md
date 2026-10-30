@@ -49,6 +49,22 @@ therefore recommend-only via the orchestrator (never auto-run).
 (`object_name_linter`, unused variables, etc.). Read-only — it never edits your code; pair
 it with `r:style` to auto-fix the subset that's mechanically fixable.
 
+### Match the CI environment
+
+Run package lint in a fresh R process without `devtools::load_all()` or attaching
+testthat first. Match the workflow's `.lintr`, startup files and R library. When
+CI installs the current package, establish that the selected installed namespace
+comes from the source ref being linted; version equality alone is insufficient.
+Record R/lintr versions, `.libPaths()` and installed package path/version. Without
+that evidence, report local findings with CI parity unverified. Do not install
+packages implicitly.
+
+A helper outside `test_that()` can need `testthat::expect_true(...)`; a loaded
+session may hide the missing namespace. A stale installed package can produce
+unrelated missing-name findings. Fix the namespace or environment rather than
+suppressing `object_usage_linter`. Inspect findings and missing-engine/messages
+fields: process exit zero alone does not prove a clean scan.
+
 This is the **only quality command with diff-aware flags.** With `--changed` it scopes the
 run to the package(s) you touched on this branch and tags each lint `[introduced]` vs
 `[pre-existing]` via a merge-base baseline run. The depth of that behavior (the second

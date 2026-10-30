@@ -45,6 +45,25 @@ Run `lintr::lint_package()` (read-only).
 `lintr` is optional — if `engine_missing` includes `lintr`, report 🟡 + hint.
 
 ## Process
+
+### Match the CI environment
+
+Use a fresh R process without `devtools::load_all()` or attaching testthat first.
+Inspect the project's lint workflow, `.lintr`, R startup configuration and
+effective `.libPaths()`. If CI installs the current package, use an installed
+copy tied to the source ref being linted; matching versions alone are not proof.
+Record R/lintr versions and the installed package path/version. A stale installed
+namespace can produce unrelated missing-name findings. If installation provenance
+or environment parity is unknown, report local findings with CI parity unverified.
+Do not install packages without authorization.
+
+The engine starts a separate Rscript process, inherits its library environment,
+and honors R startup files. Verify those files do not preload development code.
+A loaded local lint can hide an unqualified assertion in a helper outside
+`test_that()`; use `testthat::expect_true(...)` rather than attaching testthat or
+suppressing `object_usage_linter`. A zero process exit or zero lint count with a
+missing engine is not a passing scan; inspect the envelope and messages.
+
 ```bash
 python3 -m lib.rcmd --kind lint --path "<path>"
 

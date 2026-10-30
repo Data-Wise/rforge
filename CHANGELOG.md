@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Source-only Codex adapter 0.2.0 adds `rforge-lint`, reusing the existing lint
+  engine with fresh-process, installed-source and CI-environment evidence. No
+  engine or Claude command-surface change; installation and fresh-session
+  verification remain separate.
+
+### Changed
+
+- Limit embedded A2 platform evidence to `main` and PRs targeting `main`, keeping
+  expensive release runs out of ordinary dev CI.
+- The lint regression retains dependency libraries when adding its fixture
+  library and exercises dependencies available only through `R_LIBS_USER`.
+- Fast CI pins pytest 8.4.2, loads A2 options before parsing, and supplies the
+  checkout on `PYTHONPATH`; the frozen A2 manifests are unchanged.
+- Lint command and quality guide distinguish CI parity from loaded-session
+  results, diagnose stale installed namespaces, and recommend explicit testthat
+  namespaces in helpers.
+
 ---
 
 ## [2.22.1] - 2026-10-25

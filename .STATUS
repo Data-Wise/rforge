@@ -1,3 +1,46 @@
+# PR #113 fast-CI scope repair — 2026-10-29
+# Branch pushed and PR opened to dev at af7404f. The embedded unconditional A2
+# release call unexpectedly started expensive jobs in run 40989630575; the run
+# and both platform jobs are confirmed cancelled, with no acceptance claimed.
+# Guard A2 platform evidence to main refs/main-targeting PRs; five trigger cases
+# protect fast-only dev PR/push behavior. Fast CI will rerun on the repaired head.
+# Local scope checks: 16 passed; structural gates 47/47; strict MkDocs passed;
+# no new Markdown diagnostics. Full local lint-repair evidence is recorded below.
+# No merge, plugin installation, release, or deployment authorized/performed.
+
+# Lint-skill review repair — 2026-10-29 (local only)
+# Fixed P2: prepend fixture R_LIBS while preserving effective dependency libraries;
+# assert fixture selection and exercise default/user-library-only environments.
+# Red/green: old setup 1 failed/1 passed; repaired setup 2 passed. The exact
+# external user-library-only reproducer also passed both cases after repair.
+# CI now pins pytest 8.4.2, registers A2 options first, and exports PYTHONPATH.
+# Executed the configured workflow command locally on Python 3.12/R 4.6.2:
+# 1605 passed, 5 skipped; all test files included. Hosted matrix not run.
+# Structural gates 47/47; version/reference sync and strict MkDocs passed;
+# no new Markdown diagnostics. Frozen A2 test sources/manifests unchanged.
+# Contributor instructions and CLAUDE/AGENTS mirror match the configured runner.
+# No push, PR, plugin install/reload, hosted CI, publication or deployment.
+# New lint-skill fresh-session discovery/invocation remains unverified.
+
+# Codex CI lint skill — 2026-10-29 (local source only)
+# Branch: codex/ci-lint-skill; base: dev b17c099.
+# Adapter source 0.2.0 adds rforge-lint using the existing lib.rcmd engine.
+# Shared lint guidance covers fresh processes, installed-source/library evidence,
+# explicit testthat helper namespaces and honest CI-parity reporting.
+# Regression: unqualified helper gives 1 object_usage_linter finding; attaching
+# testthat masks it (0); explicit namespace passes fresh-process lint (0).
+# Space-containing package/library paths exercised; dependencies not installed.
+# Validation: new real-R regression passed; structural gates 47/47; manifest and
+# all 3 skill frontmatters valid; strict MkDocs and rendered-text checks passed.
+# Changed Markdown introduces no new diagnostics; version/reference sync passed.
+# Full local pytest: 1604 passed, 5 skipped (Python 3.12, pytest 8.4.2, R 4.6.2).
+# Invocation: PYTHONPATH=<worktree> python -m pytest tests/a2 tests/harness
+# tests/test_*.py -q; 1609 nodes collected. Listing A2 first registers its options
+# before parsing on pytest 8. Pytest 9 changes IDs in the existing A2 manifest.
+# Restricted A2 lifecycle/replay failures cleared with process/local-server access.
+# No push, PR, publication, installation/reload, deployment or hosted CI run.
+# Fresh-session discovery/invocation of the new skill remains unverified.
+
 # PR #95 conflict reconciliation — 2026-10-22
 # Incorporated dev d2f9e58 into the feature branch; dev/main remain unchanged.
 # Retained both status histories and dev's updated Codex navigation/setup guidance.
