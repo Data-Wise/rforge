@@ -1,3 +1,16 @@
+# PR #113 merged to dev — 2026-10-29
+# Squash merge: 5472c3687fcdb7fb3fc7d24590c5ce62b4371fd7.
+# Reviewed head 76043b8: all six fast checks passed in run 40990020016;
+# each Python matrix job reported 1553 passed, 62 prerequisite-dependent skips.
+# Independent review reran real-R lint/CI guard cases (7 passed) and release/CI
+# scope cases (16 passed). No blocking findings; fresh-session lint unverified.
+# Earlier expensive run 40989630575 was cancelled; repaired A2 job skipped.
+# Post-merge dev fast run 40990874885 started; its final result is separate.
+# Local dev synchronized; merged local/remote feature branch and worktree removed.
+# Unrelated untracked .codex/ preserved. No plugin installation/reload, release,
+# main promotion or deployment. Expensive CI remains reserved for main-bound work.
+# Earlier entries below record historical preparation stages, not current state.
+
 # PR #113 fast-CI scope repair — 2026-10-29
 # Branch pushed and PR opened to dev at af7404f. The embedded unconditional A2
 # release call unexpectedly started expensive jobs in run 40989630575; the run
