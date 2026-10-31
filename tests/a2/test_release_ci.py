@@ -5,7 +5,7 @@ from .test_release_verifier import v
 
 
 def records():
-    platforms=[{'platform':p,'candidate_sha':'sha','uploaded':True,'retrieved':True,'verified':True} for p in ('ubuntu-24.04','macos-14')]
+    platforms=[{'platform':p,'candidate_sha':'sha','uploaded':True,'retrieved':True,'verified':True} for p in ('ubuntu-24.04','macos-15')]
     observations={name:{'candidate_sha':'sha','status':'passed','provenance':'actual completed observation'} for name in ('live_smoke','package_triage','full_gates','rendered_review','adversarial_review','requirement_mapping')}
     return platforms,observations
 
