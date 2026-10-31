@@ -1,3 +1,11 @@
+# Dependabot base — 2026-10-31
+# #109 merged into dev (044ee45; dev CI green). dependabot.yml target-branch: dev (bb4a8c5)
+# takes effect only after the next dev->main release: dependabot reads the default
+# branch's config. Until then dependabot PRs open against main; retarget each to dev by hand.
+# #110 recreated (same number, base main, branch cut from main without the pytest pin),
+# retargeted to dev and held; its CI results predate the pin and the macos-14 migration
+# (#115) and are not evidence. actions/download-artifact@v8 remains unexercised.
+
 # A2 workflow pin + macos-14 retirement — 2026-10-31
 # a2-release run 41221084359 failed on ubuntu: unpinned pytest resolved 9.2.0 and broke
 # manifest node IDs (test_manifest_nodes_are_exactly_the_collection). Pinned pytest==8.4.2
