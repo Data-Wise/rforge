@@ -13,5 +13,5 @@
     "ubuntu-24.04",
     "macos-15"
   ],
-  "provenance": "Observed local installed R versions 2026-10-12; both-platform provisioning and route compatibility pending"
+  "provenance": "Observed local installed R versions 2026-10-12; both-platform provisioning and route compatibility pending; 2026-10-31 macos-15 (macos-15-arm64) probe run 41230922650 provisioned R 4.6.1 and passed 679/680 (one failure was the intentional matrix-guard edit), which is not acceptance evidence"
 }
