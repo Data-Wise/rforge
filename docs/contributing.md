@@ -42,7 +42,7 @@ pip install 'pytest==8.4.2' pyyaml mkdocs-material
 A2 acceptance jobs select the latest stable Python 3 (`3.x`, checking for the
 latest release and excluding prereleases). Each artifact records the exact
 interpreter used. The R and fixture dependency versions remain locked in
-`tests/a2/fixture-lock.json`; actual Ubuntu 24.04 and macOS 14 evidence is still
+`tests/a2/fixture-lock.json`; actual Ubuntu 24.04 and macOS 15 evidence is still
 required. Local compatibility tests on another supported Python version do not
 replace those platform runs.
 
@@ -50,6 +50,15 @@ The local and CI full-suite command lists A2 first so pytest 8 registers its
 options before parsing. Pytest is pinned to 8.4.2 because the existing A2 manifest
 records its parameter identifiers; pytest 9 changes them. `PYTHONPATH` lets replay
 subprocesses import the checkout. This does not refresh frozen release evidence.
+The release gate's own command, `python -m pytest tests/ -q -p no:cacheprovider`,
+also works under pytest 8.4.2 because `--a2-release` is registered in
+`tests/conftest.py`.
+
+Run A2 collection and `scripts/refresh_a2_manifest.py` with `PYTEST_ADDOPTS`
+unset (`env -u PYTEST_ADDOPTS ...`). A shell that sets `-q` there turns the
+collection command's `-q` into `-qq`, which prints per-file counts instead of node
+IDs; the refresh tool then reads "nothing collected" and drops every manifest node.
+Check its `dropped N, added N` line and revert on a surprise.
 Ordinary dev PRs and dev pushes run fast CI only. The embedded locked-platform
 release job runs on `main` or PRs targeting `main`; explicit A2 evidence workflows
 remain separate release actions.
