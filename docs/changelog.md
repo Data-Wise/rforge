@@ -7,6 +7,16 @@ The full changelog lives in the repository:
 
 ---
 
+## 2.22.2 — 2026-10-31
+
+The A2 release gate now requires `ubuntu-24.04` and `macos-15`, because GitHub
+retires the macOS 14 runner image on 2026-11-02. `pytest tests/`, the gate's
+required command, works under the pinned pytest 8.4.2 again, and the artifact
+actions moved to `upload-artifact` 7 and `download-artifact` 8. The source-only
+Codex adapter 0.2.0 adds `rforge-lint`. No command-surface change.
+
+---
+
 ## 2.22.1 — 2026-10-25
 
 `/rforge:docs:check --run-examples` now compares documented whole numbers of up

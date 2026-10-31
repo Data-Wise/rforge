@@ -23,7 +23,7 @@ jobs:
           python-version: '3.x'
           check-latest: true
           allow-prereleases: false
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: a2-release-evidence-*
           path: retrieved-a2-evidence
@@ -38,7 +38,7 @@ jobs:
         run: |
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$A2_EVIDENCE_RUN" > producer-run.json
           python scripts/verify_a2_producer_run.py --run producer-run.json --candidate-sha "$GITHUB_SHA" --run-id "$A2_EVIDENCE_RUN"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: a2-acceptance-evidence
           run-id: ${{ inputs.acceptance-evidence-run }}

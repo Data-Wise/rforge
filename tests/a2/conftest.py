@@ -27,10 +27,6 @@ R_FUNCTIONS = {
 }
 
 
-def pytest_addoption(parser):
-    parser.addoption('--a2-release', action='store_true', help='Require the locked A2 R runtime; skips cannot satisfy release evidence.')
-
-
 def runtime():
     r=shutil.which('Rscript')
     if not r:return None

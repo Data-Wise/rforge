@@ -10,15 +10,22 @@ Self-contained R package analysis for Claude Code. As of v1.3.0 the plugin is fu
 
 ## Codex personal plugin
 
-The native `rforge-openai` adapter 0.1.1 provides two skills:
-`$rforge-check` for package validation and `$rforge-docs-check` for static
-README/vignette API audits. Both reuse the Rforge engines and have been verified
-in fresh sessions on isolated medfit copies. The adapter is integrated on `dev`
+The source `rforge-openai` adapter 0.2.0 provides three skills:
+`$rforge-check` for package validation, `$rforge-docs-check` for static
+README/vignette API audits, and `$rforge-lint` for CI-aware package lint.
+All reuse the existing Rforge engines. Package/docs skills were verified in
+fresh sessions on isolated medfit copies; the new lint skill still needs
+installation and fresh-session discovery. The original adapter was integrated
+on `dev`
 ([PR #92](https://github.com/Data-Wise/rforge/pull/92)); it is not a published
 adapter release or a port of the Claude command catalog and hooks.
 
 Start with the [Codex installation and checks guide](docs/guides/codex-checks.md). Claude
 marketplace and Homebrew installation below do not install these Codex skills.
+
+## What's new in v2.22.2
+
+- 🍎 **The A2 release gate moves from `macos-14` to `macos-15`.** GitHub retires the macOS 14 runner image on 2026-11-02, so the gate now requires `ubuntu-24.04` and `macos-15`. `pytest tests/`, the gate's required command, works under the pinned pytest 8.4.2 again, and the artifact actions moved to `upload-artifact` 7 and `download-artifact` 8. The source-only Codex adapter 0.2.0 adds `rforge-lint`. No command-surface change.
 
 ## What's new in v2.22.1
 
@@ -459,6 +466,6 @@ MIT
 
 ---
 
-**Version:** 2.22.1
+**Version:** 2.22.2
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+

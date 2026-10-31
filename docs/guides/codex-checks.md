@@ -4,8 +4,8 @@ See [Check evidence and approval decisions](evidence-and-approval.md) to separat
 technical check outcomes, unresolved evidence and owner authorization.
 
 !!! tip "Personal pilot"
-    Two focused skills reuse the local Rforge checkout. The full Claude command
-    catalog and its hooks are not imported.
+    Three focused source skills reuse the local Rforge checkout. The full Claude
+    command catalog and its hooks are not imported.
 
 ## Package checks
 
@@ -35,17 +35,34 @@ New-export coverage requires `--since REF`; without a chosen comparison ref,
 that component is omitted and must be reported separately from signature coverage.
 It does not execute examples or build a site.
 
+## Package lint and CI parity
+
+Ask `$rforge-lint` to lint an absolute package path. It uses a separate R process
+without preloading development code or attaching testthat. Inspect the lint CI
+workflow and startup files; match its linters, R/lintr versions and library.
+If CI installs the current package, require an install receipt tied to the source
+ref. Matching version strings alone cannot establish the installed source.
+Missing prerequisites mean unavailable; unknown provenance means local findings
+with CI parity unverified. Installation requires separate authorization.
+
+Helpers outside `test_that()` should qualify assertions such as
+`testthat::expect_true(...)`. A loaded development session can hide this missing
+name, while an old installed namespace can create unrelated diagnostics.
+Read the lint findings and missing-engine/messages fields, not only exit zero.
+See [quality commands](quality.md#match-the-ci-environment) for the shared guidance.
+The new skill's installation and fresh-session invocation remain separate gates.
+
 ## Setup and first use
 
-1. Use a durable checkout of `dev` containing PR #92. Review the two skills.
+1. Use a reviewed checkout containing the desired adapter. Review all skill instructions.
 2. In Codex's local marketplace controls, register the checkout's `openai`
    directory (the catalog file is `openai/.agents/plugins/marketplace.json`).
 3. Install and enable `rforge-openai`, then start a fresh Codex session.
-4. Confirm `$rforge-check` and `$rforge-docs-check` are discoverable. Run the
+4. Confirm `$rforge-check`, `$rforge-docs-check` and `$rforge-lint` are discoverable. Run the
    static audit first, then explicitly request the package check.
 
 The source package is `openai/rforge-openai`; the personal catalog is
-`openai/.agents/plugins/marketplace.json`. Review the two skill instructions,
+`openai/.agents/plugins/marketplace.json`. Review the skill instructions,
 register the local catalog in Codex, install `rforge-openai`, and restart.
 The default engine checkout is `/Users/davood/projects/dev-tools/rforge`;
 point the workflow to another Rforge checkout if needed. Use Python 3.10+.
@@ -58,7 +75,8 @@ plus docaudit's
 containing that integration, rather than a retired verification worktree. See the
 [adapter source on dev](https://github.com/Data-Wise/rforge/tree/dev/openai/rforge-openai). The
 personal local catalog source is `/Users/davood/projects/dev-tools/rforge/openai`.
-Installed adapter 0.1.1 and the engine's Git ref should be reported separately.
+Report the installed adapter version and engine Git ref separately. The new
+source adapter is 0.2.0; editing source does not refresh installed 0.1.1.
 
 Start with `$rforge-docs-check Audit /absolute/path/to/package`.
 Confirm its resolved package and checked-versus-total coverage, then try

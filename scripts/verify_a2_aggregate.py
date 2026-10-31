@@ -17,7 +17,7 @@ def main(argv=None):
     args=parser.parse_args(argv)
     try:
         platforms=[]
-        for platform in ('ubuntu-24.04','macos-14'):
+        for platform in ('ubuntu-24.04','macos-15'):
             file=args.artifacts/('a2-release-evidence-'+platform)/'evidence.json'
             require(file.is_file(),'missing retrieved artifact: '+platform)
             evidence=json.loads(file.read_text())

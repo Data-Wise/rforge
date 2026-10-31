@@ -1,3 +1,109 @@
+# v2.22.2 release prep on dev — 2026-10-31
+# Version bumped to 2.22.2 (package.json, plugin.json, marketplace.json x2, mkdocs.yml via version_sync.py,
+# README, docs/README, CLAUDE.md/AGENTS.md, CHANGELOG [2.22.2], docs/changelog.md) and the version
+# assertion in tests/a2/test_docs.py. Contents: A2 gate on ubuntu-24.04 + macos-15 (#115/#117),
+# pytest tests/ gate fix (#116), pytest==8.4.2 pin, upload-artifact 7 / download-artifact 8, Dependabot
+# target-branch dev, Codex adapter 0.2.0 rforge-lint (#113). 44 commands, no command-surface change.
+# Not released: no release PR, tag, GitHub release or Homebrew sync yet.
+
+# A2 macos-15 migration merged — 2026-10-31 (#115, #116, PR #117)
+# PR #117 squash-merged to dev (8dbd32e); dev CI green. The A2 gate now requires ubuntu-24.04 +
+# macos-15; no macos-14 remains in the matrix, verifiers, required.json or fixture-lock.json (history
+# entries, CHANGELOG and README still name macos-14 as the v2.22.0 acceptance platform). #116 fixed in
+# the same PR: --a2-release registered in tests/conftest.py so pytest tests/ works under pytest 8.4.2.
+# Acceptance on head d71effa: a2-observations 41241520378 (6/6) then a2-release 41244853737 (ubuntu-24.04
+# + macos-15 + aggregate, verified platforms: 2). Not release evidence: the candidate on main needs fresh
+# observations and a2-release at its own SHA. Pending: fix reaches main only with the next dev->main
+# release (macos-14 retires 2026-11-02); retest #110 (download-artifact@v8) after rebasing it onto dev;
+# delete probe/macos-15 and feature/a2-macos-15; macos-15 will itself retire. Supersedes the in-progress
+# entry below. Local A2 runs need env -u PYTEST_ADDOPTS.
+
+# A2 macos-15 migration in progress — 2026-10-31 (#115, #116)
+# SPEC-a2-macos-15-2026-10-31.md and the implementation live on feature/a2-macos-15 (head d71effa,
+# not merged): macos-14 to macos-15 in the matrix, both verifiers, required.json/fixture-lock and two
+# test fixtures; manifest re-hashed (680 nodes, 0 dropped/added). Probe run 41230922650 on
+# macos-15-arm64 passed 679/680 (one intentional matrix-guard failure), not acceptance evidence.
+# Local gate on d71effa: pytest tests/ exit 0, 1610 passed, 5 skipped; test-all.sh 47/47.
+# Attestation attempt a2-observations 41237353606 (53d633f): 5/6 observations passed; full_gates
+# failed on a pre-existing bug, issue #116: pytest tests/ under pytest 8.4.2 hits "no option named
+# a2_release" (option registered in tests/a2/conftest.py too late). Fixed on the branch (3bf81cf) by
+# registering --a2-release in tests/conftest.py. Still pending: reviewer sign-off on the delta, a
+# fresh a2-observations on the final SHA, then a2-release. Local runs need env -u PYTEST_ADDOPTS.
+
+# Dependabot base — 2026-10-31
+# #109 merged into dev (044ee45; dev CI green). dependabot.yml target-branch: dev (bb4a8c5)
+# takes effect only after the next dev->main release: dependabot reads the default
+# branch's config. Until then dependabot PRs open against main; retarget each to dev by hand.
+# #110 recreated (same number, base main, branch cut from main without the pytest pin),
+# retargeted to dev and held; its CI results predate the pin and the macos-14 migration
+# (#115) and are not evidence. actions/download-artifact@v8 remains unexercised.
+
+# A2 workflow pin + macos-14 retirement — 2026-10-31
+# a2-release run 41221084359 failed on ubuntu: unpinned pytest resolved 9.2.0 and broke
+# manifest node IDs (test_manifest_nodes_are_exactly_the_collection). Pinned pytest==8.4.2
+# in a2-platform.yml and a2-observations.yml (1acda3e, matches ci.yml); run 41222612918
+# from dev: ubuntu-24.04 green. macos-14 jobs cancelled by a scheduled runner-image
+# brownout; the image retires 2026-11-02 and the A2 gate hard-requires macos-14
+# (verify_a2_aggregate.py, verify_a2_release.py, required.json, fixture-lock.json).
+# Migration tracked in issue #115. Aggregate and actions/download-artifact@v8 (PR #110)
+# remain unexercised; #110 held. Dependabot #109/#110 were based on main; #109 retargeted to dev.
+
+# PR #113 merged to dev — 2026-10-29
+# Squash merge: 5472c3687fcdb7fb3fc7d24590c5ce62b4371fd7.
+# Reviewed head 76043b8: all six fast checks passed in run 40990020016;
+# each Python matrix job reported 1553 passed, 62 prerequisite-dependent skips.
+# Independent review reran real-R lint/CI guard cases (7 passed) and release/CI
+# scope cases (16 passed). No blocking findings; fresh-session lint unverified.
+# Earlier expensive run 40989630575 was cancelled; repaired A2 job skipped.
+# Post-merge dev fast run 40990874885 started; its final result is separate.
+# Local dev synchronized; merged local/remote feature branch and worktree removed.
+# Unrelated untracked .codex/ preserved. No plugin installation/reload, release,
+# main promotion or deployment. Expensive CI remains reserved for main-bound work.
+# Earlier entries below record historical preparation stages, not current state.
+
+# PR #113 fast-CI scope repair — 2026-10-29
+# Branch pushed and PR opened to dev at af7404f. The embedded unconditional A2
+# release call unexpectedly started expensive jobs in run 40989630575; the run
+# and both platform jobs are confirmed cancelled, with no acceptance claimed.
+# Guard A2 platform evidence to main refs/main-targeting PRs; five trigger cases
+# protect fast-only dev PR/push behavior. Fast CI will rerun on the repaired head.
+# Local scope checks: 16 passed; structural gates 47/47; strict MkDocs passed;
+# no new Markdown diagnostics. Full local lint-repair evidence is recorded below.
+# No merge, plugin installation, release, or deployment authorized/performed.
+
+# Lint-skill review repair — 2026-10-29 (local only)
+# Fixed P2: prepend fixture R_LIBS while preserving effective dependency libraries;
+# assert fixture selection and exercise default/user-library-only environments.
+# Red/green: old setup 1 failed/1 passed; repaired setup 2 passed. The exact
+# external user-library-only reproducer also passed both cases after repair.
+# CI now pins pytest 8.4.2, registers A2 options first, and exports PYTHONPATH.
+# Executed the configured workflow command locally on Python 3.12/R 4.6.2:
+# 1605 passed, 5 skipped; all test files included. Hosted matrix not run.
+# Structural gates 47/47; version/reference sync and strict MkDocs passed;
+# no new Markdown diagnostics. Frozen A2 test sources/manifests unchanged.
+# Contributor instructions and CLAUDE/AGENTS mirror match the configured runner.
+# No push, PR, plugin install/reload, hosted CI, publication or deployment.
+# New lint-skill fresh-session discovery/invocation remains unverified.
+
+# Codex CI lint skill — 2026-10-29 (local source only)
+# Branch: codex/ci-lint-skill; base: dev b17c099.
+# Adapter source 0.2.0 adds rforge-lint using the existing lib.rcmd engine.
+# Shared lint guidance covers fresh processes, installed-source/library evidence,
+# explicit testthat helper namespaces and honest CI-parity reporting.
+# Regression: unqualified helper gives 1 object_usage_linter finding; attaching
+# testthat masks it (0); explicit namespace passes fresh-process lint (0).
+# Space-containing package/library paths exercised; dependencies not installed.
+# Validation: new real-R regression passed; structural gates 47/47; manifest and
+# all 3 skill frontmatters valid; strict MkDocs and rendered-text checks passed.
+# Changed Markdown introduces no new diagnostics; version/reference sync passed.
+# Full local pytest: 1604 passed, 5 skipped (Python 3.12, pytest 8.4.2, R 4.6.2).
+# Invocation: PYTHONPATH=<worktree> python -m pytest tests/a2 tests/harness
+# tests/test_*.py -q; 1609 nodes collected. Listing A2 first registers its options
+# before parsing on pytest 8. Pytest 9 changes IDs in the existing A2 manifest.
+# Restricted A2 lifecycle/replay failures cleared with process/local-server access.
+# No push, PR, publication, installation/reload, deployment or hosted CI run.
+# Fresh-session discovery/invocation of the new skill remains unverified.
+
 # PR #95 conflict reconciliation — 2026-10-22
 # Incorporated dev d2f9e58 into the feature branch; dev/main remain unchanged.
 # Retained both status histories and dev's updated Codex navigation/setup guidance.
@@ -59,9 +165,9 @@
 # Still pending: fresh-session older/missing-engine handling, variadic-signature coverage.
 
 project: rforge
-updated: 2026-10-24
+updated: 2026-10-31
 status: Active
-in_progress: none. v2.22.0 released (A2 --site/--run-examples). Issue #101 closed: guardian guards tested, accepted limits recorded in COVERAGE-docs-check-a2-2026-10-12.md; integer comparator fix merged (#106, issue #105 closes at release). Post-release macos-14 guardian timing flakes fixed in tests only (64bf438, 80b12b7; dev CI 662/662 on both platforms). Post-release docs merged to dev: PR #95 (evidence vs approval guide, 709d92b) and PR #102 (evidence-bounded verification tutorial section, 32ee189); both unreleased.
+in_progress: v2.22.2 release prep committed on dev (not yet released; see the top entry). v2.22.1 released (exact short-integer comparison, #105/#106; PR #108 merge 6ce4e50; tag v2.22.1; tap PR #246). v2.22.0 released (A2 --site/--run-examples). Issue #101 closed: guardian guards tested, accepted limits recorded in COVERAGE-docs-check-a2-2026-10-12.md; integer comparator fix merged (#106, issue #105 closes at release). Post-release macos-14 guardian timing flakes fixed in tests only (64bf438, 80b12b7; dev CI 662/662 on both platforms). Post-release docs merged to dev: PR #95 (evidence vs approval guide, 709d92b) and PR #102 (evidence-bounded verification tutorial section, 32ee189); both unreleased.
   (1) #84 fix MERGED to dev 2026-10-11 as PR #85 (squash 99b4171; CI 5/5 green). #84 stays
   open until release (a feature→dev merge does not auto-close it). Follow-up PR #86 MERGED (squash f7036b4): a Codex
   adversarial review found #85 stopped /rforge:finish adding `version:` to a .STATUS that lacks one; fixed via
@@ -76,8 +182,8 @@ in_progress: none. v2.22.0 released (A2 --site/--run-examples). Issue #101 close
   review is attested (rounds 1-4 reviewed 661f9b5; 87525d4 differs only by the output-limit bound 15s->45s + manifest hash, delta_note
   in the record); live smoke supported-site is r-hub/cranlogs only (no Data-Wise/tidyverse package is checkable by --site).
   Planning files stay at repo root (tests/a2/requirements.json and scripts/verify_a2_release.py reference them).
-next: batch v2.22.1 (integer comparator, #105) with the next change; open low-priority candidates in CLAUDE.md Roadmap.
-version: 2.22.1 (release PR pending; v2.22.0 tag d36cee7)
+next: cut v2.22.2 (dev to main release PR, merge, tag, GitHub release, Homebrew tap and manifest sync); open low-priority candidates in CLAUDE.md Roadmap.
+version: 2.22.2 (prepared on dev 2026-10-31, NOT released; last release v2.22.1 2026-10-25, on main 6ce4e50)
 last_release: 2026-10-25 v2.22.0 (minor, 44 commands, no surface change; PR #100 dev→main merge d36cee7; tag v2.22.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.22.0; tap PR #245 merge 699b59a; brew audit --strict clean, 2.22.0 installed). Prior: 2026-10-11 v2.21.0 (minor, 44 commands, no surface change — PR #91 dev→main merge 7387a05; tag v2.21.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.21.0. Ships /rforge:docs:check content audit (lib.docaudit, A1), tests/harness, #84 fix (#85/#86), docs gap-fill (#89/#90). Gates: test-all 47/47, pytest 899+4 skipped, CI green on main (RForge CI + Deploy Documentation). Tap Data-Wise/homebrew-tap#244 squash 09bc9c3 — formula+manifest → v2.21.0 sha256 f376d0da…, stale revision dropped, generate.py --diff IDENTICAL; brew audit by path unavailable. Aggregator claude-plugins#74 auto-merged. Pending: user runs `brew upgrade rforge`.)
 last_release_prior_v2_20_1: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
   9d0b01a; tag v2.20.1; release https://github.com/Data-Wise/rforge/releases/tag/v2.20.1. Ships

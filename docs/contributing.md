@@ -29,21 +29,39 @@ git worktree add ~/.git-worktrees/rforge/feature-<name> -b feature/<name> dev
 cd ~/.git-worktrees/rforge/feature-<name>
 ```
 
-All `lib/` modules are pure-Python (stdlib-only) — no R, npm, or MCP server
-required for development.
+Analysis modules are pure Python; R-runner integration tests additionally use R
+and preinstalled R dependencies. Missing R prerequisites skip those optional
+local tests; they are never installed by the tests.
 The test gates need three dev packages (`tests/test-all.sh` warns up front
 when any is missing):
 
 ```zsh
-pip install pytest pyyaml mkdocs-material
+pip install 'pytest==8.4.2' pyyaml mkdocs-material
 ```
 
 A2 acceptance jobs select the latest stable Python 3 (`3.x`, checking for the
 latest release and excluding prereleases). Each artifact records the exact
 interpreter used. The R and fixture dependency versions remain locked in
-`tests/a2/fixture-lock.json`; actual Ubuntu 24.04 and macOS 14 evidence is still
+`tests/a2/fixture-lock.json`; actual Ubuntu 24.04 and macOS 15 evidence is still
 required. Local compatibility tests on another supported Python version do not
 replace those platform runs.
+
+The local and CI full-suite command lists A2 first so pytest 8 registers its
+options before parsing. Pytest is pinned to 8.4.2 because the existing A2 manifest
+records its parameter identifiers; pytest 9 changes them. `PYTHONPATH` lets replay
+subprocesses import the checkout. This does not refresh frozen release evidence.
+The release gate's own command, `python -m pytest tests/ -q -p no:cacheprovider`,
+also works under pytest 8.4.2 because `--a2-release` is registered in
+`tests/conftest.py`.
+
+Run A2 collection and `scripts/refresh_a2_manifest.py` with `PYTEST_ADDOPTS`
+unset (`env -u PYTEST_ADDOPTS ...`). A shell that sets `-q` there turns the
+collection command's `-q` into `-qq`, which prints per-file counts instead of node
+IDs; the refresh tool then reads "nothing collected" and drops every manifest node.
+Check its `dropped N, added N` line and revert on a surprise.
+Ordinary dev PRs and dev pushes run fast CI only. The embedded locked-platform
+release job runs on `main` or PRs targeting `main`; explicit A2 evidence workflows
+remain separate release actions.
 
 ## What makes a good PR
 
@@ -51,7 +69,7 @@ replace those platform runs.
    three.
 2. **Tests pass.** Before opening:
    ```zsh
-   python3 -m pytest tests/
+   PYTHONPATH="$PWD" python3 -m pytest tests/a2 tests/harness tests/test_*.py
    bash tests/test-all.sh
    ```
 3. **Docs updated.** If you add a command flag, update the command file,
@@ -90,13 +108,14 @@ replace those platform runs.
 5. Run `python3 scripts/version_sync.py` to propagate the count.
 6. Add tests in `tests/`.
 7. Update `docs/commands.md`, `docs/REFCARD.md`, and the relevant guide.
-8. Verify: `bash tests/test-all.sh && python3 -m pytest tests/`
+8. Verify with the full-suite command in [Testing](#testing), then
+   `bash tests/test-all.sh`.
 
 ## Testing
 
 ```zsh
 # All Python unit tests
-python3 -m pytest tests/ -v
+PYTHONPATH="$PWD" python3 -m pytest tests/a2 tests/harness tests/test_*.py -v
 
 # Full suite (47 checks)
 bash tests/test-all.sh

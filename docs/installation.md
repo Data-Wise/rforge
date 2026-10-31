@@ -11,10 +11,11 @@
 ## Codex personal plugin
 
 For Codex, use the [Codex installation and checks guide](guides/codex-checks.md).
-Register the local catalog from a durable checkout of `dev` containing PR #92,
-install `rforge-openai`, then restart and verify both skill names. Adapter 0.1.1
-is separate from the Claude plugin version. The Claude methods below do not
-install the two native Codex skills.
+Register the local catalog from a reviewed checkout containing the desired
+adapter, install `rforge-openai`, then restart and verify its skill names.
+Source adapter 0.2.0 adds `$rforge-lint` to the two 0.1.1 skills; it is separate
+from the Claude plugin version. Source changes do not update an installed copy.
+The Claude methods below do not install the native Codex skills.
 
 ## Pick an install method
 

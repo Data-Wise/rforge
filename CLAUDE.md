@@ -20,7 +20,9 @@ variadic-signature limits and an unexplained restricted-session check terminatio
 remain; see the spec for evidence and unexercised edge cases.
 Do not expand this adapter into website generation or a full Claude command port.
 
-## Current state (2026-10-25)
+## Current state (2026-10-31)
+
+**v2.22.2 (2026-10-31, patch, 44 commands, no command-surface change):** the A2 release gate requires `ubuntu-24.04` and `macos-15` (GitHub retires the macOS 14 image 2026-11-02; #115/#117), `pytest tests/` works under pytest 8.4.2 (#116), A2 workflows pin `pytest==8.4.2`, `upload-artifact` 7 and `download-artifact` 8, Dependabot targets `dev`, and the source-only Codex adapter 0.2.0 adds `rforge-lint` (#113). Records: `.STATUS`, CHANGELOG `[2.22.2]`.
 
 **v2.22.1 (2026-10-25, patch, 44 commands, no command-surface change):** `--run-examples` compares documented bare integers of up to six digits exactly (#105/#106); decimals, scientific notation and longer integers keep the spec tolerance. Records: `.STATUS`, CHANGELOG `[2.22.1]`.
 
@@ -45,6 +47,7 @@ Do not expand this adapter into website generation or a full Claude command port
 
 ### Release history — architecture deltas only (release mechanics live in CHANGELOG + git)
 
+- **v2.22.2** — A2 gate on `ubuntu-24.04` + `macos-15` (#115/#117), `pytest tests/` gate fix (#116), artifact actions 7/8, Codex adapter 0.2.0 `rforge-lint` (#113). 44 commands.
 - **v2.22.1** — exact short-integer comparison in `--run-examples` (#105/#106). 44 commands.
 - **v2.22.0** — `/rforge:docs:check --site`/`--run-examples` (A2) with candidate-bound two-platform acceptance (PR #99). 44 commands.
 - **v2.21.0** — `/rforge:docs:check` content audit (`lib/docaudit.py`, A1) + dev-only replay harness `tests/harness/`; `/rforge:finish` version-drift fix (#84/#85/#86); docs gap-fill (#89/#90). 44 commands, 47 `test-all.sh` checks.
@@ -160,8 +163,14 @@ The `arguments:` array is the machine-readable spec; the `## Usage` body is the 
 Both must pass before any PR:
 
 - `bash tests/test-all.sh` — **47 checks** (versions, hook compile + behavior, manifests parse, skills valid, lib pytest, lib CLI smoke incl. `rcmd`/`cranlint`/`runiverse`/`s7review`/`changed`, lib reference docs in sync, **version/count sync (`version_sync.py --check`)**, **AGENTS.md body mirrors CLAUDE.md**, **commands.md sync (`_check_commands_doc.py`)**, **mkdocs nav integrity (every nav file exists + no orphaned guide/tutorial/reference page)**, rename stubs/targets, command-name uniqueness, migration recipe E2E, **agent guards: no `rforge_` MCP refs / orchestrator frontmatter / real `lib.rcmd` engines**)
-- `python3 -m pytest tests/` — **1500+ test cases** (discovery, deps, status, init, rcmd, cranlint, deps_sync, ghrelease, runiverse, s7review, changed, scaffold, **version_sync**)
-- **Python ≥3.10 environment:** system `python3` is 3.9 and fails 3 of 47 `test-all.sh` checks (pytest, mkdocs parse, nav) from environment alone. Use a venv with pytest, pyyaml, mkdocs-material, mkdocs-macros-plugin, pillow and cairosvg (`uv venv ~/.venvs/rforge-dev --python 3.12`). `test-all.sh`'s `lib_pytest` runs only 4 named test files; the rest run under `pytest tests/` in CI.
+- `PYTHONPATH="$PWD" python3 -m pytest tests/a2 tests/harness tests/test_*.py -q` — **1500+ test cases** (discovery, deps, status, init, rcmd, cranlint, deps_sync, ghrelease, runiverse, s7review, changed, scaffold, **version_sync**)
+- **Python ≥3.10 environment:** system `python3` is 3.9 and fails 3 of 47
+  `test-all.sh` checks (pytest, mkdocs parse, nav) from environment alone. Use a
+  venv with pytest, pyyaml, mkdocs-material, mkdocs-macros-plugin, pillow and
+  cairosvg (`uv venv ~/.venvs/rforge-dev --python 3.12`). `test-all.sh`'s
+  `lib_pytest` runs only 4 named test files; the full suite uses the A2-first
+  command above in CI. CI pins pytest 8.4.2 to preserve existing A2 manifest
+  node IDs and supplies the checkout on PYTHONPATH.
 
 ## Homebrew tap quirks (rforge-specific)
 
