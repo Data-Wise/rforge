@@ -45,7 +45,7 @@ jobs:
         run: python scripts/run_a2_release.py --output a2-release-evidence
       - name: Upload evidence including failure records
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: a2-release-evidence-${{ matrix.os }}
           path: a2-release-evidence/
