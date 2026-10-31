@@ -1,3 +1,15 @@
+# A2 macos-15 migration in progress — 2026-10-31 (#115, #116)
+# SPEC-a2-macos-15-2026-10-31.md and the implementation live on feature/a2-macos-15 (head d71effa,
+# not merged): macos-14 to macos-15 in the matrix, both verifiers, required.json/fixture-lock and two
+# test fixtures; manifest re-hashed (680 nodes, 0 dropped/added). Probe run 41230922650 on
+# macos-15-arm64 passed 679/680 (one intentional matrix-guard failure), not acceptance evidence.
+# Local gate on d71effa: pytest tests/ exit 0, 1610 passed, 5 skipped; test-all.sh 47/47.
+# Attestation attempt a2-observations 41237353606 (53d633f): 5/6 observations passed; full_gates
+# failed on a pre-existing bug, issue #116: pytest tests/ under pytest 8.4.2 hits "no option named
+# a2_release" (option registered in tests/a2/conftest.py too late). Fixed on the branch (3bf81cf) by
+# registering --a2-release in tests/conftest.py. Still pending: reviewer sign-off on the delta, a
+# fresh a2-observations on the final SHA, then a2-release. Local runs need env -u PYTEST_ADDOPTS.
+
 # Dependabot base — 2026-10-31
 # #109 merged into dev (044ee45; dev CI green). dependabot.yml target-branch: dev (bb4a8c5)
 # takes effect only after the next dev->main release: dependabot reads the default
