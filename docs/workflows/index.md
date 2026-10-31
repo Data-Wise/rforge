@@ -214,6 +214,36 @@ flowchart LR
 
 → [Fix a docs:check finding](../tutorials/fix-a-docs-check-finding.md) (~10 min) · [Docs audit guide](../guides/docs-audit.md)
 
+## 🧹 Tidy conventions
+
+A "how tidy am I?" report. Every stage is advisory and never blocks.
+
+```mermaid
+flowchart LR
+    A["/rforge:r:tidy<br/>read-only report"] --> B{"status ok?"}
+    B -- "yes" --> Z["done"]
+    B -- "warn" --> C["/rforge:r:tidy --fix<br/>styler + DESCRIPTION rewrite"]
+    C --> D["fix the rest by hand:<br/>roxygen tags, NEWS.md"]
+    D --> A
+```
+
+→ [Tidy a package with r:tidy](../tutorials/tidy-your-package.md) (~10 min)
+
+## 🔗 Dependency reconciliation
+
+Make `DESCRIPTION` match what the code actually uses.
+
+```mermaid
+flowchart LR
+    A["/rforge:r:deps-sync<br/>report only"] --> B{"missing or<br/>misclassified?"}
+    B -- "yes" --> C["/rforge:r:deps-sync --write<br/>applies adds and moves"]
+    C --> D["re-run: only advisory<br/>unused entries remain"]
+    D --> E["review unused by hand<br/>(may be used dynamically)"]
+    B -- "no" --> E
+```
+
+→ [Dependency reconciliation](../tutorials/dependency-reconciliation.md) (~6 min)
+
 ## 🔚 Session boundary
 
 Start a session with a recap; end it by syncing `.STATUS`.
