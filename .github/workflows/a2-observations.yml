@@ -41,7 +41,7 @@ jobs:
       - name: Provision locked fixture dependencies
         run: Rscript --vanilla scripts/provision_a2.R
       - name: Install Python and build dependencies
-        run: python -m pip install pytest pyyaml mkdocs-material mkdocs-macros-plugin pillow cairosvg
+        run: python -m pip install 'pytest==8.4.2' pyyaml mkdocs-material mkdocs-macros-plugin pillow cairosvg
       - name: Clone pinned triage sources and install their R dependencies
         env:
           WORKDIR: ${{ runner.temp }}/a2-work
