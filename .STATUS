@@ -1,3 +1,13 @@
+# A2 workflow pin + macos-14 retirement — 2026-10-31
+# a2-release run 41221084359 failed on ubuntu: unpinned pytest resolved 9.2.0 and broke
+# manifest node IDs (test_manifest_nodes_are_exactly_the_collection). Pinned pytest==8.4.2
+# in a2-platform.yml and a2-observations.yml (1acda3e, matches ci.yml); run 41222612918
+# from dev: ubuntu-24.04 green. macos-14 jobs cancelled by a scheduled runner-image
+# brownout; the image retires 2026-11-02 and the A2 gate hard-requires macos-14
+# (verify_a2_aggregate.py, verify_a2_release.py, required.json, fixture-lock.json).
+# Migration tracked in issue #115. Aggregate and actions/download-artifact@v8 (PR #110)
+# remain unexercised; #110 held. Dependabot #109/#110 were based on main; #109 retargeted to dev.
+
 # PR #113 merged to dev — 2026-10-29
 # Squash merge: 5472c3687fcdb7fb3fc7d24590c5ce62b4371fd7.
 # Reviewed head 76043b8: all six fast checks passed in run 40990020016;
