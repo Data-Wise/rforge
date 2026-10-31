@@ -21,7 +21,9 @@ variadic-signature limits and an unexplained restricted-session check terminatio
 remain; see the spec for evidence and unexercised edge cases.
 Do not expand this adapter into website generation or a full Claude command port.
 
-## Current state (2026-10-25)
+## Current state (2026-10-31)
+
+**v2.22.2 (2026-10-31, patch, 44 commands, no command-surface change):** the A2 release gate requires `ubuntu-24.04` and `macos-15` (GitHub retires the macOS 14 image 2026-11-02; #115/#117), `pytest tests/` works under pytest 8.4.2 (#116), A2 workflows pin `pytest==8.4.2`, `upload-artifact` 7 and `download-artifact` 8, Dependabot targets `dev`, and the source-only Codex adapter 0.2.0 adds `rforge-lint` (#113). Records: `.STATUS`, CHANGELOG `[2.22.2]`.
 
 **v2.22.1 (2026-10-25, patch, 44 commands, no command-surface change):** `--run-examples` compares documented bare integers of up to six digits exactly (#105/#106); decimals, scientific notation and longer integers keep the spec tolerance. Records: `.STATUS`, CHANGELOG `[2.22.1]`.
 
@@ -46,6 +48,7 @@ Do not expand this adapter into website generation or a full Claude command port
 
 ### Release history — architecture deltas only (release mechanics live in CHANGELOG + git)
 
+- **v2.22.2** — A2 gate on `ubuntu-24.04` + `macos-15` (#115/#117), `pytest tests/` gate fix (#116), artifact actions 7/8, Codex adapter 0.2.0 `rforge-lint` (#113). 44 commands.
 - **v2.22.1** — exact short-integer comparison in `--run-examples` (#105/#106). 44 commands.
 - **v2.22.0** — `/rforge:docs:check --site`/`--run-examples` (A2) with candidate-bound two-platform acceptance (PR #99). 44 commands.
 - **v2.21.0** — `/rforge:docs:check` content audit (`lib/docaudit.py`, A1) + dev-only replay harness `tests/harness/`; `/rforge:finish` version-drift fix (#84/#85/#86); docs gap-fill (#89/#90). 44 commands, 47 `test-all.sh` checks.

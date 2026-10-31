@@ -23,6 +23,10 @@ adapter release or a port of the Claude command catalog and hooks.
 Start with the [Codex installation and checks guide](docs/guides/codex-checks.md). Claude
 marketplace and Homebrew installation below do not install these Codex skills.
 
+## What's new in v2.22.2
+
+- 🍎 **The A2 release gate moves from `macos-14` to `macos-15`.** GitHub retires the macOS 14 runner image on 2026-11-02, so the gate now requires `ubuntu-24.04` and `macos-15`. `pytest tests/`, the gate's required command, works under the pinned pytest 8.4.2 again, and the artifact actions moved to `upload-artifact` 7 and `download-artifact` 8. The source-only Codex adapter 0.2.0 adds `rforge-lint`. No command-surface change.
+
 ## What's new in v2.22.1
 
 - 🔢 **`--run-examples` compares short integers exactly.** A documented whole number of up to six digits must match the real output (`[1] 100` against `[1] 101` is now a mismatch). Decimals, scientific notation and longer integers keep their tolerance. See the [Docs audit guide](https://data-wise.github.io/rforge/guides/docs-audit/).
@@ -462,6 +466,6 @@ MIT
 
 ---
 
-**Version:** 2.22.1
+**Version:** 2.22.2
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+

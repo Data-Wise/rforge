@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [2.22.2] - 2026-10-31
+
 ### Added
 
 - Source-only Codex adapter 0.2.0 adds `rforge-lint`, reusing the existing lint
@@ -23,10 +27,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The lint regression retains dependency libraries when adding its fixture
   library and exercises dependencies available only through `R_LIBS_USER`.
 - Fast CI pins pytest 8.4.2, loads A2 options before parsing, and supplies the
-  checkout on `PYTHONPATH`; the frozen A2 manifests are unchanged.
+  checkout on `PYTHONPATH`; that change left the A2 manifest content as it was.
 - Lint command and quality guide distinguish CI parity from loaded-session
   results, diagnose stale installed namespaces, and recommend explicit testthat
   namespaces in helpers.
+- The A2 release gate requires `ubuntu-24.04` and `macos-15` instead of
+  `ubuntu-24.04` and `macos-14`, because GitHub retires the macOS 14 runner image
+  on 2026-11-02 (#115, #117). The platform set stays exactly two, `validate_review`
+  is unchanged, and the v2.22.0 and v2.22.1 acceptance evidence recorded on
+  `macos-14` stays valid.
+- The A2 workflows pin `pytest==8.4.2` like fast CI: an unpinned install resolved
+  pytest 9.2.0, which changes the manifest's parameter IDs.
+- `actions/upload-artifact` 4 to 7 (#109) and `actions/download-artifact` 4 to 8
+  (#118); a throwaway workflow verified the same-run pattern download, the
+  cross-run `run-id` download with its digest check, and an identical two-artifact
+  directory layout.
+- Dependabot targets `dev` (`target-branch`); the setting takes effect once this
+  release reaches `main`, because Dependabot reads the default branch's config.
+
+### Fixed
+
+- `pytest tests/`, the gate command that `verify_a2_release.py` requires, no longer
+  fails under pytest 8.4.2 with `no option named 'a2_release'`: `--a2-release` is
+  registered in `tests/conftest.py` so it exists before `tests/a2/conftest.py`
+  reads it (#116, #117).
 
 ---
 
