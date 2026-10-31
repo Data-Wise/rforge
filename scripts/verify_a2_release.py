@@ -276,7 +276,7 @@ def validate_observation(name, item, *, candidate_sha, evidence_root):
 
 
 def validate_aggregate(platforms, observations, *, candidate_sha, evidence_root=None):
-    require({p.get("platform") for p in platforms} == {"ubuntu-24.04", "macos-14"}, "both actual release platforms required")
+    require({p.get("platform") for p in platforms} == {"ubuntu-24.04", "macos-15"}, "both actual release platforms required")
     require(len(platforms) == 2, "duplicate platform artifacts")
     require(all(p.get("candidate_sha") == candidate_sha and p.get("uploaded") and p.get("retrieved") and p.get("verified") for p in platforms), "missing/failed/stale actual artifact")
     for name in ("live_smoke","package_triage","full_gates","rendered_review","adversarial_review","requirement_mapping"):

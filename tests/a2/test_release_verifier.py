@@ -100,8 +100,8 @@ def test_main_runtime_platform_fixture_binding(tmp_path,capsys,defect):
     for index,execution in enumerate(e['fixture_executions']):
         execution.update(fixture=str(index),source_hash='0'*64)
         expected['fixtures'][str(index)]={'findings':[], 'assertion_ids':execution.get('observed_assertion_ids',[]),'routes':execution.get('observed_routes',[])}
-    lock={'platforms':['macos-14','ubuntu-24.04'],'R':'4.6.1','R_packages':{'evaluate':'1.0.5'}}
-    e.update(R=lock['R'],R_packages=lock['R_packages'],platform='macos-14')
+    lock={'platforms':['macos-15','ubuntu-24.04'],'R':'4.6.1','R_packages':{'evaluate':'1.0.5'}}
+    e.update(R=lock['R'],R_packages=lock['R_packages'],platform='macos-15')
     files={'manifest':m,'requirements':ledger,'expected':expected,'lock':lock}
     for name,data in files.items():(tmp_path/name).write_text(json.dumps(data))
     (tmp_path/'spec').write_text(source);(tmp_path/'inventory').write_text('| F01 / T23 | required |\n')

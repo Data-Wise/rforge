@@ -11,7 +11,7 @@
   },
   "platforms": [
     "ubuntu-24.04",
-    "macos-14"
+    "macos-15"
   ],
   "provenance": "Observed local installed R versions 2026-10-12; both-platform provisioning and route compatibility pending"
 }
