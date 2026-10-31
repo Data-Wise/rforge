@@ -15,6 +15,16 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
 
+def pytest_addoption(parser: pytest.Parser) -> None:
+    # Registered here, not in tests/a2/conftest.py: a subdirectory conftest is not an initial conftest when
+    # `pytest tests/` is the argument, so the option would register too late for its getoption() call.
+    parser.addoption(
+        "--a2-release",
+        action="store_true",
+        help="Require the locked A2 R runtime; skips cannot satisfy release evidence.",
+    )
+
+
 @pytest.fixture
 def make_pkg(tmp_path: Path) -> Callable[..., Path]:
     """Factory: create a minimal R package directory with a DESCRIPTION file.
