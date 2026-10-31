@@ -1,3 +1,15 @@
+# A2 macos-15 migration merged — 2026-10-31 (#115, #116, PR #117)
+# PR #117 squash-merged to dev (8dbd32e); dev CI green. The A2 gate now requires ubuntu-24.04 +
+# macos-15; no macos-14 remains in the matrix, verifiers, required.json or fixture-lock.json (history
+# entries, CHANGELOG and README still name macos-14 as the v2.22.0 acceptance platform). #116 fixed in
+# the same PR: --a2-release registered in tests/conftest.py so pytest tests/ works under pytest 8.4.2.
+# Acceptance on head d71effa: a2-observations 41241520378 (6/6) then a2-release 41244853737 (ubuntu-24.04
+# + macos-15 + aggregate, verified platforms: 2). Not release evidence: the candidate on main needs fresh
+# observations and a2-release at its own SHA. Pending: fix reaches main only with the next dev->main
+# release (macos-14 retires 2026-11-02); retest #110 (download-artifact@v8) after rebasing it onto dev;
+# delete probe/macos-15 and feature/a2-macos-15; macos-15 will itself retire. Supersedes the in-progress
+# entry below. Local A2 runs need env -u PYTEST_ADDOPTS.
+
 # A2 macos-15 migration in progress — 2026-10-31 (#115, #116)
 # SPEC-a2-macos-15-2026-10-31.md and the implementation live on feature/a2-macos-15 (head d71effa,
 # not merged): macos-14 to macos-15 in the matrix, both verifiers, required.json/fixture-lock and two
