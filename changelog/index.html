@@ -2638,6 +2638,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2222-2026-10-31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.22.2 — 2026-10-31
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2221-2026-10-25" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2917,6 +2928,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2222-2026-10-31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.22.2 — 2026-10-31
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2221-2026-10-25" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3154,6 +3176,13 @@
 <p>Release history for the RForge plugin.</p>
 <p>The full changelog lives in the repository:
 <a href="https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md"><code>CHANGELOG.md</code></a>.</p>
+<hr />
+<h2 id="2222-2026-10-31">2.22.2 — 2026-10-31<a class="headerlink" href="#2222-2026-10-31" title="Permanent link">&para;</a></h2>
+<p>The A2 release gate now requires <code>ubuntu-24.04</code> and <code>macos-15</code>, because GitHub
+retires the macOS 14 runner image on 2026-11-02. <code>pytest tests/</code>, the gate's
+required command, works under the pinned pytest 8.4.2 again, and the artifact
+actions moved to <code>upload-artifact</code> 7 and <code>download-artifact</code> 8. The source-only
+Codex adapter 0.2.0 adds <code>rforge-lint</code>. No command-surface change.</p>
 <hr />
 <h2 id="2221-2026-10-25">2.22.1 — 2026-10-25<a class="headerlink" href="#2221-2026-10-25" title="Permanent link">&para;</a></h2>
 <p><code>/rforge:docs:check --run-examples</code> now compares documented whole numbers of up

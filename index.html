@@ -489,15 +489,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-new-in-2221" class="md-nav__link">
+  <a href="#whats-new-in-2222" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's new in 2.22.1
+        What's new in 2.22.2
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="What&#39;s new in 2.22.1">
+    <nav class="md-nav" aria-label="What&#39;s new in 2.22.2">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2905,15 +2905,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-new-in-2221" class="md-nav__link">
+  <a href="#whats-new-in-2222" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's new in 2.22.1
+        What's new in 2.22.2
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="What&#39;s new in 2.22.1">
+    <nav class="md-nav" aria-label="What&#39;s new in 2.22.2">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3061,10 +3061,13 @@
 </div>
 <p>Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python <code>lib/</code> modules handle discovery, dependencies, status, and init. <strong>No MCP server, no Node.js</strong> at runtime. The fast ecosystem commands (analysis, deps, status) are pure Python; the <code>r:*</code> dev-cycle commands and <code>/rforge:thorough</code> shell out to R via <code>lib/rcmd.py</code>.</p>
 <h2 id="codex-personal-plugin">Codex personal plugin<a class="headerlink" href="#codex-personal-plugin" title="Permanent link">&para;</a></h2>
-<p>The native <code>rforge-openai</code> adapter 0.1.1 provides two skills:
-<code>$rforge-check</code> for package validation and <code>$rforge-docs-check</code> for static
-README/vignette API audits. Both reuse the Rforge engines and have been verified
-in fresh sessions on isolated medfit copies. The adapter is integrated on <code>dev</code>
+<p>The source <code>rforge-openai</code> adapter 0.2.0 provides three skills:
+<code>$rforge-check</code> for package validation, <code>$rforge-docs-check</code> for static
+README/vignette API audits, and <code>$rforge-lint</code> for CI-aware package lint.
+All reuse the existing Rforge engines. Package/docs skills were verified in
+fresh sessions on isolated medfit copies; the new lint skill still needs
+installation and fresh-session discovery. The original adapter was integrated
+on <code>dev</code>
 (<a href="https://github.com/Data-Wise/rforge/pull/92">PR #92</a>); it is not a published
 adapter release or a port of the Claude command catalog and hooks.</p>
 <p>Start with the <a href="guides/codex-checks/">Codex installation and checks guide</a>. Claude
@@ -3157,7 +3160,7 @@ wraps the standard R toolchain — it doesn't replace it.</p>
 </li>
 </ul>
 </div>
-<h2 id="whats-new-in-2221">What's new in 2.22.1<a class="headerlink" href="#whats-new-in-2221" title="Permanent link">&para;</a></h2>
+<h2 id="whats-new-in-2222">What's new in 2.22.2<a class="headerlink" href="#whats-new-in-2222" title="Permanent link">&para;</a></h2>
 <ul>
 <li>🐛 <strong><code>.STATUS</code> parsing fixes</strong> — <code>lib.status</code> (behind <code>/rforge:status</code> and <code>/rforge:health</code>)
   reads the <code>key: value</code> frontmatter dialect every mediationverse package uses, and takes

@@ -2927,24 +2927,40 @@
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>git<span class="w"> </span>worktree<span class="w"> </span>add<span class="w"> </span>~/.git-worktrees/rforge/feature-&lt;name&gt;<span class="w"> </span>-b<span class="w"> </span>feature/&lt;name&gt;<span class="w"> </span>dev
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nb">cd</span><span class="w"> </span>~/.git-worktrees/rforge/feature-&lt;name&gt;
 </span></code></pre></div>
-<p>All <code>lib/</code> modules are pure-Python (stdlib-only) — no R, npm, or MCP server
-required for development.
+<p>Analysis modules are pure Python; R-runner integration tests additionally use R
+and preinstalled R dependencies. Missing R prerequisites skip those optional
+local tests; they are never installed by the tests.
 The test gates need three dev packages (<code>tests/test-all.sh</code> warns up front
 when any is missing):</p>
-<div class="language-zsh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>pytest<span class="w"> </span>pyyaml<span class="w"> </span>mkdocs-material
+<div class="language-zsh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">'pytest==8.4.2'</span><span class="w"> </span>pyyaml<span class="w"> </span>mkdocs-material
 </span></code></pre></div>
 <p>A2 acceptance jobs select the latest stable Python 3 (<code>3.x</code>, checking for the
 latest release and excluding prereleases). Each artifact records the exact
 interpreter used. The R and fixture dependency versions remain locked in
-<code>tests/a2/fixture-lock.json</code>; actual Ubuntu 24.04 and macOS 14 evidence is still
+<code>tests/a2/fixture-lock.json</code>; actual Ubuntu 24.04 and macOS 15 evidence is still
 required. Local compatibility tests on another supported Python version do not
 replace those platform runs.</p>
+<p>The local and CI full-suite command lists A2 first so pytest 8 registers its
+options before parsing. Pytest is pinned to 8.4.2 because the existing A2 manifest
+records its parameter identifiers; pytest 9 changes them. <code>PYTHONPATH</code> lets replay
+subprocesses import the checkout. This does not refresh frozen release evidence.
+The release gate's own command, <code>python -m pytest tests/ -q -p no:cacheprovider</code>,
+also works under pytest 8.4.2 because <code>--a2-release</code> is registered in
+<code>tests/conftest.py</code>.</p>
+<p>Run A2 collection and <code>scripts/refresh_a2_manifest.py</code> with <code>PYTEST_ADDOPTS</code>
+unset (<code>env -u PYTEST_ADDOPTS ...</code>). A shell that sets <code>-q</code> there turns the
+collection command's <code>-q</code> into <code>-qq</code>, which prints per-file counts instead of node
+IDs; the refresh tool then reads "nothing collected" and drops every manifest node.
+Check its <code>dropped N, added N</code> line and revert on a surprise.
+Ordinary dev PRs and dev pushes run fast CI only. The embedded locked-platform
+release job runs on <code>main</code> or PRs targeting <code>main</code>; explicit A2 evidence workflows
+remain separate release actions.</p>
 <h2 id="what-makes-a-good-pr">What makes a good PR<a class="headerlink" href="#what-makes-a-good-pr" title="Permanent link">&para;</a></h2>
 <ol>
 <li><strong>One concern per PR.</strong> A bugfix, a feature, or a docs improvement — not all
    three.</li>
 <li><strong>Tests pass.</strong> Before opening:
-   <div class="language-zsh highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/
+   <div class="language-zsh highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PWD</span><span class="s2">"</span><span class="w"> </span>python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/a2<span class="w"> </span>tests/harness<span class="w"> </span>tests/test_*.py
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>bash<span class="w"> </span>tests/test-all.sh
 </span></code></pre></div></li>
 <li><strong>Docs updated.</strong> If you add a command flag, update the command file,
@@ -2980,11 +2996,12 @@ replace those platform runs.</p>
 <li>Run <code>python3 scripts/version_sync.py</code> to propagate the count.</li>
 <li>Add tests in <code>tests/</code>.</li>
 <li>Update <code>docs/commands.md</code>, <code>docs/REFCARD.md</code>, and the relevant guide.</li>
-<li>Verify: <code>bash tests/test-all.sh &amp;&amp; python3 -m pytest tests/</code></li>
+<li>Verify with the full-suite command in <a href="#testing">Testing</a>, then
+   <code>bash tests/test-all.sh</code>.</li>
 </ol>
 <h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
 <div class="language-zsh highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># All Python unit tests</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/<span class="w"> </span>-v
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PWD</span><span class="s2">"</span><span class="w"> </span>python3<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/a2<span class="w"> </span>tests/harness<span class="w"> </span>tests/test_*.py<span class="w"> </span>-v
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Full suite (47 checks)</span>
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>bash<span class="w"> </span>tests/test-all.sh

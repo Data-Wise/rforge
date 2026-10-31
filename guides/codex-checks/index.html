@@ -607,6 +607,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#package-lint-and-ci-parity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Package lint and CI parity
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#setup-and-first-use" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2785,6 +2796,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#package-lint-and-ci-parity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Package lint and CI parity
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#setup-and-first-use" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2847,8 +2869,8 @@
 technical check outcomes, unresolved evidence and owner authorization.</p>
 <div class="admonition tip">
 <p class="admonition-title">Personal pilot</p>
-<p>Two focused skills reuse the local Rforge checkout. The full Claude command
-catalog and its hooks are not imported.</p>
+<p>Three focused source skills reuse the local Rforge checkout. The full Claude
+command catalog and its hooks are not imported.</p>
 </div>
 <h2 id="package-checks">Package checks<a class="headerlink" href="#package-checks" title="Permanent link">&para;</a></h2>
 <p>Ask <code>$rforge-check</code> to check an absolute package path. It runs <code>lib.rcmd</code> from
@@ -2872,17 +2894,31 @@ or ecosystem expansion; an explicit ecosystem request uses <code>--eco</code> in
 New-export coverage requires <code>--since REF</code>; without a chosen comparison ref,
 that component is omitted and must be reported separately from signature coverage.
 It does not execute examples or build a site.</p>
+<h2 id="package-lint-and-ci-parity">Package lint and CI parity<a class="headerlink" href="#package-lint-and-ci-parity" title="Permanent link">&para;</a></h2>
+<p>Ask <code>$rforge-lint</code> to lint an absolute package path. It uses a separate R process
+without preloading development code or attaching testthat. Inspect the lint CI
+workflow and startup files; match its linters, R/lintr versions and library.
+If CI installs the current package, require an install receipt tied to the source
+ref. Matching version strings alone cannot establish the installed source.
+Missing prerequisites mean unavailable; unknown provenance means local findings
+with CI parity unverified. Installation requires separate authorization.</p>
+<p>Helpers outside <code>test_that()</code> should qualify assertions such as
+<code>testthat::expect_true(...)</code>. A loaded development session can hide this missing
+name, while an old installed namespace can create unrelated diagnostics.
+Read the lint findings and missing-engine/messages fields, not only exit zero.
+See <a href="../quality/#match-the-ci-environment">quality commands</a> for the shared guidance.
+The new skill's installation and fresh-session invocation remain separate gates.</p>
 <h2 id="setup-and-first-use">Setup and first use<a class="headerlink" href="#setup-and-first-use" title="Permanent link">&para;</a></h2>
 <ol>
-<li>Use a durable checkout of <code>dev</code> containing PR #92. Review the two skills.</li>
+<li>Use a reviewed checkout containing the desired adapter. Review all skill instructions.</li>
 <li>In Codex's local marketplace controls, register the checkout's <code>openai</code>
    directory (the catalog file is <code>openai/.agents/plugins/marketplace.json</code>).</li>
 <li>Install and enable <code>rforge-openai</code>, then start a fresh Codex session.</li>
-<li>Confirm <code>$rforge-check</code> and <code>$rforge-docs-check</code> are discoverable. Run the
+<li>Confirm <code>$rforge-check</code>, <code>$rforge-docs-check</code> and <code>$rforge-lint</code> are discoverable. Run the
    static audit first, then explicitly request the package check.</li>
 </ol>
 <p>The source package is <code>openai/rforge-openai</code>; the personal catalog is
-<code>openai/.agents/plugins/marketplace.json</code>. Review the two skill instructions,
+<code>openai/.agents/plugins/marketplace.json</code>. Review the skill instructions,
 register the local catalog in Codex, install <code>rforge-openai</code>, and restart.
 The default engine checkout is <code>/Users/davood/projects/dev-tools/rforge</code>;
 point the workflow to another Rforge checkout if needed. Use Python 3.10+.</p>
@@ -2894,7 +2930,8 @@ plus docaudit's
 containing that integration, rather than a retired verification worktree. See the
 <a href="https://github.com/Data-Wise/rforge/tree/dev/openai/rforge-openai">adapter source on dev</a>. The
 personal local catalog source is <code>/Users/davood/projects/dev-tools/rforge/openai</code>.
-Installed adapter 0.1.1 and the engine's Git ref should be reported separately.</p>
+Report the installed adapter version and engine Git ref separately. The new
+source adapter is 0.2.0; editing source does not refresh installed 0.1.1.</p>
 <p>Start with <code>$rforge-docs-check Audit /absolute/path/to/package</code>.
 Confirm its resolved package and checked-versus-total coverage, then try
 <code>$rforge-check Check /absolute/path/to/package</code>. Missing prerequisites must
