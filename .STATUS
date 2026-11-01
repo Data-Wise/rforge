@@ -1,3 +1,11 @@
+# v2.23 planning — 2026-10-31
+# PROPOSAL-v2.23-backlog-2026-10-31.md (7a8c81f) and SPEC-site-audit-quarto-devmode-2026-10-31.md (#111; b1cb3b0,
+# five decisions: auto from DESCRIPTION version, keep refusing PKGDOWN_DEV_MODE, mapper + pkgdown differential test,
+# content_freshness unverified marker, allow only default vignettes/_quarto.yaml) are committed on dev. Proposed
+# v2.23.0 = #111 + #114 decision. A fresh read-only adversarial review of the SPEC was launched at session end; its
+# result was not triaged, so rerun it before any code. Dev-base assumption (dev site = base shift) is unconfirmed:
+# medfit has no /dev/ site. No code branch exists; created only on request. A2 re-attestation applies to _docsite changes.
+
 # v2.22.2 released — 2026-10-31
 # Release PR #119 (dev to main) merged as bcbfa57 (merge-commit; dev kept). main CI run 41251359479
 # green on all 8 jobs, including a2-release on ubuntu-24.04 and macos-15; Deploy Documentation
@@ -207,7 +215,7 @@ in_progress: nothing open. v2.22.2 released 2026-10-31 (PR #119 merge bcbfa57, t
   review is attested (rounds 1-4 reviewed 661f9b5; 87525d4 differs only by the output-limit bound 15s->45s + manifest hash, delta_note
   in the record); live smoke supported-site is r-hub/cranlogs only (no Data-Wise/tidyverse package is checkable by --site).
   Planning files stay at repo root (tests/a2/requirements.json and scripts/verify_a2_release.py reference them).
-next: delete stale local branches (user); real-package Codex rforge-lint CI-parity check (optional); open low-priority candidates in CLAUDE.md Roadmap.
+next: rerun the adversarial review of SPEC-site-audit-quarto-devmode, then (on request) a feature branch for #111; delete stale local branches (user); brew upgrade rforge (user); optional real-package Codex rforge-lint CI-parity check.
 version: 2.22.2 (released 2026-10-31, on main bcbfa57; previous release v2.22.1 2026-10-25, 6ce4e50)
 last_release: 2026-10-25 v2.22.0 (minor, 44 commands, no surface change; PR #100 dev→main merge d36cee7; tag v2.22.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.22.0; tap PR #245 merge 699b59a; brew audit --strict clean, 2.22.0 installed). Prior: 2026-10-11 v2.21.0 (minor, 44 commands, no surface change — PR #91 dev→main merge 7387a05; tag v2.21.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.21.0. Ships /rforge:docs:check content audit (lib.docaudit, A1), tests/harness, #84 fix (#85/#86), docs gap-fill (#89/#90). Gates: test-all 47/47, pytest 899+4 skipped, CI green on main (RForge CI + Deploy Documentation). Tap Data-Wise/homebrew-tap#244 squash 09bc9c3 — formula+manifest → v2.21.0 sha256 f376d0da…, stale revision dropped, generate.py --diff IDENTICAL; brew audit by path unavailable. Aggregator claude-plugins#74 auto-merged. Pending: user runs `brew upgrade rforge`.)
 last_release_prior_v2_20_1: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
