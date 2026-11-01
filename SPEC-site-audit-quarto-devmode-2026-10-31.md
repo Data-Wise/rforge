@@ -1,6 +1,6 @@
 # SPEC: `docs:check --site` supports Quarto articles and pkgdown development-mode routes
 
-- **Status:** Draft, awaiting user review (grill complete: four decisions recorded below)
+- **Status:** Draft, awaiting user review (grill complete: five decisions recorded below)
 - **Date:** 2026-10-31
 - **Target version:** v2.23.0 (minor, no command-surface change: 44 commands)
 - **Author:** grilled with Claude, grounded in issue #111 and pkgdown 2.2.1 source
@@ -51,6 +51,7 @@ every other unsupported case incomplete. No new command or flag; the engine and 
 | 2 | Workflow sets `PKGDOWN_DEV_MODE` | Keep refusing: the env var overrides the YAML and cannot be resolved statically | Accept literal values (large parsing surface); `--dev-mode` flag (new surface) |
 | 3 | How to verify route mapping | Pure-Python mapper plus a differential test against `pkgdown:::package_vignettes()` where R and pkgdown exist | Fixtures only (could bake in my reading of pkgdown); call R at runtime (breaks the offline default) |
 | 4 | Freshness | Explicit `content_freshness: "unverified"` field plus a text-report line; no new network probes | Probe per-page freshness now (unverified pkgdown behavior, new budgets); docs sentence only |
+| 5 | `vignettes/_quarto.yaml` | Supported when absent or exactly pkgdown's default (`project.render == ['*.qmd']`, no other keys); anything else, or both `.yml` and `.yaml` present, is incomplete | Accept any content (a render list could exclude files); refuse any file (refuses medfit, the motivating case) |
 
 ### Out of scope (deferred)
 
@@ -71,7 +72,10 @@ All changes are in `lib/_docsite.py` unless noted; line numbers are for engine `
   unsupported. Keep both `PKGDOWN_DEV_MODE` guards (lines 128-129 and 219-222).
 - **Quarto mapping.** `routes()` currently treats every non-`.Rmd` article as unsupported (lines 168-170). Treat `.qmd`
   like `.Rmd` (same `articles/` prefixing and nesting, lines 172-174). Front-matter checks (lines 203-218) extend to
-  `.qmd`: a non-HTML `format:` is unsupported, as a non-HTML `output:` is for `.Rmd`.
+  `.qmd`: a non-HTML `format:` is unsupported, as a non-HTML `output:` is for `.Rmd`. pkgdown 2.2.1 creates
+  `vignettes/_quarto.yaml` (`project: render: ['*.qmd']`) when absent and uses an existing one
+  (`build_quarto_articles`); medfit ships exactly that default, so a `_quarto.yaml` is normal, not a refusal. Apply
+  decision 5.
 - **pkgdown divergences found while reading.** Verify each with the differential test, do not assume:
   `.md` and `.Rmarkdown` are ignored by pkgdown (it globs `.[Rrq]md`) but counted unsupported today; lowercase `.rmd`
   is an article in pkgdown but skipped silently here; pkgdown excludes only directories that start with `tutorials`,
@@ -129,8 +133,14 @@ and `docs/commands.md` (no new flag, behavior text only), CHANGELOG, `.STATUS`, 
 ## Open questions / risks
 
 - **Dev-base assumption.** Unconfirmed on a live dev site; confirm before relying on it (see Testing).
-- **Defaults not grilled (confirm or change):** `_quarto.yml` under `vignettes/` makes the stage incomplete; an
-  unrecognized `format:` is unsupported; `unreleased` serves from the root; report the assumed pkgdown rule version.
+- **Defaults resolved without a question:** `unreleased` serves from the root (verified: pkgdown sets `in_dev` only
+  for `devel`); `.md`, `.Rmarkdown` and lowercase `.rmd` handling is decided by the differential test (decision 3);
+  the stage records the assumed pkgdown rule version.
+- **Still a stated default (unverifiable without rendering):** a non-HTML Quarto `format:` is unsupported. pkgdown
+  injects its own HTML format through a metadata file, and how that merges with a document's `format:` is not read
+  here, so this stays conservative.
+- **Superseded:** an earlier draft made any `_quarto.yml` under `vignettes/` incomplete; that would have refused
+  medfit, so decision 5 replaces it.
 - **Behavior change:** sources previously counted unsupported (`.md`, `.Rmarkdown`) will no longer make a stage
   incomplete if the differential test confirms pkgdown ignores them.
 - **A2 cost:** roughly an hour of CI per attestation attempt; batch changes first.
