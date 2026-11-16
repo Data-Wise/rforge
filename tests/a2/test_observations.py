@@ -40,8 +40,8 @@ def test_live_smoke_record_rejects(defect):
 
 def _audit_for(states):
     def audit(path, url, ref):
-        state, checked, reasons = states[url]
-        return {'stage': {'state': state, 'counts': {'checked': checked}, 'reasons': reasons}, 'requests': 1}
+        state, checked, reasons, *requests = states[url]
+        return {'stage': {'state': state, 'counts': {'checked': checked}, 'reasons': reasons}, 'requests': requests[0] if requests else 1}
     return audit
 
 
@@ -58,7 +58,7 @@ SITES = {'sup': {'name': 'sup', 'repo': 'r', 'url': v.SUPPORTED_SITE_URL}, 'lim'
 
 def test_live_smoke_observation_passes_with_a_complete_site_and_an_honest_limit(tmp_path):
     states = {v.SUPPORTED_SITE_URL: ('complete', 4, []), 'https://l/': ('incomplete', 0, ['development mode/destination mapping unsupported'])}
-    facts, status = obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=_clone_stub, supported=SITES['sup'], limits=SITES['lim'])
+    facts, status = obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=_clone_stub, supported=SITES['sup'], limits=SITES['lim'], pinned_supported=())
     assert status == 'passed'
     v.validate_live_smoke(facts)
 
@@ -69,7 +69,7 @@ def test_live_smoke_observation_passes_with_a_complete_site_and_an_honest_limit(
     {v.SUPPORTED_SITE_URL: ('complete', 4, []), 'https://l/': ('incomplete', 0, [])},
 ])
 def test_live_smoke_observation_fails(tmp_path, states):
-    _, status = obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=_clone_stub, supported=SITES['sup'], limits=SITES['lim'])
+    _, status = obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=_clone_stub, supported=SITES['sup'], limits=SITES['lim'], pinned_supported=())
     assert status == 'failed'
 
 
@@ -244,7 +244,7 @@ def test_a_limit_site_that_becomes_supported_is_an_improvement_not_a_failure(tmp
     states = {v.SUPPORTED_SITE_URL: ('complete', 4, []), 'https://l/': ('complete', 3, [])}
     sites = ({'name': 'a', 'repo': 'r', 'url': 'https://l/'}, {'name': 'b', 'repo': 'r', 'url': 'https://l2/'})
     states['https://l2/'] = ('incomplete', 0, ['development mode/destination mapping unsupported'])
-    facts, status = obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=_clone_stub, supported=SITES['sup'], limits=sites)
+    facts, status = obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=_clone_stub, supported=SITES['sup'], limits=sites, pinned_supported=())
     assert status == 'passed' and [r['name'] for r in facts['unsupported_real_runs']] == ['b'] and facts['other_real_runs'][0]['name'] == 'a'
 
 
@@ -299,3 +299,46 @@ def test_triage_drift_is_recorded_in_the_failed_observation():
     assert status == 'failed' and facts['fresh_run_drift'] == ['medfit.counts']
     clean, ok = obs.observe_package_triage(reviewed, _fresh(reviewed))
     assert ok == 'passed' and 'fresh_run_drift' not in clean
+
+
+PINNED = ({'name': 'pin-a', 'repo': 'r', 'url': 'https://pa/'}, {'name': 'pin-b', 'repo': 'r', 'url': 'https://pb/'})
+BASE = {v.SUPPORTED_SITE_URL: ('complete', 4, []), 'https://l/': ('incomplete', 0, ['custom template mapping unsupported']),
+        'https://pa/': ('complete', 66, []), 'https://pb/': ('complete', 107, [])}
+
+
+def _live(tmp_path, **changes):
+    states = {**BASE, **changes}
+    return obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=_clone_stub, supported=SITES['sup'],
+                                  limits=SITES['lim'], pinned_supported=PINNED)
+
+
+def test_pinned_real_sites_must_be_complete_and_are_recorded(tmp_path):
+    facts, status = _live(tmp_path)
+    assert status == 'passed' and [r['name'] for r in facts['pinned_real_runs']] == ['pin-a', 'pin-b']
+    assert [r['name'] for r in facts['unsupported_real_runs']] == ['lim']
+    v.validate_live_smoke(facts)
+
+
+@pytest.mark.parametrize('change', [
+    {'https://pa/': ('incomplete', 0, ['unsupported article source: vignettes/x.qmd'])},
+    {'https://pb/': ('incomplete', 107, ['development mapping'])},
+    {'https://pa/': ('complete', 0, [])},
+    {'https://pb/': ('complete', 107, [], 0)},
+    {'https://pa/': ('unavailable', 0, ['crashed'])},
+])
+def test_a_failing_pinned_real_site_fails_the_observation_even_when_the_limit_site_is_incomplete(tmp_path, change):
+    """Glue-style limit sites must not mask a regression in the sites that are supposed to be supported."""
+    _, status = _live(tmp_path, **change)
+    assert status == 'failed'
+
+
+def test_the_limit_site_must_still_be_incomplete_when_the_pinned_sites_pass(tmp_path):
+    _, status = _live(tmp_path, **{'https://l/': ('complete', 3, [])})
+    assert status == 'failed'
+
+
+def test_default_pinned_sites_are_the_real_medfit_and_probmed_commits():
+    assert [s['name'] for s in obs.PINNED_SUPPORTED_SITES] == ['medfit', 'probmed']
+    assert [s['name'] for s in obs.LIMIT_SITES] == ['glue']
+    for site in (*obs.PINNED_SUPPORTED_SITES, *obs.LIMIT_SITES):
+        assert len(site['commit']) == 40

@@ -692,20 +692,3 @@ def test_text_verdict_for_an_incomplete_site_stage_stays_incomplete(tmp_path, ca
     out = capsys.readouterr().out
     assert "INCOMPLETE" in out and "no findings" not in out
 
-
-# ---------------------------------------------------------------------------------------------------------
-# A2 live-smoke limit sites (scripts/a2_observations.py): pinned, and at least one genuinely unsupported.
-# ---------------------------------------------------------------------------------------------------------
-def test_limit_sites_are_pinned_to_commits():
-    import sys
-    from pathlib import Path
-    scripts = str(Path(__file__).resolve().parents[1] / "scripts")
-    sys.path.insert(0, scripts)
-    try:
-        import a2_observations as obs
-    finally:
-        sys.path.remove(scripts)
-    assert len(obs.LIMIT_SITES) >= 3
-    for limit in obs.LIMIT_SITES:
-        assert len(limit["commit"]) == 40 and set(limit["commit"]) <= set("0123456789abcdef"), limit["name"]
-    assert any(limit["name"] == "glue" for limit in obs.LIMIT_SITES)

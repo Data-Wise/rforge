@@ -35,8 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   reads `inst/_pkgdown.yml`/`.yaml`; any non-root configuration is still an
   overlay and keeps the stage incomplete.
 - Workflows are scanned at the pinned SHA, not the working tree, and a job-level
-  `uses:` (reusable workflow) in a pkgdown-related workflow is unverifiable even
-  with `--ref`. `PKGDOWN_DEV_MODE` is still refused. The pre-network stop is a
+  `uses:` (reusable workflow) in any workflow is unverifiable even with `--ref`
+  (a generically named reusable workflow can deploy the site). `PKGDOWN_DEV_MODE` is still refused. The pre-network stop is a
   structured condition instead of a substring match on "development".
 - Article exclusions follow pkgdown's rules: `^tutorials` applies to the
   directory part only, and `.md`/`.Rmarkdown` files are ignored, not unsupported.
@@ -44,9 +44,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   route-changing overrides (`output_file`, `knit`, `output-file`, `output-ext`,
   `output-dir`) are refused and no longer yield a false `site-missing-page` or
   `site-unreleased-page`. Root redirects and general overrides are follow-up #123.
-- A2 live smoke pins its real sites to commits and adds glue (`template.package`)
-  as the real site that must stay incomplete; medfit and probmed are now audited
-  as supported. Required A2 nodes changed: `test_release_mode_and_destination`
+- A2 live smoke pins its real sites to commits. medfit and probmed must now be
+  audited complete with checked routes and HTTP requests (the observation fails
+  otherwise), and glue (`template.package`) is the real site that must stay
+  incomplete. Required A2 nodes changed: `test_release_mode_and_destination`
   (devel/destination now supported; two refusal cases added), and the bodies of
   `test_unsupported_layout_retains_supported_routes[quarto|extension]`,
   `test_site_cli_thresholds[*-unsupported]` and

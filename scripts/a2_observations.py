@@ -34,15 +34,19 @@ from verify_a2_release import (SUPPORTED_SITE_URL, VerificationError, validate_f
 SUPPORTED_SITE = {"name": "cranlogs", "repo": "https://github.com/r-hub/cranlogs", "url": SUPPORTED_SITE_URL,
                   "commit": "c02280c7b4c6d77ff5500f80e15118edad5d94dc"}
 # Real packages audited at pinned commits (a floating HEAD could change which side of the supported line a site is on).
-# medfit and probmed (pkgdown development.mode auto, .qmd articles) became supported in #111 and are recorded as
-# `other_real_runs`; the observation needs at least one real site that is still reported incomplete, so glue is
-# pinned: its `template.package` (tidytemplate) is a custom template mapping this audit refuses. Its dev URL is
-# requested because glue's version (x.y.z.9000) resolves `mode: auto` to devel.
-LIMIT_SITES = (
+# medfit and probmed (pkgdown `development.mode: auto`, `.qmd` articles) became supported in #111: the observation
+# FAILS unless both are audited complete with checked routes and HTTP requests, so a route-mapping regression cannot
+# hide behind a site that is still incomplete.
+PINNED_SUPPORTED_SITES = (
     {"name": "medfit", "repo": "https://github.com/Data-Wise/medfit", "url": "https://data-wise.github.io/medfit/",
      "commit": "40f82c85fdad0979949bee389afe2c7301660315"},
     {"name": "probmed", "repo": "https://github.com/Data-Wise/probmed", "url": "https://data-wise.github.io/probmed/",
      "commit": "ab411df7f083e169dd4b56f264e867e4fd51e1c4"},
+)
+# Separately, at least one real site must still be reported incomplete: glue's `template.package` (tidytemplate) is a
+# custom template mapping this audit refuses. Its dev URL is requested because glue's version (x.y.z.9000) resolves
+# `mode: auto` to devel.
+LIMIT_SITES = (
     {"name": "glue", "repo": "https://github.com/tidyverse/glue", "url": "https://glue.tidyverse.org/dev/",
      "commit": "da9c73f7a3de6a27f3103cb5bb2355820a4c3a6a"},
 )
@@ -129,7 +133,8 @@ def counting_audit(path: Path, url: str, ref: str) -> dict:
 
 
 def observe_live_smoke(workdir: Path, audit: Optional[Callable] = None, clone: Optional[Callable] = None,
-                       supported: dict = SUPPORTED_SITE, limits: tuple = LIMIT_SITES) -> tuple:
+                       supported: dict = SUPPORTED_SITE, limits: tuple = LIMIT_SITES,
+                       pinned_supported: tuple = PINNED_SUPPORTED_SITES) -> tuple:
     audit, clone = audit or counting_audit, clone or _clone
 
     def run(site: dict) -> dict:
@@ -145,12 +150,15 @@ def observe_live_smoke(workdir: Path, audit: Optional[Callable] = None, clone: O
                 "state": stage.get("state"), "checked": (stage.get("counts") or {}).get("checked", 0),
                 "reasons": list(stage.get("reasons") or [])}
     primary = run(supported)
+    pinned = [run(site) for site in pinned_supported]
     runs = [run(site) for site in limits]
     unsupported = [r for r in runs if r["state"] == "incomplete" and r["reasons"]]
     other = [r for r in runs if r not in unsupported]  # a real site that became supported is an improvement, not a failure
     facts = {"url": primary["url"], "source_ref": primary["source_ref"], "requests": primary["requests"], "checked": primary["checked"],
-             "supported_site": primary, "unsupported_real_runs": unsupported, "other_real_runs": other}
-    ok = primary["state"] == "complete" and primary["requests"] > 0 and primary["checked"] > 0 and bool(unsupported)
+             "supported_site": primary, "pinned_real_runs": pinned,
+             "unsupported_real_runs": unsupported, "other_real_runs": other}
+    pinned_ok = all(r["state"] == "complete" and r["requests"] > 0 and r["checked"] > 0 for r in pinned)
+    ok = primary["state"] == "complete" and primary["requests"] > 0 and primary["checked"] > 0 and bool(unsupported) and pinned_ok
     return facts, "passed" if ok else "failed"
 
 
