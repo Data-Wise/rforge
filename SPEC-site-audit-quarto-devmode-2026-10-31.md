@@ -93,7 +93,8 @@ numbers in `_docsite.py` were re-read against `dev` at 518bd2f (engine `baa5905`
   Keep both `PKGDOWN_DEV_MODE` guards, with the line-219-222 scan moved to the pinned SHA (decision 2).
 - **Quarto mapping.** `routes()` currently treats every non-`.Rmd` article as unsupported (lines 168-170). Treat `.qmd`
   like `.Rmd` (same `articles/` prefixing and nesting, lines 172-174). Front-matter checks (lines 203-218) extend to
-  `.qmd`: a non-HTML `format:` is unsupported, as a non-HTML `output:` is for `.Rmd`. pkgdown 2.2.1 creates
+  `.qmd`: a non-HTML `format:` is unsupported (no exception, unlike `.Rmd` `extension: pdf`; see pkgdown
+  divergences), as a non-HTML `output:` is for `.Rmd`, and route-changing override keys are refused (same section). pkgdown 2.2.1 creates
   `vignettes/_quarto.yaml` (`project: render: ['*.qmd']`) when absent and uses an existing one
   (`build_quarto_articles`); medfit ships exactly that default, so a `_quarto.yaml` is normal, not a refusal. Apply
   decision 5.
@@ -105,8 +106,21 @@ numbers in `_docsite.py` were re-read against `dev` at 518bd2f (engine `baa5905`
     `tutorials-old/h.Rmd` are excluded; `articles/tutorials/f.Rmd` is an article (`articles/tutorials/f.html`);
     `vignettes/tutorials.Rmd` is an article; `_priv/i.Rmd` is an article. The code's `"tutorials" in parts`
     (`lib/_docsite.py:166`) is wrong in both directions: replace it with the directory-prefix rule.
-  - An article may emit a non-HTML route (`pkgdown: extension: pdf` gives `articles/p.pdf`; Quarto `format: pdf`
-    likewise). The mapper must apply the extension, and an unrecognized extension is unsupported, never `.html`.
+  - An `.Rmd` article can emit a non-HTML route: `pkgdown: extension: pdf` gives `articles/p.pdf` (verified by the
+    reviewer on pkgdown 2.2.1). This is the **one supported exception** to the non-HTML refusal, and only for `.Rmd`:
+    the mapper applies the declared extension when it is a plain string, and any other value (missing, non-string,
+    templated) is unsupported, never `.html`. For `.qmd` there is no such exception: a non-HTML `format:` (including
+    `format: pdf`) is unsupported and makes the stage incomplete, because how pkgdown merges its HTML format with a
+    document's `format:` is not verified (see Open questions). The fixture and the differential test pin both halves:
+    `.Rmd` + `extension: pdf` maps to `articles/p.pdf`; `.qmd` + `format: pdf` is incomplete.
+  - **Route-changing overrides are refused, not guessed.** A document whose front matter carries any key that can
+    rename or relocate its output is unsupported: for `.Rmd`, `output_file`, `knit` and `pkgdown: extension` with a
+    non-plain value; for `.qmd`, `output-file`, `output-ext` and `output-dir`, wherever they appear (top level or
+    nested under `format:`). The check scans the whole front-matter mapping, not only `format`, `output` and `as_is`.
+    Its route is removed from the expected set (as `as_is` articles are today) and the stage is incomplete with a
+    reason naming the file and key, so a default route that happens to remain in the sitemap cannot satisfy it.
+    This list is the set known now; it is conservative (refuse on presence) and implementation must also refuse any
+    key matching `output[-_](file|ext|dir)`. Full override support is the follow-up (#123).
   - Quarto copies every other rendered file under `articles/`; expect `site-extra-page` info findings for those and
     do not treat them as failures.
 - **Dev-mode base (strict match; proposed mechanism still needs a real devel site to confirm).** pkgdown writes the
@@ -151,7 +165,8 @@ numbers in `_docsite.py` were re-read against `dev` at 518bd2f (engine `baa5905`
 
 - Unknown `development.mode`, `PKGDOWN_DEV_MODE` in a workflow, a `uses:` workflow job, `_quarto.yml` projects, custom
   transforms, missing or invalid YAML, more than one pkgdown config file, bootstrap-3 `devel`, a `--site` URL that
-  fails the strict base match, an unrecognized article output extension, and ambiguous deployment sources all stay
+  fails the strict base match, an unrecognized article output extension, a route-changing override key, a `.qmd`
+  non-HTML `format:`, and ambiguous deployment sources all stay
   `state: "incomplete"` with a specific reason, and every reason that precedes the network call sets
   `pre_network_block`.
 - A `DESCRIPTION` without a parseable `Version` is incomplete, never defaulted to `release`.
@@ -160,7 +175,9 @@ numbers in `_docsite.py` were re-read against `dev` at 518bd2f (engine `baa5905`
 
 - Fixtures: `.Rmd`, `.rmd` and `.qmd`, nested `vignettes/articles`, `articles/tutorials/**`, `tutorials-old/**`,
   `tutorials.Rmd`, excludes, release vs devel versions (including `-` separators), explicit destination, root and
-  `dev/` bases, `inst/_pkgdown.yml`, a `pkgdown: extension: pdf` article, and the medfit shape (`mode: auto`,
+  `dev/` bases, `inst/_pkgdown.yml`, an `.Rmd` with `pkgdown: extension: pdf` (maps to `.pdf`), a `.qmd` with
+  `format: pdf` (incomplete), articles with `output-file`/`output-ext`/`output_file`/`knit` (incomplete; negative
+  fixture keeps the default `.html` route in the sitemap and must still be incomplete), and the medfit shape (`mode: auto`,
   `0.15.0`, 37 `.qmd` articles resolves to root routes).
 - Negative controls (must fail): a deliberately removed page is `site-missing-page`; a wrong development prefix is
   caught; `mode: auto` with a devel version and a root-only `--site` URL is incomplete (every incomplete row of the
