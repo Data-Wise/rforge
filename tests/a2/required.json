@@ -1433,7 +1433,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "fe02bcb1e234d1508ed93e75ac70d7884aed58e7438ed3e9524b16e8cd2d7896"
+        "tests/a2/test_docs.py": "a6f73c66920f9a0209fa051661d8248df4003557d5259cbaacdb08d50a82ca25"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1466,8 +1466,8 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "fe02bcb1e234d1508ed93e75ac70d7884aed58e7438ed3e9524b16e8cd2d7896",
-        "tests/a2/test_observations.py": "bc9ae78a84f32d446b3d3f25bd33240f74e45ed594104d438eec37005e7d9750"
+        "tests/a2/test_docs.py": "a6f73c66920f9a0209fa051661d8248df4003557d5259cbaacdb08d50a82ca25",
+        "tests/a2/test_observations.py": "f2b8914837e5628bcd7149255044f67e504f097b2f0e1b0da64645312c142e03"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1490,7 +1490,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "fe02bcb1e234d1508ed93e75ac70d7884aed58e7438ed3e9524b16e8cd2d7896"
+        "tests/a2/test_docs.py": "a6f73c66920f9a0209fa051661d8248df4003557d5259cbaacdb08d50a82ca25"
       },
       "review_note": "Explicit current status, unreleased acceptance hold, actual command/check counts, unchanged feature version, mirror and agent prohibitions asserted. Local coverage complete; external acceptance remains pending."
     },
@@ -1657,7 +1657,18 @@
         "tests/a2/test_evidence.py::test_a2_recall_without_history_is_pending_not_green_or_failed",
         "tests/a2/test_observations.py::test_live_smoke_record_accepted",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[bool-requests]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[duplicate-glue-run]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[extra-limit-run]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-lacks-name]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-lacks-source-ref]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-lacks-url]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-short-sha]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-uppercase-sha]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-wrong-name]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-wrong-sha]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-wrong-url]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-dns-error]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-entry-not-a-dict]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-http-503]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-mixed-layout-and-transport]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-reason-not-a-string]",
@@ -1670,6 +1681,9 @@
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-state-absent]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-timeout]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-transport-word-unsupported]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[medfit-lacks-source-ref]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[medfit-short-sha]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[medfit-wrong-sha]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[no-limit-runs]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[no-requests]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[no-supported-site]",
@@ -1696,14 +1710,25 @@
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-wrong-url]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-error-finding]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-lacks-missing]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-lacks-name]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-lacks-severities]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-lacks-source-ref]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-missing-count-bool]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-missing-count-none]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-missing-routes]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-severities-not-a-list]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-short-sha]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-warn-finding]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-wrong-name]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-wrong-sha]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[probmed-short-sha]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[probmed-source-ref-none]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[probmed-wrong-sha]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[site-incomplete]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[substitute-limit-site]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[substitute-limit-site-keeping-glue-identity-fields-blank]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[summary-disagrees]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[summary-source-ref-disagrees]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[url-disagrees]",
         "tests/a2/test_observations.py::test_live_smoke_observation_passes_with_a_complete_site_and_an_honest_limit",
         "tests/a2/test_observations.py::test_live_smoke_observation_fails[states0]",
@@ -1722,7 +1747,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa",
-        "tests/a2/test_observations.py": "bc9ae78a84f32d446b3d3f25bd33240f74e45ed594104d438eec37005e7d9750"
+        "tests/a2/test_observations.py": "f2b8914837e5628bcd7149255044f67e504f097b2f0e1b0da64645312c142e03"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1793,7 +1818,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa",
-        "tests/a2/test_observations.py": "bc9ae78a84f32d446b3d3f25bd33240f74e45ed594104d438eec37005e7d9750"
+        "tests/a2/test_observations.py": "f2b8914837e5628bcd7149255044f67e504f097b2f0e1b0da64645312c142e03"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1929,6 +1954,7 @@
         "tests/a2/test_observations.py::test_pinned_and_primary_sites_must_have_no_missing_routes_or_warn_findings[change5]",
         "tests/a2/test_observations.py::test_info_findings_do_not_fail_the_observation_and_are_recorded",
         "tests/a2/test_observations.py::test_pinned_supported_sites_are_pinned_to_the_reviewed_full_commit_shas",
+        "tests/a2/test_observations.py::test_the_producer_holds_no_second_copy_of_the_reviewed_identities",
         "tests/a2/test_observations.py::test_the_pinned_site_urls_match_the_verifier_and_every_pin_is_distinct",
         "tests/a2/test_observations.py::test_the_live_smoke_audits_the_pinned_commit_not_whatever_the_default_branch_holds",
         "tests/a2/test_observations.py::test_the_producer_and_the_verifier_share_one_soundness_predicate_and_one_pin_list",
@@ -1949,11 +1975,11 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_comparison.py": "24720640abac9095da41144b0052bf96b949a76b8b4a955aff9f3b982e87521c",
-        "tests/a2/test_docs.py": "fe02bcb1e234d1508ed93e75ac70d7884aed58e7438ed3e9524b16e8cd2d7896",
-        "tests/a2/test_final_gates.py": "84e713a3b6ae61d555a1cea683148f1d4fb31f6b89d8640cf155771ed8d12ab3",
+        "tests/a2/test_docs.py": "a6f73c66920f9a0209fa051661d8248df4003557d5259cbaacdb08d50a82ca25",
+        "tests/a2/test_final_gates.py": "eb83fa51ae5fd299507c3366e394ae357f4119407829dfa3c3dd8c83c608bfd9",
         "tests/a2/test_guardian.py": "2033368a0fbbd844fbb56e8fa5a66207a1654d4bbec510923f07a77bd7b904c1",
         "tests/a2/test_manifest.py": "278f1646c0229c9563b70f13b58af7512e4e638185d9d61318b69ef484902636",
-        "tests/a2/test_observations.py": "bc9ae78a84f32d446b3d3f25bd33240f74e45ed594104d438eec37005e7d9750",
+        "tests/a2/test_observations.py": "f2b8914837e5628bcd7149255044f67e504f097b2f0e1b0da64645312c142e03",
         "tests/a2/test_release_ci.py": "7d40d5f697a437a3d447c0179ce3bf419210c2d38cdd61493afe97fa492f31b8",
         "tests/a2/test_runtime_probe.py": "739319d20f83a0fe032a2ae6eb2ecf25e5e6306b09348ccd2d84654747be9133"
       },
@@ -2013,15 +2039,15 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "84e713a3b6ae61d555a1cea683148f1d4fb31f6b89d8640cf155771ed8d12ab3",
-        "tests/a2/test_observations.py": "bc9ae78a84f32d446b3d3f25bd33240f74e45ed594104d438eec37005e7d9750",
+        "tests/a2/test_final_gates.py": "eb83fa51ae5fd299507c3366e394ae357f4119407829dfa3c3dd8c83c608bfd9",
+        "tests/a2/test_observations.py": "f2b8914837e5628bcd7149255044f67e504f097b2f0e1b0da64645312c142e03",
         "tests/a2/test_producer_run.py": "e06f3156d3322d996bbb50817f0dbf0f5f57185009f60622e34c478c563d1fca"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 758,
+  "collected_nodes": 784,
   "review_candidate": "#111 site-audit candidate: development.mode auto/devel and Quarto article support, engine false-complete fixes, and the shared live-smoke predicates (supported, pinned and limit sites)",
   "platforms": [
     "ubuntu-24.04",
