@@ -35,11 +35,12 @@ SUPPORTED_SITE = {"name": "cranlogs", "repo": "https://github.com/r-hub/cranlogs
                   "commit": "c02280c7b4c6d77ff5500f80e15118edad5d94dc"}
 # Real packages audited at pinned commits (a floating HEAD could change which side of the supported line a site is on).
 # medfit and probmed (pkgdown `development.mode: auto`, `.qmd` articles) became supported in #111: the observation
-# FAILS unless both are audited complete with checked routes and HTTP requests, so a route-mapping regression cannot
-# hide behind a site that is still incomplete.
+# FAILS unless both are audited complete with checked routes, HTTP requests, zero missing routes and no warn/error
+# findings, so a route-mapping regression cannot hide behind a site that is still incomplete. medfit is pinned to a commit
+# whose routes match the live site (40f82c8 predates the live native-* to sem-* article rename: 9 missing pages).
 PINNED_SUPPORTED_SITES = (
     {"name": "medfit", "repo": "https://github.com/Data-Wise/medfit", "url": "https://data-wise.github.io/medfit/",
-     "commit": "40f82c85fdad0979949bee389afe2c7301660315"},
+     "commit": "6d226fb1d4ce0b46cf297c2e88154d685a337dee"},
     {"name": "probmed", "repo": "https://github.com/Data-Wise/probmed", "url": "https://data-wise.github.io/probmed/",
      "commit": "ab411df7f083e169dd4b56f264e867e4fd51e1c4"},
 )
@@ -148,6 +149,8 @@ def observe_live_smoke(workdir: Path, audit: Optional[Callable] = None, clone: O
         stage = result["stage"]
         return {"name": site["name"], "url": site["url"], "source_ref": sha, "requests": result["requests"],
                 "state": stage.get("state"), "checked": (stage.get("counts") or {}).get("checked", 0),
+                "missing": (stage.get("counts") or {}).get("missing"),
+                "finding_severities": sorted({str(f.get("severity")) for f in stage.get("findings") or []}),
                 "reasons": list(stage.get("reasons") or [])}
     primary = run(supported)
     pinned = [run(site) for site in pinned_supported]
@@ -157,8 +160,10 @@ def observe_live_smoke(workdir: Path, audit: Optional[Callable] = None, clone: O
     facts = {"url": primary["url"], "source_ref": primary["source_ref"], "requests": primary["requests"], "checked": primary["checked"],
              "supported_site": primary, "pinned_real_runs": pinned,
              "unsupported_real_runs": unsupported, "other_real_runs": other}
-    pinned_ok = all(r["state"] == "complete" and r["requests"] > 0 and r["checked"] > 0 for r in pinned)
-    ok = primary["state"] == "complete" and primary["requests"] > 0 and primary["checked"] > 0 and bool(unsupported) and pinned_ok
+    def sound(r):  # `complete` means route presence was compared, not that no published route is missing
+        return (r["state"] == "complete" and r["requests"] > 0 and r["checked"] > 0 and r["missing"] == 0
+                and not {"warn", "error"} & set(r["finding_severities"]))
+    ok = sound(primary) and bool(unsupported) and all(sound(r) for r in pinned)
     return facts, "passed" if ok else "failed"
 
 

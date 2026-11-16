@@ -40,8 +40,11 @@ def test_live_smoke_record_rejects(defect):
 
 def _audit_for(states):
     def audit(path, url, ref):
-        state, checked, reasons, *requests = states[url]
-        return {'stage': {'state': state, 'counts': {'checked': checked}, 'reasons': reasons}, 'requests': requests[0] if requests else 1}
+        state, checked, reasons, *rest = states[url]
+        requests, missing, findings = (list(rest) + [1, 0, []][len(rest):])[:3]
+        return {'stage': {'state': state, 'counts': {'checked': checked, 'missing': missing}, 'reasons': reasons,
+                          'findings': [{'check': 'site-missing-page' if sev == 'warn' else 'site-extra-page', 'severity': sev} for sev in findings]},
+                'requests': requests}
     return audit
 
 
@@ -342,3 +345,31 @@ def test_default_pinned_sites_are_the_real_medfit_and_probmed_commits():
     assert [s['name'] for s in obs.LIMIT_SITES] == ['glue']
     for site in (*obs.PINNED_SUPPORTED_SITES, *obs.LIMIT_SITES):
         assert len(site['commit']) == 40
+
+
+@pytest.mark.parametrize('change', [
+    {'https://pa/': ('complete', 66, [], 1, 9, ['warn'] * 9)},   # published routes lost: complete, but missing > 0
+    {'https://pb/': ('complete', 107, [], 1, 0, ['warn'])},      # a warn finding without a missing count
+    {'https://pb/': ('complete', 107, [], 1, 0, ['error'])},
+    {'https://pa/': ('complete', 66, [], 1, None, [])},          # missing count absent: unknown, never zero
+    {v.SUPPORTED_SITE_URL: ('complete', 4, [], 1, 1, ['warn'])},  # the primary supported site is held to the same rule
+    {v.SUPPORTED_SITE_URL: ('complete', 4, [], 1, 0, ['warn'])},
+])
+def test_pinned_and_primary_sites_must_have_no_missing_routes_or_warn_findings(tmp_path, change):
+    _, status = _live(tmp_path, **change)
+    assert status == 'failed'
+
+
+def test_info_findings_do_not_fail_the_observation_and_are_recorded(tmp_path):
+    facts, status = _live(tmp_path, **{'https://pa/': ('complete', 66, [], 1, 0, ['info', 'info'])})
+    assert status == 'passed'
+    run = facts['pinned_real_runs'][0]
+    assert run['missing'] == 0 and run['finding_severities'] == ['info']
+    assert facts['supported_site']['missing'] == 0 and facts['supported_site']['finding_severities'] == []
+    v.validate_live_smoke(facts)
+
+
+def test_pinned_supported_sites_are_pinned_to_commits_whose_routes_match_the_live_sites():
+    """Re-pinned in #111 review: medfit 40f82c8 predates the live native-* to sem-* rename (9 missing pages)."""
+    pins = {s['name']: s['commit'] for s in obs.PINNED_SUPPORTED_SITES}
+    assert pins['medfit'] != '40f82c85fdad0979949bee389afe2c7301660315'
