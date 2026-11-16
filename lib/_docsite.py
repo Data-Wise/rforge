@@ -159,14 +159,20 @@ DEFAULT_QUARTO_PROJECT = {"project": {"render": ["*.qmd"]}}
 INT_MAX = 2 ** 31 - 1
 
 
-def dev_mode_auto(version):
-    """pkgdown 2.2.1 `dev_mode_auto`; an unparseable version raises (R's `package_version` errors too)."""
+def parse_version(version):
+    """R's `package_version` components (`.` or `-` separated, at least two); anything else raises ValueError."""
     text = version.strip() if isinstance(version, str) else ""
     if not re.fullmatch(r"[0-9]+(?:[.-][0-9]+)+", text):
         raise ValueError(f"unparseable DESCRIPTION Version: {version!r}")
     parts = [int(x) for x in re.split(r"[.-]", text)]
     if any(x > INT_MAX for x in parts):
         raise ValueError(f"unparseable DESCRIPTION Version: {version!r}")
+    return parts
+
+
+def dev_mode_auto(version):
+    """pkgdown 2.2.1 `dev_mode_auto`; an unparseable version raises (R's `package_version` errors too)."""
+    parts = parse_version(version)
     if len(parts) < 3:
         return "release"
     if len(parts) == 3:
@@ -372,7 +378,9 @@ def audit(root: Path, *, url, ref=None):
             if not match:
                 raise ValueError("DESCRIPTION has no Version field")
             return match.group(1)
-        development = resolve_development(config, pinned_version)
+        version = pinned_version()  # every mode: an absent or unparseable Version is incomplete, never defaulted
+        parse_version(version)
+        development = resolve_development(config, version)
         stage["development"] = {k: development[k] for k in ("mode","prefix","destination","pkgdown_rule")}
         if development["in_dev"] and bootstrap_version(config) == 3:
             raise ValueError("development mode with Bootstrap 3 writes an unprefixed sitemap; unsupported")

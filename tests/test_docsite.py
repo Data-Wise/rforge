@@ -247,13 +247,39 @@ def test_auto_with_an_unparseable_or_missing_version_is_incomplete(tmp_path, mon
     assert any("Version" in x for x in r["reasons"])
 
 
-def test_non_auto_mode_does_not_need_a_parseable_version(tmp_path):
+@pytest.mark.parametrize("config_tail", ["", "development:\n  mode: release\n", "development:\n  mode: default\n",
+                                         "development:\n  mode: devel\n", "development:\n  mode: unreleased\n"])
+@pytest.mark.parametrize("version", [None, "", "garbage", "1", "1.2.", "1..2", "-1"])
+def test_every_mode_requires_a_parseable_pinned_version(tmp_path, monkeypatch, config_tail, version):
+    """SPEC: a DESCRIPTION without a parseable Version is incomplete, never defaulted: also for explicit modes."""
     web = tmp_path / "web"
     with server(web) as root:
-        pkg = make(tmp_path, version="garbage", config=f"url: {root}pkg\ndevelopment:\n  mode: release\n")
+        pkg = make(tmp_path, config=f"url: {root}pkg\ntemplate:\n  bootstrap: 5\n{config_tail}")
+        line = "" if version is None else f"Version: {version}\n"
+        commit(pkg, {"DESCRIPTION": DESC.replace("Version: {version}\n", line)}, "bad version")
+        no_network(monkeypatch)
+        base = root + "pkg/dev/" if "devel" in config_tail else root + "pkg/"
+        r = site.audit(pkg, url=base, ref="main")
+    assert r["state"] == "incomplete" and r["counts"]["checked"] == 0 and not r["findings"]
+    assert any("Version" in x for x in r["reasons"])
+
+
+def test_a_missing_description_is_incomplete_before_the_network(tmp_path, monkeypatch):
+    pkg = make(tmp_path, config="development:\n  mode: release\n")
+    git(pkg, "rm", "-q", "DESCRIPTION"); git(pkg, "-c", "user.email=a@b", "-c", "user.name=n", "commit", "-qm", "rm")
+    no_network(monkeypatch)
+    r = site.audit(pkg, url="https://x.example/pkg/", ref="main")
+    assert r["state"] == "incomplete" and r["counts"]["checked"] == 0
+
+
+@pytest.mark.parametrize("version", ["0.0.1", "1.2", "1.0.0-9000", "0.15.0"])
+def test_a_parseable_version_does_not_change_an_explicit_mode(tmp_path, version):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, version=version, config=f"url: {root}pkg\ndevelopment:\n  mode: release\n")
         publish(web, "pkg", root + "pkg/", ROUTES)
         r = site.audit(pkg, url=root + "pkg/", ref="main")
-    assert r["state"] == "complete"
+    assert r["state"] == "complete" and r["development"]["mode"] == "release"
 
 
 @pytest.mark.parametrize("config", ["development:\n  mode: preview\n", "development:\n  mode: devel\n  destination: a/b\n"])

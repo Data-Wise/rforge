@@ -29,8 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `--site` must equal the source `url` plus the development prefix (`<dst>/` for
   `devel` only); the audit never appends it. A mismatching base, a Bootstrap 3
-  devel site, an unknown mode or destination, or an unparseable `DESCRIPTION`
-  version under `mode: auto` is `incomplete` before any request.
+  devel site, an unknown mode or destination, or an absent or unparseable pinned
+  `DESCRIPTION` version (for every mode) is `incomplete` before any request.
 - Configuration discovery follows pkgdown (first existing file, no merge) and
   reads `inst/_pkgdown.yml`/`.yaml`; any non-root configuration is still an
   overlay and keeps the stage incomplete.
@@ -45,8 +45,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `output-dir`) are refused and no longer yield a false `site-missing-page` or
   `site-unreleased-page`. Root redirects and general overrides are follow-up #123.
 - A2 live smoke pins its real sites to commits. medfit and probmed must now be
-  audited complete with checked routes and HTTP requests (the observation fails
-  otherwise), and glue (`template.package`) is the real site that must stay
+  audited complete with checked routes, HTTP requests, zero missing routes and no
+  warn/error findings (the observation fails otherwise; medfit is re-pinned to
+  `6d226fb`, which matches the live site), and glue (`template.package`) is the real site that must stay
   incomplete. Required A2 nodes changed: `test_release_mode_and_destination`
   (devel/destination now supported; two refusal cases added), and the bodies of
   `test_unsupported_layout_retains_supported_routes[quarto|extension]`,
