@@ -34,8 +34,9 @@ import pytest
 @pytest.mark.parametrize('config,supported',[
  ({},True),({'development':{'mode':'release'}},True),
  ({'template':{'bootstrap':5,'bootswatch':'litera','bslib':{'base_font':'Roboto'}}},True),
- ({'development':{'mode':'devel'}},False),({'development':{'destination':'dev'}},False),
+ ({'development':{'mode':'devel'}},True),({'development':{'destination':'dev'}},True),
  ({'template':{'path':'custom'}},False),({'as_is':True},False),({'build':{'extra_packages':['pkg']}},False),
+ ({'development':{'mode':'preview'}},False),({'development':{'destination':'a/b'}},False),
 ])
 def test_release_mode_and_destination(config,supported):
     routes,reasons,counts=site.routes(['man/private.Rd'],config)

@@ -147,11 +147,112 @@ def select_ref(root, ref):
     return {"ref":ref,"sha":sha,"timestamp":git(root,"show","-s","--format=%cI",sha),"selection":selection,"local_ref":True,"workflow_snapshot":"current local checkout; remote freshness unverified"}
 
 
+# pkgdown 2.2.1 rules mirrored here (differentially tested in tests/differential/; see SPEC-site-audit-quarto-devmode).
+PKGDOWN_RULE = "2.2.1"
+VALID_MODES = ("auto", "default", "release", "devel", "unreleased")
+CONFIG_CANDIDATES = ("_pkgdown.yml", "_pkgdown.yaml", "pkgdown/_pkgdown.yml", "pkgdown/_pkgdown.yaml",
+                     "inst/_pkgdown.yml", "inst/_pkgdown.yaml")
+ARTICLE_SUFFIXES = (".Rmd", ".rmd", ".qmd")  # pkgdown globs `\.[Rrq]md$`: not .md, .Rmarkdown, .RMD or .Qmd
+HTML_OUTPUTS = ("html_document", "html_vignette", "rmarkdown::html_document", "rmarkdown::html_vignette")
+OVERRIDE_KEY = re.compile(r"^output[-_](file|ext|dir)$")
+DEFAULT_QUARTO_PROJECT = {"project": {"render": ["*.qmd"]}}
+INT_MAX = 2 ** 31 - 1
+
+
+def dev_mode_auto(version):
+    """pkgdown 2.2.1 `dev_mode_auto`; an unparseable version raises (R's `package_version` errors too)."""
+    text = version.strip() if isinstance(version, str) else ""
+    if not re.fullmatch(r"[0-9]+(?:[.-][0-9]+)+", text):
+        raise ValueError(f"unparseable DESCRIPTION Version: {version!r}")
+    parts = [int(x) for x in re.split(r"[.-]", text)]
+    if any(x > INT_MAX for x in parts):
+        raise ValueError(f"unparseable DESCRIPTION Version: {version!r}")
+    if len(parts) < 3:
+        return "release"
+    if len(parts) == 3:
+        return "devel" if parts[2] >= 9000 else "release"
+    return "unreleased" if parts[:3] == [0, 0, 0] else "devel"
+
+
+def resolve_development(config, version=None):
+    """Resolve `development.mode`/`destination` the way pkgdown does; never guess (raises ValueError).
+
+    `version` (or a callable returning it) is only consulted for `mode: auto`.
+    """
+    development = config.get("development")
+    if development is None:
+        development = {}
+    if not isinstance(development, dict):
+        raise ValueError("development configuration must be a mapping")
+    mode = development.get("mode", "default")
+    if not isinstance(mode, str) or mode not in VALID_MODES:
+        raise ValueError(f"development.mode unsupported: {mode!r}")
+    destination = development.get("destination", "dev")
+    if not isinstance(destination, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", destination):
+        raise ValueError(f"development.destination unsupported: {destination!r}")
+    if mode == "auto":
+        mode = dev_mode_auto(version() if callable(version) else version)
+    in_dev = mode == "devel"
+    return {"mode": mode, "destination": destination, "in_dev": in_dev,
+            "prefix": destination + "/" if in_dev else "", "pkgdown_rule": PKGDOWN_RULE}
+
+
+def bootstrap_version(config):
+    """pkgdown's Bootstrap version (unset means 3); anything it would reject or take from a template package raises."""
+    template = config.get("template")
+    if template is None:
+        template = {}
+    if not isinstance(template, dict):
+        raise ValueError("template configuration must be a mapping")
+    bslib = template.get("bslib")
+    bslib_version = bslib.get("version") if isinstance(bslib, dict) else None
+    if template.get("bootstrap") is not None and bslib_version is not None:
+        raise ValueError("template.bootstrap and template.bslib.version are both set")
+    value = template.get("bootstrap") if template.get("bootstrap") is not None else bslib_version
+    if value is None:
+        if "package" in template:
+            raise ValueError("Bootstrap version may come from template.package and cannot be resolved")
+        return 3
+    try:
+        number = float(value) if not isinstance(value, bool) else None
+    except (TypeError, ValueError):
+        number = None
+    if number not in (3.0, 4.0, 5.0):
+        raise ValueError(f"template Bootstrap version unsupported: {value!r}")
+    return 5 if number == 4.0 else int(number)
+
+
+def match_base(requested, config_url, resolved):
+    """Strict base match: `requested` must equal `config.url + prefix` (never appended on the caller's behalf)."""
+    requested = base_url(requested)
+    destination = resolved["destination"]
+    if config_url:
+        root = base_url(config_url)
+        dev = root + destination + "/"
+        if resolved["in_dev"]:
+            if requested == dev:
+                return
+            if requested == root:
+                raise ValueError(f"requested base lacks the dev prefix: development mode is devel, so audit {dev}")
+        else:
+            if requested == root:
+                return
+            if requested == dev:
+                raise ValueError(f"requested base is the dev URL but development.mode resolves to the root: audit {root}")
+        raise ValueError("source url disagrees; select canonical URL in a fresh invocation")
+    ends = requested.endswith("/" + destination + "/")
+    if resolved["in_dev"] and not ends:
+        raise ValueError(f"requested base lacks the dev prefix: development mode is devel, so the URL must end in /{destination}/")
+    if not resolved["in_dev"] and ends:
+        raise ValueError(f"requested base ends in /{destination}/ but development.mode resolves to the root")
+
+
 def routes(paths, config):
     found = {}; reasons = []; counts = {"excluded":0,"unsupported":0}
-    development = config.get("development", {})
-    if isinstance(development, dict) and (development.get("mode", "release") != "release" or "destination" in development):
-        reasons.append("development mode/destination mapping unsupported")
+    try:
+        resolve_development(config, "1.0.0")  # shape and value checks only; `auto` needs the pinned DESCRIPTION
+    except ValueError as exc:
+        reasons.append(str(exc))
     if any(key in config for key in ("as_is", "build", "includes")):
         reasons.append("custom layout/build configuration unsupported")
     template = config.get("template", {})
@@ -161,14 +262,12 @@ def routes(paths, config):
         path = Path(file); route = None
         if file.startswith("man/") and path.suffix == ".Rd" and len(path.parts) == 2:
             route = "reference/" + path.stem + ".html"
-        elif file.startswith("vignettes/"):
-            parts = list(path.parts[1:])
-            if path.name.startswith("_") or "tutorials" in parts:
+        elif file.startswith("vignettes/") and path.suffix in ARTICLE_SUFFIXES:
+            relative = file[len("vignettes/"):]
+            # pkgdown: `^_` on the file name and the regex `^tutorials` on the directory part only.
+            if path.name.startswith("_") or posixpath.dirname(relative).startswith("tutorials"):
                 counts["excluded"] += 1; continue
-            if path.suffix != ".Rmd":
-                if path.suffix in (".qmd", ".md", ".Rmarkdown"):
-                    counts["unsupported"] += 1; reasons.append(f"unsupported article source: {file}")
-                continue
+            parts = list(Path(relative).parts)
             if parts[0] == "articles":
                 parts = parts[1:]
             route = "articles/" + str(Path(*parts).with_suffix(".html"))
@@ -180,47 +279,134 @@ def routes(paths, config):
     return found, reasons, counts
 
 
+def override_key(node):
+    """First route-changing key anywhere in a front-matter structure, else None."""
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if isinstance(key, str) and OVERRIDE_KEY.match(key):
+                return key
+            found = override_key(value)
+            if found:
+                return found
+    elif isinstance(node, list):
+        for item in node:
+            found = override_key(item)
+            if found:
+                return found
+    return None
+
+
+def non_html_format(value):
+    if value is None:
+        return False
+    if isinstance(value, str):
+        return value != "html"
+    if isinstance(value, dict):
+        return any(key != "html" for key in value)
+    if isinstance(value, list):
+        return any(non_html_format(item) for item in value)
+    return True
+
+
+def article_problem(file, metadata):
+    """Why an article's output route cannot be inferred statically, else None. `.Rmd`/`.rmd` and `.qmd` differ."""
+    key = override_key(metadata)
+    if key is None and "knit" in metadata:
+        key = "knit"
+    if key:
+        return f"route-changing article override ({key}): {file}"
+    settings = metadata.get("pkgdown")
+    if file.endswith(".qmd"):
+        if non_html_format(metadata.get("format")):
+            return f"unsupported article format (format): {file}"
+    else:
+        output = metadata.get("output")
+        formats = list(output) if isinstance(output, dict) else [output] if output else []
+        if any(format not in HTML_OUTPUTS for format in formats):
+            return f"unsupported article output/as_is: {file}"
+        if settings is not None and not isinstance(settings, dict):
+            return f"unsupported article output extension (pkgdown): {file}"
+        if isinstance(settings, dict) and "extension" in settings and settings["extension"] != "html":
+            return f"unsupported article output extension (pkgdown.extension): {file}"
+    if isinstance(settings, dict) and settings.get("as_is") or metadata.get("as_is"):
+        return f"unsupported article output/as_is: {file}"
+    return None
+
+
+def workflow_blocks(root, sha, tree):
+    """Reasons the workflows at the pinned SHA make a static route mapping unverifiable (read via `git show`)."""
+    reasons = []
+    for path in tree:
+        if not re.fullmatch(r"\.github/workflows/[^/]+\.ya?ml", path):
+            continue
+        text = git(root, "show", sha + ":" + path)
+        if "PKGDOWN_DEV_MODE" in text:
+            reasons.append("workflow PKGDOWN_DEV_MODE mapping unsupported")
+        elif re.search(r"(?i)pkgdown|deploy_to_branch|build_site", text):
+            jobs = yaml_data(text).get("jobs", {})
+            if isinstance(jobs, dict) and any(isinstance(job, dict) and "uses" in job for job in jobs.values()):
+                reasons.append(f"reusable workflow job unsupported ({path}); the deployed routes cannot be verified")
+    return list(dict.fromkeys(reasons))
+
+
 def audit(root: Path, *, url, ref=None):
-    stage = {"state":"incomplete","counts":{"checked":0,"missing":0,"extra":0,"unreleased":0},"provenance":{},"reasons":[],"engine_missing":[],"findings":[]}
+    stage = {"state":"incomplete","counts":{"checked":0,"missing":0,"extra":0,"unreleased":0},"provenance":{},"reasons":[],"engine_missing":[],"findings":[],"content_freshness":"unverified"}
     try:
         base = base_url(url)
         provenance = select_ref(root,ref); stage["provenance"] = {**provenance,"requested_base":base}
-        top = Path(git(root,"rev-parse","--show-toplevel"))
+        sha = provenance["sha"]
         # Git owns package-relative casing on case-insensitive filesystems.
         prefix = git(root,"rev-parse","--show-prefix")
-        tree = git(root,"ls-tree","--full-tree","-r","--name-only",provenance["sha"]).splitlines()
+        tree = git(root,"ls-tree","--full-tree","-r","--name-only",sha).splitlines()
         paths = [p[len(prefix):] for p in tree if p.startswith(prefix)]
-        config = {}
-        configs = [p for p in paths if p in ("_pkgdown.yml","_pkgdown.yaml") or p.startswith("pkgdown/") and p.endswith((".yml",".yaml"))]
-        if len(configs) > 1 or any(p.startswith("pkgdown/") for p in configs):
+        # pkgdown reads the first existing candidate and never merges; any other config-like file is an overlay.
+        present = [p for p in CONFIG_CANDIDATES if p in paths]
+        if len(present) > 1 or any("/" in p for p in present) or any(p.startswith("pkgdown/") and p.endswith((".yml",".yaml")) for p in paths):
             stage["reasons"].append("pkgdown configuration overlays unsupported")
-        for config_file in configs:
-            config.update(yaml_data(git(root,"show",provenance["sha"] + ":" + prefix + config_file)))
-        if config.get("url") and base_url(config["url"]) != base:
-            raise ValueError("source url disagrees; select canonical URL in a fresh invocation")
+        config = yaml_data(git(root,"show",sha + ":" + prefix + present[0])) if present else {}
+        def pinned_version():
+            description = git(root,"show",sha + ":" + prefix + "DESCRIPTION")
+            match = re.search(r"^Version:[ \t]*(\S.*?)[ \t]*$", description, re.M)
+            if not match:
+                raise ValueError("DESCRIPTION has no Version field")
+            return match.group(1)
+        development = resolve_development(config, pinned_version)
+        stage["development"] = {k: development[k] for k in ("mode","prefix","destination","pkgdown_rule")}
+        if development["in_dev"] and bootstrap_version(config) == 3:
+            raise ValueError("development mode with Bootstrap 3 writes an unprefixed sitemap; unsupported")
+        source_url = config.get("url")
+        if source_url is not None and not isinstance(source_url, str):
+            raise ValueError("pkgdown url must be a string")
+        match_base(base, source_url, development)
         expected, reasons, counts = routes(paths,config)
         stage["reasons"].extend(reasons); stage["counts"].update(counts)
+        quarto = [p for p in ("vignettes/_quarto.yaml","vignettes/_quarto.yml") if p in paths]
+        if quarto and any(f.endswith(".qmd") for f in expected.values()):
+            try:
+                if len(quarto) > 1:
+                    raise ValueError("both present")
+                if yaml_data(git(root,"show",sha + ":" + prefix + quarto[0])) != DEFAULT_QUARTO_PROJECT:
+                    raise ValueError("not the pkgdown default")
+            except ValueError:
+                stage["reasons"].append("unsupported Quarto project configuration: " + ", ".join(quarto))
+        refused=set()
         for route,file in list(expected.items()):
-            if not file.endswith(".Rmd"):continue
-            source=git(root,"show",provenance["sha"]+":"+prefix+file)
+            if not file.endswith(ARTICLE_SUFFIXES):continue
+            source=git(root,"show",sha+":"+prefix+file)
             if not source.startswith("---"):continue
             parts=source.split("---",2)
             if len(parts)!=3:
                 stage["reasons"].append("unterminated article frontmatter: "+file);continue
-            metadata=yaml_data(parts[1])
-            output=metadata.get("output")
-            formats=list(output) if isinstance(output,dict) else [output] if output else []
-            custom=any(format not in ("html_document","html_vignette","rmarkdown::html_document","rmarkdown::html_vignette") for format in formats)
-            settings=metadata.get("pkgdown",{})
-            if custom or isinstance(settings,dict) and settings.get("as_is") or metadata.get("as_is"):
-                stage["reasons"].append("unsupported article output/as_is: "+file)
+            problem=article_problem(file,yaml_data(parts[1]))
+            if problem:
+                stage["reasons"].append(problem)
                 stage["counts"]["unsupported"]+=1
+                refused.add(file)
                 del expected[route]
-        # Even explicit ref cannot certify development workflow transforms.
-        for workflow in (top/".github/workflows").glob("*.y*ml"):
-            if "PKGDOWN_DEV_MODE" in workflow.read_text():
-                stage["reasons"].append("workflow PKGDOWN_DEV_MODE mapping unsupported")
-        if any("development" in r or "PKGDOWN_DEV_MODE" in r for r in stage["reasons"]):
+        # Even an explicit ref cannot certify workflow transforms: read them at the pinned SHA, not the working tree.
+        blocked = workflow_blocks(root, sha, tree)
+        if blocked:
+            stage["reasons"].extend(blocked)
             return stage
         observed, foreign = sitemap(base)
         stage["counts"].update(checked=len(expected), foreign=foreign)
@@ -240,7 +426,7 @@ def audit(root: Path, *, url, ref=None):
         current,_,_ = routes(working,config)
         head_paths = git(root,"ls-tree","--full-tree","-r","--name-only","HEAD").splitlines()
         for route,file in current.items():
-            if route not in expected:
+            if route not in expected and file not in refused:
                 stage["counts"]["unreleased"] += 1
                 dirty = prefix + file not in head_paths
                 finding("site-unreleased-page","info",file,f"{'dirty-tree' if dirty else 'checkout-only'} unreleased route: {base}{route}")

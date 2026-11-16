@@ -430,10 +430,10 @@ def test_unrelated_reusable_workflow_does_not_block(tmp_path):
 
 
 def test_monorepo_workflow_is_read_from_the_repo_root(tmp_path, monkeypatch):
-    repo = tmp_path / "mono"; (repo / "packages").mkdir(parents=True)
-    pkg = repo / "packages" / "p"; pkg.mkdir()
-    commit(pkg, {"DESCRIPTION": DESC.format(version="1.0.0"), "man/internal.Rd": "x"}, init=True)
-    commit(repo, {".github/workflows/pkgdown.yaml": WORKFLOW_DEV}, "workflow")
+    repo = tmp_path / "mono"; pkg = repo / "packages" / "p"
+    pkg.mkdir(parents=True)
+    commit(repo, {"packages/p/DESCRIPTION": DESC.format(version="1.0.0"), "packages/p/man/internal.Rd": "x",
+                  ".github/workflows/pkgdown.yaml": WORKFLOW_DEV}, init=True)
     no_network(monkeypatch)
     r = site.audit(pkg, url="https://x.example/pkg/", ref="main")
     assert r["state"] == "incomplete" and any("PKGDOWN_DEV_MODE" in x for x in r["reasons"])
