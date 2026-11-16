@@ -166,7 +166,18 @@ def validate_package_triage(facts):
                         f"{where}: unresolved false-positive class blocks release unless scoped out of a partial scope")
 
 
-SUPPORTED_SITE_URL = "https://r-hub.github.io/cranlogs/"
+# The reviewed live-smoke identities, owned here and imported by the producer (scripts/a2_observations.py) so the two
+# cannot drift: each real site by name, deployed URL and full 40-hex commit. `role` is where the record may carry it.
+# Changing an entry is a deliberate act: re-audit the site at the new commit first (see tests/a2/test_observations.py).
+REVIEWED_LIVE_SITES = {
+    "cranlogs": {"role": "primary", "url": "https://r-hub.github.io/cranlogs/", "commit": "c02280c7b4c6d77ff5500f80e15118edad5d94dc"},
+    # medfit's 40f82c8 predates the live native-* to sem-* article rename (9 missing pages), so it is pinned later.
+    "medfit": {"role": "pinned", "url": "https://data-wise.github.io/medfit/", "commit": "6d226fb1d4ce0b46cf297c2e88154d685a337dee"},
+    "probmed": {"role": "pinned", "url": "https://data-wise.github.io/probmed/", "commit": "ab411df7f083e169dd4b56f264e867e4fd51e1c4"},
+    # glue's `template.package` is a custom template mapping the audit refuses; its dev URL resolves `mode: auto` to devel.
+    "glue": {"role": "limit", "url": "https://glue.tidyverse.org/dev/", "commit": "da9c73f7a3de6a27f3103cb5bb2355820a4c3a6a"},
+}
+SUPPORTED_SITE_URL = REVIEWED_LIVE_SITES["cranlogs"]["url"]
 GATE_NAMES = ("pytest", "test-all", "version-sync", "reference-sync", "command-sync", "mkdocs-strict")
 GATE_COMMANDS = {
     "pytest": "python -m pytest tests/ -q -p no:cacheprovider", "test-all": "bash tests/test-all.sh",
@@ -214,7 +225,7 @@ def validate_full_gates(facts, candidate_sha):
 
 
 # The supported real sites whose routes the live smoke must audit completely, by name and deployed URL.
-PINNED_SUPPORTED_URLS = {"medfit": "https://data-wise.github.io/medfit/", "probmed": "https://data-wise.github.io/probmed/"}
+PINNED_SUPPORTED_URLS = {n: e["url"] for n, e in REVIEWED_LIVE_SITES.items() if e["role"] == "pinned"}
 
 
 def site_run_is_sound(run):
@@ -271,11 +282,25 @@ def limit_run_is_unsupported_layout(run):
     return bool(layout) and all(any(p.match(r) for p in UNSUPPORTED_LAYOUT_REASON_PATTERNS) for r in layout)
 
 
+def run_is_reviewed_site(run, name):
+    """The run is the reviewed site `name`: its recorded name, deployed URL and full commit equal the one table's entry."""
+    entry = REVIEWED_LIVE_SITES.get(name)
+    return (isinstance(run, dict) and entry is not None and run.get("name") == name and run.get("url") == entry["url"]
+            and isinstance(run.get("source_ref"), str) and re.fullmatch(r"[0-9a-f]{40}", run["source_ref"]) is not None
+            and run["source_ref"] == entry["commit"])
+
+
 def validate_live_smoke(facts):
-    """Real supported deployed sites were checked over HTTP, and real packages the site check cannot cover say so."""
+    """Real supported deployed sites were checked over HTTP, and real packages the site check cannot cover say so.
+
+    Every run is bound to a reviewed identity (name, URL, full commit): a site audited at another commit, or a
+    different site substituted for the limit site, is not the evidence that was reviewed.
+    """
     where = "live smoke"
     site = facts.get("supported_site")
     require(isinstance(site, dict) and site.get("url") == facts.get("url") == SUPPORTED_SITE_URL and bool(facts.get("source_ref")), f"{where}: the pinned supported site is required")
+    require(run_is_reviewed_site(site, "cranlogs") and facts.get("source_ref") == site["source_ref"],
+            f"{where}: the supported site must be cranlogs at its reviewed commit")
     require(site_run_is_sound(site), f"{where}: supported site was not completely checked over HTTP with no missing routes or warn/error findings")
     require(facts.get("requests") == site["requests"] and facts.get("checked") == site["checked"], f"{where}: summary disagrees with the site run")
     pinned = facts.get("pinned_real_runs")
@@ -284,10 +309,16 @@ def validate_live_smoke(facts):
             f"{where}: pinned_real_runs must hold exactly one run for each of {sorted(PINNED_SUPPORTED_URLS)}")
     for run in pinned:
         require(run.get("url") == PINNED_SUPPORTED_URLS[run["name"]], f"{where}: pinned site {run['name']} audited the wrong URL")
+        require(run_is_reviewed_site(run, run["name"]), f"{where}: pinned site {run['name']} was not audited at its reviewed commit")
         require(site_run_is_sound(run), f"{where}: pinned site {run['name']} was not completely checked over HTTP with no missing routes or warn/error findings")
+    limits = sorted(n for n, e in REVIEWED_LIVE_SITES.items() if e["role"] == "limit")
     runs = facts.get("unsupported_real_runs")
-    require(isinstance(runs, list) and runs and all(limit_run_is_unsupported_layout(r) for r in runs),
-            f"{where}: each unsupported real site must be incomplete for a recognized unsupported-layout reason, not a transport or availability failure")
+    require(isinstance(runs, list) and all(isinstance(r, dict) for r in runs) and sorted(str(r.get("name")) for r in runs) == limits,
+            f"{where}: unsupported_real_runs must hold exactly one run for each of {limits}")
+    for run in runs:
+        require(run_is_reviewed_site(run, run["name"]), f"{where}: limit site {run['name']} was not audited at its reviewed URL and commit")
+        require(limit_run_is_unsupported_layout(run),
+                f"{where}: limit site {run['name']} must be incomplete for a recognized unsupported-layout reason, not a transport or availability failure")
 
 
 def validate_review(facts, candidate_sha):

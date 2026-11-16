@@ -27,30 +27,25 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT))
 
 from a2_gate_record import produce as produce_gates  # noqa: E402
-from verify_a2_release import (SUPPORTED_SITE_URL, limit_run_is_unsupported_layout, site_run_is_sound, VerificationError, validate_full_gates, validate_package_triage,  # noqa: E402
+from verify_a2_release import (REVIEWED_LIVE_SITES, SUPPORTED_SITE_URL, limit_run_is_unsupported_layout, site_run_is_sound, VerificationError, validate_full_gates, validate_package_triage,  # noqa: E402
                                validate_requirements, validate_review)
 
+# Identity (name, URL, commit) of every real site comes from the verifier's one table, REVIEWED_LIVE_SITES, so what this
+# producer audits and what the verifier accepts cannot drift; only the clone URL is kept here.
+def _site(name: str, repo: str) -> dict:
+    return {"name": name, "repo": repo, "url": REVIEWED_LIVE_SITES[name]["url"], "commit": REVIEWED_LIVE_SITES[name]["commit"]}
+
+
 # A real deployed pkgdown site with a supported configuration (release mode, no template, one sitemap request).
-SUPPORTED_SITE = {"name": "cranlogs", "repo": "https://github.com/r-hub/cranlogs", "url": SUPPORTED_SITE_URL,
-                  "commit": "c02280c7b4c6d77ff5500f80e15118edad5d94dc"}
+SUPPORTED_SITE = _site("cranlogs", "https://github.com/r-hub/cranlogs")
 # Real packages audited at pinned commits (a floating HEAD could change which side of the supported line a site is on).
 # medfit and probmed (pkgdown `development.mode: auto`, `.qmd` articles) became supported in #111: the observation
 # FAILS unless both are audited complete with checked routes, HTTP requests, zero missing routes and no warn/error
-# findings, so a route-mapping regression cannot hide behind a site that is still incomplete. medfit is pinned to a commit
-# whose routes match the live site (40f82c8 predates the live native-* to sem-* article rename: 9 missing pages).
-PINNED_SUPPORTED_SITES = (
-    {"name": "medfit", "repo": "https://github.com/Data-Wise/medfit", "url": "https://data-wise.github.io/medfit/",
-     "commit": "6d226fb1d4ce0b46cf297c2e88154d685a337dee"},
-    {"name": "probmed", "repo": "https://github.com/Data-Wise/probmed", "url": "https://data-wise.github.io/probmed/",
-     "commit": "ab411df7f083e169dd4b56f264e867e4fd51e1c4"},
-)
+# findings, so a route-mapping regression cannot hide behind a site that is still incomplete.
+PINNED_SUPPORTED_SITES = (_site("medfit", "https://github.com/Data-Wise/medfit"), _site("probmed", "https://github.com/Data-Wise/probmed"))
 # Separately, at least one real site must still be reported incomplete: glue's `template.package` (tidytemplate) is a
-# custom template mapping this audit refuses. Its dev URL is requested because glue's version (x.y.z.9000) resolves
-# `mode: auto` to devel.
-LIMIT_SITES = (
-    {"name": "glue", "repo": "https://github.com/tidyverse/glue", "url": "https://glue.tidyverse.org/dev/",
-     "commit": "da9c73f7a3de6a27f3103cb5bb2355820a4c3a6a"},
-)
+# custom template mapping this audit refuses.
+LIMIT_SITES = (_site("glue", "https://github.com/tidyverse/glue"),)
 RENDERED_PAGES = {
     "guides/docs-audit": ("--site", "--run-examples", "unverified", "sandbox", "--fail-on error", "INCOMPLETE"),
     "tutorials/fix-a-docs-check-finding": ("--site", "--run-examples", "INCOMPLETE", "figure"),

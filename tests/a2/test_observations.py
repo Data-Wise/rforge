@@ -63,6 +63,32 @@ LIVE_DEFECTS = {
     'limit-reasons-absent': lambda f: f['unsupported_real_runs'][0].pop('reasons'),
     'limit-state-absent': lambda f: f['unsupported_real_runs'][0].pop('state'),
     'limit-second-run-transport': lambda f: f['unsupported_real_runs'].append(dict(f['unsupported_real_runs'][0], name='x', reasons=['HTTP Error 503'])),
+    # every run is bound to the reviewed identity: name, deployed URL and full commit (one table, owned by the verifier)
+    'primary-wrong-sha': lambda f: f['supported_site'].update(source_ref='1' * 40),
+    'medfit-wrong-sha': lambda f: f['pinned_real_runs'][0].update(source_ref='2' * 40),
+    'probmed-wrong-sha': lambda f: f['pinned_real_runs'][1].update(source_ref='3' * 40),
+    'glue-wrong-sha': lambda f: f['unsupported_real_runs'][0].update(source_ref='4' * 40),
+    'primary-short-sha': lambda f: f['supported_site'].update(source_ref=f['supported_site']['source_ref'][:7]),
+    'medfit-short-sha': lambda f: f['pinned_real_runs'][0].update(source_ref=f['pinned_real_runs'][0]['source_ref'][:12]),
+    'probmed-short-sha': lambda f: f['pinned_real_runs'][1].update(source_ref=f['pinned_real_runs'][1]['source_ref'][:7]),
+    'glue-short-sha': lambda f: f['unsupported_real_runs'][0].update(source_ref=f['unsupported_real_runs'][0]['source_ref'][:7]),
+    'glue-uppercase-sha': lambda f: f['unsupported_real_runs'][0].update(source_ref=f['unsupported_real_runs'][0]['source_ref'].upper()),
+    'primary-lacks-source-ref': lambda f: f['supported_site'].pop('source_ref'),
+    'medfit-lacks-source-ref': lambda f: f['pinned_real_runs'][0].pop('source_ref'),
+    'probmed-source-ref-none': lambda f: f['pinned_real_runs'][1].update(source_ref=None),
+    'glue-lacks-source-ref': lambda f: f['unsupported_real_runs'][0].pop('source_ref'),
+    'summary-source-ref-disagrees': lambda f: f.update(source_ref='5' * 40),
+    'primary-wrong-name': lambda f: f['supported_site'].update(name='someone-else'),
+    'primary-lacks-name': lambda f: f['supported_site'].pop('name'),
+    'glue-wrong-name': lambda f: f['unsupported_real_runs'][0].update(name='dplyr'),
+    'glue-lacks-name': lambda f: f['unsupported_real_runs'][0].pop('name'),
+    'glue-wrong-url': lambda f: f['unsupported_real_runs'][0].update(url='https://glue.tidyverse.org/'),
+    'glue-lacks-url': lambda f: f['unsupported_real_runs'][0].pop('url'),
+    'substitute-limit-site': lambda f: f['unsupported_real_runs'][0].update(name='dplyr', url='https://dplyr.tidyverse.org/dev/'),
+    'substitute-limit-site-keeping-glue-identity-fields-blank': lambda f: f.update(unsupported_real_runs=[{'state': 'incomplete', 'reasons': ['custom template mapping unsupported']}]),
+    'extra-limit-run': lambda f: f['unsupported_real_runs'].append(dict(f['unsupported_real_runs'][0], name='dplyr', url='https://dplyr.tidyverse.org/dev/')),
+    'duplicate-glue-run': lambda f: f['unsupported_real_runs'].append(dict(f['unsupported_real_runs'][0])),
+    'limit-entry-not-a-dict': lambda f: f['unsupported_real_runs'].append('glue'),
     # an old-shape record (before the pinned sites existed) has none of the new fields and must not default to a pass
     'old-shape-record': lambda f: ([f['supported_site'].pop(k) for k in ('missing', 'finding_severities')], f.pop('pinned_real_runs')),
 }
@@ -357,10 +383,30 @@ def _live(tmp_path, **changes):
                                   limits=SITES['lim'], pinned_supported=PINNED)
 
 
-def test_pinned_real_sites_must_be_complete_and_are_recorded(tmp_path):
-    facts, status = _live(tmp_path)
+def _live_reviewed(tmp_path, monkeypatch, **changes):
+    """Run the producer on the four REAL site identities; each clone stub stands in for the reviewed commit.
+
+    The stub repo's HEAD plays the part of the reviewed SHA, so the verifier's table is patched to it (the table is
+    otherwise the real one). The record that comes back is exactly what the producer writes.
+    """
+    sites = {n: {'name': n, 'repo': 'r', 'url': e['url']} for n, e in v.REVIEWED_LIVE_SITES.items()}
+    glue_url = v.REVIEWED_LIVE_SITES['glue']['url']
+    states = {**BASE, glue_url: ('incomplete', 0, ['custom template mapping unsupported']), **changes}
+    states.pop('https://l/', None)
+
+    def clone(repo, dest):
+        sha = _clone_stub(repo, dest)
+        monkeypatch.setitem(v.REVIEWED_LIVE_SITES, dest.name, {**v.REVIEWED_LIVE_SITES[dest.name], 'commit': sha})
+        sites[dest.name]['commit'] = sha
+        return sha
+    return obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=clone, supported=sites['cranlogs'],
+                                  limits=(sites['glue'],), pinned_supported=(sites['medfit'], sites['probmed']))
+
+
+def test_pinned_real_sites_must_be_complete_and_are_recorded(tmp_path, monkeypatch):
+    facts, status = _live_reviewed(tmp_path, monkeypatch)
     assert status == 'passed' and [r['name'] for r in facts['pinned_real_runs']] == ['medfit', 'probmed']
-    assert [r['name'] for r in facts['unsupported_real_runs']] == ['lim']
+    assert [r['name'] for r in facts['unsupported_real_runs']] == ['glue']
     v.validate_live_smoke(facts)
 
 
@@ -442,8 +488,8 @@ def test_pinned_and_primary_sites_must_have_no_missing_routes_or_warn_findings(t
     assert status == 'failed'
 
 
-def test_info_findings_do_not_fail_the_observation_and_are_recorded(tmp_path):
-    facts, status = _live(tmp_path, **{v.PINNED_SUPPORTED_URLS['medfit']: ('complete', 66, [], 1, 0, ['info', 'info'])})
+def test_info_findings_do_not_fail_the_observation_and_are_recorded(tmp_path, monkeypatch):
+    facts, status = _live_reviewed(tmp_path, monkeypatch, **{v.PINNED_SUPPORTED_URLS['medfit']: ('complete', 66, [], 1, 0, ['info', 'info'])})
     assert status == 'passed'
     run = facts['pinned_real_runs'][0]
     assert run['missing'] == 0 and run['finding_severities'] == ['info']
@@ -468,10 +514,23 @@ def test_pinned_supported_sites_are_pinned_to_the_reviewed_full_commit_shas():
     import re
     pins = {s['name']: s.get('commit') for s in _every_site()}
     assert pins == EXPECTED_PINS
+    # one table: the verifier's REVIEWED_LIVE_SITES is the source the producer pins from, never a second copy
+    assert pins == {n: e['commit'] for n, e in v.REVIEWED_LIVE_SITES.items()}
+    assert {n: e['url'] for n, e in v.REVIEWED_LIVE_SITES.items()} == {s['name']: s['url'] for s in _every_site()}
     for name, commit in pins.items():
         assert isinstance(commit, str) and re.fullmatch(r'[0-9a-f]{40}', commit), f'{name} is not a full lowercase 40-hex SHA'
         assert commit.upper() not in ('HEAD', 'MAIN', 'MASTER') and commit != '0' * 40, f'{name} is a floating or null ref'
     assert pins['medfit'] != '40f82c85fdad0979949bee389afe2c7301660315'  # the superseded pin
+
+
+def test_the_producer_holds_no_second_copy_of_the_reviewed_identities():
+    import inspect
+    import re
+    source = inspect.getsource(obs)
+    assert not re.findall(r'\b[0-9a-f]{40}\b', source), 'a commit SHA is hard-coded in the producer; pin it in verify_a2_release.REVIEWED_LIVE_SITES'
+    assert obs.REVIEWED_LIVE_SITES == v.REVIEWED_LIVE_SITES
+    assert {e['role'] for e in v.REVIEWED_LIVE_SITES.values()} == {'primary', 'pinned', 'limit'}
+    assert [n for n, e in v.REVIEWED_LIVE_SITES.items() if e['role'] == 'limit'] == ['glue']
 
 
 def test_the_pinned_site_urls_match_the_verifier_and_every_pin_is_distinct():
@@ -516,8 +575,8 @@ def test_the_producer_and_the_verifier_share_one_soundness_predicate_and_one_pin
     assert {s['name']: s['url'] for s in obs.PINNED_SUPPORTED_SITES} == v.PINNED_SUPPORTED_URLS
 
 
-def test_a_record_from_the_real_producer_is_accepted_by_the_verifier(tmp_path):
-    facts, status = _live(tmp_path)
+def test_a_record_from_the_real_producer_is_accepted_by_the_verifier(tmp_path, monkeypatch):
+    facts, status = _live_reviewed(tmp_path, monkeypatch)
     assert status == 'passed'
     v.validate_live_smoke(facts)
     facts['pinned_real_runs'][0]['missing'] = 1  # the same drift the producer rejects must be rejected downstream
