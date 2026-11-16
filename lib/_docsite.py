@@ -342,7 +342,9 @@ def workflow_blocks(root, sha, tree):
         text = git(root, "show", sha + ":" + path)
         if "PKGDOWN_DEV_MODE" in text:
             reasons.append("workflow PKGDOWN_DEV_MODE mapping unsupported")
-        elif re.search(r"(?i)pkgdown|deploy_to_branch|build_site", text):
+        else:
+            # SPEC decision 2: ANY job-level `uses:` is unverifiable. A reusable workflow can build or deploy the
+            # site without ever naming pkgdown, so no keyword gate; step-level `uses:` (actions) is unaffected.
             jobs = yaml_data(text).get("jobs", {})
             if isinstance(jobs, dict) and any(isinstance(job, dict) and "uses" in job for job in jobs.values()):
                 reasons.append(f"reusable workflow job unsupported ({path}); the deployed routes cannot be verified")

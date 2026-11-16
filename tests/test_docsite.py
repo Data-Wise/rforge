@@ -420,9 +420,33 @@ def test_step_level_uses_does_not_block(tmp_path):
     assert r["state"] == "complete"
 
 
-def test_unrelated_reusable_workflow_does_not_block(tmp_path):
+@pytest.mark.parametrize("name,body", [
+    ("ci.yaml", "on: pull_request\njobs:\n  check:\n    uses: r-lib/actions/.github/workflows/check-standard.yaml@v2\n"),
+    ("release.yml", "on:\n  push:\n    branches: [main]\njobs:\n  go:\n    uses: ./.github/workflows/shared.yml\n"),
+    ("a.yaml", "on: workflow_dispatch\njobs:\n  one:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo hi\n  two:\n    uses: org/repo/.github/workflows/w.yml@v1\n"),
+])
+def test_any_reusable_workflow_job_blocks_even_without_pkgdown_words(tmp_path, monkeypatch, name, body):
+    """SPEC decision 2: ANY job-level `uses:` is unverifiable (a generically named reusable workflow can deploy the site)."""
+    pkg = make(tmp_path, files={".github/workflows/" + name: body})
+    no_network(monkeypatch)
+    r = site.audit(pkg, url="https://x.example/pkg/", ref="main")
+    assert r["state"] == "incomplete" and r["counts"]["checked"] == 0 and not r["findings"]
+    assert any("reusable workflow job" in x and name in x for x in r["reasons"])
+
+
+def test_a_reusable_workflow_hidden_from_the_working_tree_still_blocks(tmp_path, monkeypatch):
+    body = "on: push\njobs:\n  go:\n    uses: org/shared/.github/workflows/deploy.yml@v1\n"
+    pkg = make(tmp_path, files={".github/workflows/deploy.yaml": body})
+    old = git(pkg, "rev-parse", "HEAD")
+    commit(pkg, {".github/workflows/deploy.yaml": "on: push\njobs:\n  go:\n    steps:\n      - run: echo hi\n"}, "inline it")
+    no_network(monkeypatch)
+    r = site.audit(pkg, url="https://x.example/pkg/", ref=old)
+    assert r["state"] == "incomplete" and any("reusable workflow job" in x for x in r["reasons"])
+
+
+def test_step_level_uses_only_workflows_do_not_block(tmp_path):
     web = tmp_path / "web"
-    body = "on: pull_request\njobs:\n  check:\n    uses: r-lib/actions/.github/workflows/check-standard.yaml@v2\n"
+    body = "on: pull_request\njobs:\n  check:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n"
     with server(web) as root:
         pkg = make(tmp_path, files={".github/workflows/check.yaml": body})
         publish(web, "", root, ROUTES)
