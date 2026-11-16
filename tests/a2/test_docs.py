@@ -14,7 +14,7 @@ def test_status_guidance_count_sync():
     status = (ROOT / '.STATUS').read_text()
     summary = re.search(r'^a2_acceptance_state: (.+)$', status, re.M).group(1)
     manifest = json.loads((ROOT / 'tests/a2/required.json').read_text())
-    gaps = sum(bool(group['coverage_gaps']) for group in manifest['groups'])
+    gaps = sum(any(g.startswith('External observation') for g in group['coverage_gaps']) for group in manifest['groups'])
     assert manifest['status'] == 'ready'
     assert f'{gaps} external-observation groups satisfied' in summary
     assert 'required nodes passed' in summary and '87525d4' in summary
@@ -34,6 +34,15 @@ def test_status_guidance_count_sync():
     assert f'all {commands} commands' in (ROOT / 'CLAUDE.md').read_text()
     assert commands == 44
     assert package['version'] == '2.22.2'
+
+
+def test_s08_records_the_deliberate_divergence_from_the_frozen_a2_spec_on_development_mode():
+    manifest = json.loads((ROOT / 'tests/a2/required.json').read_text())
+    s08 = next(group for group in manifest['groups'] if group['id'] == 'S08')
+    gap = ' '.join(s08['coverage_gaps'])
+    assert 'Deliberate divergence' in gap and 'development.mode' in gap and 'strict' in gap and 'prefix' in gap
+    assert not any('External observation' in g for g in s08['coverage_gaps'])  # not an external-observation group
+    assert '#111' in manifest['review_candidate'] and 'candidate 2' not in manifest['review_candidate']
 
 
 @pytest.mark.parametrize('prohibition', [

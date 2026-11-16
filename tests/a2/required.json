@@ -293,7 +293,9 @@
         "tests/a2/test_site_routes.py::test_release_mode_and_destination[config9-False]"
       ],
       "status": "ready",
-      "coverage_gaps": [],
+      "coverage_gaps": [
+        "Deliberate divergence from the frozen A2 SPEC (SPEC-docs-check-a2-2026-10-12.md, development.mode paragraph): issue #111 now supports pkgdown development.mode auto/default/release/devel/unreleased, resolved from the pinned DESCRIPTION version with pkgdown 2.2.1's rule, and the dev route prefix (`<destination>/`, default dev/) for a devel site, where the SPEC made every non-default mode incomplete. --site is matched strictly against the source url plus that prefix, never appended. This test covers release mode and destination only; the devel, auto, prefix and strict-base cases are covered by tests/test_docsite.py, not by this A2 group, and the frozen SPEC is intentionally not edited."
+      ],
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_site_integration.py": "c58326fa6e680666fd2563f4208af283ed334b0b838821e796b2485abe694f69",
@@ -1989,7 +1991,7 @@
   ],
   "mapping_review": "complete",
   "collected_nodes": 728,
-  "review_candidate": "A2 candidate 2: round-1 review fixes (producer-run binding, triage commit equality, crash-safe observations)",
+  "review_candidate": "#111 site-audit candidate: development.mode auto/devel and Quarto article support, engine false-complete fixes, and the shared live-smoke predicates (supported, pinned and limit sites)",
   "platforms": [
     "ubuntu-24.04",
     "macos-15"
