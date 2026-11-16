@@ -426,7 +426,8 @@ MAX_LOCAL_ACTIONS = 25
 
 def deploy_subdirectory(text, pkgdown_repo=True):
     """A deploy that publishes below the site root moves every route: `deploy_to_branch(subdir=)`, or a Pages
-    `target-folder` in a repository whose workflows build a pkgdown site (build and deploy may be separate files)."""
+    `target-folder` in a pkgdown repository (`pkgdown_repo`: a pkgdown config at the pinned SHA, or a workflow naming
+    pkgdown; build and deploy may be separate files). An unrelated `target-folder` in such a repository also blocks."""
     return bool((("deploy_to_branch" in text) and re.search(r"\bsubdir\s*=", text))
                 or (pkgdown_repo and re.search(r"\btarget[-_]folder\s*:", text)))
 
@@ -477,7 +478,11 @@ def workflow_blocks(root, sha, tree, prefix=""):
     files = set(tree)
     workflows = sorted(p for p in files if re.fullmatch(r"\.github/workflows/[^/]+\.ya?ml", p))
     texts = {p: git(root, "show", sha + ":" + p, strip=False) for p in workflows}
-    pkgdown_repo = any("pkgdown" in t for t in texts.values())
+    # "This is a pkgdown package" comes from the repository, not from workflow wording: a pkgdown config for the package
+    # directory under audit at the pinned SHA (the same candidates the config reader uses). Build and deploy can sit in
+    # different workflows and the build can hide in a local action, so neither need contain the word. Text detection is
+    # kept only for what a config misses: pkgdown builds without a config file, so a workflow that names it still counts.
+    pkgdown_repo = any(prefix + candidate in files for candidate in CONFIG_CANDIDATES) or any("pkgdown" in t for t in texts.values())
     startup_dirs = {"", prefix.rstrip("/")}
     for path in sorted(files):
         if posixpath.basename(path) in STARTUP_FILES and posixpath.dirname(path) in startup_dirs:

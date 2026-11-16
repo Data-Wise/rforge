@@ -1079,3 +1079,131 @@ def test_the_sitemap_reader_counts_only_url_children_for_the_unit_case(tmp_path)
         (web / "sitemap.xml").write_text(urlset(f"<url><loc>{root}reference/a.html</loc>{image}</url>", extra_ns=f' xmlns:image="{IMAGE_NS}"'))
         paths, foreign = site.sitemap(root)
     assert paths == {"reference/a.html"} and foreign == 0
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Codex round 6: "this is a pkgdown package" comes from a pkgdown config at the pinned SHA for the package
+# directory under audit, not from workflow wording. Build and deploy can sit in different workflows, and the
+# build can hide in a local composite action, so neither workflow need contain the word "pkgdown".
+# ---------------------------------------------------------------------------------------------------------
+BUILD_WORKFLOW = local_action_workflow("./.github/actions/site")
+SITE_ACTION = "runs:\n  using: composite\n  steps:\n    - run: ./scripts/site.sh\n      shell: bash\n"   # no pkgdown wording
+TARGET_FOLDER_DEPLOY = (WORKFLOW_HEAD + "jobs:\n  d:\n    runs-on: ubuntu-latest\n    steps:\n"
+                        "      - uses: JamesIves/github-pages-deploy-action@v4\n        with:\n          folder: docs\n          target-folder: v1\n")
+SUBDIR_DEPLOY = (WORKFLOW_HEAD + "jobs:\n  d:\n    runs-on: ubuntu-latest\n    steps:\n"
+                 "      - run: Rscript -e 'deploy_to_branch(subdir = \"v1\")'\n")
+CONFIG = "home:\n  title: Fixture\n"
+TWO_WORKFLOWS = {".github/workflows/build.yaml": BUILD_WORKFLOW, ".github/actions/site/action.yml": SITE_ACTION,
+                 ".github/workflows/deploy.yaml": TARGET_FOLDER_DEPLOY}
+
+
+def test_the_two_workflow_fixture_never_mentions_the_word_pkgdown():
+    assert not any("pkgdown" in text.lower() for text in TWO_WORKFLOWS.values())
+
+
+@pytest.mark.parametrize("config_path", ["_pkgdown.yml", "_pkgdown.yaml", "pkgdown/_pkgdown.yml", "pkgdown/_pkgdown.yaml",
+                                         "inst/_pkgdown.yml", "inst/_pkgdown.yaml"])
+def test_a_target_folder_deploy_blocks_when_a_pkgdown_config_exists_at_the_pinned_sha(tmp_path, monkeypatch, config_path):
+    pkg = make(tmp_path, files={**TWO_WORKFLOWS, config_path: CONFIG})
+    no_network(monkeypatch)
+    r = audit_args(pkg)
+    assert r["state"] == "incomplete" and any("subdirectory" in x and "deploy.yaml" in x for x in r["reasons"]), r["reasons"]
+
+
+@pytest.mark.parametrize("deploy", [SUBDIR_DEPLOY, TARGET_FOLDER_DEPLOY])
+def test_either_subdirectory_signal_blocks_with_a_config_and_no_pkgdown_wording(tmp_path, monkeypatch, deploy):
+    pkg = make(tmp_path, config=CONFIG, files={".github/workflows/deploy.yaml": deploy})
+    assert "pkgdown" not in deploy.lower()
+    no_network(monkeypatch)
+    r = audit_args(pkg)
+    assert r["state"] == "incomplete" and any("subdirectory" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_target_folder_inside_a_local_composite_action_blocks_with_a_config(tmp_path, monkeypatch):
+    action = ("runs:\n  using: composite\n  steps:\n    - uses: JamesIves/github-pages-deploy-action@v4\n"
+              "      with:\n        folder: docs\n        target-folder: v1\n")
+    pkg = make(tmp_path, config=CONFIG, files={".github/workflows/deploy.yaml": local_action_workflow("./.github/actions/d"),
+                                               ".github/actions/d/action.yml": action})
+    no_network(monkeypatch)
+    r = audit_args(pkg)
+    assert r["state"] == "incomplete" and any("subdirectory" in x and ".github/actions/d" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_config_that_exists_only_in_the_working_tree_does_not_trigger(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, files=TWO_WORKFLOWS)
+        (pkg / "_pkgdown.yml").write_text(CONFIG)            # untracked: not at the pinned SHA
+        publish(web, "", root, ROUTES)
+        r = site.audit(pkg, url=root, ref="main")
+    assert r["state"] == "complete" and not any("subdirectory" in x for x in r["reasons"]), r
+
+
+def test_a_config_added_after_the_pinned_ref_does_not_trigger(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, files=TWO_WORKFLOWS)
+        git(pkg, "branch", "pinned")
+        commit(pkg, {"_pkgdown.yml": CONFIG}, message="add config after the pin")
+        publish(web, "", root, ROUTES)
+        r = site.audit(pkg, url=root, ref="pinned")
+    assert r["state"] == "complete" and not any("subdirectory" in x for x in r["reasons"]), r
+
+
+def test_a_config_for_a_different_package_in_a_monorepo_does_not_trigger(tmp_path):
+    web = tmp_path / "web"
+    repo = tmp_path / "mono"; pkg = repo / "packages" / "ours"
+    pkg.mkdir(parents=True)
+    commit(repo, {"packages/ours/DESCRIPTION": DESC.format(version="1.0.0"), "packages/ours/man/internal.Rd": "x",
+                  "packages/other/_pkgdown.yml": CONFIG, ".github/workflows/deploy.yaml": TARGET_FOLDER_DEPLOY}, init=True)
+    with server(web) as root:
+        publish(web, "", root, ROUTES)
+        r = site.audit(pkg, url=root, ref="main")
+    assert r["state"] == "complete" and not any("subdirectory" in x for x in r["reasons"]), r
+
+
+def test_this_packages_config_in_a_monorepo_triggers(tmp_path, monkeypatch):
+    repo = tmp_path / "mono"; pkg = repo / "packages" / "ours"
+    pkg.mkdir(parents=True)
+    commit(repo, {"packages/ours/DESCRIPTION": DESC.format(version="1.0.0"), "packages/ours/man/internal.Rd": "x",
+                  "packages/ours/_pkgdown.yml": CONFIG, ".github/workflows/deploy.yaml": TARGET_FOLDER_DEPLOY}, init=True)
+    no_network(monkeypatch)
+    r = site.audit(pkg, url="https://x.example/pkg/", ref="main")
+    assert r["state"] == "incomplete" and any("subdirectory" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_repository_with_no_pkgdown_config_and_no_pkgdown_wording_is_unaffected(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, files=TWO_WORKFLOWS)
+        publish(web, "", root, ROUTES)
+        assert site.audit(pkg, url=root, ref="main")["state"] == "complete"
+
+
+def test_a_pkgdown_repository_with_no_target_folder_stays_complete(tmp_path):
+    web = tmp_path / "web"
+    plain_deploy = WORKFLOW_HEAD + "jobs:\n  d:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo deploy\n"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={".github/workflows/build.yaml": BUILD_WORKFLOW, ".github/actions/site/action.yml": SITE_ACTION,
+                                                   ".github/workflows/deploy.yaml": plain_deploy})
+        publish(web, "", root, ROUTES)
+        assert site.audit(pkg, url=root, ref="main")["state"] == "complete"
+
+
+def test_the_workflow_text_detection_still_covers_a_pkgdown_repo_with_no_config_file(tmp_path, monkeypatch):
+    """Kept: pkgdown builds without a config file, so a workflow that builds it is still evidence of a pkgdown site."""
+    pkg = make(tmp_path, files={".github/workflows/deploy.yaml": TARGET_FOLDER_DEPLOY.replace("docs", "pkgdown_out") + "# pkgdown\n"})
+    no_network(monkeypatch)
+    r = audit_args(pkg)
+    assert r["state"] == "incomplete" and any("subdirectory" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_the_reason_the_engine_gives_is_a_recognized_unsupported_layout_for_the_limit_site_rule():
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    import verify_a2_release as verifier
+    reasons = ["deploy to a subdirectory (.github/workflows/deploy.yaml); the deployed routes cannot be verified",
+               "deploy to a subdirectory in local action .github/actions/d; the deployed routes cannot be verified"]
+    for reason in reasons:
+        assert verifier.limit_run_is_unsupported_layout({"state": "incomplete", "reasons": [reason]}), reason
