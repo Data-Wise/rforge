@@ -63,6 +63,21 @@ LIVE_DEFECTS = {
     'limit-reasons-absent': lambda f: f['unsupported_real_runs'][0].pop('reasons'),
     'limit-state-absent': lambda f: f['unsupported_real_runs'][0].pop('state'),
     'limit-second-run-transport': lambda f: f['unsupported_real_runs'].append(dict(f['unsupported_real_runs'][0], name='x', reasons=['HTTP Error 503'])),
+    # only `info` findings (or none) are acceptable: an unknown, missing, None or non-string severity is never clean
+    'primary-unknown-severity': lambda f: f['supported_site'].update(finding_severities=['critical']),
+    'primary-notice-severity': lambda f: f['supported_site'].update(finding_severities=['notice']),
+    'primary-mixed-info-and-unknown': lambda f: f['supported_site'].update(finding_severities=['info', 'blocker']),
+    'primary-none-severity': lambda f: f['supported_site'].update(finding_severities=[None]),
+    'primary-string-none-severity': lambda f: f['supported_site'].update(finding_severities=['None']),
+    'primary-empty-string-severity': lambda f: f['supported_site'].update(finding_severities=['']),
+    'primary-non-string-severity': lambda f: f['supported_site'].update(finding_severities=[5]),
+    'primary-bool-severity': lambda f: f['supported_site'].update(finding_severities=[True]),
+    'primary-nested-severity': lambda f: f['supported_site'].update(finding_severities=[['info']]),
+    'primary-case-variant-severity': lambda f: f['supported_site'].update(finding_severities=['Info']),
+    'medfit-unknown-severity': lambda f: f['pinned_real_runs'][0].update(finding_severities=['critical']),
+    'medfit-mixed-info-and-unknown': lambda f: f['pinned_real_runs'][0].update(finding_severities=['info', 'weird']),
+    'probmed-none-severity': lambda f: f['pinned_real_runs'][1].update(finding_severities=[None]),
+    'probmed-non-string-severity': lambda f: f['pinned_real_runs'][1].update(finding_severities=[0]),
     # every run is bound to the reviewed identity: name, deployed URL and full commit (one table, owned by the verifier)
     'primary-wrong-sha': lambda f: f['supported_site'].update(source_ref='1' * 40),
     'medfit-wrong-sha': lambda f: f['pinned_real_runs'][0].update(source_ref='2' * 40),
@@ -486,6 +501,50 @@ def test_default_pinned_sites_are_the_real_medfit_and_probmed_commits():
 def test_pinned_and_primary_sites_must_have_no_missing_routes_or_warn_findings(tmp_path, change):
     _, status = _live(tmp_path, **change)
     assert status == 'failed'
+
+
+def _findings_audit(severities):
+    """An audit whose supported site reports findings with exactly these `severity` values (None means the key is absent)."""
+    def audit(path, url, ref):
+        findings = [({'check': 'x'} if sev is None else {'check': 'x', 'severity': sev}) for sev in severities] if url == v.SUPPORTED_SITE_URL else []
+        incomplete = url == v.REVIEWED_LIVE_SITES['glue']['url']
+        return {'stage': {'state': 'incomplete' if incomplete else 'complete', 'counts': {'checked': 0 if incomplete else 5, 'missing': 0},
+                          'reasons': ['custom template mapping unsupported'] if incomplete else [], 'findings': findings}, 'requests': 0 if incomplete else 1}
+    return audit
+
+
+def _run_with_severities(tmp_path, severities):
+    sites = {n: {'name': n, 'repo': 'r', 'url': e['url']} for n, e in v.REVIEWED_LIVE_SITES.items()}
+    return obs.observe_live_smoke(tmp_path, audit=_findings_audit(severities), clone=_clone_stub, supported=sites['cranlogs'],
+                                  limits=(sites['glue'],), pinned_supported=(sites['medfit'], sites['probmed']))
+
+
+@pytest.mark.parametrize('severities', [['critical'], ['notice'], ['info', 'critical'], [None], [5], [True], [''], ['Info'], ['warn'], ['error'], ['info', None]])
+def test_the_producer_fails_the_observation_for_any_severity_other_than_info(tmp_path, severities):
+    facts, status = _run_with_severities(tmp_path, severities)
+    assert status == 'failed'
+    recorded = facts['supported_site']['finding_severities']
+    assert all(s == 'info' for s in recorded) is False, recorded  # the offending value is recorded as itself, never dropped
+
+
+def test_a_finding_without_a_severity_is_recorded_as_none_not_the_string_none(tmp_path):
+    facts, status = _run_with_severities(tmp_path, [None])
+    assert facts['supported_site']['finding_severities'] == [None] and status == 'failed'
+
+
+@pytest.mark.parametrize('severities', [[], ['info'], ['info', 'info']])
+def test_only_info_findings_or_none_pass_the_producer_and_the_verifier(tmp_path, monkeypatch, severities):
+    sites = {n: {'name': n, 'repo': 'r', 'url': e['url']} for n, e in v.REVIEWED_LIVE_SITES.items()}
+
+    def clone(repo, dest):
+        sha = _clone_stub(repo, dest)
+        monkeypatch.setitem(v.REVIEWED_LIVE_SITES, dest.name, {**v.REVIEWED_LIVE_SITES[dest.name], 'commit': sha})
+        sites[dest.name]['commit'] = sha
+        return sha
+    facts, status = obs.observe_live_smoke(tmp_path, audit=_findings_audit(severities), clone=clone, supported=sites['cranlogs'],
+                                           limits=(sites['glue'],), pinned_supported=(sites['medfit'], sites['probmed']))
+    assert status == 'passed' and facts['supported_site']['finding_severities'] == sorted(set(severities))
+    v.validate_live_smoke(facts)
 
 
 def test_info_findings_do_not_fail_the_observation_and_are_recorded(tmp_path, monkeypatch):

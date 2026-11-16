@@ -40,7 +40,7 @@ def _site(name: str, repo: str) -> dict:
 SUPPORTED_SITE = _site("cranlogs", "https://github.com/r-hub/cranlogs")
 # Real packages audited at pinned commits (a floating HEAD could change which side of the supported line a site is on).
 # medfit and probmed (pkgdown `development.mode: auto`, `.qmd` articles) became supported in #111: the observation
-# FAILS unless both are audited complete with checked routes, HTTP requests, zero missing routes and no warn/error
+# FAILS unless both are audited complete with checked routes, HTTP requests, zero missing routes and only info
 # findings, so a route-mapping regression cannot hide behind a site that is still incomplete.
 PINNED_SUPPORTED_SITES = (_site("medfit", "https://github.com/Data-Wise/medfit"), _site("probmed", "https://github.com/Data-Wise/probmed"))
 # Separately, at least one real site must still be reported incomplete: glue's `template.package` (tidytemplate) is a
@@ -128,6 +128,20 @@ def counting_audit(path: Path, url: str, ref: str) -> dict:
     return {"stage": (report.get("stages") or {}).get("site") or {}, "requests": counter["requests"]}
 
 
+def _severities(findings) -> list:
+    """The distinct `severity` values of a stage's findings, as they are: never stringified and never dropped.
+
+    A finding with no severity (or a non-dict finding) is recorded as `None`, so the shared predicate rejects it
+    instead of it becoming the string "None" or vanishing from the set.
+    """
+    seen: list = []
+    for finding in findings or []:
+        severity = finding.get("severity") if isinstance(finding, dict) else None
+        if not any(severity is other or (type(severity) is type(other) and severity == other) for other in seen):
+            seen.append(severity)
+    return seen
+
+
 def observe_live_smoke(workdir: Path, audit: Optional[Callable] = None, clone: Optional[Callable] = None,
                        supported: dict = SUPPORTED_SITE, limits: tuple = LIMIT_SITES,
                        pinned_supported: tuple = PINNED_SUPPORTED_SITES) -> tuple:
@@ -145,7 +159,7 @@ def observe_live_smoke(workdir: Path, audit: Optional[Callable] = None, clone: O
         return {"name": site["name"], "url": site["url"], "source_ref": sha, "requests": result["requests"],
                 "state": stage.get("state"), "checked": (stage.get("counts") or {}).get("checked", 0),
                 "missing": (stage.get("counts") or {}).get("missing"),
-                "finding_severities": sorted({str(f.get("severity")) for f in stage.get("findings") or []}),
+                "finding_severities": _severities(stage.get("findings")),
                 "reasons": list(stage.get("reasons") or [])}
     primary = run(supported)
     pinned = [run(site) for site in pinned_supported]

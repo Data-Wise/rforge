@@ -233,15 +233,14 @@ def site_run_is_sound(run):
 
     `complete` means route presence was compared, not that no published route is missing: the run must also have
     made HTTP requests, checked routes, lost none (an absent or non-integer count is unknown, never zero) and
-    carry no warn/error finding (an absent or malformed severity list is unknown, never clean).
+    carry only `info` findings or none: an allow-list, so a new, unknown, missing or non-string severity is unknown, never clean.
     """
     if not isinstance(run, dict):
         return False
     severities = run.get("finding_severities")
     return (run.get("state") == "complete" and _int(run.get("requests")) and run["requests"] > 0
             and _int(run.get("checked")) and run["checked"] > 0 and _int(run.get("missing")) and run["missing"] == 0
-            and isinstance(severities, list) and all(isinstance(s, str) for s in severities)
-            and not {"warn", "error"} & set(severities))
+            and isinstance(severities, list) and all(isinstance(s, str) and s == "info" for s in severities))
 
 
 # Reasons the engine gives when it REFUSES a site layout or configuration (lib/_docsite.py). Matched from the start of
@@ -301,7 +300,7 @@ def validate_live_smoke(facts):
     require(isinstance(site, dict) and site.get("url") == facts.get("url") == SUPPORTED_SITE_URL and bool(facts.get("source_ref")), f"{where}: the pinned supported site is required")
     require(run_is_reviewed_site(site, "cranlogs") and facts.get("source_ref") == site["source_ref"],
             f"{where}: the supported site must be cranlogs at its reviewed commit")
-    require(site_run_is_sound(site), f"{where}: supported site was not completely checked over HTTP with no missing routes or warn/error findings")
+    require(site_run_is_sound(site), f"{where}: supported site was not completely checked over HTTP with no missing routes and only info findings")
     require(facts.get("requests") == site["requests"] and facts.get("checked") == site["checked"], f"{where}: summary disagrees with the site run")
     pinned = facts.get("pinned_real_runs")
     require(isinstance(pinned, list) and all(isinstance(r, dict) for r in pinned)
@@ -310,7 +309,7 @@ def validate_live_smoke(facts):
     for run in pinned:
         require(run.get("url") == PINNED_SUPPORTED_URLS[run["name"]], f"{where}: pinned site {run['name']} audited the wrong URL")
         require(run_is_reviewed_site(run, run["name"]), f"{where}: pinned site {run['name']} was not audited at its reviewed commit")
-        require(site_run_is_sound(run), f"{where}: pinned site {run['name']} was not completely checked over HTTP with no missing routes or warn/error findings")
+        require(site_run_is_sound(run), f"{where}: pinned site {run['name']} was not completely checked over HTTP with no missing routes and only info findings")
     limits = sorted(n for n, e in REVIEWED_LIVE_SITES.items() if e["role"] == "limit")
     runs = facts.get("unsupported_real_runs")
     require(isinstance(runs, list) and all(isinstance(r, dict) for r in runs) and sorted(str(r.get("name")) for r in runs) == limits,
