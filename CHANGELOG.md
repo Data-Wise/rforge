@@ -69,6 +69,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   deeply nested YAML, malformed workflow structure (null job, list `jobs`, string step,
   `with:` null) and YAML alias bombs return an incomplete stage with a specific reason
   instead of raising or hanging.
+- `docs:check --site` counts a sitemap entry only when it is a `loc` that is a direct child
+  of a `url` in the sitemaps.org 0.9 namespace. A `loc` inside an image/video/xhtml
+  extension element, nested elsewhere or outside a `url` no longer satisfies an expected
+  route. A `urlset` with no namespace or another namespace is incomplete with a specific
+  reason instead of being counted.
 
 ---
 

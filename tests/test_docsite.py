@@ -993,3 +993,89 @@ def test_a_target_folder_in_a_repository_with_no_pkgdown_workflow_does_not_block
         pkg = make(tmp_path, files={".github/workflows/coverage.yaml": body})
         publish(web, "", root, ROUTES)
         assert site.audit(pkg, url=root, ref="main")["state"] == "complete"
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Sitemap parsing (Codex round 5): only `loc` that is a direct child of a sitemap-namespace `url` is a page.
+# Decision: a urlset outside the sitemaps.org 0.9 namespace (absent or different) is refused with a specific
+# reason, never silently counted; a sitemapindex stays refused through its own explicit message.
+# ---------------------------------------------------------------------------------------------------------
+IMAGE_NS = "http://www.google.com/schemas/sitemap-image/1.1"
+
+
+def raw_sitemap_audit(tmp_path, build_xml):
+    """Audit a package whose deployed sitemap is exactly `build_xml(root)`."""
+    web = tmp_path / "web"
+    web.mkdir()
+    with server(web) as root:
+        pkg = make(tmp_path, files={"vignettes/a.qmd": "---\ntitle: x\n---\n"})
+        (web / "sitemap.xml").write_text(build_xml(root))
+        return site.audit(pkg, url=root, ref="main")
+
+
+def urlset(*urls, ns=f' xmlns="{SITEMAP_NS}"', extra_ns=""):
+    return f"<urlset{ns}{extra_ns}>" + "".join(urls) + "</urlset>"
+
+
+def ext_url(root, page, ext):
+    return f"<url><loc>{root}{page}</loc>{ext}</url>"
+
+
+def test_a_normal_sitemap_is_still_complete(tmp_path):
+    r = raw_sitemap_audit(tmp_path, lambda root: urlset(*(f"<url><loc>{root}{p}</loc></url>" for p in ROUTES + ["articles/a.html"])))
+    assert r["state"] == "complete" and r["counts"]["missing"] == 0 and not r["findings"], r
+
+
+def test_a_route_present_only_in_an_extension_loc_is_reported_missing(tmp_path):
+    """`image:loc` is an image URL, not a page: it must not satisfy the expected article route."""
+    def xml(root):
+        image = f'<image:image><image:loc>{root}articles/a.html</image:loc></image:image>'
+        return urlset(*(f"<url><loc>{root}{p}</loc></url>" for p in ROUTES), ext_url(root, "", image), extra_ns=f' xmlns:image="{IMAGE_NS}"')
+    r = raw_sitemap_audit(tmp_path, xml)
+    assert r["counts"]["missing"] == 1 and any(f["check"] == "site-missing-page" for f in r["findings"]), r
+
+
+def test_an_extension_loc_in_the_default_namespace_under_url_is_not_a_page(tmp_path):
+    """A `loc` nested inside another element (even in the sitemap namespace) is not a direct child of `url`."""
+    def xml(root):
+        nested = f"<wrapper><loc>{root}articles/a.html</loc></wrapper>"
+        return urlset(*(f"<url><loc>{root}{p}</loc></url>" for p in ROUTES), ext_url(root, "", nested))
+    r = raw_sitemap_audit(tmp_path, xml)
+    assert r["counts"]["missing"] == 1, r
+
+
+def test_a_loc_outside_a_url_element_is_not_a_page(tmp_path):
+    def xml(root):
+        return urlset(*(f"<url><loc>{root}{p}</loc></url>" for p in ROUTES), f"<loc>{root}articles/a.html</loc>")
+    r = raw_sitemap_audit(tmp_path, xml)
+    assert r["counts"]["missing"] == 1, r
+
+
+def test_a_url_in_another_namespace_is_not_a_page(tmp_path):
+    def xml(root):
+        other = f'<x:url xmlns:x="urn:other"><x:loc>{root}articles/a.html</x:loc></x:url>'
+        return urlset(*(f"<url><loc>{root}{p}</loc></url>" for p in ROUTES), other)
+    r = raw_sitemap_audit(tmp_path, xml)
+    assert r["counts"]["missing"] == 1, r
+
+
+@pytest.mark.parametrize("ns", ["", ' xmlns="urn:not-a-sitemap"', ' xmlns="http://www.sitemaps.org/schemas/sitemap/0.8"'])
+def test_a_sitemap_outside_the_sitemaps_namespace_is_incomplete_with_a_specific_reason(tmp_path, ns):
+    r = raw_sitemap_audit(tmp_path, lambda root: urlset(*(f"<url><loc>{root}{p}</loc></url>" for p in ROUTES + ["articles/a.html"]), ns=ns))
+    assert r["state"] == "incomplete" and any("namespace" in x for x in r["reasons"]), r
+    assert r["counts"]["missing"] == 0 and not r["findings"]
+
+
+def test_a_sitemap_index_stays_refused_through_its_own_message(tmp_path):
+    r = raw_sitemap_audit(tmp_path, lambda root: f'<sitemapindex xmlns="{SITEMAP_NS}"><sitemap><loc>{root}sitemap2.xml</loc></sitemap></sitemapindex>')
+    assert r["state"] == "incomplete" and any("index" in x for x in r["reasons"]), r
+    assert not any("namespace" in x for x in r["reasons"])
+
+
+def test_the_sitemap_reader_counts_only_url_children_for_the_unit_case(tmp_path):
+    web = tmp_path / "web"; web.mkdir()
+    with server(web) as root:
+        image = f'<image:image><image:loc>{root}articles/ext.html</image:loc></image:image>'
+        (web / "sitemap.xml").write_text(urlset(f"<url><loc>{root}reference/a.html</loc>{image}</url>", extra_ns=f' xmlns:image="{IMAGE_NS}"'))
+        paths, foreign = site.sitemap(root)
+    assert paths == {"reference/a.html"} and foreign == 0

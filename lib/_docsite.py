@@ -47,6 +47,9 @@ class Redirects(request.HTTPRedirectHandler):
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
+SITEMAP_NS = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
+
+
 def sitemap(base):
     deadline = time.monotonic() + TIMEOUT
     opener = request.build_opener(Redirects(base))
@@ -69,9 +72,16 @@ def sitemap(base):
     if b"<!DOCTYPE" in content.upper() or b"<!ENTITY" in content.upper():
         raise ValueError("DTD/entity sitemap unsupported")
     tree = ET.fromstring(content)
-    if tree.tag.rsplit("}",1)[-1] != "urlset":
+    local = tree.tag.rsplit("}", 1)[-1]
+    if local == "urlset" and tree.tag != SITEMAP_NS + "urlset":
+        # A urlset outside the sitemaps.org 0.9 namespace (absent or different) is not a sitemap this audit can read
+        # safely: counting its `loc` elements anyway is what let extension elements stand in for pages.
+        raise ValueError(f"sitemap urlset is not in the {SITEMAP_NS[1:-1]} namespace")
+    if tree.tag != SITEMAP_NS + "urlset":
         raise ValueError("only one urlset sitemap is supported; index is incomplete")
-    entries = [n.text.strip() for n in tree.iter() if n.tag.rsplit("}",1)[-1] == "loc" and n.text]
+    # A page is a `loc` that is a direct child of a `url` that is a direct child of the urlset, all in the sitemap
+    # namespace. An extension `loc` (image/video/xhtml) or one nested elsewhere is not a page.
+    entries = [loc.text.strip() for url in tree.findall(SITEMAP_NS + "url") for loc in url.findall(SITEMAP_NS + "loc") if loc.text]
     paths = set(); foreign = 0
     b = urlparse.urlsplit(base)
     for entry in entries:

@@ -52,7 +52,7 @@ def collect(directory):
                 requests.append(self.path)
                 base=f'http://127.0.0.1:{self.server.server_port}/pkg/'
                 routes=['articles/foo.html']+([] if missing else ['reference/private.html'])
-                xml='<urlset>'+''.join('<url><loc>'+base+r+'</loc></url>' for r in routes)+'</urlset>'
+                xml='<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join('<url><loc>'+base+r+'</loc></url>' for r in routes)+'</urlset>'
                 self.send_response(200);self.end_headers();self.wfile.write(xml.encode())
             def log_message(self,*args):pass
         server=http.server.ThreadingHTTPServer(('127.0.0.1',0),Handler)

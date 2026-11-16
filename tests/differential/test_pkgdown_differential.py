@@ -55,7 +55,7 @@ def test_audit_refuses_exactly_what_pkgdown_writes_outside_html(tmp_path, r_json
     for cmd in (["init", "-b", "main"], ["add", "-A"], ["-c", "user.email=a@b", "-c", "user.name=n", "commit", "-qm", "x"]):
         subprocess.run(["git", *cmd], cwd=pkg, check=True, capture_output=True)
     web = tmp_path / "web"; web.mkdir()
-    (web / "sitemap.xml").write_text("<urlset/>")
+    (web / "sitemap.xml").write_text("<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'/>")
     srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(web)))
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     try:
