@@ -107,7 +107,9 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       workflow, a local composite action or a repository-root or package `.Renviron`/`.Rprofile`; a
       job-level reusable-workflow `uses:`; a local `uses: ./...` action that is missing, malformed or
       not composite; a deploy below the site root (`deploy_to_branch(subdir = )`, or a Pages
-      `target-folder` when a workflow builds pkgdown); a malformed workflow; a configuration under
+      `target-folder` whenever a pkgdown config for the package exists at the pinned ref, or a
+      workflow names pkgdown, even if the `target-folder` deploy is unrelated to the site); a
+      malformed workflow; a configuration under
       `inst/` or `pkgdown/`; a non-default `vignettes/_quarto.yaml`; any symlink under `vignettes/`
       (the link text is never read as article content); and directory-level `_metadata.yml`,
       `_quarto-*.yml`, a nested `_quarto.yml` (with `.qmd` articles) or `_output.yml` (with `.Rmd`

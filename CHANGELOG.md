@@ -69,6 +69,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   deeply nested YAML, malformed workflow structure (null job, list `jobs`, string step,
   `with:` null) and YAML alias bombs return an incomplete stage with a specific reason
   instead of raising or hanging.
+- `docs:check --site` decides that a repository is a pkgdown site from a pkgdown config for
+  the package at the pinned ref (any of the six config locations), not only from workflow
+  wording. A Pages `target-folder` deploy therefore stays incomplete when build and deploy
+  are in separate workflows, or the build is in a local composite action, and neither names
+  pkgdown. Tradeoff: a pkgdown package with an unrelated `target-folder` deploy (for example
+  a coverage report) is reported incomplete. A workflow that names pkgdown still counts when
+  there is no config file.
 - `docs:check --site` counts a sitemap entry only when it is a `loc` that is a direct child
   of a `url` in the sitemaps.org 0.9 namespace. A `loc` inside an image/video/xhtml
   extension element, nested elsewhere or outside a `url` no longer satisfies an expected
