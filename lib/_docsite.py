@@ -219,7 +219,7 @@ def bootstrap_version(config):
         number = None
     if number not in (3.0, 4.0, 5.0):
         raise ValueError(f"template Bootstrap version unsupported: {value!r}")
-    return 5 if number == 4.0 else int(number)
+    return int(number)  # pkgdown keeps a configured 4 (with a warning); only `== 3` matters here
 
 
 def match_base(requested, config_url, resolved):
