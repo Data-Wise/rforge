@@ -40,7 +40,10 @@ def test_s08_records_the_deliberate_divergence_from_the_frozen_a2_spec_on_develo
     manifest = json.loads((ROOT / 'tests/a2/required.json').read_text())
     s08 = next(group for group in manifest['groups'] if group['id'] == 'S08')
     gap = ' '.join(s08['coverage_gaps'])
-    assert 'Deliberate divergence' in gap and 'development.mode' in gap and 'strict' in gap and 'prefix' in gap
+    assert 'SPEC-site-audit-quarto-devmode-2026-10-31.md rev 2' in gap and '871d6af' in gap
+    assert 'development.mode' in gap and 'prefix' in gap and 'strict' in gap and 'release-mode and destination' in gap
+    assert 'SPEC-docs-check-a2-2026-10-12.md' in gap and 'tests/test_docsite.py' in gap
+    assert not any(word in gap.lower() for word in ('rejected', 'disposition'))  # the review record is built later, never committed
     assert not any('External observation' in g for g in s08['coverage_gaps'])  # not an external-observation group
     assert '#111' in manifest['review_candidate'] and 'candidate 2' not in manifest['review_candidate']
 

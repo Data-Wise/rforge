@@ -294,7 +294,7 @@
       ],
       "status": "ready",
       "coverage_gaps": [
-        "Deliberate divergence from the frozen A2 SPEC (SPEC-docs-check-a2-2026-10-12.md, development.mode paragraph): issue #111 now supports pkgdown development.mode auto/default/release/devel/unreleased, resolved from the pinned DESCRIPTION version with pkgdown 2.2.1's rule, and the dev route prefix (`<destination>/`, default dev/) for a devel site, where the SPEC made every non-default mode incomplete. --site is matched strictly against the source url plus that prefix, never appended. This test covers release mode and destination only; the devel, auto, prefix and strict-base cases are covered by tests/test_docsite.py, not by this A2 group, and the frozen SPEC is intentionally not edited."
+        "Superseded in part: for #111, development.mode, the route prefix and strict base matching are governed by SPEC-site-audit-quarto-devmode-2026-10-31.md rev 2 (Codex-approved; dev commit 871d6af), which replaces the frozen A2 SPEC's rule that every non-default development mode is incomplete (SPEC-docs-check-a2-2026-10-12.md, which is intentionally not edited and remains the contract for everything else). This A2 group covers only the release-mode and destination cases; the devel, auto, route-prefix and strict-base cases are tested in tests/test_docsite.py."
       ],
       "mapping_review": "complete",
       "test_sources": {
