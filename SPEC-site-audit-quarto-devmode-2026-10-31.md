@@ -108,11 +108,14 @@ numbers in `_docsite.py` were re-read against `dev` at 518bd2f (engine `baa5905`
     (`lib/_docsite.py:166`) is wrong in both directions: replace it with the directory-prefix rule.
   - An `.Rmd` article can emit a non-HTML route: `pkgdown: extension: pdf` gives `articles/p.pdf` (verified by the
     reviewer on pkgdown 2.2.1). This is the **one supported exception** to the non-HTML refusal, and only for `.Rmd`:
-    the mapper applies the declared extension when it is a plain string, and any other value (missing, non-string,
+    an **absent** `pkgdown: extension` key (the ordinary case) maps to `.html`, as today. When the key is present,
+    the mapper applies the declared extension if it is a plain string, and any other value (non-string, empty,
     templated) is unsupported, never `.html`. For `.qmd` there is no such exception: a non-HTML `format:` (including
     `format: pdf`) is unsupported and makes the stage incomplete, because how pkgdown merges its HTML format with a
-    document's `format:` is not verified (see Open questions). The fixture and the differential test pin both halves:
-    `.Rmd` + `extension: pdf` maps to `articles/p.pdf`; `.qmd` + `format: pdf` is incomplete.
+    document's `format:` is not verified (see Open questions); an absent `format:` maps to `.html`. The fixture and the
+    differential test pin all of these: a default `.Rmd` with no `pkgdown` key maps to `.html`; `.Rmd` +
+    `extension: pdf` maps to `articles/p.pdf`; `.Rmd` + a non-string extension is incomplete; a default `.qmd` maps to
+    `.html`; `.qmd` + `format: pdf` is incomplete.
   - **Route-changing overrides are refused, not guessed.** A document whose front matter carries any key that can
     rename or relocate its output is unsupported: for `.Rmd`, `output_file`, `knit` and `pkgdown: extension` with a
     non-plain value; for `.qmd`, `output-file`, `output-ext` and `output-dir`, wherever they appear (top level or
@@ -165,7 +168,7 @@ numbers in `_docsite.py` were re-read against `dev` at 518bd2f (engine `baa5905`
 
 - Unknown `development.mode`, `PKGDOWN_DEV_MODE` in a workflow, a `uses:` workflow job, `_quarto.yml` projects, custom
   transforms, missing or invalid YAML, more than one pkgdown config file, bootstrap-3 `devel`, a `--site` URL that
-  fails the strict base match, an unrecognized article output extension, a route-changing override key, a `.qmd`
+  fails the strict base match, a present but unrecognized article output extension (an absent one is `.html`), a route-changing override key, a `.qmd`
   non-HTML `format:`, and ambiguous deployment sources all stay
   `state: "incomplete"` with a specific reason, and every reason that precedes the network call sets
   `pre_network_block`.
