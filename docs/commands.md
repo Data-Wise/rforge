@@ -528,11 +528,13 @@ only warn. Site GETs never build/deploy/fetch; replay is opt-in, not sandboxed.
 `DESCRIPTION`; `--site` must equal the source `url` plus the dev prefix (`.../dev/` for a devel
 site only), else `incomplete`. Incomplete with a specific reason, at the pinned ref: `PKGDOWN_DEV_MODE`
 (workflow, local action, `.Renviron`/`.Rprofile`), reusable or unreadable local actions, deploys below
-the site root (`deploy_to_branch(subdir = )`, or a Pages `target-folder` whenever a pkgdown config exists at the pinned
+the site root (`deploy_to_branch(subdir = )`, or a Pages `target-folder`/`destination-dir` whenever a pkgdown config exists at the pinned
 ref or a workflow names pkgdown), malformed workflows, directory-level `_metadata.yml`/`_quarto-*.yml`/`_output.yml`,
 symlinks under `vignettes/`. An article is refused only for the front-matter keys `output_file`/`output-file`,
 `output_ext`/`output-ext`, `output_dir`/`output-dir`, `knit`, `as_is`, a non-HTML `format`/`output` or
-`pkgdown: extension`; other overrides are not detected. A complete site stage proves route presence, not
+`pkgdown: extension`, in any key case with `-` and `_` interchangeable; YAML is read as parsed structures and R/shell
+code as tolerant text; other overrides, names built any other way, scripts a workflow merely runs and manual
+`git push`/`rsync` deploys are not detected. A complete site stage proves route presence, not
 content freshness (`content_freshness: "unverified"`).
 
 

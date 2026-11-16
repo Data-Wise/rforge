@@ -107,8 +107,9 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       workflow, a local composite action or a repository-root or package `.Renviron`/`.Rprofile`; a
       job-level reusable-workflow `uses:`; a local `uses: ./...` action that is missing, malformed or
       not composite; a deploy below the site root (`deploy_to_branch(subdir = )`, or a Pages
-      `target-folder` whenever a pkgdown config for the package exists at the pinned ref, or a
-      workflow names pkgdown, even if the `target-folder` deploy is unrelated to the site); a
+      `target-folder` or `destination-dir` input whenever a pkgdown config for the package exists
+      at the pinned ref, or a workflow names pkgdown, even if the deploy is unrelated to the
+      site); a
       malformed workflow; a configuration under
       `inst/` or `pkgdown/`; a non-default `vignettes/_quarto.yaml`; any symlink under `vignettes/`
       (the link text is never read as article content); and directory-level `_metadata.yml`,
@@ -119,9 +120,16 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       `output-file`, `output_ext`, `output-ext`, `output_dir` or `output-dir` anywhere in the front
       matter; `knit`; a Quarto `format` other than `html`; an `.Rmd` `output` other than
       `html_document`/`html_vignette`; `pkgdown: extension` other than `html`; and `as_is`. Those
-      routes are removed from the expected set, never guessed. Anything else that changes a route
-      (a script a workflow merely runs, a variable name built dynamically, `_site.yml`) is not
-      detected. Root redirects and general output overrides are follow-up work (#123).
+      routes are removed from the expected set, never guessed. Article keys match in any case, and
+      `-` and `_` are interchangeable (`as-is`, `Output-File`). Anything else that changes a route
+      (a script a workflow merely runs, a variable name built any way other than the spellings
+      below, a manual `git push` or `rsync` deploy, `_site.yml`) is not detected.
+    - **How names are matched.** YAML inputs (workflows, local actions, front matter) are read as
+      parsed structures, so quoted or escaped keys, flow mappings, anchors, merge keys and any
+      case of `target-folder`/`PKGDOWN_DEV_MODE` count. R and shell code (a `run:` body,
+      `.Rprofile`) is matched as text: the argument name in `deploy_to_branch(subdir = )` may be
+      quoted, backticked or on another line, and `PKGDOWN_DEV_MODE` is found in any case, with
+      quotes, commas or `paste0()` splits between its parts. Root redirects and general output overrides are follow-up work (#123).
     - **`content_freshness: unverified`.** A `complete` site stage means route presence only: the
       sitemap says which pages exist, not whether their content is current (a sitemap carries no
       `<lastmod>`). The text verdict reads `no findings; site content freshness unverified`.

@@ -76,6 +76,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   pkgdown. Tradeoff: a pkgdown package with an unrelated `target-folder` deploy (for example
   a coverage report) is reported incomplete. A workflow that names pkgdown still counts when
   there is no config file.
+- `docs:check --site` detects its route-moving signals from the parsed YAML where YAML is the
+  format, and from tolerant text only for R and shell code. A quoted, single-quoted, escaped,
+  flow-mapping, aliased or differently cased `target-folder` key (and the peaceiris
+  `destination-dir` input) in a workflow or local action, `PKGDOWN_DEV_MODE` in any case or
+  split across `paste0()` parts, a quoted or backticked `subdir` argument, an `as-is` or
+  differently cased article key, and a workflow that only mentions `PkgDown` or uses
+  `setup-pkgdown` are now caught. Names built any other way are still not detected.
 - `docs:check --site` counts a sitemap entry only when it is a `loc` that is a direct child
   of a `url` in the sitemaps.org 0.9 namespace. A `loc` inside an image/video/xhtml
   extension element, nested elsewhere or outside a `url` no longer satisfies an expected
