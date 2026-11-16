@@ -213,14 +213,40 @@ def validate_full_gates(facts, candidate_sha):
             require(facts.get(GATE_FLAGS[name]) is (c["exit_code"] == 0), f"{where}: {name} flag disagrees with its exit code")
 
 
+# The supported real sites whose routes the live smoke must audit completely, by name and deployed URL.
+PINNED_SUPPORTED_URLS = {"medfit": "https://data-wise.github.io/medfit/", "probmed": "https://data-wise.github.io/probmed/"}
+
+
+def site_run_is_sound(run):
+    """The one predicate for a supported real site, shared by the producer and the verifier so they cannot drift.
+
+    `complete` means route presence was compared, not that no published route is missing: the run must also have
+    made HTTP requests, checked routes, lost none (an absent or non-integer count is unknown, never zero) and
+    carry no warn/error finding (an absent or malformed severity list is unknown, never clean).
+    """
+    if not isinstance(run, dict):
+        return False
+    severities = run.get("finding_severities")
+    return (run.get("state") == "complete" and _int(run.get("requests")) and run["requests"] > 0
+            and _int(run.get("checked")) and run["checked"] > 0 and _int(run.get("missing")) and run["missing"] == 0
+            and isinstance(severities, list) and all(isinstance(s, str) for s in severities)
+            and not {"warn", "error"} & set(severities))
+
+
 def validate_live_smoke(facts):
-    """A real supported deployed site was checked over HTTP, and real packages the site check cannot cover say so."""
+    """Real supported deployed sites were checked over HTTP, and real packages the site check cannot cover say so."""
     where = "live smoke"
     site = facts.get("supported_site")
     require(isinstance(site, dict) and site.get("url") == facts.get("url") == SUPPORTED_SITE_URL and bool(facts.get("source_ref")), f"{where}: the pinned supported site is required")
-    require(site.get("state") == "complete" and _int(site.get("requests")) and site["requests"] > 0
-            and _int(site.get("checked")) and site["checked"] > 0, f"{where}: supported site was not completely checked over HTTP")
+    require(site_run_is_sound(site), f"{where}: supported site was not completely checked over HTTP with no missing routes or warn/error findings")
     require(facts.get("requests") == site["requests"] and facts.get("checked") == site["checked"], f"{where}: summary disagrees with the site run")
+    pinned = facts.get("pinned_real_runs")
+    require(isinstance(pinned, list) and all(isinstance(r, dict) for r in pinned)
+            and sorted(str(r.get("name")) for r in pinned) == sorted(PINNED_SUPPORTED_URLS),
+            f"{where}: pinned_real_runs must hold exactly one run for each of {sorted(PINNED_SUPPORTED_URLS)}")
+    for run in pinned:
+        require(run.get("url") == PINNED_SUPPORTED_URLS[run["name"]], f"{where}: pinned site {run['name']} audited the wrong URL")
+        require(site_run_is_sound(run), f"{where}: pinned site {run['name']} was not completely checked over HTTP with no missing routes or warn/error findings")
     runs = facts.get("unsupported_real_runs")
     require(isinstance(runs, list) and runs and all(isinstance(r, dict) and r.get("state") == "incomplete" and r.get("reasons") for r in runs),
             f"{where}: unsupported real packages must be recorded as incomplete with reasons")

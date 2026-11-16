@@ -23,6 +23,36 @@ LIVE_DEFECTS = {
     'no-limit-runs': lambda f: f.update(unsupported_real_runs=[]),
     'limit-run-without-reasons': lambda f: f['unsupported_real_runs'][0].update(reasons=[]),
     'limit-run-complete': lambda f: f['unsupported_real_runs'][0].update(state='complete'),
+    # the verifier holds the primary and both named pinned sites to the producer's predicate (one shared function)
+    'primary-missing-routes': lambda f: f['supported_site'].update(missing=3),
+    'primary-missing-count-none': lambda f: f['supported_site'].update(missing=None),
+    'primary-missing-count-bool': lambda f: f['supported_site'].update(missing=False),
+    'primary-warn-finding': lambda f: f['supported_site'].update(finding_severities=['warn']),
+    'primary-error-finding': lambda f: f['supported_site'].update(finding_severities=['info', 'error']),
+    'primary-severities-not-a-list': lambda f: f['supported_site'].update(finding_severities='warn'),
+    'primary-lacks-missing': lambda f: f['supported_site'].pop('missing'),
+    'primary-lacks-severities': lambda f: f['supported_site'].pop('finding_severities'),
+    'pinned-missing-routes': lambda f: f['pinned_real_runs'][0].update(missing=9),
+    'pinned-missing-count-none': lambda f: f['pinned_real_runs'][1].update(missing=None),
+    'pinned-warn-finding': lambda f: f['pinned_real_runs'][1].update(finding_severities=['warn']),
+    'pinned-error-finding': lambda f: f['pinned_real_runs'][0].update(finding_severities=['error']),
+    'pinned-incomplete': lambda f: f['pinned_real_runs'][0].update(state='incomplete'),
+    'pinned-no-requests': lambda f: f['pinned_real_runs'][1].update(requests=0),
+    'pinned-nothing-checked': lambda f: f['pinned_real_runs'][0].update(checked=0),
+    'pinned-lacks-missing': lambda f: f['pinned_real_runs'][0].pop('missing'),
+    'pinned-lacks-severities': lambda f: f['pinned_real_runs'][1].pop('finding_severities'),
+    'pinned-list-absent': lambda f: f.pop('pinned_real_runs'),
+    'pinned-list-empty': lambda f: f.update(pinned_real_runs=[]),
+    'pinned-list-not-a-list': lambda f: f.update(pinned_real_runs={'medfit': {}}),
+    'pinned-probmed-absent': lambda f: f.update(pinned_real_runs=f['pinned_real_runs'][:1]),
+    'pinned-medfit-absent': lambda f: f.update(pinned_real_runs=f['pinned_real_runs'][1:]),
+    'pinned-duplicate-medfit': lambda f: f.update(pinned_real_runs=[f['pinned_real_runs'][0]] * 2),
+    'pinned-extra-unnamed-site': lambda f: f['pinned_real_runs'].append(dict(f['pinned_real_runs'][0], name='other')),
+    'pinned-wrong-name': lambda f: f['pinned_real_runs'][0].update(name='medfit-fork'),
+    'pinned-wrong-url': lambda f: f['pinned_real_runs'][1].update(url='https://elsewhere.example/probmed/'),
+    'pinned-entry-not-a-dict': lambda f: f['pinned_real_runs'].__setitem__(0, 'medfit'),
+    # an old-shape record (before the pinned sites existed) has none of the new fields and must not default to a pass
+    'old-shape-record': lambda f: ([f['supported_site'].pop(k) for k in ('missing', 'finding_severities')], f.pop('pinned_real_runs')),
 }
 
 
@@ -62,8 +92,7 @@ SITES = {'sup': {'name': 'sup', 'repo': 'r', 'url': v.SUPPORTED_SITE_URL}, 'lim'
 def test_live_smoke_observation_passes_with_a_complete_site_and_an_honest_limit(tmp_path):
     states = {v.SUPPORTED_SITE_URL: ('complete', 4, []), 'https://l/': ('incomplete', 0, ['development mode/destination mapping unsupported'])}
     facts, status = obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=_clone_stub, supported=SITES['sup'], limits=SITES['lim'], pinned_supported=())
-    assert status == 'passed'
-    v.validate_live_smoke(facts)
+    assert status == 'passed'  # no pinned sites configured here; the verifier requires medfit and probmed (see below)
 
 
 @pytest.mark.parametrize('states', [
@@ -304,9 +333,10 @@ def test_triage_drift_is_recorded_in_the_failed_observation():
     assert ok == 'passed' and 'fresh_run_drift' not in clean
 
 
-PINNED = ({'name': 'pin-a', 'repo': 'r', 'url': 'https://pa/'}, {'name': 'pin-b', 'repo': 'r', 'url': 'https://pb/'})
+PINNED = ({'name': 'medfit', 'repo': 'r', 'url': v.PINNED_SUPPORTED_URLS['medfit']},
+          {'name': 'probmed', 'repo': 'r', 'url': v.PINNED_SUPPORTED_URLS['probmed']})
 BASE = {v.SUPPORTED_SITE_URL: ('complete', 4, []), 'https://l/': ('incomplete', 0, ['custom template mapping unsupported']),
-        'https://pa/': ('complete', 66, []), 'https://pb/': ('complete', 107, [])}
+        v.PINNED_SUPPORTED_URLS['medfit']: ('complete', 66, []), v.PINNED_SUPPORTED_URLS['probmed']: ('complete', 107, [])}
 
 
 def _live(tmp_path, **changes):
@@ -317,17 +347,17 @@ def _live(tmp_path, **changes):
 
 def test_pinned_real_sites_must_be_complete_and_are_recorded(tmp_path):
     facts, status = _live(tmp_path)
-    assert status == 'passed' and [r['name'] for r in facts['pinned_real_runs']] == ['pin-a', 'pin-b']
+    assert status == 'passed' and [r['name'] for r in facts['pinned_real_runs']] == ['medfit', 'probmed']
     assert [r['name'] for r in facts['unsupported_real_runs']] == ['lim']
     v.validate_live_smoke(facts)
 
 
 @pytest.mark.parametrize('change', [
-    {'https://pa/': ('incomplete', 0, ['unsupported article source: vignettes/x.qmd'])},
-    {'https://pb/': ('incomplete', 107, ['development mapping'])},
-    {'https://pa/': ('complete', 0, [])},
-    {'https://pb/': ('complete', 107, [], 0)},
-    {'https://pa/': ('unavailable', 0, ['crashed'])},
+    {v.PINNED_SUPPORTED_URLS['medfit']: ('incomplete', 0, ['unsupported article source: vignettes/x.qmd'])},
+    {v.PINNED_SUPPORTED_URLS['probmed']: ('incomplete', 107, ['development mapping'])},
+    {v.PINNED_SUPPORTED_URLS['medfit']: ('complete', 0, [])},
+    {v.PINNED_SUPPORTED_URLS['probmed']: ('complete', 107, [], 0)},
+    {v.PINNED_SUPPORTED_URLS['medfit']: ('unavailable', 0, ['crashed'])},
 ])
 def test_a_failing_pinned_real_site_fails_the_observation_even_when_the_limit_site_is_incomplete(tmp_path, change):
     """Glue-style limit sites must not mask a regression in the sites that are supposed to be supported."""
@@ -348,10 +378,10 @@ def test_default_pinned_sites_are_the_real_medfit_and_probmed_commits():
 
 
 @pytest.mark.parametrize('change', [
-    {'https://pa/': ('complete', 66, [], 1, 9, ['warn'] * 9)},   # published routes lost: complete, but missing > 0
-    {'https://pb/': ('complete', 107, [], 1, 0, ['warn'])},      # a warn finding without a missing count
-    {'https://pb/': ('complete', 107, [], 1, 0, ['error'])},
-    {'https://pa/': ('complete', 66, [], 1, None, [])},          # missing count absent: unknown, never zero
+    {v.PINNED_SUPPORTED_URLS['medfit']: ('complete', 66, [], 1, 9, ['warn'] * 9)},   # published routes lost: complete, but missing > 0
+    {v.PINNED_SUPPORTED_URLS['probmed']: ('complete', 107, [], 1, 0, ['warn'])},      # a warn finding without a missing count
+    {v.PINNED_SUPPORTED_URLS['probmed']: ('complete', 107, [], 1, 0, ['error'])},
+    {v.PINNED_SUPPORTED_URLS['medfit']: ('complete', 66, [], 1, None, [])},          # missing count absent: unknown, never zero
     {v.SUPPORTED_SITE_URL: ('complete', 4, [], 1, 1, ['warn'])},  # the primary supported site is held to the same rule
     {v.SUPPORTED_SITE_URL: ('complete', 4, [], 1, 0, ['warn'])},
 ])
@@ -361,7 +391,7 @@ def test_pinned_and_primary_sites_must_have_no_missing_routes_or_warn_findings(t
 
 
 def test_info_findings_do_not_fail_the_observation_and_are_recorded(tmp_path):
-    facts, status = _live(tmp_path, **{'https://pa/': ('complete', 66, [], 1, 0, ['info', 'info'])})
+    facts, status = _live(tmp_path, **{v.PINNED_SUPPORTED_URLS['medfit']: ('complete', 66, [], 1, 0, ['info', 'info'])})
     assert status == 'passed'
     run = facts['pinned_real_runs'][0]
     assert run['missing'] == 0 and run['finding_severities'] == ['info']
@@ -373,3 +403,20 @@ def test_pinned_supported_sites_are_pinned_to_commits_whose_routes_match_the_liv
     """Re-pinned in #111 review: medfit 40f82c8 predates the live native-* to sem-* rename (9 missing pages)."""
     pins = {s['name']: s['commit'] for s in obs.PINNED_SUPPORTED_SITES}
     assert pins['medfit'] != '40f82c85fdad0979949bee389afe2c7301660315'
+
+
+def test_the_producer_and_the_verifier_share_one_soundness_predicate_and_one_pin_list():
+    import inspect
+    # `v` is loaded by file path under another module name, so compare the producer's imported function by source
+    assert obs.site_run_is_sound.__module__ == 'verify_a2_release'
+    assert inspect.getsource(obs.site_run_is_sound) == inspect.getsource(v.site_run_is_sound)
+    assert {s['name']: s['url'] for s in obs.PINNED_SUPPORTED_SITES} == v.PINNED_SUPPORTED_URLS
+
+
+def test_a_record_from_the_real_producer_is_accepted_by_the_verifier(tmp_path):
+    facts, status = _live(tmp_path)
+    assert status == 'passed'
+    v.validate_live_smoke(facts)
+    facts['pinned_real_runs'][0]['missing'] = 1  # the same drift the producer rejects must be rejected downstream
+    with pytest.raises(v.VerificationError):
+        v.validate_live_smoke(facts)

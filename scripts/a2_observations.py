@@ -27,7 +27,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT))
 
 from a2_gate_record import produce as produce_gates  # noqa: E402
-from verify_a2_release import (SUPPORTED_SITE_URL, VerificationError, validate_full_gates, validate_package_triage,  # noqa: E402
+from verify_a2_release import (SUPPORTED_SITE_URL, site_run_is_sound, VerificationError, validate_full_gates, validate_package_triage,  # noqa: E402
                                validate_requirements, validate_review)
 
 # A real deployed pkgdown site with a supported configuration (release mode, no template, one sitemap request).
@@ -160,10 +160,7 @@ def observe_live_smoke(workdir: Path, audit: Optional[Callable] = None, clone: O
     facts = {"url": primary["url"], "source_ref": primary["source_ref"], "requests": primary["requests"], "checked": primary["checked"],
              "supported_site": primary, "pinned_real_runs": pinned,
              "unsupported_real_runs": unsupported, "other_real_runs": other}
-    def sound(r):  # `complete` means route presence was compared, not that no published route is missing
-        return (r["state"] == "complete" and r["requests"] > 0 and r["checked"] > 0 and r["missing"] == 0
-                and not {"warn", "error"} & set(r["finding_severities"]))
-    ok = sound(primary) and bool(unsupported) and all(sound(r) for r in pinned)
+    ok = site_run_is_sound(primary) and bool(unsupported) and all(site_run_is_sound(r) for r in pinned)
     return facts, "passed" if ok else "failed"
 
 
