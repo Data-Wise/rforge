@@ -57,7 +57,7 @@ every other unsupported case incomplete. No new command or flag; the engine and 
 
 ### Out of scope (deferred)
 
-- Root redirects and per-document output overrides beyond output-extension handling: follow-up issue (see Open
+- Root redirects and per-document output overrides and non-HTML article output (including PDF, which needs a presence check outside the sitemap): follow-up issue (see Open
   questions).
 - Freshness probes (HTTP `Last-Modified`, content hash against the pinned commit): #112.
 - Literal `PKGDOWN_DEV_MODE` support: revisit only if a real package needs it.
@@ -93,7 +93,7 @@ numbers in `_docsite.py` were re-read against `dev` at 518bd2f (engine `baa5905`
   Keep both `PKGDOWN_DEV_MODE` guards, with the line-219-222 scan moved to the pinned SHA (decision 2).
 - **Quarto mapping.** `routes()` currently treats every non-`.Rmd` article as unsupported (lines 168-170). Treat `.qmd`
   like `.Rmd` (same `articles/` prefixing and nesting, lines 172-174). Front-matter checks (lines 203-218) extend to
-  `.qmd`: a non-HTML `format:` is unsupported (no exception, unlike `.Rmd` `extension: pdf`; see pkgdown
+  `.qmd`: a non-HTML `format:` is unsupported (non-HTML articles are refused with no exception; see pkgdown
   divergences), as a non-HTML `output:` is for `.Rmd`, and route-changing override keys are refused (same section). pkgdown 2.2.1 creates
   `vignettes/_quarto.yaml` (`project: render: ['*.qmd']`) when absent and uses an existing one
   (`build_quarto_articles`); medfit ships exactly that default, so a `_quarto.yaml` is normal, not a refusal. Apply
@@ -106,19 +106,23 @@ numbers in `_docsite.py` were re-read against `dev` at 518bd2f (engine `baa5905`
     `tutorials-old/h.Rmd` are excluded; `articles/tutorials/f.Rmd` is an article (`articles/tutorials/f.html`);
     `vignettes/tutorials.Rmd` is an article; `_priv/i.Rmd` is an article. The code's `"tutorials" in parts`
     (`lib/_docsite.py:166`) is wrong in both directions: replace it with the directory-prefix rule.
-  - An `.Rmd` article can emit a non-HTML route: `pkgdown: extension: pdf` gives `articles/p.pdf` (verified by the
-    reviewer on pkgdown 2.2.1). This is the **one supported exception** to the non-HTML refusal, and only for `.Rmd`:
-    an **absent** `pkgdown: extension` key (the ordinary case) maps to `.html`, as today. When the key is present,
-    the mapper applies the declared extension if it is a plain string, and any other value (non-string, empty,
-    templated) is unsupported, never `.html`. For `.qmd` there is no such exception: a non-HTML `format:` (including
-    `format: pdf`) is unsupported and makes the stage incomplete, because how pkgdown merges its HTML format with a
-    document's `format:` is not verified (see Open questions); an absent `format:` maps to `.html`. The fixture and the
+  - **Non-HTML articles are refused, with no exception.** An `.Rmd` with `pkgdown: extension: pdf` does write
+    `articles/p.pdf` (reviewer-run on pkgdown 2.2.1), but pkgdown builds `sitemap.xml` from `get_site_paths()`, which
+    globs `*.html` only (read from the installed 2.2.1 source: `dir_ls(pkg$dst_path, glob = "*.html", recurse = TRUE)`).
+    A correctly published PDF article is therefore never in the sitemap, and expecting its route there would raise a
+    false `site-missing-page`. So a present `pkgdown: extension` with any value other than the default `html` is
+    unsupported (incomplete, route removed from the expected set, reason naming the file); an **absent** key (the
+    ordinary case) maps to `.html`, as today. Likewise for `.qmd`: a non-HTML `format:` (including `format: pdf`) is
+    unsupported, and also because how pkgdown merges its HTML format with a document's `format:` is not verified
+    (see Open questions); an absent `format:` maps to `.html`. Checking that a non-HTML article exists would need a
+    separate bounded HTTP presence check, which is out of scope here (candidate for #123). The fixture and the
     differential test pin all of these: a default `.Rmd` with no `pkgdown` key maps to `.html`; `.Rmd` +
-    `extension: pdf` maps to `articles/p.pdf`; `.Rmd` + a non-string extension is incomplete; a default `.qmd` maps to
-    `.html`; `.qmd` + `format: pdf` is incomplete.
+    `extension: html` maps to `.html`; `.Rmd` + `extension: pdf` is incomplete even when the sitemap lacks the PDF
+    (built-site test: no `site-missing-page` finding is produced for it); `.Rmd` + a non-string extension is
+    incomplete; a default `.qmd` maps to `.html`; `.qmd` + `format: pdf` is incomplete.
   - **Route-changing overrides are refused, not guessed.** A document whose front matter carries any key that can
-    rename or relocate its output is unsupported: for `.Rmd`, `output_file`, `knit` and `pkgdown: extension` with a
-    non-plain value; for `.qmd`, `output-file`, `output-ext` and `output-dir`, wherever they appear (top level or
+    rename or relocate its output is unsupported: for `.Rmd`, `output_file`, `knit` and `pkgdown: extension` with any
+    value other than `html`; for `.qmd`, `output-file`, `output-ext` and `output-dir`, wherever they appear (top level or
     nested under `format:`). The check scans the whole front-matter mapping, not only `format`, `output` and `as_is`.
     Its route is removed from the expected set (as `as_is` articles are today) and the stage is incomplete with a
     reason naming the file and key, so a default route that happens to remain in the sitemap cannot satisfy it.
@@ -168,7 +172,7 @@ numbers in `_docsite.py` were re-read against `dev` at 518bd2f (engine `baa5905`
 
 - Unknown `development.mode`, `PKGDOWN_DEV_MODE` in a workflow, a `uses:` workflow job, `_quarto.yml` projects, custom
   transforms, missing or invalid YAML, more than one pkgdown config file, bootstrap-3 `devel`, a `--site` URL that
-  fails the strict base match, a present but unrecognized article output extension (an absent one is `.html`), a route-changing override key, a `.qmd`
+  fails the strict base match, a present non-`html` article output extension (an absent one is `.html`), a route-changing override key, a `.qmd`
   non-HTML `format:`, and ambiguous deployment sources all stay
   `state: "incomplete"` with a specific reason, and every reason that precedes the network call sets
   `pre_network_block`.
@@ -178,7 +182,7 @@ numbers in `_docsite.py` were re-read against `dev` at 518bd2f (engine `baa5905`
 
 - Fixtures: `.Rmd`, `.rmd` and `.qmd`, nested `vignettes/articles`, `articles/tutorials/**`, `tutorials-old/**`,
   `tutorials.Rmd`, excludes, release vs devel versions (including `-` separators), explicit destination, root and
-  `dev/` bases, `inst/_pkgdown.yml`, an `.Rmd` with `pkgdown: extension: pdf` (maps to `.pdf`), a `.qmd` with
+  `dev/` bases, `inst/_pkgdown.yml`, an `.Rmd` with `pkgdown: extension: pdf` (incomplete, no false `site-missing-page`), a `.qmd` with
   `format: pdf` (incomplete), articles with `output-file`/`output-ext`/`output_file`/`knit` (incomplete; negative
   fixture keeps the default `.html` route in the sitemap and must still be incomplete), and the medfit shape (`mode: auto`,
   `0.15.0`, 37 `.qmd` articles resolves to root routes).
@@ -231,7 +235,7 @@ new flag, behavior text only), CHANGELOG, `.STATUS`, version files at release.
   adversarial review and quote its output in the PR body.
 - **Decided 2026-11-15: split to a follow-up issue.** From #111's acceptance list, two fixture items move out of
   this spec: "root redirects" (no design yet; the existing redirect handler accepts only same-origin, at most 3 hops)
-  and "supported output overrides" beyond the article output-extension handling specified above (per-document
+  and "supported output overrides" beyond the refusal rules specified above (per-document
   `output-file`, `output-ext` and similar). Until the follow-up ships, a redirect or override this spec does not map
   is `incomplete` with a specific reason, never an invented route. The remaining #111 acceptance items stay in scope,
   including documentation and native skill guidance. The follow-up issue is not yet filed; #111's acceptance list must
