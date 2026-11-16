@@ -51,6 +51,18 @@ LIVE_DEFECTS = {
     'pinned-wrong-name': lambda f: f['pinned_real_runs'][0].update(name='medfit-fork'),
     'pinned-wrong-url': lambda f: f['pinned_real_runs'][1].update(url='https://elsewhere.example/probmed/'),
     'pinned-entry-not-a-dict': lambda f: f['pinned_real_runs'].__setitem__(0, 'medfit'),
+    # a limit site must be incomplete for an UNSUPPORTED-LAYOUT reason, never because the site could not be read
+    'limit-http-503': lambda f: f['unsupported_real_runs'][0].update(reasons=['HTTP Error 503: Service Unavailable']),
+    'limit-timeout': lambda f: f['unsupported_real_runs'][0].update(reasons=['sitemap read exceeded 10-second budget']),
+    'limit-dns-error': lambda f: f['unsupported_real_runs'][0].update(reasons=['<urlopen error [Errno 8] nodename nor servname provided, or not known>']),
+    'limit-transport-word-unsupported': lambda f: f['unsupported_real_runs'][0].update(reasons=['HTTP Error 415: Unsupported Media Type']),
+    'limit-sitemap-content-refused': lambda f: f['unsupported_real_runs'][0].update(reasons=['DTD/entity sitemap unsupported']),
+    'limit-mixed-layout-and-transport': lambda f: f['unsupported_real_runs'][0].update(reasons=['custom template mapping unsupported', 'HTTP Error 503: Service Unavailable']),
+    'limit-reasons-not-a-list': lambda f: f['unsupported_real_runs'][0].update(reasons='custom template mapping unsupported'),
+    'limit-reason-not-a-string': lambda f: f['unsupported_real_runs'][0].update(reasons=[None]),
+    'limit-reasons-absent': lambda f: f['unsupported_real_runs'][0].pop('reasons'),
+    'limit-state-absent': lambda f: f['unsupported_real_runs'][0].pop('state'),
+    'limit-second-run-transport': lambda f: f['unsupported_real_runs'].append(dict(f['unsupported_real_runs'][0], name='x', reasons=['HTTP Error 503'])),
     # an old-shape record (before the pinned sites existed) has none of the new fields and must not default to a pass
     'old-shape-record': lambda f: ([f['supported_site'].pop(k) for k in ('missing', 'finding_severities')], f.pop('pinned_real_runs')),
 }
@@ -90,7 +102,7 @@ SITES = {'sup': {'name': 'sup', 'repo': 'r', 'url': v.SUPPORTED_SITE_URL}, 'lim'
 
 
 def test_live_smoke_observation_passes_with_a_complete_site_and_an_honest_limit(tmp_path):
-    states = {v.SUPPORTED_SITE_URL: ('complete', 4, []), 'https://l/': ('incomplete', 0, ['development mode/destination mapping unsupported'])}
+    states = {v.SUPPORTED_SITE_URL: ('complete', 4, []), 'https://l/': ('incomplete', 0, ['custom template mapping unsupported'])}
     facts, status = obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=_clone_stub, supported=SITES['sup'], limits=SITES['lim'], pinned_supported=())
     assert status == 'passed'  # no pinned sites configured here; the verifier requires medfit and probmed (see below)
 
@@ -275,7 +287,7 @@ def test_failed_status_is_never_accepted(tmp_path):
 def test_a_limit_site_that_becomes_supported_is_an_improvement_not_a_failure(tmp_path):
     states = {v.SUPPORTED_SITE_URL: ('complete', 4, []), 'https://l/': ('complete', 3, [])}
     sites = ({'name': 'a', 'repo': 'r', 'url': 'https://l/'}, {'name': 'b', 'repo': 'r', 'url': 'https://l2/'})
-    states['https://l2/'] = ('incomplete', 0, ['development mode/destination mapping unsupported'])
+    states['https://l2/'] = ('incomplete', 0, ['custom template mapping unsupported'])
     facts, status = obs.observe_live_smoke(tmp_path, audit=_audit_for(states), clone=_clone_stub, supported=SITES['sup'], limits=sites, pinned_supported=())
     assert status == 'passed' and [r['name'] for r in facts['unsupported_real_runs']] == ['b'] and facts['other_real_runs'][0]['name'] == 'a'
 
@@ -363,6 +375,46 @@ def test_a_failing_pinned_real_site_fails_the_observation_even_when_the_limit_si
     """Glue-style limit sites must not mask a regression in the sites that are supposed to be supported."""
     _, status = _live(tmp_path, **change)
     assert status == 'failed'
+
+
+@pytest.mark.parametrize('reasons', [
+    ['HTTP Error 503: Service Unavailable'],
+    ['<urlopen error timed out>'],
+    ['sitemap read exceeded 10-second budget'],
+    [],
+    ['custom template mapping unsupported', 'HTTP Error 503: Service Unavailable'],
+])
+def test_a_limit_site_that_is_incomplete_only_because_it_was_unreachable_does_not_count(tmp_path, reasons):
+    """An outage on the limit site proves nothing about the unsupported-layout contract."""
+    facts, status = _live(tmp_path, **{'https://l/': ('incomplete', 0, reasons)})
+    assert status == 'failed'
+    assert facts['unsupported_real_runs'] == [] or any(r in str(facts['unsupported_real_runs']) for r in reasons)
+
+
+@pytest.mark.parametrize('reason', [
+    'custom template mapping unsupported', 'custom layout/build configuration unsupported',
+    'pkgdown configuration overlays unsupported', 'unsupported Quarto project configuration: _quarto.yml',
+    'unsupported article format (format): vignettes/a.qmd', 'development.mode unsupported: \'weird\'',
+    'template Bootstrap version unsupported: \'3\'', 'PKGDOWN_DEV_MODE set in .github/workflows/p.yaml; development mode mapping unsupported',
+    'reusable workflow job unsupported (.github/workflows/p.yaml); the deployed routes cannot be verified',
+])
+def test_every_unsupported_layout_reason_the_engine_emits_is_recognized(reason):
+    assert v.limit_run_is_unsupported_layout({'state': 'incomplete', 'reasons': [reason]})
+
+
+def test_the_producer_and_the_verifier_share_one_limit_site_predicate():
+    import inspect
+    assert obs.limit_run_is_unsupported_layout.__module__ == 'verify_a2_release'
+    assert inspect.getsource(obs.limit_run_is_unsupported_layout) == inspect.getsource(v.limit_run_is_unsupported_layout)
+
+
+def test_the_real_glue_pin_still_fails_for_a_recognized_layout_reason():
+    """Run the engine on glue's pinned layout (template.package) and feed its actual reasons to the shared predicate."""
+    from lib import docaudit  # noqa: F401  (engine under test)
+    from lib import _docsite
+    reasons = _docsite.routes([], {'template': {'package': 'tidytemplate'}})[1]
+    assert reasons == ['custom template mapping unsupported']
+    assert v.limit_run_is_unsupported_layout({'state': 'incomplete', 'reasons': reasons})
 
 
 def test_the_limit_site_must_still_be_incomplete_when_the_pinned_sites_pass(tmp_path):

@@ -27,7 +27,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT))
 
 from a2_gate_record import produce as produce_gates  # noqa: E402
-from verify_a2_release import (SUPPORTED_SITE_URL, site_run_is_sound, VerificationError, validate_full_gates, validate_package_triage,  # noqa: E402
+from verify_a2_release import (SUPPORTED_SITE_URL, limit_run_is_unsupported_layout, site_run_is_sound, VerificationError, validate_full_gates, validate_package_triage,  # noqa: E402
                                validate_requirements, validate_review)
 
 # A real deployed pkgdown site with a supported configuration (release mode, no template, one sitemap request).
@@ -155,7 +155,7 @@ def observe_live_smoke(workdir: Path, audit: Optional[Callable] = None, clone: O
     primary = run(supported)
     pinned = [run(site) for site in pinned_supported]
     runs = [run(site) for site in limits]
-    unsupported = [r for r in runs if r["state"] == "incomplete" and r["reasons"]]
+    unsupported = [r for r in runs if limit_run_is_unsupported_layout(r)]
     other = [r for r in runs if r not in unsupported]  # a real site that became supported is an improvement, not a failure
     facts = {"url": primary["url"], "source_ref": primary["source_ref"], "requests": primary["requests"], "checked": primary["checked"],
              "supported_site": primary, "pinned_real_runs": pinned,

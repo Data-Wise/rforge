@@ -233,6 +233,44 @@ def site_run_is_sound(run):
             and not {"warn", "error"} & set(severities))
 
 
+# Reasons the engine gives when it REFUSES a site layout or configuration (lib/_docsite.py). Matched from the start of
+# the reason, never as a substring: a transport or availability failure ("HTTP Error 415: Unsupported Media Type", a
+# timeout, a DNS error, a refused sitemap body) must not count as a refused layout.
+UNSUPPORTED_LAYOUT_REASON_PATTERNS = tuple(re.compile(p) for p in (
+    r"custom (layout/build configuration|template mapping) unsupported$",
+    r"pkgdown configuration overlays unsupported$",
+    r"unsupported Quarto project configuration",
+    r"unsupported article (format|output|source)",
+    r"development\.(mode|destination) unsupported",
+    r"template Bootstrap version unsupported",
+    r"development mode with Bootstrap 3 ",
+    r"PKGDOWN_DEV_MODE set in .*mapping unsupported",
+    r"workflow PKGDOWN_DEV_MODE mapping unsupported",
+    r"reusable workflow job unsupported",
+    r"directory-level article configuration unsupported",
+    r"symlinked vignette entry unsupported",
+    r"deploy to a subdirectory",
+))
+# Informational, never blocking in the engine, and only produced after a successful sitemap read.
+_BENIGN_REASON = re.compile(r"excluded \d+ foreign sitemap entries$")
+
+
+def limit_run_is_unsupported_layout(run):
+    """The one predicate for a real site the audit must refuse, shared by the producer and the verifier.
+
+    The run must be `incomplete` and every reason it gives must be a recognized unsupported-layout reason, with at
+    least one such reason. A transport or availability failure (HTTP error, timeout, DNS), or one mixed into the
+    list, is never accepted: an outage must not stand in for evidence that the layout is refused.
+    """
+    if not isinstance(run, dict) or run.get("state") != "incomplete":
+        return False
+    reasons = run.get("reasons")
+    if not isinstance(reasons, list) or not reasons or not all(isinstance(r, str) for r in reasons):
+        return False
+    layout = [r for r in reasons if not _BENIGN_REASON.match(r)]
+    return bool(layout) and all(any(p.match(r) for p in UNSUPPORTED_LAYOUT_REASON_PATTERNS) for r in layout)
+
+
 def validate_live_smoke(facts):
     """Real supported deployed sites were checked over HTTP, and real packages the site check cannot cover say so."""
     where = "live smoke"
@@ -248,8 +286,8 @@ def validate_live_smoke(facts):
         require(run.get("url") == PINNED_SUPPORTED_URLS[run["name"]], f"{where}: pinned site {run['name']} audited the wrong URL")
         require(site_run_is_sound(run), f"{where}: pinned site {run['name']} was not completely checked over HTTP with no missing routes or warn/error findings")
     runs = facts.get("unsupported_real_runs")
-    require(isinstance(runs, list) and runs and all(isinstance(r, dict) and r.get("state") == "incomplete" and r.get("reasons") for r in runs),
-            f"{where}: unsupported real packages must be recorded as incomplete with reasons")
+    require(isinstance(runs, list) and runs and all(limit_run_is_unsupported_layout(r) for r in runs),
+            f"{where}: each unsupported real site must be incomplete for a recognized unsupported-layout reason, not a transport or availability failure")
 
 
 def validate_review(facts, candidate_sha):
