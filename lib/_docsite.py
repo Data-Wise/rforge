@@ -86,11 +86,24 @@ def sitemap(base):
     return paths, foreign
 
 
-def git(root, *args):
-    r = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, timeout=20)
+def git(root, *args, strip=True):
+    r = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=20)
     if r.returncode:
         raise ValueError(r.stderr.strip() or "local git inspection failed")
-    return r.stdout.strip()
+    return r.stdout.strip() if strip else r.stdout
+
+
+def tree_modes(root, rev):
+    """`{path: mode}` for the whole tree at `rev`. NUL-separated (`-z`): without it git C-quotes non-ASCII paths."""
+    r = subprocess.run(["git", "ls-tree", "-z", "--full-tree", "-r", rev], cwd=root, capture_output=True, timeout=20)
+    if r.returncode:
+        raise ValueError(r.stderr.decode("utf-8", "replace").strip() or "local git inspection failed")
+    modes = {}
+    for entry in r.stdout.decode("utf-8", "surrogateescape").split("\0"):
+        if entry:
+            meta, _, path = entry.partition("\t")
+            modes[path] = meta.split(" ", 1)[0]
+    return modes
 
 
 def yaml_data(text):
@@ -102,9 +115,36 @@ def yaml_data(text):
         value = yaml.safe_load(text) or {}
     except yaml.YAMLError as exc:
         raise ValueError("invalid YAML configuration") from exc
+    except RecursionError as exc:
+        raise ValueError("YAML configuration is too deeply nested") from exc
     if not isinstance(value, dict):
         raise ValueError("YAML configuration must be a mapping")
     return value
+
+
+def workflow_jobs(data, name):
+    """`(job name, job, steps)` for every job; any structure GitHub itself would reject raises ValueError naming the file."""
+    def bad(what):
+        return ValueError(f"malformed workflow structure ({name}): {what}")
+    jobs = data["jobs"] if "jobs" in data else {}
+    if not isinstance(jobs, dict):
+        raise bad("jobs must be a mapping")
+    out = []
+    for key, job in jobs.items():
+        if not isinstance(job, dict):
+            raise bad(f"job {key} must be a mapping")
+        steps = job["steps"] if "steps" in job else []
+        if not isinstance(steps, list):
+            raise bad(f"job {key} steps must be a list")
+        for step in steps:
+            if not isinstance(step, dict):
+                raise bad(f"a step of job {key} must be a mapping")
+            if "uses" in step and not isinstance(step["uses"], str):
+                raise bad(f"a step of job {key} has a non-string uses")
+            if "with" in step and not isinstance(step["with"], dict):
+                raise bad(f"a step of job {key} has a non-mapping with")
+        out.append((key, job, steps))
+    return out
 
 
 def select_ref(root, ref):
@@ -116,7 +156,10 @@ def select_ref(root, ref):
             text = file.read_text()
             if not re.search(r"pkgdown(?:::|/)|deploy_to_branch|build_site", text):
                 continue
-            data = yaml_data(text)
+            try:
+                data = yaml_data(text)
+            except ValueError as exc:
+                raise ValueError(f"malformed workflow ({file.name}): {exc}") from exc
             on = data.get("on", data.get(True, {}))
             push = on.get("push", {}) if isinstance(on, dict) else {}
             branches = push.get("branches", []) if isinstance(push, dict) else []
@@ -124,11 +167,11 @@ def select_ref(root, ref):
                 branches = [branches]
             if len(branches) != 1 or not isinstance(branches[0], str) or re.search(r"[*?\[${]", branches[0]):
                 raise ValueError("ambiguous deployment workflow; supply --ref")
-            for job in data.get("jobs", {}).values():
+            for _, job, steps in workflow_jobs(data, file.name):
                 if "uses" in job or "PKGDOWN_DEV_MODE" in str(job):
                     raise ValueError("reusable/development workflow unsupported; supply --ref and verify routes")
-                for step in job.get("steps", []):
-                    if "checkout" in str(step.get("uses", "")) and step.get("with", {}).get("ref") is not None:
+                for step in steps:
+                    if "checkout" in str(step.get("uses", "")) and (step.get("with") or {}).get("ref") is not None:
                         raise ValueError("alternate checkout ref; supply --ref")
             candidates.append(branches[0])
         if len(candidates) > 1:
@@ -285,24 +328,33 @@ def routes(paths, config):
     return found, reasons, counts
 
 
-def override_key(node):
-    """First route-changing key anywhere in a front-matter structure, else None."""
+def override_key(node, seen=None):
+    """First route-changing key anywhere in a front-matter structure, else None.
+
+    YAML aliases share nodes: each container is visited once, so an alias bomb or a self-referencing anchor is cheap.
+    """
+    seen = set() if seen is None else seen
+    if isinstance(node, (dict, list)):
+        if id(node) in seen:
+            return None
+        seen.add(id(node))
     if isinstance(node, dict):
         for key, value in node.items():
             if isinstance(key, str) and OVERRIDE_KEY.match(key):
                 return key
-            found = override_key(value)
+            found = override_key(value, seen)
             if found:
                 return found
     elif isinstance(node, list):
         for item in node:
-            found = override_key(item)
+            found = override_key(item, seen)
             if found:
                 return found
     return None
 
 
-def non_html_format(value):
+def non_html_format(value, seen=None):
+    seen = set() if seen is None else seen
     if value is None:
         return False
     if isinstance(value, str):
@@ -310,8 +362,26 @@ def non_html_format(value):
     if isinstance(value, dict):
         return any(key != "html" for key in value)
     if isinstance(value, list):
-        return any(non_html_format(item) for item in value)
+        if id(value) in seen:
+            return False
+        seen.add(id(value))
+        return any(non_html_format(item, seen) for item in value)
     return True
+
+
+def front_matter(source):
+    """`(yaml text, terminated)`; `(None, True)` when there is no front matter. rmarkdown's rule, by delimiter lines:
+    the first non-blank line is `---`, closed by the next line that is exactly `---` or `...` (never a substring)."""
+    lines = source.lstrip("\ufeff").splitlines()
+    start = 0
+    while start < len(lines) and not lines[start].strip():
+        start += 1
+    if start == len(lines) or not re.fullmatch(r"---\s*", lines[start]):
+        return None, True
+    for end in range(start + 1, len(lines)):
+        if re.fullmatch(r"(---|\.\.\.)\s*", lines[end]):
+            return "\n".join(lines[start + 1:end]), True
+    return None, False
 
 
 def article_problem(file, metadata):
@@ -339,21 +409,89 @@ def article_problem(file, metadata):
     return None
 
 
-def workflow_blocks(root, sha, tree):
-    """Reasons the workflows at the pinned SHA make a static route mapping unverifiable (read via `git show`)."""
+DEV_MODE_VARIABLE = "PKGDOWN_DEV_MODE"
+STARTUP_FILES = (".Renviron", ".Rprofile", ".Renviron.site", ".Rprofile.site")
+MAX_LOCAL_ACTIONS = 25
+
+
+def deploy_subdirectory(text, pkgdown_repo=True):
+    """A deploy that publishes below the site root moves every route: `deploy_to_branch(subdir=)`, or a Pages
+    `target-folder` in a repository whose workflows build a pkgdown site (build and deploy may be separate files)."""
+    return bool((("deploy_to_branch" in text) and re.search(r"\bsubdir\s*=", text))
+                or (pkgdown_repo and re.search(r"\btarget[-_]folder\s*:", text)))
+
+
+def local_action_reasons(root, sha, files, uses, seen, pkgdown_repo=True):
+    """Scan a local composite action (`uses: ./path`, relative to the repository root) and the local actions it calls."""
+    target = posixpath.normpath(uses[2:] or ".")
+    if target.startswith("..") or target in seen:
+        return [f"local action {uses} unresolvable at the pinned ref; the deployed routes cannot be verified"] if target.startswith("..") else []
+    seen.add(target)
+    if len(seen) > MAX_LOCAL_ACTIONS:
+        return ["too many local actions to scan; the deployed routes cannot be verified"]
+    names = [n for n in ("action.yml", "action.yaml") if posixpath.normpath(posixpath.join(target, n)) in files]
+    if not names:
+        return [f"local action {target} unresolvable at the pinned ref (no action.yml); the deployed routes cannot be verified"]
+    path = posixpath.normpath(posixpath.join(target, names[0]))
+    text = git(root, "show", sha + ":" + path, strip=False)
     reasons = []
-    for path in tree:
-        if not re.fullmatch(r"\.github/workflows/[^/]+\.ya?ml", path):
-            continue
-        text = git(root, "show", sha + ":" + path)
-        if "PKGDOWN_DEV_MODE" in text:
-            reasons.append("workflow PKGDOWN_DEV_MODE mapping unsupported")
+    if DEV_MODE_VARIABLE in text:
+        reasons.append(f"{DEV_MODE_VARIABLE} set in local action {path}; development mode mapping unsupported")
+    if deploy_subdirectory(text, pkgdown_repo):
+        reasons.append(f"deploy to a subdirectory in local action {path}; the deployed routes cannot be verified")
+    try:
+        data = yaml_data(text)
+        runs = data.get("runs")
+        if not isinstance(runs, dict) or runs.get("using") != "composite":
+            reasons.append(f"local action {path} is not a composite action and cannot be scanned; the deployed routes cannot be verified")
         else:
+            steps = runs.get("steps")
+            if not isinstance(steps, list) or not all(isinstance(x, dict) and isinstance(x.get("uses", ""), str) for x in steps):
+                raise ValueError("steps must be a list of mappings")
+            for step in steps:
+                if step.get("uses", "").startswith("./"):
+                    reasons.extend(local_action_reasons(root, sha, files, step["uses"], seen, pkgdown_repo))
+    except ValueError as exc:
+        reasons.append(f"malformed local action ({path}): {exc}")
+    return reasons
+
+
+def workflow_blocks(root, sha, tree, prefix=""):
+    """Reasons the pinned tree makes a static route mapping unverifiable (everything is read via `git show` at the SHA).
+
+    Scanned: workflows (`PKGDOWN_DEV_MODE`, any job-level `uses:`, local composite actions, deploys below the site
+    root, malformed structure) and the R startup files at the repository root and the package directory. Names built
+    dynamically or set inside scripts the workflow merely runs are not detected.
+    """
+    reasons = []
+    files = set(tree)
+    workflows = sorted(p for p in files if re.fullmatch(r"\.github/workflows/[^/]+\.ya?ml", p))
+    texts = {p: git(root, "show", sha + ":" + p, strip=False) for p in workflows}
+    pkgdown_repo = any("pkgdown" in t for t in texts.values())
+    startup_dirs = {"", prefix.rstrip("/")}
+    for path in sorted(files):
+        if posixpath.basename(path) in STARTUP_FILES and posixpath.dirname(path) in startup_dirs:
+            if DEV_MODE_VARIABLE in git(root, "show", sha + ":" + path, strip=False):
+                reasons.append(f"{DEV_MODE_VARIABLE} set in {path}; development mode mapping unsupported")
+    for path, text in texts.items():
+        if DEV_MODE_VARIABLE in text:
+            reasons.append(f"workflow PKGDOWN_DEV_MODE mapping unsupported ({path})")
+        if deploy_subdirectory(text, pkgdown_repo):
+            reasons.append(f"deploy to a subdirectory ({path}); the deployed routes cannot be verified")
+        try:
+            jobs = workflow_jobs(yaml_data(text), path)
+        except ValueError as exc:
+            reasons.append(str(exc) if str(exc).startswith("malformed workflow") else f"malformed workflow ({path}): {exc}")
+            continue
+        seen = set()
+        for _, job, steps in jobs:
             # SPEC decision 2: ANY job-level `uses:` is unverifiable. A reusable workflow can build or deploy the
             # site without ever naming pkgdown, so no keyword gate; step-level `uses:` (actions) is unaffected.
-            jobs = yaml_data(text).get("jobs", {})
-            if isinstance(jobs, dict) and any(isinstance(job, dict) and "uses" in job for job in jobs.values()):
+            if "uses" in job:
                 reasons.append(f"reusable workflow job unsupported ({path}); the deployed routes cannot be verified")
+            for step in steps:
+                if step.get("uses", "").startswith("./"):
+                    reasons.extend(local_action_reasons(root, sha, files, step["uses"], seen, pkgdown_repo))
     return list(dict.fromkeys(reasons))
 
 
@@ -365,8 +503,10 @@ def audit(root: Path, *, url, ref=None):
         sha = provenance["sha"]
         # Git owns package-relative casing on case-insensitive filesystems.
         prefix = git(root,"rev-parse","--show-prefix")
-        tree = git(root,"ls-tree","--full-tree","-r","--name-only",sha).splitlines()
-        paths = [p[len(prefix):] for p in tree if p.startswith(prefix)]
+        modes = tree_modes(root, sha)
+        tree = list(modes)
+        package_modes = {p[len(prefix):]: m for p, m in modes.items() if p.startswith(prefix)}
+        paths = list(package_modes)
         # pkgdown reads the first existing candidate and never merges; any other config-like file is an overlay.
         present = [p for p in CONFIG_CANDIDATES if p in paths]
         if len(present) > 1 or any("/" in p for p in present) or any(p.startswith("pkgdown/") and p.endswith((".yml",".yaml")) for p in paths):
@@ -400,21 +540,44 @@ def audit(root: Path, *, url, ref=None):
             except ValueError:
                 stage["reasons"].append("unsupported Quarto project configuration: " + ", ".join(quarto))
         refused=set()
+        # `git show` of a symlink returns the link text, never the file: a symlinked article cannot be read statically.
+        for link in sorted(p for p, m in package_modes.items() if m == "120000" and p.startswith("vignettes/")):
+            stage["reasons"].append(f"symlinked vignette entry unsupported (not read as article content): {link}")
+            for route, file in list(expected.items()):
+                if file == link:
+                    stage["counts"]["unsupported"] += 1
+                    refused.add(file)
+                    del expected[route]
+        # Directory-level output configuration. pkgdown's behavior for these files was not rendered, so any that
+        # could change a format or route is refused rather than guessed.
+        names = {"qmd": [], "rmd": []}
+        for p in paths:
+            if not p.startswith("vignettes/") or not re.search(r"\.ya?ml$", p):
+                continue
+            name = posixpath.basename(p)
+            nested_project = re.fullmatch(r"_quarto\.ya?ml", name) and p.count("/") > 1
+            if re.fullmatch(r"_metadata\.ya?ml|_quarto-.+\.ya?ml", name) or nested_project:
+                names["qmd"].append(p)
+            elif re.fullmatch(r"_output\.ya?ml", name):
+                names["rmd"].append(p)
+        for kind, suffixes in (("qmd", (".qmd",)), ("rmd", (".Rmd", ".rmd"))):
+            if names[kind] and any(f.endswith(suffixes) for f in expected.values()):
+                stage["reasons"].append("directory-level article configuration unsupported ("
+                                        + ", ".join(names[kind]) + "); it can change the output format or route")
         for route,file in list(expected.items()):
             if not file.endswith(ARTICLE_SUFFIXES):continue
-            source=git(root,"show",sha+":"+prefix+file)
-            if not source.startswith("---"):continue
-            parts=source.split("---",2)
-            if len(parts)!=3:
+            text,terminated=front_matter(git(root,"show",sha+":"+prefix+file,strip=False))
+            if not terminated:
                 stage["reasons"].append("unterminated article frontmatter: "+file);continue
-            problem=article_problem(file,yaml_data(parts[1]))
+            if text is None:continue
+            problem=article_problem(file,yaml_data(text))
             if problem:
                 stage["reasons"].append(problem)
                 stage["counts"]["unsupported"]+=1
                 refused.add(file)
                 del expected[route]
         # Even an explicit ref cannot certify workflow transforms: read them at the pinned SHA, not the working tree.
-        blocked = workflow_blocks(root, sha, tree)
+        blocked = workflow_blocks(root, sha, tree, prefix)
         if blocked:
             stage["reasons"].extend(blocked)
             return stage
@@ -434,7 +597,7 @@ def audit(root: Path, *, url, ref=None):
                 finding("site-extra-page","info","",f"extra supported-surface sitemap route: {base}{route}")
         working = [p.relative_to(root).as_posix() for folder in ("man","vignettes") for p in (root/folder).rglob("*") if p.is_file()]
         current,_,_ = routes(working,config)
-        head_paths = git(root,"ls-tree","--full-tree","-r","--name-only","HEAD").splitlines()
+        head_paths = tree_modes(root, "HEAD")
         for route,file in current.items():
             if route not in expected and file not in refused:
                 stage["counts"]["unreleased"] += 1
@@ -444,4 +607,6 @@ def audit(root: Path, *, url, ref=None):
         stage["state"] = "incomplete" if blocking else "complete"
     except (ValueError,OSError,subprocess.SubprocessError,ET.ParseError) as exc:
         stage["reasons"].append(str(exc))
+    except (RecursionError,TypeError,AttributeError,KeyError) as exc:  # fail closed on a structure no guard anticipated
+        stage["reasons"].append(f"unexpected input structure ({type(exc).__name__}); the audit cannot complete")
     return stage

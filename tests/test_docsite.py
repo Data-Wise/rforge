@@ -718,3 +718,278 @@ def test_text_verdict_for_an_incomplete_site_stage_stays_incomplete(tmp_path, ca
     out = capsys.readouterr().out
     assert "INCOMPLETE" in out and "no findings" not in out
 
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Review round 4 (#111): seven false-complete paths found by the engine adversarial review. Each fixture below
+# reported `complete` (or raised) before its fix.
+# ---------------------------------------------------------------------------------------------------------
+def audit_args(pkg, **kw):
+    return site.audit(pkg, url=kw.pop("url", "https://x.example/pkg/"), ref=kw.pop("ref", "main"))
+
+
+def link(pkg, name, target):
+    """Commit a symlink (`git ls-tree` mode 120000) at `name` pointing at `target`."""
+    import os
+    path = pkg / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    os.symlink(target, path)
+    git(pkg, "add", "-A"); git(pkg, "commit", "-m", "link " + name)
+
+
+# 1. `git ls-tree` C-quotes non-ASCII paths unless -z is used: such files vanished from the expected set.
+def test_non_ascii_article_is_expected_and_its_absence_is_a_missing_page(tmp_path):
+    r = article_site(tmp_path, "café.Rmd", "# x", sitemap_routes=[])
+    assert r["state"] == "complete" and r["counts"]["checked"] == 2, r
+    assert [f["file"] for f in r["findings"] if f["check"] == "site-missing-page"] == ["vignettes/café.Rmd"]
+
+
+def test_non_ascii_article_published_is_complete_and_clean(tmp_path):
+    r = article_site(tmp_path, "café.Rmd", "# x", sitemap_routes=["articles/café.html"])
+    assert r["state"] == "complete" and r["counts"]["checked"] == 2 and not r["findings"], r
+
+
+def test_a_package_in_a_non_ascii_subdirectory_is_not_complete_with_nothing_checked(tmp_path):
+    web = tmp_path / "web"
+    repo = tmp_path / "mono"; pkg = repo / "packages" / "café"
+    pkg.mkdir(parents=True)
+    commit(repo, {"packages/café/DESCRIPTION": DESC.format(version="1.0.0"), "packages/café/man/internal.Rd": "x"}, init=True)
+    with server(web) as root:
+        publish(web, "", root, [])
+        r = site.audit(pkg, url=root, ref="main")
+    assert r["counts"]["checked"] == 1, r
+    assert [f["file"] for f in r["findings"] if f["check"] == "site-missing-page"] == ["man/internal.Rd"]
+
+
+# 2. The old `source.split("---", 2)` split on any `---`, not on the delimiter lines.
+@pytest.mark.parametrize("text", [
+    "---\ntitle: A --- B\noutput-file: other.html\n---\n# body\n",
+    "---\ntitle: x\noutput-file: other.html\n...\n# body\n",
+    "---  \noutput-file: other.html\n---  \n",
+    "\n\n---\noutput-file: other.html\n---\n",
+])
+def test_front_matter_is_parsed_by_delimiter_lines_not_by_substring(tmp_path, text):
+    r = article_site(tmp_path, "a.qmd", text)
+    assert r["state"] == "incomplete" and r["counts"]["unsupported"] == 1
+    assert any("output-file" in x and "vignettes/a.qmd" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_dots_terminator_is_valid_front_matter_not_invalid_yaml(tmp_path):
+    r = article_site(tmp_path, "a.qmd", "---\ntitle: x\n...\n# body\n")
+    assert r["state"] == "complete", r["reasons"]
+
+
+def test_a_rule_in_the_body_is_not_front_matter(tmp_path):
+    r = article_site(tmp_path, "a.qmd", "# body\n\n---\noutput-file: other.html\n---\n")
+    assert r["state"] == "complete", r["reasons"]
+
+
+# 3. `git show` of a symlink returns the link text, never the file: a symlinked article skipped the override check.
+def symlink_site(tmp_path, build):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, files={"vignettes/real.txt": "---\noutput_file: x.html\n---\n"})
+        build(pkg)
+        publish(web, "", root, ROUTES + ["articles/a.html"])
+        return site.audit(pkg, url=root, ref="main")
+
+
+def test_a_symlinked_article_is_unsupported_and_its_link_text_is_never_read(tmp_path):
+    r = symlink_site(tmp_path, lambda pkg: link(pkg, "vignettes/a.Rmd", "real.txt"))
+    assert r["state"] == "incomplete" and r["counts"]["unsupported"] == 1
+    assert any("symlink" in x and "vignettes/a.Rmd" in x for x in r["reasons"]), r["reasons"]
+    assert not any("output_file" in x for x in r["reasons"])  # the target text was not parsed as front matter
+    assert not [f for f in r["findings"] if f["file"] == "vignettes/a.Rmd"]
+
+
+def test_a_symlinked_vignette_directory_is_unsupported(tmp_path):
+    def build(pkg):
+        commit(pkg, {"other/b.Rmd": "# b"}, "other")
+        link(pkg, "vignettes/sub", "../other")
+    r = symlink_site(tmp_path, build)
+    assert r["state"] == "incomplete" and any("symlink" in x and "vignettes/sub" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_symlinked_quarto_project_file_is_unsupported(tmp_path):
+    def build(pkg):
+        commit(pkg, {"vignettes/q.txt": DEFAULT_QUARTO, "vignettes/a.qmd": "# a"}, "qmd")
+        link(pkg, "vignettes/_quarto.yml", "q.txt")
+    r = symlink_site(tmp_path, build)
+    assert r["state"] == "incomplete" and any("symlink" in x and "_quarto.yml" in x for x in r["reasons"]), r["reasons"]
+
+
+# 4. Directory-level Quarto / R Markdown configuration. pkgdown's real behavior for these files was NOT rendered
+#    (no pkgdown fixture build): any such file that could change a format or route is refused, never guessed.
+@pytest.mark.parametrize("article,files", [
+    ("a.qmd", {"vignettes/_metadata.yml": "format: pdf\n"}),
+    ("a.qmd", {"vignettes/_metadata.yaml": "output-dir: out\n"}),
+    ("a.qmd", {"vignettes/sub/_metadata.yml": "format: pdf\n"}),
+    ("a.qmd", {"vignettes/_quarto-prod.yml": "project:\n  output-dir: out\n"}),
+    ("a.qmd", {"vignettes/_quarto-prod.yaml": "format: pdf\n"}),
+    ("a.qmd", {"vignettes/sub/_quarto.yml": DEFAULT_QUARTO}),
+    ("a.Rmd", {"vignettes/_output.yml": "pdf_document: default\n"}),
+    ("a.Rmd", {"vignettes/_output.yaml": "html_document:\n  output_file: x.html\n"}),
+    ("a.Rmd", {"vignettes/sub/_output.yml": "pdf_document: default\n"}),
+])
+def test_directory_level_output_configuration_is_refused(tmp_path, article, files):
+    r = article_site(tmp_path, article, "# x", extra=files)
+    assert r["state"] == "incomplete" and r["counts"]["checked"] == 2, r
+    assert any("directory-level" in x and next(iter(files)).rsplit("/", 1)[1] in x for x in r["reasons"]), r["reasons"]
+
+
+@pytest.mark.parametrize("article,files", [
+    ("a.Rmd", {"vignettes/_metadata.yml": "format: pdf\n", "vignettes/_quarto-prod.yml": "x: 1\n"}),  # Quarto-only files, no .qmd
+    ("a.qmd", {"vignettes/_output.yml": "pdf_document: default\n"}),                                    # R Markdown-only file, no .Rmd
+    ("a.qmd", {"vignettes/_quarto.yml": DEFAULT_QUARTO}),                                                 # the supported default
+])
+def test_directory_level_files_for_the_other_engine_do_not_block(tmp_path, article, files):
+    r = article_site(tmp_path, article, "# x", extra=files)
+    assert r["state"] == "complete", r["reasons"]
+
+
+# 5. PKGDOWN_DEV_MODE and deploy transforms outside `.github/workflows/*` text.
+@pytest.mark.parametrize("name,text", [
+    (".Renviron", "PKGDOWN_DEV_MODE=devel\n"),
+    (".Rprofile", 'Sys.setenv(PKGDOWN_DEV_MODE = "devel")\n'),
+    (".Renviron.site", "PKGDOWN_DEV_MODE=devel\n"),
+])
+def test_dev_mode_in_an_r_startup_file_blocks(tmp_path, monkeypatch, name, text):
+    pkg = make(tmp_path, files={name: text})
+    no_network(monkeypatch)
+    r = audit_args(pkg)
+    assert r["state"] == "incomplete" and any("PKGDOWN_DEV_MODE" in x and name in x for x in r["reasons"]), r["reasons"]
+
+
+def test_dev_mode_in_a_repo_root_startup_file_blocks_a_monorepo_package(tmp_path, monkeypatch):
+    repo = tmp_path / "mono"; pkg = repo / "packages" / "p"
+    pkg.mkdir(parents=True)
+    commit(repo, {"packages/p/DESCRIPTION": DESC.format(version="1.0.0"), "packages/p/man/internal.Rd": "x",
+                  ".Renviron": "PKGDOWN_DEV_MODE=devel\n"}, init=True)
+    no_network(monkeypatch)
+    r = site.audit(pkg, url="https://x.example/pkg/", ref="main")
+    assert r["state"] == "incomplete" and any("PKGDOWN_DEV_MODE" in x and ".Renviron" in x for x in r["reasons"])
+
+
+def local_action_workflow(path="./.github/actions/b"):
+    return f"on:\n  push:\n    branches: [main]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: {path}\n"
+
+
+def test_dev_mode_set_by_a_local_composite_action_blocks(tmp_path, monkeypatch):
+    pkg = make(tmp_path, files={".github/workflows/pkgdown.yaml": local_action_workflow(),
+                                ".github/actions/b/action.yml": "runs:\n  using: composite\n  steps:\n    - run: echo PKGDOWN_DEV_MODE=devel >> $GITHUB_ENV\n      shell: bash\n"})
+    no_network(monkeypatch)
+    r = audit_args(pkg)
+    assert r["state"] == "incomplete" and any("PKGDOWN_DEV_MODE" in x and ".github/actions/b" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_local_action_that_cannot_be_read_is_unresolvable_not_clean(tmp_path, monkeypatch):
+    pkg = make(tmp_path, files={".github/workflows/pkgdown.yaml": local_action_workflow()})
+    no_network(monkeypatch)
+    r = audit_args(pkg)
+    assert r["state"] == "incomplete" and any("local action" in x and ".github/actions/b" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_clean_local_composite_action_does_not_block(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, files={".github/workflows/pkgdown.yaml": local_action_workflow(),
+                                    ".github/actions/b/action.yaml": "runs:\n  using: composite\n  steps:\n    - run: echo hi\n      shell: bash\n"})
+        publish(web, "", root, ROUTES)
+        assert site.audit(pkg, url=root, ref="main")["state"] == "complete"
+
+
+def test_a_local_action_nested_in_a_local_action_is_followed(tmp_path, monkeypatch):
+    pkg = make(tmp_path, files={".github/workflows/pkgdown.yaml": local_action_workflow(),
+                                ".github/actions/b/action.yml": "runs:\n  using: composite\n  steps:\n    - uses: ./.github/actions/c\n      shell: bash\n",
+                                ".github/actions/c/action.yml": "runs:\n  using: composite\n  steps:\n    - run: export PKGDOWN_DEV_MODE=devel\n      shell: bash\n"})
+    no_network(monkeypatch)
+    r = audit_args(pkg)
+    assert r["state"] == "incomplete" and any("PKGDOWN_DEV_MODE" in x and ".github/actions/c" in x for x in r["reasons"]), r["reasons"]
+
+
+@pytest.mark.parametrize("step", [
+    'Rscript -e \'pkgdown::deploy_to_branch(subdir = "v1")\'',
+    "Rscript -e 'pkgdown::deploy_to_branch(new_process = FALSE, subdir=\"v1\")'",
+])
+def test_deploying_to_a_subdirectory_blocks(tmp_path, monkeypatch, step):
+    body = f"on:\n  push:\n    branches: [main]\njobs:\n  d:\n    runs-on: ubuntu-latest\n    steps:\n      - run: {step}\n"
+    pkg = make(tmp_path, files={".github/workflows/deploy.yaml": body})
+    no_network(monkeypatch)
+    r = audit_args(pkg)
+    assert r["state"] == "incomplete" and any("subdirectory" in x and "deploy.yaml" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_pages_deploy_action_with_a_target_folder_blocks(tmp_path, monkeypatch):
+    body = ("on:\n  push:\n    branches: [main]\njobs:\n  d:\n    runs-on: ubuntu-latest\n    steps:\n"
+            "      - run: Rscript -e 'pkgdown::build_site()'\n"
+            "      - uses: JamesIves/github-pages-deploy-action@v4\n        with:\n          folder: docs\n          target-folder: v1\n")
+    pkg = make(tmp_path, files={".github/workflows/deploy.yaml": body})
+    no_network(monkeypatch)
+    r = audit_args(pkg)
+    assert r["state"] == "incomplete" and any("subdirectory" in x and "deploy.yaml" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_deploy_to_branch_without_a_subdirectory_does_not_block(tmp_path):
+    web = tmp_path / "web"
+    body = "on:\n  push:\n    branches: [main]\njobs:\n  d:\n    runs-on: ubuntu-latest\n    steps:\n      - run: Rscript -e 'pkgdown::deploy_to_branch()'\n"
+    with server(web) as root:
+        pkg = make(tmp_path, files={".github/workflows/deploy.yaml": body})
+        publish(web, "", root, ROUTES)
+        assert site.audit(pkg, url=root, ref="main")["state"] == "complete"
+
+
+# 6. Malformed structure must return an incomplete stage with a specific reason, not raise.
+def nested(depth):
+    return "[" * depth + "]" * depth
+
+
+@pytest.mark.parametrize("where,files", [
+    ("config", {"_pkgdown.yml": "x: " + nested(5000) + "\n"}),
+    ("article", {"vignettes/a.qmd": "---\nx: " + nested(5000) + "\n---\n"}),
+    ("workflow", {".github/workflows/w.yaml": "on: push\njobs:\n  b:\n    steps: " + nested(5000) + "\n"}),
+])
+def test_deeply_nested_yaml_is_incomplete_not_a_crash(tmp_path, monkeypatch, where, files):
+    pkg = make(tmp_path, files=files)
+    no_network(monkeypatch)
+    r = audit_args(pkg)
+    assert r["state"] == "incomplete" and any("nested" in x for x in r["reasons"]), r["reasons"]
+
+
+WORKFLOW_HEAD = "on:\n  push:\n    branches: [main]\n"
+
+
+@pytest.mark.parametrize("body", [
+    "jobs:\n  build:\n",                                                   # null job
+    "jobs:\n",                                                             # null jobs
+    "jobs:\n  - build\n",                                                  # list jobs
+    "jobs:\n  build:\n    steps:\n      - echo hi\n",                      # string step
+    "jobs:\n  build:\n    steps:\n",                                      # null steps
+    "jobs:\n  build:\n    steps:\n      - uses: actions/checkout@v4\n        with:\n",   # `with: null`
+    "jobs:\n  build:\n    steps:\n      -\n",                              # null step
+])
+@pytest.mark.parametrize("ref_given", [True, False])
+def test_malformed_workflow_structure_is_incomplete_with_a_reason(tmp_path, monkeypatch, body, ref_given):
+    pkg = make(tmp_path, files={".github/workflows/pkgdown.yaml": WORKFLOW_HEAD + "# pkgdown::build_site()\n" + body})
+    no_network(monkeypatch)
+    r = site.audit(pkg, url="https://x.example/pkg/", ref="main" if ref_given else None)
+    assert r["state"] == "incomplete" and any("malformed workflow" in x and "pkgdown.yaml" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_an_alias_bomb_in_front_matter_is_bounded(tmp_path):
+    import time
+    anchors = ["l0: &l0 [x, x, x, x, x, x, x, x, x]"] + [
+        f"l{i}: &l{i} [" + ", ".join([f"*l{i - 1}"] * 9) + "]" for i in range(1, 9)]
+    start = time.monotonic()
+    r = article_site(tmp_path, "a.qmd", "---\n" + "\n".join(anchors) + "\n---\n")
+    assert time.monotonic() - start < 5, "alias expansion was walked as a tree"
+    assert r["state"] in ("complete", "incomplete")
+
+
+def test_a_target_folder_in_a_repository_with_no_pkgdown_workflow_does_not_block(tmp_path):
+    web = tmp_path / "web"
+    body = ("on:\n  push:\n    branches: [main]\njobs:\n  d:\n    runs-on: ubuntu-latest\n    steps:\n"
+            "      - uses: JamesIves/github-pages-deploy-action@v4\n        with:\n          folder: cov\n          target-folder: coverage\n")
+    with server(web) as root:
+        pkg = make(tmp_path, files={".github/workflows/coverage.yaml": body})
+        publish(web, "", root, ROUTES)
+        assert site.audit(pkg, url=root, ref="main")["state"] == "complete"
