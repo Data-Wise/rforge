@@ -1207,3 +1207,203 @@ def test_the_reason_the_engine_gives_is_a_recognized_unsupported_layout_for_the_
                "deploy to a subdirectory in local action .github/actions/d; the deployed routes cannot be verified"]
     for reason in reasons:
         assert verifier.limit_run_is_unsupported_layout({"state": "incomplete", "reasons": [reason]}), reason
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Codex round 7 sweep: every raw-text detection on a YAML input is matched against the plausible spellings.
+# Each test names the variant; a variant the old text match missed is marked RED-BEFORE in its comment.
+# ---------------------------------------------------------------------------------------------------------
+def yaml_ok(text):
+    try:
+        site.yaml_data(text)
+        return True
+    except ValueError:
+        return False
+
+
+def wf(body, head=WORKFLOW_HEAD):
+    return head + body
+
+
+def deploy_wf(with_block):
+    return wf("jobs:\n  d:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: JamesIves/github-pages-deploy-action@v4\n" + with_block)
+
+
+def run_wf(script):
+    indented = "\n".join("          " + line for line in script.split("\n"))
+    return wf("jobs:\n  d:\n    runs-on: ubuntu-latest\n    steps:\n      - run: |\n" + indented + "\n")
+
+
+def blocked(tmp_path, monkeypatch, files, config=CONFIG):
+    pkg = make(tmp_path, config=config, files=files)
+    no_network(monkeypatch)
+    return audit_args(pkg)
+
+
+def has(r, *words):
+    return r["state"] == "incomplete" and any(all(w in x for w in words) for x in r["reasons"])
+
+
+TARGET_FOLDER_SPELLINGS = [
+    pytest.param("        with:\n          folder: docs\n          target-folder: v1\n", id="plain"),
+    pytest.param("        with:\n          folder: docs\n          target_folder: v1\n", id="underscore"),
+    pytest.param("        with:\n          folder: docs\n          \"target-folder\": v1\n", id="double-quoted-key"),          # RED-BEFORE
+    pytest.param("        with:\n          folder: docs\n          'target-folder': v1\n", id="single-quoted-key"),          # RED-BEFORE
+    pytest.param("        with: {folder: docs, target-folder: v1}\n", id="flow-mapping"),
+    pytest.param("        with: {folder: docs, \"target-folder\": v1}\n", id="flow-mapping-quoted-key"),                     # RED-BEFORE
+    pytest.param("        with:\n          folder: docs\n          target-folder: |\n            v1\n", id="block-scalar-value"),
+    pytest.param("        with:\n          folder: docs\n          \"target\\x2dfolder\": v1\n", id="yaml-escape-in-key"),     # RED-BEFORE
+    pytest.param("        with:\n          folder: docs\n          Target-Folder: v1\n", id="case-variant"),                    # RED-BEFORE
+    pytest.param("        with: &w\n          folder: docs\n          \"target-folder\": v1\n      - uses: other/x@v1\n        with: *w\n", id="anchor-and-alias"),  # RED-BEFORE
+    pytest.param("        with:\n          folder: docs\n          destination_dir: v1\n", id="peaceiris-destination-dir"),    # RED-BEFORE (same class, new input)
+    pytest.param("        with:\n          folder: docs\n          destination-dir: v1\n", id="peaceiris-destination-dir-dashed"),  # RED-BEFORE
+]
+
+
+@pytest.mark.parametrize("with_block", TARGET_FOLDER_SPELLINGS)
+def test_every_spelling_of_a_pages_subdirectory_input_blocks_in_a_workflow(tmp_path, monkeypatch, with_block):
+    assert yaml_ok(deploy_wf(with_block)), "the fixture must be valid YAML"
+    r = blocked(tmp_path, monkeypatch, {".github/workflows/deploy.yaml": deploy_wf(with_block)})
+    assert has(r, "subdirectory", "deploy.yaml"), r["reasons"]
+
+
+@pytest.mark.parametrize("with_block", TARGET_FOLDER_SPELLINGS)
+def test_every_spelling_of_a_pages_subdirectory_input_blocks_in_a_local_action(tmp_path, monkeypatch, with_block):
+    step = "    - uses: JamesIves/github-pages-deploy-action@v4\n" + "\n".join(line[2:] if line.startswith("  ") else line for line in with_block.split("\n"))
+    action = "runs:\n  using: composite\n  steps:\n" + step
+    assert yaml_ok(action), action   # the fixture itself must be valid YAML, or only the raw-text net is being tested
+    r = blocked(tmp_path, monkeypatch, {".github/workflows/deploy.yaml": local_action_workflow("./.github/actions/d"),
+                                        ".github/actions/d/action.yml": action})
+    assert has(r, "subdirectory", ".github/actions/d"), (r["reasons"], action)
+
+
+def test_a_subdirectory_input_set_through_env_blocks(tmp_path, monkeypatch):      # RED-BEFORE for the upper-case spelling
+    body = wf("env:\n  TARGET_FOLDER: v1\njobs:\n  d:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo hi\n")
+    assert has(blocked(tmp_path, monkeypatch, {".github/workflows/deploy.yaml": body}), "subdirectory")
+
+
+@pytest.mark.parametrize("script", [
+    "Rscript -e 'pkgdown::deploy_to_branch(subdir = \"v1\")'",
+    "Rscript -e 'pkgdown::deploy_to_branch(subdir=\"v1\")'",
+    "Rscript -e 'pkgdown::deploy_to_branch(\n  new_process = FALSE,\n  subdir\n    = \"v1\")'",
+    "Rscript -e 'pkgdown::deploy_to_branch(new_process = FALSE, \\\n  subdir = \"v1\")'",
+    "Rscript -e 'do.call(pkgdown::deploy_to_branch, list(subdir = \"v1\"))'",
+    "Rscript -e 'pkgdown::deploy_to_branch(\"subdir\" = \"v1\")'",                  # RED-BEFORE: quoted argument name
+    "Rscript -e 'pkgdown::deploy_to_branch(`subdir` = \"v1\")'",                    # RED-BEFORE: backticked argument name
+    "Rscript -e 'pkgdown::deploy_to_branch(subdir = NULL)'",                         # conservative: still blocks
+], ids=["spaces", "no-spaces", "newline-before-equals", "shell-continuation", "do-call", "quoted-name", "backtick-name", "explicit-null"])
+def test_every_spelling_of_deploy_to_branch_subdir_blocks(tmp_path, monkeypatch, script):
+    r = blocked(tmp_path, monkeypatch, {".github/workflows/deploy.yaml": run_wf(script)})
+    assert has(r, "subdirectory", "deploy.yaml"), r["reasons"]
+
+
+def test_a_subdir_deploy_is_found_in_a_yaml_escaped_run_string(tmp_path, monkeypatch):   # RED-BEFORE: \\x64 decodes to d
+    body = wf("jobs:\n  d:\n    runs-on: ubuntu-latest\n    steps:\n      - run: \"Rscript -e 'pkgdown::\\x64eploy_to_branch(subdir = 1)'\"\n")
+    assert has(blocked(tmp_path, monkeypatch, {".github/workflows/deploy.yaml": body}), "subdirectory")
+
+
+def test_the_pkgdown_wording_heuristic_is_case_insensitive(tmp_path, monkeypatch):       # RED-BEFORE
+    body = deploy_wf("        with:\n          folder: docs\n          target-folder: v1\n") + "# PKGDOWN site\n"
+    r = blocked(tmp_path, monkeypatch, {".github/workflows/deploy.yaml": body}, config=None)
+    assert has(r, "subdirectory"), r["reasons"]
+
+
+DEV_MODE_SPELLINGS = [
+    pytest.param("env:\n  PKGDOWN_DEV_MODE: devel\njobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo\n", id="workflow-env"),
+    pytest.param("env:\n  \"PKGDOWN_DEV_MODE\": true\njobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo\n", id="workflow-env-quoted-key"),
+    pytest.param("env:\n  'PKGDOWN_DEV_MODE': devel\njobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo\n", id="workflow-env-single-quoted"),
+    pytest.param("jobs:\n  b:\n    runs-on: ubuntu-latest\n    env:\n      PKGDOWN_DEV_MODE: devel\n    steps:\n      - run: echo\n", id="job-env"),
+    pytest.param("jobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo\n        env:\n          PKGDOWN_DEV_MODE: devel\n", id="step-env"),
+    pytest.param("jobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo\n        env: {PKGDOWN_DEV_MODE: devel}\n", id="flow-env"),
+    pytest.param("x: &e {PKGDOWN_DEV_MODE: devel}\njobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo\n        env: *e\n", id="anchor-alias"),
+    pytest.param("jobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - run: |\n          echo \"PKGDOWN_DEV_MODE=devel\" >> $GITHUB_ENV\n", id="github-env-echo"),
+    pytest.param("jobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo \"PKGDOWN_DEV_MODE=devel\" >> \"$GITHUB_ENV\"\n", id="github-env-echo-inline"),
+    pytest.param("jobs:\n  b:\n    runs-on: ubuntu-latest\n    env:\n      \"PKGDOWN\\x5fDEV_MODE\": devel\n    steps:\n      - run: echo\n", id="yaml-escape"),   # RED-BEFORE
+    pytest.param("jobs:\n  b:\n    runs-on: ubuntu-latest\n    env:\n      pkgdown_dev_mode: devel\n    steps:\n      - run: echo\n", id="lower-case-name"),   # RED-BEFORE
+    pytest.param("jobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - run: Rscript -e 'Sys.setenv(paste0(\"PKGDOWN_DEV_\", \"MODE\") = \"devel\")'\n", id="r-paste0-split"),   # RED-BEFORE
+    pytest.param("jobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - run: Rscript -e 'Sys.setenv(paste(\"PKGDOWN\", \"DEV\", \"MODE\", sep = \"_\") = \"devel\")'\n", id="r-paste-sep"),   # RED-BEFORE
+]
+
+
+@pytest.mark.parametrize("body", DEV_MODE_SPELLINGS)
+def test_every_spelling_of_the_dev_mode_variable_blocks_in_a_workflow(tmp_path, monkeypatch, body):
+    r = blocked(tmp_path, monkeypatch, {".github/workflows/pkgdown.yaml": WORKFLOW_HEAD + body}, config=None)
+    assert has(r, "PKGDOWN_DEV_MODE", "pkgdown.yaml"), r["reasons"]
+
+
+@pytest.mark.parametrize("step", [
+    "    - run: echo \"PKGDOWN_DEV_MODE=devel\" >> $GITHUB_ENV\n      shell: bash\n",
+    "    - run: echo hi\n      shell: bash\n      env:\n        \"PKGDOWN_DEV_MODE\": devel\n",                         # quoted key
+    "    - run: echo hi\n      shell: bash\n      env: {'PKGDOWN_DEV_MODE': devel}\n",                                # flow, single quoted
+    "    - run: echo hi\n      shell: bash\n      env:\n        \"PKGDOWN\\x5fDEV_MODE\": devel\n",                  # RED-BEFORE: escape
+    "    - run: Rscript -e 'Sys.setenv(paste0(\"PKGDOWN_DEV_\", \"MODE\") = 1)'\n      shell: bash\n",              # RED-BEFORE: split
+], ids=["github-env", "quoted-key", "flow-single-quoted", "yaml-escape", "r-paste0-split"])
+def test_every_spelling_of_the_dev_mode_variable_blocks_in_a_local_action(tmp_path, monkeypatch, step):
+    action = "runs:\n  using: composite\n  steps:\n" + step
+    r = blocked(tmp_path, monkeypatch, {".github/workflows/pkgdown.yaml": local_action_workflow("./.github/actions/b"),
+                                        ".github/actions/b/action.yml": action}, config=None)
+    assert has(r, "PKGDOWN_DEV_MODE", ".github/actions/b"), r["reasons"]
+
+
+@pytest.mark.parametrize("name,text", [
+    (".Renviron", "PKGDOWN_DEV_MODE=devel\n"),
+    (".Renviron", "PKGDOWN_DEV_MODE = \"devel\"\n"),
+    (".Rprofile", "Sys.setenv(PKGDOWN_DEV_MODE = \"devel\")\n"),
+    (".Rprofile", "Sys.setenv(\"PKGDOWN_DEV_MODE\" = \"devel\")\n"),
+    (".Rprofile", "Sys.setenv(`PKGDOWN_DEV_MODE` = \"devel\")\n"),
+    (".Rprofile", "Sys.setenv(pkgdown_dev_mode = \"devel\")\n"),                                       # RED-BEFORE: case
+    (".Rprofile", "Sys.setenv(paste0(\"PKGDOWN_DEV_\", \"MODE\") = \"devel\")\n"),                      # RED-BEFORE: split name
+    (".Rprofile", "do.call(Sys.setenv, setNames(list(\"devel\"), paste(\"PKGDOWN\", \"DEV\", \"MODE\", sep = \"_\")))\n"),  # RED-BEFORE
+    (".Renviron.site", "PKGDOWN_DEV_MODE=devel\n"),
+    (".Rprofile.site", "Sys.setenv(PKGDOWN_DEV_MODE = 'devel')\n"),
+], ids=["renviron", "renviron-spaced", "rprofile", "rprofile-quoted", "rprofile-backtick", "rprofile-lower", "rprofile-paste0", "rprofile-setnames-paste", "renviron-site", "rprofile-site"])
+def test_every_spelling_of_the_dev_mode_variable_blocks_in_a_startup_file(tmp_path, monkeypatch, name, text):
+    r = blocked(tmp_path, monkeypatch, {name: text}, config=None)
+    assert has(r, "PKGDOWN_DEV_MODE", name), r["reasons"]
+
+
+@pytest.mark.parametrize("uses", ["./.github/actions/b", "./.github/actions/b/", "./.github/actions/../actions/b", "\"./.github/actions/b\"", "'./.github/actions/b'"],
+                         ids=["plain", "trailing-slash", "dotdot-normalized", "double-quoted", "single-quoted"])
+def test_every_spelling_of_a_local_action_reference_is_resolved_and_scanned(tmp_path, monkeypatch, uses):
+    wfile = (WORKFLOW_HEAD + f"jobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: {uses}\n")
+    action = "runs:\n  using: composite\n  steps:\n    - run: echo PKGDOWN_DEV_MODE=devel >> $GITHUB_ENV\n      shell: bash\n"
+    r = blocked(tmp_path, monkeypatch, {".github/workflows/pkgdown.yaml": wfile, ".github/actions/b/action.yml": action}, config=None)
+    assert has(r, "PKGDOWN_DEV_MODE", ".github/actions/b"), r["reasons"]
+
+
+def test_a_local_action_reference_through_a_yaml_alias_is_resolved(tmp_path, monkeypatch):
+    wfile = (WORKFLOW_HEAD + "x: &a ./.github/actions/b\njobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: *a\n")
+    action = "runs:\n  using: composite\n  steps:\n    - run: echo PKGDOWN_DEV_MODE=devel >> $GITHUB_ENV\n      shell: bash\n"
+    r = blocked(tmp_path, monkeypatch, {".github/workflows/pkgdown.yaml": wfile, ".github/actions/b/action.yml": action}, config=None)
+    assert has(r, "PKGDOWN_DEV_MODE", ".github/actions/b"), r["reasons"]
+
+
+@pytest.mark.parametrize("front", [
+    "---\nOutput-File: x.html\n---\n",                 # RED-BEFORE: case
+    "---\nOUTPUT_DIR: x\n---\n",                       # RED-BEFORE: case
+    "---\n\"output-file\": x.html\n---\n",             # quoted key
+    "---\n'output_ext': pdf\n---\n",                   # single-quoted key
+    "---\nformat:\n  html:\n    \"output-file\": x.html\n---\n",
+    "---\nx: &o {output-file: a.html}\ny: *o\n---\n",  # anchor
+    "---\nas-is: true\n---\n",                         # RED-BEFORE: hyphenated spelling
+    "---\npkgdown:\n  as-is: true\n---\n",             # RED-BEFORE
+    "---\npkgdown: {as_is: true}\n---\n",              # flow mapping
+], ids=["case-output-file", "case-output-dir", "double-quoted", "single-quoted", "nested-quoted", "anchor", "as-is-hyphen", "pkgdown-as-is-hyphen", "flow-pkgdown"])
+def test_every_spelling_of_a_route_changing_article_key_is_refused(tmp_path, front):
+    r = article_site(tmp_path, "a.qmd", front + "# body\n")
+    assert r["state"] == "incomplete" and any("a.qmd" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_select_ref_reads_an_escaped_dev_mode_name_in_a_workflow_job(tmp_path):         # guard: str(job) already decodes
+    body = ("on:\n  push:\n    branches: [main]\njobs:\n  b:\n    runs-on: ubuntu-latest\n    env:\n      \"PKGDOWN\\x5fDEV_MODE\": devel\n"
+            "    steps:\n      - run: pkgdown::build_site()\n")
+    pkg = make(tmp_path, files={".github/workflows/pkgdown.yaml": body})
+    with pytest.raises(ValueError, match="development workflow unsupported"):
+        site.select_ref(pkg, None)
+
+
+def test_select_ref_notices_a_deployment_workflow_that_only_uses_the_setup_action(tmp_path):   # RED-BEFORE
+    body = "on:\n  push:\n    branches: [release]\njobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: r-lib/actions/setup-pkgdown@v2\n"
+    pkg = make(tmp_path, files={".github/workflows/site.yaml": body})
+    git(pkg, "branch", "release")
+    assert site.select_ref(pkg, None)["selection"] == "literal workflow branch"

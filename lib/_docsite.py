@@ -164,7 +164,7 @@ def select_ref(root, ref):
         candidates = []
         for file in sorted((repository / ".github/workflows").glob("*.y*ml")):
             text = file.read_text()
-            if not re.search(r"pkgdown(?:::|/)|deploy_to_branch|build_site", text):
+            if not re.search(r"pkgdown|deploy_to_branch|build_site", text, re.I):
                 continue
             try:
                 data = yaml_data(text)
@@ -178,7 +178,7 @@ def select_ref(root, ref):
             if len(branches) != 1 or not isinstance(branches[0], str) or re.search(r"[*?\[${]", branches[0]):
                 raise ValueError("ambiguous deployment workflow; supply --ref")
             for _, job, steps in workflow_jobs(data, file.name):
-                if "uses" in job or "PKGDOWN_DEV_MODE" in str(job):
+                if "uses" in job or mentions_dev_mode(*(value for _, value in yaml_walk(job))):
                     raise ValueError("reusable/development workflow unsupported; supply --ref and verify routes")
                 for step in steps:
                     if "checkout" in str(step.get("uses", "")) and (step.get("with") or {}).get("ref") is not None:
@@ -207,7 +207,7 @@ CONFIG_CANDIDATES = ("_pkgdown.yml", "_pkgdown.yaml", "pkgdown/_pkgdown.yml", "p
                      "inst/_pkgdown.yml", "inst/_pkgdown.yaml")
 ARTICLE_SUFFIXES = (".Rmd", ".rmd", ".qmd")  # pkgdown globs `\.[Rrq]md$`: not .md, .Rmarkdown, .RMD or .Qmd
 HTML_OUTPUTS = ("html_document", "html_vignette", "rmarkdown::html_document", "rmarkdown::html_vignette")
-OVERRIDE_KEY = re.compile(r"^output[-_](file|ext|dir)$")
+OVERRIDE_KEY = re.compile(r"^output[-_](file|ext|dir)$", re.I)
 DEFAULT_QUARTO_PROJECT = {"project": {"render": ["*.qmd"]}}
 INT_MAX = 2 ** 31 - 1
 
@@ -397,11 +397,11 @@ def front_matter(source):
 def article_problem(file, metadata):
     """Why an article's output route cannot be inferred statically, else None. `.Rmd`/`.rmd` and `.qmd` differ."""
     key = override_key(metadata)
-    if key is None and "knit" in metadata:
+    if key is None and mapping_key(metadata, "knit") is not None:
         key = "knit"
     if key:
         return f"route-changing article override ({key}): {file}"
-    settings = metadata.get("pkgdown")
+    settings = mapping_key(metadata, "pkgdown")
     if file.endswith(".qmd"):
         if non_html_format(metadata.get("format")):
             return f"unsupported article format (format): {file}"
@@ -414,8 +414,54 @@ def article_problem(file, metadata):
             return f"unsupported article output extension (pkgdown): {file}"
         if isinstance(settings, dict) and "extension" in settings and settings["extension"] != "html":
             return f"unsupported article output extension (pkgdown.extension): {file}"
-    if isinstance(settings, dict) and settings.get("as_is") or metadata.get("as_is"):
+    if isinstance(settings, dict) and mapping_key(settings, "as_is") or mapping_key(metadata, "as_is"):
         return f"unsupported article output/as_is: {file}"
+    return None
+
+
+def yaml_walk(node):
+    """Yield `("key", text)` and `("str", text)` for every string key and string value in a parsed YAML structure.
+
+    Parsed, so YAML spellings that hide a name from a raw-text match (quoted keys, `\\x5f` escapes, folded scalars,
+    flow mappings, anchors and merge keys) are seen as the strings they are. Iterative with a visited set: aliases
+    share nodes, so an alias bomb is walked once and very deep nesting cannot exhaust the Python stack.
+    """
+    stack, seen = [node], set()
+    while stack:
+        item = stack.pop()
+        if isinstance(item, (dict, list, tuple)):
+            if id(item) in seen:
+                continue
+            seen.add(id(item))
+            if isinstance(item, dict):
+                for key, value in item.items():
+                    if isinstance(key, str):
+                        yield "key", key
+                    stack.append(key)
+                    stack.append(value)
+            else:
+                stack.extend(item)
+        elif isinstance(item, str):
+            yield "str", item
+
+
+def source_text(text, data=None):
+    """The raw text plus every parsed string of the same YAML document: what a text match must scan."""
+    return text if data is None else text + "\n" + "\n".join(value for _, value in yaml_walk(data))
+
+
+def mentions_dev_mode(*texts):
+    """`PKGDOWN_DEV_MODE` spelled any plausible way: any case, with quotes, backticks, commas, `+`, parentheses,
+    underscores or whitespace between its parts, so `paste0("PKGDOWN_DEV_", "MODE")` and `paste("PKGDOWN", "DEV", "MODE",
+    sep = "_")` count. A name built any other way (from a variable, a file, a decoded string) is not detected."""
+    return any("PKGDOWNDEVMODE" in re.sub(r"[\s\"'`,+()_\\]", "", text).upper() for text in texts)
+
+
+def mapping_key(mapping, name):
+    """The value of `name` in a front-matter mapping, matching case-insensitively with `-` and `_` interchangeable."""
+    for key, value in mapping.items():
+        if isinstance(key, str) and key.lower().replace("-", "_") == name:
+            return value
     return None
 
 
@@ -424,12 +470,28 @@ STARTUP_FILES = (".Renviron", ".Rprofile", ".Renviron.site", ".Rprofile.site")
 MAX_LOCAL_ACTIONS = 25
 
 
-def deploy_subdirectory(text, pkgdown_repo=True):
-    """A deploy that publishes below the site root moves every route: `deploy_to_branch(subdir=)`, or a Pages
-    `target-folder` in a pkgdown repository (`pkgdown_repo`: a pkgdown config at the pinned SHA, or a workflow naming
-    pkgdown; build and deploy may be separate files). An unrelated `target-folder` in such a repository also blocks."""
-    return bool((("deploy_to_branch" in text) and re.search(r"\bsubdir\s*=", text))
-                or (pkgdown_repo and re.search(r"\btarget[-_]folder\s*:", text)))
+PAGES_SUBDIR_INPUTS = ("target-folder", "destination-dir")   # JamesIves/github-pages-deploy-action, peaceiris/actions-gh-pages
+
+
+def deploy_subdirectory(text, pkgdown_repo=True, data=None):
+    """A deploy that publishes below the site root moves every route.
+
+    Two signals. `deploy_to_branch(subdir = )` is R code, so it is matched as text (on the raw text plus the parsed YAML
+    strings): the argument name may be quoted or backticked and the call may span lines or continuations, and since
+    `subdir` follows `...` in the signature it can only be named. A Pages `target-folder` / `destination-dir` input in a
+    pkgdown repository (`pkgdown_repo`: a pkgdown config at the pinned SHA, or a workflow naming pkgdown; build and
+    deploy may be separate files) is read from the PARSED YAML keys at any depth (so quoted, escaped, flow, aliased and
+    merged spellings count), with a quote-tolerant text match as a second net. An unrelated input of that name in such a
+    repository also blocks. A deploy done by a script the workflow merely runs is not detected.
+    """
+    haystack = source_text(text, data)
+    if "deploy_to_branch" in haystack and re.search(r"\bsubdir[\"'`]?\s*=", haystack):
+        return True
+    if not pkgdown_repo:
+        return False
+    if re.search(r"\b(?:target[-_]folder|destination[-_]dir)[\"']?\s*:", haystack, re.I):
+        return True
+    return data is not None and any(kind == "key" and value.lower().replace("_", "-") in PAGES_SUBDIR_INPUTS for kind, value in yaml_walk(data))
 
 
 def local_action_reasons(root, sha, files, uses, seen, pkgdown_repo=True):
@@ -446,9 +508,13 @@ def local_action_reasons(root, sha, files, uses, seen, pkgdown_repo=True):
     path = posixpath.normpath(posixpath.join(target, names[0]))
     text = git(root, "show", sha + ":" + path, strip=False)
     reasons = []
-    if DEV_MODE_VARIABLE in text:
+    try:
+        data = yaml_data(text)
+    except ValueError:
+        data = None   # reported as malformed below; the raw text is still scanned
+    if mentions_dev_mode(source_text(text, data)):
         reasons.append(f"{DEV_MODE_VARIABLE} set in local action {path}; development mode mapping unsupported")
-    if deploy_subdirectory(text, pkgdown_repo):
+    if deploy_subdirectory(text, pkgdown_repo, data):
         reasons.append(f"deploy to a subdirectory in local action {path}; the deployed routes cannot be verified")
     try:
         data = yaml_data(text)
@@ -482,19 +548,28 @@ def workflow_blocks(root, sha, tree, prefix=""):
     # directory under audit at the pinned SHA (the same candidates the config reader uses). Build and deploy can sit in
     # different workflows and the build can hide in a local action, so neither need contain the word. Text detection is
     # kept only for what a config misses: pkgdown builds without a config file, so a workflow that names it still counts.
-    pkgdown_repo = any(prefix + candidate in files for candidate in CONFIG_CANDIDATES) or any("pkgdown" in t for t in texts.values())
+    parsed, errors = {}, {}
+    for path, text in texts.items():
+        try:
+            parsed[path] = yaml_data(text)
+        except ValueError as exc:
+            errors[path] = exc   # reported as malformed below; the raw text is still scanned
+    pkgdown_repo = (any(prefix + candidate in files for candidate in CONFIG_CANDIDATES)
+                    or any("pkgdown" in source_text(t, parsed.get(p)).lower() for p, t in texts.items()))
     startup_dirs = {"", prefix.rstrip("/")}
     for path in sorted(files):
         if posixpath.basename(path) in STARTUP_FILES and posixpath.dirname(path) in startup_dirs:
-            if DEV_MODE_VARIABLE in git(root, "show", sha + ":" + path, strip=False):
+            if mentions_dev_mode(git(root, "show", sha + ":" + path, strip=False)):
                 reasons.append(f"{DEV_MODE_VARIABLE} set in {path}; development mode mapping unsupported")
     for path, text in texts.items():
-        if DEV_MODE_VARIABLE in text:
+        if mentions_dev_mode(source_text(text, parsed.get(path))):
             reasons.append(f"workflow PKGDOWN_DEV_MODE mapping unsupported ({path})")
-        if deploy_subdirectory(text, pkgdown_repo):
+        if deploy_subdirectory(text, pkgdown_repo, parsed.get(path)):
             reasons.append(f"deploy to a subdirectory ({path}); the deployed routes cannot be verified")
         try:
-            jobs = workflow_jobs(yaml_data(text), path)
+            if path in errors:
+                raise errors[path]
+            jobs = workflow_jobs(parsed[path], path)
         except ValueError as exc:
             reasons.append(str(exc) if str(exc).startswith("malformed workflow") else f"malformed workflow ({path}): {exc}")
             continue
