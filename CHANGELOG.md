@@ -41,8 +41,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Article exclusions follow pkgdown's rules: `^tutorials` applies to the
   directory part only, and `.md`/`.Rmarkdown` files are ignored, not unsupported.
   Non-HTML articles (`pkgdown: extension: pdf`, Quarto `format: pdf`) and
-  route-changing overrides (`output_file`, `knit`, `output-file`, `output-ext`,
-  `output-dir`) are refused and no longer yield a false `site-missing-page` or
+  the route-changing keys `output_file`/`output-file`, `output_ext`/`output-ext`,
+  `output_dir`/`output-dir` and `knit` are refused and no longer yield a false `site-missing-page` or
   `site-unreleased-page`. Root redirects and general overrides are follow-up #123.
 - A2 live smoke pins its real sites to commits. medfit and probmed must now be
   audited complete with checked routes, HTTP requests, zero missing routes and no
@@ -54,6 +54,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `test_site_cli_thresholds[*-unsupported]` and
   `test_destination_and_workflow_mode_integration[workflow-dev]`. The A2
   manifest and acceptance evidence need re-attestation for this candidate.
+
+### Fixed
+
+- `docs:check --site` no longer reports a false `complete` in seven cases found by the
+  adversarial review of this change: non-ASCII paths (`git ls-tree` output is now read
+  NUL-separated, so `vignettes/café.Rmd` and a package in a `café/` subdirectory are
+  expected); `---` inside a front-matter value (front matter is parsed by delimiter
+  lines, closed by `---` or `...`); symlinked vignettes (refused, never read as content);
+  directory-level `_metadata.yml`, `_quarto-*.yml`, nested `_quarto.yml` and `_output.yml`
+  (refused; pkgdown's behavior for them was not rendered); `PKGDOWN_DEV_MODE` in a local
+  composite action or a root/package `.Renviron`/`.Rprofile`, and a deploy below the site
+  root (`deploy_to_branch(subdir = )`, a Pages `target-folder`) now stay incomplete;
+  deeply nested YAML, malformed workflow structure (null job, list `jobs`, string step,
+  `with:` null) and YAML alias bombs return an incomplete stage with a specific reason
+  instead of raising or hanging.
 
 ---
 

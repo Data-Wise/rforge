@@ -103,12 +103,23 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       prefix (`https://example.org/pkg/dev/` for a devel site, `https://example.org/pkg/` otherwise);
       a root URL on a devel site, or a `/dev/` URL on a release site, is `incomplete` with a reason,
       before any request. A devel site on Bootstrap 3 writes an unprefixed sitemap and is refused.
-    - **Still `incomplete`:** a `PKGDOWN_DEV_MODE` variable or a job-level reusable-workflow `uses:` in
-      the workflows at the pinned ref, a configuration under `inst/` or `pkgdown/`, a non-default
-      `vignettes/_quarto.yaml`, a non-HTML article (`pkgdown: extension: pdf`, Quarto `format: pdf`)
-      and any route-changing override (`output_file`, `knit`, `output-file`, `output-ext`,
-      `output-dir`). Those routes are removed from the expected set, never guessed. Root redirects
-      and general output overrides are follow-up work (#123).
+    - **Still `incomplete`, with a specific reason:** at the pinned ref, `PKGDOWN_DEV_MODE` in a
+      workflow, a local composite action or a repository-root or package `.Renviron`/`.Rprofile`; a
+      job-level reusable-workflow `uses:`; a local `uses: ./...` action that is missing, malformed or
+      not composite; a deploy below the site root (`deploy_to_branch(subdir = )`, or a Pages
+      `target-folder` when a workflow builds pkgdown); a malformed workflow; a configuration under
+      `inst/` or `pkgdown/`; a non-default `vignettes/_quarto.yaml`; any symlink under `vignettes/`
+      (the link text is never read as article content); and directory-level `_metadata.yml`,
+      `_quarto-*.yml`, a nested `_quarto.yml` (with `.qmd` articles) or `_output.yml` (with `.Rmd`
+      articles). pkgdown's behavior for those directory-level files was not rendered, so they are
+      refused rather than guessed.
+    - **Per-article refusals** are exactly these front-matter keys and values: `output_file`,
+      `output-file`, `output_ext`, `output-ext`, `output_dir` or `output-dir` anywhere in the front
+      matter; `knit`; a Quarto `format` other than `html`; an `.Rmd` `output` other than
+      `html_document`/`html_vignette`; `pkgdown: extension` other than `html`; and `as_is`. Those
+      routes are removed from the expected set, never guessed. Anything else that changes a route
+      (a script a workflow merely runs, a variable name built dynamically, `_site.yml`) is not
+      detected. Root redirects and general output overrides are follow-up work (#123).
     - **`content_freshness: unverified`.** A `complete` site stage means route presence only: the
       sitemap says which pages exist, not whether their content is current (a sitemap carries no
       `<lastmod>`). The text verdict reads `no findings; site content freshness unverified`.

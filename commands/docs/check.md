@@ -156,8 +156,13 @@ invocation with the caller-selected canonical URL.
 `.qmd`, `.Rmd` and `.rmd` articles map to `articles/*.html`; `development.mode` (including
 `auto`) is resolved from the pinned `DESCRIPTION` version, and `--site` must equal the source `url`
 plus the dev prefix (`.../dev/` only for a devel site), otherwise the stage is `incomplete` before
-any request. Non-HTML articles, route-changing overrides, `PKGDOWN_DEV_MODE` and reusable-workflow
-jobs at the pinned ref, Bootstrap 3 devel sites and non-default Quarto projects stay incomplete.
+any request. At the pinned ref these stay incomplete with a specific reason: `PKGDOWN_DEV_MODE` in a
+workflow, local composite action or root/package `.Renviron`/`.Rprofile`; reusable-workflow jobs;
+unreadable local actions; deploys below the site root; malformed workflows; Bootstrap 3 devel sites;
+non-default Quarto projects; directory-level `_metadata.yml`, `_quarto-*.yml` and `_output.yml`;
+symlinks under `vignettes/`. An article is refused only for these front-matter keys: `output_file`/
+`output-file`, `output_ext`/`output-ext`, `output_dir`/`output-dir`, `knit`, `as_is`, a non-HTML Quarto
+`format`, a non-HTML `.Rmd` `output`, or `pkgdown: extension` other than `html`. Other overrides are not detected.
 A complete site stage proves route presence only: the stage carries `content_freshness: "unverified"`
 and a clean text report says `no findings; site content freshness unverified`.
 
