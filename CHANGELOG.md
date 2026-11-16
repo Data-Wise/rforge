@@ -9,6 +9,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `/rforge:docs:check --site` audits Quarto (`.qmd`) articles and pkgdown
+  development-mode sites (#111): `.qmd`, `.Rmd` and `.rmd` articles map to
+  `articles/*.html` (nested ones included), and `development.mode` (`auto`,
+  `default`, `release`, `devel`, `unreleased`) resolves from the pinned
+  `DESCRIPTION` version with pkgdown 2.2.1's rule. The stage records the mode
+  and the assumed pkgdown rule version.
+- Site stages carry `content_freshness: "unverified"`, and a clean text report
+  reads `no findings; site content freshness unverified`: a complete stage means
+  route presence only.
+- Differential tests against pkgdown 2.2.1 (`package_vignettes`, `dev_mode_auto`,
+  `as_pkgdown` mode and Bootstrap resolution) in `tests/differential/`. They run
+  by hand where R, pkgdown, the R `quarto` package and the Quarto CLI exist,
+  skip elsewhere and are not part of the A2 gate.
+
+### Changed
+
+- `--site` must equal the source `url` plus the development prefix (`<dst>/` for
+  `devel` only); the audit never appends it. A mismatching base, a Bootstrap 3
+  devel site, an unknown mode or destination, or an unparseable `DESCRIPTION`
+  version under `mode: auto` is `incomplete` before any request.
+- Configuration discovery follows pkgdown (first existing file, no merge) and
+  reads `inst/_pkgdown.yml`/`.yaml`; any non-root configuration is still an
+  overlay and keeps the stage incomplete.
+- Workflows are scanned at the pinned SHA, not the working tree, and a job-level
+  `uses:` (reusable workflow) in a pkgdown-related workflow is unverifiable even
+  with `--ref`. `PKGDOWN_DEV_MODE` is still refused. The pre-network stop is a
+  structured condition instead of a substring match on "development".
+- Article exclusions follow pkgdown's rules: `^tutorials` applies to the
+  directory part only, and `.md`/`.Rmarkdown` files are ignored, not unsupported.
+  Non-HTML articles (`pkgdown: extension: pdf`, Quarto `format: pdf`) and
+  route-changing overrides (`output_file`, `knit`, `output-file`, `output-ext`,
+  `output-dir`) are refused and no longer yield a false `site-missing-page` or
+  `site-unreleased-page`. Root redirects and general overrides are follow-up #123.
+- A2 live smoke pins its real sites to commits and adds glue (`template.package`)
+  as the real site that must stay incomplete; medfit and probmed are now audited
+  as supported. Required A2 nodes changed: `test_release_mode_and_destination`
+  (devel/destination now supported; two refusal cases added), and the bodies of
+  `test_unsupported_layout_retains_supported_routes[quarto|extension]`,
+  `test_site_cli_thresholds[*-unsupported]` and
+  `test_destination_and_workflow_mode_integration[workflow-dev]`. The A2
+  manifest and acceptance evidence need re-attestation for this candidate.
+
 ---
 
 ## [2.22.2] - 2026-10-31

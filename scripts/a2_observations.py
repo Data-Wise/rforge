@@ -33,10 +33,18 @@ from verify_a2_release import (SUPPORTED_SITE_URL, VerificationError, validate_f
 # A real deployed pkgdown site with a supported configuration (release mode, no template, one sitemap request).
 SUPPORTED_SITE = {"name": "cranlogs", "repo": "https://github.com/r-hub/cranlogs", "url": SUPPORTED_SITE_URL,
                   "commit": "c02280c7b4c6d77ff5500f80e15118edad5d94dc"}
-# Real packages whose sites A2 marks unsupported (development mode, .qmd articles): recorded honestly as incomplete.
+# Real packages audited at pinned commits (a floating HEAD could change which side of the supported line a site is on).
+# medfit and probmed (pkgdown development.mode auto, .qmd articles) became supported in #111 and are recorded as
+# `other_real_runs`; the observation needs at least one real site that is still reported incomplete, so glue is
+# pinned: its `template.package` (tidytemplate) is a custom template mapping this audit refuses. Its dev URL is
+# requested because glue's version (x.y.z.9000) resolves `mode: auto` to devel.
 LIMIT_SITES = (
-    {"name": "medfit", "repo": "https://github.com/Data-Wise/medfit", "url": "https://data-wise.github.io/medfit/"},
-    {"name": "probmed", "repo": "https://github.com/Data-Wise/probmed", "url": "https://data-wise.github.io/probmed/"},
+    {"name": "medfit", "repo": "https://github.com/Data-Wise/medfit", "url": "https://data-wise.github.io/medfit/",
+     "commit": "40f82c85fdad0979949bee389afe2c7301660315"},
+    {"name": "probmed", "repo": "https://github.com/Data-Wise/probmed", "url": "https://data-wise.github.io/probmed/",
+     "commit": "ab411df7f083e169dd4b56f264e867e4fd51e1c4"},
+    {"name": "glue", "repo": "https://github.com/tidyverse/glue", "url": "https://glue.tidyverse.org/dev/",
+     "commit": "da9c73f7a3de6a27f3103cb5bb2355820a4c3a6a"},
 )
 RENDERED_PAGES = {
     "guides/docs-audit": ("--site", "--run-examples", "unverified", "sandbox", "--fail-on error", "INCOMPLETE"),

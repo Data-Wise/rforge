@@ -524,6 +524,10 @@ transcripts with `--examples-budget-seconds N` (default 300, positive integer).
 Source/render pairing is deferred: asserted rendered output remains unverified.
 Incomplete stages exit 2 with warn/error thresholds; completed A2 warnings gate
 only warn. Site GETs never build/deploy/fetch; replay is opt-in, not sandboxed.
+`--site` maps `.qmd`/`.Rmd`/`.rmd` articles and resolves `development.mode` from the pinned
+`DESCRIPTION`; `--site` must equal the source `url` plus the dev prefix (`.../dev/` for a devel
+site only), else `incomplete`. A complete site stage proves route presence, not content freshness
+(`content_freshness: "unverified"`).
 
 
 

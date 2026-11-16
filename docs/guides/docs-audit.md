@@ -93,6 +93,26 @@ Missing selected-ref pages remain warn; checkout-only additions are info.
 Sitemap absence does not prove HTTP 404, availability or deployment freshness.
 Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
 
+!!! note "Expected behavior in v2.23.0+"
+    `--site` maps `.qmd`, `.Rmd` and `.rmd` articles (nested ones included) and resolves
+    `development.mode` (`auto`, `default`, `release`, `devel`, `unreleased`) from the pinned
+    `DESCRIPTION` version with pkgdown 2.2.1's rule, so a Quarto site on `mode: auto` at a release
+    version is audited at its root. Only `devel` serves from `<destination>/` (default `dev/`).
+
+    - **The base URL is never adjusted for you.** `--site` must equal the source `url` plus the dev
+      prefix (`https://example.org/pkg/dev/` for a devel site, `https://example.org/pkg/` otherwise);
+      a root URL on a devel site, or a `/dev/` URL on a release site, is `incomplete` with a reason,
+      before any request. A devel site on Bootstrap 3 writes an unprefixed sitemap and is refused.
+    - **Still `incomplete`:** a `PKGDOWN_DEV_MODE` variable or a job-level reusable-workflow `uses:` in
+      the workflows at the pinned ref, a configuration under `inst/` or `pkgdown/`, a non-default
+      `vignettes/_quarto.yaml`, a non-HTML article (`pkgdown: extension: pdf`, Quarto `format: pdf`)
+      and any route-changing override (`output_file`, `knit`, `output-file`, `output-ext`,
+      `output-dir`). Those routes are removed from the expected set, never guessed. Root redirects
+      and general output overrides are follow-up work (#123).
+    - **`content_freshness: unverified`.** A `complete` site stage means route presence only: the
+      sitemap says which pages exist, not whether their content is current (a sitemap carries no
+      `<lastmod>`). The text verdict reads `no findings; site content freshness unverified`.
+
 README replay loads the working tree with pkgload/evaluate, retaining hidden
 setup state and honoring literal eval/include/visibility options. Root explicit
 R fences and literal #> assertions are supported. Unsupported options, unlabeled
@@ -148,8 +168,9 @@ real deployed pkgdown site, the package-triage freshness check and the rendered-
 inspection itself. The finalized adversarial review is a recorded judgment supplied
 as the `review-record` input: the run stamps it but cannot prove it, so it is
 attested by whoever dispatches; keep it concise, because a dispatch input is limited to about 64 KB. Before downloading the artifact, `a2-release.yml` asks the Actions API whether the supplying run is the `a2-observations.yml` dispatch for the same head commit and finished successfully. The live smoke checks one supported public site and
-records that real Data-Wise packages are reported incomplete, because pkgdown
-development mode and `.qmd` articles are unsupported by `--site` today.
+records pinned real packages: since v2.23.0 the Data-Wise packages medfit and probmed (pkgdown
+`development.mode: auto`, `.qmd` articles) are audited as supported, and the pinned tidyverse
+site glue (`template.package`) must still be reported incomplete.
 
 Evaluate text is mirrored into a separate temporary spool, allowing the guardian
 to observe output growth inside a running expression. Captured text is counted

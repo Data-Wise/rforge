@@ -153,6 +153,14 @@ checkout routes are info. Missing from a sitemap does not establish HTTP 404 or
 current deployment SHA. Cross-origin and HTTP-to-HTTPS redirects require a new
 invocation with the caller-selected canonical URL.
 
+`.qmd`, `.Rmd` and `.rmd` articles map to `articles/*.html`; `development.mode` (including
+`auto`) is resolved from the pinned `DESCRIPTION` version, and `--site` must equal the source `url`
+plus the dev prefix (`.../dev/` only for a devel site), otherwise the stage is `incomplete` before
+any request. Non-HTML articles, route-changing overrides, `PKGDOWN_DEV_MODE` and reusable-workflow
+jobs at the pinned ref, Bootstrap 3 devel sites and non-default Quarto projects stay incomplete.
+A complete site stage proves route presence only: the stage carries `content_freshness: "unverified"`
+and a clean text report says `no findings; site content freshness unverified`.
+
 Example replay loads the working tree using pkgload/evaluate. Closed explicit R
 README fences execute in document order with hidden setup retained; eval=false,
 skip markers and installation chunks do not execute. Unsupported options stop
