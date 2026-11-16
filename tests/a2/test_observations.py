@@ -451,10 +451,61 @@ def test_info_findings_do_not_fail_the_observation_and_are_recorded(tmp_path):
     v.validate_live_smoke(facts)
 
 
-def test_pinned_supported_sites_are_pinned_to_commits_whose_routes_match_the_live_sites():
-    """Re-pinned in #111 review: medfit 40f82c8 predates the live native-* to sem-* rename (9 missing pages)."""
-    pins = {s['name']: s['commit'] for s in obs.PINNED_SUPPORTED_SITES}
-    assert pins['medfit'] != '40f82c85fdad0979949bee389afe2c7301660315'
+# The reviewed pins. Changing one is a deliberate act: re-audit the site at the new commit, then update it here.
+EXPECTED_PINS = {
+    'cranlogs': 'c02280c7b4c6d77ff5500f80e15118edad5d94dc',
+    'medfit': '6d226fb1d4ce0b46cf297c2e88154d685a337dee',   # 40f82c8 predates the live native-* to sem-* rename: 9 missing pages
+    'probmed': 'ab411df7f083e169dd4b56f264e867e4fd51e1c4',
+    'glue': 'da9c73f7a3de6a27f3103cb5bb2355820a4c3a6a',
+}
+
+
+def _every_site():
+    return (obs.SUPPORTED_SITE, *obs.PINNED_SUPPORTED_SITES, *obs.LIMIT_SITES)
+
+
+def test_pinned_supported_sites_are_pinned_to_the_reviewed_full_commit_shas():
+    import re
+    pins = {s['name']: s.get('commit') for s in _every_site()}
+    assert pins == EXPECTED_PINS
+    for name, commit in pins.items():
+        assert isinstance(commit, str) and re.fullmatch(r'[0-9a-f]{40}', commit), f'{name} is not a full lowercase 40-hex SHA'
+        assert commit.upper() not in ('HEAD', 'MAIN', 'MASTER') and commit != '0' * 40, f'{name} is a floating or null ref'
+    assert pins['medfit'] != '40f82c85fdad0979949bee389afe2c7301660315'  # the superseded pin
+
+
+def test_the_pinned_site_urls_match_the_verifier_and_every_pin_is_distinct():
+    assert {s['name']: s['url'] for s in obs.PINNED_SUPPORTED_SITES} == v.PINNED_SUPPORTED_URLS
+    assert obs.SUPPORTED_SITE['url'] == v.SUPPORTED_SITE_URL
+    commits = [s['commit'] for s in _every_site()]
+    assert len(set(commits)) == len(commits)
+
+
+def test_the_live_smoke_audits_the_pinned_commit_not_whatever_the_default_branch_holds(tmp_path):
+    """A clone lands on a newer default-branch commit; the observation must check out the pin, audit it and record it."""
+    import subprocess as sp
+    site = {'name': 'lim', 'repo': 'r', 'url': 'https://l/'}
+    seen = {}
+
+    def clone(repo, dest):
+        dest.mkdir(parents=True)
+        git = lambda *a: sp.run(['git', '-C', str(dest), '-c', 'user.name=t', '-c', 'user.email=t@t', *a], check=True, capture_output=True, text=True).stdout.strip()
+        sp.run(['git', 'init', '-q', str(dest)], check=True)
+        git('commit', '-q', '--allow-empty', '-m', 'pinned')
+        site['commit'] = seen['pin'] = git('rev-parse', 'HEAD')  # the pin is read after the clone, as the producer does
+        git('commit', '-q', '--allow-empty', '-m', 'newer')
+        seen['head'] = git('rev-parse', 'HEAD')
+        return seen['head']
+
+    def audit(path, url, ref):
+        seen['audited'] = sp.run(['git', '-C', str(path), 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
+        return {'stage': {'state': 'incomplete', 'counts': {'checked': 0, 'missing': 0}, 'reasons': ['custom template mapping unsupported'], 'findings': []}, 'requests': 0}
+
+    facts, _ = obs.observe_live_smoke(tmp_path, audit=audit, clone=clone, supported={'name': 'sup', 'repo': 'r', 'url': v.SUPPORTED_SITE_URL},
+                                      limits=(site,), pinned_supported=())
+    run = facts['unsupported_real_runs'][0]
+    assert seen['pin'] != seen['head']
+    assert seen['audited'] == seen['pin'] and run['source_ref'] == seen['pin']
 
 
 def test_the_producer_and_the_verifier_share_one_soundness_predicate_and_one_pin_list():
