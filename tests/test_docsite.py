@@ -1816,40 +1816,143 @@ def workflow_b(top="", job_extra="", steps="", cmd="Rscript scripts/site.R"):
             "    steps:\n      - uses: actions/checkout@v4\n" + steps + "      - run: " + cmd + "\n")
 
 
-def pair(tmp_path, b, files=None, a=SITE_A):
+def pair(tmp_path, b, files=None, a=SITE_A, tracked=False, config=CONFIG):
+    """Audit workflow A (names pkgdown, read-only) beside workflow B. `tracked` commits a file under the destination docs/."""
     web = tmp_path / "web"
+    extra = {"docs/index.html": "<html></html>"} if tracked else {}
     with server(web) as root:
-        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: a, QC_WORKFLOW: b, "scripts/site.R": DYNAMIC_SITE_R, **(files or {})})
+        pkg = make(tmp_path, config=config, files={SCRIPT_WORKFLOW: a, QC_WORKFLOW: b, "scripts/site.R": DYNAMIC_SITE_R, **extra, **(files or {})})
         publish(web, "", root, ROUTES)
         return site.audit(pkg, url=root, ref="main")
 
 
-CAPABLE = [
-    pytest.param(workflow_b(top="permissions:\n  contents: write\n"), id="workflow-contents-write"),
+TIER1 = [
     pytest.param(workflow_b(top="permissions:\n  pages: write\n"), id="workflow-pages-write"),
     pytest.param(workflow_b(top="permissions:\n  id-token: write\n"), id="workflow-id-token-write"),
     pytest.param(workflow_b(top="permissions: write-all\n"), id="write-all"),
-    pytest.param(workflow_b(top="permissions: read-all\n", job_extra="    permissions:\n      contents: write\n"), id="job-level-contents-write-only"),
-    pytest.param(workflow_b(), id="missing-permissions-key"),
+    pytest.param(workflow_b(top="permissions: read-all\n", job_extra="    permissions:\n      pages: write\n"), id="job-level-pages-write"),
     pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: JamesIves/github-pages-deploy-action@v4\n        with:\n          folder: docs\n"), id="deploy-action-in-a-later-step"),
     pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: peaceiris/actions-gh-pages@v4\n"), id="peaceiris"),
     pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: actions/deploy-pages@v4\n"), id="deploy-pages"),
     pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: actions/upload-pages-artifact@v3\n"), id="upload-pages-artifact"),
     pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: actions/configure-pages@v5\n"), id="configure-pages"),
-    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: ad-m/github-push-action@v0.8.0\n"), id="push-action"),
     pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: \"JamesIves/github-pages-deploy-action@v4\"\n"), id="quoted-uses"),
-    pytest.param(workflow_b(top="permissions: read-all\n", cmd="git push origin HEAD:gh-pages\n      - run: Rscript scripts/site.R"), id="git-push-in-a-run-body"),
-    pytest.param(workflow_b(top="permissions: read-all\n", cmd="rsync -a docs/ host:/var/www/\n      - run: Rscript scripts/site.R"), id="rsync"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="Rscript -e 'pkgdown::deploy_to_branch()'\n      - run: Rscript scripts/site.R"), id="deploy-to-branch-text"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="git worktree add gh-pages\n      - run: Rscript scripts/site.R"), id="gh-pages-text"),
     pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: actions/checkout@v4\n        with:\n          token: ${{ secrets.PAT }}\n"), id="checkout-with-a-pat"),
     pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: actions/checkout@v4\n        with:\n          ssh-key: ${{ secrets.DEPLOY_KEY }}\n"), id="checkout-with-a-deploy-key"),
     pytest.param(workflow_b(top="permissions: read-all\n", job_extra="    env:\n      NOTE: pkgdown\n"), id="names-pkgdown"),
 ]
+TIER2 = [
+    pytest.param(workflow_b(top="permissions:\n  contents: write\n"), id="workflow-contents-write"),
+    pytest.param(workflow_b(top="permissions: read-all\n", job_extra="    permissions:\n      contents: write\n"), id="job-level-contents-write-only"),
+    pytest.param(workflow_b(), id="missing-permissions-key"),
+    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: ad-m/github-push-action@v0.8.0\n"), id="push-action"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="git push origin HEAD:main\n      - run: Rscript scripts/site.R"), id="git-push-in-a-run-body"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="rsync -a docs/ host:/var/www/\n      - run: Rscript scripts/site.R"), id="rsync"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="aws s3 sync docs s3://bucket\n      - run: Rscript scripts/site.R"), id="aws-s3"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="netlify deploy --dir docs\n      - run: Rscript scripts/site.R"), id="netlify"),
+]
 
 
-@pytest.mark.parametrize("b", CAPABLE)
-def test_a_workflow_that_may_publish_is_strict_so_a_dynamic_script_reference_fails_closed(tmp_path, b):
+@pytest.mark.parametrize("tracked", [False, True], ids=["destination-untracked", "destination-tracked"])
+@pytest.mark.parametrize("b", TIER1)
+def test_a_tier_one_publish_signal_is_capable_whatever_the_destination(tmp_path, b, tracked):
+    r = pair(tmp_path, b, tracked=tracked)
+    assert reached(r, "script reference unsupported", "dynamic") and any("may publish: tier 1" in x for x in r["reasons"]), r["reasons"]
+
+
+@pytest.mark.parametrize("b", TIER2)
+def test_a_tier_two_signal_with_a_tracked_destination_is_capable_and_the_reason_names_it(tmp_path, b):
+    r = pair(tmp_path, b, tracked=True)
+    assert reached(r, "script reference unsupported", "dynamic") and any("may publish: tier 2" in x and "destination docs/ is tracked" in x for x in r["reasons"]), r["reasons"]
+
+
+@pytest.mark.parametrize("b", TIER2)
+def test_a_tier_two_signal_with_an_untracked_destination_stays_relaxed(tmp_path, b):
+    """The destination is not committed, so pushing to the default branch cannot publish site files (medfit deploys via gh-pages)."""
+    r = pair(tmp_path, b, tracked=False)
+    assert r["state"] == "complete", r["reasons"]
+
+
+def test_the_medfit_qc_shaped_workflow_stays_complete_while_docs_is_untracked(tmp_path):
+    qc = workflow_b(top="permissions:\n  contents: write\n  issues: write\n", cmd="Rscript scripts/site.R\n      - run: |\n          git add reports\n          git commit -m report\n          git push")
+    assert pair(tmp_path, qc, tracked=False)["state"] == "complete"
+    r = pair(tmp_path / "t", qc, tracked=True) if (tmp_path / "t").mkdir() is None else None
+    assert reached(r, "script reference unsupported", "dynamic"), r["reasons"]
+
+
+def test_a_missing_permissions_key_is_a_tier_two_signal_decided_both_ways(tmp_path):
+    b = workflow_b()
+    assert pair(tmp_path, b, tracked=False)["state"] == "complete"
+    (tmp_path / "t").mkdir()
+    r = pair(tmp_path / "t", b, tracked=True)
+    assert reached(r, "may publish: tier 2", "no permissions: key"), r["reasons"]
+
+
+def test_a_destination_tracked_only_in_the_working_tree_is_not_counted(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: SITE_A, QC_WORKFLOW: workflow_b(top="permissions:\n  contents: write\n"), "scripts/site.R": DYNAMIC_SITE_R})
+        (pkg / "docs").mkdir()
+        (pkg / "docs/index.html").write_text("x")          # untracked: not at the pinned SHA
+        publish(web, "", root, ROUTES)
+        assert site.audit(pkg, url=root, ref="main")["state"] == "complete"
+
+
+def test_a_destination_committed_after_the_pinned_ref_is_not_counted(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: SITE_A, QC_WORKFLOW: workflow_b(top="permissions:\n  contents: write\n"), "scripts/site.R": DYNAMIC_SITE_R})
+        git(pkg, "branch", "pinned")
+        commit(pkg, {"docs/index.html": "x"}, message="track docs after the pin")
+        publish(web, "", root, ROUTES)
+        assert site.audit(pkg, url=root, ref="pinned")["state"] == "complete"
+
+
+@pytest.mark.parametrize("config,files,expected", [
+    ("destination: site\n", {"site/index.html": "x"}, "incomplete"),
+    ("destination: site\n", {"docs/index.html": "x"}, "complete"),          # the default dir is tracked, but it is not the destination
+    ("destination: docs\n", {"docs/index.html": "x"}, "incomplete"),
+    ("destination: ./site/\n", {"site/a/b.html": "x"}, "incomplete"),
+    ("destination: $OUT\n", {}, "incomplete"),                               # dynamic: fail closed
+    ("destination: [a, b]\n", {}, "incomplete"),                             # not a string: fail closed
+    ("destination: ../out\n", {}, "incomplete"),                             # outside the package: fail closed
+    ("destination: /abs\n", {}, "incomplete"),
+    ("destination: .\n", {}, "incomplete"),                                  # the package root itself is tracked
+    ("destination: ''\n", {}, "incomplete"),
+], ids=["custom-tracked", "custom-untracked-default-tracked", "docs-tracked", "dot-slash", "dynamic", "list", "dotdot", "absolute", "dot", "empty"])
+def test_the_destination_comes_from_the_config_and_fails_closed_when_it_cannot_be_resolved(tmp_path, config, files, expected):
+    qc = workflow_b(top="permissions:\n  contents: write\n")
+    assert pair(tmp_path, qc, files=files, config=CONFIG + config)["state"] == expected
+
+
+def test_an_unparseable_config_makes_the_destination_tracked(tmp_path):
+    qc = workflow_b(top="permissions:\n  contents: write\n")
+    r = pair(tmp_path, qc, config=CONFIG + "x: [unclosed\n")
+    assert r["state"] == "incomplete"
+
+
+def test_a_package_in_a_monorepo_uses_its_own_destination_directory(tmp_path):
+    def run(files, base):
+        web = tmp_path / base
+        repo = tmp_path / (base + "-repo"); pkg = repo / "packages" / "ours"
+        pkg.mkdir(parents=True)
+        commit(repo, {"packages/ours/DESCRIPTION": DESC.format(version="1.0.0"), "packages/ours/man/internal.Rd": "x", "packages/ours/_pkgdown.yml": CONFIG,
+                      ".github/workflows/qc.yaml": workflow_b(top="permissions:\n  contents: write\n", cmd="Rscript packages/ours/s.R"),
+                      "packages/ours/s.R": DYNAMIC_SITE_R, **files}, init=True)
+        with server(web) as root:
+            publish(web, "", root, ROUTES)
+            return site.audit(pkg, url=root, ref="main")["state"]
+    assert run({"docs/index.html": "x", "packages/other/docs/index.html": "x"}, "a") == "complete"   # tracked elsewhere, not for this package
+    assert run({"packages/ours/docs/index.html": "x"}, "b") == "incomplete"
+
+
+def test_the_two_workflow_codex_fixture_with_a_tier_one_signal_is_incomplete(tmp_path):
+    b = workflow_b(top="permissions: read-all\n", steps="      - uses: JamesIves/github-pages-deploy-action@v4\n        with:\n          folder: docs\n")
+    assert "pkgdown" not in b.lower()
     r = pair(tmp_path, b)
-    assert reached(r, "script reference unsupported", "dynamic") and any("may publish" in x for x in r["reasons"]), r["reasons"]
+    assert reached(r, "script reference unsupported", "dynamic"), r["reasons"]
 
 
 READ_ONLY = [
@@ -1871,10 +1974,18 @@ def test_a_workflow_that_shows_no_ability_to_publish_stays_relaxed(tmp_path, b):
     assert r["state"] == "complete", r["reasons"]
 
 
-def test_a_publish_signal_inside_a_reached_script_makes_the_workflow_strict(tmp_path):
-    script = "system('git push origin HEAD:gh-pages')\n" + DYNAMIC_SITE_R
+def test_a_tier_one_signal_inside_a_reached_script_makes_the_workflow_strict(tmp_path):
+    script = "system('git worktree add gh-pages')\n" + DYNAMIC_SITE_R
     r = pair(tmp_path, workflow_b(top="permissions: read-all\n"), files={"scripts/site.R": script})
-    assert reached(r, "script reference unsupported", "dynamic") and any("may publish" in x and "scripts/site.R" in x for x in r["reasons"]), r["reasons"]
+    assert reached(r, "script reference unsupported", "dynamic") and any("may publish: tier 1" in x and "scripts/site.R" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_tier_two_signal_inside_a_reached_script_needs_a_tracked_destination(tmp_path):
+    script = "system('git push origin HEAD:main')\n" + DYNAMIC_SITE_R
+    assert pair(tmp_path, workflow_b(top="permissions: read-all\n"), files={"scripts/site.R": script}, tracked=False)["state"] == "complete"
+    (tmp_path / "t").mkdir()
+    r = pair(tmp_path / "t", workflow_b(top="permissions: read-all\n"), files={"scripts/site.R": script}, tracked=True)
+    assert reached(r, "script reference unsupported", "dynamic") and any("tier 2" in x and "scripts/site.R" in x for x in r["reasons"]), r["reasons"]
 
 
 def test_a_deploy_step_inside_a_local_composite_action_makes_the_calling_workflow_strict(tmp_path):
@@ -1901,12 +2012,18 @@ def test_the_publish_reason_names_the_evidence_and_is_allow_listed():
     sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
     import verify_a2_release as verifier
     reason = ("script reference unsupported (dynamic path): source() with a non-literal argument; "
-              "the deployed routes cannot be verified (workflow .github/workflows/qc.yaml may publish: permissions contents: write)")
+              "the deployed routes cannot be verified (workflow .github/workflows/qc.yaml may publish: tier 2: permissions contents: write (workflow); "
+              "destination docs/ is tracked)")
     assert verifier.limit_run_is_unsupported_layout({"state": "incomplete", "reasons": [reason]})
 
 
-def test_the_predicate_returns_its_evidence(tmp_path):
+def test_the_predicate_returns_tier_labeled_evidence(tmp_path):
     data = site.yaml_data(workflow_b(top="permissions:\n  contents: write\n", steps="      - uses: actions/deploy-pages@v4\n"))
-    evidence = site.workflow_may_publish(data, "")
-    assert any("contents" in e for e in evidence) and any("deploy-pages" in e for e in evidence)
+    evidence = site.workflow_may_publish(data, "", tracked=True, destination="destination docs/")
+    assert any(e.startswith("tier 1:") and "deploy-pages" in e for e in evidence)
+    assert any(e.startswith("tier 2:") and "contents" in e and "destination docs/ is tracked" in e for e in evidence)
+    untracked = site.workflow_may_publish(data, "", tracked=False, destination="destination docs/")
+    assert untracked and all(e.startswith("tier 1:") for e in untracked)           # tier two is dropped, tier one stays
+    only_two = site.yaml_data(workflow_b(top="permissions:\n  contents: write\n"))
+    assert site.workflow_may_publish(only_two, "", tracked=False) == []
     assert site.workflow_may_publish(site.yaml_data(workflow_b(top="permissions: read-all\n")), "") == []

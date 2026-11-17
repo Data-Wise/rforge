@@ -581,13 +581,11 @@ class ScriptScan:
             self.reasons.append(f"script reference unsupported ({why}): {ref}; the deployed routes cannot be verified{names}")
 
     def observe(self, text, data, where):
-        """Record publish evidence from a reached script or local action (for the workflow that reaches it)."""
-        found = PUBLISH_TEXT.search(source_text(text, data))
-        if found:
-            self.evidence.append(f"publish signal in {where}: {found.group(0)}")
+        """Record `(tier, label)` publish evidence from a reached script or local action (for the workflow that reaches it)."""
+        self.evidence.extend(text_publish_evidence(source_text(text, data), where))
         steps = ((data or {}).get("runs") or {}).get("steps") if isinstance(data, dict) else None
         for step in steps if isinstance(steps, list) else []:
-            self.evidence.extend(f"{item} in {where}" for item in step_publish_evidence(step))
+            self.evidence.extend((tier, f"{label} in {where}") for tier, label in step_publish_evidence(step))
 
     def directory(self, cwd, target):
         """The repository-relative directory `target` names from `cwd`, or None when it cannot be known statically."""
@@ -784,71 +782,109 @@ PAGES_ACTIONS = ("jamesives/github-pages-deploy-action", "peaceiris/actions-gh-p
                  "actions/upload-pages-artifact", "actions/configure-pages", "crazy-max/ghaction-github-pages")
 PUSH_ACTIONS = ("ad-m/github-push-action", "stefanzweifel/git-auto-commit-action", "endbug/add-and-commit",
                 "r-lib/actions/pr-push", "actions-js/push")
-PUBLISH_TEXT = re.compile(r"deploy_to_branch|gh[-_]pages|\bgit\s+push\b|\brsync\b|\baws\s+s3\b|\bnetlify\b|\bsurge\b|\bscp\b", re.I)
-WRITE_SCOPES = ("pages", "contents", "id-token")
+TIER1_TEXT = re.compile(r"deploy_to_branch|gh[-_]pages", re.I)                       # publishes the site by itself
+TIER2_TEXT = re.compile(r"\bgit\s+push\b|\brsync\b|\baws\s+s3\b|\bnetlify\b|\bsurge\b|\bscp\b", re.I)   # publishes only if the destination is tracked
 NO_PERMISSIONS = object()
 
 
 def permission_evidence(perms, where):
+    """`(tier, label)` pairs. `pages`/`id-token` write and `write-all` are tier 1; plain `contents: write` is tier 2."""
     if isinstance(perms, str) and perms.strip().lower() == "write-all":
-        return [f"permissions write-all ({where})"]
+        return [(1, f"permissions write-all ({where})")]
+    found = []
     if isinstance(perms, dict):
-        return [f"permissions {key}: write ({where})" for key, value in perms.items()
-                if str(key).lower() in WRITE_SCOPES and str(value).strip().lower() == "write"]
-    return []
+        for key, value in perms.items():
+            if str(value).strip().lower() != "write":
+                continue
+            tier = 1 if str(key).lower() in ("pages", "id-token") else 2 if str(key).lower() == "contents" else None
+            if tier:
+                found.append((tier, f"permissions {key}: write ({where})"))
+    return found
 
 
 def step_publish_evidence(step):
-    """Why one step (workflow or composite action) can publish: a Pages or push action, or a checkout given a secret."""
+    """`(tier, label)` pairs for one step: a Pages action or a checkout given a secret is tier 1, a push action tier 2."""
     uses = step.get("uses") if isinstance(step, dict) else None
     if not isinstance(uses, str):
         return []
     name = uses.split("@")[0].strip().lower()
     evidence = []
     if name in PAGES_ACTIONS:
-        evidence.append(f"deploy action {uses}")
+        evidence.append((1, f"deploy action {uses}"))
     if name in PUSH_ACTIONS:
-        evidence.append(f"push action {uses}")
+        evidence.append((2, f"push action {uses}"))
     inputs = step.get("with")
     if name.endswith("checkout") and isinstance(inputs, dict):
         for key in ("token", "ssh-key"):
             value = str(inputs.get(key, ""))
             if "secrets." in value and "secrets.GITHUB_TOKEN" not in value:
-                evidence.append(f"checkout with a secret {key}")
+                evidence.append((1, f"checkout with a secret {key}"))
     return evidence
 
 
-def workflow_may_publish(data, text, extra=()):
-    """The ability-to-publish evidence of one workflow, as a list of strings; an empty list means it shows none.
+def text_publish_evidence(text, where):
+    found = []
+    for tier, pattern in ((1, TIER1_TEXT), (2, TIER2_TEXT)):
+        match = pattern.search(text)
+        if match:
+            found.append((tier, f"publish signal in {where}: {match.group(0)}"))
+    return found
 
-    The default is strict: a workflow is relaxed only when ALL of these are absent: the word pkgdown; a Pages or push
-    action in any step; `pages`/`contents`/`id-token` write or `write-all` permission at workflow or job level; a job
-    with no `permissions:` key at either level (the default token scope is unknown, so it counts as capable); a
-    checkout given a secret token or key; a `deploy_to_branch`/`gh-pages`/`git push`/`rsync`/`aws s3`/`netlify`
-    signal in the workflow text; and `extra` (the same signals found in the scripts and local actions it reaches).
-    YAML facts are read from the parsed structure; the text signals are tolerant text. Trigger events are not
-    considered. A no-signal workflow whose dynamically loaded script pushes is not detected.
+
+def destination_tracked(files, prefix, config):
+    """`(tracked, label)`: does the pinned tree track a file under the package's pkgdown destination directory?
+
+    The destination is the config's `destination:` (default `docs`), under the package directory `prefix`. Read from the
+    pinned tree, never the working tree. A destination that is not a plain relative path inside the package (a
+    variable, a list, `..`, absolute, empty, `.`) or an unreadable config counts as tracked: fail closed.
+    """
+    destination = "docs" if config is None or "destination" not in config else config["destination"]
+    if config is False:
+        return True, "an unreadable config (assumed tracked)"
+    if (not isinstance(destination, str) or DYNAMIC_PATH.search(destination) or destination.startswith(("/", "~"))
+            or posixpath.normpath(destination) in ("", ".", "..") or posixpath.normpath(destination).startswith("../")):
+        return True, f"destination {destination!r} cannot be resolved (assumed tracked)"
+    directory = posixpath.normpath(prefix + destination)
+    return any(path.startswith(directory + "/") for path in files), f"destination {posixpath.normpath(destination)}/"
+
+
+def workflow_may_publish(data, text, extra=(), tracked=True, destination="destination docs/"):
+    """The evidence that one workflow can publish, as `tier N: ...` strings; an empty list means it is relaxed.
+
+    Default is strict. Tier 1 always counts: the word pkgdown; a Pages action in any step; `deploy_to_branch` or `gh-pages`
+    text; `pages`/`id-token` write or `write-all` permission; a checkout given a secret token or key. Tier 2 counts only
+    when the pinned tree tracks the pkgdown destination directory (`tracked`), because otherwise pushing to the default
+    branch cannot publish site files: plain `contents: write`; a push action; a job with no `permissions:` key at either
+    level (the default token scope is unknown); `git push`, `rsync`, `aws s3`, `netlify` text. `extra` holds the same
+    `(tier, label)` evidence found in the scripts and local actions the workflow reaches. YAML facts come from the parsed
+    structure, the text signals are tolerant text. Trigger events are not considered. A no-tier-1 workflow that pushes to
+    an untracked destination, and a script that pushes from a no-signal workflow, are not detected.
     """
     data = data if isinstance(data, dict) else {}
-    evidence = []
+    found = []
     if "pkgdown" in source_text(text, data).lower():
-        evidence.append("names pkgdown")
+        found.append((1, "names pkgdown"))
     top = data.get("permissions", NO_PERMISSIONS)
-    evidence += permission_evidence(top, "workflow")
+    found += permission_evidence(top, "workflow")
     jobs = data.get("jobs") if isinstance(data.get("jobs"), dict) else {}
     for key, job in jobs.items():
         if not isinstance(job, dict):
             continue
         own = job.get("permissions", NO_PERMISSIONS)
-        evidence += permission_evidence(own, f"job {key}")
+        found += permission_evidence(own, f"job {key}")
         if top is NO_PERMISSIONS and own is NO_PERMISSIONS:
-            evidence.append(f"no permissions: key for job {key} (default token scope unknown)")
+            found.append((2, f"no permissions: key for job {key} (default token scope unknown)"))
         for step in job.get("steps") if isinstance(job.get("steps"), list) else []:
-            evidence += step_publish_evidence(step)
-    found = PUBLISH_TEXT.search(source_text(text, data))
-    if found:
-        evidence.append(f"publish signal in the workflow: {found.group(0)}")
-    return list(dict.fromkeys(evidence + list(extra)))
+            found += step_publish_evidence(step)
+    found += text_publish_evidence(source_text(text, data), "the workflow")
+    found += list(extra)
+    labels = []
+    for tier, label in found:
+        if tier == 1:
+            labels.append(f"tier 1: {label}")
+        elif tracked:
+            labels.append(f"tier 2: {label}; {destination} is tracked")
+    return list(dict.fromkeys(labels))
 
 
 def local_action_reasons(root, sha, files, uses, seen, pkgdown_repo=True, scan=None):
@@ -925,6 +961,14 @@ def workflow_blocks(root, sha, tree, prefix=""):
                 reasons.append(f"{DEV_MODE_VARIABLE} set in {path}; development mode mapping unsupported")
     # Strict by default: a workflow is relaxed only when it shows no ability to publish (`workflow_may_publish`). The
     # evidence includes what its reached scripts and local actions show, found by a probe walk that discards its reasons.
+    config_path = next((prefix + c for c in CONFIG_CANDIDATES if prefix + c in files), None)
+    config = None
+    if config_path is not None:
+        try:
+            config = yaml_data(git(root, "show", sha + ":" + config_path))
+        except ValueError:
+            config = False       # unreadable: the destination counts as tracked
+    tracked, destination = destination_tracked(files, prefix, config)
     capable = {}
     for path, text in texts.items():
         probe = ScriptScan(root, sha, files, tree if isinstance(tree, dict) else {}, pkgdown_repo)
@@ -941,7 +985,7 @@ def workflow_blocks(root, sha, tree, prefix=""):
                             local_action_reasons(root, sha, files, step["uses"], set(), pkgdown_repo, probe)
             except ValueError:
                 evidence.append("workflow structure unreadable (permissions unknown)")
-        capable[path] = workflow_may_publish(parsed.get(path), text, evidence + probe.evidence)
+        capable[path] = workflow_may_publish(parsed.get(path), text, [(2, e) for e in evidence] + probe.evidence, tracked, destination)
     # Publish-capable workflows first, so a script both kinds reach is judged strictly; the visited set skips it afterwards.
     for path, text in sorted(texts.items(), key=lambda item: not capable[item[0]]):
         scan.strict, scan.context = bool(capable[path]), (path, capable[path])
