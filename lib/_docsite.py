@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import posixpath
+import fnmatch
 import re
 import subprocess
 import time
@@ -521,6 +522,8 @@ INSTALLERS = {"pip": ("install", "download", "list", "show", "freeze", "config",
 INSTALLERS["pip3"] = INSTALLERS["pip"]
 INSTALLERS["apt-get"] = INSTALLERS["apt"]
 INSTALLERS["yum"] = INSTALLERS["apk"] = INSTALLERS["dnf"]
+PR_BRANCH_ACTIONS = ("r-lib/actions/pr-push",)     # pushes the pull request's own branch (the /document and /style bots), never the default branch
+PUBLISH_CAPABLE = "stages {what} and pushes the default branch"
 SHELL_PREFIX_KEYWORDS = ("if", "then", "else", "elif", "while", "until", "do", "!", "{", "time", "nohup", "exec")   # followed by a command
 SHELL_SKIP_KEYWORDS = ("fi", "done", "esac", "for", "case", "in", "}", ")", ";;", "select", "function", "then:")
 PLAUSIBLE_PROGRAM = re.compile(r"[A-Za-z_./~][A-Za-z0-9_.+-]*")
@@ -1068,15 +1071,68 @@ MESSAGE_OPTIONS = ("-m", "-F", "-C", "-c", "-t", "--message", "--file", "--autho
 GIT_VALUE_OPTIONS = ("-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path")
 
 
-def names_directory(token, names):
+GLOB_PROBES = ("", "/", "/x", "/index.html", "/sitemap.xml", "/404.html", "/reference/index.html", "/articles/index.html", "/pkgdown.yml",
+               "/.nojekyll", "/CNAME", "/a.css", "/a.js", "/a.png", "/a.json", "/a.md", "/a.txt")
+
+
+def names_directory(token, names, pathspec=False):
     """Does a path argument name one of the destination directories (`names`)? `./docs`, `docs/`, `docs/*`, `pkg/docs`
-    and `--prefix=docs` match; `docs-archive`, `mydocs` and `notes/docs.txt` do not."""
+    and `--prefix=docs` match; `docs-archive`, `mydocs` and `notes/docs.txt` do not. As a git pathspec (`pathspec=True`) a
+    glob that can match a file in the destination (`docs*`, `d*`, `*/sitemap.xml`, `*.html`) and a parent directory of it
+    also count."""
     if token.startswith("-") and "=" in token:
         token = token.split("=", 1)[1]
     if not token or token.startswith("-") or DYNAMIC_TOKEN.search(token):
         return False
     path = posixpath.normpath(token.lstrip("+"))
+    if pathspec and re.search(r"[*?\[]", path):
+        return any(fnmatch.fnmatchcase(n + probe, path) for n in names for probe in GLOB_PROBES)
+    if pathspec and path not in (".", "..") and any(n.startswith(path + "/") for n in names):
+        return True                                         # a parent directory of the destination
     return any(path == n or path.startswith(n + "/") or path.endswith("/" + n) or f"/{n}/" in path for n in names)
+
+
+def git_parts(args):
+    """`(subcommand, rest, positional, flags, scope)` for the arguments after `git`: global `-C` values are `scope`, the values
+    of message options are dropped, and a clustered flag such as `-am` keeps its letters."""
+    i, scope = 0, []
+    while i < len(args) and args[i].startswith("-"):
+        if args[i] == "-C" and i + 1 < len(args):
+            scope.append(args[i + 1])
+        i += 2 if args[i] in GIT_VALUE_OPTIONS else 1
+    sub, rest = (args[i] if i < len(args) else ""), args[i + 1:]
+    positional, flags, j = [], [], 0
+    while j < len(rest):
+        arg = rest[j]
+        if arg == "--":
+            positional.extend(rest[j + 1:])
+            break
+        if arg in MESSAGE_OPTIONS:
+            j += 1
+        elif arg.startswith("-") and not arg.startswith("--") and len(arg) > 2 and arg.endswith("m"):
+            flags.append(arg)       # a cluster such as `-am`: the next token is the message
+            j += 1
+        elif arg.startswith("-"):
+            flags.append(arg)
+        else:
+            positional.append(arg)
+        j += 1
+    return sub, rest, positional, flags, scope
+
+
+def stage_all_command(args, names):
+    """Does this `git` command stage the whole tree? `git add -A|--all|-u|--update` with no pathspec, `git add` of `.`, `:/`,
+    `*` or a dynamic pathspec, and `git commit -a`. A named pathspec that is not the destination (`git add data/history.csv`)
+    is not."""
+    sub, rest, positional, flags, scope = git_parts(args)
+    if sub == "commit":
+        return any(f == "--all" or (not f.startswith("--") and "a" in f[1:]) for f in flags)
+    if sub != "add":
+        return False
+    everything = any(f in ("-A", "--all", "-u", "--update") or (not f.startswith("--") and re.search(r"[Au]", f[1:])) for f in flags)
+    if not positional:
+        return everything
+    return any(p in (".", "./", ":/", "/", "*", "**") or DYNAMIC_TOKEN.search(p) or re.fullmatch(r"\*+", p) for p in positional)
 
 
 def stage_command(program, args, names, built):
@@ -1085,39 +1141,17 @@ def stage_command(program, args, names, built):
     `git add`/`git commit` naming a destination (or staging the whole tree after a pkgdown build), `git subtree push`,
     `git worktree add <destination>`, and `cp`/`mv`/`rsync`/`ln`/`install` whose target is a destination."""
     if program == "git":
-        i, scope = 0, []
-        while i < len(args) and args[i].startswith("-"):
-            if args[i] == "-C" and i + 1 < len(args):
-                scope.append(args[i + 1])
-            i += 2 if args[i] in GIT_VALUE_OPTIONS else 1
-        sub, rest = (args[i] if i < len(args) else ""), args[i + 1:]
+        sub, rest, positional, flags, scope = git_parts(args)
         if sub == "subtree" and rest[:1] == ["push"]:
             return "git subtree push"
-        positional, flags, j = [], [], 0
-        while j < len(rest):
-            arg = rest[j]
-            if arg == "--":
-                positional.extend(rest[j + 1:])
-                break
-            if arg in MESSAGE_OPTIONS:
-                j += 1
-            elif arg.startswith("-") and not arg.startswith("--") and len(arg) > 2 and arg.endswith("m"):
-                flags.append(arg)       # a cluster such as `-am`: the next token is the message
-                j += 1
-            elif arg.startswith("-"):
-                flags.append(arg)
-            else:
-                positional.append(arg)
-            j += 1
         if sub == "worktree":
             return "git worktree add" if rest[:1] == ["add"] and any(names_directory(a, names) for a in positional[1:]) else None
         if sub not in ("add", "commit"):
             return None
-        if any(names_directory(a, names) for a in scope) or any(names_directory(a, names) for a in positional):
+        if any(names_directory(a, names) for a in scope) or any(names_directory(a, names, pathspec=True) for a in positional):
             return f"git {sub} names the destination"
-        everything = any(a in STAGE_ALL for a in positional + flags) or (
-            sub == "commit" and any(a == "--all" or (not a.startswith("--") and "a" in a[1:]) for a in flags))
-        return f"git {sub} stages everything after a pkgdown build" if built and everything else None
+        return f"git {sub} stages everything after a pkgdown build" if built and (
+            stage_all_command(args, names) or any(a in STAGE_ALL for a in positional + flags)) else None
     positional, i, target = [], 0, None
     while i < len(args):
         if args[i] in ("-t", "--target-directory") and i + 1 < len(args):
@@ -1178,8 +1212,8 @@ def handoff_facts(texts, names, exempt=()):
             facts.add("build")
     if DOWNLOAD_TEXT.search(joined):
         facts.add("download")
-    if any(name in joined.lower() for name in PUSH_ACTIONS):
-        facts.update(("stage", "push"))
+    if any(name in joined.lower() for name in PUSH_ACTIONS if name not in PR_BRANCH_ACTIONS):
+        facts.update(("stage", "stage_any", "stage_all", "push"))
     for match in re.finditer(r"(?<![\w./@=-])(git|curl|wget)(?=\s)", joined):
         commands = shell_commands(logical_line(joined, match.start()))
         tokens = [t.rstrip("\"')],}") for t in commands[0]] if commands else []
@@ -1192,6 +1226,12 @@ def handoff_facts(texts, names, exempt=()):
         args = tokens[1:]
         if stage_command("git", args, names, True) or (args[:1] == ["add"] and any(a in ("-f", "--force") for a in args)):
             facts.add("stage")
+        if git_parts(args)[0] in ("add", "commit"):
+            facts.add("stage_any")             # any staging at all, named pathspecs included
+        if stage_all_command(args, names):
+            facts.add("stage_all")
+        if stage_command("git", args, names, False):
+            facts.add("dest_staged")
         if target_tier("git", args, exempt) == (2, "the default branch or no refspec"):
             facts.add("push")
     return {(0, fact) for fact in facts}
@@ -1203,21 +1243,29 @@ def handoff_evidence(state):
     A workflow that stages and pushes is publish-capable whether or not the pinned tree tracks the destination when it
     also pulls build output from elsewhere (it downloads, or another workflow triggers it), or when any other workflow in
     the repository builds the site: the build output can reach it as an artifact, a release or a checkout. A workflow
-    that stages and pushes with no build or download relationship anywhere stays tier two. A workflow that stages and
-    pushes is also tier one when anything it reaches could not be resolved (a failed script or action reference, a cap, an
+    that stages and pushes with no build or download relationship anywhere stays tier two. A workflow that stages
+    everything (or names the destination) and pushes the default branch is tier one on its own: the audit does not try to
+    prove it builds no site. A workflow that stages (named pathspecs included) and pushes is also tier one when anything it
+    reaches could not be resolved (a failed script or action reference, a cap, an
     opaque executable or call): the build may hide behind it."""
     facts = {path: {label for tier, label in value[0] if tier == 0} for path, value in state.items()}
     builders = sorted(path for path, found in facts.items() if "build" in found)
     result = {}
     for path, found in facts.items():
-        if not {"stage", "push"} <= found:
+        if "push" in found and ("stage_all" in found or "dest_staged" in found):
+            what = "everything" if "stage_all" in found else "the site destination"
+            result[path] = (1, f"{PUBLISH_CAPABLE.format(what=what)}; the audit does not try to prove it builds no site")
+            continue
+        if "push" not in found:
             continue
         others = [b for b in builders if b != path]
-        if "download" in found:
+        if "stage" not in found:
+            others = []
+        if "stage" in found and "download" in found:
             result[path] = (1, "stages and pushes build output it pulls from elsewhere (artifact, release or workflow_run)")
         elif others:
             result[path] = (1, f"stages and pushes while workflow {others[0]} builds the site (cross-workflow handoff)")
-        elif any(label.startswith("unresolved") for label in found):
+        elif ("stage" in found or "stage_any" in found) and any(label.startswith("unresolved") for label in found):
             why = next(label for label in sorted(found) if label.startswith("unresolved"))[len("unresolved: "):]
             result[path] = (1, f"stages and pushes while it reaches a reference the scan cannot resolve ({why})")
     return result
@@ -1462,6 +1510,7 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
     literal = lambda d: isinstance(d, str)
     first = "docs" if config is None or config is False or "destination" not in config else config["destination"]
     stage_names = [d for d in [first, *[d for v in state.values() for d in v[1]]] if literal(d)]
+    stage_names += [prefix + d for d in stage_names if prefix]      # a monorepo stages the destination by its repository path
     for path, text in texts.items():
         data = parsed.get(path)
         pairs = [("the workflow", source_text(text, data))] + probes[path]
@@ -1498,6 +1547,9 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
     handoff = handoff_evidence(state)
     for path, item in handoff.items():
         state[path][0] = list(dict.fromkeys(state[path][0] + [item]))
+        if pkgdown_repo and item[1].startswith("stages ") and " and pushes the default branch;" in item[1]:
+            reasons.append(f"workflow {path} {item[1].split(';')[0]}; it is treated as publish capable and the audit does not try to prove it "
+                           "builds no site; the deployed routes cannot be verified")
     if honored is not None:
         honored.extend(sorted({m.group(1) for v in state.values() for _, label in v[0]
                                for m in re.finditer(r"declared non-publishing branch ([^\s)]+)", label)}))

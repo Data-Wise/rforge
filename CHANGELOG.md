@@ -108,7 +108,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stages the destination counts as tier 1 whether or not the tree tracks it yet (`git add`/`git commit`
   naming it, `git add -A`/`.` after a pkgdown build, `git subtree push`, `git worktree add`, `cp`/`mv`/
   `rsync` into it), so a workflow that generates `docs/`, force-adds and pushes it is strict; a push of
-  `data/history.csv` stays tier 2. Build output can also reach the staging workflow from another
+  `data/history.csv` stays tier 2. A workflow that stages everything (`git add .`/`-A`/`-u`,
+  `git commit -a`, an auto-commit action) and pushes the default branch is treated as publish capable
+  and is an incomplete reason: the audit does not try to prove it builds no site (a `tee`, a download,
+  an extraction or a script that writes `docs/` cannot be enumerated away); named pathspecs outside the
+  destination stay tier 2. Build output can also reach the staging workflow from another
   workflow: a workflow that stages and pushes is tier 1 when it downloads build output
   (`download-artifact`, `gh run|release download`, `curl`/`wget` of an archive, a `workflow_run`
   trigger), when any other workflow in the repository builds the site, or when anything it reaches

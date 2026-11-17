@@ -1887,9 +1887,11 @@ def test_a_tier_two_signal_with_an_untracked_destination_stays_relaxed(tmp_path,
 
 def test_the_medfit_qc_shaped_workflow_stays_complete_while_docs_is_untracked(tmp_path):
     qc = workflow_b(top="permissions:\n  contents: write\n  issues: write\n", cmd="Rscript scripts/site.R\n      - run: |\n          git add reports\n          git commit -m report\n          git push")
-    assert pair(tmp_path, qc, tracked=False)["state"] == "complete"
+    clean = {"scripts/site.R": CLEAN_R}   # a dynamic script is an unresolved reference: named stage + default-branch push + unresolved is tier one (round 13)
+    assert pair(tmp_path, qc, tracked=False, files=clean)["state"] == "complete"
     r = pair(tmp_path / "t", qc, tracked=True) if (tmp_path / "t").mkdir() is None else None
     assert reached(r, "script reference unsupported", "dynamic"), r["reasons"]
+    assert strict_tier_one(pair(fresh(tmp_path, "u"), qc, tracked=False))[0]
 
 
 def test_a_missing_permissions_key_is_a_tier_two_signal_decided_both_ways(tmp_path):
@@ -2308,7 +2310,7 @@ def test_a_destination_outside_the_package_or_dynamic_stays_tracked_even_with_on
 
 def test_the_medfit_qc_shape_with_a_gitkeep_only_docs_stays_complete(tmp_path):
     qc = workflow_b(top="permissions:\n  contents: write\n  issues: write\n", cmd="Rscript scripts/site.R\n      - run: |\n          git add reports\n          git commit -m report\n          git push")
-    assert pair(tmp_path, qc, files={"docs/.gitkeep": ""})["state"] == "complete"
+    assert pair(tmp_path, qc, files={"docs/.gitkeep": "", "scripts/site.R": CLEAN_R})["state"] == "complete"
 
 
 # --- the opt-out key: `docs.site.nonpublishing-branches` in the pinned `.rforge.yaml` -------------------------------
@@ -2490,7 +2492,7 @@ def test_add_everything_after_a_build_step_in_a_reached_script_is_strict(tmp_pat
     assert reached(r, "script reference unsupported", "tier 1"), r["reasons"]
     # The same workflow with no build step and no build workflow anywhere stays relaxed while the destination is untracked.
     quiet = workflow_b(top="permissions:\n  contents: write\n",
-                       cmd="git add -A\n      - run: git commit -m x\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
+                       cmd="git add data/history.csv\n      - run: git commit -m x\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
     # (A resolved script: a dynamic one would be an unresolved reference, which makes a stage-and-push workflow tier one.)
     assert pair(fresh(tmp_path, "quiet"), quiet, a=NO_BUILD, files={"scripts/site.R": CLEAN_R})["state"] == "complete"
     assert site.handoff_evidence({"w": [[(0, "stage"), (0, "push")], []]}) == {}
@@ -2520,9 +2522,11 @@ def test_a_destination_named_by_the_config_or_a_build_call_is_the_stage_name(tmp
 def test_a_csv_history_push_stays_tier_two_and_relaxed_when_the_destination_is_untracked(tmp_path):
     csv = workflow_b(top="permissions:\n  contents: write\n",
                      cmd="git add data/history.csv\n      - run: git commit -m history\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
-    assert pair(tmp_path, csv)["state"] == "complete"
-    # With a tracked destination the same push is tier two and counts, as before.
-    assert reached(pair(fresh(tmp_path, "t"), csv, tracked=True), "script reference unsupported", "tier 2")
+    clean = {"scripts/site.R": CLEAN_R}
+    assert pair(tmp_path, csv, files=clean)["state"] == "complete"
+    # With a tracked destination the evidence counts as before; with a dynamic script the named stage + push is tier one (round 13).
+    assert pair(fresh(tmp_path, "c"), csv, tracked=True, files=clean)["state"] == "complete"
+    assert reached(pair(fresh(tmp_path, "t"), csv, tracked=True), "script reference unsupported", "tier 1")
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -2572,7 +2576,7 @@ def test_the_field_is_present_on_an_incomplete_stage(tmp_path):
 # release, a `workflow_run` trigger), so neither workflow alone shows both halves.
 # ---------------------------------------------------------------------------------------------------------
 NO_BUILD = step_workflow("echo hello", top="permissions: read-all\n")
-STAGE_PUSH = "git add -A\n      - run: git commit -m site\n      - run: git push origin main\n      - run: Rscript scripts/site.R"
+STAGE_PUSH = "git add -f out\n      - run: git commit -m site\n      - run: git push origin main\n      - run: Rscript scripts/site.R"
 DOWNLOAD_STEP = "      - uses: actions/download-artifact@v4\n        with:\n          name: site\n"
 
 
@@ -2650,8 +2654,10 @@ def test_a_staging_workflow_with_no_build_or_download_relationship_stays_tier_tw
 @pytest.mark.parametrize("cmd", ["git add data/history.csv\n      - run: git commit -m h\n      - run: git push origin main\n      - run: Rscript scripts/site.R",
                                  "git add qc-history.csv\n      - run: git commit -m h\n      - run: git push origin main\n      - run: Rscript scripts/site.R"])
 def test_a_named_data_file_push_stays_tier_two_even_beside_a_build_workflow_or_a_download(tmp_path, cmd):
-    assert handoff(tmp_path, handoff_b(cmd=cmd), a=SITE_A)["state"] == "complete"
-    assert handoff(fresh(tmp_path, "d"), handoff_b(cmd=cmd, steps=DOWNLOAD_STEP), a=NO_BUILD)["state"] == "complete"
+    clean = {"scripts/site.R": CLEAN_R}      # (a dynamic script would be an unresolved reference: tier one since round 13)
+    assert handoff(tmp_path, handoff_b(cmd=cmd), a=SITE_A, files=clean)["state"] == "complete"
+    assert handoff(fresh(tmp_path, "d"), handoff_b(cmd=cmd, steps=DOWNLOAD_STEP), a=NO_BUILD, files=clean)["state"] == "complete"
+    assert strict_tier_one(handoff(fresh(tmp_path, "u"), handoff_b(cmd=cmd), a=NO_BUILD))[0]       # ... and with the dynamic script it is
 
 
 def test_a_declared_branch_push_beside_a_build_workflow_stays_tier_two(tmp_path):
@@ -2675,7 +2681,7 @@ def test_a_push_alone_or_a_stage_alone_is_not_a_handoff(tmp_path):
 # every opaque executable.
 # ---------------------------------------------------------------------------------------------------------
 def stage_push_workflow(*commands, push=True, steps=""):
-    lines = list(commands) + (["git add -A", "git commit -m site", "git push origin main"] if push else [])
+    lines = list(commands) + (["git add data/history.csv", "git commit -m site", "git push origin main"] if push else [])   # a named pathspec
     body = "\n".join("          " + line for line in lines)
     return (WORKFLOW_HEAD + "permissions:\n  contents: write\njobs:\n  publish:\n    runs-on: ubuntu-latest\n    steps:\n"
             + steps + "      - run: |\n" + body + "\n")
@@ -2843,10 +2849,11 @@ def test_a_push_action_stages_and_pushes_so_an_unresolved_reference_makes_it_tie
     for n, tracked in enumerate((False, True)):
         r = pair(fresh(tmp_path, n), PUSH_ACTION_B, a=NO_BUILD, tracked=tracked)
         assert reached(r, "script reference unsupported", "dynamic") and any("may publish: tier 1" in x for x in r["reasons"]), (tracked, r["reasons"])
-    # With only resolved scripts it stays tier two: relaxed untracked, and nothing to report when tracked either.
+    # Since round 15 a push action (it adds, commits and pushes) is publish capable on its own, resolved scripts or not.
     clean = {"scripts/site.R": CLEAN_R}
-    assert pair(fresh(tmp_path, "c"), PUSH_ACTION_B, a=NO_BUILD, files=clean)["state"] == "complete"
-    assert pair(fresh(tmp_path, "d"), PUSH_ACTION_B, a=NO_BUILD, files=clean, tracked=True)["state"] == "complete"
+    for n, tracked in enumerate((False, True)):
+        r = pair(fresh(tmp_path, f"c{n}"), PUSH_ACTION_B, a=NO_BUILD, files=clean, tracked=tracked)
+        assert r["state"] == "incomplete" and any(PUBLISH_CAPABLE in x for x in r["reasons"]), r["reasons"]
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -2909,3 +2916,127 @@ def test_the_qc_monthly_shape_with_only_allowlisted_commands_stays_tier_two(tmp_
     qc = ("git config user.name bot\ngit fetch --depth 1 origin qc-results\ngit show FETCH_HEAD:qc-history.csv > prev.csv || rm -f prev.csv\n"
           "Rscript scripts/site.R\ngit add qc-history.csv\ngit commit -m h\ngit push origin qc-results")
     assert pair(tmp_path, stage_push_workflow(*qc.split("\n"), push=False), a=NO_BUILD, files={".rforge.yaml": KEY, "scripts/site.R": CLEAN_R})["state"] == "complete"
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Codex round 15. The audit no longer tries to prove that a stage-and-push workflow builds no site: a workflow that
+# stages everything (or names the destination, or a pathspec that can match it) and pushes the default branch is publish
+# capable, whatever its scripts do.
+# ---------------------------------------------------------------------------------------------------------
+PUBLISH_CAPABLE = "stages everything and pushes the default branch"
+WRITER_PY = "from pathlib import Path\nPath('docs').mkdir(exist_ok=True)\nPath('docs/sitemap.xml').write_text('<urlset/>')\n"
+WRITER_R = "dir.create('docs')\nwriteLines('<urlset/>', 'docs/sitemap.xml')\n"
+
+
+def capable(r):
+    return r["state"] == "incomplete" and any(PUBLISH_CAPABLE in x or "stages the site destination" in x for x in r["reasons"]), r["reasons"]
+
+
+def push_workflow(*commands, add="git add -A", commit="git commit -m site", push="git push origin main"):
+    lines = list(commands) + [x for x in (add, commit, push) if x]
+    return stage_push_workflow(*lines, push=False)
+
+
+def audit_push(tmp_path, *commands, files=None, tracked=False, **kw):
+    return pair(tmp_path, push_workflow(*commands, **kw), files={"scripts/site.R": CLEAN_R, **(files or {})}, a=NO_BUILD, tracked=tracked)
+
+
+ALL_FORMS = ["git add -A", "git add --all", "git add .", "git add -u", "git add --update", "git add -f .", "git add -A .", "git add ./", "git add ':/'",
+             "git add '*'", "git add $DIR", "git add \"$f\"", "git add -A $PATHSPEC"]
+
+
+@pytest.mark.parametrize("add", ALL_FORMS)
+@pytest.mark.parametrize("tracked", [False, True], ids=["untracked", "tracked"])
+def test_staging_everything_and_pushing_the_default_branch_is_publish_capable(tmp_path, add, tracked):
+    ok, why = capable(audit_push(tmp_path, "echo hello", add=add, tracked=tracked))
+    assert ok, (add, why)
+
+
+@pytest.mark.parametrize("commit", ["git commit -a -m site", "git commit -am site", "git commit --all -m site"])
+def test_commit_all_and_a_push_is_publish_capable(tmp_path, commit):
+    ok, why = capable(audit_push(tmp_path, "echo hello", add="git status", commit=commit))
+    assert ok, (commit, why)
+
+
+@pytest.mark.parametrize("push", ["git push origin main", "git push", "git push origin HEAD", "git push origin master", "git push -u origin main"])
+def test_every_default_branch_or_refspecless_push_counts(tmp_path, push):
+    ok, why = capable(audit_push(tmp_path, "echo hello", push=push))
+    assert ok, (push, why)
+
+
+def test_an_add_and_commit_or_auto_commit_action_is_publish_capable(tmp_path):
+    for n, action in enumerate(["stefanzweifel/git-auto-commit-action@v5", "endbug/add-and-commit@v9", "ad-m/github-push-action@v0.8.0", "actions-js/push@master"]):
+        b = stage_push_workflow("echo hi", push=False, steps=f"      - uses: {action}\n")
+        ok, why = capable(pair(fresh(tmp_path, n), b, files={"scripts/site.R": CLEAN_R}, a=NO_BUILD))
+        assert ok, (action, why)
+
+
+def test_a_utility_that_writes_the_destination_is_caught_without_enumerating_it(tmp_path):
+    for n, cmd in enumerate(["printf x | tee docs/sitemap.xml", "echo '<urlset/>' > docs/sitemap.xml", "curl -sL https://example.org/s.xml -o docs/sitemap.xml",
+                             "tar -xzf site.tgz -C docs", "unzip -q site.zip -d docs", "cp -r _site docs", "sed 's/a/b/' in.xml > docs/out.xml"]):
+        ok, why = capable(audit_push(fresh(tmp_path, n), cmd))
+        assert ok, (cmd, why)
+
+
+def test_a_followed_script_that_writes_the_destination_directly_is_caught(tmp_path):
+    ok, why = capable(audit_push(tmp_path, "python3 scripts/w.py", files={"scripts/w.py": WRITER_PY}))
+    assert ok, why
+    ok, why = capable(audit_push(fresh(tmp_path, "r"), "Rscript scripts/w.R", files={"scripts/w.R": WRITER_R}))
+    assert ok, why
+
+
+@pytest.mark.parametrize("add", ["git add -f docs", "git add docs", "git add docs/", "git add 'docs*'", "git add d*", "git add '*/sitemap.xml'", "git add -A docs", "git add docs/sitemap.xml",
+                                 "git add --force ./docs"])
+def test_a_pathspec_that_is_or_can_match_the_destination_is_publish_capable(tmp_path, add):
+    ok, why = capable(audit_push(tmp_path, "echo hello", add=add))
+    assert ok, (add, why)
+
+
+def test_a_pathspec_that_is_a_parent_of_the_destination_is_publish_capable(tmp_path):
+    ok, why = capable(pair(tmp_path, push_workflow("echo hello", add="git add pkgsub"), a=NO_BUILD, files={"scripts/site.R": CLEAN_R}, config="destination: pkgsub/out\n"))
+    assert ok, why
+
+
+@pytest.mark.parametrize("add", ["git add data/history.csv", "git add qc-history.csv", "git add data/ reports/", "git add -A data/", "git add docs-archive/x.md", "git add R/foo.R man/foo.Rd",
+                                 "git add 'data/*.csv'", "git add -f data/history.csv", "git add NEWS.md"])
+def test_a_named_pathspec_outside_the_destination_stays_tier_two(tmp_path, add):
+    for n, tracked in enumerate((False, True)):
+        r = audit_push(fresh(tmp_path, n), "echo hello", add=add, tracked=tracked)
+        assert r["state"] == "complete", (add, tracked, r["reasons"])
+
+
+def test_the_negatives_of_the_rule(tmp_path):
+    # add-everything with no push
+    assert audit_push(tmp_path, "echo hello", push=None)["state"] == "complete"
+    # a push to a branch the repository declares non-publishing is not a push
+    r = audit_push(fresh(tmp_path, "d"), "echo hello", push="git push origin qc-results", files={".rforge.yaml": KEY})
+    assert r["state"] == "complete", r["reasons"]
+    # ... but the same push undeclared is an explicit-branch push (tier one already), and with add-everything it is reported
+    assert audit_push(fresh(tmp_path, "u"), "Rscript scripts/site.R", push="git push origin qc-results", files={"scripts/site.R": "source(Sys.getenv('X'))\n"})["state"] == "incomplete"
+    # a push with nothing staged
+    assert audit_push(fresh(tmp_path, "p"), "echo hello", add="git status", commit="git commit --allow-empty -m x")["state"] == "complete"
+
+
+def test_stage_everything_and_push_in_a_repository_that_is_not_pkgdown_is_relaxed(tmp_path):
+    r = pair(tmp_path, push_workflow("echo hello"), a=NO_BUILD, config=None, files={"scripts/site.R": CLEAN_R})
+    assert r["state"] == "complete", r["reasons"]
+
+
+def test_the_reason_states_the_rule_plainly(tmp_path):
+    r = audit_push(tmp_path, "echo hello")
+    text = next(x for x in r["reasons"] if PUBLISH_CAPABLE in x)
+    assert "publish capable" in text and "does not try to prove" in text and ".github/workflows/qc.yaml" in text
+
+
+def test_the_named_pathspec_with_an_unresolved_or_opaque_reference_is_still_tier_one(tmp_path):
+    # The round 13 and 14 rules still apply on top: named stage + push + an unresolved reference.
+    for n, cmd in enumerate(["Rscript scripts/site.R", "mytool build", "python3 -m gen"]):
+        files = {"scripts/site.R": "source(Sys.getenv('X'))\n"}
+        r = audit_push(fresh(tmp_path, n), cmd, add="git add -f data/history.csv", files=files)
+        assert fails_closed(r)[0], (cmd, r["reasons"])
+
+
+def test_the_pull_request_push_action_is_not_a_default_branch_push(tmp_path):
+    # r-lib/actions/pr-push (the /document and /style bots in glue) pushes the PR branch; named pathspecs beside it stay tier two.
+    b = stage_push_workflow("git add man/\\* NAMESPACE", "git commit -m Document", push=False, steps="      - uses: r-lib/actions/pr-push@v2\n")
+    assert pair(tmp_path, b, a=NO_BUILD, files={"scripts/site.R": CLEAN_R})["state"] == "complete"

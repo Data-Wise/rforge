@@ -151,7 +151,18 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       `git add -A`/`.`/`-u` or `git commit -a` when a pkgdown build appears in the same workflow or a script
       it reaches, `git subtree push`, `git worktree add <destination>`, `cp`/`mv`/`rsync`/`ln` into the
       destination), because such a workflow can create and push `docs/` from nothing. A push that stages
-      something else, such as `git add data/history.csv`, is not stage evidence. **Cross-workflow
+      something else, such as `git add data/history.csv`, is not stage evidence. **Stage everything and push:** a workflow
+      that stages everything (`git add .`, `-A`, `--all`, `-u`, a dynamic or `*` pathspec, `git commit -a`,
+      or an add-and-commit, auto-commit or push action) **and** pushes the default branch (or pushes with
+      no refspec) is treated as publish capable and the audit reports it as incomplete. The audit does not
+      try to prove such a workflow builds no site: a `tee`, a redirect, a download, an archive
+      extraction or a script that writes `docs/` directly cannot be enumerated away. A stage that names
+      only specific pathspecs outside the destination (`git add data/history.csv`) stays tier 2 unless
+      the workflow also reaches an unresolved reference (below), and a push to a branch declared
+      non-publishing is not a push; a pathspec that is, contains, is a parent of or is a
+      glob that can match the destination (`docs*`, `*.html`) is tier 1. `r-lib/actions/pr-push`
+      pushes a pull request's own branch and is not counted. A repository that is not a pkgdown
+      repository is not affected. **Cross-workflow
       handoff:** build output can reach the staging workflow from another workflow, so a workflow that
       stages and pushes (`git add .`/`-A`/`-u`/`-f`, `git commit -a`, a push action, then a push to the
       default branch or with no refspec) is also tier 1 when it pulls build output from elsewhere
