@@ -3269,3 +3269,23 @@ def test_a_wrapper_that_rewrites_the_command_or_its_directory_is_opaque_in_a_pub
 def test_wrappers_that_only_set_the_environment_or_user_stay_transparent(tmp_path, cmd):
     r = pair(tmp_path, stage_push_workflow(cmd, push=False, steps=PAGES), files={"scripts/site.R": CLEAN_R}, a=NO_BUILD, tracked=False)
     assert r["state"] == "complete", (cmd, r["reasons"])
+
+
+# Codex round 26. `gh` is allowlisted for reads, but a write through `gh api` (or a deploy trigger) can change the site with a
+# separate token, so it is a publish signal and an opaque call.
+GH_WRITES = ["gh api -X PUT repos/o/r/contents/docs/index.html --input payload.json", "gh api --method POST repos/o/r/git/refs -f ref=refs/heads/gh-pages",
+             "gh api repos/o/r/contents/docs/x.html -f message=m -f content=Zg==", "gh api -XPUT repos/o/r/contents/docs/a", "gh api $ENDPOINT",
+             "gh workflow run deploy.yaml", "gh pr merge 12 --squash", "gh release upload v1 site.zip"]
+
+
+@pytest.mark.parametrize("cmd", GH_WRITES)
+def test_a_gh_command_that_writes_is_a_publish_signal_and_incomplete(tmp_path, cmd):
+    r = pair(tmp_path, stage_push_workflow(cmd, push=False), files={"scripts/site.R": CLEAN_R}, a=NO_BUILD, tracked=False)
+    assert r["state"] == "incomplete", (cmd, r["reasons"])
+
+
+@pytest.mark.parametrize("cmd", ["gh api repos/o/r", "gh api -X GET repos/o/r/contents/docs", "gh run download 123", "gh pr view 12", "gh pr comment 12 --body hi", "gh release download v1",
+                                 "gh workflow list", "gh issue create --title t"])
+def test_a_gh_read_stays_benign(tmp_path, cmd):
+    r = pair(tmp_path, stage_push_workflow(cmd, push=False, steps=PAGES), files={"scripts/site.R": CLEAN_R}, a=NO_BUILD, tracked=False)
+    assert r["state"] == "complete", (cmd, r["reasons"])

@@ -754,6 +754,9 @@ class ScriptScan:
             self.make(args, cwd, depth)
         elif raw.startswith(("./", "../")):
             self.file(raw, cwd, depth)
+        elif program == "gh":
+            if gh_writes(args):
+                self.opaque("opaque executable", " ".join(command[i:i + 4]))      # `gh api -X PUT .../contents/docs/index.html`
         elif program in INSTALLERS:
             sub = next((a for a in args if not a.startswith("-")), None)
             if sub is not None and sub not in INSTALLERS[program]:
@@ -938,7 +941,7 @@ TIER1_TEXT = re.compile(r"deploy_to_branch|gh[-_]pages", re.I)                  
 DEFAULT_BRANCHES = ("HEAD", "main", "master")        # a push here is tier two; any other literal branch is tier one
 PLACEHOLDER_FILES = (".gitkeep", ".keep", ".gitignore", ".gitattributes")   # a directory holding only these is not tracked content
 DYNAMIC_TOKEN = re.compile(r"[$`]|\{\{|<\(")        # variable, command substitution or expression: the value cannot be known
-COMMAND_START = re.compile(r"(?<![\w@=-])(?:[\w.~+-]*/)*(git|rsync|scp|aws|gsutil|netlify|firebase|surge|vercel|wrangler|ghp-import)(?=\s)")      # a literal path prefix (`/usr/bin/git`) is allowed
+COMMAND_START = re.compile(r"(?<![\w@=-])(?:[\w.~+-]*/)*(git|gh|rsync|scp|aws|gsutil|netlify|firebase|surge|vercel|wrangler|ghp-import)(?=\s)")      # a literal path prefix (`/usr/bin/git`) is allowed
 R_GIT_PUSH = re.compile(r"""\bsystem2?\s*\(\s*["']git["'][^)]*["']push["']""")
 BUILD_MENTION = re.compile(r"pkgdown|build_site", re.I)
 NON_LITERAL = object()
@@ -1036,6 +1039,31 @@ def push_tier(args, exempt=()):
     return 2, f"declared non-publishing branch {declared}" if declared else "the default branch or no refspec"
 
 
+def gh_writes(args):
+    """Can this `gh` command change repository content or trigger a deploy? `gh api` with a write method (`-X PUT|POST|PATCH|DELETE`,
+    `--method=...`) or any field/input flag (which makes it a POST), a dynamic argument, `gh workflow run`, `gh pr merge`, and
+    `gh release create|upload|edit|delete` can; reads (`gh api repos/o/r`, `gh run download`, `gh pr view`) cannot."""
+    if not args:
+        return False
+    if args[0] == "api":
+        rest = args[1:]
+        method = None
+        for n, a in enumerate(rest):
+            if a in ("-X", "--method") and n + 1 < len(rest):
+                method = rest[n + 1]
+            elif a.startswith("--method="):
+                method = a.split("=", 1)[1]
+            elif a.startswith("-X") and len(a) > 2:
+                method = a[2:]
+        if method and method.upper() not in ("GET", "HEAD"):
+            return True
+        if any(a in ("-f", "-F", "--field", "--raw-field", "--input") or a.startswith(("--field=", "--raw-field=", "--input=")) for a in rest):
+            return True
+        return any(DYNAMIC_TOKEN.search(a) for a in rest)
+    sub = args[1] if len(args) > 1 else ""
+    return (args[0], sub) in (("workflow", "run"), ("pr", "merge"), ("release", "create"), ("release", "upload"), ("release", "edit"), ("release", "delete"))
+
+
 def target_tier(program, args, exempt=()):
     """`(tier, why)` or None for a publish-style command. A remote target (`host:path`, `s3://`, `gs://`, a deploy
     subcommand, a dynamic target) is tier one; the same program with no remote target is tier two."""
@@ -1046,6 +1074,8 @@ def target_tier(program, args, exempt=()):
         while i < len(args) and args[i].startswith("-"):
             i += 2 if args[i] in ("-C", "-c", "--git-dir", "--work-tree", "--namespace") else 1
         return push_tier(args[i + 1:], exempt) if args[i:i + 1] == ["push"] else None
+    if program == "gh":
+        return (1, "a gh command that writes repository content or triggers a deploy") if gh_writes(args) else None
     if program in ("rsync", "scp"):
         remote = dynamic or any("@" in a or re.match(r"[^/\s]+:", a) or a.startswith("rsync://") for a in positional)
         return (1, "a remote target") if remote else (2, "a local copy")

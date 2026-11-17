@@ -129,7 +129,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with no build, download or unresolved reference anywhere in the repository, unlisted
   executables and `knit`/`render` in a workflow that cannot publish (wrapper options such as `env --` are parsed
   first, a repo-relative path is read even with an allowlisted basename, a literal absolute path outside the system
-  bin directories is opaque, and so is a wrapper option that changes what runs or where: `env -S`/`-C`, `sudo -D`/`-i`/`-s`) (an opaque build in any workflow that may
+  bin directories is opaque, and so is a wrapper option that changes what runs or where: `env -S`/`-C`, `sudo -D`/`-i`/`-s`; a `gh api` write, `gh workflow run`,
+  `gh pr merge` and `gh release create|upload|edit|delete` are a publish signal) (an opaque build in any workflow that may
   publish, a Pages deploy included, is an incomplete reason), a Python or shell script
   that builds the site through a module it imports, actions from other repositories (beyond the
   fail-closed reusable-workflow rule), manual deploys, and a site branch mislabeled in
