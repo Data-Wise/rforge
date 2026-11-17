@@ -680,7 +680,24 @@ class ScriptScan:
         if makefile is None:
             makefile = next((name for name in ("GNUmakefile", "makefile", "Makefile")
                              if where is not None and posixpath.normpath(posixpath.join(where, name)) in self.files), "Makefile")
-        self.file(makefile, where, depth)
+        self.file(makefile, where, depth, make_dir=where)
+
+    def includes(self, text, where, norm, depth):
+        """Follow `include`/`-include`/`sinclude` lines. make resolves them from its working directory; the Makefile's own
+        directory is tried as a fallback. A missing, symlinked, dynamic or escaping include fails closed (`-include` of a
+        missing file is legal for make, but nothing can be said about what it would have run)."""
+        for line in text.replace("\\\n", " ").splitlines():
+            match = re.match(r"[ ]*(?:-include|sinclude|include)[ \t]+(.*)$", line)
+            if not match:
+                continue
+            for target in re.sub(r"(^|\s)#.*$", "", match.group(1)).split():
+                path = target
+                if where is not None and not DYNAMIC_PATH.search(target) and not target.startswith(("/", "~")):
+                    near = posixpath.normpath(posixpath.join(where, target))
+                    beside = posixpath.normpath(posixpath.join(posixpath.dirname(norm), target))
+                    if near not in self.files and beside in self.files:
+                        path = posixpath.relpath(beside, where or ".")
+                self.file(path, where, depth + 1, make_dir=where)
 
     def r_code(self, code, cwd, depth):
         for match in R_SOURCE.finditer(code):
@@ -700,7 +717,7 @@ class ScriptScan:
                 command += " " + " ".join(re.findall(r"""["']([^"']*)["']""", code[match.end():close if close >= 0 else None]))
             self.body(command, cwd, depth + 1)
 
-    def file(self, path, cwd, depth):
+    def file(self, path, cwd, depth, make_dir=None):
         if DYNAMIC_PATH.search(path):
             return self.fail("dynamic path", path)
         if cwd is None:
@@ -732,6 +749,8 @@ class ScriptScan:
             self.reasons.append(f"{DEV_MODE_VARIABLE} set in script {norm}; development mode mapping unsupported")
         if deploy_subdirectory(text, self.pkgdown_repo):
             self.reasons.append(f"deploy to a subdirectory in script {norm}; the deployed routes cannot be verified")
+        if make_dir is not None or posixpath.basename(norm) in ("Makefile", "makefile", "GNUmakefile") or norm.endswith(".mk"):
+            self.includes(text, cwd if make_dir is None else make_dir, norm, depth)
         if norm.lower().endswith((".r", ".rprofile")):
             self.r_code(text, cwd, depth + 1)
         else:

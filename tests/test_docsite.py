@@ -1710,3 +1710,86 @@ def test_an_rscript_shell_step_body_is_read_as_r_code(tmp_path):
     assert reached(r, "subdirectory", "scripts/deploy.R"), r["reasons"]
     clean = script_audit(tmp_path / "c", {}, "pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)", step_extra=step) if (tmp_path / "c").mkdir() is None else None
     assert clean["state"] == "complete", clean["reasons"]
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Codex round 9, medium: `include`/`-include`/`sinclude` in a Makefile are followed (literal paths, under the same
+# depth/file caps and visited set). A non-literal or missing include cannot be scanned and fails closed.
+# ---------------------------------------------------------------------------------------------------------
+SITE_MK = "site:\n\tRscript scripts/deploy.R\n"
+
+
+@pytest.mark.parametrize("directive", ["include", "-include", "sinclude"])
+def test_an_included_makefile_recipe_that_runs_a_route_moving_script_is_found(tmp_path, directive):
+    files = {"Makefile": f"{directive} build/site.mk\n", "build/site.mk": SITE_MK, "scripts/deploy.R": DEPLOY_R}
+    assert reached(script_audit(tmp_path, files, "make site"), "subdirectory", "scripts/deploy.R")
+
+
+def test_a_subdirectory_deploy_written_directly_in_an_included_recipe_is_found(tmp_path):
+    files = {"Makefile": "include build/site.mk\n", "build/site.mk": "site:\n\tRscript -e 'pkgdown::deploy_to_branch(subdir = \"v1\")'\n"}
+    assert reached(script_audit(tmp_path, files, "make site"), "subdirectory", "build/site.mk")
+
+
+def test_a_nested_include_is_followed(tmp_path):
+    files = {"Makefile": "include a.mk\n", "a.mk": "include b.mk\n", "b.mk": SITE_MK, "scripts/deploy.R": DEPLOY_R}
+    assert reached(script_audit(tmp_path, files, "make site"), "subdirectory", "scripts/deploy.R")
+
+
+def test_several_files_on_one_include_line_are_all_followed(tmp_path):
+    files = {"Makefile": "include a.mk b.mk\n", "a.mk": "x = 1\n", "b.mk": SITE_MK, "scripts/deploy.R": DEPLOY_R}
+    assert reached(script_audit(tmp_path, files, "make site"), "subdirectory", "scripts/deploy.R")
+
+
+def test_an_include_resolves_from_the_make_directory_and_from_the_makefile_directory(tmp_path):
+    # `make -C build` runs recipes in build/, so the recipe reaches the script as ../scripts/deploy.R
+    files = {"build/Makefile": "include site.mk\n", "build/site.mk": "site:\n\tRscript ../scripts/deploy.R\n", "scripts/deploy.R": DEPLOY_R}
+    assert reached(script_audit(tmp_path, files, "make -C build site"), "subdirectory", "scripts/deploy.R")
+    (tmp_path / "other").mkdir()
+    files = {"build/Makefile": "include site.mk\n", "build/site.mk": SITE_MK, "scripts/deploy.R": DEPLOY_R}
+    assert reached(script_audit(tmp_path / "other", files, "make -f build/Makefile site"), "subdirectory", "scripts/deploy.R")
+
+
+def test_an_include_cycle_terminates_and_a_clean_include_stays_complete(tmp_path):
+    files = {"Makefile": "include a.mk\n", "a.mk": "include Makefile\ninclude b.mk\n", "b.mk": "include a.mk\nclean:\n\trm -f x\n"}
+    r = script_audit(tmp_path, files, "make clean")
+    assert r["state"] == "complete", r["reasons"]
+
+
+def test_a_cycle_whose_last_file_holds_the_signal_is_still_found(tmp_path):
+    files = {"Makefile": "include a.mk\n", "a.mk": "include b.mk\n", "b.mk": "include a.mk\n" + SITE_MK, "scripts/deploy.R": DEPLOY_R}
+    assert reached(script_audit(tmp_path, files, "make site"), "subdirectory")
+
+
+@pytest.mark.parametrize("directive,target,why", [
+    ("include", "missing.mk", "missing"),
+    ("-include", "missing.mk", "missing"),
+    ("sinclude", "missing.mk", "missing"),
+    ("include", "build/*.mk", "dynamic"),
+    ("include", "$(DIR)/site.mk", "dynamic"),
+    ("-include", "$(wildcard build/*.mk)", "dynamic"),
+    ("include", "`ls`", "dynamic"),
+    ("include", "../outside.mk", "outside the repository"),
+], ids=["missing", "dash-missing", "sinclude-missing", "wildcard", "variable", "wildcard-function", "backtick", "escapes"])
+def test_an_include_that_cannot_be_scanned_fails_closed_in_a_pkgdown_repository(tmp_path, directive, target, why):
+    r = script_audit(tmp_path, {"Makefile": f"{directive} {target}\nsite:\n\techo hi\n"}, "make site")
+    assert reached(r, "script reference unsupported", why), r["reasons"]
+
+
+def test_an_unscannable_include_is_ignored_when_the_repository_is_not_pkgdown(tmp_path):
+    r = script_audit(tmp_path, {"Makefile": "include missing.mk\ninclude $(DIR)/x.mk\nsite:\n\techo hi\n"}, "make site", config=None)
+    assert r["state"] == "complete", r["reasons"]
+
+
+def test_an_include_of_a_symlink_fails_closed(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: step_workflow("make site"), "Makefile": "include site.mk\n", "real.mk": "x = 1\n"})
+        link(pkg, "site.mk", "real.mk")
+        publish(web, "", root, ROUTES)
+        r = site.audit(pkg, url=root, ref="main")
+    assert reached(r, "script reference unsupported", "symlink"), r["reasons"]
+
+
+def test_makefile_text_that_only_mentions_include_in_a_recipe_or_comment_is_not_an_include(tmp_path):
+    files = {"Makefile": "# include missing.mk\nsite:\n\t@echo 'include missing.mk'\n"}
+    assert script_audit(tmp_path, files, "make site")["state"] == "complete"
