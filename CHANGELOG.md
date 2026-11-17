@@ -155,6 +155,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The A2 live-smoke observation records `deploy_layout` for each site run, and the shared
   soundness predicate (producer and verifier) requires `deploy_layout: "unverified"` on every
   supported site run, so evidence that omits the qualification is not release evidence.
+- The A2 verifier requires the rendered-docs evidence to name exactly the seven configured pages
+  (), each once, each inspected with a valid hash; an unnamed, duplicated,
+  extra or missing page is not rendered-docs evidence.
 
 ---
 

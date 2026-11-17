@@ -188,6 +188,8 @@ GATE_COMMANDS = {
     "command-sync": "python tests/_check_commands_doc.py", "mkdocs-strict": "python -m mkdocs build --strict -q -d {tmp}",
 }
 GATE_FLAGS = {"version-sync": "version_sync", "reference-sync": "reference_sync", "command-sync": "command_sync", "mkdocs-strict": "mkdocs_strict"}
+# The rendered pages the A2 rendered_review observation must inspect (scripts/a2_observations.py RENDERED_PAGES holds their expected terms).
+RENDERED_PAGE_NAMES = ("guides/docs-audit", "tutorials/fix-a-docs-check-finding", "REFCARD", "command-cards", "commands", "reference/docaudit", "quickstart")
 REVIEW_DISPOSITIONS = ("fixed", "rejected")
 MIN_EVIDENCE_CHARS = 10
 
@@ -368,7 +370,12 @@ def validate_observation(name, item, *, candidate_sha, evidence_root):
     elif name == "full_gates":
         validate_full_gates(facts, candidate_sha)
     elif name == "rendered_review":
-        require(bool(facts.get("pages")) and all(v.get("inspected") is True and re.fullmatch(r"[a-f0-9]{64}", v.get("sha256", "")) for v in facts["pages"]), "render inspection incomplete")
+        pages = facts.get("pages")
+        names = [p.get("page") for p in pages] if isinstance(pages, list) and all(isinstance(p, dict) for p in pages) else None
+        # exactly the configured pages, each once: an unnamed, duplicated, extra or missing page is not rendered-docs evidence
+        require(names is not None and len(set(names)) == len(names) and sorted(map(str, names)) == sorted(RENDERED_PAGE_NAMES)
+                and all(p.get("inspected") is True and isinstance(p.get("sha256"), str) and re.fullmatch(r"[a-f0-9]{64}", p["sha256"]) for p in pages),
+                "render inspection incomplete")
     elif name == "adversarial_review":
         validate_review(facts, candidate_sha)
     elif name == "requirement_mapping":
