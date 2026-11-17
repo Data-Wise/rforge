@@ -1467,7 +1467,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_docs.py": "a6f73c66920f9a0209fa051661d8248df4003557d5259cbaacdb08d50a82ca25",
-        "tests/a2/test_observations.py": "124c886164909853fa546d885f2b9f94d72c9c09fa46e2ff30f49ed61633674a"
+        "tests/a2/test_observations.py": "ab49df1f0fa1b018869be7973e680808d169beab88e37ed8781723d7d2c8c170"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1667,9 +1667,12 @@
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-wrong-name]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-wrong-sha]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-wrong-url]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-deploy-layout-none]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-deploy-layout-verified]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-dns-error]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-entry-not-a-dict]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-http-503]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-lacks-deploy-layout]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-mixed-layout-and-transport]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-reason-not-a-string]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-reasons-absent]",
@@ -1766,7 +1769,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa",
-        "tests/a2/test_observations.py": "124c886164909853fa546d885f2b9f94d72c9c09fa46e2ff30f49ed61633674a"
+        "tests/a2/test_observations.py": "ab49df1f0fa1b018869be7973e680808d169beab88e37ed8781723d7d2c8c170"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1837,7 +1840,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa",
-        "tests/a2/test_observations.py": "124c886164909853fa546d885f2b9f94d72c9c09fa46e2ff30f49ed61633674a"
+        "tests/a2/test_observations.py": "ab49df1f0fa1b018869be7973e680808d169beab88e37ed8781723d7d2c8c170"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -2013,7 +2016,7 @@
         "tests/a2/test_final_gates.py": "a373913b2431cccb38cc5ef95c0e3ce12e6b787e59e2051d602c1672ad4fd0fd",
         "tests/a2/test_guardian.py": "2033368a0fbbd844fbb56e8fa5a66207a1654d4bbec510923f07a77bd7b904c1",
         "tests/a2/test_manifest.py": "278f1646c0229c9563b70f13b58af7512e4e638185d9d61318b69ef484902636",
-        "tests/a2/test_observations.py": "124c886164909853fa546d885f2b9f94d72c9c09fa46e2ff30f49ed61633674a",
+        "tests/a2/test_observations.py": "ab49df1f0fa1b018869be7973e680808d169beab88e37ed8781723d7d2c8c170",
         "tests/a2/test_release_ci.py": "7d40d5f697a437a3d447c0179ce3bf419210c2d38cdd61493afe97fa492f31b8",
         "tests/a2/test_runtime_probe.py": "739319d20f83a0fe032a2ae6eb2ecf25e5e6306b09348ccd2d84654747be9133"
       },
@@ -2074,14 +2077,14 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_final_gates.py": "a373913b2431cccb38cc5ef95c0e3ce12e6b787e59e2051d602c1672ad4fd0fd",
-        "tests/a2/test_observations.py": "124c886164909853fa546d885f2b9f94d72c9c09fa46e2ff30f49ed61633674a",
+        "tests/a2/test_observations.py": "ab49df1f0fa1b018869be7973e680808d169beab88e37ed8781723d7d2c8c170",
         "tests/a2/test_producer_run.py": "e06f3156d3322d996bbb50817f0dbf0f5f57185009f60622e34c478c563d1fca"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 818,
+  "collected_nodes": 821,
   "review_candidate": "#111 site-audit candidate: development.mode auto/devel and Quarto article support, engine false-complete fixes, and the shared live-smoke predicates (supported, pinned and limit sites)",
   "platforms": [
     "ubuntu-24.04",

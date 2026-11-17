@@ -23,6 +23,9 @@ LIVE_DEFECTS = {
     'no-limit-runs': lambda f: f.update(unsupported_real_runs=[]),
     'limit-run-without-reasons': lambda f: f['unsupported_real_runs'][0].update(reasons=[]),
     'limit-run-complete': lambda f: f['unsupported_real_runs'][0].update(state='complete'),
+    'limit-lacks-deploy-layout': lambda f: f['unsupported_real_runs'][0].pop('deploy_layout'),
+    'limit-deploy-layout-verified': lambda f: f['unsupported_real_runs'][0].update(deploy_layout='verified'),
+    'limit-deploy-layout-none': lambda f: f['unsupported_real_runs'][0].update(deploy_layout=None),
     # the verifier holds the primary and both named pinned sites to the producer's predicate (one shared function)
     'primary-missing-routes': lambda f: f['supported_site'].update(missing=3),
     'primary-missing-count-none': lambda f: f['supported_site'].update(missing=None),
@@ -105,7 +108,7 @@ LIVE_DEFECTS = {
     'glue-wrong-url': lambda f: f['unsupported_real_runs'][0].update(url='https://glue.tidyverse.org/'),
     'glue-lacks-url': lambda f: f['unsupported_real_runs'][0].pop('url'),
     'substitute-limit-site': lambda f: f['unsupported_real_runs'][0].update(name='dplyr', url='https://dplyr.tidyverse.org/dev/'),
-    'substitute-limit-site-keeping-glue-identity-fields-blank': lambda f: f.update(unsupported_real_runs=[{'state': 'incomplete', 'reasons': ['custom template mapping unsupported']}]),
+    'substitute-limit-site-keeping-glue-identity-fields-blank': lambda f: f.update(unsupported_real_runs=[{'state': 'incomplete', 'deploy_layout': 'unverified', 'reasons': ['custom template mapping unsupported']}]),
     'extra-limit-run': lambda f: f['unsupported_real_runs'].append(dict(f['unsupported_real_runs'][0], name='dplyr', url='https://dplyr.tidyverse.org/dev/')),
     'duplicate-glue-run': lambda f: f['unsupported_real_runs'].append(dict(f['unsupported_real_runs'][0])),
     'limit-entry-not-a-dict': lambda f: f['unsupported_real_runs'].append('glue'),
@@ -465,7 +468,7 @@ def test_a_limit_site_that_is_incomplete_only_because_it_was_unreachable_does_no
     'reusable workflow job unsupported (.github/workflows/p.yaml); the deployed routes cannot be verified',
 ])
 def test_every_unsupported_layout_reason_the_engine_emits_is_recognized(reason):
-    assert v.limit_run_is_unsupported_layout({'state': 'incomplete', 'reasons': [reason]})
+    assert v.limit_run_is_unsupported_layout({'state': 'incomplete', 'deploy_layout': 'unverified', 'reasons': [reason]})
 
 
 def test_the_producer_and_the_verifier_share_one_limit_site_predicate():
@@ -480,7 +483,7 @@ def test_the_real_glue_pin_still_fails_for_a_recognized_layout_reason():
     from lib import _docsite
     reasons = _docsite.routes([], {'template': {'package': 'tidytemplate'}})[1]
     assert reasons == ['custom template mapping unsupported']
-    assert v.limit_run_is_unsupported_layout({'state': 'incomplete', 'reasons': reasons})
+    assert v.limit_run_is_unsupported_layout({'state': 'incomplete', 'deploy_layout': 'unverified', 'reasons': reasons})
 
 
 def test_the_limit_site_must_still_be_incomplete_when_the_pinned_sites_pass(tmp_path):
@@ -623,7 +626,7 @@ def test_the_live_smoke_audits_the_pinned_commit_not_whatever_the_default_branch
 
     def audit(path, url, ref):
         seen['audited'] = sp.run(['git', '-C', str(path), 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
-        return {'stage': {'state': 'incomplete', 'counts': {'checked': 0, 'missing': 0}, 'reasons': ['custom template mapping unsupported'], 'findings': []}, 'requests': 0}
+        return {'stage': {'state': 'incomplete', 'counts': {'checked': 0, 'missing': 0}, 'reasons': ['custom template mapping unsupported'], 'findings': [], 'deploy_layout': 'unverified'}, 'requests': 0}
 
     facts, _ = obs.observe_live_smoke(tmp_path, audit=audit, clone=clone, supported={'name': 'sup', 'repo': 'r', 'url': v.SUPPORTED_SITE_URL},
                                       limits=(site,), pinned_supported=())

@@ -1209,7 +1209,7 @@ def test_the_reason_the_engine_gives_is_a_recognized_unsupported_layout_for_the_
     reasons = ["deploy to a subdirectory (.github/workflows/deploy.yaml); the deployed routes cannot be verified",
                "deploy to a subdirectory in local action .github/actions/d; the deployed routes cannot be verified"]
     for reason in reasons:
-        assert verifier.limit_run_is_unsupported_layout({"state": "incomplete", "reasons": [reason]}), reason
+        assert verifier.limit_run_is_unsupported_layout({"state": "incomplete", "deploy_layout": "unverified", "reasons": [reason]}), reason
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -1664,7 +1664,7 @@ def test_the_script_reasons_are_recognized_by_the_limit_site_rule():
     for reason in ("deploy to a subdirectory in script scripts/deploy.R; the deployed routes cannot be verified",
                    "PKGDOWN_DEV_MODE set in script scripts/deploy.R; development mode mapping unsupported",
                    "script reference unsupported (missing at the pinned ref): scripts/x.R; the deployed routes cannot be verified"):
-        assert verifier.limit_run_is_unsupported_layout({"state": "incomplete", "reasons": [reason]}), reason
+        assert verifier.limit_run_is_unsupported_layout({"state": "incomplete", "deploy_layout": "unverified", "reasons": [reason]}), reason
 
 
 UNRELATED_DYNAMIC = "gates <- 'scripts/gate.R'\nsource(file.path('scripts', 'common.R'))\nsystem2(Sys.which('git'), 'status')\n"
@@ -2028,7 +2028,7 @@ def test_the_publish_reason_names_the_evidence_and_is_allow_listed():
     reason = ("script reference unsupported (dynamic path): source() with a non-literal argument; "
               "the deployed routes cannot be verified (workflow .github/workflows/qc.yaml may publish: tier 2: permissions contents: write (workflow); "
               "destination docs/ is tracked)")
-    assert verifier.limit_run_is_unsupported_layout({"state": "incomplete", "reasons": [reason]})
+    assert verifier.limit_run_is_unsupported_layout({"state": "incomplete", "deploy_layout": "unverified", "reasons": [reason]})
 
 
 def test_the_predicate_returns_tier_labeled_evidence(tmp_path):

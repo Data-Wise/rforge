@@ -278,8 +278,8 @@ def limit_run_is_unsupported_layout(run):
     least one such reason. A transport or availability failure (HTTP error, timeout, DNS), or one mixed into the
     list, is never accepted: an outage must not stand in for evidence that the layout is refused.
     """
-    if not isinstance(run, dict) or run.get("state") != "incomplete":
-        return False
+    if not isinstance(run, dict) or run.get("state") != "incomplete" or run.get("deploy_layout") != "unverified":
+        return False        # every live-smoke run, limit runs included, carries the fixed `deploy_layout: unverified` qualification
     reasons = run.get("reasons")
     if not isinstance(reasons, list) or not reasons or not all(isinstance(r, str) for r in reasons):
         return False
