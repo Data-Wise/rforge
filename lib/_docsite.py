@@ -1042,6 +1042,69 @@ def stage_evidence(texts, names):
     return list(dict.fromkeys(found))
 
 
+ARCHIVE_TOKEN = re.compile(r"\.(?:zip|tar|tgz|gz|xz|bz2|7z)\b", re.I)
+DOWNLOAD_TEXT = re.compile(r"download-artifact|\bgh\s+(?:run|release)\s+download\b|\bworkflow_run\b")
+UPLOAD_TEXT = re.compile(r"upload-(pages-)?artifact")
+
+
+def handoff_facts(texts, names, exempt=()):
+    """The handoff facts one workflow shows, as `(0, name)` entries: `build` (a pkgdown build, or an upload of a
+    destination), `download` (it pulls build output from elsewhere: `download-artifact`, `gh run|release download`,
+    `curl`/`wget` of an archive, a `workflow_run` trigger), `stage` (`git add .`/`-A`/`-u`/`-f`, `git commit -a`, a command
+    naming a destination, or a push action) and `push` (a `git push` with no refspec or to the default branch, or a push
+    action). A push to a branch the repository declares non-publishing is not a push. `texts` are `(where, text)` pairs
+    for the workflow and the scripts and local actions it reaches; `names` are the literal destination directories."""
+    names = [posixpath.normpath(n) for n in names if isinstance(n, str) and n and not DYNAMIC_PATH.search(n)]
+    joined = "\n".join(text for _, text in texts)
+    facts = set()
+    if BUILD_MENTION.search(joined) or re.search(r"upload-pages-artifact", joined):
+        facts.add("build")
+    for upload in UPLOAD_TEXT.finditer(joined):
+        window = joined[upload.start():upload.start() + 400]
+        if any(re.search(r"path:\s*[\"']?(?:\./)?(?:[\w./-]*/)?" + re.escape(n) + r"\b", window) for n in names):
+            facts.add("build")
+    if DOWNLOAD_TEXT.search(joined):
+        facts.add("download")
+    if any(name in joined.lower() for name in PUSH_ACTIONS):
+        facts.update(("stage", "push"))
+    for match in re.finditer(r"(?<![\w./@=-])(git|curl|wget)(?=\s)", joined):
+        commands = shell_commands(logical_line(joined, match.start()))
+        tokens = [t.rstrip("\"')],}") for t in commands[0]] if commands else []
+        if not tokens or tokens[0] != match.group(1):
+            continue
+        if tokens[0] in ("curl", "wget"):
+            if any(ARCHIVE_TOKEN.search(t) for t in tokens[1:]):
+                facts.add("download")
+            continue
+        args = tokens[1:]
+        if stage_command("git", args, names, True) or (args[:1] == ["add"] and any(a in ("-f", "--force") for a in args)):
+            facts.add("stage")
+        if target_tier("git", args, exempt) == (2, "the default branch or no refspec"):
+            facts.add("push")
+    return {(0, fact) for fact in facts}
+
+
+def handoff_evidence(state):
+    """`(1, label)` evidence per workflow path from the handoff facts in `state` (path -> [evidence, destinations]).
+
+    A workflow that stages and pushes is publish-capable whether or not the pinned tree tracks the destination when it
+    also pulls build output from elsewhere (it downloads, or another workflow triggers it), or when any other workflow in
+    the repository builds the site: the build output can reach it as an artifact, a release or a checkout. A workflow
+    that stages and pushes with no build or download relationship anywhere stays tier two."""
+    facts = {path: {label for tier, label in value[0] if tier == 0} for path, value in state.items()}
+    builders = sorted(path for path, found in facts.items() if "build" in found)
+    result = {}
+    for path, found in facts.items():
+        if not {"stage", "push"} <= found:
+            continue
+        others = [b for b in builders if b != path]
+        if "download" in found:
+            result[path] = (1, "stages and pushes build output it pulls from elsewhere (artifact, release or workflow_run)")
+        elif others:
+            result[path] = (1, f"stages and pushes while workflow {others[0]} builds the site (cross-workflow handoff)")
+    return result
+
+
 def build_destinations(text):
     """Destinations a pkgdown build names in `text`: `destination =`/`dest_dir =` in R, `destination:` in YAML text and
     `--destination` on a command line. Only text that mentions pkgdown or build_site is read. A quoted value is a literal;
@@ -1146,7 +1209,7 @@ def classify_evidence(found, tracked=True, destination="destination docs/"):
     for tier, label in sorted(found, key=lambda item: item[0]):    # tier one first: the reason names the strongest evidence
         if tier == 1:
             labels.append(f"tier 1: {label}")
-        elif tracked:
+        elif tier == 2 and tracked:           # tier 0 entries are handoff facts, not evidence
             labels.append(f"tier 2: {label}; {destination} is tracked")
     return list(dict.fromkeys(labels))
 
@@ -1281,7 +1344,8 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
     stage_names = [d for d in [first, *[d for v in state.values() for d in v[1]]] if literal(d)]
     for path, text in texts.items():
         data = parsed.get(path)
-        state[path][0] = list(dict.fromkeys(state[path][0] + stage_evidence([("the workflow", source_text(text, data))] + probes[path], stage_names)))
+        pairs = [("the workflow", source_text(text, data))] + probes[path]
+        state[path][0] = list(dict.fromkeys(state[path][0] + stage_evidence(pairs, stage_names) + sorted(handoff_facts(pairs, stage_names, exempt))))
     # Reusable workflows. A caller job `uses: ./.github/workflows/x.yml` runs the callee with the caller's token, so the
     # callee gets the caller's permission evidence and the caller gets everything the callee can do. A callee that cannot
     # be resolved (missing, outside the workflows directory, another repository, a dynamic path) is assumed capable. The
@@ -1310,6 +1374,8 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
             state[caller_path][1] = state[caller_path][1] + [d for d in state[callee_path][1] if d not in state[caller_path][1]]
         if before == [(list(v[0]), list(v[1])) for v in state.values()]:
             break
+    for path, item in handoff_evidence(state).items():
+        state[path][0] = list(dict.fromkeys(state[path][0] + [item]))
     if honored is not None:
         honored.extend(sorted({m.group(1) for v in state.values() for _, label in v[0]
                                for m in re.finditer(r"declared non-publishing branch ([^\s)]+)", label)}))

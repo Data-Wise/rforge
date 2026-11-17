@@ -151,7 +151,15 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       `git add -A`/`.`/`-u` or `git commit -a` when a pkgdown build appears in the same workflow or a script
       it reaches, `git subtree push`, `git worktree add <destination>`, `cp`/`mv`/`rsync`/`ln` into the
       destination), because such a workflow can create and push `docs/` from nothing. A push that stages
-      something else, such as `git add data/history.csv`, is not stage evidence. **Tier 2, only when the pinned tree tracks the
+      something else, such as `git add data/history.csv`, is not stage evidence. **Cross-workflow
+      handoff:** build output can reach the staging workflow from another workflow, so a workflow that
+      stages and pushes (`git add .`/`-A`/`-u`/`-f`, `git commit -a`, a push action, then a push to the
+      default branch or with no refspec) is also tier 1 when it pulls build output from elsewhere
+      (`download-artifact`, `gh run download`, `gh release download`, `curl`/`wget` of an archive, a
+      `workflow_run` trigger) or when any other workflow in the repository builds the site (pkgdown
+      wording, a `build_site` call, an upload of the destination, `upload-pages-artifact`). Without a
+      build or download relationship anywhere, a stage-and-push workflow stays tier 2; a push to a
+      branch declared non-publishing is not a push for this rule. **Tier 2, only when the pinned tree tracks the
       pkgdown destination:** plain `contents: write`; a push action such as `ad-m/github-push-action`;
       a job with no `permissions:` key at either level; a push with no refspec or to the default
       branch; the same publish programs with no remote target. The destination is the config
@@ -192,9 +200,9 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
 
       A workflow with no evidence is relaxed, because QC and simulation scripts are full of
       `source(file.path(...))`. Not detected: a script that pushes from a workflow that shows no signal
-      at all; a workflow that stages the whole tree (`git add -A`) and pushes with no pkgdown build
-      visible in that workflow or the scripts it reaches, for example site files downloaded as an
-      artifact from another workflow; a destination written through a name the scan cannot read; a site branch mislabeled in
+      at all; site files that reach a staging workflow by a route the scan
+      cannot read (a custom action fetching from another repository, a submodule update, a
+      checkout of another ref) with no build or download relationship anywhere in the repository; a destination written through a name the scan cannot read; a site branch mislabeled in
       `nonpublishing-branches` (documented gap: an unverified maintainer declaration); actions from other repositories (beyond the fail-closed reusable-workflow rule); manual
       deploys outside CI.
     - **How names are matched.** YAML inputs (workflows, local actions, front matter) are read as

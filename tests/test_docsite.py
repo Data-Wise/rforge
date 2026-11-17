@@ -1875,14 +1875,14 @@ def test_a_tier_one_publish_signal_is_capable_whatever_the_destination(tmp_path,
 
 @pytest.mark.parametrize("b", TIER2)
 def test_a_tier_two_signal_with_a_tracked_destination_is_capable_and_the_reason_names_it(tmp_path, b):
-    r = pair(tmp_path, b, tracked=True)
+    r = pair(tmp_path, b, tracked=True, a=NO_BUILD)     # no build workflow beside it: the cross-workflow rule would make a push action tier 1
     assert reached(r, "script reference unsupported", "dynamic") and any("may publish: tier 2" in x and "destination docs/ is tracked" in x for x in r["reasons"]), r["reasons"]
 
 
 @pytest.mark.parametrize("b", TIER2)
 def test_a_tier_two_signal_with_an_untracked_destination_stays_relaxed(tmp_path, b):
     """The destination is not committed, so pushing to the default branch cannot publish site files (medfit deploys via gh-pages)."""
-    r = pair(tmp_path, b, tracked=False)
+    r = pair(tmp_path, b, tracked=False, a=NO_BUILD)
     assert r["state"] == "complete", r["reasons"]
 
 
@@ -2489,10 +2489,10 @@ def test_add_everything_after_a_build_step_in_a_reached_script_is_strict(tmp_pat
                       cmd="Rscript scripts/build.R\n      - run: git add -A\n      - run: git commit -m site\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
     r = pair(tmp_path, push, files={"scripts/build.R": build})
     assert reached(r, "script reference unsupported", "tier 1"), r["reasons"]
-    # The same workflow without a build step anywhere stays relaxed while the destination is untracked.
+    # The same workflow with no build step and no build workflow anywhere stays relaxed while the destination is untracked.
     quiet = workflow_b(top="permissions:\n  contents: write\n",
                        cmd="git add -A\n      - run: git commit -m x\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
-    assert pair(fresh(tmp_path, "quiet"), quiet)["state"] == "complete"
+    assert pair(fresh(tmp_path, "quiet"), quiet, a=NO_BUILD)["state"] == "complete"
 
 
 def test_a_staging_command_inside_a_reached_script_or_a_local_action_is_strict(tmp_path):
@@ -2510,7 +2510,7 @@ def test_a_destination_named_by_the_config_or_a_build_call_is_the_stage_name(tmp
     push = workflow_b(top="permissions:\n  contents: write\n", cmd="git add -f public\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
     assert reached(pair(tmp_path, push, config=config), "script reference unsupported", "tier 1")
     # With the default destination, `git add public` stages something unrelated.
-    assert pair(fresh(tmp_path, "d"), push)["state"] == "complete"
+    assert pair(fresh(tmp_path, "d"), push, a=NO_BUILD)["state"] == "complete"
     build = "pkgdown::build_site(destination = 'out')\n"
     out = workflow_b(top="permissions:\n  contents: write\n", cmd="Rscript scripts/build.R\n      - run: git add -f out\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
     assert reached(pair(fresh(tmp_path, "e"), out, files={"scripts/build.R": build}), "script reference unsupported", "tier 1")
@@ -2564,3 +2564,102 @@ def test_the_field_is_present_on_an_incomplete_stage(tmp_path):
         late = site.audit(pkg, url=root + "wrong/", ref="main")                    # workflows read, sitemap absent
     assert early["state"] == "incomplete" and early["nonpublishing_branches_honored"] == []
     assert late["state"] == "incomplete" and late["nonpublishing_branches_honored"] == ["qc-results"]
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Codex round 12. Build output can reach the staging workflow from another workflow (an artifact, a downloaded
+# release, a `workflow_run` trigger), so neither workflow alone shows both halves.
+# ---------------------------------------------------------------------------------------------------------
+NO_BUILD = step_workflow("echo hello", top="permissions: read-all\n")
+STAGE_PUSH = "git add -A\n      - run: git commit -m site\n      - run: git push origin main\n      - run: Rscript scripts/site.R"
+DOWNLOAD_STEP = "      - uses: actions/download-artifact@v4\n        with:\n          name: site\n"
+
+
+def handoff_b(cmd=STAGE_PUSH, steps="", head=WORKFLOW_HEAD, top="permissions:\n  contents: write\n"):
+    return (head + top + "jobs:\n  publish:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n"
+            + steps + "      - run: " + cmd + "\n")
+
+
+def handoff(tmp_path, b, a=SITE_A, files=None, tracked=False):
+    return pair(tmp_path, b, files=files, a=a, tracked=tracked)
+
+
+def strict_tier_one(r):
+    return reached(r, "script reference unsupported", "dynamic") and any("tier 1" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_an_artifact_handoff_to_a_staging_workflow_is_tier_one_even_when_the_destination_is_untracked(tmp_path):
+    ok, why = strict_tier_one(handoff(tmp_path, handoff_b(steps=DOWNLOAD_STEP), a=NO_BUILD))   # the download alone, no build workflow
+    assert ok, why
+    ok, why = strict_tier_one(handoff(fresh(tmp_path, "a"), handoff_b(steps=DOWNLOAD_STEP)))
+    assert ok, why
+
+
+@pytest.mark.parametrize("fetch", ["gh run download 123 -n site", "gh release download v1 --pattern '*.zip'", "curl -sL https://example.org/site.tar.gz -o s.tgz",
+                                   "wget https://example.org/site.zip", "curl -L -o site.tar.xz https://example.org/x"])
+def test_other_ways_to_pull_build_output_make_a_staging_workflow_tier_one(tmp_path, fetch):
+    b = handoff_b(cmd=fetch + "\n      - run: " + STAGE_PUSH)
+    ok, why = strict_tier_one(handoff(tmp_path, b, a=NO_BUILD))
+    assert ok, (fetch, why)
+
+
+def test_a_workflow_run_trigger_is_a_pull_of_another_workflows_output(tmp_path):
+    head = "on:\n  workflow_run:\n    workflows: [build]\n    types: [completed]\n"
+    ok, why = strict_tier_one(handoff(tmp_path, handoff_b(head=head), a=NO_BUILD))
+    assert ok, why
+
+
+@pytest.mark.parametrize("flag_command", ["git add .", "git add -A", "git add --all", "git add -f docs", "git add -f out", "git commit -am x"])
+def test_the_staging_half_covers_add_all_force_add_and_commit_all(tmp_path, flag_command):
+    b = handoff_b(cmd=flag_command + "\n      - run: git commit -m site\n      - run: git push origin main\n      - run: Rscript scripts/site.R", steps=DOWNLOAD_STEP)
+    ok, why = strict_tier_one(handoff(tmp_path, b, a=NO_BUILD))
+    assert ok, (flag_command, why)
+
+
+def test_any_build_workflow_makes_a_stage_and_push_workflow_tier_one(tmp_path):
+    # Cross-workflow handoff: A builds (names pkgdown), B stages everything and pushes main; B itself shows no build or download.
+    ok, why = strict_tier_one(handoff(tmp_path, handoff_b()))
+    assert ok, why
+    assert any("builds the site" in x for x in why), why
+    for n, cmd in enumerate(["git commit -am site\n      - run: git push origin main\n      - run: Rscript scripts/site.R",
+                             "git add -u\n      - run: git push\n      - run: Rscript scripts/site.R"]):
+        ok, why = strict_tier_one(handoff(fresh(tmp_path, n), handoff_b(cmd=cmd)))
+        assert ok, (cmd, why)
+
+
+def test_a_build_signal_in_a_reached_script_or_an_upload_of_the_destination_counts_as_a_build_workflow(tmp_path):
+    builder = step_workflow("Rscript scripts/build.R", top="permissions: read-all\n")
+    ok, why = strict_tier_one(handoff(tmp_path, handoff_b(), a=builder, files={"scripts/build.R": "pkgdown::build_site()\n"}))
+    assert ok, why
+    upload = step_workflow("echo hi", top="permissions: read-all\n", step_extra="      - uses: actions/upload-artifact@v4\n        with:\n          path: docs\n")
+    ok, why = strict_tier_one(handoff(fresh(tmp_path, "u"), handoff_b(), a=upload))
+    assert ok, why
+
+
+def test_a_staging_workflow_with_no_build_or_download_relationship_stays_tier_two(tmp_path):
+    assert handoff(tmp_path, handoff_b(), a=NO_BUILD)["state"] == "complete"
+    # ... and counts as before once the destination is tracked.
+    r = handoff(fresh(tmp_path, "t"), handoff_b(), a=NO_BUILD, tracked=True)
+    assert reached(r, "script reference unsupported", "dynamic") and any("tier 2" in x for x in r["reasons"]), r["reasons"]
+
+
+@pytest.mark.parametrize("cmd", ["git add data/history.csv\n      - run: git commit -m h\n      - run: git push origin main\n      - run: Rscript scripts/site.R",
+                                 "git add qc-history.csv\n      - run: git commit -m h\n      - run: git push origin main\n      - run: Rscript scripts/site.R"])
+def test_a_named_data_file_push_stays_tier_two_even_beside_a_build_workflow_or_a_download(tmp_path, cmd):
+    assert handoff(tmp_path, handoff_b(cmd=cmd), a=SITE_A)["state"] == "complete"
+    assert handoff(fresh(tmp_path, "d"), handoff_b(cmd=cmd, steps=DOWNLOAD_STEP), a=NO_BUILD)["state"] == "complete"
+
+
+def test_a_declared_branch_push_beside_a_build_workflow_stays_tier_two(tmp_path):
+    # The qc-monthly shape: stage a file, push a branch the repository declares non-publishing.
+    b = handoff_b(cmd="git add -A\n      - run: git commit -m h\n      - run: git push origin qc-results\n      - run: Rscript scripts/site.R")
+    assert handoff(tmp_path, b, files={".rforge.yaml": KEY})["state"] == "complete"
+    assert strict_tier_one(handoff(fresh(tmp_path, "u"), b))[0]      # undeclared: an explicit-branch push is tier one already
+
+
+def test_a_push_alone_or_a_stage_alone_is_not_a_handoff(tmp_path):
+    push_only = handoff_b(cmd="git push origin main\n      - run: Rscript scripts/site.R")
+    stage_only = handoff_b(cmd="git add -A\n      - run: Rscript scripts/site.R")
+    assert handoff(tmp_path, push_only)["state"] == "complete"
+    assert handoff(fresh(tmp_path, "s"), stage_only)["state"] == "complete"
+

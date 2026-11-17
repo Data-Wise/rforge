@@ -108,10 +108,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stages the destination counts as tier 1 whether or not the tree tracks it yet (`git add`/`git commit`
   naming it, `git add -A`/`.` after a pkgdown build, `git subtree push`, `git worktree add`, `cp`/`mv`/
   `rsync` into it), so a workflow that generates `docs/`, force-adds and pushes it is strict; a push of
-  `data/history.csv` stays tier 2. Known gaps (documented, not fixed): scripts fetched at runtime, a
-  script that pushes from a no-signal workflow, a workflow that stages the whole tree and pushes with
-  no pkgdown build visible in that workflow or the scripts it reaches (site files downloaded as an
-  artifact from another workflow), actions from other repositories (beyond the
+  `data/history.csv` stays tier 2. Build output can also reach the staging workflow from another
+  workflow: a workflow that stages and pushes is tier 1 when it downloads build output
+  (`download-artifact`, `gh run|release download`, `curl`/`wget` of an archive, a `workflow_run`
+  trigger) or when any other workflow in the repository builds the site; with no build or download
+  relationship anywhere it stays tier 2. Known gaps (documented, not fixed): scripts fetched at runtime, a
+  script that pushes from a no-signal workflow, site files that reach a staging workflow by a route the scan cannot read
+  (a custom action fetching from another repository, a submodule update, a checkout of another ref)
+  with no build or download relationship anywhere in the repository, actions from other repositories (beyond the
   fail-closed reusable-workflow rule), manual deploys, and a site branch mislabeled in
   `docs.site.nonpublishing-branches`. That key is an unverified maintainer declaration in the same
   trust class as `site.allowlist`: the engine cannot see what a branch serves without a live GitHub
