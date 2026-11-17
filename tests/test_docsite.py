@@ -1184,8 +1184,9 @@ def test_a_pkgdown_repository_with_no_target_folder_stays_complete(tmp_path):
     web = tmp_path / "web"
     plain_deploy = WORKFLOW_HEAD + "jobs:\n  d:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo deploy\n"
     with server(web) as root:
+        # the action runs ./scripts/site.sh: since round 8 a pkgdown repository must have that script readable at the pinned ref
         pkg = make(tmp_path, config=CONFIG, files={".github/workflows/build.yaml": BUILD_WORKFLOW, ".github/actions/site/action.yml": SITE_ACTION,
-                                                   ".github/workflows/deploy.yaml": plain_deploy})
+                                                   ".github/workflows/deploy.yaml": plain_deploy, "scripts/site.sh": "#!/bin/sh\necho build\n"})
         publish(web, "", root, ROUTES)
         assert site.audit(pkg, url=root, ref="main")["state"] == "complete"
 
