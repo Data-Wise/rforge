@@ -89,8 +89,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `run: Rscript scripts/deploy.R` with a `deploy_to_branch(subdir = )` call inside is no longer
   `complete`. In a pkgdown repository a script reference that cannot be scanned (missing,
   symlinked, outside the repository, absolute, dynamic, binary, oversized, over a cap) is
-  `incomplete` with "script reference unsupported", but only for workflows that name pkgdown
-  (or all workflows when none does); a clean readable script never blocks. A signal inside an
+  `incomplete` with "script reference unsupported", for every workflow that may publish
+  (a Pages or push action, `contents`/`pages`/`id-token` write, no `permissions:` key, a
+  `git push`/`deploy_to_branch`/`gh-pages` signal, or pkgdown wording; read-only workflows are
+  relaxed, and the reason names the evidence). `make` follows `include`, `-include` and
+  `sinclude`. A clean readable script never blocks. A signal inside an
   R comment still blocks. Scripts fetched at runtime, actions from other repositories and
   manual deploys are not detected.
 - `docs:check --site` counts a sitemap entry only when it is a `loc` that is a direct child

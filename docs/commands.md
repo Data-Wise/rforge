@@ -534,7 +534,9 @@ symlinks under `vignettes/`. An article is refused only for the front-matter key
 `output_ext`/`output-ext`, `output_dir`/`output-dir`, `knit`, `as_is`, a non-HTML `format`/`output` or
 `pkgdown: extension`, in any key case with `-` and `_` interchangeable; YAML is read as parsed structures and R/shell
 code as tolerant text; scripts a `run:` step executes are read at the pinned ref (5 levels, 40 files) and scanned the
-same way, and an unreadable, missing, symlinked, dynamic or over-cap reference is incomplete in a pkgdown repository;
+same way (`make` follows `include`), and an unreadable, missing, symlinked, dynamic or over-cap reference is incomplete in a
+pkgdown repository for any workflow that may publish (Pages or push action, `contents`/`pages`/`id-token` write, no
+`permissions:` key, `git push`, pkgdown wording; read-only workflows are relaxed);
 other overrides, names built any other way, `uses:` actions from other repositories, manual deploys outside CI and
 `knit`/`render` of a document are not detected. A complete site stage proves route presence, not
 content freshness (`content_freshness: "unverified"`).

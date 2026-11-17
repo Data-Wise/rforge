@@ -129,11 +129,24 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       `python`, `source`/`.`, `./path`, `make [-f] [-C]`, and `source()`/`sys.source()`/`system()`
       inside R) are read at the pinned ref, honoring `working-directory` and `cd`, followed up to
       five levels and 40 files, and scanned with the same detections as a `run:` body. A signal
-      in a reached script blocks, even inside a comment. In a pkgdown repository, a reference
-      from a workflow that names pkgdown (or from any workflow when none does) that is missing,
-      a symlink, outside the repository, absolute, dynamic (`$VAR`, `paste0()`, a glob), binary,
-      over 1 MiB or over a cap is `incomplete` ("script reference unsupported"). A clean readable
+      in a reached script blocks, even inside a comment. `make` follows `include`, `-include` and
+      `sinclude`. In a pkgdown repository, a reference that is missing, a symlink, outside the
+      repository, absolute, dynamic (`$VAR`, `paste0()`, a glob, a wildcard include), binary, over
+      1 MiB or over a cap is `incomplete` ("script reference unsupported"). A clean readable
       script never blocks. Scripts fetched or generated at runtime show up as missing or dynamic.
+    - **Which workflows are strict.** Every workflow and local action in a pkgdown repository,
+      unless the workflow shows no ability to publish. It is publish-capable, and strict, when
+      any of these is present: the word pkgdown; a Pages or push action (`JamesIves/github-pages-
+      deploy-action`, `peaceiris/actions-gh-pages`, `actions/deploy-pages`,
+      `upload-pages-artifact`, `configure-pages`, `ad-m/github-push-action` and similar);
+      `pages`, `contents` or `id-token` write or `write-all` at workflow or job level; a job with
+      no `permissions:` key at either level (the default token scope is unknown); a checkout given
+      a secret token or key; or a `deploy_to_branch`, `gh-pages`, `git push`, `rsync`, `aws s3`
+      or `netlify` signal in the workflow, a reached script or a local action. The reason names
+      the evidence. A read-only workflow is relaxed, because QC and simulation scripts are full
+      of `source(file.path(...))`; a no-signal workflow whose dynamically loaded script pushes is
+      not detected. Tradeoff: a pkgdown repository with a workflow that commits and pushes
+      (a QC report job, say) is incomplete when that workflow reaches an unresolvable script.
     - **How names are matched.** YAML inputs (workflows, local actions, front matter) are read as
       parsed structures, so quoted or escaped keys, flow mappings, anchors, merge keys and any
       case of `target-folder`/`PKGDOWN_DEV_MODE` count. R and shell code (a `run:` body,
