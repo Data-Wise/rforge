@@ -127,7 +127,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   script that pushes from a no-signal workflow, site files that reach a staging workflow by a route the scan cannot read
   (a custom action fetching from another repository, a submodule update, a checkout of another ref)
   with no build, download or unresolved reference anywhere in the repository, unlisted
-  executables and `knit`/`render` in a workflow that cannot publish (an opaque build in any workflow that may
+  executables and `knit`/`render` in a workflow that cannot publish (wrapper options such as `env --` are parsed
+  first, a repo-relative path is read even with an allowlisted basename, a literal absolute path outside the system
+  bin directories is opaque) (an opaque build in any workflow that may
   publish, a Pages deploy included, is an incomplete reason), a Python or shell script
   that builds the site through a module it imports, actions from other repositories (beyond the
   fail-closed reusable-workflow rule), manual deploys, and a site branch mislabeled in

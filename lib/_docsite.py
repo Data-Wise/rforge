@@ -657,11 +657,24 @@ class ScriptScan:
             cwd = self.command(command, cwd, depth)
 
     def command(self, command, cwd, depth):
-        i = 0
-        while i < len(command) and (re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", command[i])
-                                    or posixpath.basename(command[i]) in ("env", "sudo", "time", "nohup", "exec", "command")):
-            i += 1
-        if i >= len(command):
+        i, lookup = 0, False
+        while i < len(command):
+            wrapper = posixpath.basename(command[i])
+            if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", command[i]):
+                i += 1
+            elif wrapper in WRAPPERS:
+                i += 1
+                while i < len(command) and command[i].startswith("-"):       # the wrapper's own options: `env -i`, `sudo -E`, `--`
+                    option = command[i]
+                    i += 1
+                    lookup = lookup or (wrapper == "command" and option in ("-v", "-V"))
+                    if option == "--":
+                        break
+                    if option in WRAPPER_VALUE_OPTIONS.get(wrapper, ()) and i < len(command):
+                        i += 1
+            else:
+                break
+        if i >= len(command) or lookup:         # `command -v git` looks a program up; it does not run it
             return cwd
         raw, args = command[i], command[i + 1:]
         if re.search(r"[$`]", raw) and not raw.startswith("$(("):
@@ -747,8 +760,11 @@ class ScriptScan:
             rest = rest[1:] if program == "timeout" else rest       # `timeout 30 cmd`: the first word is the duration
             if rest:
                 self.command(rest, cwd, depth + 1)
-        elif program not in ALLOWED_PROGRAMS and "/" in raw and not raw.startswith(("/", "~")):
-            self.file(raw, cwd, depth)          # a relative path that is run: read it (or fail closed when it cannot be read)
+        elif "/" in raw and not raw.startswith(("/", "~")):
+            self.file(raw, cwd, depth)          # a relative path that is run: read it (or fail closed when it cannot be read), even
+                                                # when its basename is an allowlisted name (`tools/echo`)
+        elif raw.startswith(("/", "~")) and posixpath.dirname(raw) not in SYSTEM_BIN_DIRS:
+            self.opaque("opaque executable", " ".join(command[i:i + 3]))      # a literal path outside the system bin directories
         elif program not in ALLOWED_PROGRAMS and (program.startswith(("$", "`")) or PLAUSIBLE_PROGRAM.fullmatch(program)):
             self.opaque("opaque executable", " ".join(command[i:i + 3]))     # (text such as `%s`, `^env:` or `1` is not a command)
         return cwd
@@ -1126,6 +1142,12 @@ def git_parts(args):
     return sub, rest, positional, flags, scope
 
 
+WRAPPERS = ("env", "sudo", "time", "nohup", "exec", "command", "nice", "stdbuf", "setsid", "doas")
+WRAPPER_VALUE_OPTIONS = {"env": ("-u", "-C", "-S", "--unset", "--chdir", "--split-string"),
+                         "sudo": ("-u", "-g", "-h", "-p", "-C", "-D", "-R", "-T", "-U", "--user", "--group", "--host", "--prompt", "--chdir"),
+                         "time": ("-f", "-o", "--format", "--output"), "nice": ("-n", "--adjustment"), "doas": ("-u", "-C"),
+                         "stdbuf": ("-i", "-o", "-e")}
+SYSTEM_BIN_DIRS = frozenset({"/bin", "/sbin", "/usr/bin", "/usr/sbin", "/usr/local/bin", "/usr/local/sbin", "/opt/homebrew/bin"})
 COMPUTED_PROGRAM = "computed program"      # the `why` of an opaque() call for a program whose path or name is computed ($BIN/git)
 PATHSPEC_FILE_FLAGS = ("--pathspec-from-file", "--pathspec-file-nul")
 INDEX_PLUMBING = ("update-index", "read-tree", "write-tree", "commit-tree", "checkout-index", "apply", "am", "stash")

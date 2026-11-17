@@ -3219,3 +3219,39 @@ def test_a_pages_deploy_with_nothing_opaque_stays_complete_and_an_opaque_build_w
     assert clean["state"] == "complete", clean["reasons"]
     quiet = pair(fresh(tmp_path, "q"), stage_push_workflow("python -m site_generator", push=False), files={"scripts/site.R": CLEAN_R}, a=NO_BUILD, tracked=False)
     assert quiet["state"] == "complete", quiet["reasons"]
+
+
+# Codex round 24. Wrapper options must be parsed before the executable is classified, and a repo-relative path must be read
+# even when its basename is an allowlisted name.
+@pytest.mark.parametrize("push", ["env -- \"$GIT\" push origin main", "sudo -E \"$GIT\" push", "env -u HOME $GIT push", "nice -n 5 $GIT push origin main",
+                                  "sudo -u runner -- $GIT push", "env -i -- $GIT push"])
+def test_a_wrapped_computed_push_is_not_hidden_by_the_wrapper_options(tmp_path, push):
+    ok, why = capable_or_unresolved(audit_push(tmp_path, "echo hello", push=push))
+    assert ok, (push, why)
+
+
+@pytest.mark.parametrize("push", ["env -- git push origin main", "sudo -E git push", "nice -n 5 git push origin main", "/usr/bin/env -- /usr/bin/git push origin main"])
+def test_a_wrapped_literal_push_is_still_a_push(tmp_path, push):
+    ok, why = capable(audit_push(tmp_path, "echo hello", push=push))
+    assert ok, (push, why)
+
+
+def test_command_dash_v_is_a_lookup_not_a_run(tmp_path):
+    r = audit_push(tmp_path, "command -v git", push=None)
+    assert r["state"] == "complete", r["reasons"]
+
+
+def test_a_repo_relative_path_with_an_allowlisted_basename_is_read(tmp_path):
+    def run(files, n):
+        return pair(fresh(tmp_path, n), stage_push_workflow("tools/echo publish", push=False, steps=PAGES), files={"scripts/site.R": CLEAN_R, **files}, a=NO_BUILD, tracked=False)
+    assert run({}, "missing")["state"] == "incomplete"                                              # unreadable: fails closed
+    assert run({"tools/echo": "#!/bin/sh\npython -m gen\n"}, "opaque")["state"] == "incomplete"      # reads the file, finds an opaque build
+    assert run({"tools/echo": "#!/bin/sh\necho ok\n"}, "clean")["state"] == "complete"
+
+
+def test_a_literal_absolute_path_outside_the_system_bin_directories_is_opaque_in_a_publishing_workflow(tmp_path):
+    for n, cmd in enumerate(["/home/runner/tools/echo publish", "~/bin/echo publish", "/opt/custom/ls ."]):
+        r = pair(fresh(tmp_path, n), stage_push_workflow(cmd, push=False, steps=PAGES), files={"scripts/site.R": CLEAN_R}, a=NO_BUILD, tracked=False)
+        assert r["state"] == "incomplete", (cmd, r["reasons"])
+    ok = pair(fresh(tmp_path, "ok"), stage_push_workflow("/usr/bin/echo publish", push=False, steps=PAGES), files={"scripts/site.R": CLEAN_R}, a=NO_BUILD, tracked=False)
+    assert ok["state"] == "complete", ok["reasons"]

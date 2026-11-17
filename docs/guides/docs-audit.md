@@ -190,6 +190,9 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       `uv run <unlisted tool>`, `node`, `quarto`, `docker`, any unlisted binary, a dynamic command
       (`$X`, `bash -c "$X"`), a Python script that runs other code (`subprocess`, `os.system`, `exec`).
       The list is not extended per generator: the default for an unknown executable is to fail closed.
+      Wrapper options (`env --`, `sudo -E`, `nice -n`) are parsed before the executable is judged, a
+      repo-relative path is read even when its basename is an allowlisted name (`tools/echo`), and a literal
+      absolute path outside the system bin directories is opaque.
       For every workflow that may publish (it stages and pushes, or deploys through a Pages or deploy
       action, or is tier 1 or tier 2 capable under the tracked-destination rule) every such reference is an
       incomplete reason; a workflow that cannot publish keeps treating opaque calls as not detected. Without a build, download or unresolved reference anywhere, a
