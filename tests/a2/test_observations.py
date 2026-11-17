@@ -317,7 +317,7 @@ def test_mapping_observation_on_the_real_ledger():
 def test_written_records_and_index_pass_the_aggregate_validator(tmp_path):
     platforms, _ = records()
     facts = {'live_smoke': live_facts(), 'package_triage': triage_facts(), 'full_gates': gate_facts(),
-             'rendered_review': {'pages': [{'inspected': True, 'sha256': 'a' * 64}]}, 'adversarial_review': review_facts(),
+             'rendered_review': {'pages': [{'page': n, 'inspected': True, 'sha256': 'a' * 64} for n in v.RENDERED_PAGE_NAMES]}, 'adversarial_review': review_facts(),
              'requirement_mapping': {'review': 'complete', 'unmapped': 0, 'requirements': 118}}
     index = {k: obs.write_record(tmp_path, k, 'passed', 'sha', '123', f) for k, f in facts.items()}
     assert v.validate_aggregate(platforms, index, candidate_sha='sha', evidence_root=tmp_path)['verified']
@@ -326,7 +326,7 @@ def test_written_records_and_index_pass_the_aggregate_validator(tmp_path):
 def test_failed_status_is_never_accepted(tmp_path):
     platforms, _ = records()
     facts = {'live_smoke': live_facts(), 'package_triage': triage_facts(), 'full_gates': gate_facts(),
-             'rendered_review': {'pages': [{'inspected': True, 'sha256': 'a' * 64}]}, 'adversarial_review': review_facts(),
+             'rendered_review': {'pages': [{'page': n, 'inspected': True, 'sha256': 'a' * 64} for n in v.RENDERED_PAGE_NAMES]}, 'adversarial_review': review_facts(),
              'requirement_mapping': {'review': 'complete', 'unmapped': 0, 'requirements': 118}}
     index = {k: obs.write_record(tmp_path, k, 'failed' if k == 'live_smoke' else 'passed', 'sha', '123', f) for k, f in facts.items()}
     with pytest.raises(v.VerificationError):
