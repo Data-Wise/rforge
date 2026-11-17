@@ -161,7 +161,8 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       the workflow also reaches an unresolved reference (below), and a push to a branch declared
       non-publishing is not a push; a pathspec that is, contains, is a parent of or is a
       glob that can match the destination (`docs*`, `*.html`) is tier 1. A stage is **named** only when
-      every pathspec is a plain literal path outside the destination; pathspec magic (`:(top)docs`,
+      every pathspec is a plain literal path outside the destination (a wildcard counts only below a literal first
+      directory, as in `man/*.Rd`; `*.html` and `**/x.html` do not); pathspec magic (`:(top)docs`,
       `:/docs`, `:!x`, `:(glob)`), `--pathspec-from-file`, `..`, absolute or `~` paths, expansion and
       braces, a commit that names such a path, and git plumbing that changes the index or tree
       (`update-index`, `read-tree`, `commit-tree`, `checkout-index`, `apply`, `am`, `stash`) stage

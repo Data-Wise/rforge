@@ -3112,5 +3112,11 @@ def test_plain_literal_path_unit():
     names = ["docs"]
     for good in ("data/history.csv", "qc-history.csv", "R/foo.R", "docs-archive/x.md", "man/*.Rd", "data/*.csv", "NEWS.md"):
         assert plain_literal_path(good, names), good
-    for bad in (":(top)docs", ":/docs", ":!data", "docs", "docs/x", "./docs", "..", "../docs", "/x", "~/x", "$X", "{a,b}", ".", "./", "*", "d*", "*.html", "-A", "a\\b", ""):
+    for bad in (":(top)docs", ":/docs", ":!data", "docs", "docs/x", "./docs", "..", "../docs", "/x", "~/x", "$X", "{a,b}", ".", "./", "*", "d*", "*.html", "-A", "a\\b", "", "**/foo.html", "**/*.html", "*.Rd", "*/x", "?ocs/x", "[d]ocs/x", "*/sitemap.xml", "docs*/x"):
         assert not plain_literal_path(bad, names), bad
+
+
+def test_a_rootless_or_recursive_glob_stages_everything_when_it_can_match_the_destination(tmp_path):
+    for n, add in enumerate(["git add '**/foo.html'", "git add '**/*.html'", "git add '*.xml'", "git add '?ocs/index.html'", "git add '[d]ocs/x'", "git add '*/index.html'"]):
+        ok, why = capable(audit_push(fresh(tmp_path, n), "echo hello", add=add))
+        assert ok, (add, why)

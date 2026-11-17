@@ -113,7 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and is an incomplete reason: the audit does not try to prove it builds no site (a `tee`, a download,
   an extraction or a script that writes `docs/` cannot be enumerated away); named pathspecs outside the
   destination stay tier 2; a stage is named only when every pathspec is a plain literal path outside the
-  destination, so pathspec magic (`:(top)docs`), `--pathspec-from-file` and index-changing git plumbing
+  destination (a wildcard only below a literal first directory, as in `man/*.Rd`), so pathspec magic (`:(top)docs`), `--pathspec-from-file` and index-changing git plumbing
   (`update-index`, `read-tree`, `commit-tree`, `checkout-index`, `apply`, `am`, `stash`) stage everything
   and an unknown form fails closed. Build output can also reach the staging workflow from another
   workflow: a workflow that stages and pushes is tier 1 when it downloads build output

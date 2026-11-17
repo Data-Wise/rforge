@@ -1134,6 +1134,12 @@ def plain_literal_path(path, names):
     normal = posixpath.normpath(path)
     if normal == "." or ".." in normal.split("/"):
         return False
+    if re.search(r"[*?\[]", path):
+        # A git `*` also matches `/`, so a wildcard is plain only below a literal first directory that is not the destination,
+        # one of its parents or inside it (`man/*.Rd`, `data/*.csv`); `*.html`, `**/x.html` and `?ocs/x` are not.
+        first = normal.split("/")[0]
+        if "/" not in normal or re.search(r"[*?\[]", first) or names_directory(first, names, pathspec=True):
+            return False
     return not names_directory(path, names, pathspec=True)
 
 
