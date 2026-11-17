@@ -255,7 +255,16 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       quotes, commas or `paste0()` splits between its parts. Root redirects and general output overrides are follow-up work (#123).
     - **`content_freshness: unverified`.** A `complete` site stage means route presence only: the
       sitemap says which pages exist, not whether their content is current (a sitemap carries no
-      `<lastmod>`). The text verdict reads `no findings; site content freshness unverified`.
+      `<lastmod>`). The text verdict reads `no findings; site content freshness and deploy layout unverified`.
+    - **`deploy_layout: unverified`.** The workflow and script scan (publish-capability tiers, tracked
+      destination, stage-and-push, opaque executables) refuses a site when it finds a way CI could deploy a
+      different layout, but it is best effort and cannot be exhaustive: it infers deploy behavior from workflow
+      text and a repository can publish through commands, scripts or credentials it cannot read. A `complete`
+      stage therefore never claims how the site is deployed; the marker is a fixed property of the stage, not a
+      result of the scan. Known residuals found in review and not patched: an allowlisted program that loads a
+      script (`awk -f tools/publish.awk`, `sed -f`), `gh repo sync` and other `gh` subcommands that update
+      repository content, and deploy credentials (`GH_TOKEN: ${{ secrets.DEPLOY_PAT }}`) in a workflow with
+      read-only `contents`.
 
 README replay loads the working tree with pkgload/evaluate, retaining hidden
 setup state and honoring literal eval/include/visibility options. Root explicit

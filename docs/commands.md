@@ -545,7 +545,8 @@ joins the check): `contents: write`, a default-branch or refspec-less `git push`
 stage reports `nonpublishing_branches_honored` and the text report an info line when it applies); reusable workflows share capability with their caller; read-only workflows are relaxed);
 other overrides, names built any other way, `uses:` actions from other repositories, manual deploys outside CI and
 `knit`/`render` of a document are not detected. A complete site stage proves route presence, not
-content freshness (`content_freshness: "unverified"`).
+content freshness (`content_freshness: "unverified"`) and not the CI deploy layout (`deploy_layout: "unverified"`): the
+workflow scan is best effort.
 
 
 

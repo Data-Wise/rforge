@@ -1702,7 +1702,7 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
 
 
 def audit(root: Path, *, url, ref=None):
-    stage = {"state":"incomplete","counts":{"checked":0,"missing":0,"extra":0,"unreleased":0},"provenance":{},"reasons":[],"engine_missing":[],"findings":[],"content_freshness":"unverified","nonpublishing_branches_honored":[]}
+    stage = {"state":"incomplete","counts":{"checked":0,"missing":0,"extra":0,"unreleased":0},"provenance":{},"reasons":[],"engine_missing":[],"findings":[],"content_freshness":"unverified","deploy_layout":"unverified","nonpublishing_branches_honored":[]}
     try:
         base = base_url(url)
         provenance = select_ref(root,ref); stage["provenance"] = {**provenance,"requested_base":base}

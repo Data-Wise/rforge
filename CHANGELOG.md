@@ -17,9 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `default`, `release`, `devel`, `unreleased`) resolves from the pinned
   `DESCRIPTION` version with pkgdown 2.2.1's rule. The stage records the mode
   and the assumed pkgdown rule version.
-- Site stages carry `content_freshness: "unverified"`, and a clean text report
-  reads `no findings; site content freshness unverified`: a complete stage means
-  route presence only.
+- Site stages carry `content_freshness: "unverified"` and `deploy_layout: "unverified"`,
+  and a clean text report reads `no findings; site content freshness and deploy layout
+  unverified`: a complete stage means route presence only. The workflow and script
+  scan that guards the deploy layout is best effort and not exhaustive; the marker is a
+  fixed property of the stage, not a result of the scan. Known residuals (not patched):
+  an allowlisted program that loads a script (`awk -f`, `sed -f`), `gh repo sync` and
+  other `gh` subcommands that update content, and deploy credentials in a workflow with
+  read-only `contents`.
 - Differential tests against pkgdown 2.2.1 (`package_vignettes`, `dev_mode_auto`,
   `as_pkgdown` mode and Bootstrap resolution) in `tests/differential/`. They run
   by hand where R, pkgdown, the R `quarto` package and the Quarto CLI exist,

@@ -178,8 +178,10 @@ stage reports `nonpublishing_branches_honored` and the text report an info line 
 read-only workflows are relaxed), an unreadable, missing, symlinked,
 dynamic or over-cap reference is incomplete. Other overrides, names built any other way, `uses:` actions from other repositories,
 manual deploys outside CI and `knit`/`render` of a document are not detected.
-A complete site stage proves route presence only: the stage carries `content_freshness: "unverified"`
-and a clean text report says `no findings; site content freshness unverified`.
+A complete site stage proves route presence only: the stage carries `content_freshness: "unverified"` and
+`deploy_layout: "unverified"`, and a clean text report says `no findings; site content freshness and deploy layout unverified`.
+The workflow and script scan that decides whether CI could deploy a different layout is best effort and not exhaustive, so a
+complete stage is not a statement about how the site is deployed.
 
 Example replay loads the working tree using pkgload/evaluate. Closed explicit R
 README fences execute in document order with hidden setup retained; eval=false,

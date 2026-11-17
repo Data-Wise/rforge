@@ -689,6 +689,7 @@ def test_stage_marks_content_freshness_unverified_on_every_path(tmp_path):
         down = site.audit(pkg, url=root + "missing/", ref="main")
     assert ok["state"] == "complete" and ok["content_freshness"] == "unverified"
     assert down["state"] == "incomplete" and down["content_freshness"] == "unverified"
+    assert ok["deploy_layout"] == "unverified" and down["deploy_layout"] == "unverified"
 
 
 def test_text_verdict_says_content_freshness_unverified(tmp_path, capsys):
@@ -701,8 +702,9 @@ def test_text_verdict_says_content_freshness_unverified(tmp_path, capsys):
         docaudit.main(["--path", str(pkg), "--package-only", "--site", root, "--ref", "main", "--format", "json"])
         report = json.loads(capsys.readouterr().out)
     assert code == 0
-    assert out.rstrip().splitlines()[-1] == "no findings; site content freshness unverified"
+    assert out.rstrip().splitlines()[-1] == "no findings; site content freshness and deploy layout unverified"
     assert report["stages"]["site"]["content_freshness"] == "unverified"
+    assert report["stages"]["site"]["deploy_layout"] == "unverified"
 
 
 def test_text_verdict_is_unchanged_without_a_site_stage(tmp_path, capsys):
@@ -3289,3 +3291,39 @@ def test_a_gh_command_that_writes_is_a_publish_signal_and_incomplete(tmp_path, c
 def test_a_gh_read_stays_benign(tmp_path, cmd):
     r = pair(tmp_path, stage_push_workflow(cmd, push=False, steps=PAGES), files={"scripts/site.R": CLEAN_R}, a=NO_BUILD, tracked=False)
     assert r["state"] == "complete", (cmd, r["reasons"])
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Deploy-layout marker. The workflow and script scan that decides whether CI could deploy a different layout is best effort
+# and cannot be exhaustive (Codex rounds 11-27 kept finding another command or setting it treats as harmless), so a complete
+# stage never claims the deploy layout is verified: the stage carries `deploy_layout: "unverified"` and a clean text report
+# says so. The marker is a fixed property of the stage, not a result of the scan.
+# ---------------------------------------------------------------------------------------------------------
+def test_the_deploy_layout_marker_is_on_every_stage_whatever_the_scan_concludes(tmp_path):
+    # complete, with a workflow the scan classifies as quiet
+    r = audit_push(tmp_path, "echo hello", push=None)
+    assert r["state"] == "complete" and r["deploy_layout"] == "unverified", r
+    # incomplete
+    r = audit_push(fresh(tmp_path, "i"), "echo hello")
+    assert r["state"] == "incomplete" and r["deploy_layout"] == "unverified", r
+    # a hidden route the scan cannot see (an allowlisted `awk -f` script) still reports complete, and says it is unverified
+    hidden = pair(fresh(tmp_path, "h"), stage_push_workflow("awk -f tools/publish.awk", push=False, steps=PAGES),
+                  files={"scripts/site.R": CLEAN_R, "tools/publish.awk": "BEGIN { system(\"python -m gen\") }\n"}, a=NO_BUILD, tracked=False)
+    assert hidden["deploy_layout"] == "unverified", hidden
+
+
+def test_a_clean_text_verdict_names_the_deploy_layout(tmp_path, capsys):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path)
+        publish(web, "", root, ROUTES)
+        docaudit.main(["--path", str(pkg), "--package-only", "--site", root, "--ref", "main"])
+        out = capsys.readouterr().out
+    assert out.rstrip().splitlines()[-1].endswith("deploy layout unverified")
+
+
+def test_the_marker_is_absent_from_a_run_with_no_site_stage(tmp_path, capsys):
+    pkg = make(tmp_path)
+    docaudit.main(["--path", str(pkg), "--package-only", "--format", "json"])
+    report = json.loads(capsys.readouterr().out)
+    assert "site" not in report.get("stages", {}) and "deploy layout" not in json.dumps(report)
