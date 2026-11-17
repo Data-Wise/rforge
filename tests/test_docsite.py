@@ -1849,6 +1849,10 @@ TIER1 = [
     pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: actions/checkout@v4\n        with:\n          token: ${{ secrets.PAT }}\n"), id="checkout-with-a-pat"),
     pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: actions/checkout@v4\n        with:\n          ssh-key: ${{ secrets.DEPLOY_KEY }}\n"), id="checkout-with-a-deploy-key"),
     pytest.param(workflow_b(top="permissions: read-all\n", job_extra="    env:\n      NOTE: pkgdown\n"), id="names-pkgdown"),
+    # round 10: a remote publish target is tier one (these three were tier two in round 9)
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="rsync -a docs/ host:/var/www/\n      - run: Rscript scripts/site.R"), id="rsync-to-a-remote"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="aws s3 sync docs s3://bucket\n      - run: Rscript scripts/site.R"), id="aws-s3-sync"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="netlify deploy --dir docs\n      - run: Rscript scripts/site.R"), id="netlify-deploy"),
 ]
 TIER2 = [
     pytest.param(workflow_b(top="permissions:\n  contents: write\n"), id="workflow-contents-write"),
@@ -1856,9 +1860,9 @@ TIER2 = [
     pytest.param(workflow_b(), id="missing-permissions-key"),
     pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: ad-m/github-push-action@v0.8.0\n"), id="push-action"),
     pytest.param(workflow_b(top="permissions: read-all\n", cmd="git push origin HEAD:main\n      - run: Rscript scripts/site.R"), id="git-push-in-a-run-body"),
-    pytest.param(workflow_b(top="permissions: read-all\n", cmd="rsync -a docs/ host:/var/www/\n      - run: Rscript scripts/site.R"), id="rsync"),
-    pytest.param(workflow_b(top="permissions: read-all\n", cmd="aws s3 sync docs s3://bucket\n      - run: Rscript scripts/site.R"), id="aws-s3"),
-    pytest.param(workflow_b(top="permissions: read-all\n", cmd="netlify deploy --dir docs\n      - run: Rscript scripts/site.R"), id="netlify"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="rsync -a out/ docs/\n      - run: Rscript scripts/site.R"), id="rsync-to-a-local-directory"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="aws s3 ls\n      - run: Rscript scripts/site.R"), id="aws-s3-without-a-target"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="netlify status\n      - run: Rscript scripts/site.R"), id="netlify-without-deploy"),
 ]
 
 
@@ -2034,3 +2038,388 @@ def test_the_predicate_returns_tier_labeled_evidence(tmp_path):
     only_two = site.yaml_data(workflow_b(top="permissions:\n  contents: write\n"))
     assert site.workflow_may_publish(only_two, "", tracked=False) == []
     assert site.workflow_may_publish(site.yaml_data(workflow_b(top="permissions: read-all\n")), "") == []
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Codex round 10. Tier one now also covers explicit-branch pushes and remote publish targets; the destination check
+# also sees a destination named in a build call; a reusable workflow shares capability with its caller; a directory
+# holding only placeholders is not a tracked destination.
+# ---------------------------------------------------------------------------------------------------------
+def fresh(tmp_path, name):
+    folder = tmp_path / str(name)
+    folder.mkdir()
+    return folder
+
+
+def tiers(text):
+    return {tier for tier, _ in site.text_publish_evidence(text, "x")}
+
+
+PUSH_TIER_ONE = [
+    "git push origin HEAD:site", "git push origin site", "git push -u origin site", "git push --set-upstream origin site",
+    "git push --force origin HEAD:site", "git push -f origin site", "git push --force-with-lease origin HEAD:site",
+    "git push --force-with-lease=site origin HEAD:site", "git push origin HEAD:refs/heads/site", "git push origin +HEAD:site",
+    "git push origin HEAD:gh-pages", 'git push origin "HEAD:site"', "git push origin 'site'", "git push origin HEAD:$BRANCH",
+    "git push origin HEAD:${{ inputs.branch }}", "git push origin HEAD:$(cat branch.txt)", "git push origin `cat branch.txt`",
+    "git push $REMOTE", "git push origin \\\n  HEAD:site", "git push --all origin", "git push --mirror origin",
+    "git -C out push origin site", "git push origin main site", "git push https://example.org/r.git HEAD:site",
+    "git push origin HEAD:refs/heads/docs-site", "git push -o ci.skip origin site", "git push origin HEAD:main && git push origin HEAD:site",
+]
+PUSH_TIER_TWO = [
+    "git push", "git push origin", "git push origin HEAD", "git push origin main", "git push origin master", "git push origin HEAD:main",
+    "git push origin HEAD:refs/heads/main", "git push -u origin main", "git push --force-with-lease origin main", "git push --tags",
+    "git push origin refs/tags/v1", "git push --follow-tags origin main", "git push origin HEAD:master", "git push -u origin HEAD",
+    "git push origin \\\n  main", "git push && echo done",
+]
+
+
+@pytest.mark.parametrize("command", PUSH_TIER_ONE)
+def test_an_explicit_branch_push_is_tier_one(command):
+    assert 1 in tiers(command), site.text_publish_evidence(command, "x")
+
+
+@pytest.mark.parametrize("command", PUSH_TIER_TWO)
+def test_a_push_to_the_default_branch_or_with_no_refspec_is_tier_two(command):
+    found = site.text_publish_evidence(command, "x")
+    assert tiers(command) == {2}, found
+
+
+def test_other_text_that_mentions_push_is_no_evidence():
+    for text in ("git pull --rebase", "echo 'do not git push here'", "git status", "pre-push hook", "# git push origin site\ngit status\n"):
+        assert 2 not in tiers(text) or "echo" in text or text.startswith("#"), text
+    assert tiers("git commit -m 'git push'") <= {2}
+
+
+TARGET_TIER_ONE = [
+    "rsync -av docs/ user@host:/var/www/", "rsync -av out/ host:/site", "rsync -a docs rsync://h/module/", "scp -r docs host:/var/www",
+    "aws s3 sync docs s3://bucket", "aws s3 cp x s3://b/x", "gsutil rsync -r docs gs://b", "netlify deploy --dir docs", "npx netlify deploy --prod",
+    "firebase deploy --only hosting", "surge docs example.surge.sh", "npx surge ./docs", "vercel --prod", "vercel deploy docs",
+    "wrangler pages deploy docs", "ghp-import -n -p docs", "rsync -av docs/ $DEST", "aws s3 sync docs $BUCKET",
+]
+TARGET_TIER_TWO = ["rsync -av out/ docs/", "scp a b", "aws s3 ls", "netlify status", "rsync --version"]
+
+
+@pytest.mark.parametrize("command", TARGET_TIER_ONE)
+def test_a_command_that_names_a_remote_publish_target_is_tier_one(command):
+    assert 1 in tiers(command), site.text_publish_evidence(command, "x")
+
+
+@pytest.mark.parametrize("command", TARGET_TIER_TWO)
+def test_a_publish_style_command_without_a_remote_target_is_tier_two(command):
+    assert tiers(command) == {2}, site.text_publish_evidence(command, "x")
+
+
+def test_r_system2_git_push_is_fail_closed_tier_one():
+    assert 1 in tiers('system2("git", c("push", "origin", "HEAD:site"))')
+
+
+PUSH_FORMS = [
+    pytest.param("      - run: git push origin HEAD:site\n", id="run-line"),
+    pytest.param('      - run: "git push origin HEAD:site"\n', id="quoted-run"),
+    pytest.param("      - run: |\n          git add -A\n          git push \\\n            origin HEAD:site\n", id="block-with-continuation"),
+    pytest.param("      - run: bash -c \"git push origin HEAD:site\"\n", id="bash-c"),
+    pytest.param("      - env:\n          BRANCH: site\n        run: git push origin HEAD:$BRANCH\n", id="env-variable"),
+    pytest.param("      - run: git push origin HEAD:${{ inputs.branch }}\n", id="expression"),
+    pytest.param("      - run: git push origin HEAD:$(cat branch.txt)\n", id="command-substitution"),
+]
+
+
+@pytest.mark.parametrize("step", PUSH_FORMS)
+@pytest.mark.parametrize("tracked", [False, True], ids=["destination-untracked", "destination-tracked"])
+def test_an_explicit_branch_push_in_a_workflow_makes_it_strict_whatever_the_destination(tmp_path, step, tracked):
+    b = WORKFLOW_HEAD + "permissions:\n  contents: write\njobs:\n  qc:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n" + step + "      - run: Rscript scripts/site.R\n"
+    r = pair(tmp_path, b, tracked=tracked)
+    assert reached(r, "script reference unsupported", "dynamic") and any("may publish: tier 1" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_the_codex_fixture_a_push_to_a_site_branch_with_an_untracked_docs_and_a_dynamic_source_is_incomplete(tmp_path):
+    qc = workflow_b(top="permissions:\n  contents: write\n", cmd="git push origin HEAD:site\n      - run: Rscript scripts/site.R")
+    r = pair(tmp_path, qc, tracked=False)
+    assert reached(r, "script reference unsupported", "dynamic") and any("tier 1" in x and "git push origin HEAD:site" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_the_same_fixture_with_a_plain_git_push_and_an_untracked_docs_stays_complete(tmp_path):
+    qc = workflow_b(top="permissions:\n  contents: write\n", cmd="git push\n      - run: Rscript scripts/site.R")
+    assert pair(tmp_path, qc, tracked=False)["state"] == "complete"
+
+
+def test_an_explicit_branch_push_inside_a_reached_script_is_tier_one(tmp_path):
+    script = "system('git push origin HEAD:site')\n" + DYNAMIC_SITE_R
+    r = pair(tmp_path, workflow_b(top="permissions: read-all\n"), files={"scripts/site.R": script})
+    assert reached(r, "script reference unsupported", "dynamic") and any("may publish: tier 1" in x and "scripts/site.R" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_push_inside_a_local_composite_action_is_classified_like_one_in_a_workflow(tmp_path):
+    action = "runs:\n  using: composite\n  steps:\n    - run: git push origin HEAD:site\n      shell: bash\n"
+    b = workflow_b(top="permissions: read-all\n", steps="      - uses: ./.github/actions/ship\n")
+    r = pair(tmp_path, b, files={".github/actions/ship/action.yml": action})
+    assert reached(r, "script reference unsupported", "dynamic") and any("may publish: tier 1" in x for x in r["reasons"]), r["reasons"]
+
+
+# --- a destination named in a build call is an additional destination for the tracked check ---------------
+BUILD_CALLS = [
+    pytest.param("pkgdown::build_site(override = list(destination = \"public\"))\n", id="override-double-quoted"),
+    pytest.param("pkgdown::build_site(override = list(destination = 'public'))\n", id="override-single-quoted"),
+    pytest.param("pkgdown::build_site_github_pages(dest_dir = \"public\")\n", id="github-pages-dest-dir"),
+    pytest.param("pkgdown::build_reference(override = list(destination = \"./public/\"))\n", id="build-reference-dot-slash"),
+    pytest.param("system(\"Rscript -e 'pkgdown::build_site()' --destination public\")\n", id="cli-flag"),
+    pytest.param("cat('destination: public\\n', file = '_pkgdown.yml', append = TRUE)\npkgdown::build_site()\n", id="config-written-by-the-script"),
+]
+
+
+@pytest.mark.parametrize("call", BUILD_CALLS)
+def test_a_build_destination_that_is_tracked_makes_a_tier_two_workflow_capable(tmp_path, call):
+    qc = workflow_b(top="permissions:\n  contents: write\n")
+    script = call + DYNAMIC_SITE_R
+    r = pair(tmp_path, qc, files={"scripts/site.R": script, "public/index.html": "<html></html>"})
+    assert reached(r, "script reference unsupported", "dynamic") and any("tier 2" in x and "destination public/ is tracked" in x for x in r["reasons"]), r["reasons"]
+
+
+@pytest.mark.parametrize("call", BUILD_CALLS)
+def test_a_build_destination_that_is_not_tracked_leaves_the_workflow_relaxed(tmp_path, call):
+    qc = workflow_b(top="permissions:\n  contents: write\n")
+    assert pair(tmp_path, qc, files={"scripts/site.R": call + DYNAMIC_SITE_R})["state"] == "complete"
+
+
+def test_a_build_destination_equal_to_the_config_destination_adds_nothing(tmp_path):
+    qc = workflow_b(top="permissions:\n  contents: write\n")
+    script = "pkgdown::build_site(override = list(destination = \"docs\"))\n" + DYNAMIC_SITE_R
+    assert pair(tmp_path, qc, files={"scripts/site.R": script})["state"] == "complete"
+
+
+@pytest.mark.parametrize("argument", ["out_dir", "file.path(root, 'site')", "Sys.getenv('OUT')", "\"$OUT\""])
+def test_a_build_destination_that_is_not_a_literal_fails_closed(tmp_path, argument):
+    qc = workflow_b(top="permissions:\n  contents: write\n")
+    script = f"pkgdown::build_site(override = list(destination = {argument}))\n" + DYNAMIC_SITE_R
+    r = pair(tmp_path, qc, files={"scripts/site.R": script})
+    assert reached(r, "script reference unsupported", "dynamic"), r["reasons"]
+
+
+def test_a_destination_argument_in_text_that_has_nothing_to_do_with_pkgdown_is_ignored(tmp_path):
+    qc = workflow_b(top="permissions:\n  contents: write\n")
+    script = "file.copy(from = 'a', destination = 'public')\n" + DYNAMIC_SITE_R
+    assert pair(tmp_path, qc, files={"scripts/site.R": script, "public/index.html": "x"})["state"] == "complete"
+
+
+# --- reusable workflows share capability with their caller ---------------------------------------------------
+CALLEE = ".github/workflows/build.yml"
+CALLEE_BODY = "on: workflow_call\npermissions: read-all\njobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - run: Rscript scripts/site.R\n"
+
+
+def caller(job_uses="./.github/workflows/build.yml", top="", extra_job=""):
+    return (WORKFLOW_HEAD + top + "jobs:\n  call:\n" + extra_job + f"    uses: {job_uses}\n" +
+            "  qc:\n    runs-on: ubuntu-latest\n    steps:\n      - run: Rscript scripts/site.R\n")
+
+
+def test_a_callee_with_no_signal_inherits_the_callers_job_permissions(tmp_path):
+    b = caller(top="permissions: read-all\n", extra_job="    permissions:\n      pages: write\n")
+    r = pair(tmp_path, b, files={CALLEE: CALLEE_BODY})
+    assert reached(r, "script reference unsupported", "dynamic") and any("may publish: tier 1" in x for x in r["reasons"]), r["reasons"]
+    assert any("reusable workflow job unsupported" in x for x in r["reasons"])
+
+
+def test_a_caller_with_no_signal_inherits_the_callees_capability(tmp_path):
+    callee = "on: workflow_call\npermissions:\n  pages: write\njobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo harmless\n"
+    b = caller(top="permissions: read-all\n")
+    r = pair(tmp_path, b, files={CALLEE: callee})
+    # only the caller's sibling job runs the dynamic script; the callee's capability makes the whole caller strict
+    assert reached(r, "script reference unsupported", "dynamic") and any("may publish: tier 1" in x and ".github/workflows/qc.yaml" in x for x in r["reasons"]), r["reasons"]
+
+
+@pytest.mark.parametrize("uses,why", [
+    ("./.github/workflows/gone.yml", "missing"),
+    ("octo/repo/.github/workflows/build.yml@v1", "other repository"),
+    ("./.github/workflows/${{ inputs.which }}.yml", "dynamic"),
+    ("./.github/workflows/../../outside.yml", "outside"),
+])
+def test_an_unresolvable_callee_counts_as_capable(tmp_path, uses, why):
+    r = pair(tmp_path, caller(job_uses=uses, top="permissions: read-all\n"))
+    assert any("may publish: tier 1" in x and "reusable workflow" in x and ".github/workflows/qc.yaml" in x for x in r["reasons"]), (why, r["reasons"])
+
+
+def test_a_workflow_call_cycle_terminates_and_is_incomplete(tmp_path):
+    a = ".github/workflows/a.yml"
+    b_ = ".github/workflows/b.yml"
+    files = {a: "on: workflow_call\npermissions: read-all\njobs:\n  x:\n    uses: ./.github/workflows/b.yml\n",
+             b_: "on: workflow_call\npermissions:\n  pages: write\njobs:\n  y:\n    uses: ./.github/workflows/a.yml\n"}
+    r = pair(tmp_path, workflow_b(top="permissions: read-all\n"), files=files)
+    assert r["state"] == "incomplete"
+
+
+def test_a_clean_callee_called_from_a_read_only_caller_adds_no_capability_of_its_own(tmp_path):
+    b = caller(top="permissions: read-all\n")
+    r = pair(tmp_path, b, files={CALLEE: CALLEE_BODY})
+    assert not any("may publish" in x for x in r["reasons"]), r["reasons"]
+    assert any("reusable workflow job unsupported" in x for x in r["reasons"])
+
+
+# --- a placeholder-only directory is not a tracked destination -------------------------------------------------
+def qc_with_tier_two():
+    return workflow_b(top="permissions:\n  contents: write\n")
+
+
+@pytest.mark.parametrize("files,expected", [
+    ({"docs/.gitkeep": ""}, "complete"),
+    ({"docs/.keep": ""}, "complete"),
+    ({"docs/.gitignore": "*\n"}, "complete"),
+    ({"docs/.gitattributes": "* -diff\n"}, "complete"),
+    ({"docs/.gitkeep": "", "docs/.gitignore": "*\n"}, "complete"),
+    ({"docs/sub/.gitkeep": ""}, "complete"),
+    ({"docs/a/b/.gitkeep": "", "docs/c/.gitignore": "x"}, "complete"),
+    ({"docs/.gitkeep": "", "docs/index.html": "x"}, "incomplete"),
+    ({"docs/.nojekyll": ""}, "incomplete"),
+    ({"docs/.gitkeep": "", "docs/sub/page.html": "x"}, "incomplete"),
+    ({"docs/.GitKeep": ""}, "incomplete"),              # git paths are case-sensitive: .GitKeep is not the placeholder name
+    ({"Docs/index.html": "x"}, "complete"),             # and Docs/ is not docs/
+    ({"docs": "a file named docs"}, "incomplete"),      # the destination path itself is a tracked entry
+    ({"docs/CNAME": "example.org"}, "incomplete"),
+], ids=["gitkeep", "keep", "gitignore", "gitattributes", "two-placeholders", "nested-placeholder", "nested-placeholders", "gitkeep-plus-page",
+        "nojekyll", "gitkeep-plus-nested-page", "case-sensitive-gitkeep", "case-sensitive-directory", "destination-is-a-file", "cname"])
+def test_placeholder_only_entries_do_not_make_the_destination_tracked(tmp_path, files, expected):
+    r = pair(tmp_path, qc_with_tier_two(), files=files)
+    assert r["state"] == expected, r["reasons"]
+
+
+def test_a_submodule_at_the_destination_counts_as_tracked(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: SITE_A, QC_WORKFLOW: qc_with_tier_two(), "scripts/site.R": DYNAMIC_SITE_R})
+        git(pkg, "update-index", "--add", "--cacheinfo", "160000," + "a" * 40 + ",docs")
+        git(pkg, "commit", "-m", "submodule at docs")
+        publish(web, "", root, ROUTES)
+        r = site.audit(pkg, url=root, ref="main")
+    assert reached(r, "script reference unsupported", "dynamic") and any("destination docs/ is tracked" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_gitlink_inside_the_destination_counts_as_tracked(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: SITE_A, QC_WORKFLOW: qc_with_tier_two(), "scripts/site.R": DYNAMIC_SITE_R, "docs/.gitkeep": ""})
+        git(pkg, "update-index", "--add", "--cacheinfo", "160000," + "b" * 40 + ",docs/vendor")
+        git(pkg, "commit", "-m", "gitlink below docs")
+        publish(web, "", root, ROUTES)
+        assert reached(site.audit(pkg, url=root, ref="main"), "script reference unsupported", "dynamic")
+
+
+@pytest.mark.parametrize("config", ["destination: ../x\n", "destination: /abs\n", "destination: $OUT\n"], ids=["dotdot", "absolute", "dynamic"])
+def test_a_destination_outside_the_package_or_dynamic_stays_tracked_even_with_only_placeholders(tmp_path, config):
+    r = pair(tmp_path, qc_with_tier_two(), files={"docs/.gitkeep": ""}, config=CONFIG + config)
+    assert reached(r, "script reference unsupported", "dynamic"), r["reasons"]
+
+
+def test_the_medfit_qc_shape_with_a_gitkeep_only_docs_stays_complete(tmp_path):
+    qc = workflow_b(top="permissions:\n  contents: write\n  issues: write\n", cmd="Rscript scripts/site.R\n      - run: |\n          git add reports\n          git commit -m report\n          git push")
+    assert pair(tmp_path, qc, files={"docs/.gitkeep": ""})["state"] == "complete"
+
+
+# --- the opt-out key: `docs.site.nonpublishing-branches` in the pinned `.rforge.yaml` -------------------------------
+# medfit's qc-monthly workflow pushes a CSV history to `qc-results`. The classifier cannot tell that from a site branch,
+# so a repository declares it. A declared branch is tier two (counts only when the destination is tracked), never tier one.
+KEY = "docs:\n  site:\n    nonpublishing-branches:\n      - qc-results\n"
+
+
+def qc_push(branch_spec="origin qc-results"):
+    return workflow_b(top="permissions:\n  contents: write\n", cmd=f"git push {branch_spec}\n      - run: Rscript scripts/site.R")
+
+
+def test_a_push_to_an_undeclared_explicit_branch_is_tier_one_without_the_key(tmp_path):
+    r = pair(tmp_path, qc_push())
+    assert reached(r, "script reference unsupported", "dynamic") and any("tier 1" in x for x in r["reasons"]), r["reasons"]
+
+
+@pytest.mark.parametrize("spec", ["origin qc-results", "origin HEAD:qc-results", "origin HEAD:refs/heads/qc-results", "-u origin qc-results",
+                                  "--force-with-lease origin +HEAD:qc-results", "origin 'qc-results'", "origin \"HEAD:qc-results\""])
+def test_a_declared_branch_is_tier_two_so_an_untracked_destination_leaves_the_workflow_relaxed(tmp_path, spec):
+    assert pair(tmp_path, qc_push(spec), files={".rforge.yaml": KEY})["state"] == "complete"
+
+
+def test_a_declared_branch_still_counts_when_the_destination_is_tracked(tmp_path):
+    r = pair(tmp_path, qc_push(), files={".rforge.yaml": KEY}, tracked=True)
+    assert reached(r, "script reference unsupported", "dynamic") and any("tier 2" in x and "destination docs/ is tracked" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_the_key_exempts_only_the_branches_it_names(tmp_path):
+    for n, spec in enumerate(["origin site", "origin HEAD:gh-pages", "origin qc-results site", "origin HEAD:qc-results-2", "origin HEAD:$BRANCH", "--all origin"]):
+        r = pair(fresh(tmp_path, n), qc_push(spec), files={".rforge.yaml": KEY})
+        assert reached(r, "script reference unsupported", "dynamic") and any("tier 1" in x for x in r["reasons"]), (spec, r["reasons"])
+
+
+def test_a_listed_gh_pages_is_still_tier_one_through_the_deploy_text_signal(tmp_path):
+    key = "docs:\n  site:\n    nonpublishing-branches: [gh-pages]\n"
+    r = pair(tmp_path, qc_push("origin gh-pages"), files={".rforge.yaml": key})
+    assert reached(r, "script reference unsupported", "dynamic")
+
+
+@pytest.mark.parametrize("key", [
+    "docs:\n  site:\n    nonpublishing-branches: qc-results\n",                  # a string, not a list
+    "docs:\n  site:\n    nonpublishing-branches: [\"*\"]\n",                       # a glob
+    "docs:\n  site:\n    nonpublishing-branches: ['$BRANCH']\n",                  # not a literal
+    "docs:\n  site:\n    nonpublishing-branches: [{a: b}]\n",                      # not a string
+    "docs:\n  site:\n    nonpublishing-branches: [1]\n",
+    "docs:\n  site: [qc-results]\n",
+    "docs: [site]\n",
+    "docs:\n  site:\n    nonpublishing-branches: [unclosed\n",                    # unparseable
+    "docs:\n  site:\n    nonpublishing_branches: [qc-results]\n",                  # a different spelling is a different key
+], ids=["string", "glob", "variable", "mapping", "number", "site-list", "docs-list", "unparseable", "underscore"])
+def test_a_malformed_key_exempts_nothing(tmp_path, key):
+    r = pair(tmp_path, qc_push(), files={".rforge.yaml": key})
+    assert reached(r, "script reference unsupported", "dynamic") and any("tier 1" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_malformed_entry_does_not_spoil_the_valid_ones(tmp_path):
+    key = "docs:\n  site:\n    nonpublishing-branches: ['*', qc-results, 3]\n"
+    assert pair(tmp_path, qc_push(), files={".rforge.yaml": key})["state"] == "complete"
+
+
+def test_the_key_is_read_at_the_pinned_ref_not_the_working_tree(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: SITE_A, QC_WORKFLOW: qc_push(), "scripts/site.R": DYNAMIC_SITE_R})
+        (pkg / ".rforge.yaml").write_text(KEY)                    # uncommitted
+        publish(web, "", root, ROUTES)
+        assert site.audit(pkg, url=root, ref="main")["state"] == "incomplete"
+
+
+def test_a_key_committed_after_the_pinned_ref_is_not_honored(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: SITE_A, QC_WORKFLOW: qc_push(), "scripts/site.R": DYNAMIC_SITE_R})
+        git(pkg, "branch", "pinned")
+        commit(pkg, {".rforge.yaml": KEY}, message="declare after the pin")
+        publish(web, "", root, ROUTES)
+        assert site.audit(pkg, url=root, ref="pinned")["state"] == "incomplete"
+
+
+def test_a_monorepo_reads_the_package_key_and_the_repository_root_key(tmp_path):
+    def run(base, files):
+        repo = tmp_path / (base + "-repo"); pkg = repo / "packages" / "ours"
+        pkg.mkdir(parents=True)
+        commit(repo, {"packages/ours/DESCRIPTION": DESC.format(version="1.0.0"), "packages/ours/man/internal.Rd": "x", "packages/ours/_pkgdown.yml": CONFIG,
+                      ".github/workflows/qc.yaml": workflow_b(top="permissions:\n  contents: write\n", cmd="git push origin qc-results\n      - run: Rscript packages/ours/s.R"),
+                      "packages/ours/s.R": DYNAMIC_SITE_R, **files}, init=True)
+        web = tmp_path / base
+        with server(web) as root:
+            publish(web, "", root, ROUTES)
+            return site.audit(pkg, url=root, ref="main")["state"]
+    assert run("none", {}) == "incomplete"
+    assert run("pkgkey", {"packages/ours/.rforge.yaml": KEY}) == "complete"
+    assert run("rootkey", {".rforge.yaml": KEY}) == "complete"
+    assert run("other", {"packages/other/.rforge.yaml": KEY}) == "incomplete"
+
+
+def test_the_exemption_applies_to_a_push_inside_a_reached_script_and_a_local_action(tmp_path):
+    script = "system('git push origin qc-results')\n" + DYNAMIC_SITE_R
+    assert pair(tmp_path, workflow_b(top="permissions:\n  contents: write\n"), files={"scripts/site.R": script, ".rforge.yaml": KEY})["state"] == "complete"
+    action = "runs:\n  using: composite\n  steps:\n    - run: git push origin qc-results\n      shell: bash\n"
+    b = workflow_b(top="permissions:\n  contents: write\n", steps="      - uses: ./.github/actions/ship\n")
+    assert pair(fresh(tmp_path, "a"), b, files={".github/actions/ship/action.yml": action, ".rforge.yaml": KEY})["state"] == "complete"
+    r = pair(fresh(tmp_path, "b"), b, files={".github/actions/ship/action.yml": action})
+    assert reached(r, "script reference unsupported", "dynamic")
+
+
+def test_the_exempt_parameter_changes_only_the_classification_of_the_named_branch():
+    assert {t for t, _ in site.text_publish_evidence("git push origin qc-results", "x")} == {1}
+    assert {t for t, _ in site.text_publish_evidence("git push origin qc-results", "x", exempt=("qc-results",))} == {2}
+    assert {t for t, _ in site.text_publish_evidence("git push origin site", "x", exempt=("qc-results",))} == {1}
+    labels = [label for _, label in site.text_publish_evidence("git push origin qc-results", "x", exempt=("qc-results",))]
+    assert any("declared non-publishing branch qc-results" in label for label in labels)

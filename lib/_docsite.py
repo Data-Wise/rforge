@@ -574,6 +574,7 @@ class ScriptScan:
     def __init__(self, root, sha, files, modes, pkgdown_repo):
         self.root, self.sha, self.files, self.modes, self.pkgdown_repo = root, sha, files, modes, pkgdown_repo
         self.seen, self.reasons, self.strict, self.evidence, self.context = set(), [], True, [], None
+        self.destinations, self.exempt = [], ()
 
     def fail(self, why, ref):
         if self.pkgdown_repo and self.strict:
@@ -582,7 +583,8 @@ class ScriptScan:
 
     def observe(self, text, data, where):
         """Record `(tier, label)` publish evidence from a reached script or local action (for the workflow that reaches it)."""
-        self.evidence.extend(text_publish_evidence(source_text(text, data), where))
+        self.evidence.extend(text_publish_evidence(source_text(text, data), where, self.exempt))
+        self.destinations.extend(build_destinations(source_text(text, data)))
         steps = ((data or {}).get("runs") or {}).get("steps") if isinstance(data, dict) else None
         for step in steps if isinstance(steps, list) else []:
             self.evidence.extend((tier, f"{label} in {where}") for tier, label in step_publish_evidence(step))
@@ -783,7 +785,15 @@ PAGES_ACTIONS = ("jamesives/github-pages-deploy-action", "peaceiris/actions-gh-p
 PUSH_ACTIONS = ("ad-m/github-push-action", "stefanzweifel/git-auto-commit-action", "endbug/add-and-commit",
                 "r-lib/actions/pr-push", "actions-js/push")
 TIER1_TEXT = re.compile(r"deploy_to_branch|gh[-_]pages", re.I)                       # publishes the site by itself
-TIER2_TEXT = re.compile(r"\bgit\s+push\b|\brsync\b|\baws\s+s3\b|\bnetlify\b|\bsurge\b|\bscp\b", re.I)   # publishes only if the destination is tracked
+DEFAULT_BRANCHES = ("HEAD", "main", "master")        # a push here is tier two; any other literal branch is tier one
+PLACEHOLDER_FILES = (".gitkeep", ".keep", ".gitignore", ".gitattributes")   # a directory holding only these is not tracked content
+DYNAMIC_TOKEN = re.compile(r"[$`]|\{\{|<\(")        # variable, command substitution or expression: the value cannot be known
+COMMAND_START = re.compile(r"(?<![\w./@=-])(git|rsync|scp|aws|gsutil|netlify|firebase|surge|vercel|wrangler|ghp-import)(?=\s)")
+R_GIT_PUSH = re.compile(r"""\bsystem2?\s*\(\s*["']git["'][^)]*["']push["']""")
+BUILD_MENTION = re.compile(r"pkgdown|build_site", re.I)
+NON_LITERAL = object()
+DESTINATION_ARGUMENT = re.compile(
+    r"""(?:\b(?:destination|dest_dir)\s*(=)|\bdestination\s*(:)|(--destination)(?:=|\s+))\s*(?:"([^"]*)"|'([^']*)'|([^\s,)\]}"'\\]*))""")
 NO_PERMISSIONS = object()
 
 
@@ -822,44 +832,198 @@ def step_publish_evidence(step):
     return evidence
 
 
-def text_publish_evidence(text, where):
+def logical_line(text, start):
+    """The text from `start` to the end of its logical line, so `\\<newline>` continues the command."""
+    end = start
+    while True:
+        newline = text.find("\n", end)
+        if newline < 0:
+            return text[start:]
+        if newline > 0 and text[newline - 1] == "\\":
+            end = newline + 1
+            continue
+        return text[start:newline]
+
+
+def push_tier(args, exempt=()):
+    """`(tier, why)` for the arguments after `git push`.
+
+    An explicit branch is tier one: any literal destination branch other than `HEAD`, `main` or `master` (the default
+    branch is decided by name only, not by asking the repository), in any of `<remote> <branch>`, `<src>:<branch>`,
+    `refs/heads/<branch>`, with `-u`/`--set-upstream`, `-f`/`--force`/`--force-with-lease` and a leading `+`. A dynamic
+    remote or refspec, `--all` and `--mirror` fail closed to tier one. No refspec, a remote alone, a default branch name
+    or a tag is tier two, which counts only when the pinned tree tracks the pkgdown destination. A branch the repository
+    declares in `docs.site.nonpublishing-branches` (`exempt`) is also tier two: a literal name, matched exactly.
+    """
+    positional, mirror, i = [], False, 0
+    while i < len(args):
+        arg = args[i]
+        if arg in ("--all", "--mirror"):
+            mirror = True
+        elif arg in ("-o", "--push-option", "--repo", "--receive-pack", "--exec"):
+            i += 1
+        elif arg == "--":
+            positional.extend(args[i + 1:])
+            break
+        elif not (arg.startswith("-") and len(arg) > 1):
+            positional.append(arg)
+        i += 1
+    if mirror:
+        return 1, "pushes every branch"
+    if any(DYNAMIC_TOKEN.search(arg) for arg in positional):
+        return 1, "a dynamic remote or refspec"
+    declared = None
+    for spec in positional[1:]:
+        spec = spec.lstrip("+")
+        destination = spec.rsplit(":", 1)[-1]
+        destination = destination[len("refs/heads/"):] if destination.startswith("refs/heads/") else destination
+        if destination.startswith(("refs/tags/", "tags/")) or destination in DEFAULT_BRANCHES:
+            continue
+        if destination in exempt:
+            declared = destination
+            continue
+        return 1, f"explicit branch {destination or spec}"
+    return 2, f"declared non-publishing branch {declared}" if declared else "the default branch or no refspec"
+
+
+def target_tier(program, args, exempt=()):
+    """`(tier, why)` or None for a publish-style command. A remote target (`host:path`, `s3://`, `gs://`, a deploy
+    subcommand, a dynamic target) is tier one; the same program with no remote target is tier two."""
+    positional = [a for a in args if not a.startswith("-")]
+    dynamic = any(DYNAMIC_TOKEN.search(a) for a in positional)
+    if program == "git":
+        i = 0
+        while i < len(args) and args[i].startswith("-"):
+            i += 2 if args[i] in ("-C", "-c", "--git-dir", "--work-tree", "--namespace") else 1
+        return push_tier(args[i + 1:], exempt) if args[i:i + 1] == ["push"] else None
+    if program in ("rsync", "scp"):
+        remote = dynamic or any("@" in a or re.match(r"[^/\s]+:", a) or a.startswith("rsync://") for a in positional)
+        return (1, "a remote target") if remote else (2, "a local copy")
+    if program == "aws":
+        if args[:1] != ["s3"]:
+            return None
+        remote = dynamic or any(a.startswith("s3://") for a in positional)
+        return (1, "an s3 target") if remote and positional[1:2] and positional[1] in ("sync", "cp", "mv") else (2, "aws s3")
+    if program == "gsutil":
+        return (1, "a gs target") if dynamic or any(a.startswith("gs://") for a in positional) else None
+    if program == "netlify":
+        return (1, "deploy") if "deploy" in args else (2, "netlify")
+    if program == "firebase":
+        return (1, "deploy") if "deploy" in args else None
+    if program == "surge":
+        return (1, "surge") if any(a.startswith("-") or "/" in a or "." in a for a in args) else None
+    if program == "vercel":
+        return None if args[:1] in (["--version"], ["-v"], ["whoami"], ["login"], ["logout"]) else (1, "vercel")
+    if program == "wrangler":
+        return (1, "pages deploy") if args[:1] == ["pages"] else None
+    return (1, "ghp-import") if program == "ghp-import" else None
+
+
+def text_publish_evidence(text, where, exempt=()):
+    """`(tier, label)` evidence from run text, a script, or any YAML string.
+
+    Tier one: `deploy_to_branch`/`gh-pages` text; an explicit-branch `git push`; a command that names a remote publish
+    target (`rsync`/`scp` to a host, `aws s3 sync|cp|mv` to `s3://`, `gsutil` to `gs://`, `netlify|firebase deploy`, `surge`,
+    `vercel`, `wrangler pages`, `ghp-import`); R `system2("git", c("push", ...))`, whose refspec is not parsed. Tier two:
+    a push with no refspec or to the default branch, and the same programs with no remote target. Commands are parsed with
+    the quote-aware tokenizer, so quoting, continuation lines and `env`-style variables are handled; a command that cannot
+    be read as a literal fails closed to tier one.
+    """
     found = []
-    for tier, pattern in ((1, TIER1_TEXT), (2, TIER2_TEXT)):
-        match = pattern.search(text)
-        if match:
-            found.append((tier, f"publish signal in {where}: {match.group(0)}"))
+    match = TIER1_TEXT.search(text)
+    if match:
+        found.append((1, f"publish signal in {where}: {match.group(0)}"))
+    for match in COMMAND_START.finditer(text):
+        commands = shell_commands(logical_line(text, match.start()))
+        tokens = [t.rstrip("\"')],}") for t in commands[0]] if commands else []
+        verdict = target_tier(match.group(1), tokens[1:], exempt) if tokens else None
+        if verdict:
+            tier, why = verdict
+            kind = "explicit-branch push" if match.group(1) == "git" and tier == 1 else "publish command"
+            shown = " ".join(tokens)[:70]
+            found.append((tier, f"{kind} `{shown}` ({why}) in {where}"))
+    if R_GIT_PUSH.search(text):
+        found.append((1, f"R system2() git push with an unparsed refspec in {where}"))
+    return list(dict.fromkeys(found))
+
+
+def build_destinations(text):
+    """Destinations a pkgdown build names in `text`: `destination =`/`dest_dir =` in R, `destination:` in YAML text and
+    `--destination` on a command line. Only text that mentions pkgdown or build_site is read. A quoted value is a literal;
+    in R a bare value is an expression and any value with `(`, `$` or a brace cannot be known, so both are `NON_LITERAL`."""
+    if not BUILD_MENTION.search(text):
+        return []
+    found = []
+    for match in DESTINATION_ARGUMENT.finditer(text):
+        equals, colon, flag, double, single, bare = match.groups()
+        literal = double if double is not None else single
+        if literal is None:
+            literal = None if (equals or not bare or "(" in bare) else bare
+        found.append(NON_LITERAL if literal is None else literal)
     return found
 
 
-def destination_tracked(files, prefix, config):
-    """`(tracked, label)`: does the pinned tree track a file under the package's pkgdown destination directory?
+def tracked_directory(files, modes, directory):
+    """Does the tree hold real content under `directory`? Placeholder files (`PLACEHOLDER_FILES`, at any depth) do not
+    count; anything else does, including `.nojekyll`, a file or symlink named like the directory, and a gitlink
+    (submodule, mode 160000) at or below it. Paths are compared case-sensitively, as git does."""
+    for path in files:
+        if path == directory:
+            return True
+        if path.startswith(directory + "/"):
+            mode = modes.get(path, "100644")
+            if mode == "160000" or mode not in ("100644", "100755") or posixpath.basename(path) not in PLACEHOLDER_FILES:
+                return True
+    return False
 
-    The destination is the config's `destination:` (default `docs`), under the package directory `prefix`. Read from the
-    pinned tree, never the working tree. A destination that is not a plain relative path inside the package (a
-    variable, a list, `..`, absolute, empty, `.`) or an unreadable config counts as tracked: fail closed.
+
+def destination_tracked(files, prefix, config, modes=None, extra=()):
+    """`(tracked, label)`: does the pinned tree track real content under a pkgdown destination directory?
+
+    The destinations are the config's `destination:` (default `docs`) plus `extra` (named in a build call, see
+    `build_destinations`), each under the package directory `prefix`; tracked if any is. Read from the pinned tree, never
+    the working tree. A destination that is not a plain relative path inside the package (a variable, a list, `..`,
+    absolute, empty, `.`, a non-literal build argument) or an unreadable config counts as tracked: fail closed.
     """
-    destination = "docs" if config is None or "destination" not in config else config["destination"]
     if config is False:
         return True, "an unreadable config (assumed tracked)"
-    if (not isinstance(destination, str) or DYNAMIC_PATH.search(destination) or destination.startswith(("/", "~"))
-            or posixpath.normpath(destination) in ("", ".", "..") or posixpath.normpath(destination).startswith("../")):
-        return True, f"destination {destination!r} cannot be resolved (assumed tracked)"
-    directory = posixpath.normpath(prefix + destination)
-    return any(path.startswith(directory + "/") for path in files), f"destination {posixpath.normpath(destination)}/"
+    first = "docs" if config is None or "destination" not in config else config["destination"]
+    label = None
+    for destination in [first, *extra]:
+        if (destination is NON_LITERAL or not isinstance(destination, str) or DYNAMIC_PATH.search(destination)
+                or destination.startswith(("/", "~")) or posixpath.normpath(destination) in ("", ".", "..")
+                or posixpath.normpath(destination).startswith("../")):
+            return True, f"destination {destination if destination is not NON_LITERAL else 'of a build call'!r} cannot be resolved (assumed tracked)"
+        directory = posixpath.normpath(prefix + destination)
+        label = label or f"destination {posixpath.normpath(destination)}/"
+        if tracked_directory(files, modes or {}, directory):
+            return True, f"destination {posixpath.normpath(destination)}/"
+    return False, label
 
 
-def workflow_may_publish(data, text, extra=(), tracked=True, destination="destination docs/"):
-    """The evidence that one workflow can publish, as `tier N: ...` strings; an empty list means it is relaxed.
+def nonpublishing_branches(root, sha, files, prefix):
+    """Branch names a repository declares as never carrying site files: `docs.site.nonpublishing-branches` in
+    `.rforge.yaml`, read at the pinned SHA from the package directory and the repository root (both count). Only a list
+    of literal names counts; a malformed key, an unparseable file, a glob or a non-string entry exempts nothing."""
+    names = []
+    for path in dict.fromkeys((prefix + ".rforge.yaml", ".rforge.yaml")):
+        if path not in files:
+            continue
+        try:
+            data = yaml_data(git(root, "show", sha + ":" + path))
+        except ValueError:
+            continue
+        node = data
+        for key in ("docs", "site", "nonpublishing-branches"):
+            node = node.get(key) if isinstance(node, dict) else None
+        for entry in node if isinstance(node, list) else []:
+            if isinstance(entry, str) and entry.strip() and not DYNAMIC_TOKEN.search(entry) and not re.search(r"[*?\[\]\s]", entry):
+                names.append(entry.strip())
+    return tuple(dict.fromkeys(names))
 
-    Default is strict. Tier 1 always counts: the word pkgdown; a Pages action in any step; `deploy_to_branch` or `gh-pages`
-    text; `pages`/`id-token` write or `write-all` permission; a checkout given a secret token or key. Tier 2 counts only
-    when the pinned tree tracks the pkgdown destination directory (`tracked`), because otherwise pushing to the default
-    branch cannot publish site files: plain `contents: write`; a push action; a job with no `permissions:` key at either
-    level (the default token scope is unknown); `git push`, `rsync`, `aws s3`, `netlify` text. `extra` holds the same
-    `(tier, label)` evidence found in the scripts and local actions the workflow reaches. YAML facts come from the parsed
-    structure, the text signals are tolerant text. Trigger events are not considered. A no-tier-1 workflow that pushes to
-    an untracked destination, and a script that pushes from a no-signal workflow, are not detected.
-    """
+
+def workflow_evidence(data, text, extra=(), exempt=()):
+    """Every `(tier, label)` fact that says one workflow can publish, before the tracked-destination filter."""
     data = data if isinstance(data, dict) else {}
     found = []
     if "pkgdown" in source_text(text, data).lower():
@@ -876,15 +1040,36 @@ def workflow_may_publish(data, text, extra=(), tracked=True, destination="destin
             found.append((2, f"no permissions: key for job {key} (default token scope unknown)"))
         for step in job.get("steps") if isinstance(job.get("steps"), list) else []:
             found += step_publish_evidence(step)
-    found += text_publish_evidence(source_text(text, data), "the workflow")
+    found += text_publish_evidence(source_text(text, data), "the workflow", exempt)
     found += list(extra)
+    return list(dict.fromkeys(found))
+
+
+def classify_evidence(found, tracked=True, destination="destination docs/"):
+    """`tier N: ...` strings: tier one always, tier two only when the destination is tracked."""
     labels = []
-    for tier, label in found:
+    for tier, label in sorted(found, key=lambda item: item[0]):    # tier one first: the reason names the strongest evidence
         if tier == 1:
             labels.append(f"tier 1: {label}")
         elif tracked:
             labels.append(f"tier 2: {label}; {destination} is tracked")
     return list(dict.fromkeys(labels))
+
+
+def workflow_may_publish(data, text, extra=(), tracked=True, destination="destination docs/"):
+    """The evidence that one workflow can publish, as `tier N: ...` strings; an empty list means it is relaxed.
+
+    Default is strict. Tier 1 always counts: the word pkgdown; a Pages or deploy action in any step; `deploy_to_branch` or
+    `gh-pages` text; `pages`/`id-token` write or `write-all` permission; a checkout given a secret token or key; an
+    explicit-branch `git push`; a command that names a remote publish target (see `text_publish_evidence`). Tier 2 counts
+    only when the pinned tree tracks a pkgdown destination directory (`tracked`), because otherwise pushing to the default
+    branch cannot publish site files: plain `contents: write`; a push action; a job with no `permissions:` key at either
+    level (the default token scope is unknown); a push with no refspec or to the default branch; a publish-style command
+    with no remote target. `extra` holds the same `(tier, label)` evidence found in the scripts and local actions the
+    workflow reaches. YAML facts come from the parsed structure, the text signals are tolerant text. Trigger events are not
+    considered. Not detected: a script that pushes from a workflow that shows no signal at all.
+    """
+    return classify_evidence(workflow_evidence(data, text, extra), tracked, destination)
 
 
 def local_action_reasons(root, sha, files, uses, seen, pkgdown_repo=True, scan=None):
@@ -968,10 +1153,13 @@ def workflow_blocks(root, sha, tree, prefix=""):
             config = yaml_data(git(root, "show", sha + ":" + config_path))
         except ValueError:
             config = False       # unreadable: the destination counts as tracked
-    tracked, destination = destination_tracked(files, prefix, config)
-    capable = {}
+    modes = tree if isinstance(tree, dict) else {}
+    exempt = nonpublishing_branches(root, sha, files, prefix)
+    scan.exempt = exempt
+    state = {}      # workflow path -> [evidence list, destinations list]; a reusable workflow shares both with its caller
     for path, text in texts.items():
-        probe = ScriptScan(root, sha, files, tree if isinstance(tree, dict) else {}, pkgdown_repo)
+        probe = ScriptScan(root, sha, files, modes, pkgdown_repo)
+        probe.exempt = exempt
         evidence = []
         if path in errors:
             evidence.append("workflow YAML unreadable (permissions unknown)")
@@ -985,7 +1173,41 @@ def workflow_blocks(root, sha, tree, prefix=""):
                             local_action_reasons(root, sha, files, step["uses"], set(), pkgdown_repo, probe)
             except ValueError:
                 evidence.append("workflow structure unreadable (permissions unknown)")
-        capable[path] = workflow_may_publish(parsed.get(path), text, [(2, e) for e in evidence] + probe.evidence, tracked, destination)
+        data = parsed.get(path)
+        state[path] = [workflow_evidence(data, text, [(2, e) for e in evidence] + probe.evidence, exempt),
+                       build_destinations(source_text(text, data)) + probe.destinations]
+    # Reusable workflows. A caller job `uses: ./.github/workflows/x.yml` runs the callee with the caller's token, so the
+    # callee gets the caller's permission evidence and the caller gets everything the callee can do. A callee that cannot
+    # be resolved (missing, outside the workflows directory, another repository, a dynamic path) is assumed capable. The
+    # exchange repeats until nothing changes, so a cycle terminates.
+    edges = []
+    for path in sorted(texts):
+        data = parsed.get(path)
+        for key, job in ((data or {}).get("jobs") or {}).items() if isinstance((data or {}).get("jobs"), dict) else []:
+            uses = job.get("uses") if isinstance(job, dict) else None
+            if not isinstance(uses, str):
+                continue
+            target = posixpath.normpath(uses[2:]) if uses.startswith("./") and not DYNAMIC_PATH.search(uses) else None
+            if target is not None and re.fullmatch(r"\.github/workflows/[^/]+\.ya?ml", target) and target in texts:
+                inherited = permission_evidence(data.get("permissions", NO_PERMISSIONS), f"caller {path}") + permission_evidence(
+                    job.get("permissions", NO_PERMISSIONS), f"caller {path} job {key}")
+                if "permissions" not in data and "permissions" not in job:
+                    inherited.append((2, f"no permissions: key in caller {path} (default token scope unknown)"))
+                edges.append((path, target, inherited))
+            else:
+                state[path][0].append((1, f"reusable workflow {uses} cannot be resolved (assumed capable)"))
+    for _ in range(len(texts) + 2):
+        before = [(list(v[0]), list(v[1])) for v in state.values()]
+        for caller_path, callee_path, inherited in edges:
+            state[callee_path][0] = list(dict.fromkeys(state[callee_path][0] + inherited))
+            state[caller_path][0] = list(dict.fromkeys(state[caller_path][0] + state[callee_path][0]))
+            state[caller_path][1] = state[caller_path][1] + [d for d in state[callee_path][1] if d not in state[caller_path][1]]
+        if before == [(list(v[0]), list(v[1])) for v in state.values()]:
+            break
+    capable = {}
+    for path in texts:
+        tracked, destination = destination_tracked(files, prefix, config, modes, state[path][1])
+        capable[path] = classify_evidence(state[path][0], tracked, destination)
     # Publish-capable workflows first, so a script both kinds reach is judged strictly; the visited set skips it afterwards.
     for path, text in sorted(texts.items(), key=lambda item: not capable[item[0]]):
         scan.strict, scan.context = bool(capable[path]), (path, capable[path])
