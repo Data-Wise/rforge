@@ -164,8 +164,11 @@ symlinks under `vignettes/`. An article is refused only for these front-matter k
 `output-file`, `output_ext`/`output-ext`, `output_dir`/`output-dir`, `knit`, `as_is`, a non-HTML Quarto
 `format`, a non-HTML `.Rmd` `output`, or `pkgdown: extension` other than `html`, in any key case with `-` and `_`
 interchangeable. YAML inputs are read as parsed structures (quoted or escaped keys, flow mappings and anchors count);
-R and shell code is matched as text (quoted or backticked `subdir`, `paste0()` splits of `PKGDOWN_DEV_MODE`). Other
-overrides, names built any other way, scripts a workflow merely runs and manual `git push`/`rsync` deploys are not detected.
+R and shell code is matched as text (quoted or backticked `subdir`, `paste0()` splits of `PKGDOWN_DEV_MODE`). Scripts a
+`run:` step executes (`Rscript`, `R -f`, `bash`, `python`, `source`, `./x`, `make`, R `source()`/`system()`) are read at the pinned
+ref, followed up to 5 levels and 40 files and scanned the same way; in a pkgdown repository an unreadable, missing, symlinked,
+dynamic or over-cap reference is incomplete. Other overrides, names built any other way, `uses:` actions from other repositories,
+manual deploys outside CI and `knit`/`render` of a document are not detected.
 A complete site stage proves route presence only: the stage carries `content_freshness: "unverified"`
 and a clean text report says `no findings; site content freshness unverified`.
 

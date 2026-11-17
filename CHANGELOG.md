@@ -83,6 +83,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   split across `paste0()` parts, a quoted or backticked `subdir` argument, an `as-is` or
   differently cased article key, and a workflow that only mentions `PkgDown` or uses
   `setup-pkgdown` are now caught. Names built any other way are still not detected.
+- `docs:check --site` follows the scripts a `run:` step executes (`Rscript`, `R -f`/`CMD BATCH`,
+  `bash`/`sh`, `python`, `source`, `./x`, `make`, R `source()`/`system()`), read at the pinned
+  ref up to five levels and 40 files, and applies the run-body detections to each, so
+  `run: Rscript scripts/deploy.R` with a `deploy_to_branch(subdir = )` call inside is no longer
+  `complete`. In a pkgdown repository a script reference that cannot be scanned (missing,
+  symlinked, outside the repository, absolute, dynamic, binary, oversized, over a cap) is
+  `incomplete` with "script reference unsupported", but only for workflows that name pkgdown
+  (or all workflows when none does); a clean readable script never blocks. A signal inside an
+  R comment still blocks. Scripts fetched at runtime, actions from other repositories and
+  manual deploys are not detected.
 - `docs:check --site` counts a sitemap entry only when it is a `loc` that is a direct child
   of a `url` in the sitemaps.org 0.9 namespace. A `loc` inside an image/video/xhtml
   extension element, nested elsewhere or outside a `url` no longer satisfies an expected

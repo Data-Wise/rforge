@@ -533,8 +533,10 @@ ref or a workflow names pkgdown), malformed workflows, directory-level `_metadat
 symlinks under `vignettes/`. An article is refused only for the front-matter keys `output_file`/`output-file`,
 `output_ext`/`output-ext`, `output_dir`/`output-dir`, `knit`, `as_is`, a non-HTML `format`/`output` or
 `pkgdown: extension`, in any key case with `-` and `_` interchangeable; YAML is read as parsed structures and R/shell
-code as tolerant text; other overrides, names built any other way, scripts a workflow merely runs and manual
-`git push`/`rsync` deploys are not detected. A complete site stage proves route presence, not
+code as tolerant text; scripts a `run:` step executes are read at the pinned ref (5 levels, 40 files) and scanned the
+same way, and an unreadable, missing, symlinked, dynamic or over-cap reference is incomplete in a pkgdown repository;
+other overrides, names built any other way, `uses:` actions from other repositories, manual deploys outside CI and
+`knit`/`render` of a document are not detected. A complete site stage proves route presence, not
 content freshness (`content_freshness: "unverified"`).
 
 

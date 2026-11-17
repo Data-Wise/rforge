@@ -122,8 +122,18 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       `html_document`/`html_vignette`; `pkgdown: extension` other than `html`; and `as_is`. Those
       routes are removed from the expected set, never guessed. Article keys match in any case, and
       `-` and `_` are interchangeable (`as-is`, `Output-File`). Anything else that changes a route
-      (a script a workflow merely runs, a variable name built any way other than the spellings
-      below, a manual `git push` or `rsync` deploy, `_site.yml`) is not detected.
+      (`uses:` actions from other repositories, a variable name built any way other than the
+      spellings below, a manual deploy outside CI, `_site.yml`, a document run through
+      `knit`/`render`) is not detected.
+    - **Scripts a `run:` step executes** (`Rscript`, `R -f`/`--file`/`CMD BATCH`, `bash`/`sh`/`zsh`,
+      `python`, `source`/`.`, `./path`, `make [-f] [-C]`, and `source()`/`sys.source()`/`system()`
+      inside R) are read at the pinned ref, honoring `working-directory` and `cd`, followed up to
+      five levels and 40 files, and scanned with the same detections as a `run:` body. A signal
+      in a reached script blocks, even inside a comment. In a pkgdown repository, a reference
+      from a workflow that names pkgdown (or from any workflow when none does) that is missing,
+      a symlink, outside the repository, absolute, dynamic (`$VAR`, `paste0()`, a glob), binary,
+      over 1 MiB or over a cap is `incomplete` ("script reference unsupported"). A clean readable
+      script never blocks. Scripts fetched or generated at runtime show up as missing or dynamic.
     - **How names are matched.** YAML inputs (workflows, local actions, front matter) are read as
       parsed structures, so quoted or escaped keys, flow mappings, anchors, merge keys and any
       case of `target-folder`/`PKGDOWN_DEV_MODE` count. R and shell code (a `run:` body,
