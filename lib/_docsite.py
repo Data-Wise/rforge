@@ -501,6 +501,11 @@ DYNAMIC_PATH = re.compile(r"[$`*?\[{]|<\(")      # variable, command/process sub
 R_SOURCE = re.compile(r"""\b(?:source|sys\.source)\s*\(\s*(?:(?:file|exprs)\s*=\s*)?(?:"([^"]*)"|'([^']*)'|(\S))""")
 R_SYSTEM = re.compile(r"""\b(system2?|shell)\s*\(\s*(?:(?:command|intern)\s*=\s*)?(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|(\S))""")
 SHELL_PROGRAMS = ("bash", "sh", "zsh", "dash")
+# Executables the scan does not follow but that can generate a site; a workflow that stages and pushes and runs one of
+# them is publish-capable (`ScriptScan.opaque`). `Rscript`, `bash`, `python`, `make` and `./x` are followed, not listed.
+OPAQUE_PROGRAMS = ("quarto", "node", "npm", "npx", "yarn", "pnpm", "bun", "deno", "julia", "ruby", "perl", "php", "docker", "hugo",
+                   "jekyll", "mkdocs", "sphinx-build", "pandoc", "java", "go")
+R_OPAQUE = re.compile(r"\beval\s*\(\s*parse\b|\bdo\.call\s*\(\s*[\"']?(?:sys\.)?source\b|\brmarkdown::render\w*|\bknitr::(?:knit\w*|purl)\b|\bbookdown::\w+|\bquarto::quarto_render\b|\bcallr::\w+")
 
 
 def shell_commands(text):
@@ -575,11 +580,24 @@ class ScriptScan:
         self.root, self.sha, self.files, self.modes, self.pkgdown_repo = root, sha, files, modes, pkgdown_repo
         self.seen, self.reasons, self.strict, self.evidence, self.context = set(), [], True, [], None
         self.destinations, self.exempt, self.texts = [], (), []
+        self.unresolved, self.stage_push = [], False
+
+    def opaque(self, why, ref):
+        """A call that runs code the scan cannot read (an interpreter it does not follow, `eval(parse())`, a document
+        render). Always recorded as unresolved, so a workflow that also stages and pushes is publish-capable; it is a reason
+        only for such a workflow (`stage_push`), because elsewhere these calls are documented as not detected."""
+        self.unresolved.append(f"{why}: {ref}")
+        if self.pkgdown_repo and self.strict and self.stage_push:
+            self.fail_reason(why, ref)
+
+    def fail_reason(self, why, ref):
+        names = f" (workflow {self.context[0]} may publish: {self.context[1][0]})" if self.context and self.context[1] else ""
+        self.reasons.append(f"script reference unsupported ({why}): {ref}; the deployed routes cannot be verified{names}")
 
     def fail(self, why, ref):
+        self.unresolved.append(f"{why}: {ref}")      # recorded whether or not this workflow is strict: the probe reads it
         if self.pkgdown_repo and self.strict:
-            names = f" (workflow {self.context[0]} may publish: {self.context[1][0]})" if self.context and self.context[1] else ""
-            self.reasons.append(f"script reference unsupported ({why}): {ref}; the deployed routes cannot be verified{names}")
+            self.fail_reason(why, ref)
 
     def observe(self, text, data, where):
         """Record `(tier, label)` publish evidence from a reached script or local action (for the workflow that reaches it)."""
@@ -673,6 +691,8 @@ class ScriptScan:
             self.make(args, cwd, depth)
         elif raw.startswith(("./", "../")):
             self.file(raw, cwd, depth)
+        elif program in OPAQUE_PROGRAMS:
+            self.opaque("opaque executable", " ".join(command[i:i + 3]))
         return cwd
 
     def make(self, args, cwd, depth):
@@ -711,6 +731,8 @@ class ScriptScan:
                 self.file(path, where, depth + 1, make_dir=where)
 
     def r_code(self, code, cwd, depth):
+        for match in R_OPAQUE.finditer(code):
+            self.opaque("opaque call", match.group(0).strip())
         for match in R_SOURCE.finditer(code):
             literal = match.group(1) if match.group(1) is not None else match.group(2)
             if literal is not None:
@@ -1090,7 +1112,9 @@ def handoff_evidence(state):
     A workflow that stages and pushes is publish-capable whether or not the pinned tree tracks the destination when it
     also pulls build output from elsewhere (it downloads, or another workflow triggers it), or when any other workflow in
     the repository builds the site: the build output can reach it as an artifact, a release or a checkout. A workflow
-    that stages and pushes with no build or download relationship anywhere stays tier two."""
+    that stages and pushes with no build or download relationship anywhere stays tier two. A workflow that stages and
+    pushes is also tier one when anything it reaches could not be resolved (a failed script or action reference, a cap, an
+    opaque executable or call): the build may hide behind it."""
     facts = {path: {label for tier, label in value[0] if tier == 0} for path, value in state.items()}
     builders = sorted(path for path, found in facts.items() if "build" in found)
     result = {}
@@ -1102,6 +1126,9 @@ def handoff_evidence(state):
             result[path] = (1, "stages and pushes build output it pulls from elsewhere (artifact, release or workflow_run)")
         elif others:
             result[path] = (1, f"stages and pushes while workflow {others[0]} builds the site (cross-workflow handoff)")
+        elif any(label.startswith("unresolved") for label in found):
+            why = next(label for label in sorted(found) if label.startswith("unresolved"))[len("unresolved: "):]
+            result[path] = (1, f"stages and pushes while it reaches a reference the scan cannot resolve ({why})")
     return result
 
 
@@ -1317,6 +1344,7 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
     scan.exempt = exempt
     state = {}      # workflow path -> [evidence list, destinations list]; a reusable workflow shares both with its caller
     probes = {}     # workflow path -> (where, text) pairs of the scripts and local actions it reaches
+    unresolved = {}  # workflow path -> references the probe could not resolve (a failed script or action, an opaque call)
     for path, text in texts.items():
         probe = ScriptScan(root, sha, files, modes, pkgdown_repo)
         probe.exempt = exempt
@@ -1330,11 +1358,12 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
                     for step in steps:
                         probe.run_step(step, start)
                         if step.get("uses", "").startswith("./"):
-                            local_action_reasons(root, sha, files, step["uses"], set(), pkgdown_repo, probe)
+                            probe.unresolved.extend(local_action_reasons(root, sha, files, step["uses"], set(), pkgdown_repo, probe))
             except ValueError:
                 evidence.append("workflow structure unreadable (permissions unknown)")
         data = parsed.get(path)
         probes[path] = probe.texts
+        unresolved[path] = probe.unresolved
         state[path] = [workflow_evidence(data, text, [(2, e) for e in evidence] + probe.evidence, exempt),
                        build_destinations(source_text(text, data)) + probe.destinations]
     # A workflow that builds or stages the destination before it pushes is publish-capable whether or not the pinned tree
@@ -1345,7 +1374,8 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
     for path, text in texts.items():
         data = parsed.get(path)
         pairs = [("the workflow", source_text(text, data))] + probes[path]
-        state[path][0] = list(dict.fromkeys(state[path][0] + stage_evidence(pairs, stage_names) + sorted(handoff_facts(pairs, stage_names, exempt))))
+        facts = sorted(handoff_facts(pairs, stage_names, exempt)) + ([(0, "unresolved: " + unresolved[path][0][:90])] if unresolved[path] else [])
+        state[path][0] = list(dict.fromkeys(state[path][0] + stage_evidence(pairs, stage_names) + facts))
     # Reusable workflows. A caller job `uses: ./.github/workflows/x.yml` runs the callee with the caller's token, so the
     # callee gets the caller's permission evidence and the caller gets everything the callee can do. A callee that cannot
     # be resolved (missing, outside the workflows directory, another repository, a dynamic path) is assumed capable. The
@@ -1374,7 +1404,8 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
             state[caller_path][1] = state[caller_path][1] + [d for d in state[callee_path][1] if d not in state[caller_path][1]]
         if before == [(list(v[0]), list(v[1])) for v in state.values()]:
             break
-    for path, item in handoff_evidence(state).items():
+    handoff = handoff_evidence(state)
+    for path, item in handoff.items():
         state[path][0] = list(dict.fromkeys(state[path][0] + [item]))
     if honored is not None:
         honored.extend(sorted({m.group(1) for v in state.values() for _, label in v[0]
@@ -1384,8 +1415,8 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
         tracked, destination = destination_tracked(files, prefix, config, modes, state[path][1])
         capable[path] = classify_evidence(state[path][0], tracked, destination)
     # Publish-capable workflows first, so a script both kinds reach is judged strictly; the visited set skips it afterwards.
-    for path, text in sorted(texts.items(), key=lambda item: not capable[item[0]]):
-        scan.strict, scan.context = bool(capable[path]), (path, capable[path])
+    for path, text in sorted(texts.items(), key=lambda item: (item[0] not in handoff, not capable[item[0]])):
+        scan.strict, scan.context, scan.stage_push = bool(capable[path]), (path, capable[path]), path in handoff
         if mentions_dev_mode(source_text(text, parsed.get(path))):
             reasons.append(f"workflow PKGDOWN_DEV_MODE mapping unsupported ({path})")
         if deploy_subdirectory(text, pkgdown_repo, parsed.get(path)):

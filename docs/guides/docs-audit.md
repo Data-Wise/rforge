@@ -157,9 +157,18 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       default branch or with no refspec) is also tier 1 when it pulls build output from elsewhere
       (`download-artifact`, `gh run download`, `gh release download`, `curl`/`wget` of an archive, a
       `workflow_run` trigger) or when any other workflow in the repository builds the site (pkgdown
-      wording, a `build_site` call, an upload of the destination, `upload-pages-artifact`). Without a
-      build or download relationship anywhere, a stage-and-push workflow stays tier 2; a push to a
-      branch declared non-publishing is not a push for this rule. **Tier 2, only when the pinned tree tracks the
+      wording, a `build_site` call, an upload of the destination, `upload-pages-artifact`). A stage-and-push
+      workflow is also tier 1 when anything it reaches could not be resolved, because the build may
+      hide behind it: a dynamic or missing script, an absolute or outside path, a symlink, a binary or
+      oversized file, a depth or file cap, a dynamic working directory, a missing or malformed local
+      action, a make include that cannot be read, `eval(parse())`, `do.call(source, ...)`,
+      `rmarkdown::render`/`knitr::knit`/`quarto::quarto_render`, or an executable the scan does not
+      follow (`quarto`, `node`, `npm`, `npx`, `yarn`, `pnpm`, `bun`, `deno`, `julia`, `ruby`, `perl`,
+      `php`, `docker`, `hugo`, `jekyll`, `mkdocs`, `sphinx-build`, `pandoc`, `java`, `go`). For that
+      workflow every such reference is an incomplete reason; other workflows keep treating the opaque
+      calls as not detected. Without a build, download or unresolved reference anywhere, a
+      stage-and-push workflow stays tier 2; a push to a branch declared non-publishing is not a push
+      for this rule. **Tier 2, only when the pinned tree tracks the
       pkgdown destination:** plain `contents: write`; a push action such as `ad-m/github-push-action`;
       a job with no `permissions:` key at either level; a push with no refspec or to the default
       branch; the same publish programs with no remote target. The destination is the config
@@ -200,9 +209,10 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
 
       A workflow with no evidence is relaxed, because QC and simulation scripts are full of
       `source(file.path(...))`. Not detected: a script that pushes from a workflow that shows no signal
-      at all; site files that reach a staging workflow by a route the scan
-      cannot read (a custom action fetching from another repository, a submodule update, a
-      checkout of another ref) with no build or download relationship anywhere in the repository; a destination written through a name the scan cannot read; a site branch mislabeled in
+      at all; a stage-and-push workflow whose only route to site files is an
+      action from another repository, a submodule update or a checkout of another ref, with no
+      build, download or unresolved reference anywhere in the repository; `knit`/`render` and unlisted
+      executables in a workflow that does not stage and push; a destination written through a name the scan cannot read; a site branch mislabeled in
       `nonpublishing-branches` (documented gap: an unverified maintainer declaration); actions from other repositories (beyond the fail-closed reusable-workflow rule); manual
       deploys outside CI.
     - **How names are matched.** YAML inputs (workflows, local actions, front matter) are read as

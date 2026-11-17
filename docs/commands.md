@@ -538,7 +538,7 @@ same way (`make` follows `include`), and an unreadable, missing, symlinked, dyna
 pkgdown repository for any workflow that may publish (tier 1: pkgdown wording, a Pages or deploy action, `deploy_to_branch`/`gh-pages`,
 `pages`/`id-token` write, an explicit-branch `git push`, a remote publish command (`rsync`/`scp`/`aws s3`/`netlify`/`firebase`/`vercel`) or a command that
 builds or stages the destination even when the tree does not track it yet (`git add`/`git commit` naming it, `git add -A` after a pkgdown build,
-`git subtree push`, `git worktree add`, `cp`/`mv`/`rsync` into it), or a workflow that stages and pushes while it downloads build output or another workflow builds the site (cross-workflow handoff);
+`git subtree push`, `git worktree add`, `cp`/`mv`/`rsync` into it), or a workflow that stages and pushes while it downloads build output, another workflow builds the site (cross-workflow handoff) or it reaches a script, action or executable the scan cannot resolve;
 tier 2, only when the pinned tree tracks the pkgdown destination (placeholder-only directories do not count; a build call's destination
 joins the check): `contents: write`, a default-branch or refspec-less `git push`, a push action, no `permissions:` key; a branch listed in
 `.rforge.yaml` `docs.site.nonpublishing-branches` is tier 2 (an unverified maintainer declaration: a mislabeled site branch yields a wrong complete; the

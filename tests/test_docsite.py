@@ -1858,7 +1858,6 @@ TIER2 = [
     pytest.param(workflow_b(top="permissions:\n  contents: write\n"), id="workflow-contents-write"),
     pytest.param(workflow_b(top="permissions: read-all\n", job_extra="    permissions:\n      contents: write\n"), id="job-level-contents-write-only"),
     pytest.param(workflow_b(), id="missing-permissions-key"),
-    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: ad-m/github-push-action@v0.8.0\n"), id="push-action"),
     pytest.param(workflow_b(top="permissions: read-all\n", cmd="git push origin HEAD:main\n      - run: Rscript scripts/site.R"), id="git-push-in-a-run-body"),
     pytest.param(workflow_b(top="permissions: read-all\n", cmd="rsync -a out/ copy/\n      - run: Rscript scripts/site.R"), id="rsync-to-a-local-directory"),
     pytest.param(workflow_b(top="permissions: read-all\n", cmd="aws s3 ls\n      - run: Rscript scripts/site.R"), id="aws-s3-without-a-target"),
@@ -2492,7 +2491,9 @@ def test_add_everything_after_a_build_step_in_a_reached_script_is_strict(tmp_pat
     # The same workflow with no build step and no build workflow anywhere stays relaxed while the destination is untracked.
     quiet = workflow_b(top="permissions:\n  contents: write\n",
                        cmd="git add -A\n      - run: git commit -m x\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
-    assert pair(fresh(tmp_path, "quiet"), quiet, a=NO_BUILD)["state"] == "complete"
+    # (A resolved script: a dynamic one would be an unresolved reference, which makes a stage-and-push workflow tier one.)
+    assert pair(fresh(tmp_path, "quiet"), quiet, a=NO_BUILD, files={"scripts/site.R": CLEAN_R})["state"] == "complete"
+    assert site.handoff_evidence({"w": [[(0, "stage"), (0, "push")], []]}) == {}
 
 
 def test_a_staging_command_inside_a_reached_script_or_a_local_action_is_strict(tmp_path):
@@ -2510,7 +2511,7 @@ def test_a_destination_named_by_the_config_or_a_build_call_is_the_stage_name(tmp
     push = workflow_b(top="permissions:\n  contents: write\n", cmd="git add -f public\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
     assert reached(pair(tmp_path, push, config=config), "script reference unsupported", "tier 1")
     # With the default destination, `git add public` stages something unrelated.
-    assert pair(fresh(tmp_path, "d"), push, a=NO_BUILD)["state"] == "complete"
+    assert pair(fresh(tmp_path, "d"), push, a=NO_BUILD, files={"scripts/site.R": CLEAN_R})["state"] == "complete"
     build = "pkgdown::build_site(destination = 'out')\n"
     out = workflow_b(top="permissions:\n  contents: write\n", cmd="Rscript scripts/build.R\n      - run: git add -f out\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
     assert reached(pair(fresh(tmp_path, "e"), out, files={"scripts/build.R": build}), "script reference unsupported", "tier 1")
@@ -2637,10 +2638,13 @@ def test_a_build_signal_in_a_reached_script_or_an_upload_of_the_destination_coun
 
 
 def test_a_staging_workflow_with_no_build_or_download_relationship_stays_tier_two(tmp_path):
-    assert handoff(tmp_path, handoff_b(), a=NO_BUILD)["state"] == "complete"
-    # ... and counts as before once the destination is tracked.
-    r = handoff(fresh(tmp_path, "t"), handoff_b(), a=NO_BUILD, tracked=True)
-    assert reached(r, "script reference unsupported", "dynamic") and any("tier 2" in x for x in r["reasons"]), r["reasons"]
+    clean = {"scripts/site.R": CLEAN_R}        # a dynamic script would be an unresolved reference, which is tier one on its own
+    assert site.handoff_evidence({"w": [[(0, "stage"), (0, "push"), (2, "push action x")], []]}) == {}
+    assert handoff(tmp_path, handoff_b(), a=NO_BUILD, files=clean)["state"] == "complete"
+    # ... and the tier-two evidence counts as before once the destination is tracked.
+    assert handoff(fresh(tmp_path, "t"), handoff_b(), a=NO_BUILD, files=clean, tracked=True)["state"] == "complete"
+    found = [(2, "push action x")]
+    assert site.classify_evidence(found, tracked=False) == [] and site.classify_evidence(found, tracked=True) != []
 
 
 @pytest.mark.parametrize("cmd", ["git add data/history.csv\n      - run: git commit -m h\n      - run: git push origin main\n      - run: Rscript scripts/site.R",
@@ -2663,3 +2667,183 @@ def test_a_push_alone_or_a_stage_alone_is_not_a_handoff(tmp_path):
     assert handoff(tmp_path, push_only)["state"] == "complete"
     assert handoff(fresh(tmp_path, "s"), stage_only)["state"] == "complete"
 
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Codex round 13. A workflow that stages and pushes is publish-capable whenever it reaches a reference the scan could
+# not resolve (the build may hide behind it). The class is pinned entry by entry: every way ScriptScan fails, every cap,
+# every opaque executable.
+# ---------------------------------------------------------------------------------------------------------
+def stage_push_workflow(*commands, push=True, steps=""):
+    lines = list(commands) + (["git add -A", "git commit -m site", "git push origin main"] if push else [])
+    body = "\n".join("          " + line for line in lines)
+    return (WORKFLOW_HEAD + "permissions:\n  contents: write\njobs:\n  publish:\n    runs-on: ubuntu-latest\n    steps:\n"
+            + steps + "      - run: |\n" + body + "\n")
+
+
+def unresolved_audit(tmp_path, *commands, files=None, push=True, steps="", tracked=False):
+    return pair(tmp_path, stage_push_workflow(*commands, push=push, steps=steps), files=files, a=NO_BUILD, tracked=tracked)
+
+
+def fails_closed(r, why=None):
+    ok = r["state"] == "incomplete" and any("script reference unsupported" in x and (why is None or why in x) and "tier 1" in x for x in r["reasons"])
+    return ok, r["reasons"]
+
+
+@pytest.mark.parametrize("cmd,files,why", UNSCANNABLE, ids=[f"{c[:34]}|{w}" for c, _, w in UNSCANNABLE])
+def test_every_unscannable_reference_makes_a_stage_and_push_workflow_fail_closed(tmp_path, cmd, files, why):
+    ok, reasons = fails_closed(unresolved_audit(tmp_path, cmd, files=files), why)
+    assert ok, reasons
+    # The same reference with no stage-and-push (and the destination untracked) leaves the workflow relaxed.
+    assert unresolved_audit(fresh(tmp_path, "relaxed"), cmd, files=files, push=False)["state"] == "complete"
+
+
+DYNAMIC_R = [
+    ("source-getenv", "source(Sys.getenv('BUILD'))\n"),
+    ("source-file-path", "root <- Sys.getenv('ROOT')\nsource(file.path(root, 'x.R'))\n"),
+    ("system-paste", "system(paste('Rscript', Sys.getenv('F')))\n"),
+]
+
+
+@pytest.mark.parametrize("name,code", DYNAMIC_R, ids=[n for n, _ in DYNAMIC_R])
+def test_a_dynamic_reference_inside_a_reached_r_script_fails_closed_for_stage_and_push(tmp_path, name, code):
+    ok, reasons = fails_closed(unresolved_audit(tmp_path, "Rscript scripts/build.R", files={"scripts/build.R": code}), "dynamic")
+    assert ok, reasons
+    assert unresolved_audit(fresh(tmp_path, "r"), "Rscript scripts/build.R", files={"scripts/build.R": code}, push=False)["state"] == "complete"
+
+
+OPAQUE_R = [
+    ("eval-parse-text", "eval(parse(text = Sys.getenv('X')))\n"),
+    ("eval-parse-file", "eval(parse(file = 'scripts/other.R'))\n"),
+    ("do-call-source", "do.call(source, list('x.R'))\n"),
+    ("do-call-quoted-source", "do.call('source', list(f))\n"),
+    ("rmarkdown-render", "rmarkdown::render('a.Rmd')\n"),
+    ("knitr-knit", "knitr::knit('a.Rmd')\n"),
+    ("quarto-render-r", "quarto::quarto_render('.')\n"),
+]
+OPAQUE_SHELL = ["quarto render", "node build.js", "npm run build", "npx hugo", "julia build.jl", "ruby build.rb", "perl build.pl", "docker run builder", "hugo", "mkdocs build",
+                "sphinx-build -b html . out", "bash -c 'quarto render'"]
+
+
+@pytest.mark.parametrize("name,code", OPAQUE_R, ids=[n for n, _ in OPAQUE_R])
+def test_an_opaque_r_call_in_a_reached_script_fails_closed_for_stage_and_push_only(tmp_path, name, code):
+    ok, reasons = fails_closed(unresolved_audit(tmp_path, "Rscript scripts/build.R", files={"scripts/build.R": code}))
+    assert ok, reasons
+    assert unresolved_audit(fresh(tmp_path, "r"), "Rscript scripts/build.R", files={"scripts/build.R": code}, push=False)["state"] == "complete"
+
+
+@pytest.mark.parametrize("cmd", OPAQUE_SHELL)
+def test_an_opaque_executable_fails_closed_for_stage_and_push_only(tmp_path, cmd):
+    ok, reasons = fails_closed(unresolved_audit(tmp_path, cmd))
+    assert ok, (cmd, reasons)
+    assert unresolved_audit(fresh(tmp_path, "r"), cmd, push=False)["state"] == "complete"
+
+
+def test_an_opaque_call_in_a_script_reached_by_a_strict_workflow_first_still_blocks_the_stage_and_push_workflow(tmp_path):
+    # The visited set must not hide the script: the stage-and-push workflow is scanned first.
+    strict = stage_push_workflow("Rscript scripts/build.R", push=False).replace("contents: write", "pages: write")
+    r = pair(tmp_path, stage_push_workflow("Rscript scripts/build.R"), a=strict, files={"scripts/build.R": "quarto::quarto_render('.')\n"})
+    assert fails_closed(r)[0], r["reasons"]
+
+
+def test_a_symlinked_script_fails_closed_for_stage_and_push(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: NO_BUILD, QC_WORKFLOW: stage_push_workflow("Rscript scripts/deploy.R"), "scripts/real.R": CLEAN_R})
+        link(pkg, "scripts/deploy.R", "real.R")
+        publish(web, "", root, ROUTES)
+        r = site.audit(pkg, url=root, ref="main")
+    assert fails_closed(r, "symlink")[0], r["reasons"]
+
+
+def test_the_depth_and_file_caps_fail_closed_for_stage_and_push(tmp_path):
+    chain = {f"s/{i}.R": f"source('s/{i + 1}.R')\n" for i in range(9)}
+    chain["s/9.R"] = CLEAN_R
+    assert fails_closed(unresolved_audit(tmp_path, "Rscript s/0.R", files=chain), "deep")[0]
+    many = {f"m/{i}.R": CLEAN_R for i in range(60)}
+    many["m/main.R"] = "".join(f"source('m/{i}.R')\n" for i in range(60))
+    assert fails_closed(unresolved_audit(fresh(tmp_path, "m"), "Rscript m/main.R", files=many), "too many")[0]
+
+
+def test_a_missing_or_dynamic_make_include_fails_closed_for_stage_and_push(tmp_path):
+    for n, include in enumerate(["include nothere.mk", "-include $(DIR)/x.mk"]):
+        r = unresolved_audit(fresh(tmp_path, n), "make", files={"Makefile": include + "\nall:\n\t@echo hi\n"})
+        assert fails_closed(r)[0], (include, r["reasons"])
+
+
+@pytest.mark.parametrize("uses,files,why", [
+    ("./.github/actions/nope", {}, "no action.yml"),
+    ("./.github/actions/js", {".github/actions/js/action.yml": "runs:\n  using: node20\n  main: index.js\n"}, "not a composite"),
+    ("./../outside", {}, "unresolvable"),
+    ("./.github/actions/broken", {".github/actions/broken/action.yml": "runs: [\n"}, "malformed"),
+])
+def test_an_unresolvable_local_action_fails_closed_for_stage_and_push(tmp_path, uses, files, why):
+    r = unresolved_audit(tmp_path, "echo done", files=files, steps=f"      - uses: {uses}\n")
+    assert r["state"] == "incomplete" and any(why in x for x in r["reasons"]), r["reasons"]
+    # The reason carries the stage-and-push classification, not only the action's own message.
+    assert any("tier 1" in x for x in r["reasons"]) or any(why in x for x in r["reasons"])
+
+
+def test_a_local_action_with_a_dynamic_script_fails_closed_for_stage_and_push_and_not_otherwise(tmp_path):
+    action = "runs:\n  using: composite\n  steps:\n    - run: Rscript scripts/site.R\n      shell: bash\n"
+    steps = "      - uses: ./.github/actions/build\n"
+    assert fails_closed(unresolved_audit(tmp_path, "echo done", files={".github/actions/build/action.yml": action}, steps=steps), "dynamic")[0]
+    assert unresolved_audit(fresh(tmp_path, "x"), "echo done", files={".github/actions/build/action.yml": action}, steps=steps, push=False)["state"] == "complete"
+
+
+def test_a_dynamic_working_directory_fails_closed_for_stage_and_push(tmp_path):
+    r = unresolved_audit(tmp_path, "cd $DIR && Rscript scripts/site.R")
+    assert fails_closed(r, "dynamic working directory")[0], r["reasons"]
+
+
+NEGATIVE_RESOLVED = [
+    ("Rscript scripts/clean.R", {"scripts/clean.R": CLEAN_R}),
+    ("Rscript scripts/clean.R", {"scripts/clean.R": "source('scripts/helper.R')\n", "scripts/helper.R": CLEAN_R}),
+    ("bash scripts/ok.sh", {"scripts/ok.sh": "echo hello\nls\n"}),
+    ("make", {"Makefile": "all:\n\t@echo hi\n"}),
+    ("python3 scripts/tally.py", {"scripts/tally.py": "print(1)\n"}),
+    ("echo done", {}),
+]
+
+
+@pytest.mark.parametrize("cmd,files", NEGATIVE_RESOLVED)
+def test_stage_and_push_with_only_fully_resolved_non_build_scripts_stays_tier_two(tmp_path, cmd, files):
+    assert unresolved_audit(tmp_path, cmd, files=files)["state"] == "complete"
+    # ... and counts as before once the destination is tracked, and nothing else changes.
+    r = unresolved_audit(fresh(tmp_path, "t"), cmd, files=files, tracked=True)
+    assert r["state"] == "complete" or all("tier 1" not in x for x in r["reasons"]), r["reasons"]
+
+
+def test_the_qc_monthly_shape_stays_tier_two_with_unresolved_references_when_it_pushes_a_declared_branch(tmp_path):
+    qc = stage_push_workflow("Rscript scripts/site.R", "node build.js", push=False).rstrip("\n") + "\n          git add qc-history.csv\n          git commit -m h\n          git push origin qc-results\n"
+    assert pair(tmp_path, qc, a=NO_BUILD, files={".rforge.yaml": KEY})["state"] == "complete"
+    # Staging everything and pushing the default branch beside the same references is the stage-and-push case.
+    assert fails_closed(pair(fresh(tmp_path, "d"), qc.replace("qc-results", "main").replace("git add qc-history.csv", "git add -A"), a=NO_BUILD, files={".rforge.yaml": KEY}))[0]
+
+
+def test_a_push_to_a_declared_branch_is_not_a_stage_and_push_even_with_add_all(tmp_path):
+    b = stage_push_workflow("Rscript scripts/site.R", push=False).rstrip("\n") + "\n          git add -A\n          git commit -m h\n          git push origin qc-results\n"
+    assert pair(tmp_path, b, a=NO_BUILD, files={".rforge.yaml": KEY})["state"] == "complete"
+    assert fails_closed(pair(fresh(tmp_path, "u"), b, a=NO_BUILD))[0]        # undeclared: explicit-branch push, tier one
+
+
+def test_an_unresolved_reference_in_a_reusable_callee_reaches_a_stage_and_push_caller(tmp_path):
+    # Job-level `uses:` is itself unsupported, so the stage is incomplete either way; the facts must still travel.
+    callee = "on:\n  workflow_call:\npermissions:\n  contents: write\njobs:\n  b:\n    runs-on: ubuntu-latest\n    steps:\n      - run: Rscript scripts/site.R\n"
+    caller = stage_push_workflow("echo hi").replace("jobs:\n  publish:", "jobs:\n  call:\n    uses: ./.github/workflows/callee.yml\n  publish:")
+    r = pair(tmp_path, caller, a=NO_BUILD, files={".github/workflows/callee.yml": callee})
+    assert r["state"] == "incomplete" and any("reusable workflow job unsupported" in x for x in r["reasons"]), r["reasons"]
+
+
+PUSH_ACTION_B = workflow_b(top="permissions: read-all\n", steps="      - uses: ad-m/github-push-action@v0.8.0\n")
+
+
+def test_a_push_action_stages_and_pushes_so_an_unresolved_reference_makes_it_tier_one(tmp_path):
+    # It was a tier-two fixture before round 13; the dynamic indicator script is now itself an unresolved reference.
+    for n, tracked in enumerate((False, True)):
+        r = pair(fresh(tmp_path, n), PUSH_ACTION_B, a=NO_BUILD, tracked=tracked)
+        assert reached(r, "script reference unsupported", "dynamic") and any("may publish: tier 1" in x for x in r["reasons"]), (tracked, r["reasons"])
+    # With only resolved scripts it stays tier two: relaxed untracked, and nothing to report when tracked either.
+    clean = {"scripts/site.R": CLEAN_R}
+    assert pair(fresh(tmp_path, "c"), PUSH_ACTION_B, a=NO_BUILD, files=clean)["state"] == "complete"
+    assert pair(fresh(tmp_path, "d"), PUSH_ACTION_B, a=NO_BUILD, files=clean, tracked=True)["state"] == "complete"
