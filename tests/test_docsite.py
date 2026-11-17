@@ -1670,8 +1670,9 @@ QC_WORKFLOW = ".github/workflows/qc.yaml"
 def two_workflows(site_text, tmp_path):
     web = tmp_path / "web"
     with server(web) as root:
+        # round 9: a workflow is relaxed only when it shows no ability to publish, so the unrelated QC workflow is read-only
         pkg = make(tmp_path, config=CONFIG, files={
-            SCRIPT_WORKFLOW: site_text, QC_WORKFLOW: step_workflow("Rscript scripts/qc.R"),
+            SCRIPT_WORKFLOW: site_text, QC_WORKFLOW: step_workflow("Rscript scripts/qc.R", top="permissions: read-all\n"),
             "scripts/qc.R": UNRELATED_DYNAMIC, "scripts/site.R": CLEAN_R})
         publish(web, "", root, ROUTES)
         return site.audit(pkg, url=root, ref="main")
@@ -1688,8 +1689,13 @@ def test_the_same_dynamic_script_code_in_a_workflow_that_names_pkgdown_does_bloc
     assert reached(r, "script reference unsupported", "dynamic"), r["reasons"]
 
 
-def test_with_no_workflow_naming_pkgdown_every_workflow_is_a_site_workflow(tmp_path):
-    r = two_workflows(step_workflow("Rscript scripts/site.R"), tmp_path)
+def test_a_read_only_workflow_stays_relaxed_even_when_no_workflow_names_pkgdown(tmp_path):
+    r = two_workflows(step_workflow("Rscript scripts/site.R", top="permissions: read-all\n"), tmp_path)
+    assert r["state"] == "complete", r["reasons"]
+
+
+def test_with_no_workflow_naming_pkgdown_a_workflow_without_permissions_is_strict(tmp_path):
+    r = two_workflows(step_workflow("Rscript scripts/qc.R"), tmp_path)
     assert reached(r, "script reference unsupported", "dynamic"), r["reasons"]
 
 
@@ -1793,3 +1799,114 @@ def test_an_include_of_a_symlink_fails_closed(tmp_path):
 def test_makefile_text_that_only_mentions_include_in_a_recipe_or_comment_is_not_an_include(tmp_path):
     files = {"Makefile": "# include missing.mk\nsite:\n\t@echo 'include missing.mk'\n"}
     assert script_audit(tmp_path, files, "make site")["state"] == "complete"
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Codex round 9, high: a workflow is relaxed (unscannable script references do not fail closed) only when it shows NO
+# ability to publish. Default is strict for every workflow and local action in a pkgdown repository. Decision on
+# permissions: a missing `permissions:` key (workflow and job) means the default token scope is unknown, so it counts as
+# capable; `permissions: {}`, `read-all` or a mapping without pages/contents/id-token write is read-only.
+# ---------------------------------------------------------------------------------------------------------
+DYNAMIC_SITE_R = "root <- Sys.getenv('ROOT')\nsource(file.path(root, 'x.R'))\n"
+SITE_A = step_workflow("Rscript -e 'pkgdown::build_site()'", top="permissions: read-all\n")
+
+
+def workflow_b(top="", job_extra="", steps="", cmd="Rscript scripts/site.R"):
+    return (WORKFLOW_HEAD + top + "jobs:\n  qc:\n    runs-on: ubuntu-latest\n" + job_extra +
+            "    steps:\n      - uses: actions/checkout@v4\n" + steps + "      - run: " + cmd + "\n")
+
+
+def pair(tmp_path, b, files=None, a=SITE_A):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: a, QC_WORKFLOW: b, "scripts/site.R": DYNAMIC_SITE_R, **(files or {})})
+        publish(web, "", root, ROUTES)
+        return site.audit(pkg, url=root, ref="main")
+
+
+CAPABLE = [
+    pytest.param(workflow_b(top="permissions:\n  contents: write\n"), id="workflow-contents-write"),
+    pytest.param(workflow_b(top="permissions:\n  pages: write\n"), id="workflow-pages-write"),
+    pytest.param(workflow_b(top="permissions:\n  id-token: write\n"), id="workflow-id-token-write"),
+    pytest.param(workflow_b(top="permissions: write-all\n"), id="write-all"),
+    pytest.param(workflow_b(top="permissions: read-all\n", job_extra="    permissions:\n      contents: write\n"), id="job-level-contents-write-only"),
+    pytest.param(workflow_b(), id="missing-permissions-key"),
+    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: JamesIves/github-pages-deploy-action@v4\n        with:\n          folder: docs\n"), id="deploy-action-in-a-later-step"),
+    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: peaceiris/actions-gh-pages@v4\n"), id="peaceiris"),
+    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: actions/deploy-pages@v4\n"), id="deploy-pages"),
+    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: actions/upload-pages-artifact@v3\n"), id="upload-pages-artifact"),
+    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: actions/configure-pages@v5\n"), id="configure-pages"),
+    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: ad-m/github-push-action@v0.8.0\n"), id="push-action"),
+    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: \"JamesIves/github-pages-deploy-action@v4\"\n"), id="quoted-uses"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="git push origin HEAD:gh-pages\n      - run: Rscript scripts/site.R"), id="git-push-in-a-run-body"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="rsync -a docs/ host:/var/www/\n      - run: Rscript scripts/site.R"), id="rsync"),
+    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: actions/checkout@v4\n        with:\n          token: ${{ secrets.PAT }}\n"), id="checkout-with-a-pat"),
+    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: actions/checkout@v4\n        with:\n          ssh-key: ${{ secrets.DEPLOY_KEY }}\n"), id="checkout-with-a-deploy-key"),
+    pytest.param(workflow_b(top="permissions: read-all\n", job_extra="    env:\n      NOTE: pkgdown\n"), id="names-pkgdown"),
+]
+
+
+@pytest.mark.parametrize("b", CAPABLE)
+def test_a_workflow_that_may_publish_is_strict_so_a_dynamic_script_reference_fails_closed(tmp_path, b):
+    r = pair(tmp_path, b)
+    assert reached(r, "script reference unsupported", "dynamic") and any("may publish" in x for x in r["reasons"]), r["reasons"]
+
+
+READ_ONLY = [
+    pytest.param(workflow_b(top="permissions: read-all\n"), id="read-all"),
+    pytest.param(workflow_b(top="permissions:\n  contents: read\n  issues: write\n"), id="contents-read-issues-write"),
+    pytest.param(workflow_b(top="permissions: {}\n"), id="empty-permissions"),
+    pytest.param(workflow_b(top="permissions:\n  contents: read\n", job_extra="    permissions:\n      contents: read\n      pull-requests: write\n"), id="job-level-read-only"),
+    pytest.param(workflow_b(job_extra="    permissions: read-all\n"), id="job-only-read-all"),
+    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: r-lib/actions/setup-r@v2\n      - uses: actions/upload-artifact@v4\n"), id="setup-and-artifact-actions"),
+    pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: actions/checkout@v4\n        with:\n          token: ${{ secrets.GITHUB_TOKEN }}\n"), id="checkout-with-the-default-token"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="git status\n      - run: Rscript scripts/site.R"), id="git-without-push"),
+]
+
+
+@pytest.mark.parametrize("b", READ_ONLY)
+def test_a_workflow_that_shows_no_ability_to_publish_stays_relaxed(tmp_path, b):
+    """Modeled on medfit's QC and gate workflows: read-only token, no deploy action, a script full of source(file.path(...))."""
+    r = pair(tmp_path, b)
+    assert r["state"] == "complete", r["reasons"]
+
+
+def test_a_publish_signal_inside_a_reached_script_makes_the_workflow_strict(tmp_path):
+    script = "system('git push origin HEAD:gh-pages')\n" + DYNAMIC_SITE_R
+    r = pair(tmp_path, workflow_b(top="permissions: read-all\n"), files={"scripts/site.R": script})
+    assert reached(r, "script reference unsupported", "dynamic") and any("may publish" in x and "scripts/site.R" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_deploy_step_inside_a_local_composite_action_makes_the_calling_workflow_strict(tmp_path):
+    action = "runs:\n  using: composite\n  steps:\n    - uses: JamesIves/github-pages-deploy-action@v4\n      with:\n        folder: docs\n"
+    b = workflow_b(top="permissions: read-all\n", steps="      - uses: ./.github/actions/ship\n")
+    r = pair(tmp_path, b, files={".github/actions/ship/action.yml": action})
+    assert reached(r, "script reference unsupported", "dynamic"), r["reasons"]
+
+
+def test_a_read_only_workflow_that_calls_a_clean_local_action_stays_relaxed(tmp_path):
+    action = "runs:\n  using: composite\n  steps:\n    - run: echo hi\n      shell: bash\n"
+    b = workflow_b(top="permissions: read-all\n", steps="      - uses: ./.github/actions/note\n")
+    assert pair(tmp_path, b, files={".github/actions/note/action.yml": action})["state"] == "complete"
+
+
+def test_a_publish_capable_workflow_with_a_clean_readable_script_never_blocks(tmp_path):
+    r = pair(tmp_path, workflow_b(top="permissions:\n  contents: write\n"), files={"scripts/site.R": CLEAN_R})
+    assert r["state"] == "complete", r["reasons"]
+
+
+def test_the_publish_reason_names_the_evidence_and_is_allow_listed():
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    import verify_a2_release as verifier
+    reason = ("script reference unsupported (dynamic path): source() with a non-literal argument; "
+              "the deployed routes cannot be verified (workflow .github/workflows/qc.yaml may publish: permissions contents: write)")
+    assert verifier.limit_run_is_unsupported_layout({"state": "incomplete", "reasons": [reason]})
+
+
+def test_the_predicate_returns_its_evidence(tmp_path):
+    data = site.yaml_data(workflow_b(top="permissions:\n  contents: write\n", steps="      - uses: actions/deploy-pages@v4\n"))
+    evidence = site.workflow_may_publish(data, "")
+    assert any("contents" in e for e in evidence) and any("deploy-pages" in e for e in evidence)
+    assert site.workflow_may_publish(site.yaml_data(workflow_b(top="permissions: read-all\n")), "") == []

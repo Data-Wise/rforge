@@ -565,19 +565,29 @@ class ScriptScan:
     fetched or generated at runtime (reported as missing or dynamic in a pkgdown repository), `uses:` actions from other
     repositories, `knit`/`render` of a document, and any path built any way other than a literal.
 
-    `strict` narrows the fail-closed reasons to the workflows that can build the site: those whose text names pkgdown,
-    or every workflow when none does (a config-only repository). Unrelated workflows (QC gates, simulations) run
-    scripts full of `source(file.path(...))`; failing closed on all of them would make nearly every real pkgdown
-    repository incomplete. The signals themselves (subdirectory deploy, dev mode) are reported from any reached script.
+    `strict` is the publish-capability rule (`workflow_may_publish`): fail-closed reasons apply to every workflow that
+    shows any ability to publish. A workflow with none (read-only token, no deploy action, no push) is relaxed, because
+    QC and simulation scripts are full of `source(file.path(...))`. The signals themselves (subdirectory deploy, dev
+    mode) are reported from any reached script either way.
     """
 
     def __init__(self, root, sha, files, modes, pkgdown_repo):
         self.root, self.sha, self.files, self.modes, self.pkgdown_repo = root, sha, files, modes, pkgdown_repo
-        self.seen, self.reasons, self.strict = set(), [], True
+        self.seen, self.reasons, self.strict, self.evidence, self.context = set(), [], True, [], None
 
     def fail(self, why, ref):
         if self.pkgdown_repo and self.strict:
-            self.reasons.append(f"script reference unsupported ({why}): {ref}; the deployed routes cannot be verified")
+            names = f" (workflow {self.context[0]} may publish: {self.context[1][0]})" if self.context and self.context[1] else ""
+            self.reasons.append(f"script reference unsupported ({why}): {ref}; the deployed routes cannot be verified{names}")
+
+    def observe(self, text, data, where):
+        """Record publish evidence from a reached script or local action (for the workflow that reaches it)."""
+        found = PUBLISH_TEXT.search(source_text(text, data))
+        if found:
+            self.evidence.append(f"publish signal in {where}: {found.group(0)}")
+        steps = ((data or {}).get("runs") or {}).get("steps") if isinstance(data, dict) else None
+        for step in steps if isinstance(steps, list) else []:
+            self.evidence.extend(f"{item} in {where}" for item in step_publish_evidence(step))
 
     def directory(self, cwd, target):
         """The repository-relative directory `target` names from `cwd`, or None when it cannot be known statically."""
@@ -745,6 +755,7 @@ class ScriptScan:
         text = git(self.root, "show", self.sha + ":" + norm, strip=False)
         if "\0" in text:
             return self.fail("binary file", path)
+        self.observe(text, None, f"script {norm}")
         if mentions_dev_mode(text):
             self.reasons.append(f"{DEV_MODE_VARIABLE} set in script {norm}; development mode mapping unsupported")
         if deploy_subdirectory(text, self.pkgdown_repo):
@@ -769,6 +780,77 @@ def default_directory(*containers):
     return None
 
 
+PAGES_ACTIONS = ("jamesives/github-pages-deploy-action", "peaceiris/actions-gh-pages", "actions/deploy-pages",
+                 "actions/upload-pages-artifact", "actions/configure-pages", "crazy-max/ghaction-github-pages")
+PUSH_ACTIONS = ("ad-m/github-push-action", "stefanzweifel/git-auto-commit-action", "endbug/add-and-commit",
+                "r-lib/actions/pr-push", "actions-js/push")
+PUBLISH_TEXT = re.compile(r"deploy_to_branch|gh[-_]pages|\bgit\s+push\b|\brsync\b|\baws\s+s3\b|\bnetlify\b|\bsurge\b|\bscp\b", re.I)
+WRITE_SCOPES = ("pages", "contents", "id-token")
+NO_PERMISSIONS = object()
+
+
+def permission_evidence(perms, where):
+    if isinstance(perms, str) and perms.strip().lower() == "write-all":
+        return [f"permissions write-all ({where})"]
+    if isinstance(perms, dict):
+        return [f"permissions {key}: write ({where})" for key, value in perms.items()
+                if str(key).lower() in WRITE_SCOPES and str(value).strip().lower() == "write"]
+    return []
+
+
+def step_publish_evidence(step):
+    """Why one step (workflow or composite action) can publish: a Pages or push action, or a checkout given a secret."""
+    uses = step.get("uses") if isinstance(step, dict) else None
+    if not isinstance(uses, str):
+        return []
+    name = uses.split("@")[0].strip().lower()
+    evidence = []
+    if name in PAGES_ACTIONS:
+        evidence.append(f"deploy action {uses}")
+    if name in PUSH_ACTIONS:
+        evidence.append(f"push action {uses}")
+    inputs = step.get("with")
+    if name.endswith("checkout") and isinstance(inputs, dict):
+        for key in ("token", "ssh-key"):
+            value = str(inputs.get(key, ""))
+            if "secrets." in value and "secrets.GITHUB_TOKEN" not in value:
+                evidence.append(f"checkout with a secret {key}")
+    return evidence
+
+
+def workflow_may_publish(data, text, extra=()):
+    """The ability-to-publish evidence of one workflow, as a list of strings; an empty list means it shows none.
+
+    The default is strict: a workflow is relaxed only when ALL of these are absent: the word pkgdown; a Pages or push
+    action in any step; `pages`/`contents`/`id-token` write or `write-all` permission at workflow or job level; a job
+    with no `permissions:` key at either level (the default token scope is unknown, so it counts as capable); a
+    checkout given a secret token or key; a `deploy_to_branch`/`gh-pages`/`git push`/`rsync`/`aws s3`/`netlify`
+    signal in the workflow text; and `extra` (the same signals found in the scripts and local actions it reaches).
+    YAML facts are read from the parsed structure; the text signals are tolerant text. Trigger events are not
+    considered. A no-signal workflow whose dynamically loaded script pushes is not detected.
+    """
+    data = data if isinstance(data, dict) else {}
+    evidence = []
+    if "pkgdown" in source_text(text, data).lower():
+        evidence.append("names pkgdown")
+    top = data.get("permissions", NO_PERMISSIONS)
+    evidence += permission_evidence(top, "workflow")
+    jobs = data.get("jobs") if isinstance(data.get("jobs"), dict) else {}
+    for key, job in jobs.items():
+        if not isinstance(job, dict):
+            continue
+        own = job.get("permissions", NO_PERMISSIONS)
+        evidence += permission_evidence(own, f"job {key}")
+        if top is NO_PERMISSIONS and own is NO_PERMISSIONS:
+            evidence.append(f"no permissions: key for job {key} (default token scope unknown)")
+        for step in job.get("steps") if isinstance(job.get("steps"), list) else []:
+            evidence += step_publish_evidence(step)
+    found = PUBLISH_TEXT.search(source_text(text, data))
+    if found:
+        evidence.append(f"publish signal in the workflow: {found.group(0)}")
+    return list(dict.fromkeys(evidence + list(extra)))
+
+
 def local_action_reasons(root, sha, files, uses, seen, pkgdown_repo=True, scan=None):
     """Scan a local composite action (`uses: ./path`, relative to the repository root) and the local actions it calls."""
     target = posixpath.normpath(uses[2:] or ".")
@@ -787,6 +869,8 @@ def local_action_reasons(root, sha, files, uses, seen, pkgdown_repo=True, scan=N
         data = yaml_data(text)
     except ValueError:
         data = None   # reported as malformed below; the raw text is still scanned
+    if scan is not None:
+        scan.observe(text, data, f"local action {path}")
     if mentions_dev_mode(source_text(text, data)):
         reasons.append(f"{DEV_MODE_VARIABLE} set in local action {path}; development mode mapping unsupported")
     if deploy_subdirectory(text, pkgdown_repo, data):
@@ -839,10 +923,28 @@ def workflow_blocks(root, sha, tree, prefix=""):
         if posixpath.basename(path) in STARTUP_FILES and posixpath.dirname(path) in startup_dirs:
             if mentions_dev_mode(git(root, "show", sha + ":" + path, strip=False)):
                 reasons.append(f"{DEV_MODE_VARIABLE} set in {path}; development mode mapping unsupported")
-    wording = {p: "pkgdown" in source_text(t, parsed.get(p)).lower() for p, t in texts.items()}
-    # Site workflows first, so a script both kinds reach is judged strictly; the visited set skips it afterwards.
-    for path, text in sorted(texts.items(), key=lambda item: not (wording[item[0]] or not any(wording.values()))):
-        scan.strict = wording[path] or not any(wording.values())
+    # Strict by default: a workflow is relaxed only when it shows no ability to publish (`workflow_may_publish`). The
+    # evidence includes what its reached scripts and local actions show, found by a probe walk that discards its reasons.
+    capable = {}
+    for path, text in texts.items():
+        probe = ScriptScan(root, sha, files, tree if isinstance(tree, dict) else {}, pkgdown_repo)
+        evidence = []
+        if path in errors:
+            evidence.append("workflow YAML unreadable (permissions unknown)")
+        else:
+            try:
+                for _, job, steps in workflow_jobs(parsed[path], path):
+                    start = scan.directory("", default_directory(job, parsed[path])) if default_directory(job, parsed[path]) is not None else ""
+                    for step in steps:
+                        probe.run_step(step, start)
+                        if step.get("uses", "").startswith("./"):
+                            local_action_reasons(root, sha, files, step["uses"], set(), pkgdown_repo, probe)
+            except ValueError:
+                evidence.append("workflow structure unreadable (permissions unknown)")
+        capable[path] = workflow_may_publish(parsed.get(path), text, evidence + probe.evidence)
+    # Publish-capable workflows first, so a script both kinds reach is judged strictly; the visited set skips it afterwards.
+    for path, text in sorted(texts.items(), key=lambda item: not capable[item[0]]):
+        scan.strict, scan.context = bool(capable[path]), (path, capable[path])
         if mentions_dev_mode(source_text(text, parsed.get(path))):
             reasons.append(f"workflow PKGDOWN_DEV_MODE mapping unsupported ({path})")
         if deploy_subdirectory(text, pkgdown_repo, parsed.get(path)):
