@@ -264,7 +264,7 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       stage therefore never claims how the site is deployed; the marker is a fixed property of the stage, not a
       result of the scan. Known residuals found in review and not patched: an allowlisted program that loads a
       script (`awk -f tools/publish.awk`, `sed -f`), `gh repo sync` and other `gh` subcommands that update
-      repository content, and deploy credentials (`GH_TOKEN: ${{ secrets.DEPLOY_PAT }}`) in a workflow with
+      repository content, and deploy credentials (a personal access token passed to a step as `GH_TOKEN`) in a workflow with
       read-only `contents`.
 
 README replay loads the working tree with pkgload/evaluate, retaining hidden
