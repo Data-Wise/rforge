@@ -3040,3 +3040,77 @@ def test_the_pull_request_push_action_is_not_a_default_branch_push(tmp_path):
     # r-lib/actions/pr-push (the /document and /style bots in glue) pushes the PR branch; named pathspecs beside it stay tier two.
     b = stage_push_workflow("git add man/\\* NAMESPACE", "git commit -m Document", push=False, steps="      - uses: r-lib/actions/pr-push@v2\n")
     assert pair(tmp_path, b, a=NO_BUILD, files={"scripts/site.R": CLEAN_R})["state"] == "complete"
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Codex round 16. A stage is NAMED (tier two) only when every pathspec is a plain literal path outside the destination.
+# Pathspec magic, pathspec files and index-changing git plumbing stage everything, and unknown forms fail closed.
+# ---------------------------------------------------------------------------------------------------------
+MAGIC_FORMS = ["git add -A -- ':(top)docs'", "git add ':/docs'", "git add ':(glob)do*'", "git add ':(icase)DOCS'", "git add ':!data'", "git add ':^data'",
+               "git add -- docs", "git add -- ':(top)docs/sitemap.xml'", "git add ../docs", "git add /abs/docs", "git add ~/docs", "git add {docs,data}",
+               "git add 'docs\\x'"]
+
+
+@pytest.mark.parametrize("add", MAGIC_FORMS)
+def test_pathspec_magic_and_unreadable_forms_stage_everything(tmp_path, add):
+    ok, why = capable(audit_push(tmp_path, "echo hello", add=add))
+    assert ok, (add, why)
+
+
+@pytest.mark.parametrize("add", ["git add --pathspec-from-file=files.txt", "git add --pathspec-from-file files.txt", "git add --pathspec-from-file=- --pathspec-file-nul",
+                                 "git add --pathspec-from-file=$LIST"])
+def test_a_pathspec_file_stages_everything_whether_or_not_it_can_be_read(tmp_path, add):
+    ok, why = capable(audit_push(tmp_path, "echo hello", add=add, files={"files.txt": "docs\n"}))
+    assert ok, (add, why)
+
+
+@pytest.mark.parametrize("add", ["git update-index --add docs/x", "git read-tree HEAD", "git checkout-index -a", "git apply site.patch", "git am site.mbox", "git stash",
+                                 "git write-tree"])
+def test_index_changing_git_plumbing_stages_everything(tmp_path, add):
+    ok, why = capable(audit_push(tmp_path, "echo hello", add=add, commit="git commit -m x"))
+    assert ok, (add, why)
+
+
+def test_commit_tree_plumbing_stages_everything(tmp_path):
+    ok, why = capable(audit_push(tmp_path, "T=$(git write-tree)", add="git commit-tree $T -m x", commit=None))
+    assert ok, why
+
+
+@pytest.mark.parametrize("commit", ["git commit -m x docs", "git commit -m x -- ':(top)docs'", "git commit -m x ':/docs'", "git commit -m x 'docs*'"])
+def test_a_commit_that_names_a_path_that_is_not_plain_counts(tmp_path, commit):
+    ok, why = capable(audit_push(tmp_path, "echo hello", add="git status", commit=commit))
+    assert ok, (commit, why)
+
+
+@pytest.mark.parametrize("cmd", ["git rm -r docs", "git rm --cached ':(top)docs'", "git mv _site docs", "git mv a.csv docs/a.csv"])
+def test_rm_and_mv_of_the_destination_or_an_unplain_path_count(tmp_path, cmd):
+    ok, why = capable(audit_push(tmp_path, "echo hello", add=cmd))
+    assert ok, (cmd, why)
+
+
+@pytest.mark.parametrize("add", ["git add data/history.csv", "git add -- qc-history.csv", "git add -- data/history.csv reports/q.csv", "git add 'data/*.csv'", "git add man/*.Rd NAMESPACE",
+                                 "git add -f data/history.csv", "git add --verbose data/history.csv", "git rm old-notes.md", "git mv a.csv b.csv"])
+def test_plain_literal_pathspecs_outside_the_destination_stay_named(tmp_path, add):
+    for n, tracked in enumerate((False, True)):
+        r = audit_push(fresh(tmp_path, n), "echo hello", add=add, tracked=tracked)
+        assert r["state"] == "complete", (add, tracked, r["reasons"])
+
+
+def test_the_qc_monthly_shape_and_the_declared_branch_stay_tier_two(tmp_path):
+    r = audit_push(tmp_path, "echo hello", add="git add qc-history.csv", commit="git commit -m qc", push="git push origin qc-results", files={".rforge.yaml": KEY})
+    assert r["state"] == "complete", r["reasons"]
+    r = audit_push(fresh(tmp_path, "m"), "echo hello", add="git add -A -- ':(top)docs'", push="git push origin qc-results", files={".rforge.yaml": KEY})
+    assert r["state"] == "complete", r["reasons"]
+
+
+def test_a_magic_pathspec_without_a_push_is_relaxed(tmp_path):
+    assert audit_push(tmp_path, "echo hello", add="git add -A -- ':(top)docs'", push=None)["state"] == "complete"
+
+
+def test_plain_literal_path_unit():
+    from lib._docsite import plain_literal_path
+    names = ["docs"]
+    for good in ("data/history.csv", "qc-history.csv", "R/foo.R", "docs-archive/x.md", "man/*.Rd", "data/*.csv", "NEWS.md"):
+        assert plain_literal_path(good, names), good
+    for bad in (":(top)docs", ":/docs", ":!data", "docs", "docs/x", "./docs", "..", "../docs", "/x", "~/x", "$X", "{a,b}", ".", "./", "*", "d*", "*.html", "-A", "a\\b", ""):
+        assert not plain_literal_path(bad, names), bad

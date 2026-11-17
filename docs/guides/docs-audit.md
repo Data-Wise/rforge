@@ -160,7 +160,12 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       only specific pathspecs outside the destination (`git add data/history.csv`) stays tier 2 unless
       the workflow also reaches an unresolved reference (below), and a push to a branch declared
       non-publishing is not a push; a pathspec that is, contains, is a parent of or is a
-      glob that can match the destination (`docs*`, `*.html`) is tier 1. `r-lib/actions/pr-push`
+      glob that can match the destination (`docs*`, `*.html`) is tier 1. A stage is **named** only when
+      every pathspec is a plain literal path outside the destination; pathspec magic (`:(top)docs`,
+      `:/docs`, `:!x`, `:(glob)`), `--pathspec-from-file`, `..`, absolute or `~` paths, expansion and
+      braces, a commit that names such a path, and git plumbing that changes the index or tree
+      (`update-index`, `read-tree`, `commit-tree`, `checkout-index`, `apply`, `am`, `stash`) stage
+      everything, so an unknown form fails closed. `r-lib/actions/pr-push`
       pushes a pull request's own branch and is not counted. A repository that is not a pkgdown
       repository is not affected. **Cross-workflow
       handoff:** build output can reach the staging workflow from another workflow, so a workflow that

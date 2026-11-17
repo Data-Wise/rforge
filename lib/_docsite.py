@@ -1120,19 +1120,48 @@ def git_parts(args):
     return sub, rest, positional, flags, scope
 
 
+PATHSPEC_FILE_FLAGS = ("--pathspec-from-file", "--pathspec-file-nul")
+INDEX_PLUMBING = ("update-index", "read-tree", "write-tree", "commit-tree", "checkout-index", "apply", "am", "stash")
+STAGE_SUBCOMMANDS = ("add", "stage", "commit", "rm", "mv")
+
+
+def plain_literal_path(path, names):
+    """Is this git pathspec a plain literal relative path (or a glob that cannot match the destination) outside the destination?
+    Pathspec magic (`:(top)docs`, `:/docs`, `:!x`, `:(glob)`), expansion (`$X`, `~`, backticks, braces), `..`, absolute paths,
+    `.`, an option-looking token, and anything that is, contains, is a parent of or can match the destination are not."""
+    if not path or path.startswith((":", "-", "/", "~")) or DYNAMIC_TOKEN.search(path) or re.search(r"[{}\\\\]", path):
+        return False
+    normal = posixpath.normpath(path)
+    if normal == "." or ".." in normal.split("/"):
+        return False
+    return not names_directory(path, names, pathspec=True)
+
+
 def stage_all_command(args, names):
-    """Does this `git` command stage the whole tree? `git add -A|--all|-u|--update` with no pathspec, `git add` of `.`, `:/`,
-    `*` or a dynamic pathspec, and `git commit -a`. A named pathspec that is not the destination (`git add data/history.csv`)
-    is not."""
+    """Does this `git` command stage the whole tree, or something the audit cannot prove is outside the destination?
+
+    A stage is NAMED (it does not count) only when every pathspec is a plain literal path outside the destination
+    (`git add data/history.csv`): see `plain_literal_path`. Everything else stages everything: `git add -A|--all|-u|--update` with
+    no pathspec, `.`, `:/`, `*`, a dynamic pathspec, pathspec magic, `--pathspec-from-file`, `git commit -a`, a commit that
+    names a path that is not plain, and the git plumbing that changes the index or tree (`update-index`, `read-tree`,
+    `commit-tree`, `checkout-index`, `apply`, `am`, `stash`). An unknown index-changing command fails closed."""
     sub, rest, positional, flags, scope = git_parts(args)
+    if sub in INDEX_PLUMBING:
+        return True
+    if any(f.split("=", 1)[0] in PATHSPEC_FILE_FLAGS for f in flags):
+        return sub in STAGE_SUBCOMMANDS
     if sub == "commit":
-        return any(f == "--all" or (not f.startswith("--") and "a" in f[1:]) for f in flags)
-    if sub != "add":
+        if any(f == "--all" or (not f.startswith("--") and "a" in f[1:]) for f in flags):
+            return True
+        return any(not plain_literal_path(p, names) for p in positional)
+    if sub in ("rm", "mv"):
+        return any(not plain_literal_path(p, names) for p in positional)
+    if sub not in ("add", "stage"):
         return False
     everything = any(f in ("-A", "--all", "-u", "--update") or (not f.startswith("--") and re.search(r"[Au]", f[1:])) for f in flags)
     if not positional:
         return everything
-    return any(p in (".", "./", ":/", "/", "*", "**") or DYNAMIC_TOKEN.search(p) or re.fullmatch(r"\*+", p) for p in positional)
+    return any(not plain_literal_path(p, names) for p in positional)
 
 
 def stage_command(program, args, names, built):
@@ -1226,7 +1255,7 @@ def handoff_facts(texts, names, exempt=()):
         args = tokens[1:]
         if stage_command("git", args, names, True) or (args[:1] == ["add"] and any(a in ("-f", "--force") for a in args)):
             facts.add("stage")
-        if git_parts(args)[0] in ("add", "commit"):
+        if git_parts(args)[0] in STAGE_SUBCOMMANDS or git_parts(args)[0] in INDEX_PLUMBING:
             facts.add("stage_any")             # any staging at all, named pathspecs included
         if stage_all_command(args, names):
             facts.add("stage_all")
