@@ -190,8 +190,9 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       `uv run <unlisted tool>`, `node`, `quarto`, `docker`, any unlisted binary, a dynamic command
       (`$X`, `bash -c "$X"`), a Python script that runs other code (`subprocess`, `os.system`, `exec`).
       The list is not extended per generator: the default for an unknown executable is to fail closed.
-      For a stage-and-push workflow every such reference is an incomplete reason; other workflows keep
-      treating opaque calls as not detected. Without a build, download or unresolved reference anywhere, a
+      For every workflow that may publish (it stages and pushes, or deploys through a Pages or deploy
+      action, or is tier 1 or tier 2 capable under the tracked-destination rule) every such reference is an
+      incomplete reason; a workflow that cannot publish keeps treating opaque calls as not detected. Without a build, download or unresolved reference anywhere, a
       stage-and-push workflow stays tier 2; a push to a branch declared non-publishing is not a push
       for this rule. **Tier 2, only when the pinned tree tracks the
       pkgdown destination:** plain `contents: write`; a push action such as `ad-m/github-push-action`;
@@ -237,7 +238,7 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       at all; a stage-and-push workflow whose only route to site files is an
       action from another repository, a submodule update or a checkout of another ref, with no
       build, download or unresolved reference anywhere in the repository; `knit`/`render` and unlisted
-      executables in a workflow that does not stage and push; a destination written through a name the scan cannot read; a site branch mislabeled in
+      executables in a workflow that cannot publish; a destination written through a name the scan cannot read; a site branch mislabeled in
       `nonpublishing-branches` (documented gap: an unverified maintainer declaration); actions from other repositories (beyond the fail-closed reusable-workflow rule); manual
       deploys outside CI.
     - **How names are matched.** YAML inputs (workflows, local actions, front matter) are read as

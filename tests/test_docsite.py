@@ -3200,3 +3200,22 @@ def test_a_literal_path_to_a_publish_command_or_downloader_is_detected(tmp_path)
         assert (a["state"], a["reasons"]) == (b["state"], b["reasons"]), (bare, a["reasons"], b["reasons"])
     ok, why = capable_or_unresolved(audit_push(fresh(tmp_path, "c"), "/usr/bin/curl -sL https://example.org/site.tgz -o site.tgz", add="/usr/bin/git add -A", push="/usr/bin/git push origin main"))
     assert ok, why
+
+
+# Codex round 23. An opaque build in ANY workflow that may publish (a Pages deploy included) is an incomplete reason; in a
+# workflow that cannot publish it stays documented as not detected.
+PAGES = "      - uses: actions/deploy-pages@v4\n"
+
+
+@pytest.mark.parametrize("build", ["python -m site_generator", "python -c 'import gen; gen.run()'", "node build.js", "mytool build --site", "$BUILDER run"])
+def test_an_opaque_build_before_a_pages_deploy_is_incomplete(tmp_path, build):
+    r = pair(tmp_path, stage_push_workflow(build, push=False, steps=PAGES), files={"scripts/site.R": CLEAN_R}, a=NO_BUILD, tracked=False)
+    assert r["state"] == "incomplete", (build, r["reasons"])
+    assert any(build.split()[0].strip("$") in x or "opaque" in x or "cannot be verified" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_pages_deploy_with_nothing_opaque_stays_complete_and_an_opaque_build_without_a_deploy_is_not_detected(tmp_path):
+    clean = pair(tmp_path, stage_push_workflow("echo hello", push=False, steps=PAGES), files={"scripts/site.R": CLEAN_R}, a=NO_BUILD, tracked=False)
+    assert clean["state"] == "complete", clean["reasons"]
+    quiet = pair(fresh(tmp_path, "q"), stage_push_workflow("python -m site_generator", push=False), files={"scripts/site.R": CLEAN_R}, a=NO_BUILD, tracked=False)
+    assert quiet["state"] == "complete", quiet["reasons"]

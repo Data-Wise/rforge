@@ -608,7 +608,8 @@ class ScriptScan:
     def opaque(self, why, ref):
         """A call that runs code the scan cannot read (an interpreter it does not follow, `eval(parse())`, a document
         render). Always recorded as unresolved, so a workflow that also stages and pushes is publish-capable; it is a reason
-        only for such a workflow (`stage_push`), because elsewhere these calls are documented as not detected."""
+        only for a workflow that may publish (`stage_push`: it stages and pushes, or any publish-capable workflow, a Pages
+        deploy included), because in a workflow that cannot publish these calls are documented as not detected."""
         if self.quiet:                       # a line that is not a command (a Makefile variable or target)
             return
         self.unresolved.append(f"{why}: {ref}")
@@ -1608,7 +1609,7 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
         capable[path] = classify_evidence(state[path][0], tracked, destination)
     # Publish-capable workflows first, so a script both kinds reach is judged strictly; the visited set skips it afterwards.
     for path, text in sorted(texts.items(), key=lambda item: (item[0] not in handoff, not capable[item[0]])):
-        scan.strict, scan.context, scan.stage_push = bool(capable[path]), (path, capable[path]), path in handoff
+        scan.strict, scan.context, scan.stage_push = bool(capable[path]), (path, capable[path]), path in handoff or bool(capable[path])
         if mentions_dev_mode(source_text(text, parsed.get(path))):
             reasons.append(f"workflow PKGDOWN_DEV_MODE mapping unsupported ({path})")
         if deploy_subdirectory(text, pkgdown_repo, parsed.get(path)):
