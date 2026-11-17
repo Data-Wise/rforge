@@ -536,10 +536,13 @@ symlinks under `vignettes/`. An article is refused only for the front-matter key
 code as tolerant text; scripts a `run:` step executes are read at the pinned ref (5 levels, 40 files) and scanned the
 same way (`make` follows `include`), and an unreadable, missing, symlinked, dynamic or over-cap reference is incomplete in a
 pkgdown repository for any workflow that may publish (tier 1: pkgdown wording, a Pages or deploy action, `deploy_to_branch`/`gh-pages`,
-`pages`/`id-token` write, an explicit-branch `git push` or a remote publish command (`rsync`/`scp`/`aws s3`/`netlify`/`firebase`/`vercel`);
+`pages`/`id-token` write, an explicit-branch `git push`, a remote publish command (`rsync`/`scp`/`aws s3`/`netlify`/`firebase`/`vercel`) or a command that
+builds or stages the destination even when the tree does not track it yet (`git add`/`git commit` naming it, `git add -A` after a pkgdown build,
+`git subtree push`, `git worktree add`, `cp`/`mv`/`rsync` into it);
 tier 2, only when the pinned tree tracks the pkgdown destination (placeholder-only directories do not count; a build call's destination
 joins the check): `contents: write`, a default-branch or refspec-less `git push`, a push action, no `permissions:` key; a branch listed in
-`.rforge.yaml` `docs.site.nonpublishing-branches` is tier 2; reusable workflows share capability with their caller; read-only workflows are relaxed);
+`.rforge.yaml` `docs.site.nonpublishing-branches` is tier 2 (an unverified maintainer declaration: a mislabeled site branch yields a wrong complete; the
+stage reports `nonpublishing_branches_honored` and the text report an info line when it applies); reusable workflows share capability with their caller; read-only workflows are relaxed);
 other overrides, names built any other way, `uses:` actions from other repositories, manual deploys outside CI and
 `knit`/`render` of a document are not detected. A complete site stage proves route presence, not
 content freshness (`content_freshness: "unverified"`).

@@ -168,10 +168,13 @@ R and shell code is matched as text (quoted or backticked `subdir`, `paste0()` s
 `run:` step executes (`Rscript`, `R -f`, `bash`, `python`, `source`, `./x`, `make`, R `source()`/`system()`) are read at the pinned
 ref, followed up to 5 levels and 40 files (`make` follows `include`) and scanned the same way; in a pkgdown repository, for any
 workflow that may publish (tier 1: pkgdown wording, a Pages or deploy action, `deploy_to_branch`/`gh-pages`, `pages`/`id-token`
-write, an explicit-branch `git push` or a remote publish command (`rsync`/`scp`/`aws s3`/`netlify`/`firebase`/`vercel`); tier 2,
+write, an explicit-branch `git push`, a remote publish command (`rsync`/`scp`/`aws s3`/`netlify`/`firebase`/`vercel`) or a command that
+builds or stages the destination even when the tree does not track it yet (`git add`/`git commit` naming it, `git add -A` after a pkgdown build,
+`git subtree push`, `git worktree add`, `cp`/`mv`/`rsync` into it); tier 2,
 only when the pinned tree tracks the pkgdown destination (placeholder-only directories do not count; a build call's destination
 joins the check): `contents: write`, a default-branch or refspec-less `git push`, a push action, no `permissions:` key; a branch
-listed in `.rforge.yaml` `docs.site.nonpublishing-branches` is tier 2; reusable workflows share capability with their caller;
+listed in `.rforge.yaml` `docs.site.nonpublishing-branches` is tier 2 (an unverified maintainer declaration: a mislabeled site branch yields a wrong complete; the
+stage reports `nonpublishing_branches_honored` and the text report an info line when it applies); reusable workflows share capability with their caller;
 read-only workflows are relaxed), an unreadable, missing, symlinked,
 dynamic or over-cap reference is incomplete. Other overrides, names built any other way, `uses:` actions from other repositories,
 manual deploys outside CI and `knit`/`render` of a document are not detected.

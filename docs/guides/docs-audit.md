@@ -146,7 +146,12 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       dynamic remote or refspec, `--all` and `--mirror` fail closed to tier 1; the default branch is
       decided by name only); a command that names a remote target (`rsync` or `scp` to a host,
       `aws s3 sync|cp|mv` to `s3://`, `gsutil` to `gs://`, `netlify` or `firebase deploy`, `surge`,
-      `vercel`, `wrangler pages`, `ghp-import`). **Tier 2, only when the pinned tree tracks the
+      `vercel`, `wrangler pages`, `ghp-import`); a command that **builds or stages the destination**,
+      whether or not the pinned tree tracks it yet (`git add` or `git commit` naming the destination,
+      `git add -A`/`.`/`-u` or `git commit -a` when a pkgdown build appears in the same workflow or a script
+      it reaches, `git subtree push`, `git worktree add <destination>`, `cp`/`mv`/`rsync`/`ln` into the
+      destination), because such a workflow can create and push `docs/` from nothing. A push that stages
+      something else, such as `git add data/history.csv`, is not stage evidence. **Tier 2, only when the pinned tree tracks the
       pkgdown destination:** plain `contents: write`; a push action such as `ad-m/github-push-action`;
       a job with no `permissions:` key at either level; a push with no refspec or to the default
       branch; the same publish programs with no remote target. The destination is the config
@@ -176,10 +181,20 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       tracked. Only a list of literal names counts: a string, glob, variable or non-string entry, or an
       unparseable file, exempts nothing, and a key that exists only in the working tree or after the
       pinned ref is not read. `gh-pages` text and deploy actions stay tier 1 whatever the list says.
+
+      **The list is an unverified declaration.** It is a maintainer attestation in the same trust class as
+      `docs.allowlist` and `site.allowlist`: the engine cannot see what a branch serves without a live
+      GitHub Pages API call, which the offline default forbids, so a site branch listed by mistake yields
+      a wrong `complete`. Review the list when you review the site setup. Whenever a declaration changes
+      the result, the site stage carries `nonpublishing_branches_honored` (the sorted names whose push
+      was classified as non-publishing because of it; an empty list when none) and the text report prints
+      an `info` line naming them, so a reader sees that an exemption was applied.
+
       A workflow with no evidence is relaxed, because QC and simulation scripts are full of
-      `source(file.path(...))`. Not detected: a workflow with no tier 1 signal that pushes to a
-      destination the tree does not track; a script that pushes from a workflow that shows no signal
-      at all; actions from other repositories (beyond the fail-closed reusable-workflow rule); manual
+      `source(file.path(...))`. Not detected: a script that pushes from a workflow that shows no signal
+      at all; a build that writes the destination through a name the scan cannot read (a variable, a
+      path built at run time) and stages it by a command it cannot parse; a site branch mislabeled in
+      `nonpublishing-branches` (documented gap: an unverified maintainer declaration); actions from other repositories (beyond the fail-closed reusable-workflow rule); manual
       deploys outside CI.
     - **How names are matched.** YAML inputs (workflows, local actions, front matter) are read as
       parsed structures, so quoted or escaped keys, flow mappings, anchors, merge keys and any

@@ -104,10 +104,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (read at the pinned ref); a push to one is tier 2. A reusable workflow shares capability with its
   caller, and an unresolvable callee counts as capable. Read-only workflows are relaxed, and the
   reason names the tier and the evidence. `make` follows `include`, `-include` and `sinclude`. A clean
-  readable script never blocks. A signal inside an R comment still blocks. Not detected: scripts
-  fetched at runtime, a workflow with no tier 1 signal that pushes to an untracked destination, a
+  readable script never blocks. A signal inside an R comment still blocks. A command that builds or
+  stages the destination counts as tier 1 whether or not the tree tracks it yet (`git add`/`git commit`
+  naming it, `git add -A`/`.` after a pkgdown build, `git subtree push`, `git worktree add`, `cp`/`mv`/
+  `rsync` into it), so a workflow that generates `docs/`, force-adds and pushes it is strict; a push of
+  `data/history.csv` stays tier 2. Known gaps (documented, not fixed): scripts fetched at runtime, a
   script that pushes from a no-signal workflow, actions from other repositories (beyond the
-  fail-closed reusable-workflow rule) and manual deploys.
+  fail-closed reusable-workflow rule), manual deploys, and a site branch mislabeled in
+  `docs.site.nonpublishing-branches`. That key is an unverified maintainer declaration in the same
+  trust class as `site.allowlist`: the engine cannot see what a branch serves without a live GitHub
+  Pages API call, which the offline default forbids, so a mislabeled site branch yields a wrong
+  `complete`. Disposition: accepted and documented; the site stage reports
+  `nonpublishing_branches_honored` and the text report prints an info line whenever the declaration
+  changed a classification, so the exemption is visible to the reader.
 - `docs:check --site` counts a sitemap entry only when it is a `loc` that is a direct child
   of a `url` in the sitemaps.org 0.9 namespace. A `loc` inside an image/video/xhtml
   extension element, nested elsewhere or outside a `url` no longer satisfies an expected

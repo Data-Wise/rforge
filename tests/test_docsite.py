@@ -1860,7 +1860,7 @@ TIER2 = [
     pytest.param(workflow_b(), id="missing-permissions-key"),
     pytest.param(workflow_b(top="permissions: read-all\n", steps="      - uses: ad-m/github-push-action@v0.8.0\n"), id="push-action"),
     pytest.param(workflow_b(top="permissions: read-all\n", cmd="git push origin HEAD:main\n      - run: Rscript scripts/site.R"), id="git-push-in-a-run-body"),
-    pytest.param(workflow_b(top="permissions: read-all\n", cmd="rsync -a out/ docs/\n      - run: Rscript scripts/site.R"), id="rsync-to-a-local-directory"),
+    pytest.param(workflow_b(top="permissions: read-all\n", cmd="rsync -a out/ copy/\n      - run: Rscript scripts/site.R"), id="rsync-to-a-local-directory"),
     pytest.param(workflow_b(top="permissions: read-all\n", cmd="aws s3 ls\n      - run: Rscript scripts/site.R"), id="aws-s3-without-a-target"),
     pytest.param(workflow_b(top="permissions: read-all\n", cmd="netlify status\n      - run: Rscript scripts/site.R"), id="netlify-without-deploy"),
 ]
@@ -2423,3 +2423,144 @@ def test_the_exempt_parameter_changes_only_the_classification_of_the_named_branc
     assert {t for t, _ in site.text_publish_evidence("git push origin site", "x", exempt=("qc-results",))} == {1}
     labels = [label for _, label in site.text_publish_evidence("git push origin qc-results", "x", exempt=("qc-results",))]
     assert any("declared non-publishing branch qc-results" in label for label in labels)
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Codex round 11, finding 1. A workflow that builds or stages the destination before it pushes can publish site files
+# whether or not the pinned tree tracks the destination yet, so that evidence is tier one regardless of tracking.
+# ---------------------------------------------------------------------------------------------------------
+def staged(text, names=("docs",), build=False):
+    texts = [("the workflow", text)] + ([("scripts/build.R", "pkgdown::build_site()")] if build else [])
+    return site.stage_evidence(texts, names)
+
+
+STAGE_NAMES_DESTINATION = [
+    "git add -f docs", "git add docs", "git add docs/", "git add docs/index.html", "git add -f ./docs", "git add -A docs",
+    "git add --force docs/*", "git add pkg/docs", "git -C pkg add docs", "git commit -m x docs", "git commit -am x -- docs",
+    "git subtree push --prefix docs origin main", "git subtree push --prefix=docs origin site", "git subtree push --prefix site origin main",
+    "git worktree add docs gh-pages", "git worktree add -B site docs origin/main", "git worktree add ./docs main",
+    "cp -r _site/. docs/", "cp -R _site docs", "mv _site docs", "rsync -a _site/ docs/", "rsync -a _site/ ./docs",
+    "ln -s _site docs",
+]
+STAGE_AFTER_BUILD = ["git add .", "git add -A", "git add --all", "git add -u", "git commit -a -m x", "git commit -am x", "git add -A ."]
+STAGE_NEGATIVE = [
+    "git add data/history.csv", "git add qc-history.csv", "git add .", "git add -A", "git commit -m x", "git commit -am x",
+    "git add docs-archive/a.md", "git add mydocs", "git add docsets/x", "git add notes/docs.txt", "git worktree add ../tmp main",
+    "cp a.csv data/", "mv a.csv history/", "rsync -a a.csv data/", "git push origin main",
+]
+
+
+@pytest.mark.parametrize("command", STAGE_NAMES_DESTINATION)
+def test_a_command_that_stages_the_destination_is_tier_one(command):
+    found = staged(command)
+    assert {t for t, _ in found} == {1}, (command, found)
+    assert "stages the site destination" in found[0][1]
+
+
+@pytest.mark.parametrize("command", STAGE_AFTER_BUILD)
+def test_staging_everything_after_a_build_step_is_tier_one(command):
+    assert {t for t, _ in staged(command, build=True)} == {1}, command
+    # The same command in a text with no pkgdown build anywhere stages no site files.
+    assert staged(command) == [], command
+
+
+@pytest.mark.parametrize("command", STAGE_NEGATIVE)
+def test_staging_something_else_is_not_stage_evidence(command):
+    assert staged(command) == [], (command, staged(command))
+
+
+def test_a_destination_named_in_a_build_call_is_a_stage_name():
+    assert {t for t, _ in staged("git add public", names=("docs", "public"))} == {1}
+    assert staged("git add public", names=("docs",)) == []
+    assert staged("git add docs", names=()) == []
+
+
+def test_generated_and_pushed_site_files_are_strict_even_when_the_tree_has_no_destination(tmp_path):
+    # The Codex fixture: docs/ is absent from the pinned tree; the workflow builds it, force-adds, commits and pushes to main.
+    push = workflow_b(top="permissions:\n  contents: write\n", cmd="git add -f docs\n      - run: git commit -m site\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
+    r = pair(tmp_path, push)
+    assert reached(r, "script reference unsupported", "tier 1"), r["reasons"]
+    assert any("stages" in x and "docs" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_add_everything_after_a_build_step_in_a_reached_script_is_strict(tmp_path):
+    build = "pkgdown::build_site()\n"
+    push = workflow_b(top="permissions:\n  contents: write\n",
+                      cmd="Rscript scripts/build.R\n      - run: git add -A\n      - run: git commit -m site\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
+    r = pair(tmp_path, push, files={"scripts/build.R": build})
+    assert reached(r, "script reference unsupported", "tier 1"), r["reasons"]
+    # The same workflow without a build step anywhere stays relaxed while the destination is untracked.
+    quiet = workflow_b(top="permissions:\n  contents: write\n",
+                       cmd="git add -A\n      - run: git commit -m x\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
+    assert pair(fresh(tmp_path, "quiet"), quiet)["state"] == "complete"
+
+
+def test_a_staging_command_inside_a_reached_script_or_a_local_action_is_strict(tmp_path):
+    script = "system('git add -f docs')\n" + DYNAMIC_SITE_R
+    b = workflow_b(top="permissions:\n  contents: write\n")
+    assert reached(pair(tmp_path, b, files={"scripts/site.R": script}), "script reference unsupported", "tier 1")
+    action = "runs:\n  using: composite\n  steps:\n    - run: git add -f docs\n      shell: bash\n"
+    b = workflow_b(top="permissions:\n  contents: write\n", steps="      - uses: ./.github/actions/ship\n")
+    r = pair(fresh(tmp_path, "act"), b, files={".github/actions/ship/action.yml": action})
+    assert reached(r, "script reference unsupported", "tier 1")
+
+
+def test_a_destination_named_by_the_config_or_a_build_call_is_the_stage_name(tmp_path):
+    config = "destination: public\n"
+    push = workflow_b(top="permissions:\n  contents: write\n", cmd="git add -f public\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
+    assert reached(pair(tmp_path, push, config=config), "script reference unsupported", "tier 1")
+    # With the default destination, `git add public` stages something unrelated.
+    assert pair(fresh(tmp_path, "d"), push)["state"] == "complete"
+    build = "pkgdown::build_site(destination = 'out')\n"
+    out = workflow_b(top="permissions:\n  contents: write\n", cmd="Rscript scripts/build.R\n      - run: git add -f out\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
+    assert reached(pair(fresh(tmp_path, "e"), out, files={"scripts/build.R": build}), "script reference unsupported", "tier 1")
+
+
+def test_a_csv_history_push_stays_tier_two_and_relaxed_when_the_destination_is_untracked(tmp_path):
+    csv = workflow_b(top="permissions:\n  contents: write\n",
+                     cmd="git add data/history.csv\n      - run: git commit -m history\n      - run: git push origin main\n      - run: Rscript scripts/site.R")
+    assert pair(tmp_path, csv)["state"] == "complete"
+    # With a tracked destination the same push is tier two and counts, as before.
+    assert reached(pair(fresh(tmp_path, "t"), csv, tracked=True), "script reference unsupported", "tier 2")
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Codex round 11, finding 2 (rejected as a verification request, accepted as visibility): the key is an unverified
+# maintainer declaration, so a reader must be able to see when it was applied.
+# ---------------------------------------------------------------------------------------------------------
+def rendered(stage):
+    return docaudit.format_text({"findings": [], "messages": [], "stages": {"site": stage}})
+
+
+def test_an_applied_declaration_is_reported_in_the_stage_and_the_text_report(tmp_path):
+    r = pair(tmp_path, qc_push(), files={".rforge.yaml": KEY})
+    assert r["state"] == "complete"
+    assert r["nonpublishing_branches_honored"] == ["qc-results"]
+    line = next(x for x in rendered(r).splitlines() if x.startswith("info"))
+    assert "nonpublishing-branches" in line and "qc-results" in line and "unverified" in line
+
+
+def test_the_field_is_an_empty_list_and_there_is_no_report_line_when_nothing_was_honored(tmp_path):
+    for n, (workflow, files) in enumerate([
+            (qc_push(), {}),                                                # push to a branch the repository did not declare
+            (qc_push("origin main"), {".rforge.yaml": KEY}),                # declared, but nothing pushes to it
+            (workflow_b(top="permissions: read-all\n"), {".rforge.yaml": KEY})]):
+        r = pair(fresh(tmp_path, n), workflow, files=files)
+        assert r["nonpublishing_branches_honored"] == [], (n, r)
+        assert not any(x.startswith("info") for x in rendered(r).splitlines()), n
+
+
+def test_only_the_branches_the_declaration_actually_exempted_are_listed(tmp_path):
+    key = "docs:\n  site:\n    nonpublishing-branches:\n      - qc-results\n      - unused\n"
+    r = pair(tmp_path, qc_push(), files={".rforge.yaml": key})
+    assert r["nonpublishing_branches_honored"] == ["qc-results"]
+
+
+def test_the_field_is_present_on_an_incomplete_stage(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: SITE_A, QC_WORKFLOW: qc_push(), "scripts/site.R": DYNAMIC_SITE_R, ".rforge.yaml": KEY})
+        early = site.audit(pkg, url="ftp://example.invalid/", ref="main")          # refused before the workflows are read
+        late = site.audit(pkg, url=root + "wrong/", ref="main")                    # workflows read, sitemap absent
+    assert early["state"] == "incomplete" and early["nonpublishing_branches_honored"] == []
+    assert late["state"] == "incomplete" and late["nonpublishing_branches_honored"] == ["qc-results"]

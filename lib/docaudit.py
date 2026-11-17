@@ -1145,6 +1145,10 @@ def format_text(report: dict) -> str:
         for name, stage in r.get("stages", {}).items():
             lines.append(f"{package + ': ' if package else ''}{name}: {stage['state']} {json.dumps(stage.get('counts', {}), sort_keys=True)}")
             lines.extend(stage.get("reasons", []))
+            if stage.get("nonpublishing_branches_honored"):
+                lines.append(f"info  {name}-declaration  honored docs.site.nonpublishing-branches: "
+                             + ", ".join(stage["nonpublishing_branches_honored"])
+                             + " (an unverified maintainer declaration; a mislabeled site branch yields a wrong complete)")
     for f in report["findings"]:
         where = f"{f['package']}/{f['file']}" if "package" in f else f["file"]
         lines.append(f"{f['severity']:<5} {f['check']:<20} {where}:{f['line']}  {f['message']}")

@@ -574,7 +574,7 @@ class ScriptScan:
     def __init__(self, root, sha, files, modes, pkgdown_repo):
         self.root, self.sha, self.files, self.modes, self.pkgdown_repo = root, sha, files, modes, pkgdown_repo
         self.seen, self.reasons, self.strict, self.evidence, self.context = set(), [], True, [], None
-        self.destinations, self.exempt = [], ()
+        self.destinations, self.exempt, self.texts = [], (), []
 
     def fail(self, why, ref):
         if self.pkgdown_repo and self.strict:
@@ -585,6 +585,7 @@ class ScriptScan:
         """Record `(tier, label)` publish evidence from a reached script or local action (for the workflow that reaches it)."""
         self.evidence.extend(text_publish_evidence(source_text(text, data), where, self.exempt))
         self.destinations.extend(build_destinations(source_text(text, data)))
+        self.texts.append((where, source_text(text, data)))
         steps = ((data or {}).get("runs") or {}).get("steps") if isinstance(data, dict) else None
         for step in steps if isinstance(steps, list) else []:
             self.evidence.extend((tier, f"{label} in {where}") for tier, label in step_publish_evidence(step))
@@ -947,6 +948,100 @@ def text_publish_evidence(text, where, exempt=()):
     return list(dict.fromkeys(found))
 
 
+STAGE_START = re.compile(r"(?<![\w./@=-])(git|cp|mv|rsync|ln|install)(?=\s)")
+STAGE_ALL = ("-A", "--all", ".", "-u", "--update", ":/")      # stages the whole tree (or every tracked change)
+MESSAGE_OPTIONS = ("-m", "-F", "-C", "-c", "-t", "--message", "--file", "--author", "--date", "--template",
+                   "--reuse-message", "--reedit-message", "--cleanup", "--trailer")
+GIT_VALUE_OPTIONS = ("-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path")
+
+
+def names_directory(token, names):
+    """Does a path argument name one of the destination directories (`names`)? `./docs`, `docs/`, `docs/*`, `pkg/docs`
+    and `--prefix=docs` match; `docs-archive`, `mydocs` and `notes/docs.txt` do not."""
+    if token.startswith("-") and "=" in token:
+        token = token.split("=", 1)[1]
+    if not token or token.startswith("-") or DYNAMIC_TOKEN.search(token):
+        return False
+    path = posixpath.normpath(token.lstrip("+"))
+    return any(path == n or path.startswith(n + "/") or path.endswith("/" + n) or f"/{n}/" in path for n in names)
+
+
+def stage_command(program, args, names, built):
+    """A short description when one command stages, copies or mounts the site destination, else None.
+
+    `git add`/`git commit` naming a destination (or staging the whole tree after a pkgdown build), `git subtree push`,
+    `git worktree add <destination>`, and `cp`/`mv`/`rsync`/`ln`/`install` whose target is a destination."""
+    if program == "git":
+        i, scope = 0, []
+        while i < len(args) and args[i].startswith("-"):
+            if args[i] == "-C" and i + 1 < len(args):
+                scope.append(args[i + 1])
+            i += 2 if args[i] in GIT_VALUE_OPTIONS else 1
+        sub, rest = (args[i] if i < len(args) else ""), args[i + 1:]
+        if sub == "subtree" and rest[:1] == ["push"]:
+            return "git subtree push"
+        positional, flags, j = [], [], 0
+        while j < len(rest):
+            arg = rest[j]
+            if arg == "--":
+                positional.extend(rest[j + 1:])
+                break
+            if arg in MESSAGE_OPTIONS:
+                j += 1
+            elif arg.startswith("-") and not arg.startswith("--") and len(arg) > 2 and arg.endswith("m"):
+                flags.append(arg)       # a cluster such as `-am`: the next token is the message
+                j += 1
+            elif arg.startswith("-"):
+                flags.append(arg)
+            else:
+                positional.append(arg)
+            j += 1
+        if sub == "worktree":
+            return "git worktree add" if rest[:1] == ["add"] and any(names_directory(a, names) for a in positional[1:]) else None
+        if sub not in ("add", "commit"):
+            return None
+        if any(names_directory(a, names) for a in scope) or any(names_directory(a, names) for a in positional):
+            return f"git {sub} names the destination"
+        everything = any(a in STAGE_ALL for a in positional + flags) or (
+            sub == "commit" and any(a == "--all" or (not a.startswith("--") and "a" in a[1:]) for a in flags))
+        return f"git {sub} stages everything after a pkgdown build" if built and everything else None
+    positional, i, target = [], 0, None
+    while i < len(args):
+        if args[i] in ("-t", "--target-directory") and i + 1 < len(args):
+            target = args[i + 1]
+            i += 1
+        elif not args[i].startswith("-"):
+            positional.append(args[i])
+        i += 1
+    target = target if target is not None else (positional[-1] if len(positional) >= 2 else None)
+    return f"{program} into the destination" if target is not None and names_directory(target, names) else None
+
+
+def stage_evidence(texts, names):
+    """`(1, label)` evidence from `(where, text)` pairs when a command builds or stages the pkgdown destination.
+
+    A workflow that builds the destination, force-adds it and pushes can publish site files even though the pinned tree
+    holds none yet, so this is tier one whether or not the destination is tracked. `names` are the literal destination
+    directories (the config's `destination:`, default `docs`, and any destination a build call names). Detected: `git add`
+    or `git commit` naming a destination, or staging everything (`.`, `-A`, `-u`, `commit -a`) when a pkgdown build appears
+    in the same workflow or a script it reaches; `git subtree push`; `git worktree add <destination>`; `cp`/`mv`/`rsync`/`ln`
+    into a destination. A push that stages something else (`git add data/history.csv`) is not stage evidence.
+    """
+    names = [posixpath.normpath(n) for n in names if isinstance(n, str) and n and not DYNAMIC_PATH.search(n)]
+    built = any(BUILD_MENTION.search(text) for _, text in texts)
+    found = []
+    for where, text in texts:
+        for match in STAGE_START.finditer(text):
+            commands = shell_commands(logical_line(text, match.start()))
+            tokens = [t.rstrip("\"')],}") for t in commands[0]] if commands else []
+            if not tokens or tokens[0] != match.group(1):
+                continue
+            why = stage_command(tokens[0], tokens[1:], names, built)
+            if why:
+                found.append((1, f"stages the site destination ({why}: `{' '.join(tokens)[:70]}`) in {where}"))
+    return list(dict.fromkeys(found))
+
+
 def build_destinations(text):
     """Destinations a pkgdown build names in `text`: `destination =`/`dest_dir =` in R, `destination:` in YAML text and
     `--destination` on a command line. Only text that mentions pkgdown or build_site is read. A quoted value is a literal;
@@ -1115,12 +1210,13 @@ def local_action_reasons(root, sha, files, uses, seen, pkgdown_repo=True, scan=N
     return reasons
 
 
-def workflow_blocks(root, sha, tree, prefix=""):
+def workflow_blocks(root, sha, tree, prefix="", honored=None):
     """Reasons the pinned tree makes a static route mapping unverifiable (everything is read via `git show` at the SHA).
 
     Scanned: workflows (`PKGDOWN_DEV_MODE`, any job-level `uses:`, local composite actions, deploys below the site
     root, malformed structure) and the R startup files at the repository root and the package directory. Names built
-    dynamically or set inside scripts the workflow merely runs are not detected.
+    dynamically or set inside scripts the workflow merely runs are not detected. When `honored` is a list, it receives the
+    sorted branch names whose push was classified as non-publishing because `docs.site.nonpublishing-branches` declares them.
     """
     reasons = []
     files = set(tree)
@@ -1157,6 +1253,7 @@ def workflow_blocks(root, sha, tree, prefix=""):
     exempt = nonpublishing_branches(root, sha, files, prefix)
     scan.exempt = exempt
     state = {}      # workflow path -> [evidence list, destinations list]; a reusable workflow shares both with its caller
+    probes = {}     # workflow path -> (where, text) pairs of the scripts and local actions it reaches
     for path, text in texts.items():
         probe = ScriptScan(root, sha, files, modes, pkgdown_repo)
         probe.exempt = exempt
@@ -1174,8 +1271,17 @@ def workflow_blocks(root, sha, tree, prefix=""):
             except ValueError:
                 evidence.append("workflow structure unreadable (permissions unknown)")
         data = parsed.get(path)
+        probes[path] = probe.texts
         state[path] = [workflow_evidence(data, text, [(2, e) for e in evidence] + probe.evidence, exempt),
                        build_destinations(source_text(text, data)) + probe.destinations]
+    # A workflow that builds or stages the destination before it pushes is publish-capable whether or not the pinned tree
+    # tracks the destination yet (tier one). The names are global: the config destination plus any a build call names.
+    literal = lambda d: isinstance(d, str)
+    first = "docs" if config is None or config is False or "destination" not in config else config["destination"]
+    stage_names = [d for d in [first, *[d for v in state.values() for d in v[1]]] if literal(d)]
+    for path, text in texts.items():
+        data = parsed.get(path)
+        state[path][0] = list(dict.fromkeys(state[path][0] + stage_evidence([("the workflow", source_text(text, data))] + probes[path], stage_names)))
     # Reusable workflows. A caller job `uses: ./.github/workflows/x.yml` runs the callee with the caller's token, so the
     # callee gets the caller's permission evidence and the caller gets everything the callee can do. A callee that cannot
     # be resolved (missing, outside the workflows directory, another repository, a dynamic path) is assumed capable. The
@@ -1204,6 +1310,9 @@ def workflow_blocks(root, sha, tree, prefix=""):
             state[caller_path][1] = state[caller_path][1] + [d for d in state[callee_path][1] if d not in state[caller_path][1]]
         if before == [(list(v[0]), list(v[1])) for v in state.values()]:
             break
+    if honored is not None:
+        honored.extend(sorted({m.group(1) for v in state.values() for _, label in v[0]
+                               for m in re.finditer(r"declared non-publishing branch ([^\s)]+)", label)}))
     capable = {}
     for path in texts:
         tracked, destination = destination_tracked(files, prefix, config, modes, state[path][1])
@@ -1238,7 +1347,7 @@ def workflow_blocks(root, sha, tree, prefix=""):
 
 
 def audit(root: Path, *, url, ref=None):
-    stage = {"state":"incomplete","counts":{"checked":0,"missing":0,"extra":0,"unreleased":0},"provenance":{},"reasons":[],"engine_missing":[],"findings":[],"content_freshness":"unverified"}
+    stage = {"state":"incomplete","counts":{"checked":0,"missing":0,"extra":0,"unreleased":0},"provenance":{},"reasons":[],"engine_missing":[],"findings":[],"content_freshness":"unverified","nonpublishing_branches_honored":[]}
     try:
         base = base_url(url)
         provenance = select_ref(root,ref); stage["provenance"] = {**provenance,"requested_base":base}
@@ -1319,7 +1428,9 @@ def audit(root: Path, *, url, ref=None):
                 refused.add(file)
                 del expected[route]
         # Even an explicit ref cannot certify workflow transforms: read them at the pinned SHA, not the working tree.
-        blocked = workflow_blocks(root, sha, modes, prefix)
+        honored = []
+        blocked = workflow_blocks(root, sha, modes, prefix, honored)
+        stage["nonpublishing_branches_honored"] = honored
         if blocked:
             stage["reasons"].extend(blocked)
             return stage
