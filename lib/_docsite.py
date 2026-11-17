@@ -910,7 +910,7 @@ TIER1_TEXT = re.compile(r"deploy_to_branch|gh[-_]pages", re.I)                  
 DEFAULT_BRANCHES = ("HEAD", "main", "master")        # a push here is tier two; any other literal branch is tier one
 PLACEHOLDER_FILES = (".gitkeep", ".keep", ".gitignore", ".gitattributes")   # a directory holding only these is not tracked content
 DYNAMIC_TOKEN = re.compile(r"[$`]|\{\{|<\(")        # variable, command substitution or expression: the value cannot be known
-COMMAND_START = re.compile(r"(?<![\w./@=-])(git|rsync|scp|aws|gsutil|netlify|firebase|surge|vercel|wrangler|ghp-import)(?=\s)")
+COMMAND_START = re.compile(r"(?<![\w@=-])(?:[\w.~+-]*/)*(git|rsync|scp|aws|gsutil|netlify|firebase|surge|vercel|wrangler|ghp-import)(?=\s)")      # a literal path prefix (`/usr/bin/git`) is allowed
 R_GIT_PUSH = re.compile(r"""\bsystem2?\s*\(\s*["']git["'][^)]*["']push["']""")
 BUILD_MENTION = re.compile(r"pkgdown|build_site", re.I)
 NON_LITERAL = object()
@@ -1069,7 +1069,7 @@ def text_publish_evidence(text, where, exempt=()):
     return list(dict.fromkeys(found))
 
 
-STAGE_START = re.compile(r"(?<![\w./@=-])(git|cp|mv|rsync|ln|install)(?=\s)")
+STAGE_START = re.compile(r"(?<![\w@=-])(?:[\w.~+-]*/)*(git|cp|mv|rsync|ln|install)(?=\s)")
 STAGE_ALL = ("-A", "--all", ".", "-u", "--update", ":/")      # stages the whole tree (or every tracked change)
 MESSAGE_OPTIONS = ("-m", "-F", "-C", "-c", "-t", "--message", "--file", "--author", "--date", "--template",
                    "--reuse-message", "--reedit-message", "--cleanup", "--trailer")
@@ -1222,9 +1222,9 @@ def stage_evidence(texts, names):
         for match in STAGE_START.finditer(text):
             commands = shell_commands(logical_line(text, match.start()))
             tokens = [t.rstrip("\"')],}") for t in commands[0]] if commands else []
-            if not tokens or tokens[0] != match.group(1):
+            if not tokens or posixpath.basename(tokens[0]) != match.group(1):
                 continue
-            why = stage_command(tokens[0], tokens[1:], names, built)
+            why = stage_command(match.group(1), tokens[1:], names, built)
             if why:
                 found.append((1, f"stages the site destination ({why}: `{' '.join(tokens)[:70]}`) in {where}"))
     return list(dict.fromkeys(found))
@@ -1255,12 +1255,12 @@ def handoff_facts(texts, names, exempt=()):
         facts.add("download")
     if any(name in joined.lower() for name in PUSH_ACTIONS if name not in PR_BRANCH_ACTIONS):
         facts.update(("stage", "stage_any", "stage_all", "push"))
-    for match in re.finditer(r"(?<![\w./@=-])(git|curl|wget)(?=\s)", joined):
+    for match in re.finditer(r"(?<![\w@=-])(?:[\w.~+-]*/)*(git|curl|wget)(?=\s)", joined):
         commands = shell_commands(logical_line(joined, match.start()))
         tokens = [t.rstrip("\"')],}") for t in commands[0]] if commands else []
-        if not tokens or tokens[0] != match.group(1):
+        if not tokens or posixpath.basename(tokens[0]) != match.group(1):
             continue
-        if tokens[0] in ("curl", "wget"):
+        if match.group(1) in ("curl", "wget"):
             if any(ARCHIVE_TOKEN.search(t) for t in tokens[1:]):
                 facts.add("download")
             continue

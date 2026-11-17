@@ -3174,3 +3174,29 @@ def test_a_computed_path_to_an_allowlisted_name_is_still_opaque_but_a_fixed_one_
     assert fixed["state"] == "complete", fixed["reasons"]
     computed = audit_push(fresh(tmp_path, "c"), "$BIN/ls", push="$BIN/git push origin main")
     assert capable_or_unresolved(computed)[0], computed["reasons"]
+
+
+# Codex round 22. A literal path to the executable (`/usr/bin/git`) is the same program as `git`.
+@pytest.mark.parametrize("git", ["/usr/bin/git", "/opt/homebrew/bin/git", "./bin/git", "bin/git", "~/bin/git"])
+def test_a_literal_path_to_git_is_detected_for_staging_and_pushing(tmp_path, git):
+    ok, why = capable(audit_push(tmp_path, "echo hello", add=f"{git} add -A", commit=f"{git} commit -m site", push=f"{git} push origin main"))
+    assert ok, (git, why)
+
+
+def test_a_literal_path_to_git_keeps_the_named_stage_negative_and_the_pathspec_rule(tmp_path):
+    named = audit_push(tmp_path, "echo hello", add="/usr/bin/git add data/history.csv", commit="/usr/bin/git commit -m x", push="/usr/bin/git push origin main")
+    assert named["state"] == "complete", named["reasons"]
+    ok, why = capable(audit_push(fresh(tmp_path, "m"), "echo hello", add="/usr/bin/git add -A -- ':(top)docs'", push="/usr/bin/git push origin main"))
+    assert ok, why
+    declared = audit_push(fresh(tmp_path, "d"), "echo hello", add="/usr/bin/git add -A", push="/usr/bin/git push origin qc-results", files={".rforge.yaml": KEY})
+    assert declared["state"] == "complete", declared["reasons"]
+
+
+def test_a_literal_path_to_a_publish_command_or_downloader_is_detected(tmp_path):
+    for n, (bare, prefixed) in enumerate([("rsync -a _site/ deploy@host:/var/www/", "/usr/bin/rsync -a _site/ deploy@host:/var/www/"),
+                                          ("rsync -a _site/ docs/", "/usr/bin/rsync -a _site/ docs/")]):
+        a = audit_push(fresh(tmp_path, f"b{n}"), bare, add="git add data/history.csv")
+        b = audit_push(fresh(tmp_path, f"p{n}"), prefixed, add="git add data/history.csv")
+        assert (a["state"], a["reasons"]) == (b["state"], b["reasons"]), (bare, a["reasons"], b["reasons"])
+    ok, why = capable_or_unresolved(audit_push(fresh(tmp_path, "c"), "/usr/bin/curl -sL https://example.org/site.tgz -o site.tgz", add="/usr/bin/git add -A", push="/usr/bin/git push origin main"))
+    assert ok, why
