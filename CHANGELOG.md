@@ -109,14 +109,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   naming it, `git add -A`/`.` after a pkgdown build, `git subtree push`, `git worktree add`, `cp`/`mv`/
   `rsync` into it), so a workflow that generates `docs/`, force-adds and pushes it is strict; a push of
   `data/history.csv` stays tier 2. Known gaps (documented, not fixed): scripts fetched at runtime, a
-  script that pushes from a no-signal workflow, actions from other repositories (beyond the
+  script that pushes from a no-signal workflow, a workflow that stages the whole tree and pushes with
+  no pkgdown build visible in that workflow or the scripts it reaches (site files downloaded as an
+  artifact from another workflow), actions from other repositories (beyond the
   fail-closed reusable-workflow rule), manual deploys, and a site branch mislabeled in
   `docs.site.nonpublishing-branches`. That key is an unverified maintainer declaration in the same
   trust class as `site.allowlist`: the engine cannot see what a branch serves without a live GitHub
   Pages API call, which the offline default forbids, so a mislabeled site branch yields a wrong
   `complete`. Disposition: accepted and documented; the site stage reports
-  `nonpublishing_branches_honored` and the text report prints an info line whenever the declaration
-  changed a classification, so the exemption is visible to the reader.
+  `nonpublishing_branches_honored` and the text report prints an info line whenever a push was
+  classified tier 2 because of the declaration, so the exemption is visible to the reader.
 - `docs:check --site` counts a sitemap entry only when it is a `loc` that is a direct child
   of a `url` in the sitemaps.org 0.9 namespace. A `loc` inside an image/video/xhtml
   extension element, nested elsewhere or outside a `url` no longer satisfies an expected

@@ -185,15 +185,16 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       **The list is an unverified declaration.** It is a maintainer attestation in the same trust class as
       `docs.allowlist` and `site.allowlist`: the engine cannot see what a branch serves without a live
       GitHub Pages API call, which the offline default forbids, so a site branch listed by mistake yields
-      a wrong `complete`. Review the list when you review the site setup. Whenever a declaration changes
-      the result, the site stage carries `nonpublishing_branches_honored` (the sorted names whose push
+      a wrong `complete`. Review the list when you review the site setup. Whenever a push was classified
+      tier 2 because of the declaration, the site stage carries `nonpublishing_branches_honored` (the sorted names whose push
       was classified as non-publishing because of it; an empty list when none) and the text report prints
       an `info` line naming them, so a reader sees that an exemption was applied.
 
       A workflow with no evidence is relaxed, because QC and simulation scripts are full of
       `source(file.path(...))`. Not detected: a script that pushes from a workflow that shows no signal
-      at all; a build that writes the destination through a name the scan cannot read (a variable, a
-      path built at run time) and stages it by a command it cannot parse; a site branch mislabeled in
+      at all; a workflow that stages the whole tree (`git add -A`) and pushes with no pkgdown build
+      visible in that workflow or the scripts it reaches, for example site files downloaded as an
+      artifact from another workflow; a destination written through a name the scan cannot read; a site branch mislabeled in
       `nonpublishing-branches` (documented gap: an unverified maintainer declaration); actions from other repositories (beyond the fail-closed reusable-workflow rule); manual
       deploys outside CI.
     - **How names are matched.** YAML inputs (workflows, local actions, front matter) are read as

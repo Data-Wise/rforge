@@ -1052,7 +1052,7 @@ def _optional_stages(root: Path, *, site=None, ref=None, run_examples=False,
             stage = import_module("." + module, __package__).audit(root, **kwargs)
         except Exception as exc:
             stage = {"state": "unavailable", "counts": {}, "reasons": [f"{name}: {type(exc).__name__}: {exc}"],
-                     "engine_missing": [], "findings": [], **({"content_freshness": "unverified"} if name == "site" else {})}
+                     "engine_missing": [], "findings": [], **({"content_freshness": "unverified", "nonpublishing_branches_honored": []} if name == "site" else {})}
         stages[name] = stage
     return stages
 
