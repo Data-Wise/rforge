@@ -32,6 +32,11 @@ LIVE_DEFECTS = {
     'primary-severities-not-a-list': lambda f: f['supported_site'].update(finding_severities='warn'),
     'primary-lacks-missing': lambda f: f['supported_site'].pop('missing'),
     'primary-lacks-severities': lambda f: f['supported_site'].pop('finding_severities'),
+    'primary-lacks-deploy-layout': lambda f: f['supported_site'].pop('deploy_layout'),
+    'primary-deploy-layout-verified': lambda f: f['supported_site'].update(deploy_layout='verified'),
+    'primary-deploy-layout-none': lambda f: f['supported_site'].update(deploy_layout=None),
+    'pinned-lacks-deploy-layout': lambda f: f['pinned_real_runs'][0].pop('deploy_layout'),
+    'pinned-deploy-layout-verified': lambda f: f['pinned_real_runs'][1].update(deploy_layout='verified'),
     'pinned-missing-routes': lambda f: f['pinned_real_runs'][0].update(missing=9),
     'pinned-missing-count-none': lambda f: f['pinned_real_runs'][1].update(missing=None),
     'pinned-warn-finding': lambda f: f['pinned_real_runs'][1].update(finding_severities=['warn']),
@@ -125,7 +130,7 @@ def _audit_for(states):
     def audit(path, url, ref):
         state, checked, reasons, *rest = states[url]
         requests, missing, findings = (list(rest) + [1, 0, []][len(rest):])[:3]
-        return {'stage': {'state': state, 'counts': {'checked': checked, 'missing': missing}, 'reasons': reasons,
+        return {'stage': {'state': state, 'counts': {'checked': checked, 'missing': missing}, 'reasons': reasons, 'deploy_layout': 'unverified',
                           'findings': [{'check': 'site-missing-page' if sev == 'warn' else 'site-extra-page', 'severity': sev} for sev in findings]},
                 'requests': requests}
     return audit
@@ -509,7 +514,8 @@ def _findings_audit(severities):
         findings = [({'check': 'x'} if sev is None else {'check': 'x', 'severity': sev}) for sev in severities] if url == v.SUPPORTED_SITE_URL else []
         incomplete = url == v.REVIEWED_LIVE_SITES['glue']['url']
         return {'stage': {'state': 'incomplete' if incomplete else 'complete', 'counts': {'checked': 0 if incomplete else 5, 'missing': 0},
-                          'reasons': ['custom template mapping unsupported'] if incomplete else [], 'findings': findings}, 'requests': 0 if incomplete else 1}
+                          'reasons': ['custom template mapping unsupported'] if incomplete else [], 'findings': findings, 'deploy_layout': 'unverified'},
+                'requests': 0 if incomplete else 1}
     return audit
 
 

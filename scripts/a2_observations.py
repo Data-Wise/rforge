@@ -160,6 +160,7 @@ def observe_live_smoke(workdir: Path, audit: Optional[Callable] = None, clone: O
                 "state": stage.get("state"), "checked": (stage.get("counts") or {}).get("checked", 0),
                 "missing": (stage.get("counts") or {}).get("missing"),
                 "finding_severities": _severities(stage.get("findings")),
+                "deploy_layout": stage.get("deploy_layout"),
                 "reasons": list(stage.get("reasons") or [])}
     primary = run(supported)
     pinned = [run(site) for site in pinned_supported]

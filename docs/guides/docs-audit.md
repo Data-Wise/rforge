@@ -90,7 +90,8 @@ over-large region) make the report `INCOMPLETE` instead of clean.
 `--site` requires one resolved package. It compares an immutable local deployment
 source with one bounded sitemap; no build, fetch, deploy or link crawl occurs.
 Missing selected-ref pages remain warn; checkout-only additions are info.
-Sitemap absence does not prove HTTP 404, availability or deployment freshness.
+Sitemap absence does not prove HTTP 404, availability or deployment freshness. Each sitemap `url` must carry exactly one
+nonempty `loc`; a `url` with two, none or an empty one makes the stage incomplete (`malformed sitemap entry`).
 Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
 
 !!! note "Expected behavior in the next release (unreleased; after v2.22.2)"

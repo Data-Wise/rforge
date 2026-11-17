@@ -51,7 +51,7 @@ def live_facts():
     table=v.REVIEWED_LIVE_SITES
     def run(name,checked,**extra):
         return {'name':name,'url':table[name]['url'],'source_ref':table[name]['commit'],'requests':1,'state':'complete','checked':checked,'missing':0,
-                'finding_severities':[],'reasons':[],**extra}
+                'finding_severities':[],'deploy_layout':'unverified','reasons':[],**extra}
     site=run('cranlogs',4)
     pinned=[run('medfit',76),run('probmed',107)]
     limit=run('glue',0,requests=0,state='incomplete',reasons=['custom template mapping unsupported'])

@@ -241,7 +241,9 @@ def site_run_is_sound(run):
     if not isinstance(run, dict):
         return False
     severities = run.get("finding_severities")
-    return (run.get("state") == "complete" and _int(run.get("requests")) and run["requests"] > 0
+    # `deploy_layout: "unverified"` is the stage's fixed qualification that a complete run says nothing about how CI deploys the
+    # site; evidence that omits it (an older producer, a hand-built record) is not release evidence.
+    return (run.get("state") == "complete" and run.get("deploy_layout") == "unverified" and _int(run.get("requests")) and run["requests"] > 0
             and _int(run.get("checked")) and run["checked"] > 0 and _int(run.get("missing")) and run["missing"] == 0
             and isinstance(severities, list) and all(isinstance(s, str) and s == "info" for s in severities))
 

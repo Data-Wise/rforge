@@ -82,7 +82,14 @@ def sitemap(base):
         raise ValueError("only one urlset sitemap is supported; index is incomplete")
     # A page is a `loc` that is a direct child of a `url` that is a direct child of the urlset, all in the sitemap
     # namespace. An extension `loc` (image/video/xhtml) or one nested elsewhere is not a page.
-    entries = [loc.text.strip() for url in tree.findall(SITEMAP_NS + "url") for loc in url.findall(SITEMAP_NS + "loc") if loc.text]
+    # Each `url` carries exactly one nonempty `loc` (sitemaps.org requires it). A `url` with two `loc` elements could let an
+    # unrelated page stand in for an expected route, and one with none is not a page: refuse the sitemap rather than guess.
+    entries = []
+    for url in tree.findall(SITEMAP_NS + "url"):
+        texts = [loc.text.strip() for loc in url.findall(SITEMAP_NS + "loc") if loc.text and loc.text.strip()]
+        if len(url.findall(SITEMAP_NS + "loc")) != 1 or len(texts) != 1:
+            raise ValueError("malformed sitemap entry: each url needs exactly one nonempty loc")
+        entries.append(texts[0])
     paths = set(); foreign = 0
     b = urlparse.urlsplit(base)
     for entry in entries:

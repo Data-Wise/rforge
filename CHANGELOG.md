@@ -149,7 +149,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   of a `url` in the sitemaps.org 0.9 namespace. A `loc` inside an image/video/xhtml
   extension element, nested elsewhere or outside a `url` no longer satisfies an expected
   route. A `urlset` with no namespace or another namespace is incomplete with a specific
-  reason instead of being counted.
+  reason instead of being counted. Each `url` must carry exactly one nonempty `loc`: a `url` with two
+  (an unrelated page before the expected one), none or an empty one makes the sitemap incomplete
+  (`malformed sitemap entry`) instead of letting the extra `loc` satisfy a route.
+- The A2 live-smoke observation records `deploy_layout` for each site run, and the shared
+  soundness predicate (producer and verifier) requires `deploy_layout: "unverified"` on every
+  supported site run, so evidence that omits the qualification is not release evidence.
 
 ---
 

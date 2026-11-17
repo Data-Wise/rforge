@@ -3327,3 +3327,29 @@ def test_the_marker_is_absent_from_a_run_with_no_site_stage(tmp_path, capsys):
     docaudit.main(["--path", str(pkg), "--package-only", "--format", "json"])
     report = json.loads(capsys.readouterr().out)
     assert "site" not in report.get("stages", {}) and "deploy layout" not in json.dumps(report)
+
+
+# Codex executed review. Each sitemap `url` carries exactly one nonempty `loc`: a `url` with two cannot let an unrelated page stand in
+# for an expected route, and a `url` with none or an empty one is not a page, so the sitemap is refused (incomplete), not guessed at.
+def test_a_url_with_two_locs_cannot_satisfy_an_expected_route(tmp_path):
+    def xml(root):
+        pages = [f"<url><loc>{root}{p}</loc></url>" for p in ROUTES if p != "articles/a.html"]
+        both = f"<url><loc>{root}index.html</loc><loc>{root}articles/a.html</loc></url>"
+        return urlset(*pages, both)
+    r = raw_sitemap_audit(tmp_path, xml)
+    assert r["state"] == "incomplete" and any("malformed sitemap entry" in x for x in r["reasons"]), r
+
+
+@pytest.mark.parametrize("entry", ["<url></url>", "<url><loc></loc></url>", "<url><loc>   </loc></url>", "<url><lastmod>2026-01-01</lastmod></url>"])
+def test_a_url_without_exactly_one_nonempty_loc_refuses_the_sitemap(tmp_path, entry):
+    def xml(root):
+        return urlset(*(f"<url><loc>{root}{p}</loc></url>" for p in ROUTES), entry)
+    r = raw_sitemap_audit(tmp_path, xml)
+    assert r["state"] == "incomplete" and any("malformed sitemap entry" in x for x in r["reasons"]), (entry, r)
+
+
+def test_a_url_with_one_loc_and_other_children_is_still_a_page(tmp_path):
+    def xml(root):
+        return urlset(*(f"<url><loc>{root}{p}</loc><lastmod>2026-01-01</lastmod></url>" for p in ROUTES + ["articles/a.html"]))
+    r = raw_sitemap_audit(tmp_path, xml)
+    assert r["state"] == "complete" and r["counts"]["missing"] == 0, r
