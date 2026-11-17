@@ -1292,6 +1292,12 @@ def handoff_evidence(state):
             result[path] = (1, f"{PUBLISH_CAPABLE.format(what=what)}; the audit does not try to prove it builds no site")
             continue
         if "push" not in found:
+            # A program whose name is computed (`$(command -v git) push`, `"$GIT" push`) may be `git`: when the workflow stages
+            # everything the push can hide behind it. A merely unreadable script is not a push, so stage-alone stays relaxed.
+            dynamic = [label for label in sorted(found) if label.startswith("unresolved: opaque executable") and re.search(r"[$`]", label)]
+            if ("stage_all" in found or "dest_staged" in found) and dynamic:
+                result[path] = (1, f"stages everything while it runs a program whose name the scan cannot resolve ({dynamic[0][len('unresolved: '):]}); "
+                                   "that program may push, so the workflow is treated as publish capable")
             continue
         others = [b for b in builders if b != path]
         if "stage" not in found:

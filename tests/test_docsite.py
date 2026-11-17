@@ -3120,3 +3120,27 @@ def test_a_rootless_or_recursive_glob_stages_everything_when_it_can_match_the_de
     for n, add in enumerate(["git add '**/foo.html'", "git add '**/*.html'", "git add '*.xml'", "git add '?ocs/index.html'", "git add '[d]ocs/x'", "git add '*/index.html'"]):
         ok, why = capable(audit_push(fresh(tmp_path, n), "echo hello", add=add))
         assert ok, (add, why)
+
+
+# Codex round 18. A push the scan cannot read (`$(command -v git) push origin main`) must not hide behind a missing push fact:
+# a workflow that stages everything and reaches an unresolved or opaque command may push, so it is publish capable.
+@pytest.mark.parametrize("push", ["$(command -v git) push origin main", "$GIT push origin main", "\"$(which git)\" push origin main", "sudo $GITBIN push"])
+def test_an_opaque_push_after_staging_everything_is_publish_capable(tmp_path, push):
+    ok, why = capable_or_unresolved(audit_push(tmp_path, "echo hello", push=push))
+    assert ok, (push, why)
+
+
+def capable_or_unresolved(r):
+    return r["state"] == "incomplete" and any(("cannot resolve" in x or PUBLISH_CAPABLE in x) for x in r["reasons"]), r["reasons"]
+
+
+def test_staging_everything_with_nothing_opaque_and_no_push_stays_relaxed(tmp_path):
+    assert audit_push(tmp_path, "echo hello", push=None)["state"] == "complete"
+
+
+def test_stage_everything_beside_an_unreadable_script_or_a_named_unknown_binary_stays_relaxed_without_a_push(tmp_path):
+    # Only a computed program name may be a hidden push; a dynamic script reference or a named binary is not.
+    dynamic_script = audit_push(tmp_path, "Rscript scripts/site.R", push=None, files={"scripts/site.R": "source(Sys.getenv('X'))\n"})
+    assert dynamic_script["state"] == "complete", dynamic_script["reasons"]
+    named = audit_push(fresh(tmp_path, "b"), "mytool build", push=None)
+    assert named["state"] == "complete", named["reasons"]

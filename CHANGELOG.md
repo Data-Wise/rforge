@@ -115,7 +115,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   destination stay tier 2; a stage is named only when every pathspec is a plain literal path outside the
   destination (a wildcard only below a literal first directory, as in `man/*.Rd`), so pathspec magic (`:(top)docs`), `--pathspec-from-file` and index-changing git plumbing
   (`update-index`, `read-tree`, `commit-tree`, `checkout-index`, `apply`, `am`, `stash`) stage everything
-  and an unknown form fails closed. Build output can also reach the staging workflow from another
+  and an unknown form fails closed; a workflow that stages everything and runs a program whose name is computed
+  (such as a push through `$(command -v git)`) is tier 1 even with no visible push. Build output can also reach the staging workflow from another
   workflow: a workflow that stages and pushes is tier 1 when it downloads build output
   (`download-artifact`, `gh run|release download`, `curl`/`wget` of an archive, a `workflow_run`
   trigger), when any other workflow in the repository builds the site, or when anything it reaches

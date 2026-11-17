@@ -166,7 +166,9 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       `:/docs`, `:!x`, `:(glob)`), `--pathspec-from-file`, `..`, absolute or `~` paths, expansion and
       braces, a commit that names such a path, and git plumbing that changes the index or tree
       (`update-index`, `read-tree`, `commit-tree`, `checkout-index`, `apply`, `am`, `stash`) stage
-      everything, so an unknown form fails closed. `r-lib/actions/pr-push`
+      everything, so an unknown form fails closed. A workflow that stages everything and runs a program whose
+      name is computed is also tier 1 without a visible push (the program may be `git`, as in
+      `$(command -v git) push origin main`). `r-lib/actions/pr-push`
       pushes a pull request's own branch and is not counted. A repository that is not a pkgdown
       repository is not affected. **Cross-workflow
       handoff:** build output can reach the staging workflow from another workflow, so a workflow that
