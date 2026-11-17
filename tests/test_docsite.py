@@ -1422,7 +1422,9 @@ DEPLOY_SH_BODY = "#!/bin/sh\nRscript -e 'pkgdown::deploy_to_branch(subdir = \"v1
 SCRIPT_WORKFLOW = ".github/workflows/site.yaml"
 
 
-def step_workflow(cmd, step_extra="", job_extra="", top=""):
+def step_workflow(cmd, step_extra="", job_extra="", top=None):
+    if top is None:  # tier 1 evidence, so the workflow is strict whatever the destination
+        top = "permissions:\n  pages: write\n"
     body = "\n".join("          " + line for line in cmd.split("\n"))
     return (WORKFLOW_HEAD + top + "jobs:\n  site:\n    runs-on: ubuntu-latest\n" + job_extra + "    steps:\n      - run: |\n" + body + "\n" + step_extra)
 
@@ -1694,9 +1696,14 @@ def test_a_read_only_workflow_stays_relaxed_even_when_no_workflow_names_pkgdown(
     assert r["state"] == "complete", r["reasons"]
 
 
-def test_with_no_workflow_naming_pkgdown_a_workflow_without_permissions_is_strict(tmp_path):
+def test_with_no_workflow_naming_pkgdown_a_pages_write_workflow_is_strict(tmp_path):
     r = two_workflows(step_workflow("Rscript scripts/qc.R"), tmp_path)
     assert reached(r, "script reference unsupported", "dynamic"), r["reasons"]
+
+
+def test_with_no_workflow_naming_pkgdown_a_workflow_without_permissions_is_relaxed_when_the_destination_is_untracked(tmp_path):
+    r = two_workflows(step_workflow("Rscript scripts/qc.R", top=""), tmp_path)
+    assert r["state"] == "complete", r["reasons"]
 
 
 def test_a_signal_in_a_script_reached_only_from_an_unrelated_workflow_still_blocks(tmp_path):
