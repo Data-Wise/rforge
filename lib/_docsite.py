@@ -657,7 +657,7 @@ class ScriptScan:
             cwd = self.command(command, cwd, depth)
 
     def command(self, command, cwd, depth):
-        i, lookup = 0, False
+        i, lookup, rewrites = 0, False, None
         while i < len(command):
             wrapper = posixpath.basename(command[i])
             if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", command[i]):
@@ -670,11 +670,22 @@ class ScriptScan:
                     lookup = lookup or (wrapper == "command" and option in ("-v", "-V"))
                     if option == "--":
                         break
+                    flag = option.split("=", 1)[0]
+                    if flag in WRAPPER_REWRITING_OPTIONS.get(wrapper, ()) or (
+                            not option.startswith("--") and option[:2] in WRAPPER_REWRITING_OPTIONS.get(wrapper, ())):
+                        rewrites = rewrites or option      # changes what runs or where: `env -S 'cmd'`, `env -C dir`, `sudo -D dir`
                     if option in WRAPPER_VALUE_OPTIONS.get(wrapper, ()) and i < len(command):
                         i += 1
             else:
                 break
-        if i >= len(command) or lookup:         # `command -v git` looks a program up; it does not run it
+        if lookup:                              # `command -v git` looks a program up; it does not run it
+            return cwd
+        if rewrites:
+            # `env -S 'python -m gen'` hides the command in a string, and `env -C site ./tools/x` or `sudo -D dir` runs from another
+            # directory than the one the scan resolves paths against: fail closed rather than read the wrong file.
+            self.opaque("opaque executable", " ".join(command[:i + 3]))
+            return cwd
+        if i >= len(command):
             return cwd
         raw, args = command[i], command[i + 1:]
         if re.search(r"[$`]", raw) and not raw.startswith("$(("):
@@ -1143,6 +1154,8 @@ def git_parts(args):
 
 
 WRAPPERS = ("env", "sudo", "time", "nohup", "exec", "command", "nice", "stdbuf", "setsid", "doas")
+WRAPPER_REWRITING_OPTIONS = {"env": ("-S", "-C", "--split-string", "--chdir"), "sudo": ("-D", "--chdir", "-i", "-s", "--login", "--shell"),
+                             "doas": ("-s",), "nice": (), "time": ()}
 WRAPPER_VALUE_OPTIONS = {"env": ("-u", "-C", "-S", "--unset", "--chdir", "--split-string"),
                          "sudo": ("-u", "-g", "-h", "-p", "-C", "-D", "-R", "-T", "-U", "--user", "--group", "--host", "--prompt", "--chdir"),
                          "time": ("-f", "-o", "--format", "--output"), "nice": ("-n", "--adjustment"), "doas": ("-u", "-C"),

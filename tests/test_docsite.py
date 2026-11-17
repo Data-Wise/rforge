@@ -3255,3 +3255,17 @@ def test_a_literal_absolute_path_outside_the_system_bin_directories_is_opaque_in
         assert r["state"] == "incomplete", (cmd, r["reasons"])
     ok = pair(fresh(tmp_path, "ok"), stage_push_workflow("/usr/bin/echo publish", push=False, steps=PAGES), files={"scripts/site.R": CLEAN_R}, a=NO_BUILD, tracked=False)
     assert ok["state"] == "complete", ok["reasons"]
+
+
+# Codex round 25. Wrapper options that change what runs (`env -S`) or where (`env -C`, `sudo -D`) fail closed in a publishing workflow.
+@pytest.mark.parametrize("cmd", ["env -S 'python -m site_generator'", "env --split-string='python -m gen'", "env -C site ./tools/echo", "env --chdir=site ./tools/echo",
+                                 "env -Csite ./tools/echo", "sudo -D site ./tools/echo", "sudo --chdir=site tools/echo", "sudo -i", "sudo -s 'python -m gen'"])
+def test_a_wrapper_that_rewrites_the_command_or_its_directory_is_opaque_in_a_publishing_workflow(tmp_path, cmd):
+    r = pair(tmp_path, stage_push_workflow(cmd, push=False, steps=PAGES), files={"scripts/site.R": CLEAN_R, "tools/echo": "#!/bin/sh\necho ok\n"}, a=NO_BUILD, tracked=False)
+    assert r["state"] == "incomplete", (cmd, r["reasons"])
+
+
+@pytest.mark.parametrize("cmd", ["env -i echo hi", "env -u HOME echo hi", "sudo -E echo hi", "nice -n 5 echo hi", "env FOO=bar echo hi", "sudo -u runner echo hi"])
+def test_wrappers_that_only_set_the_environment_or_user_stay_transparent(tmp_path, cmd):
+    r = pair(tmp_path, stage_push_workflow(cmd, push=False, steps=PAGES), files={"scripts/site.R": CLEAN_R}, a=NO_BUILD, tracked=False)
+    assert r["state"] == "complete", (cmd, r["reasons"])
