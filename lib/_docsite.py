@@ -501,10 +501,30 @@ DYNAMIC_PATH = re.compile(r"[$`*?\[{]|<\(")      # variable, command/process sub
 R_SOURCE = re.compile(r"""\b(?:source|sys\.source)\s*\(\s*(?:(?:file|exprs)\s*=\s*)?(?:"([^"]*)"|'([^']*)'|(\S))""")
 R_SYSTEM = re.compile(r"""\b(system2?|shell)\s*\(\s*(?:(?:command|intern)\s*=\s*)?(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|(\S))""")
 SHELL_PROGRAMS = ("bash", "sh", "zsh", "dash")
-# Executables the scan does not follow but that can generate a site; a workflow that stages and pushes and runs one of
-# them is publish-capable (`ScriptScan.opaque`). `Rscript`, `bash`, `python`, `make` and `./x` are followed, not listed.
-OPAQUE_PROGRAMS = ("quarto", "node", "npm", "npx", "yarn", "pnpm", "bun", "deno", "julia", "ruby", "perl", "php", "docker", "hugo",
-                   "jekyll", "mkdocs", "sphinx-build", "pandoc", "java", "go")
+# The scan follows `Rscript`/`R`, `bash`/`sh`/`zsh`/`dash`, `python <script>`, `make`, `source`, `eval` and `./x`. Every other
+# executable is opaque (`ScriptScan.opaque`) unless it is listed here: commands that cannot produce site files, or that
+# other detections already cover (`git` and `cp`/`mv`/`rsync`/`ln` by `stage_evidence`, `curl`/`wget` and `gh` as downloads).
+# A workflow that stages and pushes and runs anything else is publish-capable, so the list stays short and is not extended
+# for each new site generator.
+ALLOWED_PROGRAMS = frozenset({
+    "git", "echo", "printf", "cat", "ls", "pwd", "cd", "mkdir", "rm", "cp", "mv", "touch", "test", "[", "[[", "true", "false", "exit",
+    "export", "set", "unset", "sleep", "date", "env", "which", "grep", "egrep", "fgrep", "sed", "awk", "head", "tail", "tee", "sort", "uniq",
+    "wc", "tr", "cut", "find", "xargs", "jq", "curl", "wget", "sudo", "gh", "ln", "rsync", "scp", "chmod", "chown", "mktemp", "basename",
+    "dirname", "readlink", "realpath", "stat", "du", "df", "uname", "whoami", "id", "hostname", "printenv", "seq", "wait", "trap", "read",
+    "local", "declare", "return", "shift", "let", "diff", "cmp", "tar", "unzip", "zip", "gzip", "gunzip", "bzip2", "xz", "source", ".",
+    "cksum", "paste", "md5sum", "sha1sum", "sha256sum", "shasum", "base64", "comm", "join", "rev", "tac", "nl", "od", "xxd", "file",
+    "nproc", "eval", "make", "bash", "sh", "zsh", "dash", "Rscript", "R", "ssh-keyscan", "tput", ":", "type", "command", "umask", "ulimit"})
+INSTALLERS = {"pip": ("install", "download", "list", "show", "freeze", "config", "uninstall", "check", "cache", "wheel", "index"),
+              "apt": ("install", "update", "upgrade", "remove", "autoremove", "list", "search", "show", "clean", "autoclean", "purge"),
+              "brew": ("install", "update", "upgrade", "tap", "untap", "list", "info", "cleanup", "link", "unlink", "uninstall", "reinstall", "pin"),
+              "dnf": ("install", "update", "upgrade", "remove", "list", "search", "info", "clean", "makecache")}
+INSTALLERS["pip3"] = INSTALLERS["pip"]
+INSTALLERS["apt-get"] = INSTALLERS["apt"]
+INSTALLERS["yum"] = INSTALLERS["apk"] = INSTALLERS["dnf"]
+SHELL_PREFIX_KEYWORDS = ("if", "then", "else", "elif", "while", "until", "do", "!", "{", "time", "nohup", "exec")   # followed by a command
+SHELL_SKIP_KEYWORDS = ("fi", "done", "esac", "for", "case", "in", "}", ")", ";;", "select", "function", "then:")
+PLAUSIBLE_PROGRAM = re.compile(r"[A-Za-z_./~][A-Za-z0-9_.+-]*")
+PYTHON_RUNS_CODE = re.compile(r"\bsubprocess\b|\bos\.(?:system|popen|exec\w*|spawn\w*)\b|\bruntime\b|\brunpy\b|\bimportlib\b|\b__import__\b|\bexec\s*\(|\beval\s*\(|\bpty\.spawn\b")
 R_OPAQUE = re.compile(r"\beval\s*\(\s*parse\b|\bdo\.call\s*\(\s*[\"']?(?:sys\.)?source\b|\brmarkdown::render\w*|\bknitr::(?:knit\w*|purl)\b|\bbookdown::\w+|\bquarto::quarto_render\b|\bcallr::\w+")
 
 
@@ -580,12 +600,14 @@ class ScriptScan:
         self.root, self.sha, self.files, self.modes, self.pkgdown_repo = root, sha, files, modes, pkgdown_repo
         self.seen, self.reasons, self.strict, self.evidence, self.context = set(), [], True, [], None
         self.destinations, self.exempt, self.texts = [], (), []
-        self.unresolved, self.stage_push = [], False
+        self.unresolved, self.stage_push, self.quiet = [], False, False
 
     def opaque(self, why, ref):
         """A call that runs code the scan cannot read (an interpreter it does not follow, `eval(parse())`, a document
         render). Always recorded as unresolved, so a workflow that also stages and pushes is publish-capable; it is a reason
         only for such a workflow (`stage_push`), because elsewhere these calls are documented as not detected."""
+        if self.quiet:                       # a line that is not a command (a Makefile variable or target)
+            return
         self.unresolved.append(f"{why}: {ref}")
         if self.pkgdown_repo and self.strict and self.stage_push:
             self.fail_reason(why, ref)
@@ -632,12 +654,17 @@ class ScriptScan:
 
     def command(self, command, cwd, depth):
         i = 0
-        while i < len(command) and (re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", command[i]) or command[i] in ("env", "sudo", "time", "nohup", "exec", "command")):
+        while i < len(command) and (re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", command[i])
+                                    or posixpath.basename(command[i]) in ("env", "sudo", "time", "nohup", "exec", "command")):
             i += 1
         if i >= len(command):
             return cwd
         raw, args = command[i], command[i + 1:]
-        program = posixpath.basename(raw.lstrip("@-+"))
+        program = posixpath.basename(raw.lstrip("@({")).rstrip(")}")
+        if program in SHELL_PREFIX_KEYWORDS:
+            return self.command(command[i + 1:], cwd, depth)
+        if program in SHELL_SKIP_KEYWORDS or program in ("", "(") or raw.endswith("()"):
+            return cwd
         if program == "cd":
             return self.directory(cwd, args[0]) if args and args[0] != "-" else None
         if program == "Rscript":
@@ -665,17 +692,20 @@ class ScriptScan:
                         self.file(rest[0], cwd, depth)
                     break
                 n += 1
-        elif program in SHELL_PROGRAMS or re.fullmatch(r"python[0-9.]*", program):
-            python = program.startswith("python")
+        elif re.fullmatch(r"python[0-9.]*", program):
+            self.python(args, cwd, depth)
+        elif program == "uv":
+            self.uv(args, cwd, depth)
+        elif program in SHELL_PROGRAMS:
             n = 0
             while n < len(args):
                 arg = args[n]
-                if arg == "-c" and not python and n + 1 < len(args):
+                if arg == "-c" and n + 1 < len(args):
                     self.body(args[n + 1], cwd, depth + 1)
                     break
-                if arg in ("-c", "-m") or arg in ("-o", "+o", "-O", "+O"):
-                    if arg == "-c" or arg == "-m":
-                        break
+                if arg == "-c":
+                    break
+                if arg in ("-o", "+o", "-O", "+O"):
                     n += 2
                     continue
                 if arg.startswith(("-", "+")) and arg not in ("-", "+"):
@@ -691,9 +721,61 @@ class ScriptScan:
             self.make(args, cwd, depth)
         elif raw.startswith(("./", "../")):
             self.file(raw, cwd, depth)
-        elif program in OPAQUE_PROGRAMS:
-            self.opaque("opaque executable", " ".join(command[i:i + 3]))
+        elif program in INSTALLERS:
+            sub = next((a for a in args if not a.startswith("-")), None)
+            if sub is not None and sub not in INSTALLERS[program]:
+                self.opaque("opaque executable", " ".join(command[i:i + 3]))
+        elif program == "find" and {"-exec", "-execdir", "-ok", "-okdir"} & set(args):
+            start = next(n for n, a in enumerate(args) if a in ("-exec", "-execdir", "-ok", "-okdir"))
+            run = []
+            for a in args[start + 1:]:
+                if a in (";", "+", "\\;"):
+                    break
+                run.append(a)
+            self.command(run, cwd, depth + 1) if run else None          # the command `find` runs is judged like any other
+        elif program in ("xargs", "timeout"):
+            rest = [a for a in args if not a.startswith("-")]
+            rest = rest[1:] if program == "timeout" else rest       # `timeout 30 cmd`: the first word is the duration
+            if rest:
+                self.command(rest, cwd, depth + 1)
+        elif program not in ALLOWED_PROGRAMS and "/" in raw and not raw.startswith(("/", "~")):
+            self.file(raw, cwd, depth)          # a relative path that is run: read it (or fail closed when it cannot be read)
+        elif program not in ALLOWED_PROGRAMS and (program.startswith(("$", "`")) or PLAUSIBLE_PROGRAM.fullmatch(program)):
+            self.opaque("opaque executable", " ".join(command[i:i + 3]))     # (text such as `%s`, `^env:` or `1` is not a command)
         return cwd
+
+    def python(self, args, cwd, depth):
+        """`python <script>` reads the literal script; `-c`, `-m <module>` (other than pip/venv) and a dynamic path are opaque."""
+        n = 0
+        while n < len(args):
+            arg = args[n]
+            if arg == "-c":
+                return self.opaque("opaque executable", "python -c")
+            if arg == "-m":
+                module = args[n + 1] if n + 1 < len(args) else ""
+                return None if module in ("pip", "venv", "ensurepip") else self.opaque("opaque executable", f"python -m {module}")
+            if arg in ("-W", "-X", "-Q"):
+                n += 2
+                continue
+            if arg.startswith("-") and arg != "-":
+                n += 1
+                continue
+            return self.file(arg, cwd, depth)
+        return None
+
+    def uv(self, args, cwd, depth):
+        """`uv pip|sync|venv|lock` is installation; `uv run <command>` runs the command it names; anything else is opaque."""
+        sub = next((a for a in args if not a.startswith("-")), None)
+        if sub in ("pip", "sync", "venv", "lock", "python", "cache", "version", "self", None):
+            return None
+        if sub != "run":
+            return self.opaque("opaque executable", "uv " + sub)
+        rest, n = args[args.index("run") + 1:], 0
+        while n < len(rest) and rest[n].startswith("-"):
+            n += 2 if rest[n] in ("--with", "--python", "-p", "--directory", "--project", "--env-file", "--extra", "--group", "--with-requirements") else 1
+        if n >= len(rest):
+            return None
+        return self.command(rest[n:], cwd, depth + 1) or None
 
     def make(self, args, cwd, depth):
         makefile, where, n = None, cwd, 0
@@ -787,6 +869,15 @@ class ScriptScan:
             self.includes(text, cwd if make_dir is None else make_dir, norm, depth)
         if norm.lower().endswith((".r", ".rprofile")):
             self.r_code(text, cwd, depth + 1)
+        elif norm.lower().endswith(".py"):
+            found = PYTHON_RUNS_CODE.search(text)       # python is read for signals, never parsed as shell
+            if found:
+                self.opaque("opaque executable", f"python script {norm} runs other code ({found.group(0).strip()})")
+        elif make_dir is not None or posixpath.basename(norm) in ("Makefile", "makefile", "GNUmakefile") or norm.endswith(".mk"):
+            for line in text.replace("\\\n", " ").splitlines():
+                self.quiet = not line.startswith("\t")        # only recipe lines are commands
+                self.body(line.lstrip("\t@-+ ") if not self.quiet else line, cwd, depth + 1)
+            self.quiet = False
         else:
             self.body(text, cwd, depth + 1)
         return None

@@ -162,11 +162,17 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       hide behind it: a dynamic or missing script, an absolute or outside path, a symlink, a binary or
       oversized file, a depth or file cap, a dynamic working directory, a missing or malformed local
       action, a make include that cannot be read, `eval(parse())`, `do.call(source, ...)`,
-      `rmarkdown::render`/`knitr::knit`/`quarto::quarto_render`, or an executable the scan does not
-      follow (`quarto`, `node`, `npm`, `npx`, `yarn`, `pnpm`, `bun`, `deno`, `julia`, `ruby`, `perl`,
-      `php`, `docker`, `hugo`, `jekyll`, `mkdocs`, `sphinx-build`, `pandoc`, `java`, `go`). For that
-      workflow every such reference is an incomplete reason; other workflows keep treating the opaque
-      calls as not detected. Without a build, download or unresolved reference anywhere, a
+      `rmarkdown::render`/`knitr::knit`/`quarto::quarto_render`, or **any executable outside a short
+      allowlist**. The scan follows `Rscript`/`R`, `bash`/`sh`/`zsh` (including a literal `-c` string),
+      `make`, `source`, `./x` and `python <literal script>`, and knows `git`, `gh`, `curl`/`wget`,
+      installers (`pip`, `uv pip`, `apt`, `brew`: install-type subcommands only) and plain shell and text
+      utilities (`echo`, `cat`, `ls`, `cp`, `grep`, `sed`, `awk`, `jq`, `find` and the like) cannot make
+      site files. Everything else is opaque: `python -m <module>` (except `pip`, `venv`), `python -c`,
+      `uv run <unlisted tool>`, `node`, `quarto`, `docker`, any unlisted binary, a dynamic command
+      (`$X`, `bash -c "$X"`), a Python script that runs other code (`subprocess`, `os.system`, `exec`).
+      The list is not extended per generator: the default for an unknown executable is to fail closed.
+      For a stage-and-push workflow every such reference is an incomplete reason; other workflows keep
+      treating opaque calls as not detected. Without a build, download or unresolved reference anywhere, a
       stage-and-push workflow stays tier 2; a push to a branch declared non-publishing is not a push
       for this rule. **Tier 2, only when the pinned tree tracks the
       pkgdown destination:** plain `contents: write`; a push action such as `ad-m/github-push-action`;

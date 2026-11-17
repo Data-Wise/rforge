@@ -113,12 +113,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`download-artifact`, `gh run|release download`, `curl`/`wget` of an archive, a `workflow_run`
   trigger), when any other workflow in the repository builds the site, or when anything it reaches
   could not be resolved (a failed script or action reference, a cap, `eval(parse())`, a document
-  render, an executable the scan does not follow: the build may hide behind it); with none of these
+  render, any executable outside a short allowlist of benign utilities such as `python -m <module>`,
+  `python -c`, `uv run <tool>`, `node` or an unlisted binary: the build may hide behind it); with none of these
   it stays tier 2. Every such reference is then an incomplete reason for that workflow only. Known gaps (documented, not fixed): scripts fetched at runtime, a
   script that pushes from a no-signal workflow, site files that reach a staging workflow by a route the scan cannot read
   (a custom action fetching from another repository, a submodule update, a checkout of another ref)
-  with no build, download or unresolved reference anywhere in the repository, an unlisted
-  executable or a `knit`/`render` in a workflow that does not stage and push, actions from other repositories (beyond the
+  with no build, download or unresolved reference anywhere in the repository, unlisted
+  executables and `knit`/`render` in a workflow that does not stage and push, a Python or shell script
+  that builds the site through a module it imports, actions from other repositories (beyond the
   fail-closed reusable-workflow rule), manual deploys, and a site branch mislabeled in
   `docs.site.nonpublishing-branches`. That key is an unverified maintainer declaration in the same
   trust class as `site.allowlist`: the engine cannot see what a branch serves without a live GitHub

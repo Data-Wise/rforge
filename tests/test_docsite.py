@@ -2847,3 +2847,65 @@ def test_a_push_action_stages_and_pushes_so_an_unresolved_reference_makes_it_tie
     clean = {"scripts/site.R": CLEAN_R}
     assert pair(fresh(tmp_path, "c"), PUSH_ACTION_B, a=NO_BUILD, files=clean)["state"] == "complete"
     assert pair(fresh(tmp_path, "d"), PUSH_ACTION_B, a=NO_BUILD, files=clean, tracked=True)["state"] == "complete"
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Codex round 14. The opaque list was a denylist and kept missing executables (python -m, ...). It is now an
+# allowlist: any executable the scan neither follows nor knows to be benign is opaque.
+# ---------------------------------------------------------------------------------------------------------
+OPAQUE_NOW = [
+    "python -m site_generator", "python3 -m site_generator build", "python -c 'import gen; gen.run()'", "python3 -c \"$CODE\"", "python -m pytest",
+    "uv run site-generator", "uv run --with x python -m gen", "uv run pytest", "uv tool run gen", "mytool build", "gen-site --out docs", "scripts/gen",
+    "bash -c \"$X\"", "sh -c \"$BUILD\"", "bash -c 'mytool build'", "sh -c 'mytool'", "pip run-something", "apt-get source foo", "brew services start x",
+    "find . -name '*.md' -exec mytool {} +", "xargs mytool", "sudo mytool", "env FOO=1 mytool", "if true; then mytool; fi", "for f in a b; do mytool $f; done",
+    "(cd out && mytool)", "/opt/tools/mytool", "ghostscript x", "R2 build",
+]
+BENIGN_NOW = [
+    "git status", "echo hi", "printf '%s' x", "cat README.md", "ls -la", "pwd", "mkdir -p out", "rm -rf tmp", "cp a b", "mv a b", "touch x", "test -f x",
+    "[ -f x ]", "[[ -f x ]]", "true", "false", "exit 0", "export A=1", "set -e", "sleep 1", "date -u", "env", "which R", "grep -r x .", "sed -i s/a/b/ f",
+    "awk '{print}' f", "head -1 f", "tail -1 f", "tee out.txt", "sort f", "uniq f", "wc -l f", "tr a b", "cut -d, -f1 f", "find . -name '*.csv'", "xargs rm",
+    "jq . f.json", "curl -sS https://example.org/x", "wget -q https://example.org/x", "sudo apt-get install -y libxml2-dev", "sudo apt install pandoc", "brew install pandoc",
+    "pip install -r requirements.txt", "pip3 install pandas", "python -m pip install pandas", "python3 -m pip install -U pip", "uv pip install pandas", "uv sync",
+    "gh run list", "gh pr view 1", "sh -c 'echo hi'", "bash -c 'ls && pwd'", "Rscript -e 'cat(1)'", "R CMD INSTALL .", "R CMD build .", "R CMD check pkg.tar.gz",
+    "if true; then echo hi; fi", "for f in a b; do echo $f; done", "cd subdir", "echo hi | tee out.txt", "FOO=1 echo hi", "uv run python scripts/tally.py", "python3 scripts/tally.py",
+]
+
+
+@pytest.mark.parametrize("cmd", OPAQUE_NOW)
+def test_an_unlisted_executable_fails_closed_for_stage_and_push_only(tmp_path, cmd):
+    ok, reasons = fails_closed(unresolved_audit(tmp_path, cmd, files={"scripts/tally.py": "print(1)\n"}))
+    assert ok, (cmd, reasons)
+    assert unresolved_audit(fresh(tmp_path, "r"), cmd, push=False, files={"scripts/tally.py": "print(1)\n"})["state"] == "complete"
+
+
+@pytest.mark.parametrize("cmd", BENIGN_NOW)
+def test_an_allowlisted_command_leaves_a_stage_and_push_workflow_tier_two(tmp_path, cmd):
+    files = {"scripts/tally.py": "print(1)\n"}
+    r = unresolved_audit(tmp_path, cmd, files=files)
+    assert r["state"] == "complete", (cmd, r["reasons"])
+
+
+def test_a_python_script_with_a_dynamic_path_or_that_runs_other_code_is_unresolved(tmp_path):
+    assert fails_closed(unresolved_audit(tmp_path, "python3 $SCRIPT"), "dynamic")[0]
+    assert fails_closed(unresolved_audit(fresh(tmp_path, "s"), "python3 scripts/run.py", files={"scripts/run.py": "import subprocess\nsubprocess.run(['mytool'])\n"}))[0]
+    assert fails_closed(unresolved_audit(fresh(tmp_path, "o"), "python3 scripts/run.py", files={"scripts/run.py": "import os\nos.system('mytool')\n"}))[0]
+    # A plain python script that only computes is read and is benign; its text is not parsed as shell.
+    assert unresolved_audit(fresh(tmp_path, "p"), "python3 scripts/run.py", files={"scripts/run.py": "import json\nprint(json.dumps({}))\nmytool build\n"})["state"] == "complete"
+
+
+def test_a_makefile_variable_or_target_line_is_not_a_command(tmp_path):
+    makefile = "CC = gcc\nall: build\n\t@echo hi\nbuild:\n\tmytool build\n"
+    assert fails_closed(unresolved_audit(tmp_path, "make", files={"Makefile": makefile}))[0]       # the recipe runs an unlisted tool
+    assert unresolved_audit(fresh(tmp_path, "m"), "make", files={"Makefile": "CC = gcc\nall: build\nbuild:\n\t@echo hi\n"})["state"] == "complete"
+
+
+def test_a_resolved_script_that_calls_an_unlisted_executable_is_unresolved_through_the_script(tmp_path):
+    assert fails_closed(unresolved_audit(tmp_path, "bash scripts/b.sh", files={"scripts/b.sh": "echo hi\nmytool build\n"}))[0]
+    assert unresolved_audit(fresh(tmp_path, "b"), "bash scripts/b.sh", files={"scripts/b.sh": "echo hi\nls\ngit status\n"})["state"] == "complete"
+    assert fails_closed(unresolved_audit(fresh(tmp_path, "r"), "Rscript scripts/b.R", files={"scripts/b.R": "system('mytool build')\n"}))[0]
+
+
+def test_the_qc_monthly_shape_with_only_allowlisted_commands_stays_tier_two(tmp_path):
+    qc = ("git config user.name bot\ngit fetch --depth 1 origin qc-results\ngit show FETCH_HEAD:qc-history.csv > prev.csv || rm -f prev.csv\n"
+          "Rscript scripts/site.R\ngit add qc-history.csv\ngit commit -m h\ngit push origin qc-results")
+    assert pair(tmp_path, stage_push_workflow(*qc.split("\n"), push=False), a=NO_BUILD, files={".rforge.yaml": KEY, "scripts/site.R": CLEAN_R})["state"] == "complete"
