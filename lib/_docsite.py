@@ -494,7 +494,263 @@ def deploy_subdirectory(text, pkgdown_repo=True, data=None):
     return data is not None and any(kind == "key" and value.lower().replace("_", "-") in PAGES_SUBDIR_INPUTS for kind, value in yaml_walk(data))
 
 
-def local_action_reasons(root, sha, files, uses, seen, pkgdown_repo=True):
+MAX_SCRIPT_DEPTH = 5
+MAX_SCRIPT_FILES = 40
+MAX_SCRIPT_BYTES = 1 << 20
+DYNAMIC_PATH = re.compile(r"[$`*?\[{]|<\(")      # variable, command/process substitution, expression or glob: not a literal path
+R_SOURCE = re.compile(r"""\b(?:source|sys\.source)\s*\(\s*(?:(?:file|exprs)\s*=\s*)?(?:"([^"]*)"|'([^']*)'|(\S))""")
+R_SYSTEM = re.compile(r"""\b(system2?|shell)\s*\(\s*(?:(?:command|intern)\s*=\s*)?(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|(\S))""")
+SHELL_PROGRAMS = ("bash", "sh", "zsh", "dash")
+
+
+def shell_commands(text):
+    """Split shell (or Makefile recipe) text into commands, each a list of unquoted tokens.
+
+    Quote-aware, so `;` or a newline inside `Rscript -e '...'` does not end the command; `\\<newline>` continues a line;
+    `#` starts a comment. Not a shell: `$()`, `<()`, here-documents and aliases are left as literal token text,
+    which `DYNAMIC_PATH` then treats as a path that cannot be resolved.
+    """
+    commands, command, token, quote, started, i = [], [], [], None, False, 0
+
+    def flush():
+        nonlocal token, started
+        if started:
+            command.append("".join(token))
+        token, started = [], False
+
+    def end():
+        nonlocal command
+        flush()
+        if command:
+            commands.append(command)
+        command = []
+    while i < len(text):
+        c = text[i]
+        if quote:
+            if c == quote:
+                quote = None
+            elif c == "\\" and quote == '"' and i + 1 < len(text):
+                token.append(text[i + 1]); i += 1
+            else:
+                token.append(c)
+        elif c in "'\"":
+            quote, started = c, True
+        elif c == "\\" and i + 1 < len(text):
+            if text[i + 1] != "\n":
+                token.append(text[i + 1]); started = True
+            i += 1
+        elif c == "#" and not started:
+            while i < len(text) and text[i] != "\n":
+                i += 1
+            continue
+        elif c in "\n;&|":
+            end()
+        elif c.isspace():
+            flush()
+        else:
+            token.append(c); started = True
+        i += 1
+    end()
+    return commands
+
+
+class ScriptScan:
+    """Follow the files a `run:` step executes, read at the pinned SHA, and apply the run-body detections to each.
+
+    References come from `Rscript`, `R -f/--file/CMD BATCH`, `bash|sh|zsh|dash`, `python`, `source`/`.`, `./path`,
+    `make [-f] [-C]` and, inside R code, `source()`/`sys.source()`/`system()`/`system2()`. Hops are transitive with a
+    visited set, a depth cap and a file cap. A reference that cannot be scanned (missing, symlinked, outside the
+    repository, absolute, dynamic, binary, too large, over a cap) is a reason, but only in a pkgdown repository, so
+    unrelated repositories are unaffected; a readable script with none of the signals never blocks. Not detected: scripts
+    fetched or generated at runtime (reported as missing or dynamic in a pkgdown repository), `uses:` actions from other
+    repositories, `knit`/`render` of a document, and any path built any way other than a literal.
+
+    `strict` narrows the fail-closed reasons to the workflows that can build the site: those whose text names pkgdown,
+    or every workflow when none does (a config-only repository). Unrelated workflows (QC gates, simulations) run
+    scripts full of `source(file.path(...))`; failing closed on all of them would make nearly every real pkgdown
+    repository incomplete. The signals themselves (subdirectory deploy, dev mode) are reported from any reached script.
+    """
+
+    def __init__(self, root, sha, files, modes, pkgdown_repo):
+        self.root, self.sha, self.files, self.modes, self.pkgdown_repo = root, sha, files, modes, pkgdown_repo
+        self.seen, self.reasons, self.strict = set(), [], True
+
+    def fail(self, why, ref):
+        if self.pkgdown_repo and self.strict:
+            self.reasons.append(f"script reference unsupported ({why}): {ref}; the deployed routes cannot be verified")
+
+    def directory(self, cwd, target):
+        """The repository-relative directory `target` names from `cwd`, or None when it cannot be known statically."""
+        if cwd is None or not isinstance(target, str) or DYNAMIC_PATH.search(target) or target.startswith(("/", "~")):
+            return None
+        joined = posixpath.normpath(posixpath.join(cwd, target or "."))
+        return None if joined == ".." or joined.startswith("../") else ("" if joined == "." else joined)
+
+    def run_step(self, step, base):
+        run = step.get("run")
+        if not isinstance(run, str):
+            return
+        wd = step.get("working-directory")
+        cwd = base if wd is None else self.directory(base, wd)
+        if "Rscript" in str(step.get("shell", "")):
+            self.r_code(run, cwd, 0)    # `shell: Rscript {0}`: the body is R code (the r-lib pkgdown template), not shell
+        else:
+            self.body(run, cwd, 0)
+
+    def body(self, text, cwd, depth):
+        for command in shell_commands(text):
+            cwd = self.command(command, cwd, depth)
+
+    def command(self, command, cwd, depth):
+        i = 0
+        while i < len(command) and (re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", command[i]) or command[i] in ("env", "sudo", "time", "nohup", "exec", "command")):
+            i += 1
+        if i >= len(command):
+            return cwd
+        raw, args = command[i], command[i + 1:]
+        program = posixpath.basename(raw.lstrip("@-+"))
+        if program == "cd":
+            return self.directory(cwd, args[0]) if args and args[0] != "-" else None
+        if program == "Rscript":
+            for n, arg in enumerate(args):
+                if arg == "-e":
+                    self.r_code(args[n + 1] if n + 1 < len(args) else "", cwd, depth)
+                elif n and args[n - 1] == "-e":
+                    continue
+                elif not arg.startswith("-"):
+                    self.file(arg, cwd, depth)
+                    break
+        elif program == "R":
+            n = 0
+            while n < len(args):
+                arg = args[n]
+                if arg == "-e":
+                    self.r_code(args[n + 1] if n + 1 < len(args) else "", cwd, depth); n += 1
+                elif arg in ("-f", "--file") and n + 1 < len(args):
+                    self.file(args[n + 1], cwd, depth); n += 1
+                elif arg.startswith("--file="):
+                    self.file(arg[7:], cwd, depth)
+                elif arg == "CMD" and args[n + 1:n + 2] == ["BATCH"]:
+                    rest = [a for a in args[n + 2:] if not a.startswith("-")]
+                    if rest:
+                        self.file(rest[0], cwd, depth)
+                    break
+                n += 1
+        elif program in SHELL_PROGRAMS or re.fullmatch(r"python[0-9.]*", program):
+            python = program.startswith("python")
+            n = 0
+            while n < len(args):
+                arg = args[n]
+                if arg == "-c" and not python and n + 1 < len(args):
+                    self.body(args[n + 1], cwd, depth + 1)
+                    break
+                if arg in ("-c", "-m") or arg in ("-o", "+o", "-O", "+O"):
+                    if arg == "-c" or arg == "-m":
+                        break
+                    n += 2
+                    continue
+                if arg.startswith(("-", "+")) and arg not in ("-", "+"):
+                    n += 1
+                    continue
+                self.file(arg, cwd, depth)
+                break
+        elif program in ("source", ".") and args:
+            self.file(args[0], cwd, depth)
+        elif program == "eval" and args:
+            self.body(" ".join(args), cwd, depth + 1)
+        elif program == "make" and not {"-v", "--version", "-h", "--help"} & set(args):
+            self.make(args, cwd, depth)
+        elif raw.startswith(("./", "../")):
+            self.file(raw, cwd, depth)
+        return cwd
+
+    def make(self, args, cwd, depth):
+        makefile, where, n = None, cwd, 0
+        while n < len(args):
+            arg = args[n]
+            if arg in ("-f", "--file", "--makefile") and n + 1 < len(args):
+                makefile = args[n + 1]; n += 1
+            elif arg.startswith(("--file=", "--makefile=")):
+                makefile = arg.split("=", 1)[1]
+            elif arg in ("-C", "--directory") and n + 1 < len(args):
+                where = self.directory(where, args[n + 1]); n += 1
+            elif arg.startswith("--directory="):
+                where = self.directory(where, arg.split("=", 1)[1])
+            n += 1
+        if makefile is None:
+            makefile = next((name for name in ("GNUmakefile", "makefile", "Makefile")
+                             if where is not None and posixpath.normpath(posixpath.join(where, name)) in self.files), "Makefile")
+        self.file(makefile, where, depth)
+
+    def r_code(self, code, cwd, depth):
+        for match in R_SOURCE.finditer(code):
+            literal = match.group(1) if match.group(1) is not None else match.group(2)
+            if literal is not None:
+                self.file(literal, cwd, depth)
+            else:
+                self.fail("dynamic path", "source() with a non-literal argument")
+        for match in R_SYSTEM.finditer(code):
+            literal = match.group(3) if match.group(3) is not None else match.group(2)
+            if literal is None:
+                self.fail("dynamic path", f"{match.group(1)}() with a non-literal command")
+                continue
+            command = literal.replace('\\"', '"').replace("\\'", "'")
+            if match.group(1) == "system2":
+                close = code.find(")", match.end())
+                command += " " + " ".join(re.findall(r"""["']([^"']*)["']""", code[match.end():close if close >= 0 else None]))
+            self.body(command, cwd, depth + 1)
+
+    def file(self, path, cwd, depth):
+        if DYNAMIC_PATH.search(path):
+            return self.fail("dynamic path", path)
+        if cwd is None:
+            return self.fail("dynamic working directory", path)
+        if path.startswith("/"):
+            return self.fail("absolute path", path)
+        if path.startswith("~"):
+            return self.fail("dynamic path", path)
+        norm = posixpath.normpath(posixpath.join(cwd, path))
+        if norm == ".." or norm.startswith("../"):
+            return self.fail("path outside the repository", path)
+        if norm not in self.files:
+            return self.fail("missing at the pinned ref", path)
+        if self.modes.get(norm) == "120000":
+            return self.fail("symlink, not read", path)
+        if norm in self.seen:
+            return None
+        if depth > MAX_SCRIPT_DEPTH:
+            return self.fail("nesting too deep", path)
+        if len(self.seen) >= MAX_SCRIPT_FILES:
+            return self.fail("too many scripts", path)
+        self.seen.add(norm)
+        if int(git(self.root, "cat-file", "-s", self.sha + ":" + norm)) > MAX_SCRIPT_BYTES:
+            return self.fail("file too large to scan", path)
+        text = git(self.root, "show", self.sha + ":" + norm, strip=False)
+        if "\0" in text:
+            return self.fail("binary file", path)
+        if mentions_dev_mode(text):
+            self.reasons.append(f"{DEV_MODE_VARIABLE} set in script {norm}; development mode mapping unsupported")
+        if deploy_subdirectory(text, self.pkgdown_repo):
+            self.reasons.append(f"deploy to a subdirectory in script {norm}; the deployed routes cannot be verified")
+        if norm.lower().endswith((".r", ".rprofile")):
+            self.r_code(text, cwd, depth + 1)
+        else:
+            self.body(text, cwd, depth + 1)
+        return None
+
+
+def default_directory(*containers):
+    """`defaults.run.working-directory` of the first container (job, then workflow) that sets it, else the repository root."""
+    for container in containers:
+        node = container
+        for key in ("defaults", "run", "working-directory"):
+            node = node.get(key) if isinstance(node, dict) else None
+        if node is not None:
+            return node
+    return None
+
+
+def local_action_reasons(root, sha, files, uses, seen, pkgdown_repo=True, scan=None):
     """Scan a local composite action (`uses: ./path`, relative to the repository root) and the local actions it calls."""
     target = posixpath.normpath(uses[2:] or ".")
     if target.startswith("..") or target in seen:
@@ -526,8 +782,10 @@ def local_action_reasons(root, sha, files, uses, seen, pkgdown_repo=True):
             if not isinstance(steps, list) or not all(isinstance(x, dict) and isinstance(x.get("uses", ""), str) for x in steps):
                 raise ValueError("steps must be a list of mappings")
             for step in steps:
+                if scan is not None:
+                    scan.run_step(step, "")
                 if step.get("uses", "").startswith("./"):
-                    reasons.extend(local_action_reasons(root, sha, files, step["uses"], seen, pkgdown_repo))
+                    reasons.extend(local_action_reasons(root, sha, files, step["uses"], seen, pkgdown_repo, scan))
     except ValueError as exc:
         reasons.append(f"malformed local action ({path}): {exc}")
     return reasons
@@ -556,12 +814,16 @@ def workflow_blocks(root, sha, tree, prefix=""):
             errors[path] = exc   # reported as malformed below; the raw text is still scanned
     pkgdown_repo = (any(prefix + candidate in files for candidate in CONFIG_CANDIDATES)
                     or any("pkgdown" in source_text(t, parsed.get(p)).lower() for p, t in texts.items()))
+    scan = ScriptScan(root, sha, files, tree if isinstance(tree, dict) else {}, pkgdown_repo)
     startup_dirs = {"", prefix.rstrip("/")}
     for path in sorted(files):
         if posixpath.basename(path) in STARTUP_FILES and posixpath.dirname(path) in startup_dirs:
             if mentions_dev_mode(git(root, "show", sha + ":" + path, strip=False)):
                 reasons.append(f"{DEV_MODE_VARIABLE} set in {path}; development mode mapping unsupported")
-    for path, text in texts.items():
+    wording = {p: "pkgdown" in source_text(t, parsed.get(p)).lower() for p, t in texts.items()}
+    # Site workflows first, so a script both kinds reach is judged strictly; the visited set skips it afterwards.
+    for path, text in sorted(texts.items(), key=lambda item: not (wording[item[0]] or not any(wording.values()))):
+        scan.strict = wording[path] or not any(wording.values())
         if mentions_dev_mode(source_text(text, parsed.get(path))):
             reasons.append(f"workflow PKGDOWN_DEV_MODE mapping unsupported ({path})")
         if deploy_subdirectory(text, pkgdown_repo, parsed.get(path)):
@@ -579,9 +841,12 @@ def workflow_blocks(root, sha, tree, prefix=""):
             # site without ever naming pkgdown, so no keyword gate; step-level `uses:` (actions) is unaffected.
             if "uses" in job:
                 reasons.append(f"reusable workflow job unsupported ({path}); the deployed routes cannot be verified")
+            base = scan.directory("", default_directory(job, parsed[path])) if default_directory(job, parsed[path]) is not None else ""
             for step in steps:
+                scan.run_step(step, base)
                 if step.get("uses", "").startswith("./"):
-                    reasons.extend(local_action_reasons(root, sha, files, step["uses"], seen, pkgdown_repo))
+                    reasons.extend(local_action_reasons(root, sha, files, step["uses"], seen, pkgdown_repo, scan))
+    reasons.extend(scan.reasons)
     return list(dict.fromkeys(reasons))
 
 
@@ -667,7 +932,7 @@ def audit(root: Path, *, url, ref=None):
                 refused.add(file)
                 del expected[route]
         # Even an explicit ref cannot certify workflow transforms: read them at the pinned SHA, not the working tree.
-        blocked = workflow_blocks(root, sha, tree, prefix)
+        blocked = workflow_blocks(root, sha, modes, prefix)
         if blocked:
             stage["reasons"].extend(blocked)
             return stage

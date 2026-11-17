@@ -260,6 +260,7 @@ UNSUPPORTED_LAYOUT_REASON_PATTERNS = tuple(re.compile(p) for p in (
     r"directory-level article configuration unsupported",
     r"symlinked vignette entry unsupported",
     r"deploy to a subdirectory",
+    r"script reference unsupported",
 ))
 # Informational, never blocking in the engine, and only produced after a successful sitemap read.
 _BENIGN_REASON = re.compile(r"excluded \d+ foreign sitemap entries$")

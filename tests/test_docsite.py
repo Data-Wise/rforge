@@ -1407,3 +1407,305 @@ def test_select_ref_notices_a_deployment_workflow_that_only_uses_the_setup_actio
     pkg = make(tmp_path, files={".github/workflows/site.yaml": body})
     git(pkg, "branch", "release")
     assert site.select_ref(pkg, None)["selection"] == "literal workflow branch"
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Codex round 8: route-moving behavior can live in a file a `run:` step executes. Scripts are read at the pinned
+# SHA, followed transitively (cycle guard, depth and file caps), and scanned with the same detections as run
+# bodies. An unscannable reference fails closed, but only in a pkgdown repository (config at the pinned ref, or
+# workflow wording); a readable script with none of the signals never blocks.
+# ---------------------------------------------------------------------------------------------------------
+DEPLOY_R = "pkgdown::deploy_to_branch(subdir = \"v1\")\n"
+CLEAN_R = "cat('hello')\n"
+DEPLOY_SH_BODY = "#!/bin/sh\nRscript -e 'pkgdown::deploy_to_branch(subdir = \"v1\")'\n"
+SCRIPT_WORKFLOW = ".github/workflows/site.yaml"
+
+
+def step_workflow(cmd, step_extra="", job_extra="", top=""):
+    body = "\n".join("          " + line for line in cmd.split("\n"))
+    return (WORKFLOW_HEAD + top + "jobs:\n  site:\n    runs-on: ubuntu-latest\n" + job_extra + "    steps:\n      - run: |\n" + body + "\n" + step_extra)
+
+
+def script_audit(tmp_path, files, cmd, config=CONFIG, **kw):
+    """Audit a package whose workflow runs `cmd` and whose sitemap holds EVERY expected route (the old false-complete)."""
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=config, files={SCRIPT_WORKFLOW: step_workflow(cmd, **kw), **files})
+        publish(web, "", root, ROUTES)
+        return site.audit(pkg, url=root, ref="main")
+
+
+def reached(r, *words):
+    return r["state"] == "incomplete" and any(all(w in x for w in words) for x in r["reasons"])
+
+
+def test_the_exact_codex_fixture_is_incomplete_not_complete(tmp_path):
+    r = script_audit(tmp_path, {"scripts/deploy.R": DEPLOY_R}, "Rscript scripts/deploy.R", config=None)
+    assert reached(r, "subdirectory", "scripts/deploy.R"), r
+
+
+SUBDIR_REACHED = [
+    ("Rscript scripts/deploy.R", {"scripts/deploy.R": DEPLOY_R}),
+    ("Rscript --vanilla scripts/deploy.R arg1", {"scripts/deploy.R": DEPLOY_R}),
+    ("Rscript -e \"source('scripts/deploy.R')\"", {"scripts/deploy.R": DEPLOY_R}),
+    ("Rscript -e 'sys.source(\"scripts/deploy.R\", envir = globalenv())'", {"scripts/deploy.R": DEPLOY_R}),
+    ("Rscript -e 'source(file = \"scripts/deploy.R\")'", {"scripts/deploy.R": DEPLOY_R}),
+    ("R -f scripts/deploy.R", {"scripts/deploy.R": DEPLOY_R}),
+    ("R --file=scripts/deploy.R", {"scripts/deploy.R": DEPLOY_R}),
+    ("R --file scripts/deploy.R", {"scripts/deploy.R": DEPLOY_R}),
+    ("R CMD BATCH scripts/deploy.R", {"scripts/deploy.R": DEPLOY_R}),
+    ("R CMD BATCH --no-save scripts/deploy.R out.Rout", {"scripts/deploy.R": DEPLOY_R}),
+    ("bash scripts/deploy.sh", {"scripts/deploy.sh": DEPLOY_SH_BODY}),
+    ("bash -e -x scripts/deploy.sh", {"scripts/deploy.sh": DEPLOY_SH_BODY}),
+    ("sh scripts/deploy.sh", {"scripts/deploy.sh": DEPLOY_SH_BODY}),
+    ("zsh scripts/deploy.sh", {"scripts/deploy.sh": DEPLOY_SH_BODY}),
+    ("source scripts/deploy.sh", {"scripts/deploy.sh": DEPLOY_SH_BODY}),
+    (". scripts/deploy.sh", {"scripts/deploy.sh": DEPLOY_SH_BODY}),
+    ("./scripts/deploy.sh", {"scripts/deploy.sh": DEPLOY_SH_BODY}),
+    ("python3 scripts/deploy.py", {"scripts/deploy.py": "import subprocess\nsubprocess.run(['Rscript', '-e', 'pkgdown::deploy_to_branch(subdir=\"v1\")'])\n"}),
+    ("cd scripts && Rscript deploy.R", {"scripts/deploy.R": DEPLOY_R}),
+    ("echo start\nRscript scripts/deploy.R\necho done", {"scripts/deploy.R": DEPLOY_R}),
+    ("Rscript -e \"system('Rscript scripts/deploy.R')\"", {"scripts/deploy.R": DEPLOY_R}),
+    ("make deploy", {"Makefile": "deploy:\n\tRscript -e 'pkgdown::deploy_to_branch(subdir = \"v1\")'\n"}),
+    ("make -f build/Makefile deploy", {"build/Makefile": "deploy:\n\tRscript -e 'pkgdown::deploy_to_branch(subdir = \"v1\")'\n"}),
+    ("make -C scripts deploy", {"scripts/Makefile": "deploy:\n\tRscript -e 'pkgdown::deploy_to_branch(subdir = \"v1\")'\n"}),
+    ("make deploy", {"Makefile": "deploy:\n\tRscript scripts/deploy.R\n", "scripts/deploy.R": DEPLOY_R}),
+]
+
+
+@pytest.mark.parametrize("cmd,files", SUBDIR_REACHED)
+def test_a_subdirectory_deploy_in_a_script_the_run_step_reaches_is_incomplete(tmp_path, cmd, files):
+    r = script_audit(tmp_path, files, cmd)
+    assert reached(r, "subdirectory") and not any("deploy_to_branch(subdir" in x for x in r["reasons"]), r["reasons"]
+
+
+@pytest.mark.parametrize("cmd,files", [
+    ("Rscript scripts/a.R", {"scripts/a.R": "source('scripts/b.R')\n", "scripts/b.R": DEPLOY_R}),
+    ("Rscript scripts/a.R", {"scripts/a.R": "sys.source(\"scripts/b.R\", envir = environment())\n", "scripts/b.R": DEPLOY_R}),
+    ("Rscript scripts/a.R", {"scripts/a.R": "system(\"bash scripts/b.sh\")\n", "scripts/b.sh": DEPLOY_SH_BODY}),
+    ("Rscript scripts/a.R", {"scripts/a.R": "system2('Rscript', c('scripts/b.R'))\n", "scripts/b.R": DEPLOY_R}),
+    ("bash scripts/a.sh", {"scripts/a.sh": "#!/bin/sh\nbash scripts/b.sh\n", "scripts/b.sh": DEPLOY_SH_BODY}),
+    ("bash scripts/a.sh", {"scripts/a.sh": "#!/bin/sh\nsource ./scripts/b.sh\n", "scripts/b.sh": DEPLOY_SH_BODY}),
+    ("bash scripts/a.sh", {"scripts/a.sh": "#!/bin/sh\nRscript scripts/b.R\n", "scripts/b.R": DEPLOY_R}),
+    ("make all", {"Makefile": "all:\n\tbash scripts/b.sh\n", "scripts/b.sh": DEPLOY_SH_BODY}),
+], ids=["source", "sys-source", "system-bash", "system2", "sh-calls-sh", "sh-sources-sh", "sh-calls-rscript", "make-calls-script"])
+def test_a_script_that_reaches_another_script_with_the_signal_is_followed(tmp_path, cmd, files):
+    assert reached(script_audit(tmp_path, files, cmd), "subdirectory")
+
+
+@pytest.mark.parametrize("kw,files,cmd", [
+    ({"step_extra": "        working-directory: scripts\n"}, {"scripts/deploy.R": DEPLOY_R}, "Rscript deploy.R"),
+    ({"job_extra": "    defaults:\n      run:\n        working-directory: scripts\n"}, {"scripts/deploy.R": DEPLOY_R}, "Rscript deploy.R"),
+    ({"top": "defaults:\n  run:\n    working-directory: scripts\n"}, {"scripts/deploy.R": DEPLOY_R}, "Rscript deploy.R"),
+    ({"step_extra": "        working-directory: ./scripts/\n"}, {"scripts/deploy.R": DEPLOY_R}, "Rscript deploy.R"),
+], ids=["step", "job-defaults", "workflow-defaults", "dot-slash"])
+def test_the_working_directory_is_honored_when_resolving_a_script(tmp_path, kw, files, cmd):
+    assert reached(script_audit(tmp_path, files, cmd, **kw), "subdirectory", "scripts/deploy.R")
+
+
+def test_a_script_cycle_terminates_and_clean_scripts_stay_complete(tmp_path):
+    files = {"scripts/a.R": "source('scripts/b.R')\n" + CLEAN_R, "scripts/b.R": "source('scripts/a.R')\n"}
+    r = script_audit(tmp_path, files, "Rscript scripts/a.R")
+    assert r["state"] == "complete", r["reasons"]
+
+
+def test_a_cycle_whose_second_script_holds_the_signal_is_still_found(tmp_path):
+    files = {"scripts/a.R": "source('scripts/b.R')\n", "scripts/b.R": "source('scripts/a.R')\n" + DEPLOY_R}
+    assert reached(script_audit(tmp_path, files, "Rscript scripts/a.R"), "subdirectory", "scripts/b.R")
+
+
+def test_a_chain_deeper_than_the_cap_fails_closed(tmp_path):
+    files = {f"s/{i}.R": f"source('s/{i + 1}.R')\n" for i in range(9)}
+    files["s/9.R"] = DEPLOY_R
+    r = script_audit(tmp_path, files, "Rscript s/0.R")
+    assert reached(r, "script reference unsupported", "deep"), r["reasons"]
+
+
+def test_more_scripts_than_the_file_cap_fail_closed(tmp_path):
+    files = {f"s/{i}.R": CLEAN_R for i in range(60)}
+    files["s/main.R"] = "".join(f"source('s/{i}.R')\n" for i in range(60))
+    r = script_audit(tmp_path, files, "Rscript s/main.R")
+    assert reached(r, "script reference unsupported", "too many"), r["reasons"]
+
+
+
+UNSCANNABLE = [
+    ("Rscript scripts/missing.R", {}, "missing"),
+    ("bash scripts/missing.sh", {}, "missing"),
+    ("Rscript ../outside.R", {}, "outside the repository"),
+    ("Rscript /opt/deploy.R", {}, "absolute"),
+    ("Rscript scripts/$NAME.R", {}, "dynamic"),
+    ("Rscript \"scripts/${NAME}.R\"", {}, "dynamic"),
+    ("Rscript \"scripts/${{ matrix.target }}.R\"", {}, "dynamic"),
+    ("bash $(cat which.txt)", {}, "dynamic"),
+    ("Rscript `cat which.txt`", {}, "dynamic"),
+    ("bash <(curl -s https://example.org/deploy.sh)", {}, "dynamic"),
+    ("Rscript -e 'source(paste0(\"scripts/\", f))'", {}, "dynamic"),
+    ("Rscript -e 'source(f)'", {}, "dynamic"),
+    ("Rscript -e 'system(cmd)'", {}, "dynamic"),
+    ("Rscript scripts/bin.R", {"scripts/bin.R": "x\0y"}, "binary"),
+    ("Rscript scripts/huge.R", {"scripts/huge.R": "# " + "x" * (1 << 20 + 1)}, "too large"),
+]
+
+
+@pytest.mark.parametrize("cmd,files,why", UNSCANNABLE, ids=[f"{c[:34]}|{w}" for c, _, w in UNSCANNABLE])
+def test_an_unscannable_script_reference_fails_closed_in_a_pkgdown_repository(tmp_path, cmd, files, why):
+    r = script_audit(tmp_path, files, cmd)           # CONFIG: a pkgdown config exists at the pinned ref
+    assert reached(r, "script reference unsupported", why), r["reasons"]
+
+
+@pytest.mark.parametrize("cmd,files,why", UNSCANNABLE, ids=[f"{c[:34]}|{w}" for c, _, w in UNSCANNABLE])
+def test_the_same_unscannable_reference_is_ignored_when_the_repository_is_not_pkgdown(tmp_path, cmd, files, why):
+    r = script_audit(tmp_path, files, cmd, config=None)
+    assert r["state"] == "complete" and not any("script reference" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_symlinked_script_fails_closed_in_a_pkgdown_repository(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: step_workflow("Rscript scripts/deploy.R"), "scripts/real.R": DEPLOY_R})
+        link(pkg, "scripts/deploy.R", "real.R")
+        publish(web, "", root, ROUTES)
+        r = site.audit(pkg, url=root, ref="main")
+    assert reached(r, "script reference unsupported", "symlink"), r["reasons"]
+
+
+def test_a_symlinked_script_is_ignored_when_the_repository_is_not_pkgdown(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=None, files={SCRIPT_WORKFLOW: step_workflow("Rscript scripts/deploy.R"), "scripts/real.R": CLEAN_R})
+        link(pkg, "scripts/deploy.R", "real.R")
+        publish(web, "", root, ROUTES)
+        assert site.audit(pkg, url=root, ref="main")["state"] == "complete"
+
+
+def test_a_script_only_in_the_working_tree_is_not_read(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: step_workflow("Rscript scripts/deploy.R")})
+        (pkg / "scripts").mkdir()
+        (pkg / "scripts/deploy.R").write_text(DEPLOY_R)       # untracked: not at the pinned SHA
+        publish(web, "", root, ROUTES)
+        r = site.audit(pkg, url=root, ref="main")
+    assert reached(r, "script reference unsupported", "missing") and not any("subdirectory" in x for x in r["reasons"]), r["reasons"]
+
+
+def test_a_script_changed_after_the_pinned_ref_is_not_read(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: step_workflow("Rscript scripts/deploy.R"), "scripts/deploy.R": CLEAN_R})
+        git(pkg, "branch", "pinned")
+        commit(pkg, {"scripts/deploy.R": DEPLOY_R}, message="move the deploy after the pin")
+        publish(web, "", root, ROUTES)
+        r = site.audit(pkg, url=root, ref="pinned")
+    assert r["state"] == "complete", r["reasons"]
+
+
+def test_a_pkgdown_repository_whose_scripts_are_clean_stays_complete(tmp_path):
+    files = {"scripts/coverage.R": "covr::codecov()\n", "scripts/lint.sh": "#!/bin/sh\nRscript -e 'lintr::lint_package()'\n"}
+    r = script_audit(tmp_path, files, "Rscript scripts/coverage.R\nbash scripts/lint.sh\nmake -v")
+    assert r["state"] == "complete", r["reasons"]
+
+
+@pytest.mark.parametrize("script", [
+    "Sys.setenv(PKGDOWN_DEV_MODE = \"devel\")\n",
+    "Sys.setenv(paste0(\"PKGDOWN_DEV_\", \"MODE\") = \"devel\")\n",
+    "Sys.setenv(pkgdown_dev_mode = \"devel\")\n",
+    "Sys.setenv(`PKGDOWN_DEV_MODE` = 'devel')\n",
+], ids=["plain", "paste0-split", "lower-case", "backtick"])
+def test_dev_mode_set_inside_a_reached_script_is_detected(tmp_path, script):
+    assert reached(script_audit(tmp_path, {"scripts/deploy.R": script}, "Rscript scripts/deploy.R"), "PKGDOWN_DEV_MODE", "scripts/deploy.R")
+
+
+def test_a_signal_only_inside_an_r_comment_still_blocks_conservatively(tmp_path):
+    r = script_audit(tmp_path, {"scripts/deploy.R": "# was: pkgdown::deploy_to_branch(subdir = \"v1\")\n" + CLEAN_R}, "Rscript scripts/deploy.R")
+    assert reached(r, "subdirectory"), r["reasons"]
+
+
+def test_a_pages_target_folder_in_a_script_blocks_in_a_pkgdown_repository(tmp_path):
+    files = {"scripts/deploy.sh": "#!/bin/sh\nnpx gh-pages --dest v1 # target-folder: v1\n"}
+    assert reached(script_audit(tmp_path, files, "bash scripts/deploy.sh"), "subdirectory", "scripts/deploy.sh")
+    (tmp_path / "other").mkdir()
+    assert script_audit(tmp_path / "other", files, "bash scripts/deploy.sh", config=None)["state"] == "complete"
+
+
+def test_a_script_run_from_a_local_composite_action_is_followed(tmp_path):
+    action = "runs:\n  using: composite\n  steps:\n    - run: Rscript scripts/deploy.R\n      shell: bash\n"
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: local_action_workflow("./.github/actions/d"), ".github/actions/d/action.yml": action,
+                                                   "scripts/deploy.R": DEPLOY_R})
+        publish(web, "", root, ROUTES)
+        r = site.audit(pkg, url=root, ref="main")
+    assert reached(r, "subdirectory", "scripts/deploy.R"), r["reasons"]
+
+
+def test_a_composite_action_working_directory_is_honored(tmp_path):
+    action = "runs:\n  using: composite\n  steps:\n    - run: Rscript deploy.R\n      shell: bash\n      working-directory: scripts\n"
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={SCRIPT_WORKFLOW: local_action_workflow("./.github/actions/d"), ".github/actions/d/action.yml": action,
+                                                   "scripts/deploy.R": DEPLOY_R})
+        publish(web, "", root, ROUTES)
+        r = site.audit(pkg, url=root, ref="main")
+    assert reached(r, "subdirectory", "scripts/deploy.R"), r["reasons"]
+
+
+def test_the_script_reasons_are_recognized_by_the_limit_site_rule():
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    import verify_a2_release as verifier
+    for reason in ("deploy to a subdirectory in script scripts/deploy.R; the deployed routes cannot be verified",
+                   "PKGDOWN_DEV_MODE set in script scripts/deploy.R; development mode mapping unsupported",
+                   "script reference unsupported (missing at the pinned ref): scripts/x.R; the deployed routes cannot be verified"):
+        assert verifier.limit_run_is_unsupported_layout({"state": "incomplete", "reasons": [reason]}), reason
+
+
+UNRELATED_DYNAMIC = "gates <- 'scripts/gate.R'\nsource(file.path('scripts', 'common.R'))\nsystem2(Sys.which('git'), 'status')\n"
+QC_WORKFLOW = ".github/workflows/qc.yaml"
+
+
+def two_workflows(site_text, tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={
+            SCRIPT_WORKFLOW: site_text, QC_WORKFLOW: step_workflow("Rscript scripts/qc.R"),
+            "scripts/qc.R": UNRELATED_DYNAMIC, "scripts/site.R": CLEAN_R})
+        publish(web, "", root, ROUTES)
+        return site.audit(pkg, url=root, ref="main")
+
+
+def test_dynamic_script_code_in_an_unrelated_workflow_does_not_block_a_pkgdown_repository(tmp_path):
+    """Real repositories run QC and simulation scripts full of source(file.path(...)); only site workflows fail closed."""
+    r = two_workflows(step_workflow("Rscript -e 'pkgdown::build_site()'\nRscript scripts/site.R"), tmp_path)
+    assert r["state"] == "complete", r["reasons"]
+
+
+def test_the_same_dynamic_script_code_in_a_workflow_that_names_pkgdown_does_block(tmp_path):
+    r = two_workflows(step_workflow("Rscript -e 'pkgdown::build_site()'\nRscript scripts/qc.R"), tmp_path)
+    assert reached(r, "script reference unsupported", "dynamic"), r["reasons"]
+
+
+def test_with_no_workflow_naming_pkgdown_every_workflow_is_a_site_workflow(tmp_path):
+    r = two_workflows(step_workflow("Rscript scripts/site.R"), tmp_path)
+    assert reached(r, "script reference unsupported", "dynamic"), r["reasons"]
+
+
+def test_a_signal_in_a_script_reached_only_from_an_unrelated_workflow_still_blocks(tmp_path):
+    web = tmp_path / "web"
+    with server(web) as root:
+        pkg = make(tmp_path, config=CONFIG, files={
+            SCRIPT_WORKFLOW: step_workflow("Rscript -e 'pkgdown::build_site()'"), QC_WORKFLOW: step_workflow("Rscript scripts/qc.R"),
+            "scripts/qc.R": DEPLOY_R})
+        publish(web, "", root, ROUTES)
+        assert reached(site.audit(pkg, url=root, ref="main"), "subdirectory", "scripts/qc.R")
+
+
+def test_an_rscript_shell_step_body_is_read_as_r_code(tmp_path):
+    """The r-lib pkgdown template runs R directly with `shell: Rscript {0}`."""
+    step = "        shell: Rscript {0}\n"
+    r = script_audit(tmp_path, {"scripts/deploy.R": DEPLOY_R}, "source('scripts/deploy.R')", step_extra=step)
+    assert reached(r, "subdirectory", "scripts/deploy.R"), r["reasons"]
+    clean = script_audit(tmp_path / "c", {}, "pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)", step_extra=step) if (tmp_path / "c").mkdir() is None else None
+    assert clean["state"] == "complete", clean["reasons"]
