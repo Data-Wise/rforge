@@ -136,22 +136,51 @@ Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
       script never blocks. Scripts fetched or generated at runtime show up as missing or dynamic.
     - **Which workflows are strict.** Every workflow and local action in a pkgdown repository,
       unless the workflow shows no ability to publish. Two tiers of evidence make it
-      publish-capable and strict. **Tier 1, always:** the word pkgdown; a Pages action
-      (`JamesIves/github-pages-deploy-action`, `peaceiris/actions-gh-pages`,
-      `actions/deploy-pages`, `upload-pages-artifact`, `configure-pages`); `deploy_to_branch` or
-      `gh-pages` text; `pages` or `id-token` write, or `write-all`; a checkout given a secret
-      token or key. **Tier 2, only when the pinned tree tracks the pkgdown destination
-      directory** (`destination:` in the config, default `docs/`, under the package directory; a
-      destination that is a variable, a list, absolute or `..` counts as tracked): plain
-      `contents: write`; a push action such as `ad-m/github-push-action`; a job with no
-      `permissions:` key at either level (the token scope is unknown); `git push`, `rsync`,
-      `aws s3` or `netlify` text. Evidence from the scripts and local actions a workflow reaches
-      counts the same way. The reason names the tier and the evidence, for example
-      "tier 2: permissions contents: write (workflow); destination docs/ is tracked". A workflow
-      with none is relaxed, because QC and simulation scripts are full of
-      `source(file.path(...))`. Residual gaps, not detected: a workflow with no tier 1 signal
-      that pushes to a destination the tree does not track; a script that pushes to `gh-pages`
-      from a workflow that shows no signal at all.
+      publish-capable and strict. **Tier 1, always:** the word pkgdown; a Pages or deploy action
+      (`JamesIves/github-pages-deploy-action`, `peaceiris/actions-gh-pages`, `actions/deploy-pages`,
+      `upload-pages-artifact`, `configure-pages`, Netlify, Vercel, Firebase, Cloudflare, rsync, scp and
+      S3 sync actions); `deploy_to_branch` or `gh-pages` text; `pages` or `id-token` write, or
+      `write-all`; a checkout given a secret token or key; an **explicit-branch push**, meaning any
+      `git push` whose literal branch is not `HEAD`, `main` or `master` (forms `<remote> <branch>`,
+      `<src>:<branch>`, `refs/heads/<branch>`, with `-u`, `--force`, `--force-with-lease`, `+`; a
+      dynamic remote or refspec, `--all` and `--mirror` fail closed to tier 1; the default branch is
+      decided by name only); a command that names a remote target (`rsync` or `scp` to a host,
+      `aws s3 sync|cp|mv` to `s3://`, `gsutil` to `gs://`, `netlify` or `firebase deploy`, `surge`,
+      `vercel`, `wrangler pages`, `ghp-import`). **Tier 2, only when the pinned tree tracks the
+      pkgdown destination:** plain `contents: write`; a push action such as `ad-m/github-push-action`;
+      a job with no `permissions:` key at either level; a push with no refspec or to the default
+      branch; the same publish programs with no remote target. The destination is the config
+      `destination:` (default `docs/`, under the package directory) plus any destination a pkgdown
+      build call names (`destination =`, `dest_dir =`, `destination:`, `--destination`; a value that
+      is not a literal counts as tracked). A directory holding only `.gitkeep`, `.keep`, `.gitignore`
+      or `.gitattributes` is not tracked; anything else is, including `.nojekyll`, a file or symlink
+      at the path, and a gitlink (submodule) at or below it. Paths compare case-sensitively, as git
+      does. A destination that is a variable, a list, absolute or `..`, or an unreadable config,
+      counts as tracked. Evidence from the scripts and local actions a workflow reaches counts the
+      same way. A caller job that `uses:` a local reusable workflow shares capability with it in both
+      directions (callee gets the caller's permissions, caller gets the callee's evidence); an
+      unresolvable callee (missing, another repository, dynamic) is assumed tier 1. The reason names
+      the tier and the evidence, for example "tier 2: permissions contents: write (workflow);
+      destination docs/ is tracked".
+    - **Declaring a branch that never carries site files.** A repository can list literal branch names
+      in `.rforge.yaml` (package directory or repository root, read at the pinned ref):
+
+      ```yaml
+      docs:
+        site:
+          nonpublishing-branches:
+            - qc-results
+      ```
+
+      A push to a listed branch is tier 2 instead of tier 1, so it counts only when the destination is
+      tracked. Only a list of literal names counts: a string, glob, variable or non-string entry, or an
+      unparseable file, exempts nothing, and a key that exists only in the working tree or after the
+      pinned ref is not read. `gh-pages` text and deploy actions stay tier 1 whatever the list says.
+      A workflow with no evidence is relaxed, because QC and simulation scripts are full of
+      `source(file.path(...))`. Not detected: a workflow with no tier 1 signal that pushes to a
+      destination the tree does not track; a script that pushes from a workflow that shows no signal
+      at all; actions from other repositories (beyond the fail-closed reusable-workflow rule); manual
+      deploys outside CI.
     - **How names are matched.** YAML inputs (workflows, local actions, front matter) are read as
       parsed structures, so quoted or escaped keys, flow mappings, anchors, merge keys and any
       case of `target-folder`/`PKGDOWN_DEV_MODE` count. R and shell code (a `run:` body,

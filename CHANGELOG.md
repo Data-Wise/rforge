@@ -90,14 +90,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `complete`. In a pkgdown repository a script reference that cannot be scanned (missing,
   symlinked, outside the repository, absolute, dynamic, binary, oversized, over a cap) is
   `incomplete` with "script reference unsupported", for every workflow that may publish.
-  Tier 1 always counts (pkgdown wording, a Pages action, `deploy_to_branch`/`gh-pages`,
-  `pages`/`id-token` write, a checkout given a secret). Tier 2 counts only when the pinned tree
-  tracks the pkgdown destination directory (`destination:`, default `docs/`): `contents: write`,
-  `git push`, a push action, `rsync`/`aws s3`/`netlify`, or no `permissions:` key. Read-only
-  workflows are relaxed, and the reason names the tier and the evidence. `make` follows
-  `include`, `-include` and `sinclude`. A clean readable script never blocks. A signal inside an
-  R comment still blocks. Scripts fetched at runtime, actions from other repositories and
-  manual deploys are not detected.
+  Tier 1 always counts (pkgdown wording, a Pages or deploy action, `deploy_to_branch`/`gh-pages`,
+  `pages`/`id-token` write, a checkout given a secret, an explicit-branch `git push` such as
+  `git push origin HEAD:site`, and a command that names a remote target: `rsync`/`scp` to a host,
+  `aws s3 sync|cp|mv` to `s3://`, `netlify`/`firebase deploy`, `vercel`, `surge`). Tier 2 counts
+  only when the pinned tree tracks the pkgdown destination (`destination:`, default `docs/`, plus
+  any destination a build call names; a directory holding only `.gitkeep`/`.keep`/`.gitignore`/
+  `.gitattributes` is untracked, while `.nojekyll` or a submodule counts): `contents: write`, a
+  default-branch or refspec-less `git push`, a push action, or no `permissions:` key. A repository
+  declares branches that never carry site files in `.rforge.yaml` `docs.site.nonpublishing-branches`
+  (read at the pinned ref); a push to one is tier 2. A reusable workflow shares capability with its
+  caller, and an unresolvable callee counts as capable. Read-only workflows are relaxed, and the
+  reason names the tier and the evidence. `make` follows `include`, `-include` and `sinclude`. A clean
+  readable script never blocks. A signal inside an R comment still blocks. Not detected: scripts
+  fetched at runtime, a workflow with no tier 1 signal that pushes to an untracked destination, a
+  script that pushes from a no-signal workflow, actions from other repositories (beyond the
+  fail-closed reusable-workflow rule) and manual deploys.
 - `docs:check --site` counts a sitemap entry only when it is a `loc` that is a direct child
   of a `url` in the sitemaps.org 0.9 namespace. A `loc` inside an image/video/xhtml
   extension element, nested elsewhere or outside a `url` no longer satisfies an expected
