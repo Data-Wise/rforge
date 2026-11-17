@@ -663,6 +663,11 @@ class ScriptScan:
         if i >= len(command):
             return cwd
         raw, args = command[i], command[i + 1:]
+        if re.search(r"[$`]", raw) and not raw.startswith("$(("):
+            # A program whose path or name is computed (`$BIN/git`, `"$(command -v git)"`) may be anything, `git` included:
+            # classify the raw token before the basename step would reduce `$BIN/git` to the allowed `git`.
+            self.opaque(COMPUTED_PROGRAM, " ".join(command[i:i + 3]))
+            return cwd
         program = posixpath.basename(raw.lstrip("@({")).rstrip(")}")
         if program in SHELL_PREFIX_KEYWORDS:
             return self.command(command[i + 1:], cwd, depth)
@@ -1120,6 +1125,7 @@ def git_parts(args):
     return sub, rest, positional, flags, scope
 
 
+COMPUTED_PROGRAM = "computed program"      # the `why` of an opaque() call for a program whose path or name is computed ($BIN/git)
 PATHSPEC_FILE_FLAGS = ("--pathspec-from-file", "--pathspec-file-nul")
 INDEX_PLUMBING = ("update-index", "read-tree", "write-tree", "commit-tree", "checkout-index", "apply", "am", "stash")
 STAGE_SUBCOMMANDS = ("add", "stage", "commit", "rm", "mv")
@@ -1555,7 +1561,7 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
     for path, text in texts.items():
         data = parsed.get(path)
         pairs = [("the workflow", source_text(text, data))] + probes[path]
-        computed = next((u for u in unresolved[path] if re.match(r"opaque executable: [\"']?[$`]", u)), None)      # the program token itself, not an argument
+        computed = next((u for u in unresolved[path] if u.startswith(COMPUTED_PROGRAM + ": ")), None)      # marked where the program is classified
         facts = (sorted(handoff_facts(pairs, stage_names, exempt)) + ([(0, "unresolved: " + unresolved[path][0][:90])] if unresolved[path] else [])
                  + ([(0, "computed-program: " + computed[:90])] if computed else []))      # kept apart: an earlier failure must not hide it
         state[path][0] = list(dict.fromkeys(state[path][0] + stage_evidence(pairs, stage_names) + facts))

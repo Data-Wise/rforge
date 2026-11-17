@@ -3160,3 +3160,17 @@ def test_a_missing_script_before_a_computed_push_does_not_hide_it(tmp_path, push
 def test_a_fixed_executable_with_a_dynamic_argument_is_not_a_computed_program(tmp_path, cmd):
     r = audit_push(tmp_path, cmd, push=None)
     assert r["state"] == "complete", (cmd, r["reasons"])
+
+
+# Codex round 21. A computed executable PATH (`$BIN/git`) must be judged on the raw token, not on its allowed basename.
+@pytest.mark.parametrize("push", ["$BIN/git push origin main", "\"$BIN/git\" push origin main", "${GIT_DIR}/git push", "$(dirname $(which git))/git push origin main"])
+def test_a_computed_executable_path_that_ends_in_git_is_a_hidden_push(tmp_path, push):
+    ok, why = capable_or_unresolved(audit_push(tmp_path, "echo hello", push=push))
+    assert ok, (push, why)
+
+
+def test_a_computed_path_to_an_allowlisted_name_is_still_opaque_but_a_fixed_one_is_not(tmp_path):
+    fixed = audit_push(tmp_path, "/usr/bin/git status", push=None)
+    assert fixed["state"] == "complete", fixed["reasons"]
+    computed = audit_push(fresh(tmp_path, "c"), "$BIN/ls", push="$BIN/git push origin main")
+    assert capable_or_unresolved(computed)[0], computed["reasons"]
