@@ -1294,9 +1294,9 @@ def handoff_evidence(state):
         if "push" not in found:
             # A program whose name is computed (`$(command -v git) push`, `"$GIT" push`) may be `git`: when the workflow stages
             # everything the push can hide behind it. A merely unreadable script is not a push, so stage-alone stays relaxed.
-            dynamic = [label for label in sorted(found) if label.startswith("unresolved: opaque executable") and re.search(r"[$`]", label)]
+            dynamic = [label for label in sorted(found) if label.startswith("computed-program: ")]
             if ("stage_all" in found or "dest_staged" in found) and dynamic:
-                result[path] = (1, f"stages everything while it runs a program whose name the scan cannot resolve ({dynamic[0][len('unresolved: '):]}); "
+                result[path] = (1, f"stages everything while it runs a program whose name the scan cannot resolve ({dynamic[0][len('computed-program: '):]}); "
                                    "that program may push, so the workflow is treated as publish capable")
             continue
         others = [b for b in builders if b != path]
@@ -1555,7 +1555,9 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
     for path, text in texts.items():
         data = parsed.get(path)
         pairs = [("the workflow", source_text(text, data))] + probes[path]
-        facts = sorted(handoff_facts(pairs, stage_names, exempt)) + ([(0, "unresolved: " + unresolved[path][0][:90])] if unresolved[path] else [])
+        computed = next((u for u in unresolved[path] if u.startswith("opaque executable") and re.search(r"[$`]", u)), None)
+        facts = (sorted(handoff_facts(pairs, stage_names, exempt)) + ([(0, "unresolved: " + unresolved[path][0][:90])] if unresolved[path] else [])
+                 + ([(0, "computed-program: " + computed[:90])] if computed else []))      # kept apart: an earlier failure must not hide it
         state[path][0] = list(dict.fromkeys(state[path][0] + stage_evidence(pairs, stage_names) + facts))
     # Reusable workflows. A caller job `uses: ./.github/workflows/x.yml` runs the callee with the caller's token, so the
     # callee gets the caller's permission evidence and the caller gets everything the callee can do. A callee that cannot

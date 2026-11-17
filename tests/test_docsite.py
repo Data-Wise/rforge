@@ -3144,3 +3144,12 @@ def test_stage_everything_beside_an_unreadable_script_or_a_named_unknown_binary_
     assert dynamic_script["state"] == "complete", dynamic_script["reasons"]
     named = audit_push(fresh(tmp_path, "b"), "mytool build", push=None)
     assert named["state"] == "complete", named["reasons"]
+
+
+# Codex round 19. An earlier unresolved reference must not hide a computed program that may push.
+@pytest.mark.parametrize("push", ["$GIT push origin main", "$(command -v git) push origin main"])
+def test_a_missing_script_before_a_computed_push_does_not_hide_it(tmp_path, push):
+    ok, why = capable_or_unresolved(audit_push(tmp_path, "Rscript scripts/missing.R", push=push))
+    assert ok, (push, why)
+    ok, why = capable_or_unresolved(audit_push(fresh(tmp_path, "d"), "python3 $SCRIPT", push=push))
+    assert ok, (push, why)
