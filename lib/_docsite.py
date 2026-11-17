@@ -1555,7 +1555,7 @@ def workflow_blocks(root, sha, tree, prefix="", honored=None):
     for path, text in texts.items():
         data = parsed.get(path)
         pairs = [("the workflow", source_text(text, data))] + probes[path]
-        computed = next((u for u in unresolved[path] if u.startswith("opaque executable") and re.search(r"[$`]", u)), None)
+        computed = next((u for u in unresolved[path] if re.match(r"opaque executable: [\"']?[$`]", u)), None)      # the program token itself, not an argument
         facts = (sorted(handoff_facts(pairs, stage_names, exempt)) + ([(0, "unresolved: " + unresolved[path][0][:90])] if unresolved[path] else [])
                  + ([(0, "computed-program: " + computed[:90])] if computed else []))      # kept apart: an earlier failure must not hide it
         state[path][0] = list(dict.fromkeys(state[path][0] + stage_evidence(pairs, stage_names) + facts))

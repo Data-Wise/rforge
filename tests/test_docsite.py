@@ -3153,3 +3153,10 @@ def test_a_missing_script_before_a_computed_push_does_not_hide_it(tmp_path, push
     assert ok, (push, why)
     ok, why = capable_or_unresolved(audit_push(fresh(tmp_path, "d"), "python3 $SCRIPT", push=push))
     assert ok, (push, why)
+
+
+# Codex round 20. Only a computed PROGRAM name may be a hidden push: a fixed unknown executable with a dynamic argument is not.
+@pytest.mark.parametrize("cmd", ["mytool $ARG", "mytool --out \"$DIR\"", "mytool $(date +%s)", "python3 -m mymod $X"])
+def test_a_fixed_executable_with_a_dynamic_argument_is_not_a_computed_program(tmp_path, cmd):
+    r = audit_push(tmp_path, cmd, push=None)
+    assert r["state"] == "complete", (cmd, r["reasons"])
