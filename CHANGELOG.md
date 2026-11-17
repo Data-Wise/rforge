@@ -47,7 +47,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A2 live smoke pins its real sites to commits. medfit and probmed must now be
   audited complete with checked routes, HTTP requests, zero missing routes and no
   warn/error findings (the observation fails otherwise; medfit is re-pinned to
-  `6d226fb`, which matches the live site), and glue (`template.package`) is the real site that must stay
+  `20fecf7`: `6d226fb`, which matches the live site, plus the `.rforge.yaml`
+  `docs.site.nonpublishing-branches` declaration for its `qc-results` push; the commit is on the
+  origin branch `feature/rforge-pin-qc-results`), and glue (`template.package`) is the real site that must stay
   incomplete. Required A2 nodes changed: `test_release_mode_and_destination`
   (devel/destination now supported; two refusal cases added), and the bodies of
   `test_unsupported_layout_retains_supported_routes[quarto|extension]`,

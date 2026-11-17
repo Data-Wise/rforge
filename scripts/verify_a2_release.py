@@ -171,8 +171,11 @@ def validate_package_triage(facts):
 # Changing an entry is a deliberate act: re-audit the site at the new commit first (see tests/a2/test_observations.py).
 REVIEWED_LIVE_SITES = {
     "cranlogs": {"role": "primary", "url": "https://r-hub.github.io/cranlogs/", "commit": "c02280c7b4c6d77ff5500f80e15118edad5d94dc"},
-    # medfit's 40f82c8 predates the live native-* to sem-* article rename (9 missing pages), so it is pinned later.
-    "medfit": {"role": "pinned", "url": "https://data-wise.github.io/medfit/", "commit": "6d226fb1d4ce0b46cf297c2e88154d685a337dee"},
+    # medfit's 40f82c8 predates the live native-* to sem-* article rename (9 missing pages), so it is pinned later. 20fecf7 is
+    # 6d226fb (same routes) plus `.rforge.yaml` docs.site.nonpublishing-branches: [qc-results], which declares that qc-monthly.yaml's
+    # `git push origin qc-results` never carries site files; without it the explicit-branch push makes the stage incomplete.
+    # The commit lives on the origin branch feature/rforge-pin-qc-results: keep that branch while this pin stands.
+    "medfit": {"role": "pinned", "url": "https://data-wise.github.io/medfit/", "commit": "20fecf7111ccd1c8cfcd7b1b402599f54b0b685f"},
     "probmed": {"role": "pinned", "url": "https://data-wise.github.io/probmed/", "commit": "ab411df7f083e169dd4b56f264e867e4fd51e1c4"},
     # glue's `template.package` is a custom template mapping the audit refuses; its dev URL resolves `mode: auto` to devel.
     "glue": {"role": "limit", "url": "https://glue.tidyverse.org/dev/", "commit": "da9c73f7a3de6a27f3103cb5bb2355820a4c3a6a"},

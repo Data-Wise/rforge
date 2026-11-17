@@ -559,7 +559,7 @@ def test_info_findings_do_not_fail_the_observation_and_are_recorded(tmp_path, mo
 # The reviewed pins. Changing one is a deliberate act: re-audit the site at the new commit, then update it here.
 EXPECTED_PINS = {
     'cranlogs': 'c02280c7b4c6d77ff5500f80e15118edad5d94dc',
-    'medfit': '6d226fb1d4ce0b46cf297c2e88154d685a337dee',   # 40f82c8 predates the live native-* to sem-* rename: 9 missing pages
+    'medfit': '20fecf7111ccd1c8cfcd7b1b402599f54b0b685f',   # 6d226fb + the qc-results declaration (see verify_a2_release.py); 40f82c8 predates the native-* to sem-* rename
     'probmed': 'ab411df7f083e169dd4b56f264e867e4fd51e1c4',
     'glue': 'da9c73f7a3de6a27f3103cb5bb2355820a4c3a6a',
 }
