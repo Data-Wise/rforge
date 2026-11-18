@@ -1,14 +1,21 @@
-# Migrating from `rforge-mcp` to v1.3.0+
+# 🔄 Migrating from `rforge-mcp` to v1.3.0+
+
+⏱️ 5 minutes • 🟢 Beginner • ✓ 5 steps
+
+!!! tip "TL;DR (30 seconds)"
+    - **What:** Move from the deprecated `rforge-mcp` server to the self-contained v1.3.0+ plugin.
+    - **Why:** All 7 implemented MCP tools now live in pure-Python `lib/` modules, so the server is unused weight.
+    - **How:** Upgrade the plugin → remove the `mcpServers.rforge` config → uninstall `rforge-mcp` → verify.
+    - **Next:** [Hooks & Skills](../hooks-and-skills.md).
 
 > **For whom:** You have `rforge-mcp` installed (npm-global or via the
 > plugin's old peer dependency) and want to move to the self-contained
 > v1.3.0+ plugin.
-> **Estimated time:** 5 minutes.
 > **Reversible:** Yes — you can reinstall `rforge-mcp` if anything goes wrong.
 
 As of v1.3.0, the rforge plugin no longer needs the `rforge-mcp` server.
 All 7 implemented MCP tools have been ported to pure-Python modules under
-the plugin's `lib/` directory. This tutorial walks through the cleanup.
+the plugin's `lib/` directory.
 
 ## Quick check: do I have rforge-mcp installed?
 
@@ -75,17 +82,19 @@ npm uninstall -g rforge-mcp
 brew uninstall rforge-mcp 2>/dev/null || true
 ```
 
-This step is **optional** — leaving `rforge-mcp` installed doesn't break
-anything; it just sits unused. But removing it frees the disk space and
-removes a stale dependency you'll never run again.
+!!! tip "This step is optional"
+    Leaving `rforge-mcp` installed doesn't break anything; it just sits
+    unused. Removing it frees the disk space and removes a stale
+    dependency you'll never run again.
 
 ## Step 4: Clean up any local `.rforge/` state (optional)
 
 If you previously initialized a package via `rforge_init` (the old MCP
 tool), your state lives at `~/.rforge/context.json`. The new
 `/rforge:init` reads and writes the *same file* — so existing state
-migrates transparently. **No action needed unless** you want a fresh
-start:
+migrates transparently.
+
+**No action needed unless** you want a fresh start:
 
 ```zsh
 # Fresh start (optional)
@@ -114,8 +123,9 @@ commands:
 /rforge:init
 ```
 
-If all three produce output and don't error, you've successfully
-migrated. The `rforge-mcp` server is no longer in your runtime path.
+!!! success "Migrated"
+    If all three produce output and don't error, you've successfully
+    migrated. The `rforge-mcp` server is no longer in your runtime path.
 
 ---
 
@@ -153,9 +163,9 @@ npm link    # re-creates the global symlink
 brew uninstall rforge && brew install data-wise/tap/rforge@1.2.0
 ```
 
-Don't be afraid to roll back; the plugin's `lib/` modules are independent
-of the MCP server, so a downgrade only affects which command surface
-Claude Code sees.
+!!! note "Rollback is low-risk"
+    The plugin's `lib/` modules are independent of the MCP server, so a
+    downgrade only affects which command surface Claude Code sees.
 
 ## Next steps
 

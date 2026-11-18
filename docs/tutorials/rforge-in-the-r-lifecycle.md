@@ -1,5 +1,7 @@
 # 🔄 rforge in the R package lifecycle
 
+⏱️ 12 minutes • 🟡 Intermediate • ✓ 5 steps
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** Where rforge fits among the tools you already use to build R packages.
     - **Why:** rforge does *not* scaffold or build packages — it orchestrates an *ecosystem* of them. Knowing the boundary saves confusion.
@@ -8,7 +10,6 @@
 
 > **For whom:** R developer who knows `devtools`/`usethis` and wants to
 > understand what rforge adds.
-> **Estimated time:** 12 minutes.
 > **Prior knowledge:** You've built or maintained at least one R package.
 
 ## The one-sentence answer
@@ -16,11 +17,13 @@
 > **`usethis` and `devtools` operate on a single package. rforge operates on the *set* of packages and the relationships between them.**
 
 rforge is not a replacement for the standard R toolchain — it's a layer
-*on top of it*. If you're looking for `create_package()`, `document()`,
-or `check()`, those are `usethis`/`devtools` and rforge will never
-reimplement them. rforge starts where they stop: once you have one or
-more packages on disk, rforge tells you how they relate, what a change
-ripples into, and in what order to ship.
+*on top of it*.
+
+- Looking for `create_package()`, `document()`, or `check()`? Those are
+  `usethis`/`devtools`, and rforge will never reimplement them.
+- rforge starts where they stop: once you have one or more packages on disk.
+- It tells you how they relate, what a change ripples into, and in what
+  order to ship.
 
 ## Who does what
 
@@ -121,9 +124,11 @@ cd medfit
 ```
 
 `/rforge:init` writes `~/.rforge/context.json` marking `medfit` as the
-active package. It's per-user state (one active context at a time), and
-it's idempotent — safe to re-run. Switch contexts later by `cd`-ing
-elsewhere and running it again.
+active package.
+
+- It's per-user state (one active context at a time).
+- It's idempotent — safe to re-run.
+- Switch contexts later by `cd`-ing elsewhere and running it again.
 
 ### 4. Develop using your normal R tools
 
@@ -168,7 +173,7 @@ is."
     If the question is about **how packages relate or ship together**, it's
     an rforge job.
 
-## What's next
+## Next steps
 
 - **[Ecosystem orchestration](ecosystem-orchestration.md)** — deep dive on
   `/rforge:impact`, `/rforge:cascade`, `/rforge:deps` with worked examples.
@@ -176,4 +181,5 @@ is."
   `/rforge:r:check`, `/rforge:release` end to end.
 - **[Getting started](getting-started.md)** — if you skipped the basic
   install + first-analysis walkthrough.
-- **[REFCARD](../REFCARD.md)** — all {{ rforge.command_count }} commands on one page.
+
+Looking up a command? The [REFCARD](../REFCARD.md) lists all {{ rforge.command_count }} on one page.

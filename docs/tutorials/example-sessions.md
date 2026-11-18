@@ -1,6 +1,12 @@
-# Example Sessions
+# 🎬 Example Sessions
 
-Real transcripts showing how rforge commands work in practice.
+⏱️ 5 minutes • 🟢 Beginner • ✓ 6 sessions
+
+!!! tip "TL;DR (30 seconds)"
+    - **What:** Six real transcripts of rforge commands in practice.
+    - **Why:** See what output looks like before you run anything.
+    - **How:** Read top to bottom; Sessions 1 to 3 build on each other (status, check failure, diff-aware pre-merge check).
+    - **Next:** [Getting started](getting-started.md) to run the commands yourself.
 
 ## Session 1: Starting the day with a health check
 
@@ -205,6 +211,14 @@ Claude:
 💡 Suggested commit: docs(status): note bootstrap CI vignette in progress
 ```
 
-`restore` never wrote anything on its own — it only offered, and `finish` applied the diff
-after an explicit confirm. A same-day re-run of `/rforge:finish` with nothing new to report
-would show "already current" and write nothing (the redundant-edit guard).
+!!! note "What to notice"
+    - `restore` never wrote anything on its own; it only offered.
+    - `finish` applied the diff after an explicit confirm.
+    - A same-day re-run of `/rforge:finish` with nothing new to report would show
+      "already current" and write nothing (the redundant-edit guard).
+
+## Next steps
+
+- [Getting started](getting-started.md) — run these commands on your own package
+- [R package dev cycle](r-dev-cycle.md) — the `r:` commands behind Sessions 2 to 4
+- [CRAN submission with rforge](cran-submission-with-rforge.md) — the full gate behind Sessions 4 and 5

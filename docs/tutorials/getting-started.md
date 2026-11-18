@@ -1,8 +1,15 @@
 # 🚀 Getting started with rforge
 
+⏱️ 10 minutes • 🟢 Beginner • ✓ 6 steps
+
+!!! tip "TL;DR (30 seconds)"
+    - **What:** Install rforge, then run your first analysis on an R package.
+    - **Why:** Learn the three headline commands (`/rforge:detect`, `/rforge:status`, `/rforge:analyze`) in one sitting.
+    - **How:** Install → open a package → `/rforge:detect` → `/rforge:status` → `/rforge:init` → `/rforge:analyze`.
+    - **Next:** [rforge in the R package lifecycle](rforge-in-the-r-lifecycle.md).
+
 > **For whom:** First-time rforge user. You have Claude Code installed
 > and at least one R package directory you want to analyze.
-> **Estimated time:** 10 minutes.
 > **Prior knowledge:** Basic familiarity with R packages (you know what
 > a `DESCRIPTION` file is). No prior rforge experience required.
 
@@ -30,8 +37,9 @@ Verify the plugin loaded:
 /help
 ```
 
-You should see commands prefixed `/rforge:` in the listing. If not,
-restart Claude Code and try again.
+!!! success "You should see this"
+    Commands prefixed `/rforge:` appear in the listing. If not, restart
+    Claude Code and try again.
 
 ## Step 2: Open an R package in Claude Code
 
@@ -40,9 +48,9 @@ cd ~/your/r/package    # any directory containing a DESCRIPTION file
 claude
 ```
 
-If you don't have an R package handy, the tutorial works on any folder
-that *contains* one or more package subdirectories (an "ecosystem"
-layout — see Step 3).
+!!! tip "No package handy?"
+    The tutorial works on any folder that *contains* one or more package
+    subdirectories (an "ecosystem" layout — see Step 3).
 
 ## Step 3: Detect the project structure
 
@@ -71,10 +79,12 @@ Or (ecosystem with multiple packages):
    └─ mediationverse 1.2.0
 ```
 
-**What just happened:** rforge walked the filesystem looking for
-`DESCRIPTION` files. Each found file becomes a package entry. The
-"mode" reflects how thorough subsequent analysis will be — see
-[`lib.discovery` reference](../reference/discovery.md) for details.
+**What just happened:**
+
+- rforge walked the filesystem looking for `DESCRIPTION` files.
+- Each found file became a package entry.
+- The "mode" reflects how thorough subsequent analysis will be. See the
+  [`lib.discovery` reference](../reference/discovery.md) for details.
 
 ## Step 4: Check ecosystem status
 
@@ -101,7 +111,7 @@ Generated: 2026-05-11T12:34:56
 
 - **`Check`/`Test` columns**: `unknown` means rforge hasn't yet run R
   CMD check or test suites. In v1.3.0, these are stubs — to be wired up
-  in v1.4.0. Don't worry about it for now.
+  in v1.4.0.
 - **`Progress`**: read from each package's `.STATUS` file (if present).
   `--` means no `.STATUS` file exists. See
   [lib.status reference](../reference/status.md) for the `.STATUS`
@@ -125,13 +135,14 @@ Expected output:
   Mode:    full
 ```
 
-**What this does:** writes `~/.rforge/context.json` marking this
-package as the current active context. Other rforge tools (and future
-features) read this file to know what package you're working on. It's
-**per-user, not per-package** — only one active context at a time.
+**What this does:**
 
-To switch contexts later: `cd` to a different package directory and run
-`/rforge:init` again.
+- Writes `~/.rforge/context.json` marking this package as the current active context.
+- Other rforge tools (and future features) read this file to know what package you're working on.
+
+!!! warning "One active context at a time"
+    The context is **per-user, not per-package**. To switch later, `cd` to
+    a different package directory and run `/rforge:init` again.
 
 ## Step 6: Run a deeper analysis
 
@@ -167,9 +178,9 @@ Expected output (abbreviated):
    • Run tests on dependents after change
 ```
 
-## Three headline commands
+## Commands for daily work
 
-Use these for daily work; the rest of the plugin's {{ rforge.command_count }} commands are
+Use these; the rest of the plugin's {{ rforge.command_count }} commands are
 specialized.
 
 | Command | When | What |
@@ -179,9 +190,10 @@ specialized.
 | `/rforge:r:cran-prep` | Before CRAN submission | per-package gate — document→check→revdep, writes `cran-comments.md` |
 | `/rforge:thorough "release prep"` | Ecosystem rollup before release | 2-5 min — cross-package validation + submission order |
 
-## What's next
+## Next steps
 
-Now that the basics work, follow the learning path:
+!!! success "You finished the basics"
+    Three good places to go from here.
 
 - **[rforge in the R package lifecycle](rforge-in-the-r-lifecycle.md)** —
   where rforge fits alongside `devtools`/`usethis` (read this next)
@@ -189,14 +201,13 @@ Now that the basics work, follow the learning path:
   `/rforge:analyze`, explained simply
 - **[Ecosystem orchestration](ecosystem-orchestration.md)** — managing
   several inter-dependent packages
-- **[CRAN release prep](cran-release-prep.md)** — taking a package to CRAN
 
-Reference material:
-
-- **[REFCARD](../REFCARD.md)** — all {{ rforge.command_count }} commands in one page
-- **[Hooks & Skills](../hooks-and-skills.md)** — the `pretooluse` hook
-  that flags R-aware mistakes on every Write/Edit
-- **[Architecture](../architecture.md)** — how the plugin's `lib/`
-  modules fit together
-- **[Troubleshooting](../troubleshooting.md)** — when commands don't
-  behave as expected
+??? note "More reading"
+    - **[CRAN release prep](cran-release-prep.md)** — taking a package to CRAN
+    - **[REFCARD](../REFCARD.md)** — all {{ rforge.command_count }} commands in one page
+    - **[Hooks & Skills](../hooks-and-skills.md)** — the `pretooluse` hook
+      that flags R-aware mistakes on every Write/Edit
+    - **[Architecture](../architecture.md)** — how the plugin's `lib/`
+      modules fit together
+    - **[Troubleshooting](../troubleshooting.md)** — when commands don't
+      behave as expected
