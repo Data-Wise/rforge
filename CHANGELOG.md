@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.23.0] - 2026-11-17
+
+### Behavior change
+
+- Previously-incomplete `development.mode` and Quarto sites are now audited by `--site`, so a
+  `/rforge:docs:check --site ... --fail-on warn|error` run that used to exit 2 as `incomplete` can now
+  complete and fail on real findings. Pass the source `url` plus the development prefix as `--site`.
+
 ### Added
 
 - `/rforge:docs:check --site` audits Quarto (`.qmd`) articles and pkgdown

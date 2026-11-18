@@ -33,7 +33,7 @@ def test_status_guidance_count_sync():
                    for p in (ROOT / 'commands').rglob('*.md'))
     assert f'all {commands} commands' in (ROOT / 'CLAUDE.md').read_text()
     assert commands == 44
-    assert package['version'] == '2.22.2'
+    assert package['version'] == '2.23.0'
 
 
 def test_s08_records_the_deliberate_divergence_from_the_frozen_a2_spec_on_development_mode():
