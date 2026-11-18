@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
+        <meta name="description" content="R package ecosystem orchestrator - 44 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)">
       
       
       
@@ -62,7 +62,7 @@
   
 <meta property="og:type" content="website" />
 <meta property="og:title" content="RForge Plugin" />
-<meta property="og:description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)" />
+<meta property="og:description" content="R package ecosystem orchestrator - 44 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)" />
 <meta property="og:image" content="https://data-wise.github.io/rforge/assets/images/social/index.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
@@ -70,7 +70,7 @@
 <meta property="og:url" content="https://data-wise.github.io/rforge/" />
 <meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:title" content="RForge Plugin" />
-<meta property="twitter:description" content="R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)" />
+<meta property="twitter:description" content="R package ecosystem orchestrator - 44 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)" />
 <meta property="twitter:image" content="https://data-wise.github.io/rforge/assets/images/social/index.png" />
 </head>
   
@@ -280,8 +280,15 @@
   
     
     
+      
+  
+  
+  
+  
+    
+    
       <li class="md-tabs__item">
-        <a href="workflows/" class="md-tabs__link">
+        <a href="tutorials/getting-started/" class="md-tabs__link">
           
   
   
@@ -292,8 +299,18 @@
     
   
 
+    
+  
+
       
         
+  
+  
+  
+  
+    
+    
+      
   
   
   
@@ -309,6 +326,9 @@
 
         </a>
       </li>
+    
+  
+
     
   
 
@@ -445,10 +465,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#codex-personal-plugin" class="md-nav__link">
+  <a href="#what-do-you-want-to-do" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Codex personal plugin
+        🎯 What do you want to do?
       
     </span>
   </a>
@@ -456,21 +476,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-rforge-fits" class="md-nav__link">
+  <a href="#which-command-should-i-run" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where rforge fits
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-to-start" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where to start
+        🧭 Which command should I run?
       
     </span>
   </a>
@@ -481,7 +490,7 @@
   <a href="#what-youll-run-daily" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What you'll run daily
+        ⚡ What you'll run daily
       
     </span>
   </a>
@@ -489,22 +498,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-new-in-2230" class="md-nav__link">
+  <a href="#where-rforge-fits" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's new in 2.23.0
+        🔌 Where rforge fits
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="What&#39;s new in 2.23.0">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📦 Installation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📦 Installation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#from-2200" class="md-nav__link">
+  <a href="#requirements" class="md-nav__link">
     <span class="md-ellipsis">
       
-        From 2.20.0
+        Requirements
       
     </span>
   </a>
@@ -517,76 +537,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
+  <a href="#whats-new-in-2231" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How it works
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Requirements
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#which-command-should-i-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Which command should I run?
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#design-principles-adhd-friendly" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Design principles (ADHD-friendly)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#more-documentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        More documentation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#license" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        License
+        🆕 What's new in 2.23.1
       
     </span>
   </a>
@@ -597,7 +551,40 @@
   <a href="#optional-documentation-checks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Optional documentation checks
+        🔍 Optional documentation checks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#under-the-hood" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛠️ Under the hood
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#more-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📚 More documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📄 License
       
     </span>
   </a>
@@ -732,7 +719,7 @@
   <span class="md-ellipsis">
     
   
-    Codex plugin and checks
+    Codex checks
   
 
     
@@ -760,7 +747,7 @@
   <span class="md-ellipsis">
     
   
-    Check evidence and approvals
+    Evidence and approvals
   
 
     
@@ -837,43 +824,29 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="workflows/" class="md-nav__link">
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
         
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    📊 Visual Workflows
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="cookbook/" class="md-nav__link">
-        
   
   
   <span class="md-ellipsis">
     
   
-    Cookbook (task recipes)
+    Start here
   
 
     
@@ -881,67 +854,19 @@
   
   
 
-      </a>
-    </li>
-  
-
-              
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
             
-              
-                
   
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="package-development-guide/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    🧰 Package Development Guide
+    Start here
   
 
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="tutorials/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Tutorials Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -958,34 +883,6 @@
     
   
     Getting started
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    rforge in the R package lifecycle
   
 
     
@@ -1034,6 +931,458 @@
   
   
     <li class="md-nav__item">
+      <a href="tutorials/rforge-in-the-r-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R package lifecycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📊 Visual workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/example-sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Example sessions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Everyday tasks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Everyday tasks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/r-dev-cycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dev cycle walkthrough
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="package-development-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🧰 Package dev guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/tidy-your-package/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tidy (r:tidy)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/diff-aware-checks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diff-aware walkthrough
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/dependency-reconciliation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/scaffolding-existing-packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaffold a package
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/fix-a-docs-check-finding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fix a docs:check finding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ecosystems
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Ecosystems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="tutorials/ecosystem-orchestration/" class="md-nav__link">
         
   
@@ -1041,7 +1390,7 @@
   <span class="md-ellipsis">
     
   
-    Ecosystem orchestration
+    Orchestration
   
 
     
@@ -1090,118 +1439,6 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/r-dev-cycle/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    R package dev cycle
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="tutorials/tidy-your-package/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Tidy a package (r:tidy)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="tutorials/dependency-reconciliation/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency reconciliation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="tutorials/diff-aware-checks/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Diff-aware checks
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="tutorials/s7-convention-checking/" class="md-nav__link">
         
   
@@ -1209,7 +1446,7 @@
   <span class="md-ellipsis">
     
   
-    S7 convention checking
+    S7 conventions
   
 
     
@@ -1230,14 +1467,14 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/scaffolding-existing-packages/" class="md-nav__link">
+      <a href="tutorials/migrate-from-mcp/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Scaffolding existing packages
+    Migrate from rforge-mcp
   
 
     
@@ -1251,21 +1488,43 @@
 
               
             
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
               
                 
   
   
   
   
-    <li class="md-nav__item">
-      <a href="tutorials/fix-a-docs-check-finding/" class="md-nav__link">
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
     
   
-    Fix a docs:check finding
+    CRAN and release
   
 
     
@@ -1273,11 +1532,19 @@
   
   
 
-      </a>
-    </li>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    CRAN and release
   
 
-              
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -1321,7 +1588,7 @@
   <span class="md-ellipsis">
     
   
-    CRAN submission with rforge
+    CRAN submission walkthrough
   
 
     
@@ -1349,7 +1616,7 @@
   <span class="md-ellipsis">
     
   
-    Win-builder + tarball-check
+    Win-builder + tarball
   
 
     
@@ -1377,7 +1644,7 @@
   <span class="md-ellipsis">
     
   
-    R-universe early-access
+    R-universe early access
   
 
     
@@ -1391,57 +1658,9 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="tutorials/migrate-from-mcp/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Migrating from rforge-mcp
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="tutorials/example-sessions/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Example sessions
-  
-
-    
-  </span>
-  
-  
-
-      </a>
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1510,6 +1729,56 @@
   
   
   
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick lookup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Quick lookup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="REFCARD/" class="md-nav__link">
         
@@ -1518,7 +1787,7 @@
   <span class="md-ellipsis">
     
   
-    📚 Reference Card
+    📚 Reference card
   
 
     
@@ -1566,6 +1835,98 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="command-cards/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🃏 Command cards
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📖 Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
     
@@ -1578,17 +1939,17 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
         
           
-          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    Command Guides
+    Guides: daily work
   
 
     
@@ -1599,12 +1960,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_3">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Command Guides
+    Guides: daily work
   
 
           </label>
@@ -1624,7 +1985,7 @@
   <span class="md-ellipsis">
     
   
-    Session boundary (restore/finish)
+    Session boundary
   
 
     
@@ -1652,7 +2013,7 @@
   <span class="md-ellipsis">
     
   
-    Dev cycle (load/document/test/check)
+    Dev cycle
   
 
     
@@ -1680,7 +2041,7 @@
   <span class="md-ellipsis">
     
   
-    Quality (lint/spell/style/urlcheck)
+    Quality checks
   
 
     
@@ -1708,7 +2069,7 @@
   <span class="md-ellipsis">
     
   
-    Scaffolding (r:use-*)
+    Scaffolding
   
 
     
@@ -1736,7 +2097,7 @@
   <span class="md-ellipsis">
     
   
-    S7 review (--eco/--runtime)
+    S7 review
   
 
     
@@ -1764,7 +2125,7 @@
   <span class="md-ellipsis">
     
   
-    Diff-aware checks (--changed)
+    Diff-aware (--changed)
   
 
     
@@ -1777,6 +2138,64 @@
   
 
               
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides: ship and audit
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides: ship and audit
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -1820,7 +2239,7 @@
   <span class="md-ellipsis">
     
   
-    Website + deploy guard (r:site)
+    Website (r:site)
   
 
     
@@ -1848,7 +2267,7 @@
   <span class="md-ellipsis">
     
   
-    Ecosystem analysis (analyze/impact/cascade/release)
+    Ecosystem analysis
   
 
     
@@ -1904,6 +2323,56 @@
   
   
   
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup and internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Setup and internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="orchestrator/" class="md-nav__link">
         
@@ -1912,7 +2381,7 @@
   <span class="md-ellipsis">
     
   
-    🤖 Orchestrator Agent
+    🤖 Orchestrator agent
   
 
     
@@ -1968,7 +2437,7 @@
   <span class="md-ellipsis">
     
   
-    Lib Modules
+    Lib modules
   
 
     
@@ -1989,14 +2458,14 @@
   
   
     <li class="md-nav__item">
-      <a href="troubleshooting/" class="md-nav__link">
+      <a href="reference/adhd-design-system/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Troubleshooting
+    🎨 ADHD design system
   
 
     
@@ -2010,57 +2479,9 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="glossary/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    📖 Glossary
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="command-cards/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    🃏 Quick-Reference Cards
-  
-
-    
-  </span>
-  
-  
-
-      </a>
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -2084,17 +2505,17 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
         
           
-          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    API
+    API: project state
   
 
     
@@ -2105,12 +2526,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5">
             <span class="md-nav__icon md-icon"></span>
             
   
-    API
+    API: project state
   
 
           </label>
@@ -2263,6 +2684,92 @@
   
   
     <li class="md-nav__item">
+      <a href="reference/rstatus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    rstatus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API: checks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API: checks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="reference/rcmd/" class="md-nav__link">
         
   
@@ -2319,14 +2826,14 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/ghrelease/" class="md-nav__link">
+      <a href="reference/tidyaudit/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    ghrelease
+    tidyaudit
   
 
     
@@ -2347,14 +2854,14 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/runiverse/" class="md-nav__link">
+      <a href="reference/docaudit/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    runiverse
+    docaudit
   
 
     
@@ -2424,6 +2931,64 @@
 
               
             
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API: build and ship
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API: build and ship
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
               
                 
   
@@ -2487,14 +3052,14 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/tidyaudit/" class="md-nav__link">
+      <a href="reference/ghrelease/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    tidyaudit
+    ghrelease
   
 
     
@@ -2515,42 +3080,14 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/rstatus/" class="md-nav__link">
+      <a href="reference/runiverse/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    rstatus
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="reference/docaudit/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    docaudit
+    runiverse
   
 
     
@@ -2917,10 +3454,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#codex-personal-plugin" class="md-nav__link">
+  <a href="#what-do-you-want-to-do" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Codex personal plugin
+        🎯 What do you want to do?
       
     </span>
   </a>
@@ -2928,21 +3465,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-rforge-fits" class="md-nav__link">
+  <a href="#which-command-should-i-run" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where rforge fits
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-to-start" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where to start
+        🧭 Which command should I run?
       
     </span>
   </a>
@@ -2953,7 +3479,7 @@
   <a href="#what-youll-run-daily" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What you'll run daily
+        ⚡ What you'll run daily
       
     </span>
   </a>
@@ -2961,22 +3487,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-new-in-2230" class="md-nav__link">
+  <a href="#where-rforge-fits" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's new in 2.23.0
+        🔌 Where rforge fits
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="What&#39;s new in 2.23.0">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📦 Installation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📦 Installation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#from-2200" class="md-nav__link">
+  <a href="#requirements" class="md-nav__link">
     <span class="md-ellipsis">
       
-        From 2.20.0
+        Requirements
       
     </span>
   </a>
@@ -2989,76 +3526,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
+  <a href="#whats-new-in-2231" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How it works
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Requirements
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#which-command-should-i-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Which command should I run?
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#design-principles-adhd-friendly" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Design principles (ADHD-friendly)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#more-documentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        More documentation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#license" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        License
+        🆕 What's new in 2.23.1
       
     </span>
   </a>
@@ -3069,7 +3540,40 @@
   <a href="#optional-documentation-checks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Optional documentation checks
+        🔍 Optional documentation checks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#under-the-hood" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛠️ Under the hood
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#more-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📚 More documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📄 License
       
     </span>
   </a>
@@ -3086,6 +3590,14 @@
           
           
             <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
               
               <article class="md-content__inner md-typeset">
                 
@@ -3106,92 +3618,75 @@
 <a href="https://github.com/Data-Wise/rforge/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/Data-Wise/rforge?color=green" /></a>
 <a href="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Data-Wise/rforge/actions/workflows/ci.yml/badge.svg?branch=main" /></a></p>
 <p><strong>R package ecosystem orchestrator for Claude Code — 44 commands, R-aware hooks, validation skills.</strong></p>
+<p>⏱️ <strong>5 minutes</strong> • 🟢 Beginner • ✓ 3 steps (install, restart, first command)</p>
 <div class="admonition tip">
 <p class="admonition-title">TL;DR (30 seconds)</p>
 <ul>
 <li><strong>What:</strong> R package <em>ecosystem</em> analysis from inside Claude Code. 44 slash commands.</li>
-<li><strong>Why:</strong> Fast feedback on multi-package R repos — discovery, dependencies, change impact, CRAN cascade planning.</li>
-<li><strong>How:</strong> <code>brew install data-wise/tap/rforge</code>, then <code>/rforge:analyze "&lt;what changed&gt;"</code>.</li>
-<li><strong>Next:</strong> <a href="quickstart/">Quick Start</a> → <a href="#where-to-start">Where to start</a> below.</li>
+<li><strong>Why:</strong> Fast feedback on multi-package R repos: discovery, dependencies, change impact, CRAN cascade planning.</li>
+<li><strong>How:</strong> <code>/plugin install rforge</code> (or <code>brew install data-wise/tap/rforge</code>), then <code>/rforge:analyze "&lt;what changed&gt;"</code>.</li>
+<li><strong>Next:</strong> pick a card in <a href="#what-do-you-want-to-do">What do you want to do?</a> or follow the <a href="quickstart/">Quick Start</a>.</li>
 </ul>
 </div>
-<p>Self-contained R package analysis for Claude Code. Since v1.3.0 the plugin is fully self-sufficient — pure-Python <code>lib/</code> modules handle discovery, dependencies, status, and init. <strong>No MCP server, no Node.js</strong> at runtime. The fast ecosystem commands (analysis, deps, status) are pure Python; the <code>r:*</code> dev-cycle commands and <code>/rforge:thorough</code> shell out to R via <code>lib/rcmd.py</code>.</p>
-<h2 id="codex-personal-plugin">Codex personal plugin<a class="headerlink" href="#codex-personal-plugin" title="Permanent link">&para;</a></h2>
-<p>The source <code>rforge-openai</code> adapter 0.2.0 provides three skills:
-<code>$rforge-check</code> for package validation, <code>$rforge-docs-check</code> for static
-README/vignette API audits, and <code>$rforge-lint</code> for CI-aware package lint.
-All reuse the existing Rforge engines. Package/docs skills were verified in
-fresh sessions on isolated medfit copies; the new lint skill still needs
-installation and fresh-session discovery. The original adapter was integrated
-on <code>dev</code>
-(<a href="https://github.com/Data-Wise/rforge/pull/92">PR #92</a>); it is not a published
-adapter release or a port of the Claude command catalog and hooks.</p>
-<p>Start with the <a href="guides/codex-checks/">Codex installation and checks guide</a>. Claude
-marketplace and Homebrew installation below do not install these Codex skills.</p>
-<h2 id="where-rforge-fits">Where rforge fits<a class="headerlink" href="#where-rforge-fits" title="Permanent link">&para;</a></h2>
-<pre class="mermaid"><code>flowchart LR
-    A["usethis&lt;br/&gt;scaffold"] --&gt; B["devtools&lt;br/&gt;document · test · build"]
-    B --&gt; C["rforge&lt;br/&gt;discover · deps · impact&lt;br/&gt;check --changed · s7-review&lt;br/&gt;cran-prep · site --deploy"]
-    C --&gt; D["CRAN&lt;br/&gt;ordered submission"]
-    C -. "diff-aware&lt;br/&gt;feedback loop" .-&gt; B
-
-    style A fill:#00897b,color:#fff,stroke:#00695c
-    style B fill:#00897b,color:#fff,stroke:#00695c
-    style C fill:#ff8f00,color:#fff,stroke:#ff6f00
-    style D fill:#00897b,color:#fff,stroke:#00695c</code></pre>
-<div class="admonition abstract">
-<p class="admonition-title">rforge orchestrates your ecosystem and automates your build cycle</p>
-<p><strong>usethis/devtools build one package. rforge automates the whole ecosystem.</strong> rforge
-wraps the standard R toolchain — it doesn't replace it.</p>
-<ul>
-<li><strong><code>usethis</code> / <code>devtools</code></strong> scaffold, document, test, and build a <em>single</em> package.</li>
-<li><strong>rforge</strong> wraps those same tools at the ecosystem level: <code>r:cycle</code> runs document → test → check across any package in your workspace, <code>r:check --changed</code> scopes to what you edited, <code>r:cran-prep</code> runs the multi-pass CRAN gate, and <code>r:build</code> builds the binary.</li>
-<li>rforge also answers the cross-cutting questions usethis/devtools can't: <em>Which packages exist here? What depends on what? If I change <code>medfit</code>, what breaks downstream? In what order do I submit to CRAN?</em></li>
-</ul>
-</div>
-<h2 id="where-to-start">Where to start<a class="headerlink" href="#where-to-start" title="Permanent link">&para;</a></h2>
+<h2 id="what-do-you-want-to-do">🎯 What do you want to do?<a class="headerlink" href="#what-do-you-want-to-do" title="Permanent link">&para;</a></h2>
 <div class="grid cards">
 <ul>
 <li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m13.13 22.19-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27zM5.64 12.5l-3.83-1.63 6.1-2.77C7 9.46 6.22 10.93 5.64 12.5M21.61 2.39S16.66.269 11 5.93c-2.19 2.19-3.5 4.6-4.35 6.71-.28.75-.09 1.57.46 2.13l2.13 2.12c.55.56 1.37.74 2.12.46A19.1 19.1 0 0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61m-7.07 7.07c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83s-2.05.78-2.83 0m-5.66 7.07-1.41-1.41zM6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22zM2 22h1.41l4.77-4.76-1.42-1.41L2 20.59zm0-2.83 4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76z"/></svg></span> <strong>Just want it working</strong></p>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m13.13 22.19-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27zM5.64 12.5l-3.83-1.63 6.1-2.77C7 9.46 6.22 10.93 5.64 12.5M21.61 2.39S16.66.269 11 5.93c-2.19 2.19-3.5 4.6-4.35 6.71-.28.75-.09 1.57.46 2.13l2.13 2.12c.55.56 1.37.74 2.12.46A19.1 19.1 0 0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61m-7.07 7.07c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83s-2.05.78-2.83 0m-5.66 7.07-1.41-1.41zM6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22zM2 22h1.41l4.77-4.76-1.42-1.41L2 20.59zm0-2.83 4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76z"/></svg></span> <strong>Get it running</strong></p>
 <hr />
-<p>3-minute install + first command.</p>
+<p>Install and run your first command in 5 minutes.</p>
 <p><a href="quickstart/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Quick Start</a></p>
 </li>
 <li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17z"/></svg></span> <strong>New, have a package to try</strong></p>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg></span> <strong>Check my package before a commit</strong></p>
 <hr />
-<p>Guided 10-minute walkthrough.</p>
-<p><a href="tutorials/getting-started/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Getting started</a></p>
+<p><code>/rforge:quick</code> returns in under 10 seconds.</p>
+<p><a href="quickstart/#basic-usage"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Basic usage</a></p>
 </li>
 <li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5A2.5 2.5 0 0 0 10.5 1 2.5 2.5 0 0 0 8 3.5V5H4a2 2 0 0 0-2 2v3.8h1.5c1.5 0 2.7 1.2 2.7 2.7S5 16.2 3.5 16.2H2V20a2 2 0 0 0 2 2h3.8v-1.5c0-1.5 1.2-2.7 2.7-2.7s2.7 1.2 2.7 2.7V22H17a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 2.5-2.5 2.5 2.5 0 0 0-2.5-2.5"/></svg></span> <strong>How it fits with devtools/usethis</strong></p>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 22v-2h3v-3h2v3.5c0 .39-.16.74-.46 1.04s-.65.46-1.04.46zM7 22H3.5c-.39 0-.74-.16-1.04-.46S2 20.89 2 20.5V17h2v3h3zM17 2h3.5c.39 0 .74.16 1.04.46s.46.65.46 1.04V7h-2V4h-3zM7 2v2H4v3H2V3.5c0-.39.16-.74.46-1.04S3.11 2 3.5 2zm3.5 4C13 6 15 8 15 10.5c0 .88-.25 1.7-.69 2.4l3.26 3.26-1.41 1.41-3.26-3.26c-.7.44-1.52.69-2.4.69C8 15 6 13 6 10.5S8 6 10.5 6m0 2a2.5 2.5 0 0 0 0 5 2.5 2.5 0 0 0 0-5"/></svg></span> <strong>See what my change affects</strong></p>
 <hr />
-<p>Where rforge plugs into the lifecycle.</p>
-<p><a href="tutorials/rforge-in-the-r-lifecycle/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> The R lifecycle</a></p>
+<p><code>/rforge:analyze "&lt;change&gt;"</code> shows impact and next steps.</p>
+<p><a href="guides/ecosystem-analysis/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Ecosystem analysis</a></p>
 </li>
 <li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.5 17c-.13 0-.26 0-.39.04l-1.61-3.25a2.5 2.5 0 0 0-1.75-4.29c-.13 0-.25 0-.39.04l-1.63-3.25c.48-.45.77-1.08.77-1.79a2.5 2.5 0 0 0-5 0c0 .71.29 1.34.76 1.79L8.64 9.54c-.14-.04-.26-.04-.39-.04a2.5 2.5 0 0 0-1.75 4.29l-1.61 3.25C4.76 17 4.63 17 4.5 17a2.5 2.5 0 0 0 0 5A2.5 2.5 0 0 0 7 19.5c0-.7-.29-1.34-.76-1.79l1.62-3.25c.14.04.26.04.39.04s.25 0 .39-.04l1.63 3.25c-.47.45-.77 1.09-.77 1.79a2.5 2.5 0 0 0 5 0A2.5 2.5 0 0 0 12 17c-.13 0-.26 0-.39.04L10 13.79c.46-.45.75-1.08.75-1.79s-.29-1.34-.75-1.79l1.61-3.25c.13.04.26.04.39.04s.26 0 .39-.04L14 10.21c-.45.45-.75 1.09-.75 1.79a2.5 2.5 0 0 0 2.5 2.5c.13 0 .25 0 .39-.04l1.63 3.25c-.47.45-.77 1.09-.77 1.79a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0-2.5-2.5"/></svg></span> <strong>Managing several packages</strong></p>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.54 5.23c.29.34.46.77.46 1.27V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6.5c0-.5.17-.93.46-1.27l1.38-1.68C5.12 3.21 5.53 3 6 3h12c.47 0 .88.21 1.15.55zM5.12 5h13.75l-.94-1h-12zM12 9.5 6.5 15H10v2h4v-2h3.5z"/></svg></span> <strong>Get ready for CRAN</strong></p>
 <hr />
-<p>Cross-package orchestration.</p>
-<p><a href="tutorials/ecosystem-orchestration/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Ecosystem</a></p>
-</li>
-<li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.54 5.23c.29.34.46.77.46 1.27V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6.5c0-.5.17-.93.46-1.27l1.38-1.68C5.12 3.21 5.53 3 6 3h12c.47 0 .88.21 1.15.55zM5.12 5h13.75l-.94-1h-12zM12 9.5 6.5 15H10v2h4v-2h3.5z"/></svg></span> <strong>Preparing a CRAN submission</strong></p>
-<hr />
-<p>The full submission gate.</p>
+<p><code>/rforge:r:cran-prep</code> runs the full submission gate.</p>
 <p><a href="tutorials/cran-release-prep/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> CRAN prep</a></p>
 </li>
 <li>
-<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 20H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2M5 13v2h11v-2zm0-4v2h14V9z"/></svg></span> <strong>Looking up command syntax</strong></p>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m23.5 17-5 5-3.5-3.5 1.5-1.5 2 2 3.5-3.5zM6 2c-1.11 0-2 .89-2 2v16c0 1.11.89 2 2 2h7.81c-.53-.91-.81-1.95-.81-3 0-.33.03-.67.08-1H6v-2h7.81c.46-.8 1.1-1.5 1.87-2H6v-2h12v1.08c.33-.05.67-.08 1-.08.34 0 .67.03 1 .08V8l-6-6m-1 1.5L18.5 9H13Z"/></svg></span> <strong>Check my docs still match the code</strong></p>
 <hr />
-<p>All 44 commands, one page.</p>
-<p><a href="REFCARD/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Reference Card</a></p>
+<p><code>/rforge:docs:check</code> audits README and vignette calls.</p>
+<p><a href="guides/docs-audit/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Docs audit guide</a></p>
+</li>
+<li>
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17z"/></svg></span> <strong>Learn step by step</strong></p>
+<hr />
+<p>A guided 10-minute walkthrough with a package of your own.</p>
+<p><a href="tutorials/getting-started/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Getting started</a></p>
 </li>
 </ul>
 </div>
-<h2 id="what-youll-run-daily">What you'll run daily<a class="headerlink" href="#what-youll-run-daily" title="Permanent link">&para;</a></h2>
-<p>Most work runs through these four; the rest of the 44 commands are specialized — see the <a href="REFCARD/">Reference Card</a>.</p>
+<h2 id="which-command-should-i-run">🧭 Which command should I run?<a class="headerlink" href="#which-command-should-i-run" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart TD
+    A["I want to..."] --&gt; B{"Ship to CRAN?"}
+    B -- "yes" --&gt; C["/rforge:r:cran-prep"]
+    B -- "no" --&gt; D{"Check ecosystem health?"}
+    D -- "yes" --&gt; E["/rforge:status"]
+    D -- "no" --&gt; F{"Just changed code?"}
+    F -- "yes" --&gt; G["/rforge:analyze"]
+    F -- "no" --&gt; M{"Docs vs API?"}
+    M -- "yes" --&gt; N["/rforge:docs:check"]
+    M -- "no" --&gt; H{"Quick pre-commit sanity?"}
+    H -- "yes" --&gt; I["/rforge:quick"]
+    H -- "no" --&gt; J{"Deep dive / release prep?"}
+    J -- "yes" --&gt; K["/rforge:thorough"]
+    J -- "no" --&gt; L["Browse the Reference Card"]</code></pre>
+<p>Not sure yet? Start with <code>/rforge:quick</code>, then see the <a href="REFCARD/">Reference Card</a> for all 44 commands.</p>
+<h2 id="what-youll-run-daily">⚡ What you'll run daily<a class="headerlink" href="#what-youll-run-daily" title="Permanent link">&para;</a></h2>
+<p>Most work runs through these four; the rest of the 44 commands are specialized.</p>
 <div class="grid cards">
 <ul>
 <li>
@@ -3216,44 +3711,33 @@ wraps the standard R toolchain — it doesn't replace it.</p>
 </li>
 </ul>
 </div>
-<h2 id="whats-new-in-2230">What's new in 2.23.0<a class="headerlink" href="#whats-new-in-2230" title="Permanent link">&para;</a></h2>
+<h2 id="where-rforge-fits">🔌 Where rforge fits<a class="headerlink" href="#where-rforge-fits" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart LR
+    A["usethis&lt;br/&gt;scaffold"] --&gt; B["devtools&lt;br/&gt;document · test · build"]
+    B --&gt; C["rforge&lt;br/&gt;discover · deps · impact&lt;br/&gt;check --changed · s7-review&lt;br/&gt;cran-prep · site --deploy"]
+    C --&gt; D["CRAN&lt;br/&gt;ordered submission"]
+    C -. "diff-aware&lt;br/&gt;feedback loop" .-&gt; B
+
+    style A fill:#00897b,color:#fff,stroke:#00695c
+    style B fill:#00897b,color:#fff,stroke:#00695c
+    style C fill:#ff8f00,color:#fff,stroke:#ff6f00
+    style D fill:#00897b,color:#fff,stroke:#00695c</code></pre>
+<div class="admonition abstract">
+<p class="admonition-title">rforge orchestrates your ecosystem and automates your build cycle</p>
+<p><strong>usethis/devtools build one package. rforge automates the whole ecosystem.</strong> rforge
+wraps the standard R toolchain; it doesn't replace it.</p>
 <ul>
-<li>🐛 <strong><code>.STATUS</code> parsing fixes</strong> — <code>lib.status</code> (behind <code>/rforge:status</code> and <code>/rforge:health</code>)
-  reads the <code>key: value</code> frontmatter dialect every mediationverse package uses, and takes
-  <code>phase</code> only from a <code>phase:</code> key, not from old history lines in the prose.</li>
-<li>🐛 <strong><code>/rforge:restore</code> NEWS count</strong> — entries grouped under <code>##</code> subsections are counted again.</li>
-<li>📚 <strong>MediationVerse doctrine</strong> in the <a href="guides/cran-submission/">CRAN submission</a>,
-  <a href="guides/dev-cycle/">dev cycle</a> and <a href="guides/s7-review/">S7 review</a> guides.</li>
+<li><strong><code>usethis</code> / <code>devtools</code></strong> scaffold, document, test, and build a <em>single</em> package.</li>
+<li><strong>rforge</strong> wraps those same tools at the ecosystem level: <code>r:cycle</code> runs document → test → check across any package in your workspace, <code>r:check --changed</code> scopes to what you edited, <code>r:cran-prep</code> runs the multi-pass CRAN gate, and <code>r:build</code> builds the binary.</li>
+<li>rforge also answers the cross-cutting questions usethis/devtools can't: <em>Which packages exist here? What depends on what? If I change <code>medfit</code>, what breaks downstream? In what order do I submit to CRAN?</em></li>
 </ul>
-<h3 id="from-2200">From 2.20.0<a class="headerlink" href="#from-2200" title="Permanent link">&para;</a></h3>
-<ul>
-<li>🔖 <strong><code>/rforge:restore</code> + <code>/rforge:finish</code></strong> — R-package session-boundary commands: recap a
-  single package's state (DESCRIPTION/NEWS.md/git/<code>.STATUS</code>) and sync <code>.STATUS</code> from what
-  actually happened, dry-run by default with a redundant-edit guard and a version-drift check
-  against DESCRIPTION. See the <a href="guides/session-boundary/">session boundary guide</a>.</li>
-<li>🛡️ Backed by a new <code>lib/rstatus.py</code> reader/differ, with an <code>apply_updates()</code> helper closing
-  a data-loss trap (a bare <code>RStatus(...)</code> construction silently defaulted every untouched
-  field to <code>None</code>) found in a 4-agent adversarial review before merge.</li>
-</ul>
-<p>Full release history: <a href="https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</p>
-<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>You invoke /rforge:&lt;command&gt;
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    ↓
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Claude reads commands/&lt;name&gt;.md as its prompt
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ↓
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Claude orchestrates pure-Python lib/ modules + Bash tools as needed
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ├── python3 -m lib.discovery   (ecosystem + package detection)
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    ├── python3 -m lib.deps        (dependency graph + change impact)
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    ├── python3 -m lib.status      (health snapshot)
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    └── python3 -m lib.init        (~/.rforge/context.json setup)
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    ↓
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>PreToolUse hook diagnoses risky Write/Edit ops (blocks man/*.Rd edits, etc.)
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    ↓
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>Validation skills run autonomously (description-sync, etc.)
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    ↓
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>Results synthesized into an actionable summary
+</div>
+<h2 id="installation">📦 Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>/plugin marketplace add Data-Wise/rforge
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>/plugin install rforge
 </span></code></pre></div>
-<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
+<p>Restart Claude Code so the commands register, then verify with <code>/help</code> (look for <code>/rforge:</code> entries). Homebrew and from-source options are in <a href="installation/">Installation</a>.</p>
+<h3 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -3276,34 +3760,92 @@ wraps the standard R toolchain — it doesn't replace it.</p>
 </tr>
 </tbody>
 </table>
-<h2 id="which-command-should-i-run">Which command should I run?<a class="headerlink" href="#which-command-should-i-run" title="Permanent link">&para;</a></h2>
-<pre class="mermaid"><code>flowchart TD
-    A["I want to..."] --&gt; B{"Ship to CRAN?"}
-    B -- "yes" --&gt; C[/rforge:r:cran-prep/]
-    B -- "no" --&gt; D{"Check ecosystem health?"}
-    D -- "yes" --&gt; E[/rforge:status/]
-    D -- "no" --&gt; F{"Just changed code?"}
-    F -- "yes" --&gt; G[/rforge:analyze "what changed"/]
-    F -- "no" --&gt; H{"Quick pre-commit sanity?"}
-    H -- "yes" --&gt; I[/rforge:quick/]
-    H -- "no" --&gt; J{"Deep dive / release prep?"}
-    J -- "yes" --&gt; K[/rforge:thorough/]
-    J -- "no" --&gt; L["Browse the REFCARD"]
-    click C "REFCARD.md"
-    click E "REFCARD.md"
-    click G "REFCARD.md"
-    click I "REFCARD.md"
-    click K "REFCARD.md"</code></pre>
-<p>→ Not sure yet? Start with <a href="REFCARD/">/rforge:quick</a> or the <a href="quickstart/">Quick Start</a>.</p>
-<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>/plugin marketplace add Data-Wise/rforge
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>/plugin install rforge
+<div class="admonition warning">
+<p class="admonition-title">Using Codex?</p>
+<p>This install is for Claude Code only and does not add the Codex skills. See the <a href="guides/codex-checks/">Codex installation and checks guide</a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Migrating from v1.2.x?</p>
+<p>If <code>~/.claude/settings.json</code> still has an <code>mcpServers.rforge</code> entry, it's no longer needed; remove it. See the <a href="migration/rforge-mcp-deprecation/">migration guide</a>.</p>
+</div>
+<h2 id="whats-new-in-2231">🆕 What's new in 2.23.1<a class="headerlink" href="#whats-new-in-2231" title="Permanent link">&para;</a></h2>
+<ul>
+<li>🧠 <strong>ADHD-friendly documentation site.</strong> A documented <a href="reference/adhd-design-system/">design system</a>, regrouped navigation, a "What do you want to do?" home page with a 5-minute <a href="quickstart/">quickstart</a> path, and a TL;DR, time line and next-step block on tutorials, guides and top-level pages. Docs-only: no command or flag changes.</li>
+</ul>
+<details class="note">
+<summary>From 2.23.0</summary>
+<ul>
+<li>🌐 <strong><code>/rforge:docs:check --site</code> audits Quarto articles and pkgdown development-mode sites.</strong> <code>--site</code> must equal the source <code>url</code> plus the development prefix. A complete site stage proves route presence only; content freshness and deploy layout are reported as unverified. See the <a href="guides/docs-audit/">Docs audit guide</a>.</li>
+</ul>
+</details>
+<details class="note">
+<summary>From 2.20.1</summary>
+<ul>
+<li>🐛 <strong><code>.STATUS</code> parsing fixes</strong> — <code>lib.status</code> (behind <code>/rforge:status</code> and <code>/rforge:health</code>)
+  reads the <code>key: value</code> frontmatter dialect every mediationverse package uses, and takes
+  <code>phase</code> only from a <code>phase:</code> key, not from old history lines in the prose.</li>
+<li>🐛 <strong><code>/rforge:restore</code> NEWS count</strong> — entries grouped under <code>##</code> subsections are counted again.</li>
+<li>📚 <strong>MediationVerse doctrine</strong> in the <a href="guides/cran-submission/">CRAN submission</a>,
+  <a href="guides/dev-cycle/">dev cycle</a> and <a href="guides/s7-review/">S7 review</a> guides.</li>
+</ul>
+</details>
+<details class="note">
+<summary>From 2.20.0</summary>
+<ul>
+<li>🔖 <strong><code>/rforge:restore</code> + <code>/rforge:finish</code></strong> — R-package session-boundary commands: recap a
+  single package's state (DESCRIPTION/NEWS.md/git/<code>.STATUS</code>) and sync <code>.STATUS</code> from what
+  actually happened, dry-run by default with a redundant-edit guard and a version-drift check
+  against DESCRIPTION. See the <a href="guides/session-boundary/">session boundary guide</a>.</li>
+<li>🛡️ Backed by a new <code>lib/rstatus.py</code> reader/differ, with an <code>apply_updates()</code> helper closing
+  a data-loss trap (a bare <code>RStatus(...)</code> construction silently defaulted every untouched
+  field to <code>None</code>) found in a 4-agent adversarial review before merge.</li>
+</ul>
+</details>
+<p>Full release history: <a href="https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</p>
+<h2 id="optional-documentation-checks">🔍 Optional documentation checks<a class="headerlink" href="#optional-documentation-checks" title="Permanent link">&para;</a></h2>
+<p><code>/rforge:docs:check</code> keeps its static, offline default. Use <code>--site URL --ref REF</code>
+for a bounded sitemap comparison against a local source ref, or <code>--run-examples</code>
+for partial README replay. Execution runs package code and needs a host lifetime
+longer than the example budget plus 15 seconds; use the terminal when that limit
+is unknown. A2 discrepancies are warnings, while incomplete coverage exits 2
+with either enabled severity gate. See the <a href="guides/docs-audit/">Docs audit guide</a>.</p>
+<h2 id="under-the-hood">🛠️ Under the hood<a class="headerlink" href="#under-the-hood" title="Permanent link">&para;</a></h2>
+<details class="note">
+<summary>Codex personal plugin</summary>
+<p>The source <code>rforge-openai</code> adapter 0.2.0 provides three skills:
+<code>$rforge-check</code> for package validation, <code>$rforge-docs-check</code> for static
+README/vignette API audits, and <code>$rforge-lint</code> for CI-aware package lint.
+All reuse the existing Rforge engines. Package/docs skills were verified in
+fresh sessions on isolated medfit copies; the new lint skill still needs
+installation and fresh-session discovery. The original adapter was integrated
+on <code>dev</code>
+(<a href="https://github.com/Data-Wise/rforge/pull/92">PR #92</a>); it is not a published
+adapter release or a port of the Claude command catalog and hooks.</p>
+<p>Start with the <a href="guides/codex-checks/">Codex installation and checks guide</a>. Claude
+marketplace and Homebrew installation above do not install these Codex skills.</p>
+</details>
+<details class="note">
+<summary>How it works</summary>
+<p>Since v1.3.0 the plugin is fully self-sufficient: pure-Python <code>lib/</code> modules handle discovery, dependencies, status, and init. <strong>No MCP server, no Node.js</strong> at runtime. The fast ecosystem commands (analysis, deps, status) are pure Python; the <code>r:*</code> dev-cycle commands and <code>/rforge:thorough</code> shell out to R via <code>lib/rcmd.py</code>.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>You invoke /rforge:&lt;command&gt;
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    ↓
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Claude reads commands/&lt;name&gt;.md as its prompt
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    ↓
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>Claude orchestrates pure-Python lib/ modules + Bash tools as needed
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    ├── python3 -m lib.discovery   (ecosystem + package detection)
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    ├── python3 -m lib.deps        (dependency graph + change impact)
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    ├── python3 -m lib.status      (health snapshot)
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    └── python3 -m lib.init        (~/.rforge/context.json setup)
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    ↓
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>PreToolUse hook diagnoses risky Write/Edit ops (blocks man/*.Rd edits, etc.)
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    ↓
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>Validation skills run autonomously (description-sync, etc.)
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    ↓
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>Results synthesized into an actionable summary
 </span></code></pre></div>
-<p>Restart Claude Code so the commands register, then verify with <code>/help</code> (look for <code>/rforge:</code> entries). Homebrew and from-source options are in <a href="installation/">Installation</a>.</p>
-<blockquote>
-<p><strong>Migrating from v1.2.x?</strong> If <code>~/.claude/settings.json</code> still has an <code>mcpServers.rforge</code> entry, it's no longer needed — remove it. See the <a href="migration/rforge-mcp-deprecation/">migration guide</a>.</p>
-</blockquote>
-<h2 id="design-principles-adhd-friendly">Design principles (ADHD-friendly)<a class="headerlink" href="#design-principles-adhd-friendly" title="Permanent link">&para;</a></h2>
+</details>
+<details class="note">
+<summary>Design principles (ADHD-friendly)</summary>
 <ol>
 <li><strong>Fast feedback</strong> — <code>/rforge:quick</code> returns in seconds, not minutes.</li>
 <li><strong>Clear structure</strong> — consistent, scannable output across commands.</li>
@@ -3311,11 +3853,14 @@ wraps the standard R toolchain — it doesn't replace it.</p>
 <li><strong>Always actionable</strong> — every result ends with next steps.</li>
 <li><strong>Interruptible &amp; incremental</strong> — results stream as they complete.</li>
 </ol>
-<h2 id="more-documentation">More documentation<a class="headerlink" href="#more-documentation" title="Permanent link">&para;</a></h2>
+</details>
+<h2 id="more-documentation">📚 More documentation<a class="headerlink" href="#more-documentation" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong><a href="REFCARD/">Reference Card</a></strong> — all 44 commands on one page</li>
 <li><strong><a href="command-cards/">Quick-Reference Cards</a></strong> — commands grouped by purpose</li>
 <li><strong><a href="commands/">Commands</a></strong> — full per-command reference</li>
+<li><strong><a href="tutorials/ecosystem-orchestration/">Ecosystem orchestration</a></strong> — managing several packages at once</li>
+<li><strong><a href="tutorials/rforge-in-the-r-lifecycle/">rforge in the R lifecycle</a></strong> — how it fits with devtools and usethis</li>
 <li><strong><a href="glossary/">Glossary</a></strong> — terminology explained</li>
 <li><strong><a href="architecture/">Architecture</a></strong> — how the <code>lib/</code> modules fit together</li>
 <li><strong><a href="hooks-and-skills/">Hooks &amp; Skills</a></strong> — the R-aware <code>PreToolUse</code> hook</li>
@@ -3324,15 +3869,8 @@ wraps the standard R toolchain — it doesn't replace it.</p>
 <li><strong><a href="contributing/">Contributing</a></strong> — how to help improve rforge</li>
 <li><strong><a href="changelog/">Changelog</a></strong> — version history</li>
 </ul>
-<h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h2>
+<h2 id="license">📄 License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h2>
 <p>MIT. Source: <a href="https://github.com/Data-Wise/rforge">https://github.com/Data-Wise/rforge</a></p>
-<h2 id="optional-documentation-checks">Optional documentation checks<a class="headerlink" href="#optional-documentation-checks" title="Permanent link">&para;</a></h2>
-<p><code>/rforge:docs:check</code> keeps its static, offline default. Use <code>--site URL --ref REF</code>
-for a bounded sitemap comparison against a local source ref, or <code>--run-examples</code>
-for partial README replay. Execution runs package code and needs a host lifetime
-longer than the example budget plus 15 seconds; use the terminal when that limit
-is unknown. A2 discrepancies are warnings, while incomplete coverage exits 2
-with either enabled severity gate. See the <a href="guides/docs-audit/">Docs audit guide</a>.</p>
 
 
 
@@ -3363,6 +3901,30 @@ with either enabled severity gate. See the <a href="guides/docs-audit/">Docs aud
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+        
+          
+          <a href="installation/" class="md-footer__link md-footer__link--next" aria-label="Next: 📦 Installation">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                📦 Installation
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -3388,7 +3950,7 @@ with either enabled severity gate. See the <a href="guides/docs-audit/">Docs aud
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit", "toc.follow", "navigation.path", "navigation.footer"], "search": "assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="assets/javascripts/bundle.a5f9d56c.min.js"></script>

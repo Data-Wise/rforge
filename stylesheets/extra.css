@@ -1,44 +1,293 @@
+/* ==========================================================================
+ * rforge docs: ADHD-friendly design system
+ *
+ * Documented in docs/reference/adhd-design-system.md. Palette and typography
+ * follow craft's adhd-focus preset (calm teal/green, soft contrast, 17px base,
+ * 1.7 line height); component patterns follow folio's website command
+ * (TL;DR box, time line, callouts, 44px touch targets, mermaid overflow fix).
+ *
+ * Layout of this file:
+ *   1. Tokens         (light, dark)
+ *   2. Reading        (type scale, measure, heading rhythm, lists)
+ *   3. Components     (opt-in classes: .adhd-tldr, .adhd-meta, .adhd-next, ...)
+ *   4. Accessibility  (focus-visible, reduced motion, touch targets)
+ *   5. Responsive     (mermaid, tables, narrow viewports)
+ *
+ * The component classes are opt-in. Site-wide, this file changes reading
+ * comfort (section 2: 17px body text, 68ch measure, heading rhythm, softer
+ * text and background colors), admonition shape, focus rings and touch
+ * targets. Admonition colors stay Material's.
+ * ========================================================================== */
+
+/* --- 1. Tokens ---------------------------------------------------------- */
+
 :root {
-  /* Slightly larger base for readability; Material default is 0.5rem */
+  /* Existing tokens (kept; other CSS and docs may reference them). */
   --adhd-line-height: 1.7;
-  --adhd-paragraph-width: 44rem;
+  /* Measure in characters, not rem: 68ch is about 65-75 characters per line. */
+  --adhd-paragraph-width: 68ch;
+
+  /* Type scale. Material root is 20px, so 0.85rem is 17px body text. */
+  --adhd-font-size: 0.85rem;
+  --adhd-font-size-small: 0.75rem;
+
+  /* Spacing rhythm: one unit = one short paragraph gap. */
+  --adhd-space-1: 0.5rem;
+  --adhd-space-2: 1rem;
+  --adhd-space-3: 1.5rem;
+  --adhd-space-4: 2.25rem;
+
+  --adhd-radius: 8px;
+  --adhd-border-width: 4px;
+
+  /* Calm palette (adhd-focus): soft contrast, never pure black on pure white. */
+  --adhd-fg: #2b2b2b;
+  --adhd-fg-muted: #565656;
+  --adhd-bg: #fafafa;
+  --adhd-link: #00796b; /* teal 700, 5.1:1 on --adhd-bg (AA for body text) */
+  --adhd-accent: #a35200; /* dark amber, 5.3:1 on --adhd-bg */
+  --adhd-tldr: #00796b;
+  --adhd-success: #2e7d32;
+  --adhd-surface: rgba(0, 137, 123, 0.07); /* tinted card background */
+  --adhd-rule: rgba(0, 0, 0, 0.12);
 }
 
-/* --- Base readability: comfortable line height and paragraph measure --- */
+/* Material hooks. Material declares these variables on <body>
+ * ([data-md-color-scheme]), which shadows anything set on :root, so they are
+ * set on the same element here (loaded later, equal specificity, wins).
+ * Header and tabs keep the teal primary set in mkdocs.yml. */
+[data-md-color-scheme="default"],
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: var(--adhd-bg);
+  --md-default-fg-color: var(--adhd-fg);
+  --md-default-fg-color--light: var(--adhd-fg-muted);
+  --md-typeset-color: var(--adhd-fg);
+  --md-typeset-a-color: var(--adhd-link);
+}
+
+[data-md-color-scheme="slate"] {
+  --adhd-fg: #e8e8e8;
+  --adhd-fg-muted: #b4b4bf;
+  --adhd-bg: #1a1a2e; /* deep blue-black, easier on the eyes than pure black */
+  --adhd-link: #4db6ac; /* teal 300, 7.0:1 on --adhd-bg */
+  --adhd-accent: #ffca28;
+  --adhd-tldr: #4db6ac;
+  --adhd-success: #81c784;
+  --adhd-surface: rgba(77, 182, 172, 0.1);
+  --adhd-rule: rgba(255, 255, 255, 0.14);
+}
+
+/* --- 2. Reading --------------------------------------------------------- */
+
 .md-typeset {
+  font-size: var(--adhd-font-size);
   line-height: var(--adhd-line-height);
-  font-size: 0.7rem;
 }
 
+/* Readable measure for running text. Tables, code and diagrams stay full width. */
 .md-typeset p,
 .md-typeset li,
-.md-typeset td,
-.md-typeset th {
+.md-typeset blockquote {
   max-width: var(--adhd-paragraph-width);
 }
 
-/* Headings: tighter leading so multi-line headings don't feel floaty */
-.md-typeset h1,
-.md-typeset h2,
-.md-typeset h3 {
-  line-height: 1.25;
-  margin-top: 1.5em;
-  margin-bottom: 0.5em;
+/* Paragraph and list rhythm: short gaps, clear separation. */
+.md-typeset p {
+  margin-block: var(--adhd-space-2);
+}
+.md-typeset li {
+  margin-bottom: 0.4em;
+}
+.md-typeset li > p {
+  margin-block: 0.4em;
 }
 
-/* --- Focus visibility for keyboard navigation --- */
+/* Heading rhythm: more space above than below, so each section reads as one
+ * chunk attached to its own heading. */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4 {
+  line-height: 1.25;
+  color: var(--adhd-fg);
+}
+.md-typeset h1 {
+  font-weight: 700;
+  margin: 0 0 var(--adhd-space-3);
+}
+.md-typeset h2 {
+  font-weight: 700;
+  margin: var(--adhd-space-4) 0 var(--adhd-space-2);
+  padding-bottom: 0.3em;
+  border-bottom: 2px solid var(--adhd-rule);
+}
+.md-typeset h3 {
+  font-weight: 600;
+  margin: var(--adhd-space-3) 0 var(--adhd-space-1);
+}
+.md-typeset h4 {
+  font-weight: 600;
+  margin: var(--adhd-space-2) 0 var(--adhd-space-1);
+}
+
+/* Inline code: soft tint, not a hard grey box. */
+.md-typeset code {
+  border-radius: 4px;
+}
+
+/* Admonitions: rounded, thick left border, easy to spot while scanning. */
+.md-typeset .admonition,
+.md-typeset details {
+  border-radius: var(--adhd-radius);
+  border-left-width: var(--adhd-border-width);
+  box-shadow: none;
+  font-size: inherit;
+}
+.md-typeset .admonition-title,
+.md-typeset summary {
+  font-weight: 700;
+}
+
+/* Tables: Material shrinks them to 0.64rem, which looks tiny next to 17px
+ * body text. Keep them compact but readable. */
+.md-typeset table:not([class]) {
+  font-size: 0.75rem;
+}
+.md-typeset table:not([class]) th {
+  font-weight: 700;
+}
+
+/* --- 3. Components (opt-in) ---------------------------------------------
+ * Use through Markdown only (admonition extra classes and attr_list); see
+ * docs/reference/adhd-design-system.md for copy-paste snippets.
+ */
+
+/* 3a. TL;DR box. Add the class to a tip admonition:
+ *     !!! tip adhd-tldr "TL;DR (30 seconds)"   with What/Why/How/Next bullets */
+.md-typeset .admonition.adhd-tldr,
+.md-typeset details.adhd-tldr {
+  border-color: var(--adhd-tldr);
+  background-color: var(--adhd-surface);
+}
+.md-typeset .adhd-tldr > .admonition-title,
+.md-typeset .adhd-tldr > summary {
+  background-color: transparent;
+  color: var(--adhd-tldr);
+  letter-spacing: 0.02em;
+}
+.md-typeset .adhd-tldr > .admonition-title::before,
+.md-typeset .adhd-tldr > summary::before {
+  background-color: var(--adhd-tldr);
+}
+.md-typeset .adhd-tldr ul {
+  margin: 0.3em 0;
+  padding-left: 1.1em;
+  list-style: none;
+}
+.md-typeset .adhd-tldr li {
+  margin-bottom: 0.25em;
+}
+.md-typeset .adhd-tldr li > strong:first-child {
+  display: inline-block;
+  min-width: 3.4em;
+  color: var(--adhd-tldr);
+}
+
+/* 3b. Time line: "⏱️ 10 minutes • 🟢 Beginner • ✓ 7 steps". Add the class to a
+ *     one-line paragraph with attr_list:  { .adhd-meta } on the next line. */
+.md-typeset p.adhd-meta {
+  display: inline-block;
+  max-width: 100%;
+  margin-block: var(--adhd-space-1) var(--adhd-space-2);
+  padding: 0.3em 0.9em;
+  font-size: var(--adhd-font-size-small);
+  font-weight: 600;
+  color: var(--adhd-fg);
+  background-color: var(--adhd-surface);
+  border: 1px solid var(--adhd-rule);
+  border-radius: 999px;
+}
+
+/* 3c. Next-step card. Add the class to a success admonition:
+ *     !!! success adhd-next "Next step"   containing one link or one command */
+.md-typeset .admonition.adhd-next,
+.md-typeset details.adhd-next {
+  border-color: var(--adhd-success);
+  background-color: var(--adhd-surface);
+  margin-top: var(--adhd-space-4);
+}
+.md-typeset .adhd-next > .admonition-title,
+.md-typeset .adhd-next > summary {
+  background-color: transparent;
+  color: var(--adhd-success);
+}
+.md-typeset .adhd-next > .admonition-title::before,
+.md-typeset .adhd-next > summary::before {
+  background-color: var(--adhd-success);
+}
+.md-typeset .adhd-next > p:last-child {
+  font-size: calc(var(--adhd-font-size) * 1.05);
+  font-weight: 600;
+}
+
+/* 3d. Step cards for short procedures: ordered list with big numbers.
+ *     Wrap the list in a div (md_in_html):  <div class="adhd-steps" markdown> */
+.md-typeset .adhd-steps > ol {
+  list-style: none;
+  counter-reset: adhd-step;
+  padding-left: 0;
+  margin-left: 0;
+}
+.md-typeset .adhd-steps > ol > li {
+  counter-increment: adhd-step;
+  position: relative;
+  max-width: var(--adhd-paragraph-width);
+  margin-bottom: var(--adhd-space-2);
+  padding: 0.6em 0.9em 0.6em 3em;
+  border: 1px solid var(--adhd-rule);
+  border-radius: var(--adhd-radius);
+}
+.md-typeset .adhd-steps > ol > li::before {
+  content: counter(adhd-step);
+  position: absolute;
+  left: 0.7em;
+  top: 0.55em;
+  width: 1.7em;
+  height: 1.7em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--adhd-bg);
+  background-color: var(--adhd-link);
+  border-radius: 50%;
+}
+
+/* 3e. Callouts. Standard admonitions with a leading emoji in the title carry
+ *     the meaning twice (color and symbol), so color alone never decides:
+ *       !!! tip "💡 Pro tip"       !!! warning "⚠️ Watch out"
+ *       !!! success "✅ Done when"  !!! info "🎯 Focus"
+ *     No extra CSS: Material's own admonition colors are used. */
+
+/* --- 4. Accessibility --------------------------------------------------- */
+
+/* Focus visibility for keyboard navigation: a 3px ring on every control. */
 .md-typeset a:focus-visible,
 .md-nav__link:focus-visible,
 .md-tabs__link:focus-visible,
 .md-header__button:focus-visible,
 .md-search__form:focus-visible,
-.md-typeset .md-button:focus-visible {
-  outline: 2px solid var(--md-accent-fg-color);
+.md-typeset .md-button:focus-visible,
+.md-typeset summary:focus-visible,
+.md-typeset .headerlink:focus-visible,
+.md-footer__link:focus-visible,
+.md-top:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--adhd-accent);
   outline-offset: 2px;
-  border-radius: 2px;
 }
 
-/* --- Respect reduced-motion preferences --- */
+/* Respect reduced-motion preferences. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -50,7 +299,30 @@
   }
 }
 
-/* --- Mermaid: prevent horizontal overflow on narrow screens --- */
+/* Touch targets: at least 44px on coarse pointers (phones and tablets).
+ * Navigation, tabs, buttons and footer links only; links inside running text
+ * stay inline so paragraphs keep wrapping normally. */
+@media (pointer: coarse) {
+  .md-nav__link,
+  .md-tabs__link,
+  .md-footer__link {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .md-typeset .md-button {
+    min-height: 44px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .md-typeset li {
+    margin-bottom: 0.6em;
+  }
+}
+
+/* --- 5. Responsive ------------------------------------------------------ */
+
+/* Mermaid: prevent horizontal overflow on narrow screens. */
 .md-typeset .mermaid {
   overflow-x: auto;
   max-width: 100%;
@@ -60,7 +332,7 @@
   height: auto;
 }
 
-/* --- Tables: scroll instead of breaking layout on mobile --- */
+/* Tables: scroll instead of breaking layout on mobile. */
 .md-typeset__table {
   min-width: 100%;
 }
@@ -70,23 +342,7 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* --- Touch targets: ≥44px on coarse pointers (phones/tablets) --- */
-@media (pointer: coarse) {
-  .md-typeset a,
-  .md-nav__link,
-  .md-tabs__link {
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-  }
-  .md-typeset .md-button {
-    min-height: 44px;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
-}
-
-/* --- Narrow viewport: tighten code blocks so they don't force zoom --- */
+/* Narrow viewport: tighter code, smaller headings, full-width components. */
 @media screen and (max-width: 44.9375em) {
   .md-typeset pre > code {
     font-size: 0.74rem;
@@ -94,5 +350,15 @@
   .md-typeset h1 {
     font-size: 1.5rem;
     line-height: 1.3;
+  }
+  .md-typeset h2 {
+    font-size: 1.25rem;
+    margin-top: var(--adhd-space-3);
+  }
+  .md-typeset p.adhd-meta {
+    border-radius: var(--adhd-radius);
+  }
+  .md-typeset .adhd-steps > ol > li {
+    padding-left: 2.8em;
   }
 }
