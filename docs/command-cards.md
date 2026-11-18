@@ -1,5 +1,13 @@
 # Command Quick-Reference Cards
 
+!!! tip "TL;DR (30 seconds)"
+    - **What:** one-line cards for every command, grouped by purpose.
+    - **Why:** find the right command without reading full docs.
+    - **How:** scan the group headings, then pick the row that matches your task.
+    - **Next:** [Reference card](REFCARD.md) for flags, or [Commands reference](commands.md) for full docs.
+
+⏱️ 2 minutes • 🟢 Beginner • ✓ 1 scan
+
 Handy one-line descriptions grouped by purpose.
 
 ## Health & onboarding
@@ -120,3 +128,9 @@ partial coverage: root README only, and unpaired rendered assertions or
 unsupported options are incomplete. Inspect stage coverage. Complete A2 warnings
 gate warn, incomplete stages gate warn/error. Allow the budget plus 15 seconds;
 use a terminal when the host lifetime is unknown. No site build or deploy.
+
+## Next steps
+
+- [Quickstart](quickstart.md): run your first check in under 5 minutes.
+- [Commands reference](commands.md): flags and behavior for every command.
+- [Visual workflows](workflows/index.md): see how the commands chain together.

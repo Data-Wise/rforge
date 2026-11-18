@@ -8,6 +8,25 @@
 
 Complete reference for all **{{ rforge.command_count }}** RForge commands. Commands are organized by category with usage examples and parameter details.
 
+## Jump to a command
+
+Pick the family, then the command. Each family starts with a one-line TL;DR.
+
+| Family | Commands |
+|---|---|
+| [Setup & State](#setup-state) | [`init`](#rforgeinit) |
+| [Session Boundary](#session-boundary) | [`restore`](#rforgerestore) · [`finish`](#rforgefinish) |
+| [Status & Analysis](#status-analysis) | [`status`](#rforgestatus) · [`analyze`](#rforgeanalyze) · [`quick`](#rforgequick) · [`thorough`](#rforgethorough) |
+| [Ecosystem Management](#ecosystem-management) | [`detect`](#rforgedetect) · [`cascade`](#rforgecascade) · [`impact`](#rforgeimpact) · [`release`](#rforgerelease) · [`deps`](#rforgedeps) · [`r:deps-sync`](#rforgerdeps-sync) |
+| [Documentation & Tasks](#documentation-tasks) | [`docs:check`](#rforgedocscheck) · [`complete`](#rforgecomplete) · [`capture`](#rforgecapture) · [`next`](#rforgenext) |
+| [Health Checks](#health-checks) | [`health`](#rforgehealth) · [`r:check`](#rforgercheck) |
+| [R Development Cycle](#r-development-cycle) | [`r:load`](#rforgerload) · [`r:document`](#rforgerdocument) · [`r:test`](#rforgertest) · [`r:coverage`](#rforgercoverage) · [`r:build`](#rforgerbuild) · [`r:install`](#rforgerinstall) · [`r:site`](#rforgersite) · [`r:cycle`](#rforgercycle) |
+| [R Quality](#r-quality) | [`r:lint`](#rforgerlint) · [`r:tidy`](#rforgertidy) · [`r:s7-review`](#rforgers7-review) · [`r:spell`](#rforgerspell) · [`r:urlcheck`](#rforgerurlcheck) · [`r:style`](#rforgerstyle) |
+| [CRAN Submission](#cran-submission) | [`r:revdep`](#rforgerrevdep) · [`r:goodpractice`](#rforgergoodpractice) · [`r:winbuilder`](#rforgerwinbuilder) · [`r:rhub`](#rforgerrhub) · [`r:cran-prep`](#rforgercran-prep) · [`r:submit`](#rforgersubmit) |
+| [R Authoring](#r-authoring) | [`r:use-test`](#rforgeruse-test) · [`r:use-package`](#rforgeruse-package) · [`r:use-vignette`](#rforgeruse-vignette) · [`r:use-data`](#rforgeruse-data) · [`r:use-citation`](#rforgeruse-citation) |
+
+Looking for something else? [By time budget](#by-time-budget), [by use case](#by-use-case) and [global flags](#global-flags) are at the bottom of the page.
+
 ## Command Categories
 
 - [Setup & State](#setup-state) (1 command)
@@ -17,13 +36,16 @@ Complete reference for all **{{ rforge.command_count }}** RForge commands. Comma
 - [Documentation & Tasks](#documentation-tasks) (4 commands)
 - [Health Checks](#health-checks) (2 commands)
 - [R Development Cycle](#r-development-cycle) (8 commands)
-- [R Quality](#r-quality) (5 commands)
+- [R Quality](#r-quality) (6 commands)
 - [CRAN Submission](#cran-submission) (6 commands)
 - [R Authoring](#r-authoring) (5 commands)
 
 ---
 
 ## Setup & State
+
+!!! tip "TL;DR"
+    Run `/rforge:init` once per package, or when you switch packages. Every other command reads the context it saves.
 
 ### /rforge:init
 
@@ -66,6 +88,9 @@ Initialize the active rforge context for the current R package or ecosystem. Wri
 ---
 
 ## Session Boundary
+
+!!! tip "TL;DR"
+    Start a session with `/rforge:restore` (read-only recap). End it with `/rforge:finish` (syncs `.STATUS`; dry-run by default).
 
 ### /rforge:restore
 
@@ -153,6 +178,9 @@ Sync a single R package's `.STATUS` from its current state. Dry-run by default; 
 
 ## Status & Analysis
 
+!!! tip "TL;DR"
+    Four depths of "how is my package doing?": `status` and `quick` for a glance, `analyze` for change impact, `thorough` for a full audit.
+
 ### /rforge:status
 
 Quick ecosystem-wide status dashboard with mode-specific detail levels.
@@ -168,19 +196,22 @@ Quick ecosystem-wide status dashboard with mode-specific detail levels.
 - `--format` (optional) - Output format: `terminal`, `json`, `markdown`
 
 **Examples:**
-```bash
-# Quick health check (default mode)
-/rforge:status
 
-# Debug mode for detailed diagnostics
-/rforge:status --mode debug
+??? example "Show all examples"
 
-# JSON output for automation
-/rforge:status --format json
+    ```bash
+    # Quick health check (default mode)
+    /rforge:status
 
-# Specific package status
-/rforge:status mypackage --mode release
-```
+    # Debug mode for detailed diagnostics
+    /rforge:status --mode debug
+
+    # JSON output for automation
+    /rforge:status --format json
+
+    # Specific package status
+    /rforge:status mypackage --mode release
+    ```
 
 **Output includes:**
 - Health score (0-100)
@@ -212,19 +243,22 @@ Deep analysis with mode system support and intelligent recommendations.
 - `--format` (optional) - Output format: `terminal`, `json`, `markdown`
 
 **Examples:**
-```bash
-# Balanced analysis
-/rforge:analyze "Check package health"
 
-# Debug mode for investigating issues
-/rforge:analyze --mode debug "Why are tests failing?"
+??? example "Show all examples"
 
-# Release mode for CRAN preparation
-/rforge:analyze --mode release "Prepare for CRAN submission"
+    ```bash
+    # Balanced analysis
+    /rforge:analyze "Check package health"
 
-# Performance analysis
-/rforge:analyze --mode optimize "Identify bottlenecks"
-```
+    # Debug mode for investigating issues
+    /rforge:analyze --mode debug "Why are tests failing?"
+
+    # Release mode for CRAN preparation
+    /rforge:analyze --mode release "Prepare for CRAN submission"
+
+    # Performance analysis
+    /rforge:analyze --mode optimize "Identify bottlenecks"
+    ```
 
 **Performs:**
 - Pattern recognition (CODE_CHANGE, BUG_FIX, CRAN_RELEASE, etc.)
@@ -304,6 +338,9 @@ Comprehensive analysis with R CMD check integration (2-5 minutes).
 ---
 
 ## Ecosystem Management
+
+!!! tip "TL;DR"
+    For multi-package work: discover the layout, map dependencies, and plan the order of updates, impact and release.
 
 ### /rforge:detect
 
@@ -489,6 +526,9 @@ auto-applied).
 
 ## Documentation & Tasks
 
+!!! tip "TL;DR"
+    Check docs against the package API, then track what you finished, captured or should do next.
+
 ### /rforge:docs:check
 
 Audit documentation content against the package API: calls and signatures in `README` and `vignettes/` that no longer match the exports. The default is static and read-only (`lib.docaudit`); opt-in `--site` reads a sitemap and `--run-examples` executes README code in supervised R sessions.
@@ -499,11 +539,14 @@ Audit documentation content against the package API: calls and signatures in `RE
 ```
 
 **Parameters:**
-- `package` (optional) - Package path or name; defaults to the package you are in (walks up to the nearest `DESCRIPTION`)
-- `--detailed` (optional) - Also print `info` findings (scannability)
-- `--eco` (optional) - Force the ecosystem sweep
-- `--since <tag>` (optional) - Add the coverage report, limited to exports added since the tag
-- `--fail-on` (optional) - Exit-code threshold: `none` (default), `warn` or `error`; does not change the report
+
+| Flag | Required | What it does |
+|---|---|---|
+| `package` | optional | Package path or name; defaults to the package you are in (walks up to the nearest `DESCRIPTION`) |
+| `--detailed` | optional | Also print `info` findings (scannability) |
+| `--eco` | optional | Force the ecosystem sweep |
+| `--since <tag>` | optional | Add the coverage report, limited to exports added since the tag |
+| `--fail-on` | optional | Exit-code threshold: `none` (default), `warn` or `error`; does not change the report |
 
 **Examples:**
 ```bash
@@ -524,29 +567,33 @@ transcripts with `--examples-budget-seconds N` (default 300, positive integer).
 Source/render pairing is deferred: asserted rendered output remains unverified.
 Incomplete stages exit 2 with warn/error thresholds; completed A2 warnings gate
 only warn. Site GETs never build/deploy/fetch; replay is opt-in, not sandboxed.
-`--site` maps `.qmd`/`.Rmd`/`.rmd` articles and resolves `development.mode` from the pinned
-`DESCRIPTION`; `--site` must equal the source `url` plus the dev prefix (`.../dev/` for a devel
-site only), else `incomplete`. Incomplete with a specific reason, at the pinned ref: `PKGDOWN_DEV_MODE`
-(workflow, local action, `.Renviron`/`.Rprofile`), reusable or unreadable local actions, deploys below
-the site root (`deploy_to_branch(subdir = )`, or a Pages `target-folder`/`destination-dir` whenever a pkgdown config exists at the pinned
-ref or a workflow names pkgdown), malformed workflows, directory-level `_metadata.yml`/`_quarto-*.yml`/`_output.yml`,
-symlinks under `vignettes/`. An article is refused only for the front-matter keys `output_file`/`output-file`,
-`output_ext`/`output-ext`, `output_dir`/`output-dir`, `knit`, `as_is`, a non-HTML `format`/`output` or
-`pkgdown: extension`, in any key case with `-` and `_` interchangeable; YAML is read as parsed structures and R/shell
-code as tolerant text; scripts a `run:` step executes are read at the pinned ref (5 levels, 40 files) and scanned the
-same way (`make` follows `include`), and an unreadable, missing, symlinked, dynamic or over-cap reference is incomplete in a
-pkgdown repository for any workflow that may publish (tier 1: pkgdown wording, a Pages or deploy action, `deploy_to_branch`/`gh-pages`,
-`pages`/`id-token` write, an explicit-branch `git push`, a remote publish command (`rsync`/`scp`/`aws s3`/`netlify`/`firebase`/`vercel`) or a command that
-builds or stages the destination even when the tree does not track it yet, or a workflow that stages everything and pushes the default branch (treated as publish capable; the audit does not try to prove it builds no site; a stage is named only when every pathspec is a plain literal path outside the destination, so pathspec magic, `--pathspec-from-file` and index-changing git plumbing stage everything) (`git add`/`git commit` naming it, `git add -A` after a pkgdown build,
-`git subtree push`, `git worktree add`, `cp`/`mv`/`rsync` into it), or a workflow that stages and pushes while it downloads build output, another workflow builds the site (cross-workflow handoff) or it reaches a script, action or executable the scan cannot resolve (any executable outside a short allowlist of benign utilities fails closed for such a workflow);
-tier 2, only when the pinned tree tracks the pkgdown destination (placeholder-only directories do not count; a build call's destination
-joins the check): `contents: write`, a default-branch or refspec-less `git push`, a push action, no `permissions:` key; a branch listed in
-`.rforge.yaml` `docs.site.nonpublishing-branches` is tier 2 (an unverified maintainer declaration: a mislabeled site branch yields a wrong complete; the
-stage reports `nonpublishing_branches_honored` and the text report an info line when it applies); reusable workflows share capability with their caller; read-only workflows are relaxed);
-other overrides, names built any other way, `uses:` actions from other repositories, manual deploys outside CI and
-`knit`/`render` of a document are not detected. A complete site stage proves route presence, not
-content freshness (`content_freshness: "unverified"`) and not the CI deploy layout (`deploy_layout: "unverified"`): the
-workflow scan is best effort.
+A complete site stage proves route presence only, not content freshness or the CI deploy layout.
+
+??? info "`--site` and `--run-examples` in detail (what is detected, what is incomplete)"
+
+    `--site` maps `.qmd`/`.Rmd`/`.rmd` articles and resolves `development.mode` from the pinned
+    `DESCRIPTION`; `--site` must equal the source `url` plus the dev prefix (`.../dev/` for a devel
+    site only), else `incomplete`. Incomplete with a specific reason, at the pinned ref: `PKGDOWN_DEV_MODE`
+    (workflow, local action, `.Renviron`/`.Rprofile`), reusable or unreadable local actions, deploys below
+    the site root (`deploy_to_branch(subdir = )`, or a Pages `target-folder`/`destination-dir` whenever a pkgdown config exists at the pinned
+    ref or a workflow names pkgdown), malformed workflows, directory-level `_metadata.yml`/`_quarto-*.yml`/`_output.yml`,
+    symlinks under `vignettes/`. An article is refused only for the front-matter keys `output_file`/`output-file`,
+    `output_ext`/`output-ext`, `output_dir`/`output-dir`, `knit`, `as_is`, a non-HTML `format`/`output` or
+    `pkgdown: extension`, in any key case with `-` and `_` interchangeable; YAML is read as parsed structures and R/shell
+    code as tolerant text; scripts a `run:` step executes are read at the pinned ref (5 levels, 40 files) and scanned the
+    same way (`make` follows `include`), and an unreadable, missing, symlinked, dynamic or over-cap reference is incomplete in a
+    pkgdown repository for any workflow that may publish (tier 1: pkgdown wording, a Pages or deploy action, `deploy_to_branch`/`gh-pages`,
+    `pages`/`id-token` write, an explicit-branch `git push`, a remote publish command (`rsync`/`scp`/`aws s3`/`netlify`/`firebase`/`vercel`) or a command that
+    builds or stages the destination even when the tree does not track it yet, or a workflow that stages everything and pushes the default branch (treated as publish capable; the audit does not try to prove it builds no site; a stage is named only when every pathspec is a plain literal path outside the destination, so pathspec magic, `--pathspec-from-file` and index-changing git plumbing stage everything) (`git add`/`git commit` naming it, `git add -A` after a pkgdown build,
+    `git subtree push`, `git worktree add`, `cp`/`mv`/`rsync` into it), or a workflow that stages and pushes while it downloads build output, another workflow builds the site (cross-workflow handoff) or it reaches a script, action or executable the scan cannot resolve (any executable outside a short allowlist of benign utilities fails closed for such a workflow);
+    tier 2, only when the pinned tree tracks the pkgdown destination (placeholder-only directories do not count; a build call's destination
+    joins the check): `contents: write`, a default-branch or refspec-less `git push`, a push action, no `permissions:` key; a branch listed in
+    `.rforge.yaml` `docs.site.nonpublishing-branches` is tier 2 (an unverified maintainer declaration: a mislabeled site branch yields a wrong complete; the
+    stage reports `nonpublishing_branches_honored` and the text report an info line when it applies); reusable workflows share capability with their caller; read-only workflows are relaxed);
+    other overrides, names built any other way, `uses:` actions from other repositories, manual deploys outside CI and
+    `knit`/`render` of a document are not detected. A complete site stage proves route presence, not
+    content freshness (`content_freshness: "unverified"`) and not the CI deploy layout (`deploy_layout: "unverified"`): the
+    workflow scan is best effort.
 
 
 
@@ -651,6 +698,9 @@ Get ecosystem-aware next task recommendation.
 
 ## Health Checks
 
+!!! tip "TL;DR"
+    Two gauges: `health` for ecosystem-wide metrics, `r:check` for `R CMD check` on one package.
+
 ### /rforge:health
 
 Comprehensive ecosystem health metrics with visual dashboard.
@@ -691,32 +741,38 @@ R CMD check integration with detailed error reporting.
 ```
 
 **Parameters:**
-- `package` (optional) - Package to check (defaults to current)
-- `--strict` (optional) - Run both CRAN Suggests-withholding flavors (default: false)
-- `--incoming` (optional) - Emulate CRAN's incoming `_R_CHECK_*` bundle; implies `--strict` (default: false)
-- `--changed` (optional, v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0) - Scope the check to the package(s) changed on this branch and tag each finding **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already at the fork point), via a baseline run in a detached worktree at `merge-base(HEAD, --base)`; an `[introduced]` finding whose file still has uncommitted changes is further refined to **`[uncommitted]`** (counts as introduced for `--fail-on`) (default: false)
-- `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed`; the baseline is run at `merge-base(HEAD, base)` (default: `dev`)
-- `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on findings tagged `[introduced]` (default: `introduced`); `none` is advisory
-- `--no-cache` (optional, v2.13.0) - `--changed`: bypass the baseline cache; force a fresh merge-base baseline run and skip writing it (default: false)
-- `--changed-strict` (optional, v2.10.0) - Documented no-op (default: false)
+
+| Flag | Required | What it does |
+|---|---|---|
+| `package` | optional | Package to check (defaults to current) |
+| `--strict` | optional | Run both CRAN Suggests-withholding flavors (default: false) |
+| `--incoming` | optional | Emulate CRAN's incoming `_R_CHECK_*` bundle; implies `--strict` (default: false) |
+| `--changed` | optional | Scope the check to the package(s) changed on this branch and tag each finding **`[introduced]`** (new on your branch) vs **`[pre-existing]`** (already at the fork point), via a baseline run in a detached worktree at `merge-base(HEAD, --base)`; an `[introduced]` finding whose file still has uncommitted changes is further refined to **`[uncommitted]`** (counts as introduced for `--fail-on`) (default: false) *(v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0)* |
+| `--base <ref>` | optional | Comparison ref for `--changed`; the baseline is run at `merge-base(HEAD, base)` (default: `dev`) *(v2.11.0)* |
+| `--fail-on <introduced|none>` | optional | Exit non-zero only on findings tagged `[introduced]` (default: `introduced`); `none` is advisory *(v2.11.0)* |
+| `--no-cache` | optional | `--changed`: bypass the baseline cache; force a fresh merge-base baseline run and skip writing it (default: false) *(v2.13.0)* |
+| `--changed-strict` | optional | Documented no-op (default: false) *(v2.10.0)* |
 
 **Examples:**
-```bash
-# Check current package (single --as-cran pass)
-/rforge:r:check
 
-# Check specific package
-/rforge:r:check mypackage
+??? example "Show all examples"
 
-# Strict CRAN-incoming check (both Suggests flavors)
-/rforge:r:check --strict
+    ```bash
+    # Check current package (single --as-cran pass)
+    /rforge:r:check
 
-# Add the opt-in incoming env-var bundle
-/rforge:r:check --incoming
+    # Check specific package
+    /rforge:r:check mypackage
 
-# Tag findings [introduced]/[pre-existing] vs the fork point; fail only on introduced
-/rforge:r:check --changed --base dev
-```
+    # Strict CRAN-incoming check (both Suggests flavors)
+    /rforge:r:check --strict
+
+    # Add the opt-in incoming env-var bundle
+    /rforge:r:check --incoming
+
+    # Tag findings [introduced]/[pre-existing] vs the fork point; fail only on introduced
+    /rforge:r:check --changed --base dev
+    ```
 
 **Executes:**
 - R CMD check with `--as-cran` flags
@@ -731,11 +787,16 @@ R CMD check integration with detailed error reporting.
 
 **Note:** This can take 1-5 minutes depending on package size. Strict mode runs the baseline plus two flavor passes (~3× check time; ~4× with `--incoming`).
 
-**Diff-aware mode (v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0):** `--changed` scopes the check to the R package(s) touched on this branch and tags each finding **`[introduced]`** vs **`[pre-existing]`** — computed honestly by a second baseline run in a detached worktree checked out at `merge-base(HEAD, --base)` (default base `dev`). An `[introduced]` finding whose file still has **uncommitted** changes (per `git status --porcelain`) is further refined to **`[uncommitted]`** — "you caused this with edits you haven't committed yet" vs committed branch work. This is a file-level refinement (no third check run), so every introduced finding in a dirty file tags `[uncommitted]`; string findings (R CMD check messages with no file) stay `[introduced]`. `[uncommitted]` is a subset of introduced: `--fail-on introduced` still fails on it. `--fail-on introduced` (the default) exits non-zero only on findings your branch introduced (incl. `[uncommitted]`), so CI fails on regressions you caused — not pre-existing debt (`--fail-on none` is advisory). Identity is line-shift-immune (findings key on file + message, not raw line). Degrades gracefully: not a git repo / no merge-base / baseline-worktree failure → falls back to a real full check plus a warning (scope-only, no tagging — no regression of v2.10.0); no changes → a clean no-op. Out of scope: finding-precise uncommitted attribution (would need a third clean-HEAD run) and cross-run baseline caching (each invocation pays one extra check). `--changed-strict` is a documented no-op.
+??? info "Diff-aware mode (`--changed`) in detail"
+
+    **Diff-aware mode (v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0):** `--changed` scopes the check to the R package(s) touched on this branch and tags each finding **`[introduced]`** vs **`[pre-existing]`** — computed honestly by a second baseline run in a detached worktree checked out at `merge-base(HEAD, --base)` (default base `dev`). An `[introduced]` finding whose file still has **uncommitted** changes (per `git status --porcelain`) is further refined to **`[uncommitted]`** — "you caused this with edits you haven't committed yet" vs committed branch work. This is a file-level refinement (no third check run), so every introduced finding in a dirty file tags `[uncommitted]`; string findings (R CMD check messages with no file) stay `[introduced]`. `[uncommitted]` is a subset of introduced: `--fail-on introduced` still fails on it. `--fail-on introduced` (the default) exits non-zero only on findings your branch introduced (incl. `[uncommitted]`), so CI fails on regressions you caused — not pre-existing debt (`--fail-on none` is advisory). Identity is line-shift-immune (findings key on file + message, not raw line). Degrades gracefully: not a git repo / no merge-base / baseline-worktree failure → falls back to a real full check plus a warning (scope-only, no tagging — no regression of v2.10.0); no changes → a clean no-op. Out of scope: finding-precise uncommitted attribution (would need a third clean-HEAD run) and cross-run baseline caching (each invocation pays one extra check). `--changed-strict` is a documented no-op.
 
 ---
 
 ## R Development Cycle
+
+!!! tip "TL;DR"
+    The everyday loop for one package: load, document, test, measure coverage, build, install, build the site, or run `r:cycle` for document, test and check in one pass.
 
 ### /rforge:r:load
 
@@ -812,11 +873,13 @@ Run package tests via `testthat` and report pass/fail/skip counts.
 
 **Parameters:**
 
-- `package` (optional) - Package path (defaults to current directory)
-- `--changed` (optional, v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0) - Scope tests to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; an introduced failure in an uncommitted file is refined to `[uncommitted]` (default: false)
-- `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed` (default: `dev`)
-- `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on `[introduced]` findings (default: `introduced`)
-- `--no-cache` (optional, v2.13.0) - `--changed`: bypass the baseline cache; force a fresh merge-base baseline run and skip writing it (default: false)
+| Flag | Required | What it does |
+|---|---|---|
+| `package` | optional | Package path (defaults to current directory) |
+| `--changed` | optional | Scope tests to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; an introduced failure in an uncommitted file is refined to `[uncommitted]` (default: false) *(v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0)* |
+| `--base <ref>` | optional | Comparison ref for `--changed` (default: `dev`) *(v2.11.0)* |
+| `--fail-on <introduced|none>` | optional | Exit non-zero only on `[introduced]` findings (default: `introduced`) *(v2.11.0)* |
+| `--no-cache` | optional | `--changed`: bypass the baseline cache; force a fresh merge-base baseline run and skip writing it (default: false) *(v2.13.0)* |
 
 **Examples:**
 
@@ -941,43 +1004,48 @@ Build the pkgdown website (vignettes → articles) with optional preview.
 
 **Parameters:**
 
-- `package` (optional) - Package path (defaults to current directory)
-- `--preview` (optional) - Open the built site via `pkgdown::preview_site()`
-- `--strict` (optional) - Fail-fast config check via `check_pkgdown` (useful in CI)
-- `--articles-only` (optional) - Build only articles/vignettes (reinstalls first)
-- `--devel` (optional) - Fast in-process build via `load_all` (lower fidelity)
-- `--check-leaks` (optional) - Read-only preflight (`lib.sitelint`) that flags stray scratch files pkgdown would publish; no build
-- `--deploy` (optional) - Deploy from a clean ref (detached-HEAD `git worktree`) via `pkgdown::deploy_to_branch` — MUTATING + NETWORK, recommend-only (never auto-run)
-- `--branch` (optional) - Target branch for `--deploy` (default `gh-pages`)
-- `--force` (optional) - Override the `--deploy` leak gate — proceed despite non-allowlisted committed files (downgrades block→warn)
+| Flag | Required | What it does |
+|---|---|---|
+| `package` | optional | Package path (defaults to current directory) |
+| `--preview` | optional | Open the built site via `pkgdown::preview_site()` |
+| `--strict` | optional | Fail-fast config check via `check_pkgdown` (useful in CI) |
+| `--articles-only` | optional | Build only articles/vignettes (reinstalls first) |
+| `--devel` | optional | Fast in-process build via `load_all` (lower fidelity) |
+| `--check-leaks` | optional | Read-only preflight (`lib.sitelint`) that flags stray scratch files pkgdown would publish; no build |
+| `--deploy` | optional | Deploy from a clean ref (detached-HEAD `git worktree`) via `pkgdown::deploy_to_branch` — MUTATING + NETWORK, recommend-only (never auto-run) |
+| `--branch` | optional | Target branch for `--deploy` (default `gh-pages`) |
+| `--force` | optional | Override the `--deploy` leak gate — proceed despite non-allowlisted committed files (downgrades block→warn) |
 
 **Examples:**
 
-```bash
-# Build site for current package
-/rforge:r:site
 
-# Build and preview in browser
-/rforge:r:site --preview
+??? example "Show all examples"
 
-# CI-strict config check then build
-/rforge:r:site --strict
+    ```bash
+    # Build site for current package
+    /rforge:r:site
 
-# Rebuild only articles quickly
-/rforge:r:site --articles-only
+    # Build and preview in browser
+    /rforge:r:site --preview
 
-# Fast dev build (no install)
-/rforge:r:site --devel
+    # CI-strict config check then build
+    /rforge:r:site --strict
 
-# Preflight: flag stray docs pkgdown would publish (no build)
-/rforge:r:site --check-leaks
+    # Rebuild only articles quickly
+    /rforge:r:site --articles-only
 
-# Deploy from a clean ref (recommend-only — pushes to gh-pages)
-/rforge:r:site --deploy
+    # Fast dev build (no install)
+    /rforge:r:site --devel
 
-# Deploy to a custom branch, overriding the leak gate
-/rforge:r:site --deploy --branch docs --force
-```
+    # Preflight: flag stray docs pkgdown would publish (no build)
+    /rforge:r:site --check-leaks
+
+    # Deploy from a clean ref (recommend-only — pushes to gh-pages)
+    /rforge:r:site --deploy
+
+    # Deploy to a custom branch, overriding the leak gate
+    /rforge:r:site --deploy --branch docs --force
+    ```
 
 **Executes:**
 
@@ -1022,6 +1090,9 @@ Full dev cycle — runs `document` → `test` → `check` in sequence, stopping 
 
 ## R Quality
 
+!!! tip "TL;DR"
+    Checks that find lint, style, tidyverse, S7, spelling and URL problems. Most are advisory and never block, so run them whenever you like.
+
 ### /rforge:r:lint
 
 Static analysis of the package via `lintr` — grouped report of style and code-quality issues.
@@ -1034,29 +1105,34 @@ Static analysis of the package via `lintr` — grouped report of style and code-
 
 **Parameters:**
 
-- `package` (optional) - Package path (defaults to current directory)
-- `--tidy` (optional, v2.19.0, issue #65) - Also run the tidyverse linter preset (`object_name_linter("snake_case")`, `brace_linter`, `spaces_inside_linter`, `trailing_whitespace_linter`, `semicolon_linter` — `tidyverse_linters()` was removed in lintr 3.x) alongside the default preset; report shows only the additional tidy-only findings, grouped by file (default: false)
-- `--set-lintr` (optional, v2.19.0, issue #65) - `--tidy`: write a `.lintr` activating the tidy preset permanently; refuses to overwrite an existing `.lintr` (default: false)
-- `--changed` (optional, v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0) - Scope lint to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; line-shift-immune identity; an introduced lint in an uncommitted file is refined to `[uncommitted]` (default: false)
-- `--base <ref>` (optional, v2.11.0) - Comparison ref for `--changed` (default: `dev`)
-- `--fail-on <introduced|none>` (optional, v2.11.0) - Exit non-zero only on `[introduced]` findings (default: `introduced`)
-- `--no-cache` (optional, v2.13.0) - `--changed`: bypass the baseline cache; force a fresh merge-base baseline run and skip writing it (default: false)
+| Flag | Required | What it does |
+|---|---|---|
+| `package` | optional | Package path (defaults to current directory) |
+| `--tidy` | optional | Also run the tidyverse linter preset (`object_name_linter("snake_case")`, `brace_linter`, `spaces_inside_linter`, `trailing_whitespace_linter`, `semicolon_linter` — `tidyverse_linters()` was removed in lintr 3.x) alongside the default preset; report shows only the additional tidy-only findings, grouped by file (default: false) *(v2.19.0, issue #65)* |
+| `--set-lintr` | optional | `--tidy`: write a `.lintr` activating the tidy preset permanently; refuses to overwrite an existing `.lintr` (default: false) *(v2.19.0, issue #65)* |
+| `--changed` | optional | Scope lint to the package(s) changed on this branch and tag findings `[introduced]`/`[pre-existing]` via a merge-base baseline run; line-shift-immune identity; an introduced lint in an uncommitted file is refined to `[uncommitted]` (default: false) *(v2.10.0; tagging v2.11.0; `[uncommitted]` refinement v2.12.0)* |
+| `--base <ref>` | optional | Comparison ref for `--changed` (default: `dev`) *(v2.11.0)* |
+| `--fail-on <introduced|none>` | optional | Exit non-zero only on `[introduced]` findings (default: `introduced`) *(v2.11.0)* |
+| `--no-cache` | optional | `--changed`: bypass the baseline cache; force a fresh merge-base baseline run and skip writing it (default: false) *(v2.13.0)* |
 
 **Examples:**
 
-```bash
-# Lint current package
-/rforge:r:lint
 
-# Lint only packages changed on this branch
-/rforge:r:lint --changed --base dev
+??? example "Show all examples"
 
-# Also surface tidyverse-preset-only findings
-/rforge:r:lint --tidy
+    ```bash
+    # Lint current package
+    /rforge:r:lint
 
-# ...and make the tidy preset permanent
-/rforge:r:lint --tidy --set-lintr
-```
+    # Lint only packages changed on this branch
+    /rforge:r:lint --changed --base dev
+
+    # Also surface tidyverse-preset-only findings
+    /rforge:r:lint --tidy
+
+    # ...and make the tidy preset permanent
+    /rforge:r:lint --tidy --set-lintr
+    ```
 
 **Executes:**
 
@@ -1123,32 +1199,37 @@ Static **S7 OOP convention checker** — scans `R/*.R` + `NAMESPACE` and reports
 
 **Parameters:**
 
-- `package` (optional, positional) - Package directory to review (defaults to current directory)
-- `--kind` (optional) - Limit to one convention family: `all` (default), `naming`, `validators`, `methods`, `legacy`, or `docs`
-- `--eco` (optional) - Sweep the static families across **every package** in the ecosystem manifest, aggregated (pure-stdlib; composes with `--runtime`). Also runs the ecosystem-only `cross-package-contract` family: flags a method dispatching on a **sibling** package's S7 class that isn't declared (`cross_package_undeclared_contract`) or is declared but unexported (`cross_package_unexported_class`) — the static, ecosystem-scoped sibling of `--runtime`'s `method_undeclared_dependency`
-- `--runtime` (optional) - Add an R-backed runtime pass (`method-dispatch` + `validator-runtime`) via `lib.rcmd`; degrades to an advisory `warn` when R/S7 is unavailable
-- `--format` (optional) - Output format: `json` (default) or `text`
+| Flag | Required | What it does |
+|---|---|---|
+| `package` | optional | Package directory to review (defaults to current directory) *(positional)* |
+| `--kind` | optional | Limit to one convention family: `all` (default), `naming`, `validators`, `methods`, `legacy`, or `docs` |
+| `--eco` | optional | Sweep the static families across **every package** in the ecosystem manifest, aggregated (pure-stdlib; composes with `--runtime`). Also runs the ecosystem-only `cross-package-contract` family: flags a method dispatching on a **sibling** package's S7 class that isn't declared (`cross_package_undeclared_contract`) or is declared but unexported (`cross_package_unexported_class`) — the static, ecosystem-scoped sibling of `--runtime`'s `method_undeclared_dependency` |
+| `--runtime` | optional | Add an R-backed runtime pass (`method-dispatch` + `validator-runtime`) via `lib.rcmd`; degrades to an advisory `warn` when R/S7 is unavailable |
+| `--format` | optional | Output format: `json` (default) or `text` |
 
 There is **no** `--write`/`--fix` — S7 fixes need human judgement.
 
 **Examples:**
 
-```bash
-# Review all S7 conventions in the current package
-/rforge:r:s7-review
 
-# Only the naming family, as text
-/rforge:r:s7-review --kind naming --format text
+??? example "Show all examples"
 
-# Review a specific package
-/rforge:r:s7-review ~/projects/mypackage
+    ```bash
+    # Review all S7 conventions in the current package
+    /rforge:r:s7-review
 
-# Sweep the whole ecosystem (static families)
-/rforge:r:s7-review --eco
+    # Only the naming family, as text
+    /rforge:r:s7-review --kind naming --format text
 
-# Add the R-backed runtime pass (dead generics + non-enforcing validators)
-/rforge:r:s7-review --runtime
-```
+    # Review a specific package
+    /rforge:r:s7-review ~/projects/mypackage
+
+    # Sweep the whole ecosystem (static families)
+    /rforge:r:s7-review --eco
+
+    # Add the R-backed runtime pass (dead generics + non-enforcing validators)
+    /rforge:r:s7-review --runtime
+    ```
 
 **Convention families:**
 
@@ -1162,7 +1243,9 @@ There is **no** `--write`/`--fix` — S7 fixes need human judgement.
 | method-dispatch (`--runtime`) | `dead_generic`, `method_on_missing_class`, `method_undeclared_dependency` | runtime |
 | validator-runtime (`--runtime`) | `validator_not_enforcing` | runtime |
 
-The `method-dispatch` runtime family reports `dead_generic` (an S7 generic with no registered method), `method_on_missing_class` (a method whose dispatch signature references an S7 class with no resolvable namespace binding — e.g. an inline `new_class()` left in a `method()` call — making the method unreachable), and `method_undeclared_dependency` (a method dispatching on an S7 class that *does* resolve but whose providing package — `attr(class, "package")` — is not declared in `DESCRIPTION` `Imports`/`Depends`/`LinkingTo`, typically a `Suggests`-only class; where that package is absent the dispatch class never registers and the method never fires). Each `S7_method` carries its dispatch class objects (`attr(., "signature")`), so resolvability is decided by object identity against the package's classes; base types and the package's own classes are not flagged, and base/recommended packages (`base`, `methods`, `stats`, `utils`, `S7`, …) are always treated as declared.
+??? info "Runtime method-dispatch family in detail"
+
+    The `method-dispatch` runtime family reports `dead_generic` (an S7 generic with no registered method), `method_on_missing_class` (a method whose dispatch signature references an S7 class with no resolvable namespace binding — e.g. an inline `new_class()` left in a `method()` call — making the method unreachable), and `method_undeclared_dependency` (a method dispatching on an S7 class that *does* resolve but whose providing package — `attr(class, "package")` — is not declared in `DESCRIPTION` `Imports`/`Depends`/`LinkingTo`, typically a `Suggests`-only class; where that package is absent the dispatch class never registers and the method never fires). Each `S7_method` carries its dispatch class objects (`attr(., "signature")`), so resolvability is decided by object identity against the package's classes; base types and the package's own classes are not flagged, and base/recommended packages (`base`, `methods`, `stats`, `utils`, `S7`, …) are always treated as declared.
 
 **Output:** one `{kind: "s7review", status: "ok"|"warn", stages: [...]}` envelope. Each finding carries `source: "static"` and `severity: "advisory"`, worded "looks like / consider", never "must". Exit 0 always.
 
@@ -1266,6 +1349,9 @@ Auto-format the package source via `styler::style_pkg()` and show the diff.
 ---
 
 ## CRAN Submission
+
+!!! tip "TL;DR"
+    The pre-submission gauntlet: revdep, goodpractice, win-builder, R-hub, `r:cran-prep` as the readiness gate, then `r:submit` for the handoff.
 
 ### /rforge:r:revdep
 
@@ -1383,10 +1469,12 @@ Multi-platform checks via R-hub v2 (`rhub::rhub_check`) — async dispatch via G
 
 **Parameters:**
 
-- `package` (optional) - Package path (defaults to current directory)
-- `--platforms` (optional) - Comma-separated platform list (e.g. `linux,windows,macos-arm64,atlas`); overrides preset
-- `--preset` (optional) - Named platform preset: `cran-submission` (default), `cran-submission-strict`, `sanitizers`, `all-vm`
-- `--rc-mode` (optional) - Use RC shared runners via `rc_submit()` instead of your own GitHub account
+| Flag | Required | What it does |
+|---|---|---|
+| `package` | optional | Package path (defaults to current directory) |
+| `--platforms` | optional | Comma-separated platform list (e.g. `linux,windows,macos-arm64,atlas`); overrides preset |
+| `--preset` | optional | Named platform preset: `cran-submission` (default), `cran-submission-strict`, `sanitizers`, `all-vm` |
+| `--rc-mode` | optional | Use RC shared runners via `rc_submit()` instead of your own GitHub account |
 
 **Examples:**
 
@@ -1426,27 +1514,32 @@ Per-package CRAN-readiness gate — runs the full pre-submission sequence and ge
 
 **Parameters:**
 
-- `package` (optional) - Package path (defaults to current directory)
-- `--incoming` (optional) - Also run the opt-in CRAN-incoming `_R_CHECK_*` pass (default: false)
-- `--goodpractice` (optional) - Also run the advisory goodpractice bundle (default: false)
-- `--multi-platform` (optional) - Dispatch win-builder + R-hub async checks (default: false)
-- `--no-revdep` (optional) - Skip the reverse-dependency check (default: false)
+| Flag | Required | What it does |
+|---|---|---|
+| `package` | optional | Package path (defaults to current directory) |
+| `--incoming` | optional | Also run the opt-in CRAN-incoming `_R_CHECK_*` pass (default: false) |
+| `--goodpractice` | optional | Also run the advisory goodpractice bundle (default: false) |
+| `--multi-platform` | optional | Dispatch win-builder + R-hub async checks (default: false) |
+| `--no-revdep` | optional | Skip the reverse-dependency check (default: false) |
 
 **Examples:**
 
-```bash
-# Full CRAN-prep gate for current package (strict passes run by default)
-/rforge:r:cran-prep
 
-# Add the opt-in incoming env-var pass
-/rforge:r:cran-prep --incoming
+??? example "Show all examples"
 
-# Include goodpractice advisory and multi-platform checks
-/rforge:r:cran-prep --goodpractice --multi-platform
+    ```bash
+    # Full CRAN-prep gate for current package (strict passes run by default)
+    /rforge:r:cran-prep
 
-# Skip revdep (e.g., first CRAN submission with no dependents)
-/rforge:r:cran-prep --no-revdep
-```
+    # Add the opt-in incoming env-var pass
+    /rforge:r:cran-prep --incoming
+
+    # Include goodpractice advisory and multi-platform checks
+    /rforge:r:cran-prep --goodpractice --multi-platform
+
+    # Skip revdep (e.g., first CRAN submission with no dependents)
+    /rforge:r:cran-prep --no-revdep
+    ```
 
 **Executes:**
 
@@ -1479,13 +1572,15 @@ GitHub pre-release of the submitted tarball + CRAN submit **handoff** — fills 
 
 **Parameters:**
 
-- `package` (optional) — package path (defaults to current directory)
-- `--promote` (optional) — Phase 2: flip the pre-release to a full release after CRAN accepts
-- `--universe` (optional) — Phase 0: also verify the package's **R-universe early-access** build is green (read-only; never uploads). Advisory — never blocks the CRAN handoff.
-- `--universe-name <owner>` (optional) — override the auto-detected R-universe owner (defaults to the GitHub `origin` remote owner)
-- `--dry-run` (optional) — show the tag/assets/checklist without touching GitHub
-- `--no-verify` (optional) — with `--promote`, skip the `cran.r-project.org` version check
-- `--force` (optional) — cut the pre-release even if `cran-prep` is not `ready` (records the override)
+| Flag | Required | What it does |
+|---|---|---|
+| `package` | optional | package path (defaults to current directory) |
+| `--promote` | optional | Phase 2: flip the pre-release to a full release after CRAN accepts |
+| `--universe` | optional | Phase 0: also verify the package's **R-universe early-access** build is green (read-only; never uploads). Advisory — never blocks the CRAN handoff. |
+| `--universe-name <owner>` | optional | override the auto-detected R-universe owner (defaults to the GitHub `origin` remote owner) |
+| `--dry-run` | optional | show the tag/assets/checklist without touching GitHub |
+| `--no-verify` | optional | with `--promote`, skip the `cran.r-project.org` version check |
+| `--force` | optional | cut the pre-release even if `cran-prep` is not `ready` (records the override) |
 
 **Lifecycle:**
 
@@ -1512,6 +1607,9 @@ prints the manual `gh` recipe instead of failing. Backed by `lib/ghrelease.py` (
 ---
 
 ## R Authoring
+
+!!! tip "TL;DR"
+    Scaffold tests, dependencies, vignettes, datasets and citations in an existing package. Dry-run by default; nothing is written until you pass `--write`.
 
 Scaffolding commands for **existing** packages. All three are **dry-run by default** — they print the plan and write nothing; pass `--write` to apply and `--force` to overwrite. They never invent expected values or docs prose; generated bodies are left as `# TODO` for you to fill.
 
@@ -1594,10 +1692,12 @@ Scaffold `vignettes/<name>.Rmd` for an existing package: a knitr skeleton (YAML 
 
 **Parameters:**
 
-- `name` (required) - The vignette file name (becomes `vignettes/<name>.Rmd`)
-- `--article` (optional) - Create a pkgdown-only article (not built/installed) instead of a vignette (default: false)
-- `--write` (optional) - Apply the plan: write the `.Rmd` and register the `VignetteBuilder` via guarded `usethis`. Default is dry-run (default: false)
-- `--force` (optional) - Overwrite an existing vignette file, diff shown first (default: false)
+| Flag | Required | What it does |
+|---|---|---|
+| `name` | required | The vignette file name (becomes `vignettes/<name>.Rmd`) |
+| `--article` | optional | Create a pkgdown-only article (not built/installed) instead of a vignette (default: false) |
+| `--write` | optional | Apply the plan: write the `.Rmd` and register the `VignetteBuilder` via guarded `usethis`. Default is dry-run (default: false) |
+| `--force` | optional | Overwrite an existing vignette file, diff shown first (default: false) |
 
 **Examples:**
 

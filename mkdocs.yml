@@ -1,5 +1,5 @@
 site_name: RForge Plugin
-site_description: R package ecosystem orchestrator - 41 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)
+site_description: R package ecosystem orchestrator - 44 self-contained commands for R package development, ecosystem management, CRAN submission, and intelligent orchestration (pure-Python lib/, no MCP server required)
 site_url: https://data-wise.github.io/rforge/
 
 repo_name: Data-Wise/rforge
@@ -100,69 +100,78 @@ nav:
   - Get Started:
     - 📦 Installation: installation.md
     - 🚀 Quick Start: quickstart.md
-    - Codex plugin and checks: guides/codex-checks.md
-    - Check evidence and approvals: guides/evidence-and-approval.md
+    - Codex checks: guides/codex-checks.md
+    - Evidence and approvals: guides/evidence-and-approval.md
   - Learn:
-    - 📊 Visual Workflows: workflows/index.md
-    - "Cookbook (task recipes)": cookbook.md
-    - "🧰 Package Development Guide": package-development-guide.md
-    - Tutorials Overview: tutorials/README.md
-    - "Getting started": tutorials/getting-started.md
-    - "rforge in the R package lifecycle": tutorials/rforge-in-the-r-lifecycle.md
-    - "Understanding modes": tutorials/understanding-modes.md
-    - "Ecosystem orchestration": tutorials/ecosystem-orchestration.md
-    - "Orchestrator cookbook": tutorials/orchestrator-cookbook.md
-    - "R package dev cycle": tutorials/r-dev-cycle.md
-    - "Tidy a package (r:tidy)": tutorials/tidy-your-package.md
-    - "Dependency reconciliation": tutorials/dependency-reconciliation.md
-    - "Diff-aware checks": tutorials/diff-aware-checks.md
-    - "S7 convention checking": tutorials/s7-convention-checking.md
-    - "Scaffolding existing packages": tutorials/scaffolding-existing-packages.md
-    - "Fix a docs:check finding": tutorials/fix-a-docs-check-finding.md
-    - "CRAN release prep": tutorials/cran-release-prep.md
-    - "CRAN submission with rforge": tutorials/cran-submission-with-rforge.md
-    - "Win-builder + tarball-check": tutorials/cran-winbuilder-tarball-check.md
-    - "R-universe early-access": tutorials/r-universe-early-access.md
-    - "Migrating from rforge-mcp": tutorials/migrate-from-mcp.md
-    - "Example sessions": tutorials/example-sessions.md
+    - Start here:
+      - Getting started: tutorials/getting-started.md
+      - Understanding modes: tutorials/understanding-modes.md
+      - R package lifecycle: tutorials/rforge-in-the-r-lifecycle.md
+      - 📊 Visual workflows: workflows/index.md
+      - Cookbook: cookbook.md
+      - Example sessions: tutorials/example-sessions.md
+      - Tutorial map: tutorials/README.md
+    - Everyday tasks:
+      - Dev cycle walkthrough: tutorials/r-dev-cycle.md
+      - 🧰 Package dev guide: package-development-guide.md
+      - Tidy (r:tidy): tutorials/tidy-your-package.md
+      - Diff-aware walkthrough: tutorials/diff-aware-checks.md
+      - Dependency sync: tutorials/dependency-reconciliation.md
+      - Scaffold a package: tutorials/scaffolding-existing-packages.md
+      - Fix a docs:check finding: tutorials/fix-a-docs-check-finding.md
+    - Ecosystems:
+      - Orchestration: tutorials/ecosystem-orchestration.md
+      - Orchestrator cookbook: tutorials/orchestrator-cookbook.md
+      - S7 conventions: tutorials/s7-convention-checking.md
+      - Migrate from rforge-mcp: tutorials/migrate-from-mcp.md
+    - CRAN and release:
+      - CRAN release prep: tutorials/cran-release-prep.md
+      - CRAN submission walkthrough: tutorials/cran-submission-with-rforge.md
+      - Win-builder + tarball: tutorials/cran-winbuilder-tarball-check.md
+      - R-universe early access: tutorials/r-universe-early-access.md
   - Reference:
-    - 📚 Reference Card: REFCARD.md
-    - Commands: commands.md
-    - Command Guides:
-      - "Session boundary (restore/finish)": guides/session-boundary.md
-      - "Dev cycle (load/document/test/check)": guides/dev-cycle.md
-      - "Quality (lint/spell/style/urlcheck)": guides/quality.md
-      - "Scaffolding (r:use-*)": guides/scaffolding.md
-      - "S7 review (--eco/--runtime)": guides/s7-review.md
-      - "Diff-aware checks (--changed)": guides/diff-aware.md
-      - "CRAN submission": guides/cran-submission.md
-      - "Website + deploy guard (r:site)": guides/website.md
-      - "Ecosystem analysis (analyze/impact/cascade/release)": guides/ecosystem-analysis.md
-      - "Docs audit (docs:check)": guides/docs-audit.md
-    - 🤖 Orchestrator Agent: orchestrator.md
-    - Configuration: configuration.md
-    - Lib Modules: lib-modules.md
-    - Troubleshooting: troubleshooting.md
-    - 📖 Glossary: glossary.md
-    - 🃏 Quick-Reference Cards: command-cards.md
-    - 🎨 ADHD design system: reference/adhd-design-system.md
-    - API:
-      - "discovery": reference/discovery.md
-      - "deps": reference/deps.md
-      - "deps_sync": reference/deps_sync.md
-      - "status": reference/status.md
-      - "init": reference/init.md
-      - "rcmd": reference/rcmd.md
-      - "cranlint": reference/cranlint.md
-      - "ghrelease": reference/ghrelease.md
-      - "runiverse": reference/runiverse.md
-      - "s7review": reference/s7review.md
-      - "changed": reference/changed.md
-      - "scaffold": reference/scaffold.md
-      - "sitelint": reference/sitelint.md
-      - "tidyaudit": reference/tidyaudit.md
-      - "rstatus": reference/rstatus.md
-      - "docaudit": reference/docaudit.md
+    - Quick lookup:
+      - 📚 Reference card: REFCARD.md
+      - Commands: commands.md
+      - 🃏 Command cards: command-cards.md
+      - 📖 Glossary: glossary.md
+      - Troubleshooting: troubleshooting.md
+    - "Guides: daily work":
+      - Session boundary: guides/session-boundary.md
+      - Dev cycle: guides/dev-cycle.md
+      - Quality checks: guides/quality.md
+      - Scaffolding: guides/scaffolding.md
+      - S7 review: guides/s7-review.md
+      - Diff-aware (--changed): guides/diff-aware.md
+    - "Guides: ship and audit":
+      - CRAN submission: guides/cran-submission.md
+      - Website (r:site): guides/website.md
+      - Ecosystem analysis: guides/ecosystem-analysis.md
+      - Docs audit (docs:check): guides/docs-audit.md
+    - Setup and internals:
+      - 🤖 Orchestrator agent: orchestrator.md
+      - Configuration: configuration.md
+      - Lib modules: lib-modules.md
+      - 🎨 ADHD design system: reference/adhd-design-system.md
+    - "API: project state":
+      - discovery: reference/discovery.md
+      - deps: reference/deps.md
+      - deps_sync: reference/deps_sync.md
+      - status: reference/status.md
+      - init: reference/init.md
+      - rstatus: reference/rstatus.md
+    - "API: checks":
+      - rcmd: reference/rcmd.md
+      - cranlint: reference/cranlint.md
+      - tidyaudit: reference/tidyaudit.md
+      - docaudit: reference/docaudit.md
+      - s7review: reference/s7review.md
+      - changed: reference/changed.md
+    - "API: build and ship":
+      - scaffold: reference/scaffold.md
+      - sitelint: reference/sitelint.md
+      - ghrelease: reference/ghrelease.md
+      - runiverse: reference/runiverse.md
   - Project:
     - Architecture: architecture.md
     - Hooks & Skills: hooks-and-skills.md

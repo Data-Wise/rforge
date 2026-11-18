@@ -1,5 +1,7 @@
 # 📖 RForge Quick Start
 
+⏱️ **5 minutes** • 🟢 Beginner • ✓ 5 steps
+
 For Codex, start with the [two-skill setup and usage guide](guides/codex-checks.md).
 The slash commands below are for Claude Code.
 
@@ -9,6 +11,34 @@ Get started with RForge in 5 minutes. This guide walks you through installation,
     - **What:** Install rforge, then run your first command in an R-package directory.
     - **Fast path:** install (Step 1), then `/rforge:quick` (about 10 s), `/rforge:analyze` (about 30 s) or `/rforge:thorough` (2-5 min).
     - **Next:** the [REFCARD](REFCARD.md) for all {{ rforge.command_count }} commands, or the [tutorials](tutorials/README.md).
+
+## ⚡ 5-minute path
+
+Want a first successful run with no reading? Do these five steps. Everything after this section is the full guide.
+
+1. **Install the plugin** in Claude Code:
+
+    ```text
+    /plugin marketplace add Data-Wise/rforge
+    /plugin install rforge
+    ```
+
+2. **Restart Claude Code** so the commands register.
+3. **Start Claude Code from an R package folder** (one with a `DESCRIPTION` file).
+4. **Check its health:** run `/rforge:status` inside Claude Code (under 10 seconds).
+5. **See what a change affects:** run `/rforge:analyze "what I just changed"` (about 30 seconds).
+
+```mermaid
+flowchart LR
+    A["Install"] --> B["Restart<br/>Claude Code"]
+    B --> C["cd into<br/>an R package"]
+    C --> D["/rforge:status"]
+    D --> E["/rforge:analyze"]
+```
+
+!!! success "You are done when"
+    `/rforge:status` prints a status report for your package. If it errors, see [Troubleshooting](#troubleshooting).
+    Needs Claude Code, Python 3.10+ and R 4.0+ (details in [Prerequisites](#prerequisites)).
 
 ## Prerequisites
 
@@ -209,65 +239,67 @@ No `--mode` flag = default mode. rforge also infers mode from context words
 
 ## Output Formats
 
-RForge supports 3 output formats:
+??? note "Output formats: terminal, JSON, Markdown"
+    RForge supports 3 output formats:
 
-### Terminal (Default)
-Rich colors, emojis, and formatted tables for human readability.
+    **Terminal (Default)**
+    Rich colors, emojis, and formatted tables for human readability.
 
-```bash
-/rforge:status
-```
+    ```bash
+    /rforge:status
+    ```
 
-### JSON
-Machine-readable with metadata envelope for automation.
+    **JSON**
+    Machine-readable with metadata envelope for automation.
 
-```bash
-/rforge:status --format json > status.json
-```
+    ```bash
+    /rforge:status --format json > status.json
+    ```
 
-### Markdown
-Documentation-ready for reports and READMEs.
+    **Markdown**
+    Documentation-ready for reports and READMEs.
 
-```bash
-/rforge:status --format markdown > STATUS.md
-```
+    ```bash
+    /rforge:status --format markdown > STATUS.md
+    ```
 
 ## Project Structure Detection
 
-RForge automatically detects three project types:
+??? note "Project types rforge detects"
+    RForge automatically detects three project types:
 
-### Single Package
-```
-mypackage/
-├── DESCRIPTION
-├── NAMESPACE
-├── R/
-├── man/
-└── tests/
-```
+    **Single Package**
+    ```
+    mypackage/
+    ├── DESCRIPTION
+    ├── NAMESPACE
+    ├── R/
+    ├── man/
+    └── tests/
+    ```
 
-### Ecosystem (Multiple Packages)
-```
-my-ecosystem/
-├── base-package/
-│   └── DESCRIPTION
-├── extension-1/
-│   └── DESCRIPTION
-└── extension-2/
-    └── DESCRIPTION
-```
+    **Ecosystem (Multiple Packages)**
+    ```
+    my-ecosystem/
+    ├── base-package/
+    │   └── DESCRIPTION
+    ├── extension-1/
+    │   └── DESCRIPTION
+    └── extension-2/
+        └── DESCRIPTION
+    ```
 
-### Hybrid (Mixed Content)
-```
-my-project/
-├── packages/
-│   ├── pkg-1/DESCRIPTION
-│   └── pkg-2/DESCRIPTION
-├── analysis/
-└── docs/
-```
+    **Hybrid (Mixed Content)**
+    ```
+    my-project/
+    ├── packages/
+    │   ├── pkg-1/DESCRIPTION
+    │   └── pkg-2/DESCRIPTION
+    ├── analysis/
+    └── docs/
+    ```
 
-Use `/rforge:detect` to see how RForge categorizes your project.
+    Use `/rforge:detect` to see how RForge categorizes your project.
 
 ## Troubleshooting
 
@@ -308,37 +340,28 @@ export PATH="/usr/local/bin:$PATH"
 # Restart Claude Code after updating PATH
 ```
 
-### Performance Issues
+??? note "Performance issues: analysis is slow"
+    If analysis is slow:
 
-If analysis is slow:
+    1. **Use faster modes:**
 
-1. **Use faster modes:**
+       ```bash
+       /rforge:status  # Instead of /rforge:analyze
+       ```
 
-   ```bash
-   /rforge:status  # Instead of /rforge:analyze
-   ```
+    2. **Check for large .Rcheck directories:**
 
-2. **Check for large .Rcheck directories:**
+       ```bash
+       find . -name "*.Rcheck" -type d
+       # Remove if found
+       rm -rf *.Rcheck
+       ```
 
-   ```bash
-   find . -name "*.Rcheck" -type d
-   # Remove if found
-   rm -rf *.Rcheck
-   ```
+    3. **Limit scope for ecosystems:**
 
-3. **Limit scope for ecosystems:**
-
-   ```bash
-   /rforge:status mypackage  # Specify single package
-   ```
-
-## Next Steps
-
-Now that you're set up, explore:
-
-- **[Commands Reference](commands.md)** - All 16 RForge commands
-- **[Architecture Guide](architecture.md)** - How RForge works internally
-- **[rforge in the R package lifecycle](tutorials/rforge-in-the-r-lifecycle.md)** - Where rforge fits with devtools/usethis
+       ```bash
+       /rforge:status mypackage  # Specify single package
+       ```
 
 ## Common Commands Cheat Sheet
 
@@ -394,12 +417,19 @@ The docs audit prints its scope on the first line and `checked N of M` at the en
 
 ## Uninstall
 
-```bash
-brew uninstall rforge
-```
+??? note "Remove rforge (Homebrew)"
+    ```bash
+    brew uninstall rforge
+    ```
 
 ## Getting Help
 
 - **GitHub Issues:** [Data-Wise/rforge/issues](https://github.com/Data-Wise/rforge/issues)
 - **Documentation Site:** [data-wise.github.io/rforge](https://data-wise.github.io/rforge)
 - **npm Package:** [@data-wise/rforge-plugin](https://www.npmjs.com/package/@data-wise/rforge-plugin)
+
+## 🚀 Next steps
+
+- **[Commands reference](commands.md)** - all {{ rforge.command_count }} commands in detail
+- **[Getting started tutorial](tutorials/getting-started.md)** - a guided 10-minute walkthrough
+- **[rforge in the R package lifecycle](tutorials/rforge-in-the-r-lifecycle.md)** - where rforge fits with devtools and usethis

@@ -1,12 +1,14 @@
 # 🔎 S7 convention review
 
+⏱️ **10 minutes** • 🔴 Advanced • ✓ 3 modes
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** `r:s7-review` is the complete convention auditor for [S7](https://rconsortium.github.io/S7/)
       (the modern R OOP system) — naming, validators, methods, legacy leftovers, docs, plus
       ecosystem and runtime families.
     - **Why:** S7 has idioms a linter won't catch — unbound classes, no-op validators, methods
       that silently never dispatch. This command catalogs them.
-    - **Three modes:** **static** (default, pure-Python, no R) → **`--eco`** (sweep every package
+    - **How:** three modes — **static** (default, pure-Python, no R) → **`--eco`** (sweep every package
       in the manifest + cross-package contracts) → **`--runtime`** (load the package, introspect S7).
     - **Next:** the [S7 convention checking tutorial](../tutorials/s7-convention-checking.md) for a
       hands-on walkthrough; this page is the **complete finding-family catalog**.
@@ -183,6 +185,8 @@ There is **no** `--write` / `--fix` — S7 fixes need human judgement (like `r:c
     [CRAN submission guide's MediationVerse doctrine](cran-submission.md) for the release
     side of the same ecosystem.
 
+### Class design
+
 S7 is the OOP standard for all new MediationVerse code. Model two layers: a **fitter**
 (configuration + `fit()`) and an immutable **result** (estimates + inference). Give effect
 types a small hierarchy so shared `print`/`confint` logic lives once — this is the shape
@@ -218,7 +222,9 @@ CDEResult <- new_class("CDEResult", parent = MediationResult,
 - **Put shared behavior on the parent** (`MediationResult`) and override only where an
   effect type genuinely differs (e.g. a `CDEResult` print that shows `m_level`).
 
-**Generics + methods** — define package generics with `new_generic()`, and register methods
+### Generics and methods
+
+Define package generics with `new_generic()`, and register methods
 for the base generics users reach for (`print`, `summary`, `confint`, `plot`):
 
 ```r
@@ -235,7 +241,9 @@ method(stats::confint, MediationResult) <- function(object, parm, level = 0.95, 
 }
 ```
 
-**The `.onLoad()` registration-order gotcha** — the single most common "method not found at
+### The `.onLoad()` registration-order gotcha
+
+This is the single most common "method not found at
 load/check time" bug, and exactly what `--kind methods`' `missing_methods_register` finding
 and the `--runtime` `method-dispatch` family exist to catch. When bridging to S4 (needed for
 some double dispatch / `setMethod` interop), call `S4_register()` **before**
@@ -253,12 +261,14 @@ If methods vanish under `R CMD check` but work interactively, it's almost always
 `methods_register()` not called in `.onLoad()`, (b) `S4_register()` called after it, or (c)
 the generic/class not exported.
 
-**S3 ↔ S7 interop:** to make an S7 class work with an existing S3 generic you don't own,
+### S3 and S7 interop
+
+To make an S7 class work with an existing S3 generic you don't own,
 register an S7 method on it — S7 handles S3 dispatch when the S3 generic calls
 `UseMethod`. For double dispatch (two S7 args, or S7×S4), register via the S4 bridge on both
 classes. Don't mix an S3 `class<-` onto an S7 object; let S7 own the class.
 
-**Migration pattern (S3 → S7, e.g. `medfit`):**
+### Migration pattern (S3 → S7, e.g. `medfit`)
 
 1. Inventory the S3 object's fields → S7 `properties` with types + a `validator` capturing
    the old invariants.
@@ -271,7 +281,7 @@ classes. Don't mix an S3 `class<-` onto an S7 object; let S7 own the class.
 6. Tests (testthat edition 3): construct, mutate-to-invalid (expect validator error),
    dispatch each generic, `S7_inherits()` checks.
 
-**Common pitfalls beyond what the checker flags:**
+### Common pitfalls beyond what the checker flags
 
 - `@` on a non-S7 object → "no applicable method"; you're holding an S3 list, not the S7
   object.
@@ -283,10 +293,12 @@ classes. Don't mix an S3 `class<-` onto an S7 object; let S7 own the class.
 
 ---
 
-## See also
+## Next steps
 
-- [`r:s7-review` in commands](../commands.md) — the terse command-list entry
-- [`s7review` reference](../reference/s7review.md) — the `lib.s7review` engine API (`run_all`,
-  `run_eco`, `run_all_with_runtime`, `build_class_registry`, `check_cross_package_contracts`, …)
 - [S7 convention checking tutorial](../tutorials/s7-convention-checking.md) — the hands-on
   walkthrough this guide complements
+- [`s7review` reference](../reference/s7review.md) — the `lib.s7review` engine API (`run_all`,
+  `run_eco`, `run_all_with_runtime`, `build_class_registry`, `check_cross_package_contracts`, …)
+- [CRAN submission](cran-submission.md) — the release side of the MediationVerse doctrine
+
+Terse command-list entry: [`r:s7-review` in commands](../commands.md).

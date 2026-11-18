@@ -1,14 +1,18 @@
 # 🌌 R-universe early-access with rforge
 
+⏱️ 10 minutes • 🟡 Intermediate • ✓ 4 steps
+
 !!! tip "TL;DR (30 seconds)"
-    - **What:** Publish your package to [R-universe](https://r-universe.dev) so users get binaries within minutes, then use `r:submit --universe` to verify the build is green — **while CRAN review runs in parallel**.
-    - **Why:** CRAN review is human and takes days; R-universe rebuilds from your GitHub repo in minutes and serves CRAN-like binaries. It's also a free multi-platform preflight.
+    - **What:** Publish to [R-universe](https://r-universe.dev) so users get binaries within minutes, **while CRAN review runs in parallel**.
+    - **Why:** CRAN review takes days; R-universe rebuilds from your GitHub repo in minutes. It's also a free multi-platform preflight.
     - **How:** one-time universe setup (a GitHub repo + the R-universe app) → `git push` → `/rforge:r:submit --universe`.
     - **Next:** [CRAN submission with rforge](cran-submission-with-rforge.md) — the early-access check slots in *before* the manual CRAN handoff.
 
 > **For whom:** A package author who wants users to install the new version immediately, without waiting on CRAN's review queue.
-> **Estimated time:** ~10 minutes to read; the one-time setup is ~5 minutes, and R-universe builds take a few minutes per package.
 > **Prior knowledge:** Your package lives in a public GitHub repo and passes basic `r:cycle` checks.
+
+!!! note "Time breakdown"
+    The one-time setup is about 5 minutes, and R-universe builds take a few minutes per package.
 
 ## Why a second channel?
 
@@ -19,7 +23,11 @@ R-universe and CRAN have **structurally different triggers**, which is what make
 | **R-universe** | a `git push` (once registered) | passive / automatic build | minutes |
 | **CRAN** | *you* running `devtools::submit_cran()` | active / manual | days |
 
-`r:submit --universe` is **read-only** — R-universe builds on your push, so rforge never uploads anything; it just *verifies* the build went green and reports. The CRAN submission stays exactly as explicit as before.
+`r:submit --universe` is **read-only**:
+
+- R-universe builds on your push, so rforge never uploads anything.
+- It just *verifies* the build went green and reports.
+- The CRAN submission stays exactly as explicit as before.
 
 ```mermaid
 sequenceDiagram
@@ -44,14 +52,18 @@ sequenceDiagram
 
 There is **no separate R-universe account** — a universe is tied to your GitHub user/org. Three one-time steps:
 
-**1a. Create the registry repo** named `<owner>.r-universe.dev` (all lowercase). For the GitHub user/org `Data-Wise`, that's `data-wise.r-universe.dev`:
+### 1a. Create the registry repo
+
+Name it `<owner>.r-universe.dev` (all lowercase). For the GitHub user/org `Data-Wise`, that's `data-wise.r-universe.dev`:
 
 ```bash
 gh repo create <owner>/<owner-lowercase>.r-universe.dev --public \
   -d "R-universe registry"
 ```
 
-**1b. Add a `packages.json`** listing the package repos to build, then push it:
+### 1b. Add a `packages.json`
+
+List the package repos to build, then push it:
 
 ```json
 [
@@ -63,11 +75,16 @@ gh repo create <owner>/<owner-lowercase>.r-universe.dev --public \
 !!! note "Public repos only (by default)"
     R-universe's standard flow builds **public** repos. A private package won't build in a public universe unless you explicitly grant the app access — leave private repos out of `packages.json` until they're public.
 
-**1c. Install the R-universe GitHub App** — this is the step only *you* can do (interactive browser consent):
+### 1c. Install the R-universe GitHub App
+
+This is the step only *you* can do (interactive browser consent):
 
 → **<https://github.com/apps/r-universe>** → *Install* → grant it on your account (it asks for *commit-status read/write* only).
 
-R-universe then creates a build monorepo at `github.com/r-universe/<owner>` and rebuilds on every push. Your universe goes live at `https://<owner>.r-universe.dev` within a few minutes.
+R-universe then creates a build monorepo at `github.com/r-universe/<owner>` and rebuilds on every push.
+
+!!! success "Universe live"
+    Your universe goes live at `https://<owner>.r-universe.dev` within a few minutes.
 
 !!! tip "Case doesn't matter for you, but the subdomain is lowercase"
     The `Data-Wise` GitHub org maps to `data-wise.r-universe.dev`. `r:submit --universe` lowercases the owner automatically, so you never have to think about it.
@@ -137,9 +154,8 @@ It never blocks and never triggers the (still manual) CRAN submission — it's a
 !!! note "Expected behavior in v2.7.0+"
     `r:submit --universe` is **read-only and advisory** by design. It never uploads, never blocks the CRAN handoff, and degrades to a non-fatal `warn` (with setup guidance) when offline or unregistered — so it's safe to wire into CI.
 
-## Related
+## Next steps
 
 - **[CRAN submission with rforge](cran-submission-with-rforge.md)** — the manual CRAN handoff this complements
 - **[r:submit command reference](../commands.md#rforgersubmit)** — all flags
 - **[`lib.runiverse` API reference](../reference/runiverse.md)** — the backing module
-- **[REFCARD](../REFCARD.md)** — all {{ rforge.command_count }} commands on one page

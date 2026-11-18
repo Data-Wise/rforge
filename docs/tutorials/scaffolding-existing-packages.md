@@ -1,5 +1,7 @@
 # 🏗️ Scaffolding for existing packages
 
+⏱️ 10 minutes • 🟢 Beginner • ✓ 5 commands
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** Five `r:use-*` commands that scaffold a test file, a dependency, a vignette, a documented dataset, and a citation into an **existing** package.
     - **Why:** Less boilerplate, fewer forgotten steps (NAMESPACE, VignetteBuilder, testthat infra, `LazyData`, `inst/CITATION`) — and rforge picks `Imports` vs `Suggests` for you.
@@ -9,14 +11,13 @@
 
 > **For whom:** R package developer adding a test, a dependency, or a vignette to a
 > package that already exists.
-> **Estimated time:** 10 minutes.
 > **Prior knowledge:** You have an R package (a directory with a `DESCRIPTION` file)
 > registered with `/rforge:init`. These commands **do not create packages** — they
 > add into one you already have.
 
 ## The shared contract
 
-All three commands behave the same way:
+All five commands behave the same way:
 
 | Behavior | Default | Flag |
 |----------|---------|------|
@@ -24,7 +25,8 @@ All three commands behave the same way:
 | Apply the change | — | `--write` |
 | Overwrite an existing target | — | `--force` (diff shown first) |
 
-So the loop is always: **run → read the plan → run again with `--write`**.
+!!! tip "The loop is always the same"
+    **run → read the plan → run again with `--write`**.
 
 ---
 
@@ -72,8 +74,9 @@ unconditional use in `R/` → **Imports**; tests/vignettes-only or `requireNames
 ```
 
 The recommendation **and its reason** are always surfaced, so you can override it (e.g.
-re-run intending `Suggests` if the package is test-only). After `--write` on an `Imports`
-dep, regenerate `NAMESPACE`:
+re-run intending `Suggests` if the package is test-only).
+
+After `--write` on an `Imports` dep, regenerate `NAMESPACE`:
 
 ```bash
 /rforge:r:document
@@ -178,9 +181,10 @@ A realistic "add a feature, document it, ship the data + citation" pass:
 /rforge:r:site                               # 8. build the site
 ```
 
-## See also
+## Next steps
 
-- [Scaffolding command guide](../guides/scaffolding.md) — the full `r:use-*` flag + behavior reference
-- [`scaffold` reference](../reference/scaffold.md) — the `lib.scaffold` engine behind these commands
 - [R package dev cycle](r-dev-cycle.md) — run document/test/check after scaffolding
-- [`/rforge:r:deps-sync`](../commands.md#rforgerdeps-sync) — reconcile all deps at once
+- [Scaffolding command guide](../guides/scaffolding.md) — the full `r:use-*` flag + behavior reference
+- [Dependency reconciliation](dependency-reconciliation.md) — reconcile all deps at once with `r:deps-sync`
+
+Engine details: [`scaffold` reference](../reference/scaffold.md) (`lib.scaffold`).
