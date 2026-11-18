@@ -23,7 +23,7 @@ Do not expand this adapter into website generation or a full Claude command port
 
 ## Current state (2026-11-18)
 
-**v2.23.1 (2026-11-18, patch, 44 commands, no command-surface change):** docs-only ADHD-friendly redesign of the docs site (PRs #129-#136): documented design system (`docs/reference/adhd-design-system.md`, rewritten `docs/stylesheets/extra.css`, advisory `scripts/check_docs_adhd.py`), regrouped Learn/Reference nav, TL;DR + time line + next-step block on tutorials/guides/top-level pages, home-page card grid and 5-minute quickstart. A2-frozen pages changed additively. Records: `.STATUS`, CHANGELOG `[2.23.1]`.
+**v2.23.1 (2026-11-18, patch, 44 commands, no command-surface change):** docs-only ADHD-friendly redesign of the docs site (PRs #129-#139): documented design system (`docs/reference/adhd-design-system.md`, rewritten `docs/stylesheets/extra.css`, advisory `scripts/check_docs_adhd.py`), regrouped Learn/Reference nav, TL;DR + time line + next-step block on tutorials/guides/top-level pages, home-page card grid and 5-minute quickstart. A2-frozen pages changed additively. Records: `.STATUS`, CHANGELOG `[2.23.1]`.
 
 **v2.23.0 (2026-11-17, minor, 44 commands, no command-surface change):** `/rforge:docs:check --site` audits Quarto articles and pkgdown `development.mode` sites (#111, PR #124); `--site` must equal the source `url` plus the dev prefix; site stages carry `content_freshness` and `deploy_layout` = `unverified`; A2 live smoke pins medfit/probmed to commits; previously-incomplete sites can now fail `--fail-on`. Records: `.STATUS`, CHANGELOG `[2.23.0]`.
 
@@ -52,7 +52,7 @@ Do not expand this adapter into website generation or a full Claude command port
 
 ### Release history — architecture deltas only (release mechanics live in CHANGELOG + git)
 
-- **v2.23.1** — docs-only ADHD-friendly site redesign: design system, regrouped nav, page pattern on tutorials/guides/top-level pages (PRs #129-#136). 44 commands.
+- **v2.23.1** — docs-only ADHD-friendly site redesign: design system, regrouped nav, page pattern on tutorials/guides/top-level pages (PRs #129-#139). 44 commands.
 - **v2.23.0** — `--site` audits Quarto and `development.mode` sites with `deploy_layout`/`content_freshness` markers (#111, PR #124); A2 manifest 831 nodes. 44 commands.
 - **v2.22.2** — A2 gate on `ubuntu-24.04` + `macos-15` (#115/#117), `pytest tests/` gate fix (#116), artifact actions 7/8, Codex adapter 0.2.0 `rforge-lint` (#113). 44 commands.
 - **v2.22.1** — exact short-integer comparison in `--run-examples` (#105/#106). 44 commands.
@@ -83,7 +83,7 @@ Do not expand this adapter into website generation or a full Claude command port
 - **v2.0.0** — sub-namespacing (`docs:check`, `r:check`, `health`).
 - **v1.3.0** — absorbed `rforge-mcp` into pure-Python `lib/*` (see "rforge-mcp is gone" below).
 
-**Roadmap** (`.STATUS`): craft-parity **COMPLETE**; the pkgdown deploy leak guard (#52) shipped in v2.16.0. Open candidates (rforge-native, all low-priority): `contract_drift` (S7 cross-package 3rd family — candidate, deferred from v2.13.0 B1); full R6/S4 convention checking (B2 — parked); R-universe `sensitivity` follow-up (add to `data-wise.r-universe.dev` once public). Issues #9 (rename ergonomics — closed resolved-by-time 2026-06-21) and #46 (CRAN gap-fill — closed, shipped v2.14.0) are done. Cadence: approved spec → TDD → pre-merge adversarial review → end-to-end smoke test for network/deploy paths → release; multi-feature bundles built in one worktree by sequential implementer agents.
+**Roadmap** (`.STATUS`): craft-parity **COMPLETE**; the pkgdown deploy leak guard (#52) shipped in v2.16.0. Open issues (2026-11-18, all unscheduled): #123 `docs:check --site` root redirects and per-document output overrides, #122 optional rendered readability/accessibility stage, #121 release-docs drift rules for `docs:check`, #120 ADHD pkgdown design kit (overlaps the v2.23.1 site redesign; check before building), #114 decide whether `/rforge:finish` gets an opt-in `--pr` step, #112 verified Quarto/pkgdown website audit and update skill, #98 CI trigger hygiene across the R packages, #74 shiny app lifecycle commands, #73 submission-status state file after `r:rhub`/`r:winbuilder`. Older rforge-native candidates (all low-priority): `contract_drift` (S7 cross-package 3rd family — candidate, deferred from v2.13.0 B1); full R6/S4 convention checking (B2 — parked); R-universe `sensitivity` follow-up (add to `data-wise.r-universe.dev` once public). Issues #9 (rename ergonomics — closed resolved-by-time 2026-06-21) and #46 (CRAN gap-fill — closed, shipped v2.14.0) are done. Cadence: approved spec → TDD → pre-merge adversarial review → end-to-end smoke test for network/deploy paths → release; multi-feature bundles built in one worktree by sequential implementer agents.
 
 ## Branch architecture
 
