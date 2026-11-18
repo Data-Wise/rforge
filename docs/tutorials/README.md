@@ -110,9 +110,14 @@ If you write a new tutorial, follow these conventions:
 
 - Filename: `<topic>.md` (lowercase, hyphenated, no `TUTORIAL-` prefix —
   the path already says `tutorials/`)
-- Open with a short "for whom" and "estimated time" summary
+- Right under the title, add a time line: `⏱️ X minutes • 🟢 Level • ✓ Y steps`
+  (🟢 beginner, 🟡 intermediate, 🔴 advanced)
+- Then a "TL;DR (30 seconds)" tip admonition with What / Why / How / Next
+- Add a short "for whom" and prerequisites note
+- Keep paragraphs short (about 5 sentences at most) and split sections longer than
+  about 40 lines into subsections
 - Use numbered steps, not nested bullet lists, for sequential work
 - Include expected output (or a screenshot equivalent) after each step
   so users can verify they're on track
-- End with a "next steps" pointer to related docs
+- End with a "Next steps" block of 2 to 3 links to related docs
 - Add the tutorial to `mkdocs.yml` nav under the Tutorials section

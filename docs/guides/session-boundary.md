@@ -1,5 +1,7 @@
 # 🔖 Session boundary commands
 
+⏱️ **4 minutes** • 🟢 Beginner • ✓ 3 steps
+
 For reporting what checks establish and which decisions remain with the owner,
 use [Check evidence and approval decisions](evidence-and-approval.md).
 
@@ -9,9 +11,8 @@ use [Check evidence and approval decisions](evidence-and-approval.md).
     - **Why:** rforge already has ecosystem-wide state commands (`status`, `health`, `next`)
       and task-scoped ones (`capture`, `complete`) — this pair fills the session-*boundary*
       slot craft's and savant's own `restore`/`finish` fill for their repos.
-    - **The flow:** `restore` (open, read-only) → do the work → `finish` (close, diff-gated
-      write).
-    - **Safety:** both are read-only or dry-run by default; `finish --write` only ever
+    - **How:** `restore` (open, read-only) → do the work → `finish` (close, diff-gated
+      write). Both are read-only or dry-run by default; `finish --write` only ever
       applies after showing the diff, and never commits.
     - **Next:** [SPEC-restore-finish-commands-2026-07-31.md](https://github.com/Data-Wise/rforge/blob/dev/SPEC-restore-finish-commands-2026-07-31.md)
       for the full design rationale (repo-root working doc, not part of the published docs site).
@@ -99,7 +100,7 @@ required to trigger a write.
 /rforge:finish --write
 ```
 
-## Related
+## Next steps
 
 - [`/rforge:status`](../commands.md) — ecosystem-wide dashboard
 - [`/rforge:complete`](../commands.md) — single-task completion + doc cascade

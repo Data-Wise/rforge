@@ -1,5 +1,7 @@
 # 🏗️ Scaffolding commands
 
+⏱️ **8 minutes** • 🟢 Beginner • ✓ 5 commands
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** Five `r:use-*` commands that add one piece of structure to an
       **existing** package — a test file, a declared dependency, a vignette, a
@@ -7,10 +9,9 @@
     - **Why:** They handle the boilerplate you forget (NAMESPACE `@importFrom`,
       `VignetteBuilder`, testthat 3e infra, `LazyData`/`Depends`, `inst/CITATION`)
       and pick `Imports` vs `Suggests` for you.
-    - **The commands:** `r:use-test` · `r:use-package` · `r:use-vignette` ·
-      `r:use-data` · `r:use-citation`.
-    - **Dry-run is the default.** Every command prints a plan and writes nothing
-      until you re-run with `--write`.
+    - **How:** `r:use-test` · `r:use-package` · `r:use-vignette` ·
+      `r:use-data` · `r:use-citation`. **Dry-run is the default** — every command
+      prints a plan and writes nothing until you re-run with `--write`.
     - **Next:** the task walkthrough — [Scaffolding for existing
       packages](../tutorials/scaffolding-existing-packages.md).
 
@@ -216,15 +217,15 @@ calls **verbatim**.
 
 ---
 
-## See also
+## Next steps
 
-- [Command reference (`commands.md`)](../commands.md) — the terse one-line entry
-  for every `r:use-*` command.
-- [`scaffold` reference](../reference/scaffold.md) — the `lib.scaffold` engine
-  behind these commands (`plan_test`, `plan_package`, `plan_vignette`,
-  `scaffold_data`, `scaffold_citation`).
 - [Scaffolding for existing packages](../tutorials/scaffolding-existing-packages.md)
   — the task walkthrough that strings these into a real "add a feature, document
   it, ship the data + citation" pass.
 - [`/rforge:r:deps-sync`](../tutorials/dependency-reconciliation.md) —
   `r:use-package` declares **one** dep; `r:deps-sync` reconciles **all** of them.
+- [`scaffold` reference](../reference/scaffold.md) — the `lib.scaffold` engine
+  behind these commands (`plan_test`, `plan_package`, `plan_vignette`,
+  `scaffold_data`, `scaffold_citation`).
+
+Terse entry for every `r:use-*` command: [command reference](../commands.md).

@@ -1,5 +1,7 @@
 # 🌐 Package website (`r:site`) + deploy leak guard
 
+⏱️ **6 minutes** • 🟡 Intermediate • ✓ 4 steps
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** `r:site` builds the [pkgdown](https://pkgdown.r-lib.org/) website
       (vignettes → articles), previews it, and — as of v2.16.0 — **deploys** it safely.
@@ -8,8 +10,10 @@
       `PLAN-*.md` / `ISSUE-*.md` scratch file gets published to your public `gh-pages`.
     - **The guard:** `--check-leaks` flags strays before they ship; `--deploy` builds from a
       **clean `HEAD` checkout** so untracked/uncommitted files are structurally excluded.
-    - **Next:** run `r:site --check-leaks` any time; use `r:site --deploy` instead of a manual
+    - **How:** run `r:site --check-leaks` any time; use `r:site --deploy` instead of a manual
       `deploy_to_branch`.
+    - **Next:** [CRAN submission](cran-submission.md), where the same detector runs as the
+      `site-leaks` advisory stage.
 
 ---
 
@@ -121,7 +125,10 @@ python3 -m lib.rcmd --kind deploy --path . --branch gh-pages
 
 ---
 
-## Related
+## Next steps
 
-- `r:cran-prep` — runs the `site-leaks` detector as a Tier-4 advisory stage.
-- Doc conventions — see the repo `CLAUDE.md` (admonition palette + version-sync rules these pages follow).
+- [CRAN submission](cran-submission.md): `r:cran-prep` runs the `site-leaks` detector as a Tier-4 advisory stage.
+- [Dev cycle](dev-cycle.md): the `r:site` build and preview flags in the context of the inner loop.
+- [`sitelint` reference](../reference/sitelint.md): the `lib.sitelint` engine behind `--check-leaks`.
+
+Doc conventions: see the repo `CLAUDE.md` (admonition palette and version-sync rules these pages follow).

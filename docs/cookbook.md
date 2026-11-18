@@ -1,9 +1,12 @@
-# Cookbook: task recipes
+# 🍳 Cookbook: task recipes
 
 !!! tip "TL;DR (30 seconds)"
     - **What:** one-command answers to "how do I find out X about my packages?", each run for real.
-    - **Who:** R-package authors who know what they want to check and just need the command.
-    - **Scope:** read-only, pure-Python commands (no R needed). Recipes that write files live in the [tutorials](tutorials/README.md).
+    - **Why:** you know what you want to check and just need the command.
+    - **How:** find your question in the headings below, copy the command. Read-only, no R needed.
+    - **Next:** recipes that write files live in the [tutorials](tutorials/README.md).
+
+⏱️ **1 minute** per recipe • 🟢 Beginner • ✓ 1 command each
 
 Every recipe that shows output was run against a throwaway two-package ecosystem: `corepkg` (no dependencies) and
 `apppkg` (imports `corepkg`). The ecosystem path is shortened to `~/r-eco`, and long output is trimmed to the lines
@@ -141,7 +144,7 @@ Needs R with `lintr`, `usethis` and `styler`. Full walkthrough: [Tidy a package]
 
 ---
 
-## What next
+## Next steps
 
 - [Visual workflows](workflows/index.md): the same commands as flow diagrams.
 - [Command reference](commands.md): every flag.

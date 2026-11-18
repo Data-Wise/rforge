@@ -1,9 +1,24 @@
-# Changelog
+# 📝 Changelog
+
+!!! tip "TL;DR (30 seconds)"
+    - **What:** One-paragraph summaries of each rforge release, newest first.
+    - **Why:** See what changed before you upgrade, or why a behavior moved.
+    - **How:** Scan the version headings; open the full file for every detail.
+    - **Next:** [Installation](installation.md) shows how to upgrade.
 
 Release history for the RForge plugin.
 
 The full changelog lives in the repository:
 [`CHANGELOG.md`](https://github.com/Data-Wise/rforge/blob/main/CHANGELOG.md).
+
+---
+
+## 2.23.1 — 2026-11-18
+
+Docs-only patch: an ADHD-friendly redesign of the documentation site. A documented design
+system, regrouped navigation, and a TL;DR, time line and next-step block on tutorials, guides
+and top-level pages, plus a home-page card grid and a 5-minute quickstart path. No command-surface
+change (44 commands).
 
 ---
 
@@ -142,3 +157,11 @@ Absorbed `rforge-mcp` into pure-Python `lib/*` modules. No MCP server needed.
 ## 1.2.0–1.0.0 — 2026-03–2026-04
 
 Initial plugin releases with MCP server architecture (deprecated).
+
+---
+
+## Next steps
+
+- [Installation](installation.md): upgrade or reinstall the plugin.
+- [Quick Start](quickstart.md): try the newest commands.
+- [Troubleshooting](troubleshooting.md): fix problems after an upgrade.

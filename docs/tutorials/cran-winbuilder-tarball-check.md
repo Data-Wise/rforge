@@ -1,8 +1,15 @@
-# CRAN win-builder + tarball-check walkthrough
+# 🪟 CRAN win-builder + tarball-check walkthrough
+
+⏱️ 10 minutes • 🟡 Intermediate • ✓ 4 steps
+
+!!! tip "TL;DR (30 seconds)"
+    - **What:** Catch the failures CRAN's incoming checks and win-builder see, before you submit.
+    - **Why:** `devtools::check()` on your source tree can hide stray build artifacts that only show up in the built tarball.
+    - **How:** `/rforge:r:cran-prep` (tarball-check stage) → fix `.Rbuildignore` → `/rforge:r:winbuilder`.
+    - **Next:** [CRAN release prep](cran-release-prep.md) for the full gate.
 
 > **For whom:** You are preparing an R package for CRAN and want to catch the
 > failures that CRAN's incoming checks and win-builder see, *before* you submit.
-> **Estimated time:** 10 minutes.
 > **Prerequisites:** A working R package with `devtools` installed.
 
 ## The problem
@@ -16,8 +23,10 @@ Running `devtools::check()` from your source tree can hide real CRAN failures:
   not on `PYTHONPATH`, the previous `r:winbuilder` implementation failed with a
   bare `ModuleNotFoundError`.
 
-v2.17.0 adds two fixes: a **tarball-check** stage in `r:cran-prep` and a
-**WinBuilder fallback** in `r:winbuilder`.
+v2.17.0 adds two fixes:
+
+- a **tarball-check** stage in `r:cran-prep`
+- a **WinBuilder fallback** in `r:winbuilder`
 
 ---
 
@@ -52,8 +61,9 @@ If the tarball contains stray artifacts, you'll see advisory findings like:
 🟡 tarball_build_artifact: pkg/vignettes/.quarto/_freeze/index.qmd
 ```
 
-If the tarball check produces an ERROR, WARNING, or real NOTE, it **blocks**
-`r:cran-prep` from returning `ready`.
+!!! warning "Tarball errors block `ready`"
+    If the tarball check produces an ERROR, WARNING, or real NOTE, it
+    **blocks** `r:cran-prep` from returning `ready`.
 
 ---
 
@@ -82,11 +92,14 @@ Once `r:cran-prep` reports `ready`, submit to win-builder for Windows checking:
 /rforge:r:winbuilder
 ```
 
-`r:winbuilder` normally delegates to `lib/rcmd.py`. If the plugin's `lib/`
-folder is not on `PYTHONPATH` (common when you invoke it from inside an R
-package directory), v2.17.0 detects this and falls back to calling
-`devtools::check_win_devel()` / `check_win_release()` / `check_win_oldrelease()`
-directly in R, printing a 🟡 warning that the fallback path was used.
+`r:winbuilder` normally delegates to `lib/rcmd.py`.
+
+!!! tip "Fallback path"
+    If the plugin's `lib/` folder is not on `PYTHONPATH` (common when you
+    invoke it from inside an R package directory), v2.17.0 detects this and
+    falls back to calling `devtools::check_win_devel()` / `check_win_release()` /
+    `check_win_oldrelease()` directly in R, printing a 🟡 warning that the
+    fallback path was used.
 
 You can also pick a platform:
 

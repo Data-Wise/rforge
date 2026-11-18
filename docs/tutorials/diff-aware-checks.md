@@ -1,21 +1,15 @@
 # 🔬 Diff-aware checks — "did *my* change cause this?"
 
+⏱️ 8 minutes • 🟡 Intermediate • ✓ 3 steps
+
 !!! tip "TL;DR (30 seconds)"
-    - **What:** `--changed` on `r:check` / `r:test` / `r:lint` scopes the run to the
-      package(s) you touched on this branch and tags each finding **`[introduced]`**
-      (new on your branch), **`[pre-existing]`** (already at the fork point), or
-      **`[uncommitted]`** (introduced, but in a file you haven't committed yet).
-    - **Why:** A full `R CMD check` surfaces every NOTE/WARNING regardless of whether
-      *your* branch caused it. Diff-aware mode answers the merge-gate question directly.
-    - **How:** It runs a second baseline check in a throwaway worktree at
-      `git merge-base(HEAD, --base)` and set-diffs the findings.
-    - **CI:** `--fail-on introduced` (the default) exits non-zero **only** on findings you
-      introduced — so CI blocks regressions you caused, not pre-existing debt.
+    - **What:** `--changed` on `r:check` / `r:test` / `r:lint` scopes the run to the packages you touched and tags each finding `[introduced]`, `[pre-existing]` or `[uncommitted]`.
+    - **Why:** A full `R CMD check` surfaces every NOTE/WARNING, whether or not *your* branch caused it.
+    - **How:** A second baseline run in a throwaway worktree at the merge-base is set-diffed against HEAD. CI: `--fail-on introduced` (default) fails only on findings you introduced.
     - **Next:** [R package dev cycle](r-dev-cycle.md) for the inner loop these gate.
 
 > **For whom:** R package developer (or ecosystem maintainer) preparing a branch for
 > merge, who wants to separate "my regressions" from "pre-existing debt."
-> **Estimated time:** 8 minutes.
 > **Prior knowledge:** A git repo with a feature branch off `dev` (or `main`), and an R
 > package registered with `/rforge:init`.
 
@@ -47,6 +41,15 @@ flowchart TD
 The baseline runs in a **real detached git worktree** checked out at the merge-base commit
 (cleaned up afterward) — it is not a re-run of HEAD, so the comparison is honest.
 
+| Tag | Meaning |
+|-----|---------|
+| `[introduced]` | New on your branch |
+| `[pre-existing]` | Already present at the fork point |
+| `[uncommitted]` | Introduced, but in a file you haven't committed yet |
+
+**CI behavior:** `--fail-on introduced` (the default) exits non-zero **only** on findings
+you introduced, so CI blocks regressions you caused, not pre-existing debt.
+
 ## Walkthrough
 
 ```bash
@@ -66,9 +69,12 @@ A tagged result reads like:
 [uncommitted]   WARNING: undocumented argument 'draft' in bar()  (not committed yet)
 ```
 
-The first is debt you inherited; the second is yours to fix before merge; the third is
-also yours, but it lives in a file you haven't committed — commit it to promote it to
-`[introduced]` so CI gates on it.
+Reading the three lines:
+
+1. The first is debt you inherited.
+2. The second is yours to fix before merge.
+3. The third is also yours, but it lives in a file you haven't committed — commit it to
+   promote it to `[introduced]` so CI gates on it.
 
 ### Wiring it into CI
 
@@ -96,11 +102,12 @@ also yours, but it lives in a file you haven't committed — commit it to promot
     - No git repo / no merge-base / baseline-worktree failure → graceful fallback to a
       full check plus a warning (scope-only, no tagging).
 
-## See also
+## Next steps
 
 - [Diff-aware checks — command guide](../guides/diff-aware.md) — the exhaustive reference:
   all three tags, the per-package cache key + invalidation, every flag
-- [`changed` reference](../reference/changed.md) — the `lib.changed` engine (`merge_base`,
-  `run_baseline`, `scope_check`, `tag_findings`, `cached_baseline`)
 - [R package dev cycle](r-dev-cycle.md) — the inner loop these checks gate
 - [CRAN release prep](cran-release-prep.md) — the full-package strict checks for submission
+
+Engine details: [`changed` reference](../reference/changed.md) (`merge_base`, `run_baseline`,
+`scope_check`, `tag_findings`, `cached_baseline`).

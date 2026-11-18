@@ -1433,7 +1433,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "33a91c49e764d3a6781473e683deca3524b54aa53895bf8d873e7f37ac10ff96"
+        "tests/a2/test_docs.py": "d6cd88b460afa9a1fb7bff12ef429846bb3c1744971f09dcbede8879833dc150"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1466,7 +1466,7 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "33a91c49e764d3a6781473e683deca3524b54aa53895bf8d873e7f37ac10ff96",
+        "tests/a2/test_docs.py": "d6cd88b460afa9a1fb7bff12ef429846bb3c1744971f09dcbede8879833dc150",
         "tests/a2/test_observations.py": "f786cb75880203a09b565e4ee48ea404aa4d0a4fd1f25a63021af302906e1638"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
@@ -1490,7 +1490,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "33a91c49e764d3a6781473e683deca3524b54aa53895bf8d873e7f37ac10ff96"
+        "tests/a2/test_docs.py": "d6cd88b460afa9a1fb7bff12ef429846bb3c1744971f09dcbede8879833dc150"
       },
       "review_note": "Explicit current status, unreleased acceptance hold, actual command/check counts, unchanged feature version, mirror and agent prohibitions asserted. Local coverage complete; external acceptance remains pending."
     },
@@ -2022,7 +2022,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_comparison.py": "24720640abac9095da41144b0052bf96b949a76b8b4a955aff9f3b982e87521c",
-        "tests/a2/test_docs.py": "33a91c49e764d3a6781473e683deca3524b54aa53895bf8d873e7f37ac10ff96",
+        "tests/a2/test_docs.py": "d6cd88b460afa9a1fb7bff12ef429846bb3c1744971f09dcbede8879833dc150",
         "tests/a2/test_final_gates.py": "7564ed1ff019dba7ee48ed577837b5148dc60cdd5a4c413d8be178ad8b24ae0f",
         "tests/a2/test_guardian.py": "2033368a0fbbd844fbb56e8fa5a66207a1654d4bbec510923f07a77bd7b904c1",
         "tests/a2/test_manifest.py": "278f1646c0229c9563b70f13b58af7512e4e638185d9d61318b69ef484902636",

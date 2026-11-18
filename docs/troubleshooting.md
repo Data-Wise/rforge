@@ -4,10 +4,12 @@
     - **What:** Symptom-organized error lookup for rforge.
     - **Why:** Find the fix without reading the whole page.
     - **How:** Match your error to a section below → run the suggested command.
-    - **Next:** Still stuck? File an issue: <https://github.com/Data-Wise/rforge/issues>
+    - **Next:** Still stuck? Jump to [Still stuck?](#still-stuck) or file an issue: <https://github.com/Data-Wise/rforge/issues>
 
-Common errors and how to resolve them. Symptoms are listed first; click
-through to the section that matches what you're seeing.
+⏱️ **1–3 minutes** per fix • 🟢 Beginner • ✓ 3 steps or fewer
+
+Common errors and how to resolve them. Each entry pairs a **Symptom** with a
+**Fix**. Pick the section that matches what you're seeing.
 
 ## Quick navigation
 
@@ -19,9 +21,7 @@ through to the section that matches what you're seeing.
 - [Leftover rforge-mcp signals](#leftover-rforge-mcp-signals)
 - [Hook unexpectedly blocks an edit](#hook-unexpectedly-blocks-an-edit)
 - [Tests fail after a fresh install](#tests-fail-after-a-fresh-install)
-
-If your issue isn't covered, file an issue:
-<https://github.com/Data-Wise/rforge/issues>.
+- [Still stuck?](#still-stuck)
 
 ---
 
@@ -120,20 +120,29 @@ This is intentional — it forces the package layout that prevents
 
 ## Missing R / Rscript
 
+### An `r:*` command reports `engine_missing` for R
+
+!!! warning "Symptom"
+    A command such as `/rforge:r:check` or `/rforge:r:test` stops with
+    `engine_missing: ["R"]` (exit 127).
+
+!!! success "Fix"
+    The `r:*` commands run R engines through `Rscript`, so it must be on
+    your `PATH`. Check it, then install R 4.0 or newer if it is missing:
+
+    ```zsh
+    Rscript --version
+    ```
+    The rest of the plugin (ecosystem analysis, `status`, `detect`) runs
+    without R.
+
 ### `lib.status` reports `unknown` for every package's `check`/`test`
 
-!!! note "Expected behavior in v1.3.0+"
-    The R subprocess integration is deferred to v1.4.0. `lib.status`
-    currently reads `.STATUS` files only — it doesn't shell out to
-    `R CMD check` or run test suites. The `unknown` placeholder is
-    **intentional**, not a bug.
-
-### Future v1.4.0 behavior
-
-When the 4-mode contract lands, missing R will degrade gracefully:
-`default` and `debug` modes will continue to work; `optimize` and
-`release` modes will warn and skip the R-requiring checks. Until then,
-nothing in v1.3.0 requires R installed.
+!!! note "Expected behavior"
+    `lib.status` reads `.STATUS` files only. It does not shell out to
+    `R CMD check` or run test suites, so the `unknown` placeholder is
+    **intentional**, not a bug. Run `/rforge:r:check` or `/rforge:r:test`
+    for live results.
 
 ---
 
@@ -298,3 +307,9 @@ details on the 4 hook rules.
   full error output. Reproducer is gold.
 - **Check the CHANGELOG:** maybe the behavior you're seeing was a
   documented breaking change in a recent version.
+
+## Next steps
+
+- [Installation](installation.md): re-check the install methods and requirements.
+- [Hooks & Skills](hooks-and-skills.md): what the edit-blocking hook does and why.
+- [Changelog](changelog.md): see whether a recent release changed the behavior.

@@ -20,7 +20,9 @@ variadic-signature limits and an unexplained restricted-session check terminatio
 remain; see the spec for evidence and unexercised edge cases.
 Do not expand this adapter into website generation or a full Claude command port.
 
-## Current state (2026-11-17)
+## Current state (2026-11-18)
+
+**v2.23.1 (2026-11-18, patch, 44 commands, no command-surface change):** docs-only ADHD-friendly redesign of the docs site (PRs #129-#136): documented design system (`docs/reference/adhd-design-system.md`, rewritten `docs/stylesheets/extra.css`, advisory `scripts/check_docs_adhd.py`), regrouped Learn/Reference nav, TL;DR + time line + next-step block on tutorials/guides/top-level pages, home-page card grid and 5-minute quickstart. A2-frozen pages changed additively. Records: `.STATUS`, CHANGELOG `[2.23.1]`.
 
 **v2.23.0 (2026-11-17, minor, 44 commands, no command-surface change):** `/rforge:docs:check --site` audits Quarto articles and pkgdown `development.mode` sites (#111, PR #124); `--site` must equal the source `url` plus the dev prefix; site stages carry `content_freshness` and `deploy_layout` = `unverified`; A2 live smoke pins medfit/probmed to commits; previously-incomplete sites can now fail `--fail-on`. Records: `.STATUS`, CHANGELOG `[2.23.0]`.
 
@@ -49,6 +51,7 @@ Do not expand this adapter into website generation or a full Claude command port
 
 ### Release history — architecture deltas only (release mechanics live in CHANGELOG + git)
 
+- **v2.23.1** — docs-only ADHD-friendly site redesign: design system, regrouped nav, page pattern on tutorials/guides/top-level pages (PRs #129-#136). 44 commands.
 - **v2.23.0** — `--site` audits Quarto and `development.mode` sites with `deploy_layout`/`content_freshness` markers (#111, PR #124); A2 manifest 831 nodes. 44 commands.
 - **v2.22.2** — A2 gate on `ubuntu-24.04` + `macos-15` (#115/#117), `pytest tests/` gate fix (#116), artifact actions 7/8, Codex adapter 0.2.0 `rforge-lint` (#113). 44 commands.
 - **v2.22.1** — exact short-integer comparison in `--run-examples` (#105/#106). 44 commands.
@@ -202,7 +205,7 @@ Only rule 1 blocks. Hook contract: reads JSON via stdin (NOT env vars). Tested b
 
 - **Specs and plans live at the repo root** (`BRAINSTORM-*.md`, `GRILL-*.md`, `SPEC-*.md`, `PROPOSAL-*.md`; shipped ones move to `archive/specs/`). There is no `docs/specs/`, so craft's `/craft:plan` detection, which searches there, must also look at the root.
 - **Three doc tiers** (v2.13.0+): `docs/commands.md` (terse per-command, gated by `_check_commands_doc.py`) -> `docs/guides/*` (exhaustive per-family **Command Guides**) -> `docs/tutorials/*` (task walkthroughs). `test-all.sh` gates nav-orphans: every `docs/{guides,tutorials,reference}/*` page must appear in `mkdocs.yml` nav.
-- **Material admonitions** for ADHD-friendliness: `!!! tip "TL;DR (30 seconds)"` on major pages; `!!! warning "Symptom"` + `!!! tip "Fix"` for troubleshooting pairs; `!!! note "Expected behavior in vX.Y.Z+"` for clarifying quirks. Don't write custom CSS — the Material palette covers note/tip/warning/danger/success/info/abstract.
+- **Material admonitions** for ADHD-friendliness: `!!! tip "TL;DR (30 seconds)"` on major pages; `!!! warning "Symptom"` + `!!! tip "Fix"` for troubleshooting pairs; `!!! note "Expected behavior in vX.Y.Z+"` for clarifying quirks. Custom CSS lives in one place: `docs/stylesheets/extra.css`, the ADHD design system documented in `docs/reference/adhd-design-system.md` (tokens, `.adhd-tldr`/`.adhd-meta`/`.adhd-next`/`.adhd-steps` opt-in components, dark mode, reduced motion). Extend that file and page; do not add per-page CSS or inline styles. Prefer Material's admonition types (note/tip/warning/danger/success/info/abstract) with the design-system classes. `python3 scripts/check_docs_adhd.py` is an advisory checker (TL;DR, time line, longest paragraph, next-step block); it is not a gate.
 - **Verification trap** when curl-grepping deployed pages: HTML entities + `<code>`-tag fragmentation + box-drawing characters all break naive regexes. If a deploy "looks broken," parse the `<article>` body with `re.sub(r'<[^>]+>', ' ', body)` before searching. Details in `reference_rforge_doc_conventions.md`.
 
 ## rforge-mcp is gone — don't reach for it

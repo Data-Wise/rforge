@@ -1,13 +1,21 @@
-# Tidy a package with r:tidy
+# 🧹 Tidy a package with r:tidy
+
+⏱️ 10 minutes • 🟢 Beginner • ✓ 5 steps
 
 !!! tip "TL;DR (30 seconds)"
-    - **What:** run `/rforge:r:tidy` for a "how tidy am I?" report, apply the safe fixes with `--fix`, then fix the rest by hand until every stage is `ok`.
-    - **Time:** about 10 minutes.
-    - **You need:** an R package. The roxygen and `NEWS.md` stages are static and need no R; the lint, `DESCRIPTION` and style stages use `lintr`, `usethis` and `styler` through R.
+    - **What:** run `/rforge:r:tidy` for a "how tidy am I?" report on tidyverse conventions.
+    - **Why:** Advisory only; it never blocks, unlike `r:cran-prep`.
+    - **How:** Apply the safe fixes with `--fix`, then fix the rest by hand until every stage is `ok`.
+    - **Next:** [R package dev cycle](r-dev-cycle.md).
 
-`r:tidy` checks a package against tidyverse conventions. **Every stage is advisory and never blocks**, unlike
-[`r:cran-prep`](cran-submission-with-rforge.md), which gates a CRAN submission. Without `--fix` it writes nothing to
-your package.
+!!! note "You need"
+    An R package. The roxygen and `NEWS.md` stages are static and need no R; the lint, `DESCRIPTION` and style stages use `lintr`, `usethis` and `styler` through R.
+
+`r:tidy` checks a package against tidyverse conventions.
+
+- **Every stage is advisory and never blocks**, unlike
+  [`r:cran-prep`](cran-submission-with-rforge.md), which gates a CRAN submission.
+- Without `--fix` it writes nothing to your package.
 
 The examples below come from a real run on a small demo package with deliberately planted defects, so you can
 see what each finding looks like and what clears it.
@@ -58,8 +66,9 @@ Only `tidydesc` and the `style` stage (added by `--fix`) are safe to automate. A
 
 ## Step 3: Apply the safe fixes
 
-`--fix` is **mutating**: it runs `styler` on the package and rewrites `DESCRIPTION` in place. Commit first so that
-`git diff` shows exactly what changed.
+!!! warning "`--fix` is mutating"
+    It runs `styler` on the package and rewrites `DESCRIPTION` in place. Commit first so that
+    `git diff` shows exactly what changed.
 
 ```text
 /rforge:r:tidy --fix
@@ -117,7 +126,10 @@ roxygen_completeness  ok
 news_header           ok
 ```
 
-No messages and `status: ok` is the goal. Remember to regenerate `man/*.Rd` (`/rforge:r:document`) after editing
+!!! success "Goal"
+    No messages and `status: ok`.
+
+Remember to regenerate `man/*.Rd` (`/rforge:r:document`) after editing
 roxygen tags, so the help pages match.
 
 ## Where it fits
@@ -126,7 +138,7 @@ roxygen tags, so the help pages match.
 - Run [`r:cran-prep`](cran-release-prep.md) when you are preparing a submission. That one blocks.
 - To run a single stage on its own, use `/rforge:r:lint --tidy` or `/rforge:r:style`.
 
-## What next
+## Next steps
 
 - [R package dev cycle](r-dev-cycle.md): the daily `r:` commands around `r:tidy`.
 - [Quality guide](../guides/quality.md): lint, style and spell checks in depth.

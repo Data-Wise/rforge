@@ -23,6 +23,10 @@ adapter release or a port of the Claude command catalog and hooks.
 Start with the [Codex installation and checks guide](docs/guides/codex-checks.md). Claude
 marketplace and Homebrew installation below do not install these Codex skills.
 
+## What's new in v2.23.1
+
+- 🧠 **ADHD-friendly documentation site.** A documented design system, regrouped navigation, a "What do you want to do?" home page with a 5-minute quickstart path, and a TL;DR, time line and next-step block on tutorials, guides and top-level pages. Docs-only: no command or flag changes (44 commands). See the [design system](https://data-wise.github.io/rforge/reference/adhd-design-system/).
+
 ## What's new in v2.23.0
 
 - 🧭 **`--site` audits Quarto articles and pkgdown development-mode sites.** `.qmd`, `.Rmd` and `.rmd` articles map to `articles/*.html`, and `development.mode` resolves from the pinned `DESCRIPTION` version with pkgdown 2.2.1's rule. `--site` must equal the source `url` plus the development prefix. Every site stage reports `content_freshness` and `deploy_layout` as `unverified`, so a complete stage means route presence only. Sites that were previously incomplete can now complete and fail `--fail-on`. No command-surface change. See the [Docs audit guide](https://data-wise.github.io/rforge/guides/docs-audit/).
@@ -470,6 +474,6 @@ MIT
 
 ---
 
-**Version:** 2.23.0
+**Version:** 2.23.1
 **Status:** Active development
 **Compatibility:** Claude Code 0.1.0+

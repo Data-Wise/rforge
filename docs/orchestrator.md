@@ -3,8 +3,10 @@
 !!! tip "TL;DR (30 seconds)"
     - **What:** A Claude Code *agent* that recognizes the **intent** behind an R-package request and runs the matching rforge analyses for you, then synthesizes one summary.
     - **Why:** You don't have to remember which of the {{ rforge.command_count }} commands to run — say *"is this CRAN-ready?"* and it runs the right read-only checks.
-    - **Safety:** Only **read-only** analyses run automatically. Anything that writes files or hits the network is **recommended, never executed**.
+    - **How:** Ask an open-ended question; only **read-only** analyses run automatically. Anything that writes files or hits the network is **recommended, never executed**.
     - **Next:** [Cookbook: orchestrator worked examples](tutorials/orchestrator-cookbook.md).
+
+⏱️ **4 minutes** to read • 🟢 Beginner • ✓ 4 steps (recognize, run, recommend, synthesize)
 
 The orchestrator is rforge's single agent (`agents/orchestrator.md`). Unlike a slash
 command — which you invoke explicitly — the orchestrator is invoked when you ask
@@ -110,9 +112,8 @@ swallowed; a command that fails to run is reported with the command shown.
 | You want several related analyses synthesized into one answer | You want one command's raw output |
 | You're exploring an unfamiliar package | You're scripting a fixed step |
 
-## See also
+## Next steps
 
-- [Cookbook: orchestrator worked examples](tutorials/orchestrator-cookbook.md)
-- [Architecture](architecture.md) — how the agent fits the static surface
-- [Commands reference](commands.md) — the commands it recommends
-- [lib/ modules](lib-modules.md) — the analysis envelopes it consumes
+- [Cookbook: orchestrator worked examples](tutorials/orchestrator-cookbook.md): see the agent on real requests.
+- [Commands reference](commands.md): the commands it recommends.
+- [lib/ modules](lib-modules.md): the analysis envelopes it consumes (and [Architecture](architecture.md) for how the agent fits the rest).

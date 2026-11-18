@@ -1,9 +1,12 @@
-# Ecosystem analysis (analyze / impact / deps / cascade / release)
+# 🌐 Ecosystem analysis (analyze / impact / deps / cascade / release)
+
+⏱️ **7 minutes** • 🟡 Intermediate • ✓ 5 steps
 
 !!! tip "TL;DR (30 seconds)"
     - **What:** the commands that look *across* packages: what is here, how healthy it is, what a change touches, and in what order to update and release.
-    - **Start:** `/rforge:status` (snapshot), then `/rforge:quick` (under 10 s) or `/rforge:thorough` (2-5 min).
-    - **Before a change:** `/rforge:impact`, then `/rforge:cascade` to plan the order. **Before a release:** `/rforge:release`.
+    - **Why:** a change in one package can break its dependents; these commands show the order and the blast radius first.
+    - **How:** `/rforge:status` (snapshot), then `/rforge:quick` (under 10 s) or `/rforge:thorough` (2-5 min). Before a change: `/rforge:impact`, then `/rforge:cascade`. Before a release: `/rforge:release`.
+    - **Next:** [Dev cycle](dev-cycle.md) for a single package, [CRAN submission](cran-submission.md) for the gate.
 
 These commands read the packages under your ecosystem root. They use the `lib.discovery`, `lib.deps` and `lib.status`
 modules (pure Python, no R) for the facts and add Claude's synthesis on top. For a *single* package's dev cycle see
@@ -101,3 +104,9 @@ task made stale. Use `/rforge:finish` at the end of a session to sync `.STATUS` 
 !!! tip "Fix"
     Run `/rforge:detect` from the ecosystem root, not from inside a package: discovery stops at a package directory
     and does not descend into it.
+
+## Next steps
+
+- [Dev cycle](dev-cycle.md): the edit, test and check loop for one package.
+- [CRAN submission](cran-submission.md): the per-package gate and hand-off after the release order is set.
+- [Session boundary](session-boundary.md): open and close a work session with `restore` and `finish`.

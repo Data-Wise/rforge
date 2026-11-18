@@ -1,5 +1,7 @@
 # 🎛️ Understanding modes
 
+⏱️ 5 minutes • 🟢 Beginner • ✓ 4 modes
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** "Modes" are four depth settings for **one command** — `/rforge:analyze`.
     - **Why:** Same command, dial how deep (and how slow) the analysis goes.
@@ -8,7 +10,6 @@
 
 > **For whom:** Anyone confused by the `--mode` flag (you are not alone —
 > this is the most common rforge question).
-> **Estimated time:** 5 minutes.
 
 ## The one thing to understand first
 
@@ -21,8 +22,10 @@ Think of it like a camera:
 - **optimize** = a stopwatch — measure what's *slow*
 - **release** = a full inspection before you hand it to someone else (CRAN)
 
-Same camera (`/rforge:analyze`), four settings. You pick the setting with
-the `--mode` flag — or you pick nothing and get the fast default.
+Same camera (`/rforge:analyze`), four settings.
+
+You pick the setting with the `--mode` flag — or you pick nothing and get
+the fast default.
 
 !!! warning "Modes belong to ONE command"
     This is the part that trips people up. **Only `/rforge:analyze` has
@@ -110,7 +113,7 @@ Modes are a within-`analyze` choice. Here's the bigger picture of which
 | "`optimize` checks my code style" | No — it profiles *speed* (bottlenecks, load time), not style. |
 | "More mode = always better" | No — deeper modes are slower. Use the lightest one that answers your question. |
 
-## What's next
+## Next steps
 
 - **[Getting started](getting-started.md)** — the basic install + first
   commands, if you skipped it.

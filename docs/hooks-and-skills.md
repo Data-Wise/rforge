@@ -6,6 +6,8 @@
     - **How:** Fires on every `Write`/`Edit`; only the `man/*.Rd` rule blocks — the rest warn.
     - **Next:** [Configuration](configuration.md) to tune behavior, or [Architecture](architecture.md) for the full surface.
 
+⏱️ **3 minutes** to read, 2 to wire the hook • 🟡 Intermediate • ✓ 3 steps (wire, test, read the output)
+
 > Added in v1.2.0. Mirrors craft's `.claude-plugin/` layout.
 
 RForge ships two pieces of autonomous tooling that activate without an
@@ -182,12 +184,11 @@ in R packages. Pure shell, no R required.
 
 ---
 
-## See Also
+## Next steps
 
-- [Architecture Guide](architecture.md) — where hooks and skills sit
+- [Architecture Guide](architecture.md): where hooks and skills sit
   relative to the rest of the plugin.
-- [Configuration Guide](configuration.md) — user-tunable defaults via
-  `.claude-plugin/config.json`.
-- [REFCARD](REFCARD.md) — quick reference card.
+- [Configuration Guide](configuration.md): user-tunable defaults.
+- [Troubleshooting](troubleshooting.md): the hook blocks an edit you need.
 - Source: `.claude-plugin/hooks/pretooluse.py`,
   `.claude-plugin/skills/validation/description-sync.md`.

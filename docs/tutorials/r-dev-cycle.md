@@ -1,5 +1,7 @@
 # 🔁 R package dev cycle with rforge
 
+⏱️ 10 minutes • 🟡 Intermediate • ✓ 12 commands
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** 12 `r:` commands that run the full R package development loop from inside Claude Code.
     - **Why:** One namespace, consistent JSON envelopes, no context-switching to a terminal.
@@ -8,9 +10,11 @@
 
 > **For whom:** R package developer who wants to run document/test/check and quality
 > checks without leaving Claude Code.
-> **Estimated time:** 10 minutes to read; commands themselves take seconds to minutes.
 > **Prior knowledge:** You have an R package (a directory with a `DESCRIPTION` file)
 > registered with `/rforge:init`.
+
+!!! note "Reading time vs. run time"
+    The 10 minutes covers reading only. The commands themselves take seconds to minutes.
 
 ## The two tiers
 
@@ -82,8 +86,8 @@ Use these when you want to zoom in on one stage without running the full cycle.
 /rforge:r:load
 ```
 
-Runs `pkgload::load_all()`. Use after changing function signatures or exports — 
-loads the package without installing it so tests can reach the new exports immediately.
+Runs `pkgload::load_all()`. Use after changing function signatures or exports.
+It loads the package without installing it, so tests can reach the new exports immediately.
 
 ```text
 ## Load: medfit v2.0.0
@@ -440,11 +444,12 @@ Install them as you need them; `r:cycle` (document/test/check) has no optional d
 
 ---
 
-## What's next
+## Next steps
 
 - **[Dev-cycle command guide](../guides/dev-cycle.md)** — the full per-flag reference for these inner-loop commands
 - **[CRAN submission with rforge](cran-submission-with-rforge.md)** — once
   `r:cycle` is green, run the full pre-submission gate with `r:cran-prep`
 - **[CRAN release prep](cran-release-prep.md)** — ecosystem-level submission
   order when you have multiple interdependent packages
-- **[REFCARD](../REFCARD.md)** — all {{ rforge.command_count }} commands in one page
+
+Syntax lookup: [REFCARD](../REFCARD.md) lists all {{ rforge.command_count }} commands in one page.
