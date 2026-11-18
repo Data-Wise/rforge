@@ -9,6 +9,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.23.1] - 2026-11-18
+
+Docs-only patch: an ADHD-friendly redesign of the documentation site. No command, flag or
+library behavior changes (44 commands).
+
+### Added
+
+- A documented ADHD design system: `docs/reference/adhd-design-system.md` and a rewritten
+  `docs/stylesheets/extra.css` (light and dark tokens, 17px body text, 68ch measure, opt-in
+  `.adhd-tldr`, `.adhd-meta`, `.adhd-next` and `.adhd-steps` components, focus ring, reduced
+  motion, 44px touch targets). `scripts/check_docs_adhd.py` is an advisory checker for the
+  page pattern and is not part of any gate.
+- A "What do you want to do?" card grid, a "which command?" flowchart and a 5-minute path on
+  the home page and quickstart. A "Jump to a command" index and per-family TL;DR on `commands.md`.
+
+### Changed
+
+- Navigation: Learn and Reference are regrouped into labelled sections (at most seven items
+  each) and the site description says 44 commands. Theme features `toc.follow`, `navigation.path`
+  and `navigation.footer` are on.
+- Pages carry a TL;DR, a time line and a closing "Next steps" block: 17 tutorials, 11 guides, 10
+  top-level pages and the A2-frozen pages (additive only). The advisory checker counts on the
+  54 hand-written pages: TL;DR 41 to 50, time line 24 to 47, next-step block 11 to 45.
+- `CLAUDE.md` and `AGENTS.md` replace the "Don't write custom CSS" rule with the design-system rule.
+- Body text is 17px (was 14px) and tables are 0.75rem.
+
+### Known limits
+
+- `reference/docaudit.md` is generated and has no TL;DR, time line or next steps; fixing that needs
+  a change to the generator.
+- A few old quickstart anchors (the mid-page "Next steps" and some troubleshooting and
+  performance headings) are no longer headings, so deep links to them no longer resolve.
+
 ## [2.23.0] - 2026-11-17
 
 ### Behavior change

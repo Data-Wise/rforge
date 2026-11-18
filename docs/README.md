@@ -1,6 +1,6 @@
 # RForge Plugin - Documentation
 
-> **Complete documentation for the RForge Plugin 2.23.0**
+> **Complete documentation for the RForge Plugin 2.23.1**
 
 ---
 
@@ -80,7 +80,7 @@ Perfect for:
 ```
 rforge/
 ├── .claude-plugin/            # Claude Code plugin manifest + extras
-│   ├── plugin.json            # Plugin manifest (2.23.0)
+│   ├── plugin.json            # Plugin manifest (2.23.1)
 │   ├── marketplace.json       # Marketplace install metadata
 │   ├── config.json            # User-tunable options
 │   ├── hooks/
@@ -240,9 +240,9 @@ from a previous version, remove it (see
 
 ## 📝 Document Maintenance
 
-**Last Updated:** 2026-11-17
-**Plugin Version:** 2.23.0
-**Documentation Version:** 2.23.0
+**Last Updated:** 2026-11-18
+**Plugin Version:** 2.23.1
+**Documentation Version:** 2.23.1
 
 **Releases:** https://github.com/Data-Wise/rforge/releases
 

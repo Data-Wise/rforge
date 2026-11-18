@@ -20,7 +20,9 @@ variadic-signature limits and an unexplained restricted-session check terminatio
 remain; see the spec for evidence and unexercised edge cases.
 Do not expand this adapter into website generation or a full Claude command port.
 
-## Current state (2026-11-17)
+## Current state (2026-11-18)
+
+**v2.23.1 (2026-11-18, patch, 44 commands, no command-surface change):** docs-only ADHD-friendly redesign of the docs site (PRs #129-#136): documented design system (`docs/reference/adhd-design-system.md`, rewritten `docs/stylesheets/extra.css`, advisory `scripts/check_docs_adhd.py`), regrouped Learn/Reference nav, TL;DR + time line + next-step block on tutorials/guides/top-level pages, home-page card grid and 5-minute quickstart. A2-frozen pages changed additively. Records: `.STATUS`, CHANGELOG `[2.23.1]`.
 
 **v2.23.0 (2026-11-17, minor, 44 commands, no command-surface change):** `/rforge:docs:check --site` audits Quarto articles and pkgdown `development.mode` sites (#111, PR #124); `--site` must equal the source `url` plus the dev prefix; site stages carry `content_freshness` and `deploy_layout` = `unverified`; A2 live smoke pins medfit/probmed to commits; previously-incomplete sites can now fail `--fail-on`. Records: `.STATUS`, CHANGELOG `[2.23.0]`.
 
@@ -49,6 +51,7 @@ Do not expand this adapter into website generation or a full Claude command port
 
 ### Release history — architecture deltas only (release mechanics live in CHANGELOG + git)
 
+- **v2.23.1** — docs-only ADHD-friendly site redesign: design system, regrouped nav, page pattern on tutorials/guides/top-level pages (PRs #129-#136). 44 commands.
 - **v2.23.0** — `--site` audits Quarto and `development.mode` sites with `deploy_layout`/`content_freshness` markers (#111, PR #124); A2 manifest 831 nodes. 44 commands.
 - **v2.22.2** — A2 gate on `ubuntu-24.04` + `macos-15` (#115/#117), `pytest tests/` gate fix (#116), artifact actions 7/8, Codex adapter 0.2.0 `rforge-lint` (#113). 44 commands.
 - **v2.22.1** — exact short-integer comparison in `--run-examples` (#105/#106). 44 commands.
