@@ -322,7 +322,7 @@ real deployed pkgdown site, the package-triage freshness check and the rendered-
 inspection itself. The finalized adversarial review is a recorded judgment supplied
 as the `review-record` input: the run stamps it but cannot prove it, so it is
 attested by whoever dispatches; keep it concise, because a dispatch input is limited to about 64 KB. Before downloading the artifact, `a2-release.yml` asks the Actions API whether the supplying run is the `a2-observations.yml` dispatch for the same head commit and finished successfully. The live smoke checks one supported public site and
-records pinned real packages: in the unreleased next version, the Data-Wise packages medfit and probmed (pkgdown
+records pinned real packages: since v2.23.0, the Data-Wise packages medfit and probmed (pkgdown
 `development.mode: auto`, `.qmd` articles) are audited as supported, and the pinned tidyverse
 site glue (`template.package`) must still be reported incomplete.
 

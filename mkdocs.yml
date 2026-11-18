@@ -55,8 +55,8 @@ extra_css:
 extra:
   rforge:
     version: "2.23.0"
-    prev_version: "2.19.0"
-    release_date: "2026-08-01"
+    prev_version: "2.22.2"
+    release_date: "2026-11-17"
     command_count: 44
 
 plugins:
