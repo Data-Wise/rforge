@@ -1,9 +1,14 @@
-# Check evidence and approval decisions
+# ✅ Check evidence and approval decisions
+
+⏱️ **5 minutes** • 🟡 Intermediate • ✓ 3 questions
 
 !!! tip "TL;DR (30 seconds)"
-    A successful check supports a bounded technical claim. It does not prove
-    scientific assumptions, recover missing historical evidence, or authorize
-    release, deployment, submission or merge. Track evidence and decisions separately.
+    - **What:** A successful check supports a bounded technical claim. It does not prove
+      scientific assumptions, recover missing historical evidence, or authorize
+      release, deployment, submission or merge.
+    - **Why:** Mixing "what was verified" with "what is approved" hides gaps from reviewers.
+    - **How:** Track evidence and decisions separately, using the three questions below.
+    - **Next:** [Codex checks](codex-checks.md) shows the supported check contracts.
 
 ## Three questions to answer separately
 
@@ -103,3 +108,9 @@ review or broaden its scope to manufacture a clean verdict.
 For session status updates, use the [session boundary guide](session-boundary.md).
 This guide adds reporting guidance; it adds no new command, automatic gate,
 scientific certification or authorization workflow.
+
+## Next steps
+
+- [Codex checks](codex-checks.md): the check contracts this guide tells you how to report.
+- [Session boundary commands](session-boundary.md): record status at the start and end of a session.
+- [Website guide](website.md): separate local build, deploy and visual-inspection claims.
