@@ -524,6 +524,29 @@ transcripts with `--examples-budget-seconds N` (default 300, positive integer).
 Source/render pairing is deferred: asserted rendered output remains unverified.
 Incomplete stages exit 2 with warn/error thresholds; completed A2 warnings gate
 only warn. Site GETs never build/deploy/fetch; replay is opt-in, not sandboxed.
+`--site` maps `.qmd`/`.Rmd`/`.rmd` articles and resolves `development.mode` from the pinned
+`DESCRIPTION`; `--site` must equal the source `url` plus the dev prefix (`.../dev/` for a devel
+site only), else `incomplete`. Incomplete with a specific reason, at the pinned ref: `PKGDOWN_DEV_MODE`
+(workflow, local action, `.Renviron`/`.Rprofile`), reusable or unreadable local actions, deploys below
+the site root (`deploy_to_branch(subdir = )`, or a Pages `target-folder`/`destination-dir` whenever a pkgdown config exists at the pinned
+ref or a workflow names pkgdown), malformed workflows, directory-level `_metadata.yml`/`_quarto-*.yml`/`_output.yml`,
+symlinks under `vignettes/`. An article is refused only for the front-matter keys `output_file`/`output-file`,
+`output_ext`/`output-ext`, `output_dir`/`output-dir`, `knit`, `as_is`, a non-HTML `format`/`output` or
+`pkgdown: extension`, in any key case with `-` and `_` interchangeable; YAML is read as parsed structures and R/shell
+code as tolerant text; scripts a `run:` step executes are read at the pinned ref (5 levels, 40 files) and scanned the
+same way (`make` follows `include`), and an unreadable, missing, symlinked, dynamic or over-cap reference is incomplete in a
+pkgdown repository for any workflow that may publish (tier 1: pkgdown wording, a Pages or deploy action, `deploy_to_branch`/`gh-pages`,
+`pages`/`id-token` write, an explicit-branch `git push`, a remote publish command (`rsync`/`scp`/`aws s3`/`netlify`/`firebase`/`vercel`) or a command that
+builds or stages the destination even when the tree does not track it yet, or a workflow that stages everything and pushes the default branch (treated as publish capable; the audit does not try to prove it builds no site; a stage is named only when every pathspec is a plain literal path outside the destination, so pathspec magic, `--pathspec-from-file` and index-changing git plumbing stage everything) (`git add`/`git commit` naming it, `git add -A` after a pkgdown build,
+`git subtree push`, `git worktree add`, `cp`/`mv`/`rsync` into it), or a workflow that stages and pushes while it downloads build output, another workflow builds the site (cross-workflow handoff) or it reaches a script, action or executable the scan cannot resolve (any executable outside a short allowlist of benign utilities fails closed for such a workflow);
+tier 2, only when the pinned tree tracks the pkgdown destination (placeholder-only directories do not count; a build call's destination
+joins the check): `contents: write`, a default-branch or refspec-less `git push`, a push action, no `permissions:` key; a branch listed in
+`.rforge.yaml` `docs.site.nonpublishing-branches` is tier 2 (an unverified maintainer declaration: a mislabeled site branch yields a wrong complete; the
+stage reports `nonpublishing_branches_honored` and the text report an info line when it applies); reusable workflows share capability with their caller; read-only workflows are relaxed);
+other overrides, names built any other way, `uses:` actions from other repositories, manual deploys outside CI and
+`knit`/`render` of a document are not detected. A complete site stage proves route presence, not
+content freshness (`content_freshness: "unverified"`) and not the CI deploy layout (`deploy_layout: "unverified"`): the
+workflow scan is best effort.
 
 
 

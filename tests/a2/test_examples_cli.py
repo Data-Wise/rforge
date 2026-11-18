@@ -67,7 +67,7 @@ def test_combined_stage_and_eco_partial_results(tmp_path, failed_stage):
     (p/'README.md').write_text(f'```r\n{code}\n#> [1] 1\n```')
     with server(web) as url:
         if failed_stage!='site':
-            (web/'pkg'/'sitemap.xml').write_text(f'<urlset><url><loc>{url}reference/internal.html</loc></url><url><loc>{url}articles/pizza/slice.html</loc></url></urlset>')
+            (web/'pkg'/'sitemap.xml').write_text(f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>{url}reference/internal.html</loc></url><url><loc>{url}articles/pizza/slice.html</loc></url></urlset>')
         report=docaudit.audit(p,site=url,ref='main',run_examples=True)
     stages=report['stages']
     assert report['incomplete'] and set(stages)=={'site','examples'}

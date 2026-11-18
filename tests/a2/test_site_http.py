@@ -31,7 +31,7 @@ def test_same_origin_redirect_policy(hops,accepted):
             if index<hops:
                 self.send_response(302);self.send_header('Location',f'/pkg/{index+1}');self.end_headers()
             else:
-                self.send_response(200);self.end_headers();self.wfile.write(b'<urlset/>')
+                self.send_response(200);self.end_headers();self.wfile.write(b'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>')
         def log_message(self,*args):pass
     with server(Handler) as base:
         if accepted:assert site.sitemap(base)==(set(),0)
@@ -62,7 +62,7 @@ def test_foreign_and_zero_inbase_entries():
     class Handler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
             base=f'http://127.0.0.1:{self.server.server_port}'
-            xml=f'<urlset><url><loc>{base}/pkg/reference/Case%2froute.html#fragment</loc></url><url><loc>{base}/pkg-extra/reference/a.html</loc></url><url><loc>{base}/pkg/reference/case/route.html</loc></url></urlset>'
+            xml=f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>{base}/pkg/reference/Case%2froute.html#fragment</loc></url><url><loc>{base}/pkg-extra/reference/a.html</loc></url><url><loc>{base}/pkg/reference/case/route.html</loc></url></urlset>'
             self.send_response(200);self.end_headers();self.wfile.write(xml.encode())
         def log_message(self,*args):pass
     with server(Handler) as base:

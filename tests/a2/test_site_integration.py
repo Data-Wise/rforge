@@ -80,7 +80,7 @@ def test_nested_package_immutable_routes(tmp_path):
     git(repo,'init','-b','release');git(repo,'config','user.email','fixture@example.org');git(repo,'config','user.name','Fixture');git(repo,'add','.');git(repo,'commit','-m','fixture')
     web=tmp_path/'web';(web/'pkg').mkdir(parents=True)
     with server(web) as url:
-        (web/'pkg'/'sitemap.xml').write_text('<urlset/>')
+        (web/'pkg'/'sitemap.xml').write_text('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>')
         report=site.audit(pkg,url=url)
     assert report['state']=='complete' and report['counts']['checked']==1
     assert report['provenance']['ref']=='release'
@@ -93,7 +93,7 @@ def test_custom_article_frontmatter_not_invented(tmp_path,header):
     pkg,web=fixture(tmp_path)
     (pkg/'vignettes/pizza/slice.Rmd').write_text('---\n'+header+'\n---\n')
     git(pkg,'add','.');git(pkg,'commit','-m','custom output')
-    (web/'pkg/sitemap.xml').write_text('<urlset/>')
+    (web/'pkg/sitemap.xml').write_text('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>')
     with server(web) as url:r=site.audit(pkg,url=url,ref='main')
     assert r['state']=='incomplete' and r['counts']['unsupported']==1
     assert not any(f['file']=='vignettes/pizza/slice.Rmd' and f['check']=='site-missing-page' for f in r['findings'])
@@ -106,13 +106,13 @@ def test_site_cli_thresholds(tmp_path, capsys, case, threshold):
     from lib import docaudit
     pkg, web = fixture(tmp_path)
     if case == 'unsupported':
-        (pkg/'vignettes'/'custom.qmd').write_text('# Unsupported source')
+        (pkg/'vignettes'/'custom.qmd').write_text('---\nformat: pdf\n---\n')
         git(pkg,'add','.'); git(pkg,'commit','-m','Quarto source')
     with server(web) as url:
         if case != 'offline':
             paths = ['articles/pizza/slice.html']
             if case != 'missing': paths.append('reference/internal.html')
-            xml = '<urlset>'+''.join(f'<url><loc>{url}{p}</loc></url>' for p in paths)+'</urlset>'
+            xml = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join(f'<url><loc>{url}{p}</loc></url>' for p in paths)+'</urlset>'
             (web/'pkg'/'sitemap.xml').write_text(xml)
         code = docaudit.main(['--path',str(pkg),'--site',url,'--ref','main','--format','json','--fail-on',threshold])
     report = json.loads(capsys.readouterr().out)
@@ -143,7 +143,7 @@ def test_no_build_crawl_fetch_or_deploy(tmp_path, monkeypatch):
     thread = threading.Thread(target=srv.serve_forever,daemon=True); thread.start()
     try:
         url = f'http://127.0.0.1:{srv.server_port}/pkg/'
-        (web/'pkg'/'sitemap.xml').write_text(f'<urlset><url><loc>{url}reference/internal.html</loc></url></urlset>')
+        (web/'pkg'/'sitemap.xml').write_text(f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>{url}reference/internal.html</loc></url></urlset>')
         report = site.audit(pkg,url=url,ref='main')
     finally:
         srv.shutdown(); srv.server_close(); thread.join()
@@ -171,17 +171,20 @@ def test_selected_ref_config_requires_yaml_reader(tmp_path,monkeypatch):
 @pytest.mark.parametrize('case',['quarto','extension','overlay'])
 def test_unsupported_layout_retains_supported_routes(tmp_path,case):
     pkg,web=fixture(tmp_path)
-    if case in ('quarto','extension'):
-        (pkg/'vignettes'/('custom.qmd' if case=='quarto' else 'custom.Rmarkdown')).write_text('# unsupported')
+    if case=='quarto':
+        (pkg/'vignettes'/'custom.qmd').write_text('---\nformat: pdf\n---\n')
+    elif case=='extension':
+        (pkg/'vignettes'/'custom.Rmd').write_text('---\npkgdown:\n  extension: pdf\n---\n')
     else:
         (pkg/'_pkgdown.yml').write_text('development:\n  mode: release\n')
         (pkg/'pkgdown').mkdir();(pkg/'pkgdown'/'extra.yml').write_text('template:\n  bootstrap: 5\n')
     git(pkg,'add','.');git(pkg,'commit','-m','unsupported layout')
-    (web/'pkg'/'sitemap.xml').write_text('<urlset/>')
+    (web/'pkg'/'sitemap.xml').write_text('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>')
     with server(web) as url:r=site.audit(pkg,url=url,ref='main')
     assert r['state']=='incomplete' and r['counts']['checked']==2 and r['counts']['missing']==2
     assert {f['file'] for f in r['findings'] if f['check']=='site-missing-page'}=={'man/internal.Rd','vignettes/pizza/slice.Rmd'}
-    assert any(('overlays' if case=='overlay' else 'unsupported article source') in reason for reason in r['reasons'])
+    expected_reason={'overlay':'overlays','quarto':'unsupported article format','extension':'unsupported article output extension'}[case]
+    assert any(expected_reason in reason for reason in r['reasons'])
 
 
 @pytest.mark.parametrize('case',['destination','workflow-dev'])
@@ -191,12 +194,13 @@ def test_destination_and_workflow_mode_integration(tmp_path,monkeypatch,case):
         (pkg/'_pkgdown.yml').write_text('destination: public-output\n')
         git(pkg,'add','.');git(pkg,'commit','-m','local destination')
         with server(web) as url:
-            (web/'pkg'/'sitemap.xml').write_text('<urlset>'+''.join(f'<url><loc>{url}{p}</loc></url>' for p in ['reference/internal.html','articles/pizza/slice.html'])+'</urlset>')
+            (web/'pkg'/'sitemap.xml').write_text('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join(f'<url><loc>{url}{p}</loc></url>' for p in ['reference/internal.html','articles/pizza/slice.html'])+'</urlset>')
             r=site.audit(pkg,url=url,ref='main')
         assert r['state']=='complete' and r['counts']['checked']==2 and r['counts']['missing']==0 and not r['findings']
     else:
         (pkg/'.github/workflows').mkdir(parents=True)
         (pkg/'.github/workflows/pkgdown.yml').write_text('env:\n  PKGDOWN_DEV_MODE: devel\n')
+        git(pkg,'add','.');git(pkg,'commit','-m','dev-mode workflow')
         monkeypatch.setattr(site,'sitemap',lambda *a:pytest.fail('development transform requested comparison'))
         r=site.audit(pkg,url='https://example.org/pkg/',ref='main')
         assert r['state']=='incomplete' and r['counts']['checked']==0 and not r['findings']
@@ -218,6 +222,6 @@ def test_source_url_and_missing_sitemap(tmp_path,monkeypatch,source_url):
 def test_absent_source_url_allows_explicit_base(tmp_path):
     pkg,web=fixture(tmp_path)
     with server(web) as url:
-        (web/'pkg/sitemap.xml').write_text('<urlset>'+''.join(f'<url><loc>{url}{route}</loc></url>' for route in ('reference/internal.html','articles/pizza/slice.html'))+'</urlset>')
+        (web/'pkg/sitemap.xml').write_text('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join(f'<url><loc>{url}{route}</loc></url>' for route in ('reference/internal.html','articles/pizza/slice.html'))+'</urlset>')
         r=site.audit(pkg,url=url,ref='main')
     assert r['state']=='complete' and r['counts']['checked']==2 and not r['findings']
