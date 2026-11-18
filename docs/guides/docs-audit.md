@@ -94,7 +94,7 @@ Sitemap absence does not prove HTTP 404, availability or deployment freshness. E
 nonempty `loc`; a `url` with two, none or an empty one makes the stage incomplete (`malformed sitemap entry`).
 Foreign/scheme-changing redirects require a fresh canonical-URL invocation.
 
-!!! note "Expected behavior in the next release (unreleased; after v2.22.2)"
+!!! note "Expected behavior in v2.23.0+"
     `--site` maps `.qmd`, `.Rmd` and `.rmd` articles (nested ones included) and resolves
     `development.mode` (`auto`, `default`, `release`, `devel`, `unreleased`) from the pinned
     `DESCRIPTION` version with pkgdown 2.2.1's rule, so a Quarto site on `mode: auto` at a release

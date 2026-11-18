@@ -1,3 +1,10 @@
+# v2.23.0 release prep on dev — 2026-11-17
+# #111 (--site audits Quarto and development.mode sites, deploy_layout/content_freshness markers) merged to dev
+# as PR #124 (squash 829ddd0) after stage-1 A2 at e6cd416 (runs 44194507998, 44202756232; 831 nodes).
+# Version bumped to 2.23.0 (package.json, plugin.json, marketplace.json x2, mkdocs.yml via version_sync.py, README,
+# docs/README, CLAUDE.md/AGENTS.md, CHANGELOG [2.23.0], docs/changelog.md, tests/a2/test_docs.py). Release-candidate
+# review and A2 acceptance run at the release-candidate SHA; see the release PR for the evidence.
+
 # v2.23 planning — 2026-10-31
 # PROPOSAL-v2.23-backlog-2026-10-31.md (7a8c81f) and SPEC-site-audit-quarto-devmode-2026-10-31.md (#111; b1cb3b0,
 # five decisions: auto from DESCRIPTION version, keep refusing PKGDOWN_DEV_MODE, mapper + pkgdown differential test,
@@ -203,7 +210,7 @@
 # Still pending: fresh-session older/missing-engine handling, variadic-signature coverage.
 
 project: rforge
-updated: 2026-10-31
+updated: 2026-11-17
 status: Active
 in_progress: nothing open. v2.22.2 released 2026-10-31 (PR #119 merge bcbfa57, tag v2.22.2; tap PR #248 merged). v2.22.1 released (exact short-integer comparison, #105/#106; PR #108 merge 6ce4e50; tag v2.22.1; tap PR #246). v2.22.0 released (A2 --site/--run-examples). Issue #101 closed: guardian guards tested, accepted limits recorded in COVERAGE-docs-check-a2-2026-10-12.md; integer comparator fix merged (#106, issue #105 closes at release). Post-release macos-14 guardian timing flakes fixed in tests only (64bf438, 80b12b7; dev CI 662/662 on both platforms). Post-release docs merged to dev: PR #95 (evidence vs approval guide, 709d92b) and PR #102 (evidence-bounded verification tutorial section, 32ee189); both unreleased.
   (1) #84 fix MERGED to dev 2026-10-11 as PR #85 (squash 99b4171; CI 5/5 green). #84 stays
@@ -221,7 +228,7 @@ in_progress: nothing open. v2.22.2 released 2026-10-31 (PR #119 merge bcbfa57, t
   in the record); live smoke supported-site is r-hub/cranlogs only (no Data-Wise/tidyverse package is checkable by --site).
   Planning files stay at repo root (tests/a2/requirements.json and scripts/verify_a2_release.py reference them).
 next: triage the SPEC-site-audit-quarto-devmode review findings and revise the SPEC, then (on request) a feature branch for #111; delete stale local branches (user); brew upgrade rforge (user); optional real-package Codex rforge-lint CI-parity check.
-version: 2.22.2 (released 2026-10-31, on main bcbfa57; previous release v2.22.1 2026-10-25, 6ce4e50)
+version: 2.23.0 (release prep on dev, not yet released; previous release v2.22.2 2026-10-31, bcbfa57)
 last_release: 2026-10-25 v2.22.0 (minor, 44 commands, no surface change; PR #100 dev→main merge d36cee7; tag v2.22.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.22.0; tap PR #245 merge 699b59a; brew audit --strict clean, 2.22.0 installed). Prior: 2026-10-11 v2.21.0 (minor, 44 commands, no surface change — PR #91 dev→main merge 7387a05; tag v2.21.0; release https://github.com/Data-Wise/rforge/releases/tag/v2.21.0. Ships /rforge:docs:check content audit (lib.docaudit, A1), tests/harness, #84 fix (#85/#86), docs gap-fill (#89/#90). Gates: test-all 47/47, pytest 899+4 skipped, CI green on main (RForge CI + Deploy Documentation). Tap Data-Wise/homebrew-tap#244 squash 09bc9c3 — formula+manifest → v2.21.0 sha256 f376d0da…, stale revision dropped, generate.py --diff IDENTICAL; brew audit by path unavailable. Aggregator claude-plugins#74 auto-merged. Pending: user runs `brew upgrade rforge`.)
 last_release_prior_v2_20_1: 2026-09-23 v2.20.1 (patch, 44 commands, no surface change — PR #83 dev→main merge
   9d0b01a; tag v2.20.1; release https://github.com/Data-Wise/rforge/releases/tag/v2.20.1. Ships
