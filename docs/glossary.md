@@ -1,6 +1,13 @@
-# Glossary
+# 📖 Glossary
 
-Terms used across the rforge documentation and plugin output.
+!!! tip "TL;DR (30 seconds)"
+    - **What:** Plain-language definitions of rforge terms (blast radius, advisory, envelope, verdict, and more).
+    - **Why:** Plugin output and the docs reuse these words; one lookup beats guessing.
+    - **How:** Jump to a letter range below, or use the search box at the top of the site.
+    - **Next:** Put the terms to work in the [Quick Start](quickstart.md).
+
+Terms used across the rforge documentation and plugin output. Entries are
+alphabetical, grouped by letter range.
 
 ## A–C
 
@@ -157,3 +164,9 @@ Terms used across the rforge documentation and plugin output.
 **win-builder**
 :   CRAN's Windows build service. `r:winbuilder` dispatches a check to
     win-builder and emails results (via the R `devtools::check_win_*()` path).
+
+## Next steps
+
+- [Quick Start](quickstart.md): run your first command and see these terms in output.
+- [Reference Card](REFCARD.md): one-page command and flag lookup.
+- [Troubleshooting](troubleshooting.md): match an error message to its fix.

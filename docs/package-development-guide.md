@@ -1,19 +1,21 @@
 # 🧰 Package Development Guide
 
-The end-to-end map of rforge's R-package-development (`r:`) commands — from scaffolding a
-new piece through the inner dev loop, quality gates, and the CRAN handoff. Each stage links
-to a **command guide** (the exhaustive per-family reference) and a **tutorial** (a task
-walkthrough).
-
 !!! tip "TL;DR (30 seconds)"
     - **What:** the `r:*` commands wrap the standard R toolchain (`devtools`/`usethis`/
       `roxygen2`/`testthat`/`lintr`/…) behind one consistent, structured-output interface.
-    - **The loop:** scaffold → **load → document → test → check** → quality → deps → S7 →
-      coverage → CRAN.
-    - **Two safety rules:** read-only analyses can auto-run; anything that **writes files or
-      hits the network** is recommend-only. And `r:submit` **never** uploads to CRAN for you.
+    - **Why:** one interface for the whole loop: scaffold → **load → document → test → check**
+      → quality → deps → S7 → coverage → CRAN.
+    - **How:** read-only analyses can auto-run; anything that **writes files or hits the
+      network** is recommend-only, and `r:submit` **never** uploads to CRAN for you.
     - **Next:** jump to any stage below, or the [Reference Card](REFCARD.md) for the full
       command list.
+
+⏱️ **6 minutes** to read • 🟡 Intermediate • ✓ 8 stages from scaffold to CRAN
+
+The end-to-end map of rforge's R-package-development (`r:`) commands, from scaffolding a
+new piece through the inner dev loop, quality gates, and the CRAN handoff. Each stage links
+to a **command guide** (the exhaustive per-family reference) and a **tutorial** (a task
+walkthrough).
 
 !!! abstract "rforge complements `devtools`/`usethis` — it doesn't replace them"
     The `r:` commands shell out to the same engines you already use; rforge's value is the
@@ -174,9 +176,8 @@ rforge draws one hard line through every `r:` command:
     and it runs the read-only analyses, but names every mutating/network step instead of
     running it.
 
-## See also
+## Next steps
 
-- [Reference Card](REFCARD.md) — every command on one page
-- [Commands](commands.md) — the terse per-command reference
-- [Lib Modules](lib-modules.md) — the pure-Python engines behind the commands
-- [Orchestrator Agent](orchestrator.md) — goal-driven command selection
+- [Reference Card](REFCARD.md): every command on one page.
+- [Commands](commands.md): the terse per-command reference.
+- [Orchestrator Agent](orchestrator.md): goal-driven command selection (and [Lib Modules](lib-modules.md) for the engines behind the commands).
