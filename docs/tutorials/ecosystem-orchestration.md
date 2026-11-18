@@ -1,5 +1,7 @@
 # 🔗 Ecosystem orchestration: impact, cascade, deps
 
+⏱️ 15 minutes • 🟡 Intermediate • ✓ 3 steps
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** Coordinate changes across several inter-dependent R packages.
     - **Why:** A change to a core package ripples outward — these commands show the blast radius *before* you commit.
@@ -7,7 +9,6 @@
     - **Next:** [CRAN release prep](cran-release-prep.md) once the cascade is done.
 
 > **For whom:** Maintainer of multiple related R packages (a "verse").
-> **Estimated time:** 15 minutes.
 > **Prior knowledge:** You've run [Getting started](getting-started.md) and
 > understand [rforge's role in the lifecycle](rforge-in-the-r-lifecycle.md).
 
@@ -59,9 +60,11 @@ Level 2 (Meta):
 Topological order: medfit → {probmed, medsim} → mediationverse
 ```
 
-**Reading it:** the topological order is the *safe build/update order* —
-always leaves-first. You never update `mediationverse` before the packages
-it depends on. rforge also flags circular dependencies here if any exist.
+**Reading it:**
+
+- The topological order is the *safe build/update order* — always leaves-first.
+- You never update `mediationverse` before the packages it depends on.
+- rforge also flags circular dependencies here if any exist.
 
 !!! tip "Want JSON for scripting?"
     Every ecosystem command takes `--format json`:
@@ -71,6 +74,8 @@ it depends on. rforge also flags circular dependencies here if any exist.
     Pipe it into `jq` to drive your own automation.
 
 ## Step 2: Assess the blast radius of a change
+
+### 2a. Ask what depends on the function
 
 You're about to change `extract_mediation()` in `medfit`. Before touching
 it, ask what depends on it:
@@ -104,6 +109,8 @@ Indirect Impact:
 Total cascade: 8-12 hours
 Recommended: Deprecation path + major version bump
 ```
+
+### 2b. Match `--change-type` to the change
 
 **`--change-type` drives the severity.** The realistic options:
 
@@ -212,7 +219,7 @@ of `medfit` with no API change:
 When impact is minimal, skip the cascade entirely. The tools tell you when
 coordination *isn't* needed, which is just as valuable.
 
-## What's next
+## Next steps
 
 - **[CRAN release prep](cran-release-prep.md)** — once your cascade is
   executed, turn it into an ordered CRAN submission.

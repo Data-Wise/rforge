@@ -1,9 +1,12 @@
-# Orchestrator cookbook — worked examples
+# 🍳 Orchestrator cookbook — worked examples
+
+⏱️ 10 minutes • 🟢 Beginner • ✓ 4 recipes
 
 !!! tip "TL;DR (30 seconds)"
     - **What:** Copy-paste-style scenarios showing what the [orchestrator](../orchestrator.md) runs and synthesizes for common R-package goals.
     - **Why:** See the intent → recipe → summary flow before you rely on it.
-    - **Prereq:** An R package or ecosystem directory; rforge installed.
+    - **How:** Pick the recipe that matches your goal, then read its intent → commands → summary. Prereq: an R package or ecosystem directory with rforge installed.
+    - **Next:** [The orchestrator agent](../orchestrator.md) for the full intent + safety contract.
 
 Each recipe below is **read-only** unless the summary explicitly *recommends* a
 file-writing command — the orchestrator never runs those for you (see the
@@ -113,14 +116,15 @@ $ python3 -m lib.deps --format json
 
 ## What it will *not* do for you
 
-The orchestrator surfaces these as recommendations and stops — run them yourself:
+!!! warning "Recommend-only boundary"
+    The orchestrator surfaces these as recommendations and stops — run them yourself.
 
 - regenerate docs (`/rforge:r:document`), format (`/rforge:r:style`), build/install
 - write `cran-comments.md` (`/rforge:r:cran-prep`)
 - submit / pre-release (`/rforge:r:submit`), upload to win-builder / R-hub
 - apply a dependency patch (`/rforge:r:deps-sync --write`)
 
-## See also
+## Next steps
 
 - [The orchestrator agent](../orchestrator.md) — the full intent + safety contract
 - [Ecosystem orchestration](ecosystem-orchestration.md) — the multi-package workflow

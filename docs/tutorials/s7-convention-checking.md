@@ -1,21 +1,14 @@
 # 🧬 S7 convention checking — `r:s7-review`
 
+⏱️ 10 minutes • 🟡 Intermediate • ✓ 3 steps
+
 !!! tip "TL;DR (30 seconds)"
-    - **What:** `r:s7-review` audits [S7](https://rconsortium.github.io/S7/) (the modern R
-      OOP system) for convention issues — naming, validators, methods, legacy leftovers,
-      and docs.
-    - **Static (default):** pure-Python, no R — parses `R/*.R` + `NAMESPACE`. Fast,
-      runs anywhere.
-    - **`--eco`:** sweep the static families across **every package** in your ecosystem
-      manifest, with a per-package + roll-up report.
-    - **`--runtime`:** an R-backed pass that *loads* the package and introspects S7 at
-      runtime — catches dead generics, non-enforcing validators, and unreachable methods
-      that source parsing can't see.
-    - **Always advisory** — worded "looks like / consider", never "must"; exit 0 always.
+    - **What:** `r:s7-review` audits [S7](https://rconsortium.github.io/S7/) (the modern R OOP system) for naming, validator, method, legacy and docs issues.
+    - **Why:** Catch dead generics, non-enforcing validators and unreachable methods early. Always advisory, exit 0.
+    - **How:** Static by default (pure-Python, no R); add `--eco` for the whole ecosystem or `--runtime` for an R-backed pass.
     - **Next:** [R package dev cycle](r-dev-cycle.md) to fix and re-check.
 
 > **For whom:** Author of an R package (or ecosystem) that uses S7 classes/generics.
-> **Estimated time:** 10 minutes.
 > **Prior knowledge:** A package using S7, registered with `/rforge:init`. `--runtime`
 > additionally needs R + the `S7`/`pkgload` packages installed.
 
@@ -73,9 +66,10 @@ Packages are ordered by the manifest's `manifest_order`; a package that fails to
 becomes a per-package `warn` and never aborts the sweep.
 
 `--eco` also runs one **ecosystem-only** family the per-package modes can't: the
-**`cross-package-contract`** family. It builds a registry of every S7 class → its
-defining package, then flags a method that dispatches on a **sibling** package's class
-whose contract is unsatisfiable:
+**`cross-package-contract`** family.
+
+It builds a registry of every S7 class → its defining package. It then flags a method
+that dispatches on a **sibling** package's class whose contract is unsatisfiable:
 
 - **`cross_package_undeclared_contract`** — package B has `method(generic, C)` where `C`
   is defined in sibling package A, but B doesn't declare A in `Imports`/`Depends`/
@@ -125,10 +119,11 @@ The runtime pass adds three checks source parsing can't make:
     classes, not by `@name` — so the idiomatic `Foo <- new_class("Bar")` (binding name ≠
     `@name`) is correctly **not** flagged. Base types and imported classes are also excluded.
 
-## See also
+## Next steps
 
 - [S7 review command guide](../guides/s7-review.md) — the complete finding-family catalog
-- [`s7review` reference](../reference/s7review.md) — the `lib.s7review` engine + family details
-- [`rcmd` reference](../reference/rcmd.md) — the `s7runtime` R engine behind `--runtime`
-- [Ecosystem orchestration](ecosystem-orchestration.md) — the `--eco` manifest model
 - [R package dev cycle](r-dev-cycle.md) — fix findings, then re-review
+- [Ecosystem orchestration](ecosystem-orchestration.md) — the `--eco` manifest model
+
+Engine details: [`s7review` reference](../reference/s7review.md) and the
+[`rcmd` reference](../reference/rcmd.md) (the `s7runtime` R engine behind `--runtime`).

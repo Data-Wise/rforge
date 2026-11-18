@@ -1,5 +1,7 @@
 # 🚀 CRAN submission with rforge
 
+⏱️ 15 minutes • 🟡 Intermediate • ✓ 7 steps
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** Full per-package CRAN-readiness gate using `r:cran-prep`, then hand off to `/rforge:release`.
     - **Why:** One command sequences document→lint→spell→urlcheck→test→coverage→check(--as-cran)→revdep and writes `cran-comments.md`.
@@ -7,8 +9,10 @@
     - **Next:** [CRAN release prep](cran-release-prep.md) for the ecosystem-level submission order.
 
 > **For whom:** Maintainer preparing a CRAN submission for a single package.
-> **Estimated time:** 15 minutes to read; the actual gate takes longer because `R CMD check --as-cran` and `revdepcheck` can take minutes.
 > **Prior knowledge:** You have a package that passes basic `r:cycle` checks and want to submit it to CRAN.
+
+!!! note "Reading time vs. run time"
+    The 15 minutes covers reading only. The actual gate takes longer because `R CMD check --as-cran` and `revdepcheck` can take minutes.
 
 ## Before you start
 
@@ -24,6 +28,8 @@ You need:
 ```bash
 /rforge:r:cran-prep
 ```
+
+### 1a. What the gate runs
 
 This runs the full sequence in order:
 
@@ -56,7 +62,7 @@ This runs the full sequence in order:
     used unconditionally. This is intended. **Fix:** move it to `Imports`, or guard with
     `requireNamespace()` in code **and** `skip_if_not_installed()` in tests.
 
-**Output — what to look for:**
+### 1b. What the output looks like
 
 ```markdown
 ## CRAN-Prep: medfit v2.2.0
@@ -152,6 +158,7 @@ cat cran-comments.md
 ```
 
 The file captures:
+
 - The R CMD check result (errors, warnings, notes)
 - NOTE classifications (spurious vs. real)
 - Reverse-dependency check outcome
@@ -205,15 +212,17 @@ With a green gate and reviewed `cran-comments.md`, hand off to the ecosystem-lev
 
 ---
 
-## Related commands
+## Next steps
 
-- [CRAN submission command guide](../guides/cran-submission.md) — the per-command reference + safety model
-- `/rforge:r:cran-prep` — the full gate (this tutorial)
-- `/rforge:r:revdep` — reverse-dependency check only
-- `/rforge:r:goodpractice` — advisory best-practice bundle only
-- `/rforge:r:winbuilder` — win-builder dispatch only
-- `/rforge:r:rhub` — R-hub dispatch only
-- `/rforge:release` — ecosystem submission ordering
-- `/rforge:r:cycle` — quick dev loop (document → test → check); use before cran-prep
-- [CRAN release prep](cran-release-prep.md) — the broader ecosystem release workflow
-- [R-universe early-access](r-universe-early-access.md) — ship binaries to users *while* CRAN reviews (`r:submit --universe`)
+- **[CRAN release prep](cran-release-prep.md)** — the broader ecosystem release workflow
+- **[CRAN submission command guide](../guides/cran-submission.md)** — the per-command reference + safety model
+- **[R-universe early-access](r-universe-early-access.md)** — ship binaries to users *while* CRAN reviews (`r:submit --universe`)
+
+??? note "Related commands"
+    - `/rforge:r:cran-prep` — the full gate (this tutorial)
+    - `/rforge:r:revdep` — reverse-dependency check only
+    - `/rforge:r:goodpractice` — advisory best-practice bundle only
+    - `/rforge:r:winbuilder` — win-builder dispatch only
+    - `/rforge:r:rhub` — R-hub dispatch only
+    - `/rforge:release` — ecosystem submission ordering
+    - `/rforge:r:cycle` — quick dev loop (document → test → check); use before cran-prep

@@ -1,5 +1,7 @@
 # 📦 CRAN release prep: thorough, r:check, release
 
+⏱️ 15 minutes • 🟡 Intermediate • ✓ 4 steps
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** Take one or more packages from "code complete" to "submitted to CRAN."
     - **Why:** rforge can now run the full per-package gate (`r:cran-prep`) **and** plan ecosystem submission order (`release`).
@@ -9,9 +11,11 @@
 
 > **For whom:** Maintainer preparing a CRAN submission (single package or
 > ecosystem).
-> **Estimated time:** 15 minutes to read; the actual checks take longer
-> because `R CMD check --as-cran` and `revdepcheck` are slow.
 > **Prior knowledge:** You've built the package and want to ship it.
+
+!!! note "Reading time vs. run time"
+    The 15 minutes covers reading only. The actual checks take longer
+    because `R CMD check --as-cran` and `revdepcheck` are slow.
 
 !!! note "What rforge runs vs. what you run (v2.2.0+)"
     As of v2.2.0, `/rforge:r:cran-prep` **does** run the heavy checks
@@ -66,6 +70,8 @@ It does not check NEWS.md or run examples. See [Docs audit](../guides/docs-audit
 
 ## Step 2: Run the full CRAN-prep gate (v2.2.0+)
 
+### 2a. Run the gate and read the verdict
+
 For most submissions, use the orchestrating command:
 
 ```text
@@ -101,20 +107,31 @@ cran-comments.md written → review before submitting
 !!! tip "NOTEs are classified automatically"
     `r:cran-prep` tags each NOTE as `spurious` (expected on first submission,
     e.g. "New submission" or "checking CRAN incoming feasibility") or `real`
-    (needs attention). Spurious NOTEs do not block `ready`. Real NOTEs
-    downgrade the verdict to `warn`.
+    (needs attention).
+
+    - Spurious NOTEs do not block `ready`.
+    - Real NOTEs downgrade the verdict to `warn`.
+
+### 2b. Know what runs by default
 
 !!! note "Strict flavor passes run by default"
-    The gate now runs the `check` stage **plus two strict flavor passes** —
-    `check (noSuggests)` (`_R_CHECK_DEPENDS_ONLY_=true`) and
-    `check (suggests-only)` (`_R_CHECK_SUGGESTS_ONLY_=true`), each with
-    `--run-donttest`. These emulate CRAN's post-acceptance flavors and catch a
-    `Suggests` package used unconditionally (which plain `--as-cran` misses).
-    A strict-pass **ERROR blocks `ready`**. It also adds three pure-Python,
-    **advisory** Tier 4 stages — `description` (DESCRIPTION incoming nits),
-    `build-hygiene` (planning/dev docs that would ship in the tarball, with the
-    exact `.Rbuildignore` fix), and `docs-consistency`. Tier 4 stages surface as
-    `warn` and **never block** `ready`.
+    The gate runs the `check` stage **plus two strict flavor passes**:
+
+    - `check (noSuggests)` (`_R_CHECK_DEPENDS_ONLY_=true`)
+    - `check (suggests-only)` (`_R_CHECK_SUGGESTS_ONLY_=true`)
+
+    Each runs with `--run-donttest`. These emulate CRAN's post-acceptance
+    flavors and catch a `Suggests` package used unconditionally (which plain
+    `--as-cran` misses). A strict-pass **ERROR blocks `ready`**.
+
+    It also adds three pure-Python, **advisory** Tier 4 stages:
+
+    - `description` (DESCRIPTION incoming nits)
+    - `build-hygiene` (planning/dev docs that would ship in the tarball, with
+      the exact `.Rbuildignore` fix)
+    - `docs-consistency`
+
+    Tier 4 stages surface as `warn` and **never block** `ready`.
 
 !!! warning "Behavior change — a package green today can turn red"
     Because the strict passes are on by default, a package that reports 🟢
@@ -123,7 +140,7 @@ cran-comments.md written → review before submitting
     **Fix:** move the package to `Imports`, or guard with
     `requireNamespace()` in code **and** `skip_if_not_installed()` in tests.
 
-**Optional flags:**
+### 2c. Optional flags
 
 ```text
 /rforge:r:cran-prep --no-revdep         # skip revdep (first submission, no dependents)
@@ -177,7 +194,9 @@ into a release-readiness summary.
 
 For an ecosystem, you can't submit in arbitrary order — CRAN needs each
 dependency *approved and available* before its dependents pass incoming
-checks. `/rforge:release` computes the sequence:
+checks. `/rforge:release` computes the sequence.
+
+### 4a. Get the plan
 
 ```text
 /rforge:release
@@ -205,6 +224,8 @@ Submission Order (by dependency):
 
 Timeline: 4-6 weeks total
 ```
+
+### 4b. See what blocks a package
 
 Add `--detailed` for per-package readiness with reverse-dependency checks:
 
@@ -259,17 +280,6 @@ For multi-platform verification before submission:
 - [ ] For ecosystems: submit in the order `/rforge:release` gives, waiting
       for each approval before the next
 
-## What's next
-
-- **[CRAN submission command guide](../guides/cran-submission.md)** — every command's flags, tiers, and the safety model
-- **[Ecosystem orchestration](ecosystem-orchestration.md)** — if the
-  release surfaced a needed cross-package change, plan it with
-  `/rforge:cascade`.
-- **[REFCARD](../REFCARD.md)** — `thorough`, `r:check`, `docs:check`,
-  `release` syntax.
-- **[Configuration](../configuration.md)** — set your `cran_mirror` and
-  `vignette_engine` so checks use the right defaults.
-
 ### Optional documentation release gates
 
 A site-only check needs one package and an explicitly supplied `--site URL`;
@@ -278,3 +288,14 @@ A site-only check needs one package and an explicitly supplied `--site URL`;
 discrepancies are warnings, so `--fail-on error` permits them. Both enabled
 thresholds return 2 for incomplete coverage. Source assertions do not certify
 rendered README output, and this replay does not replace `R CMD check`.
+
+## Next steps
+
+- **[CRAN submission command guide](../guides/cran-submission.md)** — every command's flags, tiers, and the safety model
+- **[Ecosystem orchestration](ecosystem-orchestration.md)** — if the
+  release surfaced a needed cross-package change, plan it with
+  `/rforge:cascade`.
+- **[Configuration](../configuration.md)** — set your `cran_mirror` and
+  `vignette_engine` so checks use the right defaults.
+
+Syntax lookup: [REFCARD](../REFCARD.md) (`thorough`, `r:check`, `docs:check`, `release`).

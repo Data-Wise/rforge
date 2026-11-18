@@ -1,20 +1,15 @@
 # 🔗 Dependency reconciliation — "does my DESCRIPTION match my code?"
 
+⏱️ 6 minutes • 🟡 Intermediate • ✓ 3 steps
+
 !!! tip "TL;DR (30 seconds)"
-    - **What:** `/rforge:r:deps-sync` scans `R/`, `tests/`, `vignettes/` + `NAMESPACE` for
-      what your package *actually* uses and compares it against `Depends`/`Imports`/`Suggests`
-      in `DESCRIPTION`.
-    - **Why:** A package that uses `dplyr::filter()` in `R/` but never declares `dplyr` fails
-      `R CMD check` — and a `Suggests` dependency used *unconditionally* fails for users who
-      don't install it. Drift between code and `DESCRIPTION` is the most common CRAN reject.
-    - **How:** Pure-Python (`lib.deps_sync`), **report-only by default**; `--write` applies the
-      unambiguous additions/moves (never the advisory removals).
-    - **Next:** [r:check --strict](../guides/cran-submission.md) — the runtime sibling that
-      catches a misclassified `Suggests` at check time.
+    - **What:** `/rforge:r:deps-sync` scans `R/`, `tests/`, `vignettes/` and `NAMESPACE`, then compares what your code uses against `Depends`/`Imports`/`Suggests` in `DESCRIPTION`.
+    - **Why:** Undeclared or unguarded dependencies fail `R CMD check`; drift is the most common CRAN reject.
+    - **How:** Report-only by default; `--write` applies the unambiguous additions and moves (never removals).
+    - **Next:** [r:check --strict](../guides/cran-submission.md) catches a misclassified `Suggests` at check time.
 
 > **For whom:** an R-package author who has added (or removed) library usage in `R/`,
 > tests, or vignettes and wants `DESCRIPTION` to match before committing or submitting.
-> **Estimated time:** 6 minutes.
 > **Prior knowledge:** the difference between `Imports` (loaded at use), `Suggests`
 > (optional, must be guarded), and `Depends` (attached) in an R `DESCRIPTION`.
 
@@ -87,12 +82,18 @@ A report groups findings by kind and ends with a suggested patch:
 | `unused` | declared, but no usage found | advisory removal candidate — **never auto-removed** (it may be used dynamically) |
 
 !!! warning "`--write` applies adds and moves — not removals"
-    `/rforge:r:deps-sync --write` applies the **unambiguous** changes: `missing` → add to
-    Imports, `misclassified` → move to Imports, `missing_suggests` → add to Suggests. It
-    **never** removes an `unused` dependency automatically — dynamic usage (`get()`,
+    `/rforge:r:deps-sync --write` applies the **unambiguous** changes:
+
+    - `missing` → add to Imports
+    - `misclassified` → move to Imports
+    - `missing_suggests` → add to Suggests
+
+    It **never** removes an `unused` dependency automatically. Dynamic usage (`get()`,
     `do.call()`, reflection) is invisible to a static scan, so removals stay advisory for
-    you to confirm. After a `--write`, run [`/rforge:r:document`](../guides/dev-cycle.md) if
-    you changed `@importFrom` tags so `NAMESPACE` regenerates.
+    you to confirm.
+
+    After a `--write`, run [`/rforge:r:document`](../guides/dev-cycle.md) if you changed
+    `@importFrom` tags so `NAMESPACE` regenerates.
 
 !!! tip "Fixing a `misclassified` finding two ways"
     A `Suggests` package used unconditionally has two valid fixes: **move it to Imports**
@@ -100,12 +101,13 @@ A report groups findings by kind and ends with a suggested patch:
     *and* `skip_if_not_installed("pkg")` in tests. `deps-sync --write` takes the first;
     choose the second by hand when the dependency really is optional.
 
-## See also
+## Next steps
 
-- [Scaffolding command guide](../guides/scaffolding.md) — `r:use-package` adds *one*
-  declared dependency; `deps-sync` reconciles *all* of them
 - [CRAN submission guide](../guides/cran-submission.md) — `r:check --strict` catches a
   misclassified `Suggests` at check time (the runtime sibling of this static check)
+- [Scaffolding command guide](../guides/scaffolding.md) — `r:use-package` adds *one*
+  declared dependency; `deps-sync` reconciles *all* of them
 - [`deps_sync` reference](../reference/deps_sync.md) — the `lib.deps_sync` engine
   (`scan_usage`, `reconcile`, `deps_sync`)
-- [`/rforge:deps`](../commands.md#rforgedeps) — the *inter*-package ecosystem graph
+
+Looking for the *inter*-package ecosystem graph? Use [`/rforge:deps`](../commands.md#rforgedeps).
