@@ -5,6 +5,8 @@
     - **Run:** `/rforge:docs:check` in a package (or `--eco` for every package under the ecosystem root).
     - **Read:** `error` = a call that would fail as written; `warn` = a candidate to check by hand; the `checked N of M` line says how much it could see.
 
+⏱️ 10 minutes • 🔵 Intermediate • ✓ 8 sections
+
 ## What it checks
 
 | Check | Severity | Fires when |
@@ -374,3 +376,9 @@ is recovered only when its run ID matches the current initial checkpoint;
 completed lifecycle evidence cannot override the exception. KeyboardInterrupt
 still propagates. Before workload spawn, a checkpoint PGID alone does not authorize
 a destructive signal; the child handle is allocated before launching the workload.
+
+## Next steps
+
+- [Fix a docs:check finding](../tutorials/fix-a-docs-check-finding.md): a 10-minute walkthrough.
+- [Commands reference](../commands.md): flags for `/rforge:docs:check`.
+- [CRAN release prep](../tutorials/cran-release-prep.md): where the audit fits before `r:cran-prep`.

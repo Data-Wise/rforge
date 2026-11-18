@@ -5,6 +5,8 @@
     - **Time:** about 10 minutes.
     - **You need:** an R package with a `man/` folder and docs (`README`, `vignettes/`). No R session is required for the default static audit; `--run-examples` needs R.
 
+⏱️ 10 minutes • 🟢 Beginner • ✓ 5 steps
+
 You will find a doc call that no longer matches the function, fix it, and wire the check into a release.
 The reference for every check is the [Docs audit guide](../guides/docs-audit.md).
 

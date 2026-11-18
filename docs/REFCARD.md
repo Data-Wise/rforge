@@ -11,6 +11,8 @@ The slash commands below are for Claude Code.
     - **How:** Daily? `/rforge:status` `/rforge:quick`. After changes? `/rforge:analyze "what?"`. Per-package CRAN gate? `/rforge:r:cran-prep`. Ecosystem rollup? `/rforge:thorough`.
     - **Next:** [Commands reference](commands.md) for full per-command docs.
 
+⏱️ 3 minutes • 🟢 Beginner • ✓ 1 scan
+
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  RFORGE PLUGIN REFERENCE                                            v{{ rforge.version }}  │
@@ -410,3 +412,9 @@ partial coverage: root README only, and unpaired rendered assertions or
 unsupported options are incomplete. Inspect stage coverage. Complete A2 warnings
 gate warn, incomplete stages gate warn/error. Allow the budget plus 15 seconds;
 use a terminal when the host lifetime is unknown. No site build or deploy.
+
+## Next steps
+
+- [Quickstart](quickstart.md): run your first check in under 5 minutes.
+- [Commands reference](commands.md): flags and behavior for every command.
+- [Visual workflows](workflows/index.md): the same commands as diagrams.
