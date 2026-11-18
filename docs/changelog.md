@@ -13,6 +13,15 @@ The full changelog lives in the repository:
 
 ---
 
+## 2.23.1 — 2026-11-18
+
+Docs-only patch: an ADHD-friendly redesign of the documentation site. A documented design
+system, regrouped navigation, and a TL;DR, time line and next-step block on tutorials, guides
+and top-level pages, plus a home-page card grid and a 5-minute quickstart path. No command-surface
+change (44 commands).
+
+---
+
 ## 2.23.0 — 2026-11-17
 
 `/rforge:docs:check --site` now audits Quarto (`.qmd`) articles and pkgdown
