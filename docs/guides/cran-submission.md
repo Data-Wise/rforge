@@ -1,12 +1,14 @@
 # 📦 CRAN submission commands
 
+⏱️ **12 minutes** • 🔴 Advanced • ✓ 6 commands
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** The `r:` commands that take a package from "code complete" to "live on
       CRAN" — `revdep`, `goodpractice`, `winbuilder`, `rhub`, `cran-prep`, and `submit`.
     - **Why:** Each plays a distinct role on the path to submission: a blocking **gate**, an
       advisory bundle, async multi-platform **dispatch**, the full per-package gate, and the
       submission **handoff**.
-    - **The flow:** `r:cran-prep` (gate) → `r:winbuilder` / `r:rhub` (dispatch) →
+    - **How:** `r:cran-prep` (gate) → `r:winbuilder` / `r:rhub` (dispatch) →
       `r:submit` (handoff) → `r:submit --promote` (on acceptance).
     - **Safety:** everything that writes a file or hits the network is **recommend-only** —
       `r:submit` **never uploads to CRAN automatically**.
@@ -174,11 +176,15 @@ passes, the Tier-4 advisory stages, and the reverse-dependency check, and **writ
 `cran-comments.md`**. Composes with `/rforge:release` (this = single-package gate; release =
 cross-package ordering).
 
+### Stage sequence
+
 **Default stage sequence (in order):** `document` → `lint` → `spell` → `urlcheck` → `test` →
 `coverage` → `check` (`--as-cran` + NOTE classifier) → `check (noSuggests)` → `check
 (suggests-only)` → `tarball-check` → `description` / `build-hygiene` / `docs-consistency` /
-`test_config` / `site-leaks` (Tier 4) → `revdep`. It also verifies the PDF reference manual
-builds (Tier 1b) — `warn` (never block) if no LaTeX is available.
+`test_config` / `site-leaks` (Tier 4) → `revdep`.
+
+It also verifies the PDF reference manual builds (Tier 1b) — `warn` (never block) if no
+LaTeX is available.
 
 !!! note "Tarball check catches source-tree blind spots"
     `tarball-check` builds a source tarball with `devtools::build()` and runs `R CMD check --as-cran`
@@ -193,6 +199,8 @@ builds (Tier 1b) — `warn` (never block) if no LaTeX is available.
     they downgrade `urlcheck` status from `error` → `warn` and appear in `doi_blocked_count`
     rather than `broken`. If `urlcheck` reports `🟡 warn` with only doi.org 403s, you may
     proceed to submit — no link is actually broken.
+
+### Flags
 
 | Flag | Type | Default | Effect |
 |------|------|---------|--------|
@@ -209,7 +217,7 @@ builds (Tier 1b) — `warn` (never block) if no LaTeX is available.
 /rforge:r:cran-prep --incoming         # add the CRAN-incoming check pass
 ```
 
-**Output / status — the `ready` verdict:**
+### Verdicts
 
 | Verdict | Meaning |
 |---------|---------|
@@ -220,6 +228,8 @@ builds (Tier 1b) — `warn` (never block) if no LaTeX is available.
 The result table is one row per stage with its status dot; `🔴 blocked` lists the blockers,
 `--multi-platform` adds a "Dispatched (async)" section, and the footer reports
 `cran-comments.md`'s path.
+
+### Strict passes and Tier 4
 
 !!! note "Strict passes run by default; a strict ERROR blocks `ready`"
     The two strict flavor passes — `check (noSuggests)` (`_R_CHECK_DEPENDS_ONLY_=true`) and
@@ -360,13 +370,12 @@ explicit" is structurally guaranteed.
     repo's **Actions tab**. If the local gate is already green you need not wait for them to
     proceed, but you must read the results before relying on multi-platform coverage.
 
-## See also
+## Next steps
 
-- [Commands reference](../commands.md) — terse one-line entry for every command
-- [`rcmd` reference](../reference/rcmd.md) — the revdep / goodpractice / winbuilder / rhub / cran-prep engines
-- [`cranlint` reference](../reference/cranlint.md) — the Tier-4 advisory stages (`description` / `build-hygiene` / `docs-consistency`)
-- [`ghrelease` reference](../reference/ghrelease.md) — the `gh` pre-release + promote helpers behind `r:submit`
-- [`runiverse` reference](../reference/runiverse.md) — the R-universe early-access check behind `r:submit --universe`
-- [CRAN release prep](../tutorials/cran-release-prep.md) — the ecosystem-level release workflow + submission ordering
 - [CRAN submission with rforge](../tutorials/cran-submission-with-rforge.md) — the single-package submission walkthrough
+- [CRAN release prep](../tutorials/cran-release-prep.md) — the ecosystem-level release workflow + submission ordering
 - [R-universe early-access](../tutorials/r-universe-early-access.md) — ship binaries to users *while* CRAN reviews
+
+Engine details: [`rcmd`](../reference/rcmd.md), [`cranlint`](../reference/cranlint.md),
+[`ghrelease`](../reference/ghrelease.md) and [`runiverse`](../reference/runiverse.md) references;
+terse flag list in the [commands reference](../commands.md).

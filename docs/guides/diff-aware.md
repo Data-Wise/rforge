@@ -1,17 +1,16 @@
 # 🔬 Diff-aware checks (`--changed`)
 
+⏱️ **6 minutes** • 🟡 Intermediate • ✓ 4 flags
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** `--changed` on `r:check` / `r:test` / `r:lint` scopes the run to the
       R package(s) you touched on this branch (vs `--base`, default `dev`).
     - **Why:** A full run flags every NOTE / WARNING / lint / failure regardless of
       who caused it. Diff-aware mode separates *your* regressions from inherited debt.
-    - **The 3 tags:** every finding is `[introduced]` (new on your branch),
-      `[pre-existing]` (already at the fork point), or `[uncommitted]` (an introduced
-      finding in a file you haven't committed yet).
-    - **Caching:** the merge-base baseline is cached **per package**, so a repeat run
-      re-runs only the packages it hasn't already baselined.
-    - **CI:** `--fail-on introduced` (default) exits non-zero **only** on findings you
-      introduced. **Next:** [R package dev cycle](dev-cycle.md).
+    - **How:** every finding is tagged `[introduced]`, `[pre-existing]` or `[uncommitted]`.
+      `--fail-on introduced` (default) exits non-zero **only** on findings you introduced;
+      the merge-base baseline is cached **per package**.
+    - **Next:** [R package dev cycle](dev-cycle.md).
 
 ---
 
@@ -159,11 +158,12 @@ worktree baseline pays for itself only when a job re-runs against an unchanged m
     that's the whole point. To see every finding regardless of tag, run the command
     without `--changed`.
 
-## See also
+## Next steps
 
-- [Command reference (`commands.md`)](../commands.md) — the terse one-line flag listing
+- [Diff-aware checks tutorial](../tutorials/diff-aware-checks.md) — the task walkthrough
+- [R package dev cycle](dev-cycle.md) — the inner loop these checks gate
 - [`changed` reference](../reference/changed.md) — the `lib.changed` engine
   (`merge_base`, `run_baseline`, `scope_check`, `tag_findings`, `cached_baseline`,
   `clear_baseline_cache`)
-- [Diff-aware checks tutorial](../tutorials/diff-aware-checks.md) — the task walkthrough
-- [R package dev cycle](dev-cycle.md) — the inner loop these checks gate
+
+Terse flag listing: [command reference](../commands.md).

@@ -1,13 +1,15 @@
 # 🧹 Quality commands
 
+⏱️ **7 minutes** • 🟢 Beginner • ✓ 4 commands
+
 !!! tip "TL;DR (30 seconds)"
     - **What:** Four static-quality commands for an R package — `r:lint` (style/bug
       smells), `r:spell` (typos), `r:style` (auto-format), `r:urlcheck` (dead/redirected
       links).
     - **Why:** Catch the cheap, high-signal issues — and the common CRAN rejection causes
       (misspellings, broken URLs) — before they reach `R CMD check`.
-    - **The split that matters:** Three are **read-only**. `r:style` **rewrites your source
-      files** — it is the only mutating command in the family.
+    - **How:** Three are **read-only**. `r:style` **rewrites your source
+      files** — it is the only mutating command in the family, so commit first.
     - **Next:** Fold these into the [R package dev cycle](../tutorials/r-dev-cycle.md), and
       scope `r:lint` to your branch with [diff-aware checks](diff-aware.md).
 
@@ -52,18 +54,26 @@ it with `r:style` to auto-fix the subset that's mechanically fixable.
 ### Match the CI environment
 
 Run package lint in a fresh R process without `devtools::load_all()` or attaching
-testthat first. Match the workflow's `.lintr`, startup files and R library. When
-CI installs the current package, establish that the selected installed namespace
-comes from the source ref being linted; version equality alone is insufficient.
-Record R/lintr versions, `.libPaths()` and installed package path/version. Without
-that evidence, report local findings with CI parity unverified. Do not install
-packages implicitly.
+testthat first.
 
-A helper outside `test_that()` can need `testthat::expect_true(...)`; a loaded
-session may hide the missing namespace. A stale installed package can produce
-unrelated missing-name findings. Fix the namespace or environment rather than
-suppressing `object_usage_linter`. Inspect findings and missing-engine/messages
-fields: process exit zero alone does not prove a clean scan.
+1. Match the workflow's `.lintr`, startup files and R library.
+2. When CI installs the current package, establish that the selected installed namespace
+   comes from the source ref being linted; version equality alone is insufficient.
+3. Record R/lintr versions, `.libPaths()` and installed package path/version.
+4. Without that evidence, report local findings with CI parity unverified.
+5. Do not install packages implicitly.
+
+Two common traps:
+
+- A helper outside `test_that()` can need `testthat::expect_true(...)`; a loaded
+  session may hide the missing namespace.
+- A stale installed package can produce unrelated missing-name findings.
+
+Fix the namespace or environment rather than suppressing `object_usage_linter`.
+Inspect findings and missing-engine/messages fields: process exit zero alone does
+not prove a clean scan.
+
+### Diff-aware lint
 
 This is the **only quality command with diff-aware flags.** With `--changed` it scopes the
 run to the package(s) you touched on this branch and tags each lint `[introduced]` vs
@@ -71,6 +81,8 @@ run to the package(s) you touched on this branch and tags each lint `[introduced
 baseline run, `[uncommitted]` refinement, the per-package cache) lives in the diff-aware
 guide — see [diff-aware checks](diff-aware.md) rather than duplicating
 it here.
+
+### Flags and output
 
 | Flag | Type | Default | Effect |
 |---|---|---|---|
@@ -213,12 +225,14 @@ reports suggestions but does not rewrite your links.
 
 ---
 
-## See also
+## Next steps
 
-- [Command reference](../commands.md) — the terse one-line index of all commands.
-- [`lib/rcmd.py` reference](../reference/rcmd.md) — the engine layer (`lintr` / `spelling`
-  / `styler` / `urlchecker` kinds) and the normalized envelope these commands consume.
 - [R package dev cycle](../tutorials/r-dev-cycle.md) — the inner loop these quality gates
   fit into.
 - [Diff-aware checks](diff-aware.md) — the full story behind
   `r:lint --changed` (`[introduced]` / `[pre-existing]` tagging, baseline cache).
+- [CRAN submission](cran-submission.md) — where `spell` and `urlcheck` findings turn into submission blockers.
+
+Reference: [command reference](../commands.md) and the
+[`lib/rcmd.py` reference](../reference/rcmd.md) (the `lintr` / `spelling` / `styler` /
+`urlchecker` kinds and the normalized envelope).
