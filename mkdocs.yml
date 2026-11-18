@@ -43,6 +43,9 @@ theme:
     - search.highlight
     - content.code.copy
     - content.action.edit
+    - toc.follow
+    - navigation.path
+    - navigation.footer
   icon:
     repo: fontawesome/brands/github
 
@@ -149,6 +152,7 @@ nav:
       - 🤖 Orchestrator agent: orchestrator.md
       - Configuration: configuration.md
       - Lib modules: lib-modules.md
+      - 🎨 ADHD design system: reference/adhd-design-system.md
     - "API: project state":
       - discovery: reference/discovery.md
       - deps: reference/deps.md
