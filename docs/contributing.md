@@ -1,5 +1,13 @@
 # Contributing
 
+!!! tip "TL;DR (30 seconds)"
+    - **What:** how to propose a change to rforge.
+    - **Why:** PRs that follow the branch and test rules merge faster.
+    - **How:** branch from `dev`, work in a worktree, run the test gates, open a PR into `dev`.
+    - **Next:** [Which branch?](#which-branch) to start, or [Testing](#testing) before you open the PR.
+
+⏱️ 10 minutes • 🟢 Beginner • ✓ 6 sections
+
 Thank you for your interest in rforge! Here's how to get started.
 
 ## Which branch?
@@ -132,3 +140,9 @@ bash tests/cli/e2e-tests.sh          # needs a real R package workspace
 - File an [issue](https://github.com/Data-Wise/rforge/issues) for bugs.
 - See [Architecture](architecture.md) and [Lib Modules](lib-modules.md) for
   the internals deep-dive.
+
+## Next steps
+
+- [Lib modules](lib-modules.md): how the Python modules are organized.
+- [Architecture](architecture.md): how the plugin fits together.
+- [Commands reference](commands.md): the command docs you update when adding a command.

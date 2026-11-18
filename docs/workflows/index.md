@@ -6,6 +6,8 @@
     - **How:** Find your scenario below → follow the diagram → click through to the matching tutorial.
     - **Next:** [Tutorials](../tutorials/README.md) for the step-by-step versions.
 
+⏱️ 5 minutes • 🟢 Beginner • ✓ 14 workflows
+
 This page collects the rforge workflows as diagrams. Each one links to the
 tutorial that walks it through in detail.
 

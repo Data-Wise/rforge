@@ -6,6 +6,8 @@
     - **How:** Each takes `--path` and `--format text|json`; importable as a Python API too.
     - **Next:** [Reference API docs](reference/discovery.md) for signatures, or [Architecture](architecture.md#path-b-lib-modules) for fit.
 
+⏱️ 10 minutes • 🔵 Intermediate • ✓ 8 sections
+
 Pure-Python R ecosystem analysis, callable from plugin commands or directly
 from any shell. Ships with rforge v1.3+ (no R subprocess by default — only
 the opt-in `docaudit --run-examples` launches R — no MCP server, no
@@ -336,3 +338,9 @@ Optional docs audit: `--site URL` plus optional local `--ref REF`;
 Default remains static. Inspect stage coverage; unpaired rendered assertions and
 unsupported options are incomplete. Complete A2 warnings gate warn, incomplete
 stages gate warn/error. No site build/deploy/fetch; example replay is opt-in.
+
+## Next steps
+
+- [Contributing](contributing.md): add or change a lib module.
+- [Architecture](architecture.md#path-b-lib-modules): where `lib/` fits in the plugin.
+- [Commands reference](commands.md): the commands that call these modules.
