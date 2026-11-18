@@ -240,7 +240,7 @@ from a previous version, remove it (see
 
 ## 📝 Document Maintenance
 
-**Last Updated:** 2026-08-01
+**Last Updated:** 2026-11-17
 **Plugin Version:** 2.23.0
 **Documentation Version:** 2.23.0
 
