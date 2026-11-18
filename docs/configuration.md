@@ -3,7 +3,7 @@
 !!! tip "TL;DR (30 seconds)"
     - **What:** Tune 4 options (CRAN mirror, vignette engine, R version pin, CLAUDE.md budget).
     - **Why:** Defaults work for most repos; override when you need CRAN-specific behavior or mirror selection.
-    - **How:** Edit `.claude-plugin/config.json` in your repo root.
+    - **How:** Add overrides to `.claude/rforge.local.json` in your repo; leave the bundled `.claude-plugin/config.json` alone.
     - **Next:** Most users skip this entirely — the defaults are sensible.
 
 ⏱️ **5 minutes** • 🟢 Beginner • Optional
@@ -129,6 +129,7 @@ equality (`==`) — use `==` only when you have a real reason.
 **Type:** Integer (line count)
 
 Maximum number of lines for `CLAUDE.md` files in your R package.
+
 !!! warning "Not enforced yet"
     No rforge command reads this setting today. `/rforge:docs:check` audits docs content against
     the API, not file length; the key is reserved.
@@ -170,13 +171,6 @@ A complete project-local override at `.claude/rforge.local.json`:
 
 ---
 
-## See Also
-
-- [Hooks & Skills Reference](hooks-and-skills.md) — what runs
-  automatically on every edit.
-- `.claude-plugin/config.json` — the plugin-shipped defaults (read-only).
-- `/rforge:status` — shows the active configuration for your project.
-
 ## Optional docs-audit coverage
 
 `docs.allowlist` suppresses source findings, including A2 site/README findings,
@@ -185,3 +179,13 @@ stage. It cannot authorize execution or suppress source-less extra-URL
 information. `--site URL`, `--ref`, `--run-examples` and
 `--examples-budget-seconds` are invocation flags, not inferred site or execution
 authorization from configuration. See the [Docs audit guide](guides/docs-audit.md).
+
+## Next steps
+
+- [Hooks & Skills](hooks-and-skills.md): what runs automatically on every edit.
+- [Docs audit guide](guides/docs-audit.md): the docs-check flags and allowlist in depth.
+- [Troubleshooting](troubleshooting.md): fix a config or setup error.
+
+Also useful: `.claude-plugin/config.json` holds the plugin-shipped defaults
+(read-only), and `/rforge:status` shows the active configuration for your
+project.

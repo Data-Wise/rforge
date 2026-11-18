@@ -6,7 +6,7 @@
     - **How:** For Codex, use the guide below; for Claude, pick one method.
     - **Next:** [Quick Start](quickstart.md) to run your first command.
 
-⏱️ **2 minutes** • 🟢 Beginner • Pick ONE method
+⏱️ **2 minutes** • 🟢 Beginner • ✓ 3 steps (pick ONE method, then verify)
 
 ## Codex personal plugin
 
@@ -36,7 +36,7 @@ Works on macOS, Linux, and Windows. Updates with `/plugin update rforge`.
 brew install data-wise/tap/rforge
 ```
 
-Stable v2.17.0. Updates automatically with `brew upgrade`.
+Installs the latest stable release. Update with `brew upgrade`.
 
 To track the development branch instead:
 
@@ -65,15 +65,12 @@ don't, restart Claude Code and try again.
 A quicker confirmation from the shell:
 
 ```zsh
-ls ~/.claude/plugins/rforge/commands/r/
+ls ~/.claude/plugins/rforge/commands/
 ```
 
-Expected: a list of 17 `.md` files in `commands/r/` (check, load, document,
-test, coverage, build, install, site, cycle, lint, spell, urlcheck, style,
-revdep, goodpractice, winbuilder, cran-prep) plus `commands/rhub.md`, and
-the 15 top-level commands in `commands/` (analyze, capture, cascade,
-complete, deps, detect, health, impact, init, next, quick, release, status,
-thorough, plus `docs/check.md`).
+Expected: top-level command files such as `analyze.md`, `status.md` and
+`thorough.md`, plus the `r/` and `docs/` subfolders for the `r:*` and
+`docs:*` commands. The authoritative list is in the [REFCARD](REFCARD.md).
 
 ## Requirements
 
@@ -123,7 +120,13 @@ issues on macOS).
 ## What you get
 
 - **{{ rforge.command_count }} slash commands** for R-package ecosystem analysis (see [REFCARD](REFCARD.md))
-- **4 pure-Python `lib/` modules** invokable as `python3 -m lib.<mod>`
+- **Pure-Python `lib/` modules** invokable as `python3 -m lib.<mod>` (see [Lib Modules](lib-modules.md))
 - **R-aware `PreToolUse` hook** that protects roxygen-generated files
-- **`description-sync` validation skill** for pre-CRAN release checks
+- **Validation skills** for pre-CRAN release checks (see [Hooks & Skills](hooks-and-skills.md))
 - **Self-contained** — no MCP server, no Node runtime requirement
+
+## Next steps
+
+- [Quick Start](quickstart.md): run your first command.
+- [Configuration](configuration.md): optional tuning (most users skip it).
+- [Troubleshooting](troubleshooting.md): if `/help` shows no `/rforge:` commands.

@@ -6,7 +6,11 @@
     - **How:** `/rforge:<command>` reads a markdown prompt; Claude runs `python3 -m lib.<module>` and synthesizes.
     - **Next:** [Lib Modules](lib-modules.md) for the module-by-module breakdown.
 
+⏱️ **10 minutes** to skim, 25 to read in full • 🔴 Advanced
+
 Deep dive into how RForge works internally: auto-delegation orchestration, pattern recognition, parallel execution, and result synthesis.
+
+**Jump to:** [Plugin surface](#plugin-surface) · [`lib/` modules](#path-b-lib-modules) · [Layers](#architecture-layers) · [Patterns](#pattern-recognition) · [Parallel execution](#parallel-execution) · [Modes](#mode-system-integration) · [Synthesis](#result-synthesis)
 
 ## Overview
 
@@ -34,7 +38,7 @@ graph LR
     subgraph Plugin[".claude-plugin/"]
         MP[marketplace.json<br/><i>install-time</i>]
         CFG[config.json<br/><i>plugin-load</i>]
-        CMD[commands/*.md<br/><i>16 slash commands</i>]
+        CMD[commands/*.md<br/><i>{{ rforge.command_count }} slash commands</i>]
         AGT[agents/orchestrator.md<br/><i>auto-delegation</i>]
         HK[hooks/pretooluse.py<br/><i>every Write/Edit</i>]
         SK[skills/validation/*.md<br/><i>auto-discovered</i>]
@@ -169,7 +173,7 @@ Two architectural categories have emerged since v1.3.0:
 
 | Module | Powers | Notes |
 |---|---|---|
-| `lib.rcmd` | **(v2.1.0)** the 17 `r:` commands — `load`/`document`/`test`/`check`/`coverage`/`build`/`install`/`site`/`cycle` + quality + CRAN-submission. v2.3.0 added strict CRAN-incoming check flavors | wraps `rcmdcheck`/`pkgbuild`/`roxygen2`/`testthat`/`covr`/`pkgdown`/… → normalizes to one JSON envelope; `devtools` only for `r:winbuilder` |
+| `lib.rcmd` | **(v2.1.0)** the `r:` commands — `load`/`document`/`test`/`check`/`coverage`/`build`/`install`/`site`/`cycle` + quality + CRAN-submission. v2.3.0 added strict CRAN-incoming check flavors | wraps `rcmdcheck`/`pkgbuild`/`roxygen2`/`testthat`/`covr`/`pkgdown`/… → normalizes to one JSON envelope; `devtools` only for `r:winbuilder` |
 
 So the v1.3.0 "four analysis modules" picture is now **five stdlib modules + one R-runner**: deep-R workflows (`/rforge:r:*`) run through `lib.rcmd`, *not* ad-hoc Bash `R CMD check` calls.
 
@@ -704,7 +708,8 @@ class MarkdownFormatter {
    - Smarter cache invalidation based on file changes
    - Git-aware caching
 
-## See Also
+## Next steps
 
-- **[Quick Start Guide](quickstart.md)** - Getting started
-- **[Commands Reference](commands.md)** - All commands
+- [Lib Modules](lib-modules.md): the module-by-module breakdown.
+- [Commands Reference](commands.md): every command and flag.
+- [Orchestrator Agent](orchestrator.md): the agent that applies these patterns (and the [Quick Start](quickstart.md) if you have not run a command yet).
