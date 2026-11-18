@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -666,6 +666,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook (task recipes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../package-development-guide/" class="md-nav__link">
         
   
@@ -972,6 +1000,34 @@
     
   
     R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tidy-your-package/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tidy a package (r:tidy)
   
 
     
@@ -2890,6 +2946,16 @@ scenario and walks through the exact commands and expected output.</p>
 <td>~10 min</td>
 </tr>
 <tr>
+<td>Checking a package against tidyverse conventions and applying the safe fixes</td>
+<td><a href="tidy-your-package/">Tidy a package with r:tidy</a></td>
+<td>~10 min</td>
+</tr>
+<tr>
+<td>Checking that <code>DESCRIPTION</code> matches what your code actually uses</td>
+<td><a href="dependency-reconciliation/">Dependency reconciliation</a></td>
+<td>~6 min</td>
+</tr>
+<tr>
 <td>Separating <em>your</em> regressions from pre-existing debt before merge</td>
 <td><a href="diff-aware-checks/">Diff-aware checks</a></td>
 <td>~8 min</td>
@@ -2920,6 +2986,11 @@ scenario and walks through the exact commands and expected output.</p>
 <td>~15 min</td>
 </tr>
 <tr>
+<td>Catching win-builder and CRAN-incoming failures before you submit</td>
+<td><a href="cran-winbuilder-tarball-check/">Win-builder + tarball-check</a></td>
+<td>~10 min</td>
+</tr>
+<tr>
 <td>Shipping early-access binaries while CRAN reviews</td>
 <td><a href="r-universe-early-access/">R-universe early-access</a></td>
 <td>~10 min</td>
@@ -2933,6 +3004,11 @@ scenario and walks through the exact commands and expected output.</p>
 <td>Upgrading from v1.x and hit a renamed-command error</td>
 <td><a href="../migration/v2.0.0-rename/">v2.0.0 rename migration</a></td>
 <td>~2 min</td>
+</tr>
+<tr>
+<td>Seeing what real command sessions look like</td>
+<td><a href="example-sessions/">Example sessions</a> (6 transcripts)</td>
+<td>read-only</td>
 </tr>
 <tr>
 <td>Looking up a specific command's syntax</td>
@@ -2979,6 +3055,11 @@ scenario and walks through the exact commands and expected output.</p>
 <li><strong><a href="fix-a-docs-check-finding/">Fix a docs:check finding</a></strong> — run the docs
   audit, triage each finding against <code>man/*.Rd</code>, fix or allowlist it, and gate
   a release with <code>--fail-on</code>. ~10 min.</li>
+<li><strong><a href="tidy-your-package/">Tidy a package with r:tidy</a></strong> — run the advisory
+  tidyverse-conventions audit, apply the safe <code>--fix</code>, and clear the roxygen and
+  <code>NEWS.md</code> findings by hand. ~10 min.</li>
+<li><strong><a href="dependency-reconciliation/">Dependency reconciliation</a></strong> — <code>r:deps-sync</code>
+  compares what your code uses against <code>Depends</code>/<code>Imports</code>/<code>Suggests</code>. ~6 min.</li>
 <li><strong><a href="orchestrator-cookbook/">Orchestrator cookbook</a></strong> — ask the orchestrator
   agent a <em>goal</em> ("is this CRAN-ready?") and let it run the right read-only
   analyses. ~10 min.</li>
@@ -2988,6 +3069,10 @@ scenario and walks through the exact commands and expected output.</p>
 <li><strong><a href="cran-submission-with-rforge/">CRAN submission with rforge</a></strong> — Per-package
   CRAN gate: <code>/rforge:r:cran-prep</code> → fix blockers → re-run → <code>--multi-platform</code>
   → review <code>cran-comments.md</code> → <code>/rforge:release</code>. ~15 min.</li>
+<li><strong><a href="cran-winbuilder-tarball-check/">Win-builder + tarball-check</a></strong> — catch the
+  failures CRAN's incoming checks and win-builder see before you submit. ~10 min.</li>
+<li><strong><a href="example-sessions/">Example sessions</a></strong> — six real transcripts of rforge
+  commands in practice.</li>
 <li><strong><a href="migrate-from-mcp/">Migrating from rforge-mcp</a></strong> — For users
   currently running <code>rforge-mcp</code> (the deprecated MCP server). Steps to
   upgrade to v1.3.0+ and clean up the old install. ~5 min.</li>
@@ -3067,7 +3152,7 @@ is documented in <a href="../configuration/">Configuration</a>.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

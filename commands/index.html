@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -661,6 +661,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook (task recipes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../package-development-guide/" class="md-nav__link">
         
   
@@ -865,6 +893,34 @@
     
   
     R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/tidy-your-package/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tidy a package (r:tidy)
   
 
     
@@ -4569,7 +4625,30 @@ auto-applied).</p>
 transcripts with <code>--examples-budget-seconds N</code> (default 300, positive integer).
 Source/render pairing is deferred: asserted rendered output remains unverified.
 Incomplete stages exit 2 with warn/error thresholds; completed A2 warnings gate
-only warn. Site GETs never build/deploy/fetch; replay is opt-in, not sandboxed.</p>
+only warn. Site GETs never build/deploy/fetch; replay is opt-in, not sandboxed.
+<code>--site</code> maps <code>.qmd</code>/<code>.Rmd</code>/<code>.rmd</code> articles and resolves <code>development.mode</code> from the pinned
+<code>DESCRIPTION</code>; <code>--site</code> must equal the source <code>url</code> plus the dev prefix (<code>.../dev/</code> for a devel
+site only), else <code>incomplete</code>. Incomplete with a specific reason, at the pinned ref: <code>PKGDOWN_DEV_MODE</code>
+(workflow, local action, <code>.Renviron</code>/<code>.Rprofile</code>), reusable or unreadable local actions, deploys below
+the site root (<code>deploy_to_branch(subdir = )</code>, or a Pages <code>target-folder</code>/<code>destination-dir</code> whenever a pkgdown config exists at the pinned
+ref or a workflow names pkgdown), malformed workflows, directory-level <code>_metadata.yml</code>/<code>_quarto-*.yml</code>/<code>_output.yml</code>,
+symlinks under <code>vignettes/</code>. An article is refused only for the front-matter keys <code>output_file</code>/<code>output-file</code>,
+<code>output_ext</code>/<code>output-ext</code>, <code>output_dir</code>/<code>output-dir</code>, <code>knit</code>, <code>as_is</code>, a non-HTML <code>format</code>/<code>output</code> or
+<code>pkgdown: extension</code>, in any key case with <code>-</code> and <code>_</code> interchangeable; YAML is read as parsed structures and R/shell
+code as tolerant text; scripts a <code>run:</code> step executes are read at the pinned ref (5 levels, 40 files) and scanned the
+same way (<code>make</code> follows <code>include</code>), and an unreadable, missing, symlinked, dynamic or over-cap reference is incomplete in a
+pkgdown repository for any workflow that may publish (tier 1: pkgdown wording, a Pages or deploy action, <code>deploy_to_branch</code>/<code>gh-pages</code>,
+<code>pages</code>/<code>id-token</code> write, an explicit-branch <code>git push</code>, a remote publish command (<code>rsync</code>/<code>scp</code>/<code>aws s3</code>/<code>netlify</code>/<code>firebase</code>/<code>vercel</code>) or a command that
+builds or stages the destination even when the tree does not track it yet, or a workflow that stages everything and pushes the default branch (treated as publish capable; the audit does not try to prove it builds no site; a stage is named only when every pathspec is a plain literal path outside the destination, so pathspec magic, <code>--pathspec-from-file</code> and index-changing git plumbing stage everything) (<code>git add</code>/<code>git commit</code> naming it, <code>git add -A</code> after a pkgdown build,
+<code>git subtree push</code>, <code>git worktree add</code>, <code>cp</code>/<code>mv</code>/<code>rsync</code> into it), or a workflow that stages and pushes while it downloads build output, another workflow builds the site (cross-workflow handoff) or it reaches a script, action or executable the scan cannot resolve (any executable outside a short allowlist of benign utilities fails closed for such a workflow);
+tier 2, only when the pinned tree tracks the pkgdown destination (placeholder-only directories do not count; a build call's destination
+joins the check): <code>contents: write</code>, a default-branch or refspec-less <code>git push</code>, a push action, no <code>permissions:</code> key; a branch listed in
+<code>.rforge.yaml</code> <code>docs.site.nonpublishing-branches</code> is tier 2 (an unverified maintainer declaration: a mislabeled site branch yields a wrong complete; the
+stage reports <code>nonpublishing_branches_honored</code> and the text report an info line when it applies); reusable workflows share capability with their caller; read-only workflows are relaxed);
+other overrides, names built any other way, <code>uses:</code> actions from other repositories, manual deploys outside CI and
+<code>knit</code>/<code>render</code> of a document are not detected. A complete site stage proves route presence, not
+content freshness (<code>content_freshness: "unverified"</code>) and not the CI deploy layout (<code>deploy_layout: "unverified"</code>): the
+workflow scan is best effort.</p>
 <h3 id="rforgecomplete">/rforge:complete<a class="headerlink" href="#rforgecomplete" title="Permanent link">&para;</a></h3>
 <p>Mark tasks complete with automatic documentation cascade.</p>
 <p><strong>Usage:</strong>
@@ -5594,7 +5673,7 @@ prints the manual <code>gh</code> recipe instead of failing. Backed by <code>lib
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

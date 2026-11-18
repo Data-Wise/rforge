@@ -16,14 +16,14 @@
         <link rel="prev" href="../guides/evidence-and-approval/">
       
       
-        <link rel="next" href="../package-development-guide/">
+        <link rel="next" href="../cookbook/">
       
       
         
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -819,6 +819,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#tidy-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧹 Tidy conventions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-reconciliation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔗 Dependency reconciliation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#session-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -872,6 +894,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook (task recipes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1088,6 +1138,34 @@
     
   
     R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/tidy-your-package/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tidy a package (r:tidy)
   
 
     
@@ -3000,6 +3078,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#tidy-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧹 Tidy conventions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-reconciliation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔗 Dependency reconciliation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#session-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3227,6 +3327,24 @@ that a source-tree check masks.</p>
     E --&gt; A
     D -- "none" --&gt; F["/rforge:r:cran-prep"]</code></pre>
 <p>→ <a href="../tutorials/fix-a-docs-check-finding/">Fix a docs:check finding</a> (~10 min) · <a href="../guides/docs-audit/">Docs audit guide</a></p>
+<h2 id="tidy-conventions">🧹 Tidy conventions<a class="headerlink" href="#tidy-conventions" title="Permanent link">&para;</a></h2>
+<p>A "how tidy am I?" report. Every stage is advisory and never blocks.</p>
+<pre class="mermaid"><code>flowchart LR
+    A["/rforge:r:tidy&lt;br/&gt;read-only report"] --&gt; B{"status ok?"}
+    B -- "yes" --&gt; Z["done"]
+    B -- "warn" --&gt; C["/rforge:r:tidy --fix&lt;br/&gt;styler + DESCRIPTION rewrite"]
+    C --&gt; D["fix the rest by hand:&lt;br/&gt;roxygen tags, NEWS.md"]
+    D --&gt; A</code></pre>
+<p>→ <a href="../tutorials/tidy-your-package/">Tidy a package with r:tidy</a> (~10 min)</p>
+<h2 id="dependency-reconciliation">🔗 Dependency reconciliation<a class="headerlink" href="#dependency-reconciliation" title="Permanent link">&para;</a></h2>
+<p>Make <code>DESCRIPTION</code> match what the code actually uses.</p>
+<pre class="mermaid"><code>flowchart LR
+    A["/rforge:r:deps-sync&lt;br/&gt;report only"] --&gt; B{"missing or&lt;br/&gt;misclassified?"}
+    B -- "yes" --&gt; C["/rforge:r:deps-sync --write&lt;br/&gt;applies adds and moves"]
+    C --&gt; D["re-run: only advisory&lt;br/&gt;unused entries remain"]
+    D --&gt; E["review unused by hand&lt;br/&gt;(may be used dynamically)"]
+    B -- "no" --&gt; E</code></pre>
+<p>→ <a href="../tutorials/dependency-reconciliation/">Dependency reconciliation</a> (~6 min)</p>
 <h2 id="session-boundary">🔚 Session boundary<a class="headerlink" href="#session-boundary" title="Permanent link">&para;</a></h2>
 <p>Start a session with a recap; end it by syncing <code>.STATUS</code>.</p>
 <pre class="mermaid"><code>flowchart LR
@@ -3326,7 +3444,7 @@ blocks incomplete stages with exit 2.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

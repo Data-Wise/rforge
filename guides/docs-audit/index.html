@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -661,6 +661,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook (task recipes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../package-development-guide/" class="md-nav__link">
         
   
@@ -865,6 +893,34 @@
     
   
     R package dev cycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/tidy-your-package/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tidy a package (r:tidy)
   
 
     
@@ -3071,8 +3127,179 @@ over-large region) make the report <code>INCOMPLETE</code> instead of clean.</p>
 <p><code>--site</code> requires one resolved package. It compares an immutable local deployment
 source with one bounded sitemap; no build, fetch, deploy or link crawl occurs.
 Missing selected-ref pages remain warn; checkout-only additions are info.
-Sitemap absence does not prove HTTP 404, availability or deployment freshness.
+Sitemap absence does not prove HTTP 404, availability or deployment freshness. Each sitemap <code>url</code> must carry exactly one
+nonempty <code>loc</code>; a <code>url</code> with two, none or an empty one makes the stage incomplete (<code>malformed sitemap entry</code>).
 Foreign/scheme-changing redirects require a fresh canonical-URL invocation.</p>
+<div class="admonition note">
+<p class="admonition-title">Expected behavior in v2.23.0+</p>
+<p><code>--site</code> maps <code>.qmd</code>, <code>.Rmd</code> and <code>.rmd</code> articles (nested ones included) and resolves
+<code>development.mode</code> (<code>auto</code>, <code>default</code>, <code>release</code>, <code>devel</code>, <code>unreleased</code>) from the pinned
+<code>DESCRIPTION</code> version with pkgdown 2.2.1's rule, so a Quarto site on <code>mode: auto</code> at a release
+version is audited at its root. Only <code>devel</code> serves from <code>&lt;destination&gt;/</code> (default <code>dev/</code>).</p>
+<ul>
+<li><strong>The base URL is never adjusted for you.</strong> <code>--site</code> must equal the source <code>url</code> plus the dev
+  prefix (<code>https://example.org/pkg/dev/</code> for a devel site, <code>https://example.org/pkg/</code> otherwise);
+  a root URL on a devel site, or a <code>/dev/</code> URL on a release site, is <code>incomplete</code> with a reason,
+  before any request. A devel site on Bootstrap 3 writes an unprefixed sitemap and is refused.</li>
+<li><strong>Still <code>incomplete</code>, with a specific reason:</strong> at the pinned ref, <code>PKGDOWN_DEV_MODE</code> in a
+  workflow, a local composite action or a repository-root or package <code>.Renviron</code>/<code>.Rprofile</code>; a
+  job-level reusable-workflow <code>uses:</code>; a local <code>uses: ./...</code> action that is missing, malformed or
+  not composite; a deploy below the site root (<code>deploy_to_branch(subdir = )</code>, or a Pages
+  <code>target-folder</code> or <code>destination-dir</code> input whenever a pkgdown config for the package exists
+  at the pinned ref, or a workflow names pkgdown, even if the deploy is unrelated to the
+  site); a
+  malformed workflow; a configuration under
+  <code>inst/</code> or <code>pkgdown/</code>; a non-default <code>vignettes/_quarto.yaml</code>; any symlink under <code>vignettes/</code>
+  (the link text is never read as article content); and directory-level <code>_metadata.yml</code>,
+  <code>_quarto-*.yml</code>, a nested <code>_quarto.yml</code> (with <code>.qmd</code> articles) or <code>_output.yml</code> (with <code>.Rmd</code>
+  articles). pkgdown's behavior for those directory-level files was not rendered, so they are
+  refused rather than guessed.</li>
+<li><strong>Per-article refusals</strong> are exactly these front-matter keys and values: <code>output_file</code>,
+  <code>output-file</code>, <code>output_ext</code>, <code>output-ext</code>, <code>output_dir</code> or <code>output-dir</code> anywhere in the front
+  matter; <code>knit</code>; a Quarto <code>format</code> other than <code>html</code>; an <code>.Rmd</code> <code>output</code> other than
+  <code>html_document</code>/<code>html_vignette</code>; <code>pkgdown: extension</code> other than <code>html</code>; and <code>as_is</code>. Those
+  routes are removed from the expected set, never guessed. Article keys match in any case, and
+  <code>-</code> and <code>_</code> are interchangeable (<code>as-is</code>, <code>Output-File</code>). Anything else that changes a route
+  (<code>uses:</code> actions from other repositories, a variable name built any way other than the
+  spellings below, a manual deploy outside CI, <code>_site.yml</code>, a document run through
+  <code>knit</code>/<code>render</code>) is not detected.</li>
+<li><strong>Scripts a <code>run:</code> step executes</strong> (<code>Rscript</code>, <code>R -f</code>/<code>--file</code>/<code>CMD BATCH</code>, <code>bash</code>/<code>sh</code>/<code>zsh</code>,
+  <code>python</code>, <code>source</code>/<code>.</code>, <code>./path</code>, <code>make [-f] [-C]</code>, and <code>source()</code>/<code>sys.source()</code>/<code>system()</code>
+  inside R) are read at the pinned ref, honoring <code>working-directory</code> and <code>cd</code>, followed up to
+  five levels and 40 files, and scanned with the same detections as a <code>run:</code> body. A signal
+  in a reached script blocks, even inside a comment. <code>make</code> follows <code>include</code>, <code>-include</code> and
+  <code>sinclude</code>. In a pkgdown repository, a reference that is missing, a symlink, outside the
+  repository, absolute, dynamic (<code>$VAR</code>, <code>paste0()</code>, a glob, a wildcard include), binary, over
+  1 MiB or over a cap is <code>incomplete</code> ("script reference unsupported"). A clean readable
+  script never blocks. Scripts fetched or generated at runtime show up as missing or dynamic.</li>
+<li><strong>Which workflows are strict.</strong> Every workflow and local action in a pkgdown repository,
+  unless the workflow shows no ability to publish. Two tiers of evidence make it
+  publish-capable and strict. <strong>Tier 1, always:</strong> the word pkgdown; a Pages or deploy action
+  (<code>JamesIves/github-pages-deploy-action</code>, <code>peaceiris/actions-gh-pages</code>, <code>actions/deploy-pages</code>,
+  <code>upload-pages-artifact</code>, <code>configure-pages</code>, Netlify, Vercel, Firebase, Cloudflare, rsync, scp and
+  S3 sync actions); <code>deploy_to_branch</code> or <code>gh-pages</code> text; <code>pages</code> or <code>id-token</code> write, or
+  <code>write-all</code>; a checkout given a secret token or key; an <strong>explicit-branch push</strong>, meaning any
+  <code>git push</code> whose literal branch is not <code>HEAD</code>, <code>main</code> or <code>master</code> (forms <code>&lt;remote&gt; &lt;branch&gt;</code>,
+  <code>&lt;src&gt;:&lt;branch&gt;</code>, <code>refs/heads/&lt;branch&gt;</code>, with <code>-u</code>, <code>--force</code>, <code>--force-with-lease</code>, <code>+</code>; a
+  dynamic remote or refspec, <code>--all</code> and <code>--mirror</code> fail closed to tier 1; the default branch is
+  decided by name only); a command that names a remote target (<code>rsync</code> or <code>scp</code> to a host,
+  <code>aws s3 sync|cp|mv</code> to <code>s3://</code>, <code>gsutil</code> to <code>gs://</code>, <code>netlify</code> or <code>firebase deploy</code>, <code>surge</code>,
+  <code>vercel</code>, <code>wrangler pages</code>, <code>ghp-import</code>); a command that <strong>builds or stages the destination</strong>,
+  whether or not the pinned tree tracks it yet (<code>git add</code> or <code>git commit</code> naming the destination,
+  <code>git add -A</code>/<code>.</code>/<code>-u</code> or <code>git commit -a</code> when a pkgdown build appears in the same workflow or a script
+  it reaches, <code>git subtree push</code>, <code>git worktree add &lt;destination&gt;</code>, <code>cp</code>/<code>mv</code>/<code>rsync</code>/<code>ln</code> into the
+  destination), because such a workflow can create and push <code>docs/</code> from nothing. A push that stages
+  something else, such as <code>git add data/history.csv</code>, is not stage evidence. <strong>Stage everything and push:</strong> a workflow
+  that stages everything (<code>git add .</code>, <code>-A</code>, <code>--all</code>, <code>-u</code>, a dynamic or <code>*</code> pathspec, <code>git commit -a</code>,
+  or an add-and-commit, auto-commit or push action) <strong>and</strong> pushes the default branch (or pushes with
+  no refspec) is treated as publish capable and the audit reports it as incomplete. The audit does not
+  try to prove such a workflow builds no site: a <code>tee</code>, a redirect, a download, an archive
+  extraction or a script that writes <code>docs/</code> directly cannot be enumerated away. A stage that names
+  only specific pathspecs outside the destination (<code>git add data/history.csv</code>) stays tier 2 unless
+  the workflow also reaches an unresolved reference (below), and a push to a branch declared
+  non-publishing is not a push; a pathspec that is, contains, is a parent of or is a
+  glob that can match the destination (<code>docs*</code>, <code>*.html</code>) is tier 1. A stage is <strong>named</strong> only when
+  every pathspec is a plain literal path outside the destination (a wildcard counts only below a literal first
+  directory, as in <code>man/*.Rd</code>; <code>*.html</code> and <code>**/x.html</code> do not); pathspec magic (<code>:(top)docs</code>,
+  <code>:/docs</code>, <code>:!x</code>, <code>:(glob)</code>), <code>--pathspec-from-file</code>, <code>..</code>, absolute or <code>~</code> paths, expansion and
+  braces, a commit that names such a path, and git plumbing that changes the index or tree
+  (<code>update-index</code>, <code>read-tree</code>, <code>commit-tree</code>, <code>checkout-index</code>, <code>apply</code>, <code>am</code>, <code>stash</code>) stage
+  everything, so an unknown form fails closed. A workflow that stages everything and runs a program whose
+  name is computed is also tier 1 without a visible push (the program may be <code>git</code>, as in
+  <code>$(command -v git) push origin main</code>). <code>r-lib/actions/pr-push</code>
+  pushes a pull request's own branch and is not counted. A repository that is not a pkgdown
+  repository is not affected. <strong>Cross-workflow
+  handoff:</strong> build output can reach the staging workflow from another workflow, so a workflow that
+  stages and pushes (<code>git add .</code>/<code>-A</code>/<code>-u</code>/<code>-f</code>, <code>git commit -a</code>, a push action, then a push to the
+  default branch or with no refspec) is also tier 1 when it pulls build output from elsewhere
+  (<code>download-artifact</code>, <code>gh run download</code>, <code>gh release download</code>, <code>curl</code>/<code>wget</code> of an archive, a
+  <code>workflow_run</code> trigger) or when any other workflow in the repository builds the site (pkgdown
+  wording, a <code>build_site</code> call, an upload of the destination, <code>upload-pages-artifact</code>). A stage-and-push
+  workflow is also tier 1 when anything it reaches could not be resolved, because the build may
+  hide behind it: a dynamic or missing script, an absolute or outside path, a symlink, a binary or
+  oversized file, a depth or file cap, a dynamic working directory, a missing or malformed local
+  action, a make include that cannot be read, <code>eval(parse())</code>, <code>do.call(source, ...)</code>,
+  <code>rmarkdown::render</code>/<code>knitr::knit</code>/<code>quarto::quarto_render</code>, or <strong>any executable outside a short
+  allowlist</strong>. The scan follows <code>Rscript</code>/<code>R</code>, <code>bash</code>/<code>sh</code>/<code>zsh</code> (including a literal <code>-c</code> string),
+  <code>make</code>, <code>source</code>, <code>./x</code> and <code>python &lt;literal script&gt;</code>, and knows <code>git</code>, <code>gh</code>, <code>curl</code>/<code>wget</code>,
+  installers (<code>pip</code>, <code>uv pip</code>, <code>apt</code>, <code>brew</code>: install-type subcommands only) and plain shell and text
+  utilities (<code>echo</code>, <code>cat</code>, <code>ls</code>, <code>cp</code>, <code>grep</code>, <code>sed</code>, <code>awk</code>, <code>jq</code>, <code>find</code> and the like) cannot make
+  site files. Everything else is opaque: <code>python -m &lt;module&gt;</code> (except <code>pip</code>, <code>venv</code>), <code>python -c</code>,
+  <code>uv run &lt;unlisted tool&gt;</code>, <code>node</code>, <code>quarto</code>, <code>docker</code>, any unlisted binary, a dynamic command
+  (<code>$X</code>, <code>bash -c "$X"</code>), a Python script that runs other code (<code>subprocess</code>, <code>os.system</code>, <code>exec</code>).
+  The list is not extended per generator: the default for an unknown executable is to fail closed.
+  Wrapper options (<code>env --</code>, <code>sudo -E</code>, <code>nice -n</code>) are parsed before the executable is judged, a
+  repo-relative path is read even when its basename is an allowlisted name (<code>tools/echo</code>), a literal
+  absolute path outside the system bin directories is opaque, and a wrapper option that changes what runs or
+  where (<code>env -S</code>, <code>env -C</code>, <code>sudo -D</code>, <code>sudo -i</code>/<code>-s</code>) is opaque. <code>gh</code> is allowed for reads; <code>gh api</code> with a
+  write method or field flags, <code>gh workflow run</code>, <code>gh pr merge</code> and <code>gh release create|upload|edit|delete</code> are a
+  publish signal and opaque.
+  For every workflow that may publish (it stages and pushes, or deploys through a Pages or deploy
+  action, or is tier 1 or tier 2 capable under the tracked-destination rule) every such reference is an
+  incomplete reason; a workflow that cannot publish keeps treating opaque calls as not detected. Without a build, download or unresolved reference anywhere, a
+  stage-and-push workflow stays tier 2; a push to a branch declared non-publishing is not a push
+  for this rule. <strong>Tier 2, only when the pinned tree tracks the
+  pkgdown destination:</strong> plain <code>contents: write</code>; a push action such as <code>ad-m/github-push-action</code>;
+  a job with no <code>permissions:</code> key at either level; a push with no refspec or to the default
+  branch; the same publish programs with no remote target. The destination is the config
+  <code>destination:</code> (default <code>docs/</code>, under the package directory) plus any destination a pkgdown
+  build call names (<code>destination =</code>, <code>dest_dir =</code>, <code>destination:</code>, <code>--destination</code>; a value that
+  is not a literal counts as tracked). A directory holding only <code>.gitkeep</code>, <code>.keep</code>, <code>.gitignore</code>
+  or <code>.gitattributes</code> is not tracked; anything else is, including <code>.nojekyll</code>, a file or symlink
+  at the path, and a gitlink (submodule) at or below it. Paths compare case-sensitively, as git
+  does. A destination that is a variable, a list, absolute or <code>..</code>, or an unreadable config,
+  counts as tracked. Evidence from the scripts and local actions a workflow reaches counts the
+  same way. A caller job that <code>uses:</code> a local reusable workflow shares capability with it in both
+  directions (callee gets the caller's permissions, caller gets the callee's evidence); an
+  unresolvable callee (missing, another repository, dynamic) is assumed tier 1. The reason names
+  the tier and the evidence, for example "tier 2: permissions contents: write (workflow);
+  destination docs/ is tracked".</li>
+<li><strong>Declaring a branch that never carries site files.</strong> A repository can list literal branch names
+  in <code>.rforge.yaml</code> (package directory or repository root, read at the pinned ref):</li>
+</ul>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">docs</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">site</span><span class="p">:</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">nonpublishing-branches</span><span class="p">:</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">qc-results</span>
+</span></code></pre></div>
+<p>A push to a listed branch is tier 2 instead of tier 1, so it counts only when the destination is
+  tracked. Only a list of literal names counts: a string, glob, variable or non-string entry, or an
+  unparseable file, exempts nothing, and a key that exists only in the working tree or after the
+  pinned ref is not read. <code>gh-pages</code> text and deploy actions stay tier 1 whatever the list says.</p>
+<p><strong>The list is an unverified declaration.</strong> It is a maintainer attestation in the same trust class as
+  <code>docs.allowlist</code> and <code>site.allowlist</code>: the engine cannot see what a branch serves without a live
+  GitHub Pages API call, which the offline default forbids, so a site branch listed by mistake yields
+  a wrong <code>complete</code>. Review the list when you review the site setup. Whenever a push was classified
+  tier 2 because of the declaration, the site stage carries <code>nonpublishing_branches_honored</code> (the sorted names whose push
+  was classified as non-publishing because of it; an empty list when none) and the text report prints
+  an <code>info</code> line naming them, so a reader sees that an exemption was applied.</p>
+<p>A workflow with no evidence is relaxed, because QC and simulation scripts are full of
+  <code>source(file.path(...))</code>. Not detected: a script that pushes from a workflow that shows no signal
+  at all; a stage-and-push workflow whose only route to site files is an
+  action from another repository, a submodule update or a checkout of another ref, with no
+  build, download or unresolved reference anywhere in the repository; <code>knit</code>/<code>render</code> and unlisted
+  executables in a workflow that cannot publish; a destination written through a name the scan cannot read; a site branch mislabeled in
+  <code>nonpublishing-branches</code> (documented gap: an unverified maintainer declaration); actions from other repositories (beyond the fail-closed reusable-workflow rule); manual
+  deploys outside CI.
+- <strong>How names are matched.</strong> YAML inputs (workflows, local actions, front matter) are read as
+  parsed structures, so quoted or escaped keys, flow mappings, anchors, merge keys and any
+  case of <code>target-folder</code>/<code>PKGDOWN_DEV_MODE</code> count. R and shell code (a <code>run:</code> body,
+  <code>.Rprofile</code>) is matched as text: the argument name in <code>deploy_to_branch(subdir = )</code> may be
+  quoted, backticked or on another line, and <code>PKGDOWN_DEV_MODE</code> is found in any case, with
+  quotes, commas or <code>paste0()</code> splits between its parts. Root redirects and general output overrides are follow-up work (#123).
+- <strong><code>content_freshness: unverified</code>.</strong> A <code>complete</code> site stage means route presence only: the
+  sitemap says which pages exist, not whether their content is current (a sitemap carries no
+  <code>&lt;lastmod&gt;</code>). The text verdict reads <code>no findings; site content freshness and deploy layout unverified</code>.
+- <strong><code>deploy_layout: unverified</code>.</strong> The workflow and script scan (publish-capability tiers, tracked
+  destination, stage-and-push, opaque executables) refuses a site when it finds a way CI could deploy a
+  different layout, but it is best effort and cannot be exhaustive: it infers deploy behavior from workflow
+  text and a repository can publish through commands, scripts or credentials it cannot read. A <code>complete</code>
+  stage therefore never claims how the site is deployed; the marker is a fixed property of the stage, not a
+  result of the scan. Known residuals found in review and not patched: an allowlisted program that loads a
+  script (<code>awk -f tools/publish.awk</code>, <code>sed -f</code>), <code>gh repo sync</code> and other <code>gh</code> subcommands that update
+  repository content, and deploy credentials (a personal access token passed to a step as <code>GH_TOKEN</code>) in a workflow with
+  read-only <code>contents</code>.</p>
+</div>
 <p>README replay loads the working tree with pkgload/evaluate, retaining hidden
 setup state and honoring literal eval/include/visibility options. Root explicit
 R fences and literal #&gt; assertions are supported. Unsupported options, unlabeled
@@ -3120,8 +3347,9 @@ real deployed pkgdown site, the package-triage freshness check and the rendered-
 inspection itself. The finalized adversarial review is a recorded judgment supplied
 as the <code>review-record</code> input: the run stamps it but cannot prove it, so it is
 attested by whoever dispatches; keep it concise, because a dispatch input is limited to about 64 KB. Before downloading the artifact, <code>a2-release.yml</code> asks the Actions API whether the supplying run is the <code>a2-observations.yml</code> dispatch for the same head commit and finished successfully. The live smoke checks one supported public site and
-records that real Data-Wise packages are reported incomplete, because pkgdown
-development mode and <code>.qmd</code> articles are unsupported by <code>--site</code> today.</p>
+records pinned real packages: since v2.23.0, the Data-Wise packages medfit and probmed (pkgdown
+<code>development.mode: auto</code>, <code>.qmd</code> articles) are audited as supported, and the pinned tidyverse
+site glue (<code>template.package</code>) must still be reported incomplete.</p>
 <p>Evaluate text is mirrored into a separate temporary spool, allowing the guardian
 to observe output growth inside a running expression. Captured text is counted
 once from that spool; condition text is counted separately as it occurs. Native
@@ -3221,7 +3449,7 @@ a destructive signal; the child handle is allocated before launching the workloa
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>
