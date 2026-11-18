@@ -159,12 +159,18 @@ Restart Claude Code so the commands register, then verify with `/help` (look for
 
 ## 🆕 What's new in {{ rforge.version }}
 
-- 🐛 **`.STATUS` parsing fixes** — `lib.status` (behind `/rforge:status` and `/rforge:health`)
-  reads the `key: value` frontmatter dialect every mediationverse package uses, and takes
-  `phase` only from a `phase:` key, not from old history lines in the prose.
-- 🐛 **`/rforge:restore` NEWS count** — entries grouped under `##` subsections are counted again.
-- 📚 **MediationVerse doctrine** in the [CRAN submission](guides/cran-submission.md),
-  [dev cycle](guides/dev-cycle.md) and [S7 review](guides/s7-review.md) guides.
+- 🧠 **ADHD-friendly documentation site.** A documented [design system](reference/adhd-design-system.md), regrouped navigation, a "What do you want to do?" home page with a 5-minute [quickstart](quickstart.md) path, and a TL;DR, time line and next-step block on tutorials, guides and top-level pages. Docs-only: no command or flag changes.
+
+??? note "From 2.23.0"
+    - 🌐 **`/rforge:docs:check --site` audits Quarto articles and pkgdown development-mode sites.** `--site` must equal the source `url` plus the development prefix. A complete site stage proves route presence only; content freshness and deploy layout are reported as unverified. See the [Docs audit guide](guides/docs-audit.md).
+
+??? note "From 2.20.1"
+    - 🐛 **`.STATUS` parsing fixes** — `lib.status` (behind `/rforge:status` and `/rforge:health`)
+      reads the `key: value` frontmatter dialect every mediationverse package uses, and takes
+      `phase` only from a `phase:` key, not from old history lines in the prose.
+    - 🐛 **`/rforge:restore` NEWS count** — entries grouped under `##` subsections are counted again.
+    - 📚 **MediationVerse doctrine** in the [CRAN submission](guides/cran-submission.md),
+      [dev cycle](guides/dev-cycle.md) and [S7 review](guides/s7-review.md) guides.
 
 ??? note "From 2.20.0"
     - 🔖 **`/rforge:restore` + `/rforge:finish`** — R-package session-boundary commands: recap a

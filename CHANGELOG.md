@@ -34,6 +34,7 @@ library behavior changes (44 commands).
   54 hand-written pages: TL;DR 41 to 50, time line 24 to 47, next-step block 11 to 45.
 - `CLAUDE.md` and `AGENTS.md` replace the "Don't write custom CSS" rule with the design-system rule.
 - Body text is 17px (was 14px) and tables are 0.75rem.
+- The home page "What's new" section describes the current release; it listed v2.20.1 fixes under the current version. The older notes are collapsed under their own versions.
 
 ### Known limits
 
