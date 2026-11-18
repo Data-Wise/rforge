@@ -61,8 +61,17 @@ engine changes are read directly from the local checkout.
 
 Fresh-session discovery and isolated medfit package/docs checks passed. Static
 checks leave variadic signatures unchecked. Installed 0.1.1 missing/older-engine
-rejection was verified separately; 0.2.0 lint discovery/invocation has not been
-verified in a fresh Codex session. Local engine smoke tests are separate evidence.
+rejection was verified separately. Installed 0.2.0 (identical to this source) was
+exercised in fresh `codex exec` sessions on 2026-10-31 against engine ref `baa5905`:
+all three skills were discovered; `$rforge-lint` ran `lib.rcmd --kind lint` on a clean
+package (`ok`, 0 findings) and on a package with a planted assignment and undefined-name
+defect (`warn`, 2 findings: `assignment_linter`, `object_usage_linter`). Both runs
+reported CI parity as unverified, as intended, because the package was not installed
+and had no CI workflow. Real CI parity, a real package and variadic signatures remain
+unexercised. Codex listed every skill's description as "No description provided"
+although each `SKILL.md` has one; it affected all three skills equally and did not
+prevent invocation. Its cause is not investigated.
+Local engine smoke tests are separate evidence.
 Site builds, runnable examples and live resources need separate verification.
 See the repository website's
 [Codex guide](https://data-wise.github.io/rforge/guides/codex-checks/).

@@ -163,7 +163,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9",
+        "tests/a2/test_site_integration.py": "a5b43e8a0ee1567e6cce58b52209f4f7824e45b0c5cbb7e3cfcf9e4959cfdd83",
         "tests/a2/test_site_refs.py": "5a3346a29fadb6da059475918f285f1e87683a6547d06b2d0a947a362ecf24ac"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
@@ -219,7 +219,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9",
+        "tests/a2/test_site_integration.py": "a5b43e8a0ee1567e6cce58b52209f4f7824e45b0c5cbb7e3cfcf9e4959cfdd83",
         "tests/a2/test_site_refs.py": "5a3346a29fadb6da059475918f285f1e87683a6547d06b2d0a947a362ecf24ac"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
@@ -235,7 +235,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_routes.py": "49fc012db734446278d082c1129eafa2055a46c58255f7af859f1ae3689c8153"
+        "tests/a2/test_site_routes.py": "e05a46f42e947a100ef3eccc3529db738f335af48fa032539e5435c17588f554"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -250,7 +250,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_routes.py": "49fc012db734446278d082c1129eafa2055a46c58255f7af859f1ae3689c8153"
+        "tests/a2/test_site_routes.py": "e05a46f42e947a100ef3eccc3529db738f335af48fa032539e5435c17588f554"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -270,7 +270,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
+        "tests/a2/test_site_integration.py": "a5b43e8a0ee1567e6cce58b52209f4f7824e45b0c5cbb7e3cfcf9e4959cfdd83"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -284,18 +284,22 @@
         "tests/a2/test_site_routes.py::test_release_mode_and_destination[config0-True]",
         "tests/a2/test_site_routes.py::test_release_mode_and_destination[config1-True]",
         "tests/a2/test_site_routes.py::test_release_mode_and_destination[config2-True]",
-        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config3-False]",
-        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config4-False]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config3-True]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config4-True]",
         "tests/a2/test_site_routes.py::test_release_mode_and_destination[config5-False]",
         "tests/a2/test_site_routes.py::test_release_mode_and_destination[config6-False]",
-        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config7-False]"
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config7-False]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config8-False]",
+        "tests/a2/test_site_routes.py::test_release_mode_and_destination[config9-False]"
       ],
       "status": "ready",
-      "coverage_gaps": [],
+      "coverage_gaps": [
+        "Superseded in part: for #111, development.mode, the route prefix and strict base matching are governed by SPEC-site-audit-quarto-devmode-2026-10-31.md rev 2 (Codex-approved; dev commit 871d6af), which replaces the frozen A2 SPEC's rule that every non-default development mode is incomplete (SPEC-docs-check-a2-2026-10-12.md, which is intentionally not edited and remains the contract for everything else). This A2 group covers only the release-mode and destination cases; the devel, auto, route-prefix and strict-base cases are tested in tests/test_docsite.py."
+      ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9",
-        "tests/a2/test_site_routes.py": "49fc012db734446278d082c1129eafa2055a46c58255f7af859f1ae3689c8153"
+        "tests/a2/test_site_integration.py": "a5b43e8a0ee1567e6cce58b52209f4f7824e45b0c5cbb7e3cfcf9e4959cfdd83",
+        "tests/a2/test_site_routes.py": "e05a46f42e947a100ef3eccc3529db738f335af48fa032539e5435c17588f554"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -317,8 +321,8 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_http.py": "59c8b4826bb8f0e0cf0124d5a60f42c7f36a50108d5df011507f9e43fb204597",
-        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
+        "tests/a2/test_site_http.py": "0c3ac4ab78b99aea8cd367f98b90e4fdf007246fd31460c0585b363946f2a86d",
+        "tests/a2/test_site_integration.py": "a5b43e8a0ee1567e6cce58b52209f4f7824e45b0c5cbb7e3cfcf9e4959cfdd83"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -338,7 +342,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_http.py": "59c8b4826bb8f0e0cf0124d5a60f42c7f36a50108d5df011507f9e43fb204597"
+        "tests/a2/test_site_http.py": "0c3ac4ab78b99aea8cd367f98b90e4fdf007246fd31460c0585b363946f2a86d"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -359,8 +363,8 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_http.py": "59c8b4826bb8f0e0cf0124d5a60f42c7f36a50108d5df011507f9e43fb204597",
-        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
+        "tests/a2/test_site_http.py": "0c3ac4ab78b99aea8cd367f98b90e4fdf007246fd31460c0585b363946f2a86d",
+        "tests/a2/test_site_integration.py": "a5b43e8a0ee1567e6cce58b52209f4f7824e45b0c5cbb7e3cfcf9e4959cfdd83"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -375,7 +379,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_http.py": "59c8b4826bb8f0e0cf0124d5a60f42c7f36a50108d5df011507f9e43fb204597"
+        "tests/a2/test_site_http.py": "0c3ac4ab78b99aea8cd367f98b90e4fdf007246fd31460c0585b363946f2a86d"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -390,7 +394,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
+        "tests/a2/test_site_integration.py": "a5b43e8a0ee1567e6cce58b52209f4f7824e45b0c5cbb7e3cfcf9e4959cfdd83"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -416,7 +420,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
+        "tests/a2/test_site_integration.py": "a5b43e8a0ee1567e6cce58b52209f4f7824e45b0c5cbb7e3cfcf9e4959cfdd83"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -431,7 +435,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_site_integration.py": "7ae967adb9a96fa8ad8213b789a3138500571295094060554cdaca49d96ecff9"
+        "tests/a2/test_site_integration.py": "a5b43e8a0ee1567e6cce58b52209f4f7824e45b0c5cbb7e3cfcf9e4959cfdd83"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1100,7 +1104,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+        "tests/a2/test_examples_cli.py": "632597289a1487d3edb7898fc8fc34e173a5f7b08c9b4511907261a610449a8c"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1182,7 +1186,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79",
+        "tests/a2/test_examples_cli.py": "632597289a1487d3edb7898fc8fc34e173a5f7b08c9b4511907261a610449a8c",
         "tests/a2/test_examples_r.py": "9e0dc125cf57c7d483a7dabd12cf070b1417e1ffea50e32ab990237b7d551dd2"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
@@ -1215,7 +1219,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+        "tests/a2/test_examples_cli.py": "632597289a1487d3edb7898fc8fc34e173a5f7b08c9b4511907261a610449a8c"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1231,7 +1235,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+        "tests/a2/test_examples_cli.py": "632597289a1487d3edb7898fc8fc34e173a5f7b08c9b4511907261a610449a8c"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1246,7 +1250,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+        "tests/a2/test_examples_cli.py": "632597289a1487d3edb7898fc8fc34e173a5f7b08c9b4511907261a610449a8c"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1276,7 +1280,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+        "tests/a2/test_examples_cli.py": "632597289a1487d3edb7898fc8fc34e173a5f7b08c9b4511907261a610449a8c"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1291,7 +1295,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+        "tests/a2/test_examples_cli.py": "632597289a1487d3edb7898fc8fc34e173a5f7b08c9b4511907261a610449a8c"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1307,7 +1311,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_examples_cli.py": "46e9f496a35242f618f51b6ff1cb758b25089878df4f7e5431b3b3b4625c3c79"
+        "tests/a2/test_examples_cli.py": "632597289a1487d3edb7898fc8fc34e173a5f7b08c9b4511907261a610449a8c"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1429,7 +1433,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "eb6012ed6423b71c6f763bb4d7804724ca209ffb2d3899e18f53cee703156b6f"
+        "tests/a2/test_docs.py": "33a91c49e764d3a6781473e683deca3524b54aa53895bf8d873e7f37ac10ff96"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1462,8 +1466,8 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "eb6012ed6423b71c6f763bb4d7804724ca209ffb2d3899e18f53cee703156b6f",
-        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085"
+        "tests/a2/test_docs.py": "33a91c49e764d3a6781473e683deca3524b54aa53895bf8d873e7f37ac10ff96",
+        "tests/a2/test_observations.py": "f786cb75880203a09b565e4ee48ea404aa4d0a4fd1f25a63021af302906e1638"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1486,7 +1490,7 @@
       "coverage_gaps": [],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_docs.py": "eb6012ed6423b71c6f763bb4d7804724ca209ffb2d3899e18f53cee703156b6f"
+        "tests/a2/test_docs.py": "33a91c49e764d3a6781473e683deca3524b54aa53895bf8d873e7f37ac10ff96"
       },
       "review_note": "Explicit current status, unreleased acceptance hold, actual command/check counts, unchanged feature version, mirror and agent prohibitions asserted. Local coverage complete; external acceptance remains pending."
     },
@@ -1653,14 +1657,100 @@
         "tests/a2/test_evidence.py::test_a2_recall_without_history_is_pending_not_green_or_failed",
         "tests/a2/test_observations.py::test_live_smoke_record_accepted",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[bool-requests]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[duplicate-glue-run]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[extra-limit-run]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-lacks-name]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-lacks-source-ref]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-lacks-url]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-short-sha]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-uppercase-sha]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-wrong-name]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-wrong-sha]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[glue-wrong-url]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-deploy-layout-none]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-deploy-layout-verified]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-dns-error]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-entry-not-a-dict]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-http-503]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-lacks-deploy-layout]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-mixed-layout-and-transport]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-reason-not-a-string]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-reasons-absent]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-reasons-not-a-list]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-run-complete]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-run-without-reasons]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-second-run-transport]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-sitemap-content-refused]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-state-absent]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-timeout]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[limit-transport-word-unsupported]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[medfit-lacks-source-ref]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[medfit-mixed-info-and-unknown]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[medfit-short-sha]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[medfit-unknown-severity]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[medfit-wrong-sha]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[no-limit-runs]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[no-requests]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[no-supported-site]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[nothing-checked]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[old-shape-record]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-deploy-layout-verified]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-duplicate-medfit]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-entry-not-a-dict]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-error-finding]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-extra-unnamed-site]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-incomplete]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-lacks-deploy-layout]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-lacks-missing]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-lacks-severities]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-list-absent]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-list-empty]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-list-not-a-list]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-medfit-absent]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-missing-count-none]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-missing-routes]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-no-requests]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-nothing-checked]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-probmed-absent]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-warn-finding]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-wrong-name]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[pinned-wrong-url]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-bool-severity]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-case-variant-severity]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-deploy-layout-none]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-deploy-layout-verified]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-empty-string-severity]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-error-finding]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-lacks-deploy-layout]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-lacks-missing]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-lacks-name]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-lacks-severities]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-lacks-source-ref]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-missing-count-bool]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-missing-count-none]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-missing-routes]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-mixed-info-and-unknown]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-nested-severity]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-non-string-severity]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-none-severity]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-notice-severity]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-severities-not-a-list]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-short-sha]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-string-none-severity]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-unknown-severity]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-warn-finding]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-wrong-name]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[primary-wrong-sha]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[probmed-non-string-severity]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[probmed-none-severity]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[probmed-short-sha]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[probmed-source-ref-none]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[probmed-wrong-sha]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[site-incomplete]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[substitute-limit-site]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[substitute-limit-site-keeping-glue-identity-fields-blank]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[summary-disagrees]",
+        "tests/a2/test_observations.py::test_live_smoke_record_rejects[summary-source-ref-disagrees]",
         "tests/a2/test_observations.py::test_live_smoke_record_rejects[url-disagrees]",
         "tests/a2/test_observations.py::test_live_smoke_observation_passes_with_a_complete_site_and_an_honest_limit",
         "tests/a2/test_observations.py::test_live_smoke_observation_fails[states0]",
@@ -1679,7 +1769,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa",
-        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085"
+        "tests/a2/test_observations.py": "f786cb75880203a09b565e4ee48ea404aa4d0a4fd1f25a63021af302906e1638"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1750,7 +1840,7 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_evidence.py": "e62d828156859325e90601810820f41a348945fd6ccba253eef15657e60a55aa",
-        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085"
+        "tests/a2/test_observations.py": "f786cb75880203a09b565e4ee48ea404aa4d0a4fd1f25a63021af302906e1638"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     },
@@ -1792,6 +1882,7 @@
         "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[[1] 1234568-[1] 1234567-match]",
         "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[[1] 1234568-[1] 1234570-output]",
         "tests/a2/test_comparison.py::test_short_documented_integers_match_exactly[1e3-1001-match]",
+        "tests/a2/test_docs.py::test_s08_records_the_deliberate_divergence_from_the_frozen_a2_spec_on_development_mode",
         "tests/a2/test_final_gates.py::test_gate_record_validation[missing-full_gates]",
         "tests/a2/test_final_gates.py::test_gate_record_validation[missing-rendered_review]",
         "tests/a2/test_final_gates.py::test_gate_record_validation[missing-adversarial_review]",
@@ -1835,6 +1926,16 @@
         "tests/a2/test_final_gates.py::test_count_parsing_reads_only_the_final_summary_line",
         "tests/a2/test_final_gates.py::test_producer_missing_summary_is_not_a_pass",
         "tests/a2/test_final_gates.py::test_producer_flags_a_tree_dirtied_by_the_gates",
+        "tests/a2/test_final_gates.py::test_rendered_page_names_match_the_producer_table",
+        "tests/a2/test_final_gates.py::test_rendered_review_must_name_exactly_the_configured_pages[unnamed]",
+        "tests/a2/test_final_gates.py::test_rendered_review_must_name_exactly_the_configured_pages[duplicate]",
+        "tests/a2/test_final_gates.py::test_rendered_review_must_name_exactly_the_configured_pages[missing]",
+        "tests/a2/test_final_gates.py::test_rendered_review_must_name_exactly_the_configured_pages[extra]",
+        "tests/a2/test_final_gates.py::test_rendered_review_must_name_exactly_the_configured_pages[wrong-name]",
+        "tests/a2/test_final_gates.py::test_rendered_review_must_name_exactly_the_configured_pages[not-a-list-entry]",
+        "tests/a2/test_final_gates.py::test_rendered_review_must_name_exactly_the_configured_pages[bad-hash]",
+        "tests/a2/test_final_gates.py::test_rendered_review_must_name_exactly_the_configured_pages[not-inspected]",
+        "tests/a2/test_final_gates.py::test_rendered_review_with_every_configured_page_passes",
         "tests/a2/test_guardian.py::test_forged_phase_ack_never_releases_code[wrong-run-id]",
         "tests/a2/test_guardian.py::test_forged_phase_ack_never_releases_code[wrong-sequence]",
         "tests/a2/test_guardian.py::test_completed_run_with_live_group_fails_closed",
@@ -1853,6 +1954,58 @@
         "tests/a2/test_observations.py::test_failed_status_is_never_accepted",
         "tests/a2/test_observations.py::test_a_crashing_observation_becomes_a_failed_record_not_a_crash",
         "tests/a2/test_observations.py::test_triage_drift_is_recorded_in_the_failed_observation",
+        "tests/a2/test_observations.py::test_pinned_real_sites_must_be_complete_and_are_recorded",
+        "tests/a2/test_observations.py::test_a_failing_pinned_real_site_fails_the_observation_even_when_the_limit_site_is_incomplete[change0]",
+        "tests/a2/test_observations.py::test_a_failing_pinned_real_site_fails_the_observation_even_when_the_limit_site_is_incomplete[change1]",
+        "tests/a2/test_observations.py::test_a_failing_pinned_real_site_fails_the_observation_even_when_the_limit_site_is_incomplete[change2]",
+        "tests/a2/test_observations.py::test_a_failing_pinned_real_site_fails_the_observation_even_when_the_limit_site_is_incomplete[change3]",
+        "tests/a2/test_observations.py::test_a_failing_pinned_real_site_fails_the_observation_even_when_the_limit_site_is_incomplete[change4]",
+        "tests/a2/test_observations.py::test_a_limit_site_that_is_incomplete_only_because_it_was_unreachable_does_not_count[reasons0]",
+        "tests/a2/test_observations.py::test_a_limit_site_that_is_incomplete_only_because_it_was_unreachable_does_not_count[reasons1]",
+        "tests/a2/test_observations.py::test_a_limit_site_that_is_incomplete_only_because_it_was_unreachable_does_not_count[reasons2]",
+        "tests/a2/test_observations.py::test_a_limit_site_that_is_incomplete_only_because_it_was_unreachable_does_not_count[reasons3]",
+        "tests/a2/test_observations.py::test_a_limit_site_that_is_incomplete_only_because_it_was_unreachable_does_not_count[reasons4]",
+        "tests/a2/test_observations.py::test_every_unsupported_layout_reason_the_engine_emits_is_recognized[custom template mapping unsupported]",
+        "tests/a2/test_observations.py::test_every_unsupported_layout_reason_the_engine_emits_is_recognized[custom layout/build configuration unsupported]",
+        "tests/a2/test_observations.py::test_every_unsupported_layout_reason_the_engine_emits_is_recognized[pkgdown configuration overlays unsupported]",
+        "tests/a2/test_observations.py::test_every_unsupported_layout_reason_the_engine_emits_is_recognized[unsupported Quarto project configuration: _quarto.yml]",
+        "tests/a2/test_observations.py::test_every_unsupported_layout_reason_the_engine_emits_is_recognized[unsupported article format (format): vignettes/a.qmd]",
+        "tests/a2/test_observations.py::test_every_unsupported_layout_reason_the_engine_emits_is_recognized[development.mode unsupported: 'weird']",
+        "tests/a2/test_observations.py::test_every_unsupported_layout_reason_the_engine_emits_is_recognized[template Bootstrap version unsupported: '3']",
+        "tests/a2/test_observations.py::test_every_unsupported_layout_reason_the_engine_emits_is_recognized[PKGDOWN_DEV_MODE set in .github/workflows/p.yaml; development mode mapping unsupported]",
+        "tests/a2/test_observations.py::test_every_unsupported_layout_reason_the_engine_emits_is_recognized[reusable workflow job unsupported (.github/workflows/p.yaml); the deployed routes cannot be verified]",
+        "tests/a2/test_observations.py::test_the_producer_and_the_verifier_share_one_limit_site_predicate",
+        "tests/a2/test_observations.py::test_the_real_glue_pin_still_fails_for_a_recognized_layout_reason",
+        "tests/a2/test_observations.py::test_the_limit_site_must_still_be_incomplete_when_the_pinned_sites_pass",
+        "tests/a2/test_observations.py::test_default_pinned_sites_are_the_real_medfit_and_probmed_commits",
+        "tests/a2/test_observations.py::test_pinned_and_primary_sites_must_have_no_missing_routes_or_warn_findings[change0]",
+        "tests/a2/test_observations.py::test_pinned_and_primary_sites_must_have_no_missing_routes_or_warn_findings[change1]",
+        "tests/a2/test_observations.py::test_pinned_and_primary_sites_must_have_no_missing_routes_or_warn_findings[change2]",
+        "tests/a2/test_observations.py::test_pinned_and_primary_sites_must_have_no_missing_routes_or_warn_findings[change3]",
+        "tests/a2/test_observations.py::test_pinned_and_primary_sites_must_have_no_missing_routes_or_warn_findings[change4]",
+        "tests/a2/test_observations.py::test_pinned_and_primary_sites_must_have_no_missing_routes_or_warn_findings[change5]",
+        "tests/a2/test_observations.py::test_the_producer_fails_the_observation_for_any_severity_other_than_info[severities0]",
+        "tests/a2/test_observations.py::test_the_producer_fails_the_observation_for_any_severity_other_than_info[severities1]",
+        "tests/a2/test_observations.py::test_the_producer_fails_the_observation_for_any_severity_other_than_info[severities2]",
+        "tests/a2/test_observations.py::test_the_producer_fails_the_observation_for_any_severity_other_than_info[severities3]",
+        "tests/a2/test_observations.py::test_the_producer_fails_the_observation_for_any_severity_other_than_info[severities4]",
+        "tests/a2/test_observations.py::test_the_producer_fails_the_observation_for_any_severity_other_than_info[severities5]",
+        "tests/a2/test_observations.py::test_the_producer_fails_the_observation_for_any_severity_other_than_info[severities6]",
+        "tests/a2/test_observations.py::test_the_producer_fails_the_observation_for_any_severity_other_than_info[severities7]",
+        "tests/a2/test_observations.py::test_the_producer_fails_the_observation_for_any_severity_other_than_info[severities8]",
+        "tests/a2/test_observations.py::test_the_producer_fails_the_observation_for_any_severity_other_than_info[severities9]",
+        "tests/a2/test_observations.py::test_the_producer_fails_the_observation_for_any_severity_other_than_info[severities10]",
+        "tests/a2/test_observations.py::test_a_finding_without_a_severity_is_recorded_as_none_not_the_string_none",
+        "tests/a2/test_observations.py::test_only_info_findings_or_none_pass_the_producer_and_the_verifier[severities0]",
+        "tests/a2/test_observations.py::test_only_info_findings_or_none_pass_the_producer_and_the_verifier[severities1]",
+        "tests/a2/test_observations.py::test_only_info_findings_or_none_pass_the_producer_and_the_verifier[severities2]",
+        "tests/a2/test_observations.py::test_info_findings_do_not_fail_the_observation_and_are_recorded",
+        "tests/a2/test_observations.py::test_pinned_supported_sites_are_pinned_to_the_reviewed_full_commit_shas",
+        "tests/a2/test_observations.py::test_the_producer_holds_no_second_copy_of_the_reviewed_identities",
+        "tests/a2/test_observations.py::test_the_pinned_site_urls_match_the_verifier_and_every_pin_is_distinct",
+        "tests/a2/test_observations.py::test_the_live_smoke_audits_the_pinned_commit_not_whatever_the_default_branch_holds",
+        "tests/a2/test_observations.py::test_the_producer_and_the_verifier_share_one_soundness_predicate_and_one_pin_list",
+        "tests/a2/test_observations.py::test_a_record_from_the_real_producer_is_accepted_by_the_verifier",
         "tests/a2/test_release_ci.py::test_observations_workflow_is_dispatch_only_and_bound_to_the_run",
         "tests/a2/test_release_ci.py::test_no_temporary_smoke_workflow_remains",
         "tests/a2/test_runtime_probe.py::test_probe_code_names_every_locked_package_once",
@@ -1869,10 +2022,11 @@
       "mapping_review": "complete",
       "test_sources": {
         "tests/a2/test_comparison.py": "24720640abac9095da41144b0052bf96b949a76b8b4a955aff9f3b982e87521c",
-        "tests/a2/test_final_gates.py": "fd2b6c76e37168464d84ba12647b8d85eaf6950e57d56137fa12451a22725f07",
+        "tests/a2/test_docs.py": "33a91c49e764d3a6781473e683deca3524b54aa53895bf8d873e7f37ac10ff96",
+        "tests/a2/test_final_gates.py": "7564ed1ff019dba7ee48ed577837b5148dc60cdd5a4c413d8be178ad8b24ae0f",
         "tests/a2/test_guardian.py": "2033368a0fbbd844fbb56e8fa5a66207a1654d4bbec510923f07a77bd7b904c1",
         "tests/a2/test_manifest.py": "278f1646c0229c9563b70f13b58af7512e4e638185d9d61318b69ef484902636",
-        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085",
+        "tests/a2/test_observations.py": "f786cb75880203a09b565e4ee48ea404aa4d0a4fd1f25a63021af302906e1638",
         "tests/a2/test_release_ci.py": "7d40d5f697a437a3d447c0179ce3bf419210c2d38cdd61493afe97fa492f31b8",
         "tests/a2/test_runtime_probe.py": "739319d20f83a0fe032a2ae6eb2ecf25e5e6306b09348ccd2d84654747be9133"
       },
@@ -1932,16 +2086,16 @@
       ],
       "mapping_review": "complete",
       "test_sources": {
-        "tests/a2/test_final_gates.py": "fd2b6c76e37168464d84ba12647b8d85eaf6950e57d56137fa12451a22725f07",
-        "tests/a2/test_observations.py": "a228a2e938efe5a72d6adc15d8f8715d6a143cbad63d15f97e4dcf0af3c31085",
+        "tests/a2/test_final_gates.py": "7564ed1ff019dba7ee48ed577837b5148dc60cdd5a4c413d8be178ad8b24ae0f",
+        "tests/a2/test_observations.py": "f786cb75880203a09b565e4ee48ea404aa4d0a4fd1f25a63021af302906e1638",
         "tests/a2/test_producer_run.py": "e06f3156d3322d996bbb50817f0dbf0f5f57185009f60622e34c478c563d1fca"
       },
       "review_note": "Concrete test bodies and oracles reviewed against this inventory row; local passes do not establish external/platform acceptance."
     }
   ],
   "mapping_review": "complete",
-  "collected_nodes": 680,
-  "review_candidate": "A2 candidate 2: round-1 review fixes (producer-run binding, triage commit equality, crash-safe observations)",
+  "collected_nodes": 831,
+  "review_candidate": "#111 site-audit candidate: development.mode auto/devel and Quarto article support, engine false-complete fixes, and the shared live-smoke predicates (supported, pinned and limit sites)",
   "platforms": [
     "ubuntu-24.04",
     "macos-15"

@@ -153,6 +153,36 @@ checkout routes are info. Missing from a sitemap does not establish HTTP 404 or
 current deployment SHA. Cross-origin and HTTP-to-HTTPS redirects require a new
 invocation with the caller-selected canonical URL.
 
+`.qmd`, `.Rmd` and `.rmd` articles map to `articles/*.html`; `development.mode` (including
+`auto`) is resolved from the pinned `DESCRIPTION` version, and `--site` must equal the source `url`
+plus the dev prefix (`.../dev/` only for a devel site), otherwise the stage is `incomplete` before
+any request. At the pinned ref these stay incomplete with a specific reason: `PKGDOWN_DEV_MODE` in a
+workflow, local composite action or root/package `.Renviron`/`.Rprofile`; reusable-workflow jobs;
+unreadable local actions; deploys below the site root (`deploy_to_branch(subdir = )`, or a Pages `target-folder`/`destination-dir` whenever a pkgdown config exists at the pinned ref or a workflow names pkgdown); malformed workflows; Bootstrap 3 devel sites;
+non-default Quarto projects; directory-level `_metadata.yml`, `_quarto-*.yml` and `_output.yml`;
+symlinks under `vignettes/`. An article is refused only for these front-matter keys: `output_file`/
+`output-file`, `output_ext`/`output-ext`, `output_dir`/`output-dir`, `knit`, `as_is`, a non-HTML Quarto
+`format`, a non-HTML `.Rmd` `output`, or `pkgdown: extension` other than `html`, in any key case with `-` and `_`
+interchangeable. YAML inputs are read as parsed structures (quoted or escaped keys, flow mappings and anchors count);
+R and shell code is matched as text (quoted or backticked `subdir`, `paste0()` splits of `PKGDOWN_DEV_MODE`). Scripts a
+`run:` step executes (`Rscript`, `R -f`, `bash`, `python`, `source`, `./x`, `make`, R `source()`/`system()`) are read at the pinned
+ref, followed up to 5 levels and 40 files (`make` follows `include`) and scanned the same way; in a pkgdown repository, for any
+workflow that may publish (tier 1: pkgdown wording, a Pages or deploy action, `deploy_to_branch`/`gh-pages`, `pages`/`id-token`
+write, an explicit-branch `git push`, a remote publish command (`rsync`/`scp`/`aws s3`/`netlify`/`firebase`/`vercel`) or a command that
+builds or stages the destination even when the tree does not track it yet, or a workflow that stages everything and pushes the default branch (treated as publish capable; the audit does not try to prove it builds no site; a stage is named only when every pathspec is a plain literal path outside the destination, so pathspec magic, `--pathspec-from-file` and index-changing git plumbing stage everything) (`git add`/`git commit` naming it, `git add -A` after a pkgdown build,
+`git subtree push`, `git worktree add`, `cp`/`mv`/`rsync` into it), or a workflow that stages and pushes while it downloads build output, another workflow builds the site (cross-workflow handoff) or it reaches a script, action or executable the scan cannot resolve (any executable outside a short allowlist of benign utilities fails closed for such a workflow); tier 2,
+only when the pinned tree tracks the pkgdown destination (placeholder-only directories do not count; a build call's destination
+joins the check): `contents: write`, a default-branch or refspec-less `git push`, a push action, no `permissions:` key; a branch
+listed in `.rforge.yaml` `docs.site.nonpublishing-branches` is tier 2 (an unverified maintainer declaration: a mislabeled site branch yields a wrong complete; the
+stage reports `nonpublishing_branches_honored` and the text report an info line when it applies); reusable workflows share capability with their caller;
+read-only workflows are relaxed), an unreadable, missing, symlinked,
+dynamic or over-cap reference is incomplete. Other overrides, names built any other way, `uses:` actions from other repositories,
+manual deploys outside CI and `knit`/`render` of a document are not detected.
+A complete site stage proves route presence only: the stage carries `content_freshness: "unverified"` and
+`deploy_layout: "unverified"`, and a clean text report says `no findings; site content freshness and deploy layout unverified`.
+The workflow and script scan that decides whether CI could deploy a different layout is best effort and not exhaustive, so a
+complete stage is not a statement about how the site is deployed.
+
 Example replay loads the working tree using pkgload/evaluate. Closed explicit R
 README fences execute in document order with hidden setup retained; eval=false,
 skip markers and installation chunks do not execute. Unsupported options stop

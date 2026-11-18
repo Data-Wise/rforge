@@ -44,11 +44,19 @@ CANONICAL={'pytest':'python -m pytest tests/ -q -p no:cacheprovider','test-all':
 
 
 def live_facts():
-    """A valid live-smoke record: one supported real site checked completely, real packages the check cannot cover said so."""
-    site={'name':'cranlogs','url':v.SUPPORTED_SITE_URL,'source_ref':'abc','requests':1,'state':'complete','checked':4,'reasons':[]}
-    limit={'name':'medfit','url':'https://example.org/medfit/','source_ref':'def','requests':1,'state':'incomplete','checked':0,
-           'reasons':['development mode/destination mapping unsupported']}
-    return {'url':site['url'],'source_ref':'abc','requests':1,'checked':4,'supported_site':site,'unsupported_real_runs':[limit]}
+    """A valid live-smoke record: the supported site and both pinned supported sites sound, real packages the check cannot cover said so.
+
+    Every run carries the reviewed name, URL and commit from the verifier's one table, as the producer records them.
+    """
+    table=v.REVIEWED_LIVE_SITES
+    def run(name,checked,**extra):
+        return {'name':name,'url':table[name]['url'],'source_ref':table[name]['commit'],'requests':1,'state':'complete','checked':checked,'missing':0,
+                'finding_severities':[],'deploy_layout':'unverified','reasons':[],**extra}
+    site=run('cranlogs',4)
+    pinned=[run('medfit',76),run('probmed',107)]
+    limit=run('glue',0,requests=0,state='incomplete',reasons=['custom template mapping unsupported'])
+    return {'url':site['url'],'source_ref':site['source_ref'],'requests':1,'checked':4,'supported_site':site,'pinned_real_runs':pinned,
+            'unsupported_real_runs':[limit]}
 
 
 def gate_facts():
@@ -72,7 +80,7 @@ def evidence_records(observations, root):
         'live_smoke': live_facts(),
         'package_triage': triage_facts(),
         'full_gates': gate_facts(),
-        'rendered_review': {'pages':[{'inspected':True,'sha256':'a'*64}]},
+        'rendered_review': {'pages':[{'page':n,'inspected':True,'sha256':'a'*64} for n in v.RENDERED_PAGE_NAMES]},
         'adversarial_review': review_facts(),
         'requirement_mapping': {'review':'complete','unmapped':0,'requirements':118},
     }
@@ -252,3 +260,45 @@ def test_producer_flags_a_tree_dirtied_by_the_gates(monkeypatch):
         return real(cmd,*a,**k)
     monkeypatch.setattr(mod.subprocess,'run',fake)
     assert mod.produce(runner=_fake_runner())['tree_clean'] is False
+
+
+# Codex executed review. The rendered-docs evidence must name exactly the configured pages, each once.
+def _rendered(mutate):
+    platforms,observations=records()
+    import tempfile, pathlib
+    root=pathlib.Path(tempfile.mkdtemp())
+    evidence_records(observations,root)
+    import json
+    path=root/'rendered_review.json'
+    record=json.loads(path.read_text())
+    mutate(record['facts']['pages'])
+    path.write_text(json.dumps(record))
+    observations['rendered_review']['provenance']['sha256']=v.digest(path)
+    return platforms,observations,root
+
+
+def test_rendered_page_names_match_the_producer_table():
+    import importlib.util, pathlib, sys
+    sys.path.insert(0,str(pathlib.Path(v.__file__).parent))
+    obs=importlib.import_module('a2_observations')
+    assert sorted(obs.RENDERED_PAGES)==sorted(v.RENDERED_PAGE_NAMES)
+
+
+@pytest.mark.parametrize('defect',['unnamed','duplicate','missing','extra','wrong-name','not-a-list-entry','bad-hash','not-inspected'])
+def test_rendered_review_must_name_exactly_the_configured_pages(defect):
+    def mutate(pages):
+        if defect=='unnamed':pages[:]=[{'inspected':True,'sha256':'a'*64}]
+        elif defect=='duplicate':pages[1]['page']=pages[0]['page']
+        elif defect=='missing':pages.pop()
+        elif defect=='extra':pages.append({'page':'extra','inspected':True,'sha256':'a'*64})
+        elif defect=='wrong-name':pages[0]['page']='not/a/page'
+        elif defect=='not-a-list-entry':pages[0]='guides/docs-audit'
+        elif defect=='bad-hash':pages[0]['sha256']='zz'
+        else:pages[0]['inspected']=False
+    platforms,observations,root=_rendered(mutate)
+    with pytest.raises(v.VerificationError):v.validate_aggregate(platforms,observations,candidate_sha='sha',evidence_root=root)
+
+
+def test_rendered_review_with_every_configured_page_passes():
+    platforms,observations,root=_rendered(lambda pages:None)
+    v.validate_aggregate(platforms,observations,candidate_sha='sha',evidence_root=root)

@@ -9,6 +9,164 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.23.0] - 2026-11-17
+
+### Behavior change
+
+- Previously-incomplete `development.mode` and Quarto sites are now audited by `--site`, so a
+  `/rforge:docs:check --site ... --fail-on warn|error` run that used to exit 2 as `incomplete` can now
+  complete and fail on real findings. Pass the source `url` plus the development prefix as `--site`.
+
+### Added
+
+- `/rforge:docs:check --site` audits Quarto (`.qmd`) articles and pkgdown
+  development-mode sites (#111): `.qmd`, `.Rmd` and `.rmd` articles map to
+  `articles/*.html` (nested ones included), and `development.mode` (`auto`,
+  `default`, `release`, `devel`, `unreleased`) resolves from the pinned
+  `DESCRIPTION` version with pkgdown 2.2.1's rule. The stage records the mode
+  and the assumed pkgdown rule version.
+- Site stages carry `content_freshness: "unverified"` and `deploy_layout: "unverified"`,
+  and a clean text report reads `no findings; site content freshness and deploy layout
+  unverified`: a complete stage means route presence only. The workflow and script
+  scan that guards the deploy layout is best effort and not exhaustive; the marker is a
+  fixed property of the stage, not a result of the scan. Known residuals (not patched):
+  an allowlisted program that loads a script (`awk -f`, `sed -f`), `gh repo sync` and
+  other `gh` subcommands that update content, and deploy credentials in a workflow with
+  read-only `contents`.
+- Differential tests against pkgdown 2.2.1 (`package_vignettes`, `dev_mode_auto`,
+  `as_pkgdown` mode and Bootstrap resolution) in `tests/differential/`. They run
+  by hand where R, pkgdown, the R `quarto` package and the Quarto CLI exist,
+  skip elsewhere and are not part of the A2 gate.
+
+### Changed
+
+- `--site` must equal the source `url` plus the development prefix (`<dst>/` for
+  `devel` only); the audit never appends it. A mismatching base, a Bootstrap 3
+  devel site, an unknown mode or destination, or an absent or unparseable pinned
+  `DESCRIPTION` version (for every mode) is `incomplete` before any request.
+- Configuration discovery follows pkgdown (first existing file, no merge) and
+  reads `inst/_pkgdown.yml`/`.yaml`; any non-root configuration is still an
+  overlay and keeps the stage incomplete.
+- Workflows are scanned at the pinned SHA, not the working tree, and a job-level
+  `uses:` (reusable workflow) in any workflow is unverifiable even with `--ref`
+  (a generically named reusable workflow can deploy the site). `PKGDOWN_DEV_MODE` is still refused. The pre-network stop is a
+  structured condition instead of a substring match on "development".
+- Article exclusions follow pkgdown's rules: `^tutorials` applies to the
+  directory part only, and `.md`/`.Rmarkdown` files are ignored, not unsupported.
+  Non-HTML articles (`pkgdown: extension: pdf`, Quarto `format: pdf`) and
+  the route-changing keys `output_file`/`output-file`, `output_ext`/`output-ext`,
+  `output_dir`/`output-dir` and `knit` are refused and no longer yield a false `site-missing-page` or
+  `site-unreleased-page`. Root redirects and general overrides are follow-up #123.
+- A2 live smoke pins its real sites to commits. medfit and probmed must now be
+  audited complete with checked routes, HTTP requests, zero missing routes and no
+  warn/error findings (the observation fails otherwise; medfit is re-pinned to
+  `20fecf7`: `6d226fb`, which matches the live site, plus the `.rforge.yaml`
+  `docs.site.nonpublishing-branches` declaration for its `qc-results` push; the commit is on the
+  origin branch `feature/rforge-pin-qc-results`), and glue (`template.package`) is the real site that must stay
+  incomplete. Required A2 nodes changed: `test_release_mode_and_destination`
+  (devel/destination now supported; two refusal cases added), and the bodies of
+  `test_unsupported_layout_retains_supported_routes[quarto|extension]`,
+  `test_site_cli_thresholds[*-unsupported]` and
+  `test_destination_and_workflow_mode_integration[workflow-dev]`. The A2
+  manifest and acceptance evidence need re-attestation for this candidate.
+
+### Fixed
+
+- `docs:check --site` no longer reports a false `complete` in seven cases found by the
+  adversarial review of this change: non-ASCII paths (`git ls-tree` output is now read
+  NUL-separated, so `vignettes/café.Rmd` and a package in a `café/` subdirectory are
+  expected); `---` inside a front-matter value (front matter is parsed by delimiter
+  lines, closed by `---` or `...`); symlinked vignettes (refused, never read as content);
+  directory-level `_metadata.yml`, `_quarto-*.yml`, nested `_quarto.yml` and `_output.yml`
+  (refused; pkgdown's behavior for them was not rendered); `PKGDOWN_DEV_MODE` in a local
+  composite action or a root/package `.Renviron`/`.Rprofile`, and a deploy below the site
+  root (`deploy_to_branch(subdir = )`, a Pages `target-folder`) now stay incomplete;
+  deeply nested YAML, malformed workflow structure (null job, list `jobs`, string step,
+  `with:` null) and YAML alias bombs return an incomplete stage with a specific reason
+  instead of raising or hanging.
+- `docs:check --site` decides that a repository is a pkgdown site from a pkgdown config for
+  the package at the pinned ref (any of the six config locations), not only from workflow
+  wording. A Pages `target-folder` deploy therefore stays incomplete when build and deploy
+  are in separate workflows, or the build is in a local composite action, and neither names
+  pkgdown. Tradeoff: a pkgdown package with an unrelated `target-folder` deploy (for example
+  a coverage report) is reported incomplete. A workflow that names pkgdown still counts when
+  there is no config file.
+- `docs:check --site` detects its route-moving signals from the parsed YAML where YAML is the
+  format, and from tolerant text only for R and shell code. A quoted, single-quoted, escaped,
+  flow-mapping, aliased or differently cased `target-folder` key (and the peaceiris
+  `destination-dir` input) in a workflow or local action, `PKGDOWN_DEV_MODE` in any case or
+  split across `paste0()` parts, a quoted or backticked `subdir` argument, an `as-is` or
+  differently cased article key, and a workflow that only mentions `PkgDown` or uses
+  `setup-pkgdown` are now caught. Names built any other way are still not detected.
+- `docs:check --site` follows the scripts a `run:` step executes (`Rscript`, `R -f`/`CMD BATCH`,
+  `bash`/`sh`, `python`, `source`, `./x`, `make`, R `source()`/`system()`), read at the pinned
+  ref up to five levels and 40 files, and applies the run-body detections to each, so
+  `run: Rscript scripts/deploy.R` with a `deploy_to_branch(subdir = )` call inside is no longer
+  `complete`. In a pkgdown repository a script reference that cannot be scanned (missing,
+  symlinked, outside the repository, absolute, dynamic, binary, oversized, over a cap) is
+  `incomplete` with "script reference unsupported", for every workflow that may publish.
+  Tier 1 always counts (pkgdown wording, a Pages or deploy action, `deploy_to_branch`/`gh-pages`,
+  `pages`/`id-token` write, a checkout given a secret, an explicit-branch `git push` such as
+  `git push origin HEAD:site`, and a command that names a remote target: `rsync`/`scp` to a host,
+  `aws s3 sync|cp|mv` to `s3://`, `netlify`/`firebase deploy`, `vercel`, `surge`). Tier 2 counts
+  only when the pinned tree tracks the pkgdown destination (`destination:`, default `docs/`, plus
+  any destination a build call names; a directory holding only `.gitkeep`/`.keep`/`.gitignore`/
+  `.gitattributes` is untracked, while `.nojekyll` or a submodule counts): `contents: write`, a
+  default-branch or refspec-less `git push`, a push action, or no `permissions:` key. A repository
+  declares branches that never carry site files in `.rforge.yaml` `docs.site.nonpublishing-branches`
+  (read at the pinned ref); a push to one is tier 2. A reusable workflow shares capability with its
+  caller, and an unresolvable callee counts as capable. Read-only workflows are relaxed, and the
+  reason names the tier and the evidence. `make` follows `include`, `-include` and `sinclude`. A clean
+  readable script never blocks. A signal inside an R comment still blocks. A command that builds or
+  stages the destination counts as tier 1 whether or not the tree tracks it yet (`git add`/`git commit`
+  naming it, `git add -A`/`.` after a pkgdown build, `git subtree push`, `git worktree add`, `cp`/`mv`/
+  `rsync` into it), so a workflow that generates `docs/`, force-adds and pushes it is strict; a push of
+  `data/history.csv` stays tier 2. A workflow that stages everything (`git add .`/`-A`/`-u`,
+  `git commit -a`, an auto-commit action) and pushes the default branch is treated as publish capable
+  and is an incomplete reason: the audit does not try to prove it builds no site (a `tee`, a download,
+  an extraction or a script that writes `docs/` cannot be enumerated away); named pathspecs outside the
+  destination stay tier 2; a stage is named only when every pathspec is a plain literal path outside the
+  destination (a wildcard only below a literal first directory, as in `man/*.Rd`), so pathspec magic (`:(top)docs`), `--pathspec-from-file` and index-changing git plumbing
+  (`update-index`, `read-tree`, `commit-tree`, `checkout-index`, `apply`, `am`, `stash`) stage everything
+  and an unknown form fails closed; a workflow that stages everything and runs a program whose name is computed
+  (such as a push through `$(command -v git)`) is tier 1 even with no visible push. Build output can also reach the staging workflow from another
+  workflow: a workflow that stages and pushes is tier 1 when it downloads build output
+  (`download-artifact`, `gh run|release download`, `curl`/`wget` of an archive, a `workflow_run`
+  trigger), when any other workflow in the repository builds the site, or when anything it reaches
+  could not be resolved (a failed script or action reference, a cap, `eval(parse())`, a document
+  render, any executable outside a short allowlist of benign utilities such as `python -m <module>`,
+  `python -c`, `uv run <tool>`, `node` or an unlisted binary: the build may hide behind it); with none of these
+  it stays tier 2. Every such reference is then an incomplete reason for that workflow only. Known gaps (documented, not fixed): scripts fetched at runtime, a
+  script that pushes from a no-signal workflow, site files that reach a staging workflow by a route the scan cannot read
+  (a custom action fetching from another repository, a submodule update, a checkout of another ref)
+  with no build, download or unresolved reference anywhere in the repository, unlisted
+  executables and `knit`/`render` in a workflow that cannot publish (wrapper options such as `env --` are parsed
+  first, a repo-relative path is read even with an allowlisted basename, a literal absolute path outside the system
+  bin directories is opaque, and so is a wrapper option that changes what runs or where: `env -S`/`-C`, `sudo -D`/`-i`/`-s`; a `gh api` write, `gh workflow run`,
+  `gh pr merge` and `gh release create|upload|edit|delete` are a publish signal) (an opaque build in any workflow that may
+  publish, a Pages deploy included, is an incomplete reason), a Python or shell script
+  that builds the site through a module it imports, actions from other repositories (beyond the
+  fail-closed reusable-workflow rule), manual deploys, and a site branch mislabeled in
+  `docs.site.nonpublishing-branches`. That key is an unverified maintainer declaration in the same
+  trust class as `site.allowlist`: the engine cannot see what a branch serves without a live GitHub
+  Pages API call, which the offline default forbids, so a mislabeled site branch yields a wrong
+  `complete`. Disposition: accepted and documented; the site stage reports
+  `nonpublishing_branches_honored` and the text report prints an info line whenever a push was
+  classified tier 2 because of the declaration, so the exemption is visible to the reader.
+- `docs:check --site` counts a sitemap entry only when it is a `loc` that is a direct child
+  of a `url` in the sitemaps.org 0.9 namespace. A `loc` inside an image/video/xhtml
+  extension element, nested elsewhere or outside a `url` no longer satisfies an expected
+  route. A `urlset` with no namespace or another namespace is incomplete with a specific
+  reason instead of being counted. Each `url` must carry exactly one nonempty `loc`: a `url` with two
+  (an unrelated page before the expected one), none or an empty one makes the sitemap incomplete
+  (`malformed sitemap entry`) instead of letting the extra `loc` satisfy a route.
+- The A2 live-smoke observation records `deploy_layout` for each site run, and the shared
+  soundness predicate (producer and verifier) requires `deploy_layout: "unverified"` on every
+  supported site run, so evidence that omits the qualification is not release evidence.
+- The A2 verifier requires the rendered-docs evidence to name exactly the seven configured pages
+  (), each once, each inspected with a valid hash; an unnamed, duplicated,
+  extra or missing page is not rendered-docs evidence.
+
 ---
 
 ## [2.22.2] - 2026-10-31

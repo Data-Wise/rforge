@@ -18,15 +18,19 @@ scenario and walks through the exact commands and expected output.
 | Confused by the `--mode` flag | [Understanding modes](understanding-modes.md) | ~5 min |
 | Managing several inter-dependent packages | [Ecosystem orchestration](ecosystem-orchestration.md) | ~15 min |
 | Using the 12 `r:` dev-cycle commands daily | [R package dev cycle](r-dev-cycle.md) | ~10 min |
+| Checking a package against tidyverse conventions and applying the safe fixes | [Tidy a package with r:tidy](tidy-your-package.md) | ~10 min |
+| Checking that `DESCRIPTION` matches what your code actually uses | [Dependency reconciliation](dependency-reconciliation.md) | ~6 min |
 | Separating *your* regressions from pre-existing debt before merge | [Diff-aware checks](diff-aware-checks.md) | ~8 min |
 | Auditing S7 OOP conventions (static / ecosystem / runtime) | [S7 convention checking](s7-convention-checking.md) | ~10 min |
 | Scaffolding tests, deps, vignettes, data, citations into a package | [Scaffolding existing packages](scaffolding-existing-packages.md) | ~10 min |
 | Asking the orchestrator agent a *goal* instead of picking commands | [Orchestrator cookbook](orchestrator-cookbook.md) | ~10 min |
 | Preparing a CRAN submission — ecosystem ordering | [CRAN release prep](cran-release-prep.md) | ~15 min |
 | Running the full per-package CRAN gate | [CRAN submission with rforge](cran-submission-with-rforge.md) | ~15 min |
+| Catching win-builder and CRAN-incoming failures before you submit | [Win-builder + tarball-check](cran-winbuilder-tarball-check.md) | ~10 min |
 | Shipping early-access binaries while CRAN reviews | [R-universe early-access](r-universe-early-access.md) | ~10 min |
 | Coming from `rforge-mcp` (the deprecated MCP server) | [Migrating from rforge-mcp](migrate-from-mcp.md) | ~5 min |
 | Upgrading from v1.x and hit a renamed-command error | [v2.0.0 rename migration](../migration/v2.0.0-rename.md) | ~2 min |
+| Seeing what real command sessions look like | [Example sessions](example-sessions.md) (6 transcripts) | read-only |
 | Looking up a specific command's syntax | [REFCARD](../REFCARD.md) (not a tutorial) | <1 min |
 
 ## Suggested learning path
@@ -71,6 +75,11 @@ flowchart LR
 - **[Fix a docs:check finding](fix-a-docs-check-finding.md)** — run the docs
   audit, triage each finding against `man/*.Rd`, fix or allowlist it, and gate
   a release with `--fail-on`. ~10 min.
+- **[Tidy a package with r:tidy](tidy-your-package.md)** — run the advisory
+  tidyverse-conventions audit, apply the safe `--fix`, and clear the roxygen and
+  `NEWS.md` findings by hand. ~10 min.
+- **[Dependency reconciliation](dependency-reconciliation.md)** — `r:deps-sync`
+  compares what your code uses against `Depends`/`Imports`/`Suggests`. ~6 min.
 - **[Orchestrator cookbook](orchestrator-cookbook.md)** — ask the orchestrator
   agent a *goal* ("is this CRAN-ready?") and let it run the right read-only
   analyses. ~10 min.
@@ -80,6 +89,10 @@ flowchart LR
 - **[CRAN submission with rforge](cran-submission-with-rforge.md)** — Per-package
   CRAN gate: `/rforge:r:cran-prep` → fix blockers → re-run → `--multi-platform`
   → review `cran-comments.md` → `/rforge:release`. ~15 min.
+- **[Win-builder + tarball-check](cran-winbuilder-tarball-check.md)** — catch the
+  failures CRAN's incoming checks and win-builder see before you submit. ~10 min.
+- **[Example sessions](example-sessions.md)** — six real transcripts of rforge
+  commands in practice.
 - **[Migrating from rforge-mcp](migrate-from-mcp.md)** — For users
   currently running `rforge-mcp` (the deprecated MCP server). Steps to
   upgrade to v1.3.0+ and clean up the old install. ~5 min.

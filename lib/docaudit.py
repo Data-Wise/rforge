@@ -1052,7 +1052,7 @@ def _optional_stages(root: Path, *, site=None, ref=None, run_examples=False,
             stage = import_module("." + module, __package__).audit(root, **kwargs)
         except Exception as exc:
             stage = {"state": "unavailable", "counts": {}, "reasons": [f"{name}: {type(exc).__name__}: {exc}"],
-                     "engine_missing": [], "findings": []}
+                     "engine_missing": [], "findings": [], **({"content_freshness": "unverified", "deploy_layout": "unverified", "nonpublishing_branches_honored": []} if name == "site" else {})}
         stages[name] = stage
     return stages
 
@@ -1145,6 +1145,10 @@ def format_text(report: dict) -> str:
         for name, stage in r.get("stages", {}).items():
             lines.append(f"{package + ': ' if package else ''}{name}: {stage['state']} {json.dumps(stage.get('counts', {}), sort_keys=True)}")
             lines.extend(stage.get("reasons", []))
+            if stage.get("nonpublishing_branches_honored"):
+                lines.append(f"info  {name}-declaration  honored docs.site.nonpublishing-branches: "
+                             + ", ".join(stage["nonpublishing_branches_honored"])
+                             + " (an unverified maintainer declaration; a mislabeled site branch yields a wrong complete)")
     for f in report["findings"]:
         where = f"{f['package']}/{f['file']}" if "package" in f else f["file"]
         lines.append(f"{f['severity']:<5} {f['check']:<20} {where}:{f['line']}  {f['message']}")
@@ -1156,7 +1160,10 @@ def format_text(report: dict) -> str:
         lines.append("INCOMPLETE: part of the package could not be audited (see above); "
                      + ("the findings listed are a lower bound" if report["findings"] else "do not read this as clean"))
     elif not report["findings"]:
-        lines.append("no findings")
+        # A complete site stage proves route presence only; never let "no findings" read as a current site, or as proof of how CI deploys it
+        # (`deploy_layout`: the workflow scan is best effort, not a verdict).
+        site_ran = any("site" in r.get("stages", {}) for _, r in stage_reports)
+        lines.append("no findings; site content freshness and deploy layout unverified" if site_ran else "no findings")
     return "\n".join(lines)
 
 

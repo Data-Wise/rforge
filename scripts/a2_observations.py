@@ -27,17 +27,25 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT))
 
 from a2_gate_record import produce as produce_gates  # noqa: E402
-from verify_a2_release import (SUPPORTED_SITE_URL, VerificationError, validate_full_gates, validate_package_triage,  # noqa: E402
+from verify_a2_release import (REVIEWED_LIVE_SITES, SUPPORTED_SITE_URL, limit_run_is_unsupported_layout, site_run_is_sound, VerificationError, validate_full_gates, validate_package_triage,  # noqa: E402
                                validate_requirements, validate_review)
 
+# Identity (name, URL, commit) of every real site comes from the verifier's one table, REVIEWED_LIVE_SITES, so what this
+# producer audits and what the verifier accepts cannot drift; only the clone URL is kept here.
+def _site(name: str, repo: str) -> dict:
+    return {"name": name, "repo": repo, "url": REVIEWED_LIVE_SITES[name]["url"], "commit": REVIEWED_LIVE_SITES[name]["commit"]}
+
+
 # A real deployed pkgdown site with a supported configuration (release mode, no template, one sitemap request).
-SUPPORTED_SITE = {"name": "cranlogs", "repo": "https://github.com/r-hub/cranlogs", "url": SUPPORTED_SITE_URL,
-                  "commit": "c02280c7b4c6d77ff5500f80e15118edad5d94dc"}
-# Real packages whose sites A2 marks unsupported (development mode, .qmd articles): recorded honestly as incomplete.
-LIMIT_SITES = (
-    {"name": "medfit", "repo": "https://github.com/Data-Wise/medfit", "url": "https://data-wise.github.io/medfit/"},
-    {"name": "probmed", "repo": "https://github.com/Data-Wise/probmed", "url": "https://data-wise.github.io/probmed/"},
-)
+SUPPORTED_SITE = _site("cranlogs", "https://github.com/r-hub/cranlogs")
+# Real packages audited at pinned commits (a floating HEAD could change which side of the supported line a site is on).
+# medfit and probmed (pkgdown `development.mode: auto`, `.qmd` articles) became supported in #111: the observation
+# FAILS unless both are audited complete with checked routes, HTTP requests, zero missing routes and only info
+# findings, so a route-mapping regression cannot hide behind a site that is still incomplete.
+PINNED_SUPPORTED_SITES = (_site("medfit", "https://github.com/Data-Wise/medfit"), _site("probmed", "https://github.com/Data-Wise/probmed"))
+# Separately, at least one real site must still be reported incomplete: glue's `template.package` (tidytemplate) is a
+# custom template mapping this audit refuses.
+LIMIT_SITES = (_site("glue", "https://github.com/tidyverse/glue"),)
 RENDERED_PAGES = {
     "guides/docs-audit": ("--site", "--run-examples", "unverified", "sandbox", "--fail-on error", "INCOMPLETE"),
     "tutorials/fix-a-docs-check-finding": ("--site", "--run-examples", "INCOMPLETE", "figure"),
@@ -120,8 +128,23 @@ def counting_audit(path: Path, url: str, ref: str) -> dict:
     return {"stage": (report.get("stages") or {}).get("site") or {}, "requests": counter["requests"]}
 
 
+def _severities(findings) -> list:
+    """The distinct `severity` values of a stage's findings, as they are: never stringified and never dropped.
+
+    A finding with no severity (or a non-dict finding) is recorded as `None`, so the shared predicate rejects it
+    instead of it becoming the string "None" or vanishing from the set.
+    """
+    seen: list = []
+    for finding in findings or []:
+        severity = finding.get("severity") if isinstance(finding, dict) else None
+        if not any(severity is other or (type(severity) is type(other) and severity == other) for other in seen):
+            seen.append(severity)
+    return seen
+
+
 def observe_live_smoke(workdir: Path, audit: Optional[Callable] = None, clone: Optional[Callable] = None,
-                       supported: dict = SUPPORTED_SITE, limits: tuple = LIMIT_SITES) -> tuple:
+                       supported: dict = SUPPORTED_SITE, limits: tuple = LIMIT_SITES,
+                       pinned_supported: tuple = PINNED_SUPPORTED_SITES) -> tuple:
     audit, clone = audit or counting_audit, clone or _clone
 
     def run(site: dict) -> dict:
@@ -135,14 +158,19 @@ def observe_live_smoke(workdir: Path, audit: Optional[Callable] = None, clone: O
         stage = result["stage"]
         return {"name": site["name"], "url": site["url"], "source_ref": sha, "requests": result["requests"],
                 "state": stage.get("state"), "checked": (stage.get("counts") or {}).get("checked", 0),
+                "missing": (stage.get("counts") or {}).get("missing"),
+                "finding_severities": _severities(stage.get("findings")),
+                "deploy_layout": stage.get("deploy_layout"),
                 "reasons": list(stage.get("reasons") or [])}
     primary = run(supported)
+    pinned = [run(site) for site in pinned_supported]
     runs = [run(site) for site in limits]
-    unsupported = [r for r in runs if r["state"] == "incomplete" and r["reasons"]]
+    unsupported = [r for r in runs if limit_run_is_unsupported_layout(r)]
     other = [r for r in runs if r not in unsupported]  # a real site that became supported is an improvement, not a failure
     facts = {"url": primary["url"], "source_ref": primary["source_ref"], "requests": primary["requests"], "checked": primary["checked"],
-             "supported_site": primary, "unsupported_real_runs": unsupported, "other_real_runs": other}
-    ok = primary["state"] == "complete" and primary["requests"] > 0 and primary["checked"] > 0 and bool(unsupported)
+             "supported_site": primary, "pinned_real_runs": pinned,
+             "unsupported_real_runs": unsupported, "other_real_runs": other}
+    ok = site_run_is_sound(primary) and bool(unsupported) and all(site_run_is_sound(r) for r in pinned)
     return facts, "passed" if ok else "failed"
 
 

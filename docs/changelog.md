@@ -7,6 +7,17 @@ The full changelog lives in the repository:
 
 ---
 
+## 2.23.0 — 2026-11-17
+
+`/rforge:docs:check --site` now audits Quarto (`.qmd`) articles and pkgdown
+`development.mode` sites (#111). `--site` must equal the source `url` plus the
+development prefix, and every site stage carries `content_freshness` and
+`deploy_layout` markers set to `unverified`: a complete stage means route presence
+only. Sites that were previously reported incomplete can now complete and fail
+`--fail-on`. No command-surface change (44 commands).
+
+---
+
 ## 2.22.2 — 2026-10-31
 
 The A2 release gate now requires `ubuntu-24.04` and `macos-15`, because GitHub
